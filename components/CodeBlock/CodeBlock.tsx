@@ -1,24 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import theme from 'prism-react-renderer/themes/vsDark';
-import SimpleBar from 'simplebar';
 import CopyButton from '../CopyButton/CopyButton';
 import styles from './CodeBlock.module.css';
+import code from './code';
 
-interface Props {
-  code: string;
-}
-
-const CodeBlock:React.FC<Props> = ({ code }) => {
-  const scrollableRef = useRef<HTMLDivElement>(null!);
+const CodeBlock = () => {
   const scriptRef = useRef<HTMLPreElement>(null!);
-  useEffect(() => {
-    if (scrollableRef.current) {
-      // eslint-disable-next-line no-new
-      new SimpleBar(scrollableRef.current);
-    }
-  }, []);
-
   const getText = () => {
     if (scriptRef.current) {
       navigator.clipboard.writeText(scriptRef.current.innerText);
@@ -28,11 +16,11 @@ const CodeBlock:React.FC<Props> = ({ code }) => {
   return (
     <div className={styles.wrap}>
       <div className={styles.fade_border} />
-      <Highlight {...defaultProps} theme={theme} code={code} language="sql">
+      <Highlight {...defaultProps} theme={theme} code={code} language="typescript">
         {({
           className, style, tokens, getLineProps, getTokenProps,
         }) => (
-          <div className={styles['pre-wrap']} ref={scrollableRef}>
+          <div className={styles['pre-wrap']}>
             <pre ref={scriptRef} className={`${className} ${styles.pre}`} style={style}>
               {tokens.map((line, i) => (
                 <div {...getLineProps({ line, key: i })}>

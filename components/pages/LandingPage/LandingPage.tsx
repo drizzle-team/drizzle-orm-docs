@@ -1,81 +1,129 @@
 import React from 'react';
 import styles from './LandingPage.module.css';
-import Example from '../../Example/Example';
 import mdxstyles from '../../../assets/styles/mdx-styles.module.css';
-import install from '../../../utils/install.json';
-import commands1 from '../../../utils/commands-1.json';
-import commands2 from '../../../utils/commands-2.json';
-import cliOption from '../../../utils/cli-option.json';
-import confFile from '../../../utils/conf-file.json';
-import introspect from '../../../utils/introspect.json';
-import generateSchema from '../../../utils/generate-schema.json';
-import updateStale from '../../../utils/updateStale.json';
-import updateStaleExample from '../../../utils/update-stale-example.json';
-import migrationCheck from '../../../utils/migration-check.json';
-import migrationCheckExample from '../../../utils/migration-check-example.json';
+import installation from '../../../utils/installation.json';
 import SmallTerminal from '../../SmallTerminal/SmallTerminal';
+import CodeBlock from '../../CodeBlock/CodeBlock';
 
 const LandingPage = () => (
   <div className={styles.wrap}>
     <div className={styles.header}>
-      <b>DrizzleKit</b>
-      {' '}
-      - is a CLI migrator tool for DrizzleORM. It is probably one and
-      only tool that lets you completely automatically
-      generate SQL migrations and covers ~95% of the common cases
-      like delitions and renames by prompting user input.
+      <p className={mdxstyles.p}>
+        <b>Drizzle ORM</b>
+        {' '}
+        is a TypeScript ORM for SQL databases designed with maximum type safety in mind.
+        It comes with a
+        {' '}
+        <a href="https://github.com/drizzle-team/drizzle-kit-mirror" className={mdxstyles.a}>drizzle-kit</a>
+        {' '}
+        CLI companion for automatic SQL migrations generation.
+        Drizzle ORM is meant to be a library, not a framework.
+        It stays as an opt-in solution all the time at any levels.
+      </p>
+      <p className={mdxstyles.p}>
+        The ORM main philosophy is &quot;If you know SQL, you know Drizzle ORM&quot;.
+        We follow the SQL-like syntax whenever possible,
+        are strongly typed ground top and fail at compile time, not in runtime.
+      </p>
+      <p className={mdxstyles.p}>
+        Drizzle ORM is being battle-tested on production projects by multiple teams 🚀
+        Give it a try and let us know if you have any questions or feedback on
+        {' '}
+        <a className={mdxstyles.a} href="https://discord.gg/yfjTbVXMW4">Discord</a>
+        .
+      </p>
     </div>
-    <h2 className={mdxstyles.h2}>How it works?</h2>
-    <Example />
-    <h2 className={mdxstyles.h2}>Installation & configuration</h2>
-    <SmallTerminal data={install} height="16px" />
-    <p className={mdxstyles.p}>Running with CLI options</p>
-    <SmallTerminal data={cliOption} height="16px" />
-    <p className={mdxstyles.p}>Or put your file to `drizzle.config.json` configuration file:</p>
-    <SmallTerminal data={confFile} height="64px" />
-    <h2 className={mdxstyles.h2}>List of commands</h2>
-    <p className={mdxstyles.p}>Generate SQL migrations based on current .ts schema\</p>
-    <SmallTerminal data={commands1} height="80px" />
+    <h2 className={mdxstyles.h2}>Feature list</h2>
+    <ul className={mdxstyles.ul}>
+      <li className={mdxstyles.li}>Full type safety</li>
+      <li className={mdxstyles.li}>
+        <a className={mdxstyles.a} href="https://github.com/drizzle-team/drizzle-kit-mirror">Smart automated migrations generation</a>
+      </li>
+      <li className={mdxstyles.li}>No ORM learning curve</li>
+      <li className={mdxstyles.li}>SQL-like syntax for table definitions and queries</li>
+      <li className={mdxstyles.li}>Best in class fully typed joins</li>
+      <li className={mdxstyles.li}>
+        Fully typed partial and non-partial selects of any complexity
+      </li>
+      <li className={mdxstyles.li}>
+        Auto-inferring of TS types for DB models for selections and insertions separately
+      </li>
+      <li className={mdxstyles.li}>Zero dependencies</li>
+    </ul>
+    <h2 className={mdxstyles.h2}>Supported databases</h2>
+    <table className={mdxstyles.table}>
+      <thead className={mdxstyles.thead}>
+        <tr className={mdxstyles.tr}>
+          <th className={mdxstyles.th} align="left">Database</th>
+          <th className={mdxstyles.th} align="center">Status</th>
+          <th className={mdxstyles.th} align="left"> </th>
+        </tr>
+      </thead>
+      <tbody className={mdxstyles.tbody}>
+        <tr className={mdxstyles.tr}>
+          <td className={mdxstyles.td} align="left">PostgreSQL</td>
+          <td className={mdxstyles.td} align="center">✅</td>
+          <td className={mdxstyles.td} align="left"><a className={mdxstyles.a} href="/drizzle-orm/src/pg-core/README.md">Docs</a></td>
+        </tr>
+        <tr className={mdxstyles.tr}>
+          <td className={mdxstyles.td} align="left">MySQL</td>
+          <td className={mdxstyles.td} align="center">✅</td>
+          <td className={mdxstyles.td} align="left"><a className={mdxstyles.a} href="/drizzle-orm/src/mysql-core/README.md">Docs</a></td>
+        </tr>
+        <tr className={mdxstyles.tr}>
+          <td className={mdxstyles.td} align="left">SQLite</td>
+          <td className={mdxstyles.td} align="center">✅</td>
+          <td className={mdxstyles.td} align="left"><a className={mdxstyles.a} href="/drizzle-orm/src/sqlite-core/README.md">Docs</a></td>
+        </tr>
+        <tr className={mdxstyles.tr}>
+          <td className={mdxstyles.td} align="left">DynamoDB</td>
+          <td className={mdxstyles.td} align="center">⏳</td>
+          <td className={mdxstyles.td} align="left" />
+        </tr>
+        <tr className={mdxstyles.tr}>
+          <td className={mdxstyles.td} align="left">MS SQL</td>
+          <td className={mdxstyles.td} align="center">⏳</td>
+          <td className={mdxstyles.td} align="left" />
+        </tr>
+        <tr className={mdxstyles.tr}>
+          <td className={mdxstyles.td} align="left">CockroachDB</td>
+          <td className={mdxstyles.td} align="center">⏳</td>
+          <td className={mdxstyles.td} align="left" />
+        </tr>
+      </tbody>
+    </table>
+    <h2 className={mdxstyles.h2}>Installation</h2>
+    <SmallTerminal data={installation} height="32px" />
+    <h2 className={mdxstyles.h2}>Feature showcase (PostgreSQL)</h2>
+    <blockquote className={mdxstyles.blockquote}>
+      <p className={mdxstyles.p}>
+        <strong>Note</strong>
+        : don&apos;t forget to install
+        {' '}
+        <code className={mdxstyles.code}>pg</code>
+        {' '}
+        and
+        {' '}
+        <code className={mdxstyles.code}>@types/pg</code>
+        {' '}
+        packages for this example to work.
+      </p>
+    </blockquote>
+    <CodeBlock />
     <p className={mdxstyles.p}>
-      <code className={mdxstyles.code}>--config</code>
-      {' '}
-      [optional defalut=drizzle.config.json] config file path
-      <br />
-      <code className={mdxstyles.code}>--schema</code>
-      {' '}
-      path to typescript schema file or folder with multiple schema files
-      <br />
-      <code className={mdxstyles.code}>--out</code>
-      {' '}
-      [optional default=drizzle/] migrations folder
+      <strong>See full docs for further reference:</strong>
     </p>
-    <SmallTerminal data={commands2} height="176px" />
-    <p className={mdxstyles.p}>Introspect existing database and generate typescript schema</p>
-    <SmallTerminal data={introspect} height="16px" />
-    <SmallTerminal data={generateSchema} height="48px" />
-    <p className={mdxstyles.p}>Update stale snapshots</p>
-    <SmallTerminal data={updateStale} height="80px" />
-    <p className={mdxstyles.p}>
-      <code className={mdxstyles.code}>--out</code>
-      {' '}
-      [optional] migrations folder
-      <br />
-      <code className={mdxstyles.code}>--config</code>
-      {' '}
-      [optional defalut=drizzle.config.json] config file path
-    </p>
-    <SmallTerminal data={updateStaleExample} height="64px" />
-    <p className={mdxstyles.p}>Migrations collisions check</p>
-    <SmallTerminal data={migrationCheck} height="80px" />
-    <p className={mdxstyles.p}>
-      <code className={mdxstyles.code}>--out</code>
-      {' '}
-      [optional] migration folder
-      <br />
-      <code className={mdxstyles.code}>--config</code>
-      [optional defalut=drizzle.config.json] config file path
-    </p>
-    <SmallTerminal data={migrationCheckExample} height="64px" />
+    <ul className={mdxstyles.ul}>
+      <li className={mdxstyles.li}>
+        <a className={mdxstyles.a} href="https://github.com/drizzle-team/drizzle-kit-mirror">PostgreSQL</a>
+      </li>
+      <li className={mdxstyles.li}>
+        <a className={mdxstyles.a} href="https://github.com/drizzle-team/drizzle-kit-mirror">MySQL</a>
+      </li>
+      <li className={mdxstyles.li}>
+        <a className={mdxstyles.a} href="https://github.com/drizzle-team/drizzle-kit-mirror">SQLite</a>
+      </li>
+    </ul>
   </div>
 );
 
