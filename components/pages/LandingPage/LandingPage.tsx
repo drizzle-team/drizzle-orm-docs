@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './LandingPage.module.css';
 import mdxstyles from '../../../assets/styles/mdx-styles.module.css';
-import installation from '../../../utils/installation.json';
+import installation from '../../../scripts/installation.json';
 import SmallTerminal from '../../SmallTerminal/SmallTerminal';
 import CodeBlock from '../../CodeBlock/CodeBlock';
 

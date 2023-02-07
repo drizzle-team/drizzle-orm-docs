@@ -1,3 +1,129 @@
-import LandingPage from '../components/pages/LandingPage/LandingPage';
+import installation from '../scripts/index/npm.json';
+import SmallTerminal from '../components/SmallTerminal/SmallTerminal';
 
-<LandingPage/>
+## Drizzle ORM
+
+**Drizzle ORM** is a TypeScript ORM for SQL databases designed with maximum type safety in mind. It comes with a [drizzle-kit](https://github.com/drizzle-team/drizzle-kit-mirror) CLI companion for automatic SQL migrations generation. Drizzle ORM is meant to be a library, not a framework. It stays as an opt-in solution all the time at any levels.
+
+The ORM main philosophy is "If you know SQL, you know Drizzle ORM". We follow the SQL-like syntax whenever possible, are strongly typed ground top and fail at compile time, not in runtime.
+
+Drizzle ORM is being battle-tested on production projects by multiple teams 🚀 Give it a try and let us know if you have any questions or feedback on [Discord](https://discord.gg/yfjTbVXMW4).
+
+## Feature list
+
+- Full type safety
+- [Smart automated migrations generation](https://github.com/drizzle-team/drizzle-kit-mirror)
+- No ORM learning curve
+- SQL-like syntax for table definitions and queries
+- Best in class fully typed joins
+- Fully typed partial and non-partial selects of any complexity
+- Auto-inferring of TS types for DB models for selections and insertions separately
+- Zero dependencies
+
+## Supported databases
+
+| Database    | Status | |
+|:------------|:-------:|:---|
+| PostgreSQL  | ✅ | [Docs](./drizzle-orm/src/pg-core/README.md)|
+| MySQL       | ✅      |[Docs](./drizzle-orm/src/mysql-core/README.md)|
+| SQLite      | ✅      |[Docs](./drizzle-orm/src/sqlite-core/README.md)|
+| DynamoDB    | ⏳      |            |
+| MS SQL      | ⏳      |            |
+| CockroachDB | ⏳      |            |
+
+## Installation
+
+<SmallTerminal data={installation} height="32px" />
+
+## Feature showcase (PostgreSQL)
+
+> **Note**: don't forget to install `pg` and `@types/pg` packages for this example to work.
+
+```typescript copy
+import { eq } from 'drizzle-orm/expressions';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { InferModel, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm/sql';
+import { Pool } from 'pg';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name').notNull(),
+  phone: varchar('phone', { length: 20 }).notNull(),
+  role: text<'user' | 'admin'>('role').default('user').notNull(),
+  cityId: integer('city_id').references(() => cities.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type User = InferModel<typeof users>;
+export type NewUser = InferModel<typeof users, 'insert'>;
+
+export const cities = pgTable('cities', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+export type City = InferModel<typeof cities>;
+export type NewCity = InferModel<typeof cities, 'insert'>;
+
+const pool = new Pool({
+  connectionString: 'postgres://user:password@host:port/db',
+});
+
+const db = drizzle(pool);
+
+// Insert
+const newUser: NewUser = {
+  fullName: 'John Doe',
+  phone: '+123456789',
+};
+const insertedUsers /* : User */ = await db.insert(users).values(newUser).returning();
+const insertedUser = insertedUsers[0]!;
+
+const newCity: NewCity = {
+  name: 'New York',
+};
+const insertedCities /* : City */ = await db.insert(cities).values(newCity).returning();
+const insertedCity = insertedCities[0]!;
+
+// Update
+const updateResult /* : { updated: Date }[] */ = await db.update(users)
+  .set({ cityId: insertedCity.id, updatedAt: new Date() })
+  .where(eq(users.id, insertedUser.id))
+  .returning({ updated: users.updatedAt });
+
+// Select
+const allUsers /* : User[] */ = await db.select(users);
+
+// Select custom fields
+const upperCaseNames /* : { id: number; name: string }[] */ = await db.select(users)
+  .fields({
+    id: users.id,
+    name: sql`upper(${users.fullName})`.as<string>(),
+  });
+
+// Joins
+// You wouldn't BELIEVE how SMART the result type is! 😱
+const allUsersWithCities = await db.select(users)
+  .fields({
+    id: users.id,
+    name: users.fullName,
+    city: {
+      id: cities.id,
+      name: cities.name,
+    },
+  })
+  .leftJoin(cities, eq(users.cityId, cities.id));
+
+// Delete
+const deletedNames /* : { name: string }[] */ = await db.delete(users)
+  .where(eq(users.id, insertedUser.id))
+  .returning({ name: users.fullName });
+```
+
+**See full docs for further reference:**
+
+- [PostgreSQL](./drizzle-orm/src/pg-core/README.md)
+- [MySQL](./drizzle-orm/src/mysql-core/README.md)
+- [SQLite](./drizzle-orm/src/sqlite-core/README.md)

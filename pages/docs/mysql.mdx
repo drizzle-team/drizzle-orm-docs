@@ -1,3 +1,9 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+import installationNpm from '../../scripts/mysql/npm.json';
+import installationPnpm from '../../scripts/mysql/pnpm.json';
+import installationYarn from '../../scripts/mysql/yarn.json';
+import SmallTerminal from '../../components/SmallTerminal/SmallTerminal';
+
 Drizzle ORM is a TypeScript ORM for SQL databases designed with maximum type safety in mind. It comes with a [drizzle-kit](https://github.com/drizzle-team/drizzle-kit-mirror) CLI companion for automatic SQL migrations generation. This is the documentation for Drizzle ORM version for PostgreSQL.
 
 | Driver | Support |
@@ -7,19 +13,17 @@ Drizzle ORM is a TypeScript ORM for SQL databases designed with maximum type saf
 
 ## Installation
 
-```bash
-# npm
-npm i drizzle-orm mysql2
-npm i -D drizzle-kit
-
-# yarn
-yarn add drizzle-orm mysql2
-yarn add -D drizzle-kit
-
-# pnpm
-pnpm add drizzle-orm mysql2
-pnpm add -D drizzle-kit
-```
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+    <SmallTerminal withoutMargin data={installationNpm} height="32px" />
+  </Tab>
+  <Tab>
+    <SmallTerminal withoutMargin data={installationPnpm} height="32px" />
+  </Tab>
+  <Tab>
+    <SmallTerminal withoutMargin data={installationYarn} height="32px" />
+  </Tab>
+</Tabs>
 
 ## SQL schema declaration
 
@@ -52,8 +56,7 @@ With `drizzle-orm` you declare SQL schema in TypeScript. You can have either one
 
 ## Quick start
 
-```typescript
-// schema.ts
+```typescript filename="schema.ts"
 export const users = mysqlTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
@@ -63,8 +66,7 @@ export const users = mysqlTable('users', {
 
 ### Connect using mysql2 Pool (recommended)
 
-```typescript
-// db.ts
+```typescript filename="db.ts"
 import { drizzle } from 'drizzle-orm/mysql2';
 
 import mysql from 'mysql2/promise';
@@ -84,8 +86,7 @@ const allUsers = await db.select(users);
 
 ### Connect using mysql2 Client
 
-```typescript
-// db.ts
+```typescript filename="db.ts"
 import { drizzle } from 'drizzle-orm/mysql2';
 
 import mysql from 'mysql2/promise';
@@ -105,8 +106,7 @@ const allUsers = await db.select(users);
 
 ### Connect using PlanetScale Serverless client
 
-```typescript
-// db.ts
+```typescript filename="db.ts"
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 
 import { connect } from '@planetscale/database';
@@ -128,8 +128,7 @@ const allUsers = await db.select(users);
 
 This is how you declare SQL schema in `schema.ts`. You can declare tables, indexes and constraints, foreign keys and enums. Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#migrations).
 
-```typescript
-// db.ts
+```typescript filename="db.ts"
 import {
   int,
   mysqlEnum,
@@ -157,8 +156,7 @@ export const cities = mysqlTable('cities', {
 
 ### Database and table entity types
 
-```typescript
-// db.ts
+```typescript filename="db.ts"
 import { InferModel, MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
 import mysql from 'mysql2/promise';
 import { drizzle } from 'drizzle-orm/mysql2';
@@ -203,8 +201,7 @@ export async function insertUser(user: NewUser): Promise<MySqlRawQueryResult> {
 
 ### Declaring indexes and foreign keys
 
-```typescript
-// db.ts
+```typescript filename="db.ts"
 import { foreignKey, index, int, mysqlTable, serial, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 export const countries = mysqlTable('countries', {

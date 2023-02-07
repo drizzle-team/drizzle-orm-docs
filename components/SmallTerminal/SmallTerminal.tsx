@@ -4,10 +4,11 @@ import TerminalObject, { Options } from '../../utils/trmnl/index';
 
 interface Props {
   data: any,
-  height?: string
+  height?: string,
+  withoutMargin?: boolean,
 }
 
-const SmallTerminal: React.FC<Props> = ({ data, height }) => {
+const SmallTerminal: React.FC<Props> = ({ data, height, withoutMargin }) => {
   let terminal1: TerminalObject;
 
   const terminalRef = useRef<HTMLDivElement>(null)!;
@@ -43,7 +44,7 @@ const SmallTerminal: React.FC<Props> = ({ data, height }) => {
   }, []);
 
   return (
-    <div style={{ marginTop: '1.5rem' }} ref={terminalRef} />
+    <div style={!withoutMargin ? { marginTop: '1.5rem' } : {}} ref={terminalRef} />
   );
 };
 
