@@ -57,7 +57,7 @@ In Drizzle ORM, you declare SQL schema with TypeScript. You can either have a si
 ```
 
 ## Quick start
-```typescript filename="schema.ts"
+```typescript filename="schema.ts" copy
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
@@ -67,7 +67,7 @@ export const users = pgTable('users', {
 
 ### Connect using node-postgres Pool (recommended)
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
@@ -93,7 +93,7 @@ const allUsers = await db.select(users);
 
 ### Connect using node-postgres Client
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
@@ -121,7 +121,7 @@ const allUsers = await db.select(users);
 
 ### Connect using aws data api client
 
-```typescript
+```typescript copy
 import { drizzle, migrate } from 'drizzle-orm/aws-data-api/pg';
 
 const rdsClient = new RDSDataClient({});
@@ -137,7 +137,7 @@ const db = drizzle(rdsClient, {
 
 This is how you declare SQL schema in `schema.ts`. You can declare tables, indexes and constraints, foreign keys and enums. Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#migrations).
 
-```typescript
+```typescript copy
 import { pgEnum, pgTable, serial, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 
 // declaring enum in database
@@ -162,7 +162,7 @@ export const cities = pgTable('cities', {
 
 ### Database and table entity types
 
-```typescript
+```typescript copy
 import { pgTable, InferModel, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 
@@ -190,7 +190,7 @@ export async function insertUser(user: NewUser): Promise<User> {
 
 ### Declaring indexes and foreign keys
 
-```typescript
+```typescript copy
 import { foreignKey, index, uniqueIndex, integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
 
 export const countries = pgTable('countries', {
@@ -302,7 +302,7 @@ But if you will specify any custom schema you want, then drizzle will generate -
 
 ### Usage example
 
-```typescript
+```typescript copy
 // Table in default schema
 const publicUsersTable = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -331,7 +331,7 @@ const usersTable = mySchema('users', {
 
 Querying, sorting and filtering. We also support partial select.
 
-```typescript
+```typescript copy
 ...
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/node-postgres';;
@@ -414,7 +414,7 @@ or(expressions: SQL[])
 
 ### Insert
 
-```typescript
+```typescript copy
 import { pgTable, serial, text, timestamp, InferModel } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/node-postgres';;
 
@@ -469,7 +469,7 @@ const insertedUsersIds: { insertedId: number }[] = await db.insert(users)
 
 ### Upsert (Insert with on conflict statement)
 
-```typescript
+```typescript copy
 await db.insert(users)
   .values({ id: 1, name: 'Dan' })
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
@@ -493,7 +493,7 @@ await db.insert(users)
 
 ### Update and Delete
 
-```typescript
+```typescript copy
 await db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(users.name, 'Dan'));
@@ -528,7 +528,7 @@ Last but not least. Probably the most powerful feature in the library🚀
 
 #### Many-to-one
 
-```typescript
+```typescript copy
 const cities = pgTable('cities', {
   id: serial('id').primaryKey(),
   name: text('name'),
@@ -546,7 +546,7 @@ const result = db.select(cities)
 
 #### Many-to-many
 
-```typescript
+```typescript copy
 const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('name'),
@@ -571,7 +571,7 @@ const result = await db.select(usersToChatGroups)
 
 #### Join aliases and self-joins
 
-```typescript
+```typescript copy
 import { ..., alias } from 'drizzle-orm/pg-core';
 
 export const files = pgTable('folders', {
@@ -589,7 +589,7 @@ const result = await db.select(files)
 
 #### Join using partial select
 
-```typescript
+```typescript copy
 // Select user ID and city ID and name
 const result1 = await db.select(cities).fields({
   userId: users.id,
@@ -609,7 +609,7 @@ const result2 = await db.select(cities).fields({
 
 ## Prepared statements
 
-```typescript
+```typescript copy
 const query = db.select(users)
   .where(eq(users.name, 'Dan'))
   .prepare();
@@ -619,7 +619,7 @@ const result = await query.execute();
 
 ### Prepared statements with parameters
 
-```typescript
+```typescript copy
 import { placeholder } from 'drizzle-orm/pg-core';
 
 const query = db.select(users)
@@ -633,7 +633,7 @@ const result = await query.execute({ name: 'Dan' });
 
 If you have some complex queries to execute and drizzle-orm can't handle them yet, you can use the `db.execute` method to execute raw queries.
 
-```typescript
+```typescript copy
 // it will automatically run a parametrized query!
 const res: QueryResult<{ id: number; name: string }> = await db.execute<
   { id: number; name: string }
@@ -650,7 +650,7 @@ Check out the [docs for DrizzleKit](https://drizzle-kit-doc.pages.dev)
 
 For schema file:
 
-```typescript
+```typescript copy
 import { index, integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -669,7 +669,7 @@ export const authOtps = pgTable('auth_otp', {
 
 It will generate:
 
-```sql
+```sql copy
 CREATE TABLE IF NOT EXISTS auth_otp (
   'id' SERIAL PRIMARY KEY,
   'phone' character varying(256),
@@ -692,7 +692,7 @@ CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
 
 And you can run migrations manually or using our embedded migrations module
 
-```typescript
+```typescript copy
 import { drizzle } from 'drizzle-orm/node-postgres';;
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';

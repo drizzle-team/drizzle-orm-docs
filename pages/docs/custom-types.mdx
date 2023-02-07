@@ -12,7 +12,7 @@ Best way to see, how customType definition is working - is to check how existing
 
 #### **Serial**
 
-```typescript
+```typescript copy
 const customSerial = customType<{ data: number; notNull: true; default: true }>(
   {
     dataType() {
@@ -24,7 +24,7 @@ const customSerial = customType<{ data: number; notNull: true; default: true }>(
 
 #### **Text**
 
-```typescript
+```typescript copy
 const customText = customType<{ data: string }>({
   dataType() {
     return 'text';
@@ -34,7 +34,7 @@ const customText = customType<{ data: string }>({
 
 #### **Boolean**
 
-```typescript
+```typescript copy
 const customBoolean = customType<{ data: boolean }>({
   dataType() {
     return 'boolean';
@@ -44,7 +44,7 @@ const customBoolean = customType<{ data: boolean }>({
 
 #### **Jsonb**
 
-```typescript
+```typescript copy
 const customJsonb = <TData>(name: string) =>
   customType<{ data: TData; driverData: string }>({
     dataType() {
@@ -58,7 +58,7 @@ const customJsonb = <TData>(name: string) =>
 
 #### **Timestamp**
 
-```typescript
+```typescript copy
 const customTimestamp = customType<
   {
     data: Date;
@@ -82,7 +82,7 @@ const customTimestamp = customType<
 
 #### Usage for all types will be same as defined functions in Drizzle ORM
 
-```typescript
+```typescript copy
 const usersTable = pgTable('users', {
   id: customSerial('id').primaryKey(),
   name: customText('name').notNull(),
@@ -99,7 +99,7 @@ const usersTable = pgTable('users', {
 
 #### **Serial**
 
-```typescript
+```typescript copy
 const customSerial = customType<{ data: number; notNull: true; default: true }>(
   {
     dataType() {
@@ -111,7 +111,7 @@ const customSerial = customType<{ data: number; notNull: true; default: true }>(
 
 #### **Text**
 
-```typescript
+```typescript copy
 const customText = customType<{ data: string }>({
   dataType() {
     return 'text';
@@ -121,7 +121,7 @@ const customText = customType<{ data: string }>({
 
 #### **Boolean**
 
-```typescript
+```typescript copy
 const customBoolean = customType<{ data: boolean }>({
   dataType() {
     return 'boolean';
@@ -137,7 +137,7 @@ const customBoolean = customType<{ data: boolean }>({
 
 #### **Json**
 
-```typescript
+```typescript copy
 const customJson = <TData>(name: string) =>
   customType<{ data: TData; driverData: string }>({
     dataType() {
@@ -151,7 +151,7 @@ const customJson = <TData>(name: string) =>
 
 #### **Timestamp**
 
-```typescript
+```typescript copy
 const customTimestamp = customType<
   { data: Date; driverData: string; config: { fsp: number } }
 >({
@@ -169,7 +169,7 @@ const customTimestamp = customType<
 
 #### Usage for all types will be same as defined functions in Drizzle ORM
 
-```typescript
+```typescript copy
 const usersTable = mysqlTable('userstest', {
   id: customSerial('id').primaryKey(),
   name: customText('name').notNull(),

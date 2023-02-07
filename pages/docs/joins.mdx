@@ -3,7 +3,7 @@
 As with other parts of Drizzle ORM, the joins syntax is a balance between the SQL-likeness and type safety.
 Here's an example of how a common `1-to-many` relationship can be modelled.
 
-```typescript
+```typescript copy
 const users = pgTable('users', {
   id: serial('id').primaryKey(),
   firstName: text('first_name').notNull(),
@@ -21,7 +21,7 @@ Now, let's select all cities with all users that live in that city.
 
 This is how you'd write it in raw SQL:
 
-```sql
+```sql copy
 select
   cities.id as city_id,
   cities.name as city_name,
@@ -34,7 +34,7 @@ left join users on users.city_id = cities.id
 
 And here's how to do the same with Drizzle ORM:
 
-```typescript
+```typescript copy
 const rows = await db.select(cities)
   .fields({
     cityId: cities.id,
@@ -48,7 +48,7 @@ const rows = await db.select(cities)
 
 `rows` will have the following type:
 
-```typescript
+```typescript copy
 {
   cityId: number;
   cityName: string;
@@ -64,7 +64,7 @@ to verify that the user was joined and all of its fields are available.
 
 **To achieve that, you can group the fields of a certain table in a nested object inside the `.fields()`:**
 
-```typescript
+```typescript copy
 const rows = await db.select(cities)
   .fields({
     cityId: cities.id,
@@ -80,7 +80,7 @@ const rows = await db.select(cities)
 
 In that case, the ORM will use dark TypeScript magic (as if it wasn't already) and figure out that you have a nested object where all the fields belong to the same table. So, the `rows` type will now look like this:
 
-```typescript
+```typescript copy
 {
   cityId: number;
   cityName: string;
@@ -99,7 +99,7 @@ This is much more convenient! Now, you can just do a single check for `row.user 
 Note that you can group any fields in a nested object however you like, but the single check optimization will only be applied to a certain nested object if all its fields belong to the same table.
 So, for example, you can group the city fields, too:
 
-```typescript
+```typescript copy
 .fields({
   city: {
     id: cities.id,
@@ -115,7 +115,7 @@ So, for example, you can group the city fields, too:
 
 And the result type will look like this:
 
-```typescript
+```typescript copy
 {
   city: {
     id: number;
@@ -133,13 +133,13 @@ And the result type will look like this:
 
 If you just need all the fields from all the tables you're selecting and joining, you can skip the `.fields()` method altogether:
 
-```typescript
+```typescript copy
 const rows = await db.select(cities).leftJoin(users, eq(users.cityId, cities.id));
 ```
 
 > **Note**: in this case, the DB table names will be used as the keys in the result object.
 
-```typescript
+```typescript copy
 {
   cities: {
     id: number;
@@ -158,7 +158,7 @@ const rows = await db.select(cities).leftJoin(users, eq(users.cityId, cities.id)
 
 There are cases where you'd want to select all the fields from one table, but pick fields from others. In that case, instead of listing all the table fields, you can just pass a table:
 
-```typescript
+```typescript copy
 .fields({
   cities, // shorthand for "cities: cities", the key can be anything
   user: {
@@ -167,7 +167,7 @@ There are cases where you'd want to select all the fields from one table, but pi
 })
 ```
 
-```typescript
+```typescript copy
 {
   cities: {
     id: number;
@@ -183,7 +183,7 @@ There are cases where you'd want to select all the fields from one table, but pi
 
 But what happens if you group columns from multiple tables in the same nested object? Nothing, really - they will still be all individually nullable, just grouped under the same object (as you might expect!):
 
-```typescript
+```typescript copy
 .fields({
   id: cities.id,
   cityAndUser: {
@@ -195,7 +195,7 @@ But what happens if you group columns from multiple tables in the same nested ob
 })
 ```
 
-```typescript
+```typescript copy
 {
   id: number;
   cityAndUser: {
@@ -214,7 +214,7 @@ That's the neat part - you can do that however you'd like! No hand-holding here.
 
 For example, one of the ways to do that would be `Array.reduce()`:
 
-```typescript
+```typescript copy
 import { InferModel } from 'drizzle-orm';
 
 type User = InferModel<typeof users>;

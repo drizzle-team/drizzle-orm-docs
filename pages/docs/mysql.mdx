@@ -56,7 +56,7 @@ With `drizzle-orm` you declare SQL schema in TypeScript. You can have either one
 
 ## Quick start
 
-```typescript filename="schema.ts"
+```typescript filename="schema.ts" copy
 export const users = mysqlTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
@@ -66,7 +66,7 @@ export const users = mysqlTable('users', {
 
 ### Connect using mysql2 Pool (recommended)
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { drizzle } from 'drizzle-orm/mysql2';
 
 import mysql from 'mysql2/promise';
@@ -86,7 +86,7 @@ const allUsers = await db.select(users);
 
 ### Connect using mysql2 Client
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { drizzle } from 'drizzle-orm/mysql2';
 
 import mysql from 'mysql2/promise';
@@ -106,7 +106,7 @@ const allUsers = await db.select(users);
 
 ### Connect using PlanetScale Serverless client
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 
 import { connect } from '@planetscale/database';
@@ -128,7 +128,7 @@ const allUsers = await db.select(users);
 
 This is how you declare SQL schema in `schema.ts`. You can declare tables, indexes and constraints, foreign keys and enums. Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#migrations).
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import {
   int,
   mysqlEnum,
@@ -156,7 +156,7 @@ export const cities = mysqlTable('cities', {
 
 ### Database and table entity types
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { InferModel, MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
 import mysql from 'mysql2/promise';
 import { drizzle } from 'drizzle-orm/mysql2';
@@ -201,7 +201,7 @@ export async function insertUser(user: NewUser): Promise<MySqlRawQueryResult> {
 
 ### Declaring indexes and foreign keys
 
-```typescript filename="db.ts"
+```typescript filename="db.ts" copy
 import { foreignKey, index, int, mysqlTable, serial, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 export const countries = mysqlTable('countries', {
@@ -294,7 +294,7 @@ json<string[]>('name');
 
 Usage example
 
-```typescript
+```typescript copy
 // Table in default schema
 const publicUsersTable = mysqlTable('users', {
   id: serial('id').primaryKey(),
@@ -322,7 +322,7 @@ const mySchemaUsersTable = mySchema('users', {
 
 Querying, sorting and filtering. We also support partial select.
 
-```typescript
+```typescript copy
 ...
 import { mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/mysql2';
@@ -405,7 +405,7 @@ or(expressions: SQL[])
 
 ### Insert
 
-```typescript
+```typescript copy
 import { mysqlTable, serial, text, timestamp, InferModel } from 'drizzle-orm/mysql-core';
 import { drizzle } from 'drizzle-orm/mysql2';
 
@@ -454,7 +454,7 @@ await db.insert(users).values(...newUsers);
 
 ### Update and Delete
 
-```typescript
+```typescript copy
 await db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(users.name, 'Dan'));
@@ -471,7 +471,7 @@ Last but not least. Probably the most powerful feature in the library🚀
 
 #### Many-to-one
 
-```typescript
+```typescript copy
 const cities = mysqlTable('cities', {
   id: serial('id').primaryKey(),
   name: text('name'),
@@ -489,7 +489,7 @@ const result = db.select(cities)
 
 #### Many-to-many
 
-```typescript
+```typescript copy
 const users = mysqlTable('users', {
   id: serial('id').primaryKey(),
   name: text('name'),
@@ -514,7 +514,7 @@ const result = await db.select(usersToChatGroups)
 
 #### Join aliases and self-joins
 
-```typescript
+```typescript copy
 import { ..., alias } from 'drizzle-orm/mysql-core';
 
 export const files = mysqlTable('folders', {
@@ -532,7 +532,7 @@ const result = await db.select(files)
 
 #### Join using partial select
 
-```typescript
+```typescript copy
 // Select user ID and city ID and name
 const result1 = await db.select(cities).fields({
   userId: users.id,
@@ -553,7 +553,7 @@ const result2 = await db.select(cities).fields({
 
 ## Prepared statements
 
-```typescript
+```typescript copy
 const query = db.select(users)
   .where(eq(users.name, 'Dan'))
   .prepare();
@@ -563,7 +563,7 @@ const result = await query.execute();
 
 ### Prepared statements with parameters
 
-```typescript
+```typescript copy
 import { placeholder } from 'drizzle-orm/mysql-core';
 
 const query = db.select(users)
@@ -577,7 +577,7 @@ const result = await query.execute({ name: 'Dan' });
 
 If you have some complex queries to execute and drizzle-orm can't handle them yet, you can use the `db.execute` method to execute raw queries.
 
-```typescript
+```typescript copy
 // it will automatically run a parametrized query!
 const res: MySqlQueryResult<{ id: number; name: string }> = await db.execute<
   { id: number; name: string }
@@ -594,7 +594,7 @@ Check out the [docs for DrizzleKit](https://drizzle-kit-doc.pages.dev)
 
 For schema file:
 
-```typescript
+```typescript copy
 import { index, integer, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
@@ -613,7 +613,7 @@ export const authOtps = mysqlTable('auth_otp', {
 
 It will generate:
 
-```sql
+```sql copy
 CREATE TABLE `users` (
  `id` int PRIMARY KEY,
  `full_name` varchar(256)
@@ -633,7 +633,7 @@ CREATE INDEX name_idx ON users (`full_name`);
 
 And you can run migrations manually or using our embedded migrations module
 
-```typescript
+```typescript copy
 import { drizzle } from 'drizzle-orm/mysql2';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import mysql from 'mysql2/promise';

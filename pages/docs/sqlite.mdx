@@ -20,7 +20,7 @@ Here you can find extensive docs for SQLite module.
 
 ## 🚀 Quick start
 
-```typescript
+```typescript copy
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
@@ -38,7 +38,7 @@ const users = db.select(users).all();
 
 ## Connecting to databases
 
-```typescript
+```typescript copy
 // better-sqlite3 or fly.io LiteFS
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
@@ -107,7 +107,7 @@ With `drizzle-orm` you declare SQL schema in TypeScript. You can have either one
 
 This is how you declare SQL schema in `schema.ts`. You can declare tables, indexes and constraints, foreign keys and enums. Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#-migrations).
 
-```typescript
+```typescript copy
 import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const countries = sqliteTable('countries', {
@@ -127,7 +127,7 @@ export const cities = sqliteTable('cities', {
 
 Database and table entity types
 
-```typescript
+```typescript copy
 import { InferModel, text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 
 const users = sqliteTable('users', {
@@ -172,7 +172,7 @@ column.default(...)
 
 Declaring indexes, foreign keys and composite primary keys
 
-```typescript
+```typescript copy
 import { sqliteTable, foreignKey, primaryKey, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const countries = sqliteTable('countries', {
@@ -221,7 +221,7 @@ index('name_idx').on(table.column).where(sql``)
 
 Querying, sorting and filtering. We also support partial select.
 
-```typescript
+```typescript copy
 ...
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { and, asc, desc, eq, or } from 'drizzle-orm/expressions'
@@ -304,7 +304,7 @@ or(expressions: Expr[])
 
 Inserting
 
-```typescript
+```typescript copy
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
@@ -335,7 +335,7 @@ const insertedUser = db.insert(users).values({ name: 'Dan', createdAt: +new Date
 
 Update and Delete
 
-```typescript
+```typescript copy
 db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(usersTable.name, 'Dan'))
@@ -350,7 +350,7 @@ db.delete(users)
 
 They work just like they do in SQL, but you have them fully type safe
 
-```typescript
+```typescript copy
 const orders = sqliteTable('order', {
   id: integer('id').primaryKey(),
   orderDate: integer('order_date', { mode: 'timestamp' }).notNull(),
@@ -400,7 +400,7 @@ Last but not least. Probably the most powerful feature in the library🚀
 
 ### Many-to-one
 
-```typescript
+```typescript copy
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
@@ -422,7 +422,7 @@ const result = db.select(cities).leftJoin(users, eq(cities2.id, users2.cityId)).
 
 ### Many-to-many
 
-```typescript
+```typescript copy
 const users = sqliteTable('users', {
   id: integer('id').primaryKey(),
   name: text('name'),
@@ -451,7 +451,7 @@ db.select(usersToChatGroups)
 
 ### Join aliases and self-joins
 
-```typescript
+```typescript copy
 import { ..., alias } from 'drizzle-orm/sqlite-core';
 
 export const files = sqliteTable('folders', {
@@ -474,7 +474,7 @@ db.select(files)
 
 Join Cities with Users getting only needed fields form request
 
-```typescript
+```typescript copy
 db.select(cities).fields({
   id: cities.id,
   cityName: cities.name
@@ -487,7 +487,7 @@ db.select(cities).fields({
 
 With Drizzle ORM you can go [**faster than better-sqlite3 driver**](https://twitter.com/_alexblokh/status/1593593415907909634) by utilizing our `prepared statements` and `placeholder` APIs
 
-```typescript
+```typescript copy
 import { placeholder } from 'drizzle-orm/sql';
 
 const db = drizzle(...);
@@ -516,7 +516,7 @@ Check out the [docs for DrizzleKit](https://drizzle-kit-doc.pages.dev)
 
 For schema file:
 
-```typescript
+```typescript copy
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const users = sqliteTable('users', {
@@ -535,7 +535,7 @@ export const authOtps = sqliteTable('auth_otp', {
 
 It will generate:
 
-```sql
+```sql copy
 CREATE TABLE IF NOT EXISTS auth_otp (
   'id' INTEGER PRIMARY KEY,
   'phone' TEXT,
@@ -558,7 +558,7 @@ CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
 
 And you can run migrations manually or using our embedded migrations module
 
-```typescript
+```typescript copy
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import Database from 'better-sqlite3';
@@ -574,7 +574,7 @@ migrate(db, { migrationsFolder: './drizzle' })
 
 ### Printing SQL query
 
-```typescript
+```typescript copy
 const query = db.select(users)
     .fields({ id: users.id, name: users.name })
     .groupBy(users.id)
@@ -588,7 +588,7 @@ const query = db.select(users)
 
 ### Raw query usage
 
-```typescript
+```typescript copy
 // it will automatically run a parametrized query!
 const res: QueryResult<any> = await db.run(sql`SELECT * FROM users WHERE user.id = ${userId}`)
 ```

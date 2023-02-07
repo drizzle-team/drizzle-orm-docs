@@ -28,7 +28,7 @@ Each type creation should use 2 classes:
 
 - `TData` - extends return type for column. Current example will infer string type for current datatype used in schema definition
 
-```typescript
+```typescript copy
 export class PgTextBuilder<TData extends string = string>
 	extends PgColumnBuilder<
 		ColumnBuilderConfig<{ data: TData; driverParam: string }>
@@ -60,7 +60,7 @@ Column class has set of types/functions, that could be overridden to get needed 
 
 #### Usage example for jsonb type
 
-```typescript
+```typescript copy
 override mapToDriverValue(value: TData): string {
 	return JSON.stringify(value);
 }
@@ -70,7 +70,7 @@ override mapToDriverValue(value: TData): string {
 
 #### Usage example for int type
 
-```typescript
+```typescript copy
 override mapFromDriverValue(value: number | string): number {
 	if (typeof value === 'string') {
 		return parseInt(value);
@@ -81,7 +81,7 @@ override mapFromDriverValue(value: number | string): number {
 
 #### Column class example
 
-```typescript
+```typescript copy
 export class PgText<TTableName extends string, TData extends string>
 	extends PgColumn<ColumnConfig<{ tableName: TTableName; data: TData; driverParam: string }>> {
 	protected override $pgColumnBrand!: 'PgText';
@@ -114,7 +114,7 @@ export class PgText<TTableName extends string, TData extends string>
 
 For more postgres data type examples you could check [here](https://github.com/drizzle-team/drizzle-orm/tree/main/drizzle-orm/src/pg-core/columns)
 
-```typescript
+```typescript copy
 import { ColumnConfig } from 'drizzle-orm';
 import { ColumnBuilderConfig } from 'drizzle-orm/column-builder';
 import { AnyPgTable } from '~/table';
@@ -179,7 +179,7 @@ export function text<T extends string = string>(
 
 ### CITEXT data type example
 
-```typescript
+```typescript copy
 export class PgCITextBuilder<TData extends string = string> extends PgColumnBuilder<
 	ColumnBuilderConfig<{ data: TData; driverParam: string }>
 > {
@@ -211,7 +211,7 @@ export function citext<T extends string = string>(name: string): PgCITextBuilder
 
 #### Usage example
 
-```typescript
+```typescript copy
 const table = pgTable('table', {
 	id: integer('id').primaryKey(),
 	ciname: citext('ciname')
