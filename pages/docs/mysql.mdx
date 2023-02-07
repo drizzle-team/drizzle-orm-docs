@@ -243,7 +243,7 @@ index('name_idx')
 
 ## Column types
 
-The list of all column types. You can also create custom types - [see here](https://github.com/drizzle-team/drizzle-orm/blob/main/docs/custom-types.md).
+The list of all column types. You can also create custom types - [see here](./custom-types).
 
 ```typescript
 mysqlEnum('popularity', ['unknown', 'known', 'popular'])
@@ -288,7 +288,7 @@ json<string[]>('name');
 > **Warning**
 > If you have tables with same names in different schemas, Drizzle will set result types to `never[]` and return an error from the database.
 >
-> In this case you may use [alias syntax](/drizzle-orm/src/mysql-core/README.md#join-aliases-and-self-joins).
+> In this case you may use [alias syntax](#join-aliases-and-self-joins).
 
 ---
 
@@ -467,7 +467,7 @@ await db.delete(users)
 
 Last but not least. Probably the most powerful feature in the library🚀
 
-> **Note**: for in-depth partial select joins documentation, refer to [this page](/docs/joins.md).
+> **Note**: for in-depth partial select joins documentation, refer to [this page](./joins).
 
 #### Many-to-one
 
@@ -590,7 +590,7 @@ const res: MySqlQueryResult<{ id: number; name: string }> = await db.execute<
 
 [DrizzleKit](https://www.npmjs.com/package/drizzle-kit) - is a CLI migrator tool for DrizzleORM. It is probably one and only tool that lets you completely automatically generate SQL migrations and covers ~95% of the common cases like deletions and renames by prompting user input.
 
-Check out the [docs for DrizzleKit](https://github.com/drizzle-team/drizzle-kit-mirror)
+Check out the [docs for DrizzleKit](https://drizzle-kit-doc.pages.dev)
 
 For schema file:
 

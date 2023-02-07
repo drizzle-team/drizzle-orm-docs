@@ -9,7 +9,7 @@ Drizzle ORM is a TypeScript ORM for SQL databases designed with maximum type saf
 | Driver | Support | | Driver version |
 | :- | :-: | :-: | :-: |
 | [node-postgres](https://github.com/brianc/node-postgres) | ✅ | | <img alt='driver version' src='https://img.shields.io/npm/dependency-version/drizzle-orm/peer/pg'/> |
-| [postgres.js](https://github.com/porsager/postgres) | ✅ | [Docs](/drizzle-orm/src/postgres-js/README.md) | <img alt='driver version' src='https://img.shields.io/npm/dependency-version/drizzle-orm/peer/postgres'/> |
+| [postgres.js](https://github.com/porsager/postgres) | ✅ | [Docs](./postgresql/postgresjs) | <img alt='driver version' src='https://img.shields.io/npm/dependency-version/drizzle-orm/peer/postgres'/> |
 | [NeonDB Serverless](https://github.com/neondatabase/serverless) | ✅ | | <img alt='driver version' src='https://img.shields.io/npm/dependency-version/drizzle-orm/peer/@neondatabase/serverless'/> |
 | [AWS Data API](https://github.com/aws/aws-sdk-js-v3/blob/main/clients/client-rds-data/README.md) | ✅ | | <img alt='driver version' src='https://img.shields.io/npm/dependency-version/drizzle-orm/peer/@aws-sdk/client-rds-data'/>
 
@@ -241,7 +241,7 @@ index('name')
 
 ## Column types
 
-The list of all column types. You can also create custom types - [see here](https://github.com/drizzle-team/drizzle-orm/blob/main/docs/custom-types.md).
+The list of all column types. You can also create custom types - [see here](./custom-types).
 
 ```typescript
 export const popularityEnum = pgEnum('popularity', ['unknown', 'known', 'popular']); // declare enum type
@@ -298,7 +298,7 @@ But if you will specify any custom schema you want, then drizzle will generate -
 > **Warning**
 > If you will have tables with same names in different schemas then drizzle will respond with `never[]` error in result types and error from database
 >
-> In this case you may use [alias syntax](/drizzle-orm/src/pg-core/README.md#join-aliases-and-self-joins)
+> In this case you may use [alias syntax](#join-aliases-and-self-joins)
 
 ### Usage example
 
@@ -524,7 +524,7 @@ const deletedUserId: { deletedId: number }[] = await db.delete(users)
 
 Last but not least. Probably the most powerful feature in the library🚀
 
-> **Note**: for in-depth partial select joins documentation, refer to [this page](/docs/joins.md).
+> **Note**: for in-depth partial select joins documentation, refer to [this page](./joins).
 
 #### Many-to-one
 
@@ -646,7 +646,7 @@ const res: QueryResult<{ id: number; name: string }> = await db.execute<
 
 [DrizzleKit](https://www.npmjs.com/package/drizzle-kit) - is a CLI migrator tool for DrizzleORM. It is probably one and only tool that lets you completely automatically generate SQL migrations and covers ~95% of the common cases like deletions and renames by prompting user input.
 
-Check out the [docs for DrizzleKit](https://github.com/drizzle-team/drizzle-kit-mirror)
+Check out the [docs for DrizzleKit](https://drizzle-kit-doc.pages.dev)
 
 For schema file:
 
