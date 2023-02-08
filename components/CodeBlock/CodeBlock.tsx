@@ -1,7 +1,10 @@
 import React, { useRef } from 'react';
 import Highlight, { defaultProps } from 'prism-react-renderer';
+
 import theme from 'prism-react-renderer/themes/vsDark';
+
 import CopyButton from '../CopyButton/CopyButton';
+
 import styles from './CodeBlock.module.css';
 import code from './code';
 

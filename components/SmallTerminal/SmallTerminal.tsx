@@ -1,6 +1,8 @@
 import { useRef, useEffect } from 'react';
 
 import TerminalObject, { Options } from '../../utils/trmnl/index';
+import CopyButton from '../CopyButton/CopyButton';
+import styles from './SmallTerminal.module.css';
 
 interface Props {
   data: any,
@@ -9,7 +11,7 @@ interface Props {
 }
 
 const SmallTerminal: React.FC<Props> = ({ data, height, withoutMargin }) => {
-  let terminal1: TerminalObject;
+  let terminal: TerminalObject;
 
   const terminalRef = useRef<HTMLDivElement>(null)!;
 
@@ -31,20 +33,41 @@ const SmallTerminal: React.FC<Props> = ({ data, height, withoutMargin }) => {
 
   useEffect(() => {
     if (terminalRef.current) {
-      terminal1 = new TerminalObject(
+      terminal = new TerminalObject(
         terminalRef.current,
         data,
         schemaOptions,
       );
-      terminal1.render();
+      terminal.render();
     }
     return (() => {
-      terminal1.clearTimeout();
+      terminal.clearTimeout();
     });
   }, []);
 
+  const copy = () => {
+    const textValues = data.data;
+    const text = textValues.map((t: any) => {
+      let value = '';
+      if ('input' in t) {
+        value = t.input;
+      }
+      if ('output' in t) {
+        value = t.output;
+      }
+      if ('frames' in t) {
+        value = t.frames[t.frames.length - 1].value;
+      }
+      return value;
+    });
+    navigator.clipboard.writeText(text.join('\n'));
+  };
+
   return (
-    <div style={!withoutMargin ? { marginTop: '1.5rem' } : {}} ref={terminalRef} />
+    <div className={styles.wrap}>
+      <div style={!withoutMargin ? { marginTop: '1.5rem' } : {}} ref={terminalRef} />
+      <CopyButton onClick={copy} />
+    </div>
   );
 };
 
