@@ -28,6 +28,9 @@ const config: DocsThemeConfig = {
   navbar: {
     extraContent: <TwitterIcon />,
   },
+  nextThemes: {
+    defaultTheme: 'light',
+  },
 };
 
 export default config;
