@@ -1,0 +1,23 @@
+## ⚡️ Performance and prepared statements
+
+With Drizzle ORM you can go [**faster than better-sqlite3 driver**](https://twitter.com/_alexblokh/status/1593593415907909634) by utilizing our `prepared statements` and `placeholder` APIs
+
+```typescript copy
+import { placeholder } from 'drizzle-orm/sql';
+
+const db = drizzle(...);
+
+const q = db.select(customers).prepare();
+q.all() // SELECT * FROM customers
+
+const q = db.select(customers).where(eq(customers.id, placeholder('id'))).prepare()
+
+q.get({ id: 10 }) // SELECT * FROM customers WHERE id = 10
+q.get({ id: 12 }) // SELECT * FROM customers WHERE id = 12
+
+const q = db.select(customers)
+  .where(sql`lower(${customers.name}) like ${placeholder('name')}`)
+  .prepare();
+
+q.all({ name: '%an%' }) // SELECT * FROM customers WHERE name ilike '%an%'
+```

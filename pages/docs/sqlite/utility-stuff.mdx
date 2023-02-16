@@ -1,0 +1,22 @@
+## Utility stuff
+
+### Printing SQL query
+
+```typescript copy
+const query = db.select(users)
+    .fields({ id: users.id, name: users.name })
+    .groupBy(users.id)
+    .toSQL();
+// query:
+{
+  sql: 'select 'id', 'name' from 'users' group by 'users'.'id'',
+  params: [],
+}
+```
+
+### Raw query usage
+
+```typescript copy
+// it will automatically run a parametrized query!
+const res: QueryResult<any> = await db.run(sql`SELECT * FROM users WHERE user.id = ${userId}`)
+```

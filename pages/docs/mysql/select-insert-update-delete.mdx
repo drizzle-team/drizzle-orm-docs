@@ -1,0 +1,234 @@
+## Select, Insert, Update, Delete
+
+### Select
+
+Querying, sorting and filtering. We also support partial select.
+
+```typescript copy
+...
+import { mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+import { drizzle } from 'drizzle-orm/mysql2';
+import { and, asc, desc, eq, or } from 'drizzle-orm/expressions';
+
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('full_name'),
+});
+
+const db = drizzle(...);
+
+await db.select(users);
+await db.select(users).where(eq(users.id, 42));
+
+// you can combine filters with eq(...) or or(...)
+await db.select(users)
+  .where(and(eq(users.id, 42), eq(users.name, 'Dan')));
+
+await db.select(users)
+  .where(or(eq(users.id, 42), eq(users.id, 1)));
+
+// partial select
+const result = await db.select(users).fields({
+    mapped1: users.id,
+    mapped2: users.name,
+  });
+const { mapped1, mapped2 } = result[0];
+
+// limit, offset & order by
+await db.select(users).limit(10).offset(10);
+await db.select(users).orderBy(asc(users.name));
+await db.select(users).orderBy(desc(users.name));
+// you can pass multiple order args
+await db.select(users).orderBy(asc(users.name), desc(users.name));
+
+// list of all filter operators
+eq(column, value)
+eq(column1, column2)
+ne(column, value)
+ne(column1, column2)
+
+notEq(column, value)
+less(column, value)
+lessEq(column, value)
+
+gt(column, value)
+gt(column1, column2)
+gte(column, value)
+gte(column1, column2)
+lt(column, value)
+lt(column1, column2)
+lte(column, value)
+lte(column1, column2)
+
+isNull(column)
+isNotNull(column)
+
+inArray(column, values[])
+inArray(column, sqlSubquery)
+notInArray(column, values[])
+notInArray(column, sqlSubquery)
+
+exists(sqlSubquery)
+notExists(sqlSubquery)
+
+between(column, min, max)
+notBetween(column, min, max)
+
+like(column, value)
+like(column, value)
+ilike(column, value)
+notIlike(column, value)
+
+not(sqlExpression)
+
+and(expressions: SQL[])
+or(expressions: SQL[])
+```
+
+### Insert
+
+```typescript copy
+import { mysqlTable, serial, text, timestamp, InferModel } from 'drizzle-orm/mysql-core';
+import { drizzle } from 'drizzle-orm/mysql2';
+
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+  createdAt: timestamp('created_at'),
+});
+
+type NewUser = InferModel<typeof users>;
+
+const db = drizzle(...);
+
+await db.insert(users)
+  .values({
+    name: 'Andrew',
+    createdAt: new Date(),
+  });
+
+// accepts vararg of items
+await db.insert(users)
+  .values(
+    {
+      name: 'Andrew',
+      createdAt: new Date(),
+    },
+    {
+      name: 'Dan',
+      createdAt: new Date(),
+    },
+  );
+
+const newUsers: NewUser[] = [
+  {
+      name: 'Andrew',
+      createdAt: new Date(),
+  },
+  {
+    name: 'Dan',
+    createdAt: new Date(),
+  },
+];
+
+await db.insert(users).values(...newUsers);
+```
+
+### Update and Delete
+
+```typescript copy
+await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'));
+
+await db.delete(users)
+  .where(eq(users.name, 'Dan'));
+```
+
+### Joins
+
+Last but not least. Probably the most powerful feature in the library🚀
+
+> **Note**: for in-depth partial select joins documentation, refer to [this page](./joins).
+
+#### Many-to-one
+
+```typescript copy
+const cities = mysqlTable('cities', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+});
+
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+  cityId: int('city_id').references(() => cities.id),
+});
+
+const result = db.select(cities)
+  .leftJoin(users, eq(cities2.id, users2.cityId));
+```
+
+#### Many-to-many
+
+```typescript copy
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+});
+
+const chatGroups = mysqlTable('chat_groups', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+});
+
+const usersToChatGroups = mysqlTable('usersToChatGroups', {
+  userId: integer('user_id').notNull().references(() => users.id),
+  groupId: integer('group_id').notNull().references(() => chatGroups.id),
+});
+
+// querying user group with id 1 and all the participants(users)
+const result = await db.select(usersToChatGroups)
+  .leftJoin(users, eq(usersToChatGroups.userId, users.id))
+  .leftJoin(chatGroups, eq(usersToChatGroups.groupId, chatGroups.id))
+  .where(eq(chatGroups.id, 1));
+```
+
+#### Join aliases and self-joins
+
+```typescript copy
+import { ..., alias } from 'drizzle-orm/mysql-core';
+
+export const files = mysqlTable('folders', {
+  name: text('name').notNull(),
+  parent: text('parent_folder')
+})
+
+const nestedFiles = alias(files, 'nested_files');
+
+// will return files and folders and nested files for each folder at root dir
+const result = await db.select(files)
+  .leftJoin(nestedFiles, eq(files.name, nestedFiles.name))
+  .where(eq(files.parent, '/'));
+```
+
+#### Join using partial select
+
+```typescript copy
+// Select user ID and city ID and name
+const result1 = await db.select(cities).fields({
+  userId: users.id,
+  cityId: cities.id,
+  cityName: cities.name,
+}).leftJoin(users, eq(users.cityId, cities.id));
+
+// Select all fields from users and only id and name from cities
+const result2 = await db.select(cities).fields({
+  // Supports any level of nesting!
+  user: users,
+  city: {
+    id: cities.id,
+    name: cities.name,
+  },
+}).leftJoin(users, eq(users.cityId, cities.id));
+```

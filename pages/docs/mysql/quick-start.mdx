@@ -1,0 +1,69 @@
+## Quick start
+
+```typescript filename="schema.ts" copy
+export const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name'),
+  phone: varchar('phone', { length: 256 }),
+});
+```
+
+### Connect using mysql2 Pool (recommended)
+
+```typescript filename="db.ts" copy
+import { drizzle } from 'drizzle-orm/mysql2';
+
+import mysql from 'mysql2/promise';
+import { users } from './schema';
+
+// create the connection
+const poolConnection = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  database: 'test',
+});
+
+const db = drizzle(poolConnection);
+
+const allUsers = await db.select(users);
+```
+
+### Connect using mysql2 Client
+
+```typescript filename="db.ts" copy
+import { drizzle } from 'drizzle-orm/mysql2';
+
+import mysql from 'mysql2/promise';
+import { users } from './schema';
+
+// create the connection
+const connection = await mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  database: 'test',
+});
+
+const db = drizzle(connection);
+
+const allUsers = await db.select(users);
+```
+
+### Connect using PlanetScale Serverless client
+
+```typescript filename="db.ts" copy
+import { drizzle } from 'drizzle-orm/planetscale-serverless';
+
+import { connect } from '@planetscale/database';
+import { users } from './schema';
+
+// create the connection
+const connection = connect({
+  host: process.env['DATABASE_HOST'],
+  username: process.env['DATABASE_USERNAME'],
+  password: process.env['DATABASE_PASSWORD'],
+});
+
+const db = drizzle(connection);
+
+const allUsers = await db.select(users);
+```

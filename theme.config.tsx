@@ -1,4 +1,5 @@
 import { DocsThemeConfig } from 'nextra-theme-docs';
+import TwitterIcon from './components/TwitterIcon';
 
 const config: DocsThemeConfig = {
   logo: (
@@ -23,6 +24,10 @@ const config: DocsThemeConfig = {
   docsRepositoryBase: 'https://github.com/drizzle-team/drizzle-orm',
   navigation: false,
   gitTimestamp: <></>,
+  main: ({ children }) => <div style={{ maxWidth: 1024, margin: '0 auto' }}>{children}</div>,
+  navbar: {
+    extraContent: <TwitterIcon />,
+  },
 };
 
 export default config;
