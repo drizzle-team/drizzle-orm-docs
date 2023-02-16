@@ -2,7 +2,7 @@ import SmallTerminal from '../../components/SmallTerminal/SmallTerminal';
 
 import installation from '../../scripts/sqlite/npm.json';
 
-DrizzleORM is a [tiny](https://twitter.com/_alexblokh/status/1594735880417472512), [blazingly fast](#️-performance-and-prepared-statements) TypeScript ORM library with a [drizzle-kit](#-migrations) CLI companion for automatic SQL migrations generation.
+DrizzleORM is a [tiny](https://twitter.com/_alexblokh/status/1594735880417472512), [blazingly fast](./sqlite/performance-and-prepared-statements) TypeScript ORM library with a [drizzle-kit](./sqlite/migrations) CLI companion for automatic SQL migrations generation.
 Here you can find extensive docs for SQLite module.
 
 | Driver | Support | | Driver version |
@@ -17,4 +17,8 @@ Here you can find extensive docs for SQLite module.
 
 ## 💾 Installation
 
-<SmallTerminal data={installation} height="48px" />
+```
+npm install drizzle-orm better-sqlite3
+## opt-in automatic migrations generator
+npm install -D drizzle-kit 
+```
