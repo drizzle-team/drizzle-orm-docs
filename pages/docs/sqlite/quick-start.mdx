@@ -1,8 +1,31 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
 
-## 🚀 Quick start
+### Installation
 
-```typescript copy
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+```bash copy
+npm install drizzle-orm better-sqlite3
+npm install -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+pnpm add drizzle-orm better-sqlite3
+pnpm add -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+yarn add drizzle-orm better-sqlite3
+yarn add -D drizzle-kit 
+```
+  </Tab>
+</Tabs>
+
+### Example file
+
+```typescript filename="index.ts" copy
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
@@ -18,11 +41,11 @@ const db = drizzle(sqlite);
 const users = db.select(users).all();
 ```
 
-## Connecting to databases
+### Connecting to databases
 
 <Tabs items={['better-sqlite3', 'bun', 'Cloudflare D1', 'Proxy HTTP']}>
   <Tab>
-```typescript copy
+```typescript copy filename="index.ts"
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 
@@ -32,7 +55,7 @@ const result = db.select(users).all()
 ```
   </Tab>
     <Tab>
-```typescript copy
+```typescript copy filename="index.ts"
 import { drizzle, BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
@@ -42,7 +65,7 @@ const result = db.select(users).all()
 ```
   </Tab>
     <Tab>
-```typescript copy
+```typescript copy filename="index.ts"
 import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1';
 
 // env.DB from cloudflare worker environment
@@ -51,7 +74,7 @@ const result = await db.select(users).all() // pay attention this one is async
 ```
   </Tab>
     <Tab>
-```typescript copy
+```typescript copy filename="index.ts"
 const db = drizzle(async (sql, params, method) => {
   try {
     const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
