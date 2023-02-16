@@ -33,6 +33,9 @@ const config: DocsThemeConfig = {
   sidebar: {
     defaultMenuCollapseLevel: 1,
   },
+  editLink: {
+    text: '',
+  },
 };
 
 export default config;
