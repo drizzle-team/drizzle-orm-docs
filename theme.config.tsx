@@ -30,6 +30,9 @@ const config: DocsThemeConfig = {
   nextThemes: {
     defaultTheme: 'light',
   },
+  sidebar: {
+    defaultMenuCollapseLevel: 1,
+  },
 };
 
 export default config;
