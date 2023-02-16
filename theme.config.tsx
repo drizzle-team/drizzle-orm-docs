@@ -22,7 +22,6 @@ const config: DocsThemeConfig = {
     link: 'https://discord.gg/yfjTbVXMW4',
   },
   docsRepositoryBase: 'https://github.com/drizzle-team/drizzle-orm',
-  navigation: false,
   gitTimestamp: <></>,
   main: ({ children }) => <div style={{ maxWidth: 1024, margin: '0 auto' }}>{children}</div>,
   navbar: {

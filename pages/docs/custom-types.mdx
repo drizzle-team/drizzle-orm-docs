@@ -1,18 +1,20 @@
-# Common way of defining custom types
+import { Tab, Tabs } from 'nextra-theme-docs';
 
-> **Info**: For more advanced documentation about defining custom data types in PostgreSQL and MySQL please check [custom types advanced](./custom-types/custom-types-advanced)
+# Common way of defining custom types
 
 ## Examples
 
 Best way to see, how customType definition is working - is to check how existing data types in postgres and mysql could be defined using `customType` function from Drizzle ORM
 
-### Postgres Data Types using `node-postgres` driver
 
----
+<Tabs items={['Postgres Data Types', 'MySql Data Types']}>
+  <Tab>
 
-#### **Serial**
+**Serial**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/pg-core';
+
 const customSerial = customType<{ data: number; notNull: true; default: true }>(
   {
     dataType() {
@@ -22,9 +24,11 @@ const customSerial = customType<{ data: number; notNull: true; default: true }>(
 );
 ```
 
-#### **Text**
+**Text**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/pg-core';
+
 const customText = customType<{ data: string }>({
   dataType() {
     return 'text';
@@ -32,9 +36,11 @@ const customText = customType<{ data: string }>({
 });
 ```
 
-#### **Boolean**
+**Boolean**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/pg-core';
+
 const customBoolean = customType<{ data: boolean }>({
   dataType() {
     return 'boolean';
@@ -42,9 +48,11 @@ const customBoolean = customType<{ data: boolean }>({
 });
 ```
 
-#### **Jsonb**
+**Jsonb**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/pg-core';
+
 const customJsonb = <TData>(name: string) =>
   customType<{ data: TData; driverData: string }>({
     dataType() {
@@ -56,9 +64,11 @@ const customJsonb = <TData>(name: string) =>
   })(name);
 ```
 
-#### **Timestamp**
+**Timestamp**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/pg-core';
+
 const customTimestamp = customType<
   {
     data: Date;
@@ -80,7 +90,7 @@ const customTimestamp = customType<
 });
 ```
 
-#### Usage for all types will be same as defined functions in Drizzle ORM
+Usage for all types will be same as defined functions in Drizzle ORM
 
 ```typescript copy
 const usersTable = pgTable('users', {
@@ -92,14 +102,14 @@ const usersTable = pgTable('users', {
     .default(sql`now()`),
 });
 ```
+  </Tab>
+  <Tab>
 
-### MySql Data Types using `mysql2` driver
-
----
-
-#### **Serial**
+**Serial**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/mysql-core';
+
 const customSerial = customType<{ data: number; notNull: true; default: true }>(
   {
     dataType() {
@@ -109,9 +119,11 @@ const customSerial = customType<{ data: number; notNull: true; default: true }>(
 );
 ```
 
-#### **Text**
+**Text**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/mysql-core';
+
 const customText = customType<{ data: string }>({
   dataType() {
     return 'text';
@@ -119,9 +131,11 @@ const customText = customType<{ data: string }>({
 });
 ```
 
-#### **Boolean**
+**Boolean**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/mysql-core';
+
 const customBoolean = customType<{ data: boolean }>({
   dataType() {
     return 'boolean';
@@ -135,9 +149,11 @@ const customBoolean = customType<{ data: boolean }>({
 });
 ```
 
-#### **Json**
+**Json**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/mysql-core';
+
 const customJson = <TData>(name: string) =>
   customType<{ data: TData; driverData: string }>({
     dataType() {
@@ -149,9 +165,11 @@ const customJson = <TData>(name: string) =>
   })(name);
 ```
 
-#### **Timestamp**
+**Timestamp**
 
 ```typescript copy
+import { customType } from 'drizzle-orm/mysql-core';
+
 const customTimestamp = customType<
   { data: Date; driverData: string; config: { fsp: number } }
 >({
@@ -167,7 +185,7 @@ const customTimestamp = customType<
 });
 ```
 
-#### Usage for all types will be same as defined functions in Drizzle ORM
+Usage for all types will be same as defined functions in Drizzle ORM
 
 ```typescript copy
 const usersTable = mysqlTable('userstest', {
@@ -181,9 +199,14 @@ const usersTable = mysqlTable('userstest', {
 });
 ```
 
+  </Tab>
+</Tabs>
+
+## TS-doc for type definitions 
+
 You can check ts-doc for types and param definition
 
-````typescript
+```typescript
 export type CustomTypeValues = {
   /**
    * Required type for custom column, that will infer proper type model
@@ -287,4 +310,4 @@ export interface CustomTypeParams<T extends CustomTypeValues> {
    */
   fromDriver?: (value: T['driverData']) => T['data'];
 }
-````
+```
