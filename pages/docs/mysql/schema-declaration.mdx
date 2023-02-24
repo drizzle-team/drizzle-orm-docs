@@ -54,7 +54,7 @@ const poolConnection = mysql.createPool({
 
 export const db: MySqlDatabase = drizzle(poolConnection);
 
-const result: User[] = await db.select(users);
+const result: User[] = await db.select().from(users);
 
 /* type MySqlRawQueryExample is a response from mysql2 driver
    type MySqlRawQueryResult = [ResultSetHeader, FieldPacket[]];

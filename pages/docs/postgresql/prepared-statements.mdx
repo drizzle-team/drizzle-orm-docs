@@ -1,9 +1,7 @@
 ## Prepared statements
 
 ```typescript copy
-const query = db.select(users)
-  .where(eq(users.name, 'Dan'))
-  .prepare();
+const query = db.select().from(users).where(eq(users.name, 'Dan')).prepare();
 
 const result = await query.execute();
 ```
@@ -13,9 +11,7 @@ const result = await query.execute();
 ```typescript copy
 import { placeholder } from 'drizzle-orm/pg-core';
 
-const query = db.select(users)
-  .where(eq(users.name, placeholder('name')))
-  .prepare();
+const query = db.select().from(users).where(eq(users.name, placeholder('name'))).prepare();
 
 const result = await query.execute({ name: 'Dan' });
 ```

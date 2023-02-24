@@ -7,15 +7,17 @@ import { placeholder } from 'drizzle-orm/sql';
 
 const db = drizzle(...);
 
-const q = db.select(customers).prepare();
+const q = db.select().from(customers).prepare();
 q.all() // SELECT * FROM customers
 
-const q = db.select(customers).where(eq(customers.id, placeholder('id'))).prepare()
+const q = db.select().from(customers).where(eq(customers.id, placeholder('id'))).prepare()
 
 q.get({ id: 10 }) // SELECT * FROM customers WHERE id = 10
 q.get({ id: 12 }) // SELECT * FROM customers WHERE id = 12
 
-const q = db.select(customers)
+const q = db
+  .select()
+  .from(customers)
   .where(sql`lower(${customers.name}) like ${placeholder('name')}`)
   .prepare();
 

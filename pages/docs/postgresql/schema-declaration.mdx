@@ -46,7 +46,7 @@ const pool = new Pool(...);
 
 export const db: NodePgDatabase = drizzle(pool);
 
-const result: User[] = await db.select(users);
+const result: User[] = await db.select().from(users);
 
 export async function insertUser(user: NewUser): Promise<User> {
   return db.insert(users).values(user).returning();

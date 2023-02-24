@@ -3,10 +3,11 @@
 ### Printing SQL query
 
 ```typescript copy
-const query = db.select(users)
-    .fields({ id: users.id, name: users.name })
-    .groupBy(users.id)
-    .toSQL();
+const query = db
+  .select({ id: users.id, name: users.name })
+  .from(users)
+  .groupBy(users.id)
+  .toSQL();
 // query:
 {
   sql: 'select 'id', 'name' from 'users' group by 'users'.'id'',
@@ -18,5 +19,5 @@ const query = db.select(users)
 
 ```typescript copy
 // it will automatically run a parametrized query!
-const res: QueryResult<any> = await db.run(sql`SELECT * FROM users WHERE user.id = ${userId}`)
+const res: QueryResult<any> = db.run(sql`SELECT * FROM users WHERE user.id = ${userId}`);
 ```

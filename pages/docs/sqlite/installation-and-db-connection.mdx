@@ -34,7 +34,7 @@ import Database from 'better-sqlite3';
 
 const sqlite = new Database('sqlite.db');
 const db: BetterSQLite3Database = drizzle(sqlite);
-const result = db.select(users).all()
+const result = db.select().from(users).all()
 ```
   </Tab>
     <Tab>
@@ -44,7 +44,7 @@ import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('nw.sqlite');
 const db: BunSQLiteDatabase = drizzle(sqlite);
-const result = db.select(users).all()
+const result = db.select().from(users).all()
 ```
   </Tab>
     <Tab>
@@ -53,7 +53,7 @@ import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1';
 
 // env.DB from cloudflare worker environment
 const db: DrizzleD1Database = drizzle(env.DB);
-const result = await db.select(users).all() // pay attention this one is async
+const result = await db.select().from(users).all(); // pay attention this one is async
 ```
   </Tab>
     <Tab>

@@ -25,7 +25,7 @@ const poolConnection = mysql.createPool({
 
 const db = drizzle(poolConnection);
 
-const allUsers = await db.select(users);
+const allUsers = await db.select().from(users);
 ```
 
 ### Connect using mysql2 Client
@@ -45,7 +45,7 @@ const connection = await mysql.createConnection({
 
 const db = drizzle(connection);
 
-const allUsers = await db.select(users);
+const allUsers = await db.select().from(users);
 ```
 
 ### Connect using PlanetScale Serverless client
@@ -65,5 +65,5 @@ const connection = connect({
 
 const db = drizzle(connection);
 
-const allUsers = await db.select(users);
+const allUsers = await db.select().from(users);
 ```

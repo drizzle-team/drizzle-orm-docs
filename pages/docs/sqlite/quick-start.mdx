@@ -38,7 +38,7 @@ const users = sqliteTable('users', {
 const sqlite = new Database('sqlite.db');
 const db = drizzle(sqlite);
 
-const users = db.select(users).all();
+const users = db.select().from(users).all();
 ```
 
 ### Connecting to databases
@@ -51,29 +51,29 @@ import Database from 'better-sqlite3';
 
 const sqlite = new Database('sqlite.db');
 const db: BetterSQLite3Database = drizzle(sqlite);
-const result = db.select(users).all()
+const result = db.select().from(users).all()
 ```
   </Tab>
-    <Tab>
+  <Tab>
 ```typescript copy filename="index.ts"
 import { drizzle, BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('nw.sqlite');
 const db: BunSQLiteDatabase = drizzle(sqlite);
-const result = db.select(users).all()
+const result = db.select().from(users).all()
 ```
   </Tab>
-    <Tab>
+  <Tab>
 ```typescript copy filename="index.ts"
 import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1';
 
 // env.DB from cloudflare worker environment
 const db: DrizzleD1Database = drizzle(env.DB);
-const result = await db.select(users).all() // pay attention this one is async
+const result = await db.select().from(users).all(); // pay attention this one is async
 ```
   </Tab>
-    <Tab>
+  <Tab>
 ```typescript copy filename="index.ts"
 const db = drizzle(async (sql, params, method) => {
   try {

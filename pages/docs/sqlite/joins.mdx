@@ -23,7 +23,7 @@ const users = sqliteTable('users', {
 
 const db = drizzle(sqlite);
 
-const result = db.select(cities).leftJoin(users, eq(cities2.id, users2.cityId)).all()
+const result = db.select().from(cities).leftJoin(users, eq(cities2.id, users2.cityId)).all();
 ```
 
 ## Many-to-many
@@ -48,7 +48,9 @@ const usersToChatGroups = sqliteTable('usersToChatGroups', {
 const db = drizzle(...);
 
 // querying user group with id 1 and all the participants(users)
-db.select(usersToChatGroups)
+db
+  .select()
+  .from(usersToChatGroups)
   .leftJoin(users, eq(usersToChatGroups.userId, users.id))
   .leftJoin(chatGroups, eq(usersToChatGroups.groupId, chatGroups.id))
   .where(eq(chatGroups.id, 1))
@@ -69,7 +71,7 @@ export const files = sqliteTable('folders', {
 const db = drizzle(...);
 
 const nestedFiles = alias(files, 'nested_files');
-db.select(files)
+db.select().from(files)
   .leftJoin(nestedFiles, eq(files.name, nestedFiles.name))
   .where(eq(files.parent, '/'))
   .all();
@@ -81,10 +83,13 @@ db.select(files)
 Join Cities with Users getting only needed fields form request
 
 ```typescript copy
-db.select(cities).fields({
-  id: cities.id,
-  cityName: cities.name
-  userId: users.id
-}).leftJoin(users, eq(users.cityId, cities.id))
+db
+  .select({
+    id: cities.id,
+    cityName: cities.name
+    userId: users.id
+  })
+  .from(cities)
+  .leftJoin(users, eq(users.cityId, cities.id))
   .all();
 ```

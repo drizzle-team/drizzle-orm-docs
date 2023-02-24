@@ -21,7 +21,7 @@ export const authOtps = sqliteTable('auth_otp', {
   id: integer('id').primaryKey(),
   phone: text('phone'),
   userId: integer('user_id').references(() => users.id),
-}
+});
 ```
 
 It will generate:
@@ -58,5 +58,5 @@ const sqlite = new Database('sqlite.db');
 const db = drizzle(sqlite);
 
 // this will automatically run needed migrations on the database
-migrate(db, { migrationsFolder: './drizzle' })
+migrate(db, { migrationsFolder: './drizzle' });
 ```

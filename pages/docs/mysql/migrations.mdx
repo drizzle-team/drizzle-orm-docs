@@ -22,7 +22,7 @@ export const authOtps = mysqlTable('auth_otp', {
   id: serial('id').primaryKey(),
   phone: varchar('phone', { length: 256 }),
   userId: int('user_id').references(() => users.id),
-}
+});
 ```
 
 It will generate:
@@ -57,6 +57,7 @@ const poolConnection = mysql.createPool({
   host: 'localhost',
   user: 'root',
   database: 'test',
+  multipleStatements: true,
 });
 
 const db = drizzle(poolConnection);
