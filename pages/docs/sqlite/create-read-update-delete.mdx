@@ -101,52 +101,6 @@ Subqueries in joins are supported, too:
 db.select().from(users).leftJoin(sq, eq(users.id, sq.id)).all();
 ```
 
-#### List of all filter operators
-
-```typescript
-eq(column, value)
-eq(column1, column2)
-ne(column, value)
-ne(column1, column2)
-
-notEq(column, value)
-less(column, value)
-lessEq(column, value)
-
-gt(column, value)
-gt(column1, column2)
-gte(column, value)
-gte(column1, column2)
-lt(column, value)
-lt(column1, column2)
-lte(column, value)
-lte(column1, column2)
-
-isNull(column)
-isNotNull(column)
-
-inArray(column, values[])
-inArray(column, sqlSubquery)
-notInArray(column, values[])
-notInArray(column, sqlSubquery)
-
-exists(sqlSubquery)
-notExists(sqlSubquery)
-
-between(column, min, max)
-notBetween(column, min, max)
-
-like(column, value)
-like(column, value)
-ilike(column, value)
-notIlike(column, value)
-
-not(sqlExpression)
-
-and(...expressions: Expr[])
-or(...expressions: Expr[])
-```
-
 ## Inserting
 
 ```typescript copy

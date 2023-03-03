@@ -1,0 +1,19 @@
+### The list of all column types. 
+
+You can also create custom types - [see here](../custom-types).
+
+```typescript
+integer('...')
+integer('...', { mode: 'number' | 'timestamp' | 'bigint' })
+real('...')
+text('...');
+text<'union' | 'string' | 'type'>('...');
+
+blob('...');
+blob('...', { mode: 'json' | 'buffer' });
+blob<{ foo: string }>('...');
+
+column.primaryKey()
+column.notNull()
+column.default(...)
+```
