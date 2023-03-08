@@ -1,0 +1,21 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.wrapper > div {
+  width: calc(50% - 0.5rem);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .wrapper > div {
+    width: 100%;
+  }
+}

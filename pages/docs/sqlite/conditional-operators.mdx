@@ -1,3 +1,6 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+import Section from '../../../components/Section/Section'
+
 ## List of all filter operators
 
 ```typescript
@@ -82,6 +85,47 @@ SELECT *
   LEFT JOIN table_name2 
   ON table_name.integer_column_name = table_name2.foreign_integer
 ```
+
+---
+
+***Tabs***
+
+<Tabs items={["Typescript", "SQL"]}>
+  <Tab>
+```typescript
+db.select()
+  .from(table)
+  .where(eq(table.integerColumnName, 5))
+  .all();
+```
+  </Tab>
+  <Tab>
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name = 5
+```
+  </Tab>
+</Tabs>
+
+---
+
+***Inline***
+
+<Section>
+```typescript
+db.select()
+  .from(table)
+  .where(eq(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name = 5
+```
+</Section>
 
 ### ne
 
