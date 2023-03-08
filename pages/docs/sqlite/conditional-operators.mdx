@@ -1,4 +1,4 @@
-#### List of all filter operators
+## List of all filter operators
 
 ```typescript
 eq(column, value)
@@ -42,4 +42,515 @@ not(sqlExpression)
 
 and(...expressions: Expr[])
 or(...expressions: Expr[])
+```
+
+### eq
+
+Value equals `n`
+
+#### Column to value
+
+Column equals value
+
+```typescript
+db.select()
+  .from(table)
+  .where(eq(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name = 5
+```
+
+#### Column to column
+
+Column equals column
+
+```typescript
+db.select()
+ .from(table)
+ .leftJoin(table2, eq(table.integerColumnName, table2.foreign_integer))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  LEFT JOIN table_name2 
+  ON table_name.integer_column_name = table_name2.foreign_integer
+```
+
+### ne
+
+Column is not equal to `n`
+
+#### Column to value
+
+Column is not equal to value
+
+```typescript
+db.select()
+  .from(table)
+  .where(ne(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name <> 5
+```
+
+#### Column to column
+
+Column is not equal to column
+
+```typescript
+db.select()
+  .from(table)
+  .leftJoin(table2, ne(table.integerColumnName, table2.foreign_integer))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  LEFT JOIN table_name2 
+  ON table_name.integer_column_name 
+  <> table_name2.foreign_integer
+```
+
+### gt
+
+Value `y` is greater than `n`.
+
+#### Column to value
+
+The value of the column is greater than the value.
+
+```typescript
+db.select()
+  .from(table)
+  .where(gt(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name > 5
+```
+
+#### Column to column
+
+The value of a column is greater than the value of another column.
+
+```typescript
+db.select()
+ .from(table)
+ .leftJoin(table2, gt(table.integerColumnName, table2.foreign_integer))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  LEFT JOIN table_name2 
+  ON table_name.integer_column_name 
+  > table_name2.foreign_integer
+```
+
+### gte
+
+Value `y` is greater than or equal to `n`.
+
+#### Column to value
+
+The value of the column is greater or equal than the value.
+
+```typescript
+db.select()
+  .from(table)
+  .where(gte(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name >= 5
+```
+
+#### Column to column
+
+The value of a column is greater or equal than the value of another column.
+
+```typescript
+db.select()
+ .from(table)
+ .leftJoin(table2, gte(table.integerColumnName, table2.foreign_integer))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  LEFT JOIN table_name2 
+  ON table_name.integer_column_name 
+  >= table_name2.foreign_integer
+```
+
+### lt
+
+Value `y` is less than `n`.
+
+#### Column to value
+
+The value of the column is less than the value.
+
+```typescript
+db.select()
+  .from(table)
+  .where(lt(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name < 5
+```
+
+#### Column to column
+
+The value of a column is less than the value of another column.
+
+```typescript
+db.select()
+ .from(table)
+ .leftJoin(table2, lt(table.integerColumnName, table2.foreign_integer))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  LEFT JOIN table_name2 
+  ON table_name.integer_column_name 
+  < table_name2.foreign_integer
+```
+
+### lte
+
+Value `y` is less than or equal to `n`.
+
+#### Column to value
+
+The value of the column is less or equal than the value.
+
+```typescript
+db.select()
+  .from(table)
+  .where(lte(table.integerColumnName, 5))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name <= 5
+```
+
+#### Column to column
+
+The value of a column is less or equal than the value of another column.
+
+```typescript
+db.select()
+ .from(table)
+ .leftJoin(table2, lte(table.integerColumnName, table2.foreign_integer))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  LEFT JOIN table_name2 
+  ON table_name.integer_column_name 
+  <= table_name2.foreign_integer
+```
+
+### isNull
+
+```typescript
+db.select()
+  .from(table)
+  .where(isNull(table.string_column))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name IS NULL
+```
+
+
+### isNotNull
+
+```typescript
+db.select()
+  .from(table)
+  .where(isNotNull(table.string_column))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name IS NOT NULL
+```
+
+
+### inArray
+
+#### Column to values
+
+```typescript
+db.select()
+  .from(table)
+  .where(inArray(table.integerColumnName, [1, 2, 3, 4]))
+  .all();
+```
+
+```sql
+SELECT *
+  FROM table_name 
+  WHERE table_name.integer_column_name in (1, 2, 3, 4)
+```
+
+#### Column to subquery
+
+```typescript
+db.select()
+  .from(table)
+  .where(
+    inArray(
+    table.string_column,
+    db.select({ data: table2.string_column }).from(table2)
+    )
+  ).all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name 
+  IN (SELECT table_name2.text_column_name FROM table_name2)
+```
+
+### notInArray
+
+#### Column to values
+
+```typescript
+db.select()
+  .from(table)
+  .where(notInArray(table.integerColumnName, [1, 2, 3, 4]))
+  .all();
+```
+
+```sql
+SELECT *
+  FROM table_name 
+  WHERE table_name.integer_column_name NOT in (1, 2, 3, 4)
+```
+
+#### Column to subquery
+
+```typescript
+db.select()
+  .from(table)
+  .where(
+    notInArray(
+    table.string_column,
+    db.select({ data: table2.string_column }).from(table2)
+    )
+  ).all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name 
+  NOT IN (SELECT table_name2.text_column_name FROM table_name2)
+```
+
+### exists
+
+```typescript
+const subquery = db.select().from(table2)
+db.select()
+  .from(table)
+  .where(exists(subquery))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name
+  WHERE EXISTS (SELECT * from table_name2)
+```
+
+### notExists
+
+```typescript
+const subquery = db.select().from(table2)
+db.select()
+  .from(table)
+  .where(notExists(subquery))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name
+  WHERE NOT EXISTS (SELECT * from table_name2)
+```
+
+### between
+
+```typescript
+db.select()
+  .from(table)
+  .where(between(table.integerColumnName, 2, 7))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name 
+  BETWEEN 2 AND 7
+```
+
+### notBetween
+
+```typescript
+db.select()
+  .from(table)
+  .where(notBetween(table.integerColumnName, 2, 7))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.integer_column_name 
+  NOT BETWEEN 2 AND 7
+```
+
+### like
+
+```typescript
+db.select()
+  .from(table)
+  .where(like(table.string_column, "%llo wor%"))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name 
+  LIKE '%llo wor%'
+```
+
+### ilike
+
+```typescript
+db.select()
+  .from(table)
+  .where(ilike(table.string_column, "%llo wor%"))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name 
+  ILIKE '%llo wor%'
+```
+
+
+### notIlike
+
+```typescript
+db.select()
+  .from(table)
+  .where(notIlike(table.string_column, "%llo wor%"))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE table_name.text_column_name 
+  NOT ILIKE '%llo wor%'
+```
+
+### not
+
+All conditions must return `false`.
+
+```typescript
+db.select()
+  .from(table)
+  .where(not(eq(table.integerColumnName, 5)))
+  .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE NOT (table_name.integer_column_name = 5)
+```
+
+### and
+
+All conditions must return `true`.
+
+```typescript
+db.select()
+ .from(table)
+ .where(and(gt(table.integerColumnName, 5), lt(table.integerColumnName, 7)))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE (table_name.integer_column_name > 5 
+  AND table_name.integer_column_name < 7)
+```
+
+### or
+
+One or more conditions must return `true`.
+
+```typescript
+db.select()
+ .from(table)
+ .where(or(gt(table.integerColumnName, 5), lt(table.integerColumnName, 7)))
+ .all();
+```
+
+```sql
+SELECT * 
+  FROM table_name 
+  WHERE (table_name.integer_column_name > 5 
+  OR table_name.integer_column_name < 7)
 ```
