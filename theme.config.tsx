@@ -28,7 +28,7 @@ const config: DocsThemeConfig = {
     extraContent: <TwitterIcon />,
   },
   nextThemes: {
-    defaultTheme: 'light',
+    defaultTheme: 'system',
   },
   sidebar: {
     defaultMenuCollapseLevel: 1,
