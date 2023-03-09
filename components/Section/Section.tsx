@@ -6,9 +6,7 @@ interface Props {
 }
 
 const Section: React.FC<Props> = ({ children }) => (
-  <div className={styles.wrapper}>
-    {children}
-  </div>
+  <div className={styles.wrapper}>{children}</div>
 );
 
 export default Section;

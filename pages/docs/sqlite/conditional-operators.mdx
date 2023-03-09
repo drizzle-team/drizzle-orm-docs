@@ -1,600 +1,360 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
-import Section from '../../../components/Section/Section'
+import Section from '../../../components/Section/Section';
 
 ## List of all filter operators
-
-```typescript
-eq(column, value)
-eq(column1, column2)
-ne(column, value)
-ne(column1, column2)
-
-notEq(column, value)
-less(column, value)
-lessEq(column, value)
-
-gt(column, value)
-gt(column1, column2)
-gte(column, value)
-gte(column1, column2)
-lt(column, value)
-lt(column1, column2)
-lte(column, value)
-lte(column1, column2)
-
-isNull(column)
-isNotNull(column)
-
-inArray(column, values[])
-inArray(column, sqlSubquery)
-notInArray(column, values[])
-notInArray(column, sqlSubquery)
-
-exists(sqlSubquery)
-notExists(sqlSubquery)
-
-between(column, min, max)
-notBetween(column, min, max)
-
-like(column, value)
-like(column, value)
-ilike(column, value)
-notIlike(column, value)
-
-not(sqlExpression)
-
-and(...expressions: Expr[])
-or(...expressions: Expr[])
-```
 
 ### eq
 
 Value equals `n`
 
-#### Column to value
-
-Column equals value
-
-```typescript
-db.select()
-  .from(table)
-  .where(eq(table.integerColumnName, 5))
-  .all();
+<Section>
+```typescript copy
+//text
+db.select().from(table).where(eq(table.column, 5));
 ```
 
-```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name = 5
+```sql copy
+SELECT * FROM table WHERE table.column = 5
 ```
+</Section>
 
-#### Column to column
-
-Column equals column
-
-```typescript
-db.select()
- .from(table)
- .leftJoin(table2, eq(table.integerColumnName, table2.foreign_integer))
- .all();
-```
-
-```sql
-SELECT * 
-  FROM table_name 
-  LEFT JOIN table_name2 
-  ON table_name.integer_column_name = table_name2.foreign_integer
-```
-
----
-
-***Tabs***
-
-<Tabs items={["Typescript", "SQL"]}>
-  <Tab>
-```typescript
-db.select()
-  .from(table)
-  .where(eq(table.integerColumnName, 5))
-  .all();
-```
-  </Tab>
-  <Tab>
-```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name = 5
-```
-  </Tab>
-</Tabs>
-
----
-
-***Inline***
 
 <Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(eq(table.integerColumnName, 5))
-  .all();
+db.select().from(table).where(eq(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name = 5
+SELECT * FROM table WHERE table.column1 = table.column2
 ```
 </Section>
+
+
 
 ### ne
 
 Column is not equal to `n`
 
-#### Column to value
-
-Column is not equal to value
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(ne(table.integerColumnName, 5))
-  .all();
+db.select().from(table).where(ne(table.column, 5));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name <> 5
+SELECT * FROM table WHERE table.column <> 5
 ```
+</Section>
 
-#### Column to column
 
-Column is not equal to column
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .leftJoin(table2, ne(table.integerColumnName, table2.foreign_integer))
-  .all();
+db.select().from(table).where(ne(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  LEFT JOIN table_name2 
-  ON table_name.integer_column_name 
-  <> table_name2.foreign_integer
+SELECT * FROM table WHERE table.column1 <> table.column2
 ```
+</Section>
+
+
 
 ### gt
 
 Value `y` is greater than `n`.
 
-#### Column to value
-
-The value of the column is greater than the value.
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(gt(table.integerColumnName, 5))
-  .all();
+db.select().from(table).where(gt(table.column, 5));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name > 5
+SELECT * FROM table WHERE table.column > 5
 ```
+</Section>
 
-#### Column to column
 
-The value of a column is greater than the value of another column.
-
+<Section>
 ```typescript
-db.select()
- .from(table)
- .leftJoin(table2, gt(table.integerColumnName, table2.foreign_integer))
- .all();
+db.select().from(table).where(gt(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  LEFT JOIN table_name2 
-  ON table_name.integer_column_name 
-  > table_name2.foreign_integer
+SELECT * FROM table WHERE table.column1 > table.column2
 ```
+</Section>
 
 ### gte
 
 Value `y` is greater than or equal to `n`.
 
-#### Column to value
-
-The value of the column is greater or equal than the value.
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(gte(table.integerColumnName, 5))
-  .all();
+db.select().from(table).where(gte(table.column, 5));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name >= 5
+SELECT * FROM table WHERE table.column >= 5
 ```
+</Section>
 
-#### Column to column
 
-The value of a column is greater or equal than the value of another column.
-
+<Section>
 ```typescript
-db.select()
- .from(table)
- .leftJoin(table2, gte(table.integerColumnName, table2.foreign_integer))
- .all();
+db.select().from(table).where(gte(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  LEFT JOIN table_name2 
-  ON table_name.integer_column_name 
-  >= table_name2.foreign_integer
+SELECT * FROM table WHERE table.column1 >= table.column2
 ```
+</Section>
 
 ### lt
 
 Value `y` is less than `n`.
 
-#### Column to value
-
-The value of the column is less than the value.
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(lt(table.integerColumnName, 5))
-  .all();
+db.select().from(table).where(lt(table.column, 5));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name < 5
+SELECT * FROM table WHERE table.column < 5
 ```
+</Section>
 
-#### Column to column
 
-The value of a column is less than the value of another column.
-
+<Section>
 ```typescript
-db.select()
- .from(table)
- .leftJoin(table2, lt(table.integerColumnName, table2.foreign_integer))
- .all();
+db.select().from(table).where(lt(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  LEFT JOIN table_name2 
-  ON table_name.integer_column_name 
-  < table_name2.foreign_integer
+SELECT * FROM table WHERE table.column1 < table.column2
 ```
+</Section>
 
 ### lte
 
 Value `y` is less than or equal to `n`.
 
-#### Column to value
-
-The value of the column is less or equal than the value.
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(lte(table.integerColumnName, 5))
-  .all();
+db.select().from(table).where(lte(table.column, 5));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name <= 5
+SELECT * FROM table WHERE table.column <= 5
 ```
+</Section>
 
-#### Column to column
-
-The value of a column is less or equal than the value of another column.
-
+<Section>
 ```typescript
-db.select()
- .from(table)
- .leftJoin(table2, lte(table.integerColumnName, table2.foreign_integer))
- .all();
+db.select().from(table).where(lte(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  LEFT JOIN table_name2 
-  ON table_name.integer_column_name 
-  <= table_name2.foreign_integer
+SELECT * FROM table WHERE table.column1 <= table.column2
 ```
+</Section>
+
 
 ### isNull
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(isNull(table.string_column))
-  .all();
+db.select().from(table).where(isNull(table.column));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name IS NULL
+SELECT * FROM table WHERE table.column IS NULL
 ```
+</Section>
 
 
 ### isNotNull
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(isNotNull(table.string_column))
-  .all();
+db.select().from(table).where(isNotNull(table.column));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name IS NOT NULL
+SELECT * FROM table WHERE table.column IS NOT NULL
 ```
+</Section>
+
 
 
 ### inArray
 
-#### Column to values
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(inArray(table.integerColumnName, [1, 2, 3, 4]))
-  .all();
+db.select().from(table).where(inArray(table.column, [1, 2, 3, 4]));
 ```
 
 ```sql
-SELECT *
-  FROM table_name 
-  WHERE table_name.integer_column_name in (1, 2, 3, 4)
+SELECT * FROM table WHERE table.column in (1, 2, 3, 4)
 ```
+</Section>
 
-#### Column to subquery
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(
-    inArray(
-    table.string_column,
-    db.select({ data: table2.string_column }).from(table2)
-    )
-  ).all();
+const query = db.select({ data: table2.column }).from(table2);
+db.select().from(table).where(inArray(table.column, query));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name 
-  IN (SELECT table_name2.text_column_name FROM table_name2)
+SELECT * FROM table WHERE table.column IN (SELECT table2.column FROM table2)
 ```
+</Section>
 
 ### notInArray
 
-#### Column to values
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(notInArray(table.integerColumnName, [1, 2, 3, 4]))
-  .all();
+db.select().from(table).where(notInArray(table.column, [1, 2, 3, 4]));
 ```
 
 ```sql
-SELECT *
-  FROM table_name 
-  WHERE table_name.integer_column_name NOT in (1, 2, 3, 4)
+SELECT * FROM table WHERE table.column NOT in (1, 2, 3, 4)
 ```
+</Section>
 
-#### Column to subquery
-
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(
-    notInArray(
-    table.string_column,
-    db.select({ data: table2.string_column }).from(table2)
-    )
-  ).all();
+const query = db.select({ data: table2.column }).from(table2);
+db.select().from(table).where(notInArray(table.column, query));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name 
-  NOT IN (SELECT table_name2.text_column_name FROM table_name2)
+SELECT * FROM table WHERE table.column NOT IN (SELECT table2.column FROM table2)
 ```
+</Section>
 
 ### exists
 
+<Section>
 ```typescript
-const subquery = db.select().from(table2)
-db.select()
-  .from(table)
-  .where(exists(subquery))
-  .all();
+const query = db.select().from(table2)
+db.select().from(table).where(exists(query));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name
-  WHERE EXISTS (SELECT * from table_name2)
+SELECT * FROM table WHERE EXISTS (SELECT * from table2)
 ```
+</Section>
 
 ### notExists
 
+<Section>
 ```typescript
-const subquery = db.select().from(table2)
-db.select()
-  .from(table)
-  .where(notExists(subquery))
-  .all();
+const query = db.select().from(table2)
+db.select().from(table).where(notExists(query));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name
-  WHERE NOT EXISTS (SELECT * from table_name2)
+SELECT * FROM table WHERE NOT EXISTS (SELECT * from table2)
 ```
+</Section>
 
 ### between
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(between(table.integerColumnName, 2, 7))
-  .all();
+db.select().from(table).where(between(table.column, 2, 7));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name 
-  BETWEEN 2 AND 7
+SELECT * FROM table WHERE table.column BETWEEN 2 AND 7
 ```
+</Section>
 
 ### notBetween
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(notBetween(table.integerColumnName, 2, 7))
-  .all();
+db.select().from(table).where(notBetween(table.column, 2, 7));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.integer_column_name 
-  NOT BETWEEN 2 AND 7
+SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7
 ```
+</Section>
 
 ### like
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(like(table.string_column, "%llo wor%"))
-  .all();
+db.select().from(table).where(like(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name 
-  LIKE '%llo wor%'
+SELECT * FROM table  WHERE table.column LIKE '%llo wor%'
 ```
+</Section>
 
 ### ilike
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(ilike(table.string_column, "%llo wor%"))
-  .all();
+db.select().from(table).where(ilike(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name 
-  ILIKE '%llo wor%'
+SELECT * FROM table WHERE table.column ILIKE '%llo wor%'
 ```
-
+</Section>
 
 ### notIlike
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(notIlike(table.string_column, "%llo wor%"))
-  .all();
+db.select().from(table).where(notIlike(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE table_name.text_column_name 
-  NOT ILIKE '%llo wor%'
+SELECT * FROM table WHERE table.column NOT ILIKE '%llo wor%'
 ```
+</Section>
 
 ### not
 
 All conditions must return `false`.
 
+<Section>
 ```typescript
-db.select()
-  .from(table)
-  .where(not(eq(table.integerColumnName, 5)))
-  .all();
+db.select().from(table).where(not(eq(table.column, 5)));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE NOT (table_name.integer_column_name = 5)
+SELECT * FROM table WHERE NOT (table.column = 5)
 ```
+</Section>
 
 ### and
 
 All conditions must return `true`.
 
+<Section>
 ```typescript
-db.select()
- .from(table)
- .where(and(gt(table.integerColumnName, 5), lt(table.integerColumnName, 7)))
- .all();
+db.select().from(table).where(and(gt(table.column, 5), lt(table.column, 7)));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE (table_name.integer_column_name > 5 
-  AND table_name.integer_column_name < 7)
+SELECT * FROM table WHERE (table.column > 5 AND table.column < 7)
 ```
+</Section>
 
 ### or
 
 One or more conditions must return `true`.
 
+<Section>
 ```typescript
-db.select()
- .from(table)
- .where(or(gt(table.integerColumnName, 5), lt(table.integerColumnName, 7)))
- .all();
+db.select().from(table).where(or(gt(table.column, 5), lt(table.column, 7)));
 ```
 
 ```sql
-SELECT * 
-  FROM table_name 
-  WHERE (table_name.integer_column_name > 5 
-  OR table_name.integer_column_name < 7)
+SELECT * FROM table WHERE (table.column > 5 OR table.column < 7)
 ```
+</Section>

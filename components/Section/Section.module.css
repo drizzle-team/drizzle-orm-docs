@@ -1,21 +1,31 @@
 .wrapper {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .wrapper > div {
-  width: calc(50% - 0.5rem);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.wrapper > div > pre {
+  border-radius: 0;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-@media (max-width: 767px) {
-  .wrapper {
-    flex-direction: column;
-  }
+.wrapper > div:first-child > pre {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
 
-  .wrapper > div {
-    width: 100%;
-  }
+.wrapper > div:last-child > pre {
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}
+
+.wrapper > div:not(:last-child) {
+  border-bottom: 1px solid #e0e8f6;
+}
+
+html[class~=dark] .wrapper > div:not(:last-child) {
+  border-bottom: 1px solid #2e3e49;
 }
