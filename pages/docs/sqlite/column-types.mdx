@@ -9,13 +9,14 @@ You can also create custom types - [see here](../custom-types).
 <Section>
 ```typescript
 const table = sqliteTable('table', {
-  id: integer('id')
+	id: integer('id')
 });
 
 // you can customize integer mode be either number or timestamp
 integer('id', { mode: 'number' })
 integer('id', { mode: 'timestamp' }) // Date
 ```
+
 ```sql
 CREATE TABLE table (
 	`id` integer
@@ -42,7 +43,7 @@ CREATE TABLE table (
 <Section>
 ```typescript
 const table = sqliteTable('table', {
-  real: real('real')
+	real: real('real')
 });
 ```
 
@@ -58,11 +59,10 @@ CREATE TABLE table (
 <Section>
 ```typescript
 const table = sqliteTable('table', {
-  text: text('text')
+	text: text('text')
 });
 
 text('text')
-
 text<'union' | 'string' | 'type'>('union')
 ```
 
@@ -78,7 +78,7 @@ CREATE TABLE table (
 <Section>
 ```typescript
 const table = sqliteTable('table', {
-  blob: blob('blob')
+	blob: blob('blob')
 });
 
 blob('blob')
@@ -89,7 +89,7 @@ blob<{ foo: string }>('blob', { mode: 'json' })
 
 ```sql
 CREATE TABLE table (
-  `blob` blob
+	`blob` blob
 );
 ```
 </Section>
@@ -100,7 +100,9 @@ CREATE TABLE table (
 
 <Section>
 ```typescript
-const table = sqliteTable('table', { id: integer('id').primaryKey({ autoIncrement: true }) });
+const table = sqliteTable('table', { 
+	id: integer('id').primaryKey({ autoIncrement: true }) 
+});
 ```
 
 ```sql
@@ -114,7 +116,9 @@ CREATE TABLE table (
 
 <Section>
 ```typescript
-const table = sqliteTable('table', { numInt: integer('numInt').notNull() });
+const table = sqliteTable('table', { 
+	numInt: integer('numInt').notNull() 
+});
 ```
 
 ```sql
@@ -128,7 +132,9 @@ CREATE TABLE table (
 
 <Section>
 ```typescript
-const table = sqliteTable('table', { numInt: integer('numInt').default(123) });
+const table = sqliteTable('table', {
+	numInt: integer('numInt').default(123) 
+});
 ```
 
 ```sql
