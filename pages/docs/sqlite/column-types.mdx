@@ -1,13 +1,21 @@
-import Section from '../../../components/Section/Section';
+import Section from "../../../components/Section/Section";
 
-### The list of all column types. 
+## List of all SQLite column types
 
-You can also create custom types - [see here](../custom-types).
+Based on official [SQLite docs](https://www.sqlite.org/datatype3.html),
+each value stored in an SQLite database (or manipulated by the database engine)
+has one of the following storage classes `NULL`, `INTEGER`, `REAL`, `TEXT` and `BLOB`
 
-#### integer
+We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
+
+#### Integer
+
+A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
 
 <Section>
 ```typescript
+import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
 const table = sqliteTable('table', {
 	id: integer('id')
 });
@@ -15,13 +23,15 @@ const table = sqliteTable('table', {
 // you can customize integer mode be either number or timestamp
 integer('id', { mode: 'number' })
 integer('id', { mode: 'timestamp' }) // Date
-```
+
+````
 
 ```sql
-CREATE TABLE table (
+CREATE TABLE `table` (
 	`id` integer
 );
-```
+````
+
 </Section>
 
 <Section>
@@ -30,53 +40,67 @@ CREATE TABLE table (
 integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true })
 ```
 ```sql
-CREATE TABLE table (
+CREATE TABLE `table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
 );
 ```
 </Section>
 
+#### Real
 
-
-#### real
+A floating point value, stored as an `8-byte IEEE` floating point number.
 
 <Section>
 ```typescript
+import { real, sqliteTable } from "drizzle-orm/sqlite-core";
+
 const table = sqliteTable('table', {
 	real: real('real')
 });
-```
+
+````
 
 ```sql
-CREATE TABLE table (
+CREATE TABLE `table` (
 	`real` real
 );
-```
+````
+
 </Section>
 
-#### text 
+#### Text
+
+A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).
 
 <Section>
 ```typescript
+import { text, sqliteTable } from "drizzle-orm/sqlite-core";
+
 const table = sqliteTable('table', {
 	text: text('text')
 });
 
 text('text')
 text<'union' | 'string' | 'type'>('union')
-```
+
+````
 
 ```sql
-CREATE TABLE table (
+CREATE TABLE `table` (
 	`text` text
 );
-```
+````
+
 </Section>
 
-#### blob
+#### Blob
+
+A blob of data, stored exactly as it was input.
 
 <Section>
 ```typescript
+import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
+
 const table = sqliteTable('table', {
 	blob: blob('blob')
 });
@@ -85,35 +109,20 @@ blob('blob')
 blob('blob', { mode: 'buffer' })
 blob('blob', { mode: 'json' })
 blob<{ foo: string }>('blob', { mode: 'json' })
-```
+
+````
 
 ```sql
-CREATE TABLE table (
+CREATE TABLE `table` (
 	`blob` blob
 );
-```
+````
+
 </Section>
 
-### Columns attributes
-
-#### Primary key
-
-<Section>
-```typescript
-const table = sqliteTable('table', { 
-	id: integer('id').primaryKey({ autoIncrement: true }) 
-});
-```
-
-```sql
-CREATE TABLE table (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
-);
-```
-</Section>
-
+## Columns constraints
 #### Not null
-
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
 <Section>
 ```typescript
 const table = sqliteTable('table', { 
@@ -126,20 +135,58 @@ CREATE TABLE table (
 	`numInt` integer NOT NULL
 );
 ```
+
 </Section>
 
 #### Default value
 
+The `DEFAULT` clause specifies a default value to use for the column if no value
+is explicitly provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
+import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
 const table = sqliteTable('table', {
-	numInt: integer('numInt').default(123) 
+int1: integer('int1').default(42),
+int2: integer('int2').default(sql`(abs(42))`)
+});
+
+````
+
+```sql
+CREATE TABLE `table` (
+	`int1` integer DEFAULT 42
+	`int2` integer DEFAULT (abs(42))
+);
+````
+</Section>
+
+A default value may also be one of the special case-independent keywords `CURRENT_TIME`, `CURRENT_DATE` or `CURRENT_TIMESTAMP`
+
+<Section>
+```typescript
+import { sql } from "drizzle-orm";
+import { text, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const table = sqliteTable("table", {
+  time: text("time").default(sql`CURRENT_TIME`),
+  date: text("date").default(sql`CURRENT_DATE`),
+  timestamp: text("timestamp").default(sql`CURRENT_TIMESTAMP`),
 });
 ```
 
 ```sql
-CREATE TABLE table (
-	`numInt` integer DEFAULT 123
+CREATE TABLE `table` (
+	`time` text DEFAULT CURRENT_TIME
+	`date` text DEFAULT CURRENT_DATE
+	`timestamp` text DEFAULT CURRENT_TIMESTAMP
 );
 ```
 </Section>
