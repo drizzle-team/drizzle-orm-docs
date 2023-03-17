@@ -49,21 +49,11 @@ yarn add -D drizzle-kit
   </Tab>
 </Tabs>
 
-### Example file 
-
-```typescript filename="schema.ts"
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-  phone: varchar('phone', { length: 256 }),
-});
-```
-
 ### Connecting to databases
 
 <Tabs items={['node-postgres', 'aws data api', 'Postgres.JS']}>
   <Tab>
-```typescript copy filename="db.ts Pool"
+```typescript copy filename="Pool"
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
@@ -86,7 +76,7 @@ const db = drizzle(pool);
 const allUsers = await db.select().from(users);
 ```
 
-```typescript copy filename="db.ts Client"
+```typescript copy filename="Client"
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';

@@ -1,0 +1,576 @@
+import Section from "../../../components/Section/Section";
+
+## List of all PostrgreSQL column types
+
+We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
+
+#### Integer
+
+A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
+
+<Section>
+```typescript
+import { integer, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	id: integer('id')
+});
+
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"id" integer
+);
+````
+</Section>
+
+<Section>
+```typescript
+// to make integer primary key auto increment
+integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true })
+```
+```sql
+CREATE TABLE `table` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+);
+```
+</Section>
+
+#### smallint
+
+<Section>
+```typescript
+import { smallint, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	smallint: smallint('smallint')
+});
+
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"smallint" smallint
+);
+````
+</Section>
+
+#### bigint
+
+<Section>
+```typescript
+import { bigint, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	bigint: bigint('bigint', { mode: 'number' })
+});
+
+bigint: bigint('bigint', { mode: 'bigint' })
+
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"bigint" bigint,
+);
+````
+</Section>
+
+#### boolean
+
+<Section>
+```typescript
+import { boolean, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	boolean: boolean('boolean')
+});
+
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"boolean" boolean,
+);
+````
+</Section>
+
+#### text
+
+<Section>
+```typescript
+import { text, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  text: text('text')
+});
+
+text<'union' | 'string' | 'type'>('union')
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"text" text,
+);
+````
+</Section>
+
+#### varchar
+
+<Section>
+```typescript
+import { varchar, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  varchar: varchar('varchar'),
+});
+
+varchar<'union' | 'string' | 'type'>('union'),
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"varchar" varchar,
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { varchar, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  varchar: varchar('varchar', { length: 256 }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"varchar" varchar(256),
+);
+````
+</Section>
+
+#### serial
+
+<Section>
+```typescript
+import { serial, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  serial: serial('serial'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"serial" serial NOT NULL,
+);
+````
+</Section>
+
+#### bigserial
+
+<Section>
+```typescript
+import { bigserial, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  bigserial: bigserial('bigserial', { mode: 'number' }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"bigserial" bigserial NOT NULL,
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { bigserial, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  bigserial: bigserial('bigserial', { mode: 'bigint' }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"bigserial" bigserial,
+);
+````
+</Section>
+
+#### decimal
+
+<Section>
+```typescript
+import { decimal, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  decimal: decimal('decimal'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"decimal" numeric,
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { decimal, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  decimal: decimal('decimal', { precision: 3, scale: 2 }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"decimal" numeric(3,2),
+);
+````
+</Section>
+
+
+#### numeric
+
+<Section>
+```typescript
+import { numeric, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  numeric: numeric('numeric'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"numeric" numeric,
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { numeric, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  numeric: numeric('numeric', { precision: 3, scale: 2 }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"numeric" numeric(3,2),
+);
+````
+</Section>
+
+#### real
+
+A floating point value, stored as an `8-byte IEEE` floating point number.
+
+<Section>
+```typescript
+import { real, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	real: real('real')
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"real" real,
+);
+````
+</Section>
+
+#### doublePrecision
+
+<Section>
+```typescript
+import { doublePrecision, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	doublePrecision: doublePrecision('doublePrecision'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"doublePrecision" double precision,
+);
+````
+</Section>
+
+#### json
+
+<Section>
+```typescript
+import { json, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	json: json('json'),
+});
+
+json<...>('...');
+json<string[]>('...');
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"json" json,
+);
+````
+</Section>
+
+#### jsonb
+
+<Section>
+```typescript
+import { jsonb, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	jsonb: jsonb('jsonb'),
+});
+
+jsonb<...>('...');
+jsonb<string[]>('...');
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"jsonb" jsonb,
+);
+````
+</Section>
+
+#### time
+
+<Section>
+```typescript
+import { time, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+  time: time('time'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"time" time,
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { time, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+  time: time('time', { precision: 6, withTimezone: true }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"time" time,
+	"time" time(6) with time zone,
+);
+````
+</Section>
+
+#### timestamp
+
+<Section>
+```typescript
+import { timestamp, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+  timestamp: timestamp('timestamp'),
+	timestamp2: timestamp('timestamp2', { mode: 'date',  precision: 6, withTimezone: true }),
+});
+
+
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"timestamp" timestamp,
+	"timestamp2": timestamp (6) with time zone,
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { timestamp, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	timestamp: timestamp('timestamp').defaultNow(),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"timestamp" timestamp DEFAULT now(),
+);
+````
+</Section>
+
+#### date
+
+<Section>
+```typescript
+import { date, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	date: date('date'),
+});
+
+date('...', { mode: 'string' | 'date' })
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"date" date,
+);
+````
+</Section>
+
+#### interval
+
+<Section>
+```typescript
+import { interval, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	interval: interval('interval'),
+  intervalDay: interval('interval_day', { fields: 'day' , precision: 6 }),
+  intervalMonth: interval('interval_month', { fields: 'month' }),
+});
+
+interval('...', { fields: 'day' | 'month' | '...' , precision: 0..6 })
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"interval" interval,
+	"interval_day" interval day(6),
+	"interval_month" interval month,
+);
+````
+</Section>
+
+#### enumColumn
+
+
+<Section>
+```typescript
+import { pgEnum, sqliteTable } from "drizzle-orm/pg-core";
+
+const popularityEnum = pgEnum('popularity', ['unknown', 'known', 'popular']);
+
+const table = pgTable('table', {
+  column: popularityEnum('column'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"column" popularity,
+);
+````
+</Section>
+
+## Columns constraints
+#### Not null
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
+
+<Section>
+```typescript
+import { integer, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	integer: integer('integer').notNull(),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"integer" integer NOT NULL,
+);
+````
+</Section>
+
+
+#### Default value
+
+The `DEFAULT` clause specifies a default value to use for the column if no value
+is explicitly provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Section>
+```typescript
+import { integer, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	integer: integer('integer').default(3),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"integer" integer DEFAULT 3,
+);
+````
+</Section>
+
+
+#### Primary key
+
+<Section>
+```typescript
+import { integer, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	integer: integer('integer').primaryKey(),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"integer" integer PRIMARY KEY NOT NULL,
+);
+````
+</Section>
+
+#### Default random
+
+<Section>
+```typescript
+import { uuid, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	uuid: uuid('uuid').defaultRandom(),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"uuid" uuid DEFAULT gen_random_uuid()
+);
+````
+</Section>

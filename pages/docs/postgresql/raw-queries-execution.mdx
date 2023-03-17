@@ -4,7 +4,7 @@ If you have some complex queries to execute and drizzle-orm can't handle them ye
 
 ```typescript copy
 // it will automatically run a parametrized query!
-const res: QueryResult<{ id: number; name: string }> = await db.execute<
+const res/*: QueryResult<{ id: number; name: string }>*/ = await db.execute<
   { id: number; name: string }
 >(sql`select * from ${users} where ${users.id} = ${userId}`);
 ```

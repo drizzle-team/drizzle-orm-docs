@@ -1,0 +1,93 @@
+# Joins
+
+> **Note**: for in-depth partial select joins documentation, refer to [this page](../joins).
+
+## Many-to-one
+
+```typescript copy
+const cities = mysqlTable('cities', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+});
+
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+  cityId: int('city_id').references(() => cities.id),
+});
+
+const result = db.select().from(cities).leftJoin(users, eq(cities2.id, users2.cityId));
+```
+
+## Many-to-many
+
+```typescript copy
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+});
+
+const chatGroups = mysqlTable('chat_groups', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+});
+
+const usersToChatGroups = mysqlTable('usersToChatGroups', {
+  userId: integer('user_id').notNull().references(() => users.id),
+  groupId: integer('group_id').notNull().references(() => chatGroups.id),
+});
+
+// querying user group with id 1 and all the participants(users)
+const result = await db
+  .select()
+  .from(usersToChatGroups)
+  .leftJoin(users, eq(usersToChatGroups.userId, users.id))
+  .leftJoin(chatGroups, eq(usersToChatGroups.groupId, chatGroups.id))
+  .where(eq(chatGroups.id, 1));
+```
+
+## Join aliases and self-joins
+
+```typescript copy
+import { ..., alias } from 'drizzle-orm/mysql-core';
+
+export const files = mysqlTable('folders', {
+  name: text('name').notNull(),
+  parent: text('parent_folder')
+})
+
+const nestedFiles = alias(files, 'nested_files');
+
+// will return files and folders and nested files for each folder at root dir
+const result = await db
+  .select()
+  .from(files)
+  .leftJoin(nestedFiles, eq(files.name, nestedFiles.name))
+  .where(eq(files.parent, '/'));
+```
+
+## Join using partial field select
+
+Join Cities with Users getting only needed fields form request
+
+```typescript copy
+// Select user ID and city ID and name
+const result1 = await db
+  .select({
+    userId: users.id,
+    cityId: cities.id,
+    cityName: cities.name,
+  })
+  .from(cities).leftJoin(users, eq(users.cityId, cities.id));
+
+// Select all fields from users and only id and name from cities
+const result2 = await db
+  .select({
+    user: users,
+    city: {
+      id: cities.id,
+      name: cities.name,
+    },
+  })
+  .from(cities).leftJoin(users, eq(users.cityId, cities.id));
+```

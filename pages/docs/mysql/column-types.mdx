@@ -1,0 +1,621 @@
+import Section from "../../../components/Section/Section";
+
+## List of all MySQL column types
+
+We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
+
+#### Integer
+
+A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
+
+<Section>
+```typescript
+import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	id: int('id')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`int` int,
+);
+```
+</Section>
+
+#### tinyint
+
+<Section>
+```typescript
+import { tinyint, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	tinyint: tinyint('tinyint')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`tinyint` tinyint,
+);
+```
+</Section>
+
+#### smallint
+
+<Section>
+```typescript
+import { smallint, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	smallint: smallint('smallint')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`smallint` smallint,
+);
+```
+</Section>
+
+#### mediumint
+
+<Section>
+```typescript
+import { mediumint, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	mediumint: mediumint('mediumint')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`mediumint` mediumint,
+);
+```
+</Section>
+
+#### bigint
+
+<Section>
+```typescript
+import { bigint, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	bigint: bigint('bigint')
+});
+
+bigint('...', { mode: 'number' | 'bigint' });
+```
+
+```sql
+CREATE TABLE `table` (
+	`bigint` bigint,
+);
+```
+</Section>
+
+#### real
+
+<Section>
+```typescript
+import { real, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	real: real('real')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`real` real,
+);
+```
+</Section>
+
+<Section>
+```typescript
+import { real, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	realPrecision: real('real_precision', { precision: 1,}),
+	realPrecisionScale: real('real_precision_scale', { precision: 1, scale: 1,}),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`real_precision` real(1),
+	`real_precision_scale` real(1, 1),
+);
+```
+</Section>
+
+#### decimal
+
+<Section>
+```typescript
+import { decimal, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	decimal: decimal('decimal')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`decimal` decimal,
+);
+```
+</Section>
+
+<Section>
+```typescript
+import { decimal, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	decimalPrecision: decimal('decimal_precision', { precision: 1,}),
+	decimalPrecisionScale: decimal('decimal_precision_scale', { precision: 1, scale: 1,}),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`decimal_precision` real(1),
+	`decimal_precision_scale` real(1, 1),
+);
+```
+</Section>
+
+#### double
+
+<Section>
+```typescript
+import { double, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	double: double('double')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`double` double,
+);
+```
+</Section>
+
+<Section>
+```typescript
+import { double, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	doublePrecision: double('double_precision', { precision: 1,}),
+	doublePrecisionScale: double('double_precision_scale', { precision: 1, scale: 1,}),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`double_precision` real(1),
+	`double_precision_scale` real(1, 1),
+);
+```
+</Section>
+
+#### float
+
+<Section>
+```typescript
+import { float, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	float: float('float')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`float` float,
+);
+```
+</Section>
+
+#### serial
+
+<Section>
+```typescript
+import { serial, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	serial: serial('serial')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`serial` serial AUTO_INCREMENT,
+);
+```
+</Section>
+
+#### binary
+
+<Section>
+```typescript
+import { binary, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	binary: binary('binary')
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`binary` binary,
+);
+```
+</Section>
+
+#### varbinary
+
+<Section>
+```typescript
+import { varbinary, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	varbinary: varbinary('varbinary', { length: 2}),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`varbinary` varbinary(2),
+);
+```
+</Section>
+
+#### char
+
+<Section>
+```typescript
+import { char, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	char: char('char'),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`char` char,
+);
+```
+</Section>
+
+#### varchar
+
+<Section>
+```typescript
+import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	varchar: varchar('varchar', { length: 2 }),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`varchar` varchar(2),
+);
+```
+</Section>
+
+#### text
+
+<Section>
+```typescript
+import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	text: text('text'),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`text` text,
+);
+```
+</Section>
+
+#### boolean
+
+<Section>
+```typescript
+import { boolean, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	boolean: boolean('boolean'),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`boolean` boolean,
+);
+```
+</Section>
+
+#### date
+
+<Section>
+```typescript
+import { boolean, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	date: date('date'),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`date` date,
+);
+```
+</Section>
+
+#### datetime
+
+<Section>
+```typescript
+import { datetime, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	datetime: datetime('datetime'),
+});
+
+datetime('...', { mode: 'date' | "string"}),
+datetime('...', { fsp : 0..6}),
+```
+
+```sql
+CREATE TABLE `table` (
+	`datetime` datetime,
+);
+```
+</Section>
+
+<Section>
+```typescript
+import { datetime, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	datetime: datetime('datetime', { mode: 'date', fsp: 6 }),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`datetime` datetime(6),
+);
+```
+</Section>
+
+#### time 
+
+<Section>
+```typescript
+import { time, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	time: time('time'),
+	timefsp: time('time_fsp', { fsp: 6 }),
+});
+	
+time('...', { fsp: 0..6 }),
+```
+
+```sql
+CREATE TABLE `table` (
+	`time` time,
+	`time_fsp` time(6),
+);
+```
+</Section>
+
+#### year
+
+<Section>
+```typescript
+import { year, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	year: year('year'),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`year` year,
+);
+```
+</Section>
+
+#### timestamp
+
+<Section>
+```typescript
+import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	timestamp: timestamp('timestamp'),
+});
+
+timestamp('...', { mode: 'date' | "string"}),
+timestamp('...', { fsp : 0..6}),
+```
+
+```sql
+CREATE TABLE `table` (
+	`timestamp` timestamp,
+);
+```
+</Section>
+
+<Section>
+```typescript
+import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	timestamp: timestamp('timestamp', { mode: 'date', fsp: 6 }),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`timestamp` timestamp(6),
+);
+```
+</Section>
+
+<Section>
+```typescript
+import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	timestamp: timestamp('timestamp').defaultNow(),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`timestamp` timestamp DEFAULT (now()),
+);
+```
+</Section>
+
+#### json
+
+<Section>
+```typescript
+import { json, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	json: json('json'),
+});
+
+json<...>('...');
+json<string[]>('...')
+```
+
+```sql
+CREATE TABLE `table` (
+	`json` json,
+);
+```
+</Section>
+
+
+### enumColumn
+
+<Section>
+```typescript
+import { mysqlEnum, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	mysqlEnum: mysqlEnum('popularity', ['unknown', 'known', 'popular']),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`popularity` enum('unknown','known','popular'),
+);
+```
+</Section>
+
+## Columns constraints
+#### Not null
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
+
+<Section>
+```typescript
+import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	int: int('int').notNull(),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`int` int NOT NULL,
+);
+```
+</Section>
+
+#### Default value
+
+The `DEFAULT` clause specifies a default value to use for the column if no value
+is explicitly provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Section>
+```typescript
+import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	int: int('int').default(3),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`int` int DEFAULT 3,
+);
+```
+</Section>
+
+#### Primary key 
+
+<Section>
+```typescript
+import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	int: int('int').primaryKey(),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`int` int PRIMARY KEY NOT NULL,
+);
+```
+</Section>
+
+#### Auto increment
+
+<Section>
+```typescript
+import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	int: int('int').autoincrement(),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`int` int AUTO_INCREMENT
+);
+```
+</Section>

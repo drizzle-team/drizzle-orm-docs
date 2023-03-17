@@ -1,0 +1,103 @@
+# SQL schema declaration
+
+With drizzle-orm you declare SQL schema in TypeScript. You can have either one schema.ts file with all declarations or you can group them logically in multiple files. We prefer to use single file schema.
+
+### Single schema file example
+
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📜schema.ts
+```
+
+### Multiple schema files example
+
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📂 schema
+          ├ 📜users.ts
+          ├ 📜countries.ts
+          ├ 📜cities.ts
+          ├ 📜products.ts
+          ├ 📜clients.ts
+          ├ 📜enums.ts
+          └ 📜etc.ts
+```
+
+### TypeScript schema declaration
+
+This is how you declare SQL schema in `schema.ts`. You can declare tables, indexes and constraints, foreign keys and enums. Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](./migrations).
+
+```typescript copy filename="db.ts"
+import {
+  int,
+  mysqlEnum,
+  mysqlTable,
+  serial,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/mysql-core';
+
+// declaring enum in database
+export const countries = mysqlTable('countries', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }),
+}, (countries) => ({
+  nameIndex: uniqueIndex('name_idx').on(countries.name),
+}));
+
+export const cities = mysqlTable('cities', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }),
+  countryId: int('country_id').references(() => countries.id),
+  popularity: mysqlEnum('popularity', ['unknown', 'known', 'popular']),
+});
+```
+
+### Database and table entity types
+
+```typescript filename="db.ts" copy
+import { InferModel, MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+import mysql from 'mysql2/promise';
+import { drizzle } from 'drizzle-orm/mysql2';
+
+const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name'),
+  phone: varchar('phone', { length: 256 }),
+});
+
+export type User = InferModel<typeof users>; // return type when queried
+export type NewUser = InferModel<typeof users, 'insert'>; // insert type
+...
+
+// init mysql2 Pool or Client
+const poolConnection = mysql.createPool({
+    host:'localhost', 
+    user: 'root',
+    database: 'test'
+});
+
+export const db: MySqlDatabase = drizzle(poolConnection);
+
+const result: User[] = await db.select().from(users);
+
+/* type MySqlRawQueryExample is a response from mysql2 driver
+   type MySqlRawQueryResult = [ResultSetHeader, FieldPacket[]];
+   type ResultSetHeader = {
+      affectedRows: number;
+      fieldCount: number;
+      info: string;
+      insertId: number;
+      serverStatus: number;
+      warningStatus: number;
+      changedRows?: number;
+    }
+*/
+export async function insertUser(user: NewUser): Promise<MySqlRawQueryResult> {
+  return db.insert(users).values(user);
+}
+```

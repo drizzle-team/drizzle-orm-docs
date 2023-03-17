@@ -23,16 +23,6 @@ yarn add -D drizzle-kit
   </Tab>
 </Tabs>
 
-### Example file 
-
-```typescript filename="schema.ts" copy
-export const users = mysqlTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-  phone: varchar('phone', { length: 256 }),
-});
-```
-
 ### Connecting to databases
 
 <Tabs items={['mysql2', 'PlanetScale Serverless']}>
