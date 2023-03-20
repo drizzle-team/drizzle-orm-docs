@@ -1,126 +1,139 @@
-import { Tab, Tabs } from 'nextra-theme-docs';
+import { Tab, Tabs } from "nextra-theme-docs";
 
-### Installation
-
-<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tabs items={['node-postgres', 'Postgres.JS', 'AWS Data API']}>
   <Tab>
-```bash copy
-npm i drizzle-orm pg
-npm i -D @types/pg
-npm i -D drizzle-kit
-```
-  </Tab>
-  <Tab>
-```bash copy
-pnpm add drizzle-orm pg
-pnpm add -D @types/pg
-pnpm add -D drizzle-kit
-```
-  </Tab>
-  <Tab>
-```bash copy
-yarn add drizzle-orm pg
-yarn add -D @types/pg
-yarn add -D drizzle-kit
-```
-  </Tab>
-</Tabs>
+    <Tabs items={['npm', 'pnpm', 'yarn']}>
+      <Tab>
+        ```bash copy
+        npm i drizzle-orm pg
+        npm i -D @types/pg
+        npm i -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        pnpm add drizzle-orm pg
+        pnpm add -D @types/pg
+        pnpm add -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        yarn add drizzle-orm pg
+        yarn add -D @types/pg
+        yarn add -D drizzle-kit
+        ```
+      </Tab>
+    </Tabs>
 
-Postgres.JS installation
+```typescript copy filename="index.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool, Client } from "pg";
 
-<Tabs items={['npm', 'pnpm', 'yarn']}>
-  <Tab>
-```bash copy
-npm i drizzle-orm postgres
-npm i -D drizzle-kit
-```
-  </Tab>
-  <Tab>
-```bash copy
-pnpm add drizzle-orm postgres
-pnpm add -D drizzle-kit
-```
-  </Tab>
-  <Tab>
-```bash copy
-yarn add drizzle-orm postgres
-yarn add -D drizzle-kit
-```
-  </Tab>
-</Tabs>
-
-### Connecting to databases
-
-<Tabs items={['node-postgres', 'aws data api', 'Postgres.JS']}>
-  <Tab>
-```typescript copy filename="Pool"
-import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-
-import { users } from './schema';
-
+// <--- You can use pg pool to connect ---
 const pool = new Pool({
-  connectionString: 'postgres://user:password@host:port/db',
+  connectionString: "postgres://user:password@host:port/db",
 });
 // or
 const pool = new Pool({
-  host: '127.0.0.1',
+  host: "127.0.0.1",
   port: 5432,
-  user: 'postgres',
-  password: 'password',
-  database: 'db_name',
+  user: "postgres",
+  password: "password",
+  database: "db_name",
 });
-
 const db = drizzle(pool);
-const allUsers = await db.select().from(users);
-```
 
-```typescript copy filename="Client"
-import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Client } from 'pg';
-
-import { users } from './schema';
-
+// --- Or you can use pg client ---
 const client = new Client({
-  connectionString: 'postgres://user:password@host:port/db',
+  connectionString: "postgres://user:password@host:port/db",
 });
 // or
 const client = new Client({
-  host: '127.0.0.1',
+  host: "127.0.0.1",
   port: 5432,
-  user: 'postgres',
-  password: 'password',
-  database: 'db_name',
+  user: "postgres",
+  password: "password",
+  database: "db_name",
 });
 
 await client.connect();
-
 const db = drizzle(client);
-const allUsers = await db.select().from(users);
 ```
+
   </Tab>
+
+{/* <--- Postgres JS ---> */}
+
   <Tab>
-```typescript copy filename="db.ts"
-import { drizzle, migrate } from 'drizzle-orm/aws-data-api/pg';
+    <Tabs items={['npm', 'pnpm', 'yarn']}>
+      <Tab>
+        ```bash copy
+        npm i drizzle-orm postgres
+        npm i -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        pnpm add drizzle-orm postgres
+        pnpm add -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        yarn add drizzle-orm postgres
+        yarn add -D drizzle-kit
+        ```
+      </Tab>
+    </Tabs>
 
-const rdsClient = new RDSDataClient({});
+    ```typescript copy filename="index.ts"
+    import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+    import postgres from 'postgres';
 
-const db = drizzle(rdsClient, {
-  database: '',
-  secretArn: '',
-  resourceArn: '',
-});
-```
+    const client = postgres(connectionString);
+    const db: PostgresJsDatabase = drizzle(client);
+    ```
+
   </Tab>
-<Tab>
-```typescript copy filename="db.ts"
-import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
 
-const client = postgres(connectionString);
-const db: PostgresJsDatabase = drizzle(client);
-```
+{/* <--- AWS Data API ---> */}
+
+  <Tab>
+    <Tabs items={['npm', 'pnpm', 'yarn']}>
+      <Tab>
+        ```bash copy
+        npm i drizzle-orm @aws-sdk/client-rds-data
+        npm i -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        pnpm add drizzle-orm @aws-sdk/client-rds-data
+        pnpm add -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        yarn add drizzle-orm @aws-sdk/client-rds-data
+        yarn add -D drizzle-kit
+        ```
+      </Tab>
+    </Tabs>
+
+    ```typescript copy filename="index.ts"
+    import { drizzle, migrate } from 'drizzle-orm/aws-data-api/pg';
+    import { RDSDataClient } from '@aws-sdk/client-rds-data';
+
+    const rdsClient = new RDSDataClient({});
+
+    const db = drizzle(rdsClient, {
+      database: '',
+      secretArn: '',
+      resourceArn: '',
+    });
+    ```
+
   </Tab>
 </Tabs>
