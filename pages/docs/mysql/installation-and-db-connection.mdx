@@ -1,85 +1,101 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
 
-### Installation
-
-<Tabs items={['npm', 'pnpm', 'yarn']}>
-  <Tab>
-```bash copy
-npm i drizzle-orm mysql2
-npm i -D drizzle-kit
-```
-  </Tab>
-  <Tab>
-```bash copy
-pnpm add drizzle-orm mysql2
-pnpm add -D drizzle-kit
-```
-  </Tab>
-  <Tab>
-```bash copy
-yarn add drizzle-orm mysql2
-yarn add -D drizzle-kit
-```
-  </Tab>
-</Tabs>
-
-### Connecting to databases
-
 <Tabs items={['mysql2', 'PlanetScale Serverless']}>
   <Tab>
-```typescript copy filename="db.ts Pool"
-import { drizzle } from 'drizzle-orm/mysql2';
+    <Tabs items={['npm', 'pnpm', 'yarn']}>
+      <Tab>
+        ```bash copy
+        npm i drizzle-orm mysql2
+        npm i -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        pnpm add drizzle-orm mysql2
+        pnpm add -D drizzle-kit
+        ```
+      </Tab>
+      <Tab>
+        ```bash copy
+        yarn add drizzle-orm mysql2
+        yarn add -D drizzle-kit
+        ```
+      </Tab>
+    </Tabs>
 
-import mysql from 'mysql2/promise';
-import { users } from './schema';
+  ```typescript copy filename="index.ts Pool"
+  import { drizzle } from 'drizzle-orm/mysql2';
 
-// create the connection
-const poolConnection = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
-});
+  import mysql from 'mysql2/promise';
+  import { users } from './schema';
 
-const db = drizzle(poolConnection);
+  // create the connection
+  const poolConnection = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    database: 'test',
+  });
 
-const allUsers = await db.select().from(users);
-```
+  const db = drizzle(poolConnection);
 
-```typescript copy filename="db.ts Client"
-import { drizzle } from 'drizzle-orm/mysql2';
+  const allUsers = await db.select().from(users);
+  ```
 
-import mysql from 'mysql2/promise';
-import { users } from './schema';
+  ```typescript copy filename="index.ts Client"
+  import { drizzle } from 'drizzle-orm/mysql2';
 
-// create the connection
-const connection = await mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
-});
+  import mysql from 'mysql2/promise';
+  import { users } from './schema';
 
-const db = drizzle(connection);
+  // create the connection
+  const connection = await mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: 'test',
+  });
 
-const allUsers = await db.select().from(users);
-```
+  const db = drizzle(connection);
+
+  const allUsers = await db.select().from(users);
+  ```
   </Tab>
   <Tab>
-```typescript copy filename="db.ts"
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+    <Tabs items={['npm', 'pnpm', 'yarn']}>
+      <Tab>
+    ```bash copy
+    npm i drizzle-orm @planetscale/database
+    npm i -D drizzle-kit
+    ```
+      </Tab>
+      <Tab>
+    ```bash copy
+    pnpm add drizzle-orm @planetscale/database
+    pnpm add -D drizzle-kit
+    ```
+      </Tab>
+      <Tab>
+    ```bash copy
+    yarn add drizzle-orm @planetscale/database
+    yarn add -D drizzle-kit
+    ```
+      </Tab>
+    </Tabs>
+  ```typescript copy filename="index.ts"
+  import { drizzle } from 'drizzle-orm/planetscale-serverless';
 
-import { connect } from '@planetscale/database';
-import { users } from './schema';
+  import { connect } from '@planetscale/database';
+  import { users } from './schema';
 
-// create the connection
-const connection = connect({
-  host: process.env['DATABASE_HOST'],
-  username: process.env['DATABASE_USERNAME'],
-  password: process.env['DATABASE_PASSWORD'],
-});
+  // create the connection
+  const connection = connect({
+    host: process.env['DATABASE_HOST'],
+    username: process.env['DATABASE_USERNAME'],
+    password: process.env['DATABASE_PASSWORD'],
+  });
 
-const db = drizzle(connection);
+  const db = drizzle(connection);
 
-const allUsers = await db.select().from(users);
-```
+  const allUsers = await db.select().from(users);
+  ```
   </Tab>
 </Tabs>

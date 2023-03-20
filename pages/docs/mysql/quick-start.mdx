@@ -1,7 +1,9 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
 
-### Installation
 
+**For the quick start example we're going to use MySQL2 driver**
+
+#### Install the dependencies
 <Tabs items={['npm', 'pnpm', 'yarn']}>
   <Tab>
 ```bash copy
@@ -23,9 +25,8 @@ yarn add -D drizzle-kit
   </Tab>
 </Tabs>
 
-### Example file 
-
-```typescript filename="schema.ts" copy
+#### Declare your first schema file
+```typescript filename="schema.ts"
 export const users = mysqlTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
@@ -33,63 +34,20 @@ export const users = mysqlTable('users', {
 });
 ```
 
-### Connecting to databases
-
-<Tabs items={['mysql2', 'PlanetScale Serverless']}>
-  <Tab>
-```typescript copy filename="db.ts Pool"
-import { drizzle } from 'drizzle-orm/mysql2';
-
-import mysql from 'mysql2/promise';
-import { users } from './schema';
-
-// create the connection
-const poolConnection = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
-});
-
-const db = drizzle(poolConnection);
-
-const allUsers = await db.select().from(users);
-```
-
-```typescript copy filename="db.ts Client"
-import { drizzle } from 'drizzle-orm/mysql2';
-
-import mysql from 'mysql2/promise';
-import { users } from './schema';
-
-// create the connection
-const connection = await mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
-});
-
-const db = drizzle(connection);
-
-const allUsers = await db.select().from(users);
-```
-  </Tab>
-  <Tab>
+#### Run your first query, that's it!
 ```typescript copy filename="db.ts"
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
-
-import { connect } from '@planetscale/database';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import { users } from './schema';
 
-// create the connection
-const connection = connect({
-  host: process.env['DATABASE_HOST'],
-  username: process.env['DATABASE_USERNAME'],
-  password: process.env['DATABASE_PASSWORD'],
+
+const client = await mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  database: 'test',
 });
 
-const db = drizzle(connection);
+const db = drizzle(client);
 
 const allUsers = await db.select().from(users);
 ```
-  </Tab>
-</Tabs>
