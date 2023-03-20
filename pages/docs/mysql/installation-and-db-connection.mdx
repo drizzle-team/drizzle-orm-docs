@@ -23,13 +23,13 @@ import { Tab, Tabs } from 'nextra-theme-docs';
       </Tab>
     </Tabs>
 
-  ```typescript copy filename="index.ts Pool"
+  ```typescript copy filename="index.ts"
   import { drizzle } from 'drizzle-orm/mysql2';
 
   import mysql from 'mysql2/promise';
   import { users } from './schema';
 
-  // create the connection
+  // --- You can use mysql2 pool to connect ---
   const poolConnection = mysql.createPool({
     host: 'localhost',
     user: 'root',
@@ -38,16 +38,7 @@ import { Tab, Tabs } from 'nextra-theme-docs';
 
   const db = drizzle(poolConnection);
 
-  const allUsers = await db.select().from(users);
-  ```
-
-  ```typescript copy filename="index.ts Client"
-  import { drizzle } from 'drizzle-orm/mysql2';
-
-  import mysql from 'mysql2/promise';
-  import { users } from './schema';
-
-  // create the connection
+  // --- Or you can use mysql2 client ---
   const connection = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -55,8 +46,6 @@ import { Tab, Tabs } from 'nextra-theme-docs';
   });
 
   const db = drizzle(connection);
-
-  const allUsers = await db.select().from(users);
   ```
   </Tab>
   <Tab>
@@ -94,8 +83,6 @@ import { Tab, Tabs } from 'nextra-theme-docs';
   });
 
   const db = drizzle(connection);
-
-  const allUsers = await db.select().from(users);
   ```
   </Tab>
 </Tabs>

@@ -36,9 +36,9 @@ export const users = mysqlTable('users', {
 
 #### Run your first query, that's it!
 ```typescript copy filename="db.ts"
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { users } from './schema';
+  import { drizzle } from 'drizzle-orm/mysql2';
+  import mysql from 'mysql2/promise';
+  import { users } from './schema';
 
 
 const client = await mysql.createConnection({
