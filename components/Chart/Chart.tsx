@@ -24,11 +24,10 @@ const Chart: React.FC<Props> = ({ item, max }) => {
     <div className={styles.wrap}>
       <div>{item.name}</div>
       <div className={styles.chart_block}>
-        <div className={styles.block} ref={blockRef}>
-          <div className={styles.number}>{item.time}</div>
-          <div className={styles.text}>iter/sec</div>
-        </div>
+        <div className={styles.block} ref={blockRef} />
       </div>
+      <div>{item.time}</div>
+      <div className={styles.text}>iter/sec</div>
     </div>
   );
 };

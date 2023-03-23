@@ -8,50 +8,50 @@ const Performance = () => {
   const [page, setPage] = useState(0);
   const benchmarks = [
     {
+      query: 'select * from customer',
+      tests: [{
+        name: 'drizzle:p',
+        time: 0.1269,
+      },
+      {
+        name: 'typeorm',
+        time: 0.6961,
+      },
+      {
+        name: 'prisma',
+        time: 0.74131,
+      },
+      ],
+    },
+    {
       query: 'select * from customer where id = ?',
       tests: [{
         name: 'drizzle:p',
-        time: 92.47,
+        time: 0.76558,
       },
       {
-        name: 'kysely',
-        time: 111.69,
+        name: 'typeorm',
+        time: 8.19,
       },
       {
         name: 'prisma',
-        time: 184.46,
+        time: 12.08,
       },
       ],
     },
     {
-      query: 'select * from customer where company_name ilike ?',
+      query: 'select * from customer where company_name like ?',
       tests: [{
         name: 'drizzle:p',
-        time: 58.25,
+        time: 1.75,
       },
       {
-        name: 'kysely',
-        time: 70.89,
+        name: 'typeorm',
+        time: 7.57,
       },
       {
         name: 'prisma',
-        time: 108.91,
-      },
-      ],
-    },
-    {
-      query: 'SELECT * FROM employee',
-      tests: [{
-        name: 'drizzle:p',
-        time: 1.42,
-      },
-      {
-        name: 'kysely',
-        time: 1.36,
-      },
-      {
-        name: 'prisma',
-        time: 1.89,
+        time: 11.17,
       },
       ],
     },
@@ -59,27 +59,27 @@ const Performance = () => {
       query: 'select * from employee where id = ? left join reportee',
       tests: [{
         name: 'drizzle:p',
-        time: 9.27,
+        time: 0.12255,
       },
       {
-        name: 'kysely',
-        time: 13.79,
+        name: 'typeorm',
+        time: 2.67,
       },
       {
         name: 'prisma',
-        time: 23.44,
+        time: 2.28,
       },
       ],
     },
     {
       query: 'SELECT * FROM supplier',
       tests: [{
-        name: 'drizzle',
-        time: 0.0655,
+        name: 'drizzle:p',
+        time: 0.4657,
       },
       {
-        name: 'kysely',
-        time: 0.08405,
+        name: 'typeorm',
+        time: 0.25741,
       },
       {
         name: 'prisma',
@@ -88,18 +88,18 @@ const Performance = () => {
       ],
     },
     {
-      query: 'SELECT * FROM product LEFT JOIN supplier WHERE product.id = ?',
+      query: 'select all order with sum and count',
       tests: [{
         name: 'drizzle:p',
-        time: 80.01,
+        time: 132.6,
       },
       {
-        name: 'kysely',
-        time: 93.93,
+        name: 'typeorm',
+        time: 6560,
       },
       {
         name: 'prisma',
-        time: 267.18,
+        time: 3960,
       },
       ],
     },
@@ -109,7 +109,7 @@ const Performance = () => {
     ...b,
     tests: b.tests.map((t) => ({
       ...t,
-      time: +(1000 / t.time).toFixed(2),
+      time: +(1000 / t.time).toFixed(),
     })),
   }));
 
