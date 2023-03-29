@@ -1,5 +1,6 @@
 html[class~=dark] .wrap {
   border-color: rgb(64 64 64);
+  background-color: #111111;
 }
 
 html[class~=dark] .wrap:hover {
@@ -7,6 +8,14 @@ html[class~=dark] .wrap:hover {
   border-color: rgb(64 64 64);
 }
 
+html[class~=dark] .icon {
+  border: 1.7px solid rgb(64,64,64);
+  background-color: #282828;
+}
+
+html[class~=dark] .header {
+  color: rgb(243, 244, 246);
+}
 
 html[class~=dark] .img_light {
   display: none;
@@ -31,9 +40,8 @@ html[class~=dark] .img_dark {
   transition-timing-function: cubic-bezier(.4,0,.2,1);
   color: currentColor;
   padding: 1rem;
-  background-color: transparent;
-  border-color: rgb(229 231 235);
-  border-width: 1px;
+  background-color: rgba(240, 241, 242, 0.27);
+  border: 1px solid rgba(33, 39, 46, 0.12);
   border-radius: 0.5rem;
   overflow: hidden;
   justify-content: flex-start;
@@ -48,9 +56,17 @@ html[class~=dark] .img_dark {
 }
 
 .icon {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  border-radius: 5px;
+  padding: 10px;
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  text-align: center;
+  border: 1.7px solid rgba(33, 39, 46, 0.08);
+  background-color: rgb(240, 241, 242);
 }
 
 .icon img {
@@ -60,11 +76,11 @@ html[class~=dark] .img_dark {
 
 .header {
   font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  margin-bottom: 0.25rem;
+  font-size: 16px;
+  color: rgb(33, 39, 46);
 }
 
 .description {
-  color: rgba(156,163,175,1);
+  font-size: 14px;
+  color: rgb(120, 124, 128);
 }
