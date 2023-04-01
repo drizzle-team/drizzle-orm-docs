@@ -1,4 +1,4 @@
-import { ICards } from '../../../@types/SVGTypes';
+import { ICards } from '../@types/SVGTypes';
 
 const data: ICards = {
   'node-postgres': {
