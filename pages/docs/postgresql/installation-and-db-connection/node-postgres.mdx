@@ -24,29 +24,21 @@ import { Tab, Tabs } from "nextra-theme-docs";
   </Tab>
 </Tabs>
 
+There're two ways you can connect to the PostgreSQL with `pg` driver - it's either single `client` connection or a `pool`.
+For the built in `migrate` function with DDL migrations we and drivers are strongly encourage you to use single `client` connection.
+For querying purposes feel free to use either `client` or `pool` based on your business demands.
+
+<Tabs items={['Client connection', 'Pool connection']}>
+  <Tab>
 ```typescript copy filename="index.ts"
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool, Client } from "pg";
+import { Client } from "pg";
 
-// --- You can use pg pool to connect ---
-const pool = new Pool({
-  connectionString: "postgres://user:password@host:port/db",
-});
-// or
-const pool = new Pool({
-  host: "127.0.0.1",
-  port: 5432,
-  user: "postgres",
-  password: "password",
-  database: "db_name",
-});
-const db = drizzle(pool);
-
-// --- Or you can use pg client ---
 const client = new Client({
   connectionString: "postgres://user:password@host:port/db",
 });
+
 // or
 const client = new Client({
   host: "127.0.0.1",
@@ -59,3 +51,27 @@ const client = new Client({
 await client.connect();
 const db = drizzle(client);
 ```
+</Tab>
+<Tab>
+```typescript copy filename="index.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+const pool = new Pool({
+  connectionString: "postgres://user:password@host:port/db",
+});
+
+// or
+const pool = new Pool({
+  host: "127.0.0.1",
+  port: 5432,
+  user: "postgres",
+  password: "password",
+  database: "db_name",
+});
+
+const db = drizzle(pool);
+```
+</Tab>
+</Tabs>
