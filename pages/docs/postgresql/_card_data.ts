@@ -43,11 +43,11 @@ const data: ICards = {
     image: 'neon-serverless',
     lightIcon: {
       width: 24,
-      src: "/svg/neon-light.svg"
+      src: '/svg/neon-light.svg',
     },
     darkIcon: {
       width: 24,
-      src: "/svg/neon-dark.svg"
+      src: '/svg/neon-dark.svg',
     },
     description: 'Description',
     href: './installation-and-db-connection/aws-data-api',
