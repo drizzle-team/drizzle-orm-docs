@@ -1,10 +1,10 @@
 import Section from "../../../components/Section/Section";
 
   
-**List of all PostrgreSQL column types**  
+### PostgreSQL column types
 We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
 
-#### Integer
+#### integer
 `integer` `int` `int4`  
 Signed 4-byte integer     
 If you need `integer autoincrement` - please refer to [serial](#serial)
@@ -17,13 +17,13 @@ export const table = pgTable('table', {
 	int: integer('int')
 });
 
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"int" integer
 );
-````
+```
 </Section>
 
 <Section>
@@ -36,17 +36,17 @@ export const table = pgTable('table', {
 	int2: integer('int2').default(sql`'10'::int`)
 });
 
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"int1" integer DEFAULT 10
 	"int2" integer DEFAULT '10'::int
 );
-````
+```
 </Section>
 
-#### Smallint
+#### smallint
 `smallint` `int2`  
 Small-range signed 2-byte integer   
 If you need `smallint autoincrement` - please refer to [smallserial](#smallserial)
@@ -57,13 +57,13 @@ import { smallint, pgTable } from "drizzle-orm/pg-core";
 export const table = pgTable('table', {
 	smallint: smallint('smallint')
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"smallint" smallint
 );
-````
+```
 </Section>
 
 <Section>
@@ -75,17 +75,17 @@ export const table = pgTable('table', {
 	smallint1: smallint('smallint1').default(10)
 	smallint2: smallint('smallint2').default(sql`'10'::smallint`)
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"smallint1" smallint DEFAULT 10
 	"smallint2" smallint DEFAULT '10'::smallint
 );
-````
+```
 </Section>
 
-#### Bigint
+#### bigint
 `bigint` `int8`  
 Signed 8-byte integer  
 If you need `bigint autoincrement` - please refer to [bigserial](#bigserial)
@@ -104,13 +104,13 @@ bigint: bigint('bigint', { mode: 'number' })
 
 // will be inferred as `bigint`
 bigint: bigint('bigint', { mode: 'bigint' })
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"bigint" bigint
 );
-````
+```
 </Section>
 
 <Section>
@@ -122,17 +122,17 @@ export const table = pgTable('table', {
 	bigint1: bigint('bigint1').default(10)
 	bigint2: bigint('bigint2').default(sql`'10'::bigint`)
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"bigint1" bigint DEFAULT 10
 	"bigint2" bigint DEFAULT '10'::bigint
 );
-````
+```
 </Section>
 
-#### Serial
+#### serial
 `serial` `serial4`  
 Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
@@ -143,16 +143,16 @@ import { serial, pgTable } from "drizzle-orm/pg-core";
 export const table = pgTable('table', {
   serial: serial('serial'),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"serial" serial NOT NULL,
 );
-````
+```
 </Section>
 
-#### Smallserial
+#### smallserial
 `smallserial` `serial2`  
 Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
@@ -163,16 +163,16 @@ import { smallserial, pgTable } from "drizzle-orm/pg-core";
 export const table = pgTable('table', {
   smallserial: smallserial('smallserial'),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"smallserial" smallserial NOT NULL,
 );
-````
+```
 </Section>
 
-#### Bigserial
+#### bigserial
 `bigserial` `serial8`  
 Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
@@ -185,17 +185,17 @@ import { bigserial, pgTable } from "drizzle-orm/pg-core";
 export const table = pgTable('table', {
   bigserial: bigserial('bigserial', { mode: 'number' }),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"bigserial" bigserial NOT NULL,
 );
-````
+```
 </Section>
 
 
-#### Boolean
+#### boolean
 PostgreSQL provides the standard SQL type boolean
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-boolean.html)  
 
@@ -207,16 +207,16 @@ export const table = pgTable('table', {
 	boolean: boolean('boolean')
 });
 
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"boolean" boolean,
 );
-````
+```
 </Section>
 
-#### Text
+#### text
 `text`  
 Variable-length(unlimited) character string  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
@@ -232,16 +232,16 @@ export const table = pgTable('table', {
 
 // will be inferred as text: "value1" | "value2" | null
 text: text('text', { enum: ["value1", "value2"] })
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"text" text,
 );
-````
+```
 </Section>
 
-#### Varchar
+#### varchar
 `character varying(n)` `varchar(n)`  
 Variable-length character string, can store strings up to **`n`** characters(not bytes)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
@@ -259,17 +259,17 @@ export const table = pgTable('table', {
 
 // will be inferred as text: "value1" | "value2" | null
 varchar: varchar('varchar', { enum: ["value1", "value2"] }),
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"varchar1" varchar,
 	"varchar2" varchar(256),
 );
-````
+```
 </Section>
 
-#### Char
+#### char
 `character(n)` `char(n)`  
 Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
@@ -287,240 +287,236 @@ export const table = pgTable('table', {
 
 // will be inferred as text: "value1" | "value2" | null
 char: char('char', { enum: ["value1", "value2"] }),
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"char1" char,
 	"char2" char(256),
 );
-````
+```
+</Section>
+
+#### numeric
+`numeric` `decimal`  
+Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)  
+<Section>
+```typescript
+import { numeric, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  numeric1: numeric('numeric1'),
+  numeric2: numeric('numeric2', { precision: 100 }),
+  numeric3: numeric('numeric3', { precision: 100, scale: 20 }),
+});
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"numeric1" numeric,
+	"numeric2" numeric(100),
+	"numeric3" numeric(100, 20),
+);
+```
 </Section>
 
 #### decimal
-
-<Section>
-```typescript
-import { decimal, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  decimal: decimal('decimal'),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"decimal" numeric,
-);
-````
-</Section>
-
-<Section>
-```typescript
-import { decimal, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  decimal: decimal('decimal', { precision: 3, scale: 2 }),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"decimal" numeric(3,2),
-);
-````
-</Section>
-
-
-#### numeric
-
-<Section>
-```typescript
-import { numeric, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  numeric: numeric('numeric'),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"numeric" numeric,
-);
-````
-</Section>
-
-<Section>
-```typescript
-import { numeric, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  numeric: numeric('numeric', { precision: 3, scale: 2 }),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"numeric" numeric(3,2),
-);
-````
-</Section>
+Is an alias of [numeric](#numeric)
 
 #### real
-
-A floating point value, stored as an `8-byte IEEE` floating point number.
+`real` `float4`  
+Single precision floating-point number (4 bytes)  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
 
 <Section>
 ```typescript
-import { real, sqliteTable } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { real, sqliteTable } from "drizzle-orm/pg-core";  
 
 const table = pgTable('table', {
-	real: real('real')
+	real1: real('real1'),
+	real2: real('real2').default(10.10),
+	real2: real('real2').default(sql`'10.10'::real`),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"real" real,
+	"real1" real,
+	"real2" real default 10.10,
+	"real2" real default '10.10'::real
 );
-````
+```
 </Section>
 
-#### doublePrecision
+#### double precision
+`double precision` `float8`  
+Double precision floating-point number (8 bytes)  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
 
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
 import { doublePrecision, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	doublePrecision: doublePrecision('doublePrecision'),
+	double1: doublePrecision('double1'),
+	double2: doublePrecision('double2').default(10.10),
+	double3: doublePrecision('double3').default(sql`'10.10'::double precision`),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"doublePrecision" double precision,
+	"double1" double precision,
+	"double2" double precision default 10.10,
+	"double3" double precision default '10.10'::double precision,
 );
-````
+```
 </Section>
 
 #### json
-
+`json`  
+Textual JSON data, as specified in [RFC 7159](https://tools.ietf.org/html/rfc7159)  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
 import { json, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	json: json('json'),
+	json1: json('json1'),
+	json2: json('json2').default({ foo: "bar" }),
+	json3: json('json3').default(sql`'{foo: "bar"}'::json`),
 });
-
-json<...>('...');
-json<string[]>('...');
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"json" json,
+	"json1" json,
+	"json2" json default '{"foo": "bar"}'::json,
+	"json3" json default '{"foo": "bar"}'::json,
 );
-````
+```
 </Section>
+  
+You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
+It provides compile time protection for default values, insert and select schemas.
+```typescript
+// will be infered as { foo: string }
+json: json('json').$type<{ foo: string }>();
+
+// will be infered as string[]
+json: json('json').$type<string[]>();
+
+// won't compile
+json: json('json').$type<string[]>().default({});
+```
 
 #### jsonb
-
+`jsonb`  
+Binary JSON data, decomposed  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
 <Section>
 ```typescript
 import { jsonb, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	jsonb: jsonb('jsonb'),
+	jsonb1: jsonb('jsonb1'),
+	jsonb2: jsonb('jsonb2').default({ foo: "bar" }),
+	jsonb3: jsonb('jsonb3').default(sql`'{foo: "bar"}'::jsonb`),
 });
-
-jsonb<...>('...');
-jsonb<string[]>('...');
-````
-
+```
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"jsonb" jsonb,
+	"jsonb1" jsonb,
+	"jsonb2" jsonb default '{"foo": "bar"}'::jsonb,
+	"jsonb3" jsonb default '{"foo": "bar"}'::jsonb,
 );
-````
+```
 </Section>
+
+You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
+It provides compile time protection for default values, insert and select schemas.
+
+```typescript
+// will be infered as { foo: string }
+jsonb: jsonb('jsonb').$type<{ foo: string }>();
+
+// will be infered as string[]
+jsonb: jsonb('jsonb').$type<string[]>();
+
+// won't compile
+jsonb: jsonb('jsonb').$type<string[]>().default({});
+```
 
 #### time
+`time` `timetz` `time with timezone` `time without timezone`
+Time of day with or without time zone  
+PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)
 
 <Section>
 ```typescript
 import { time, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-  time: time('time'),
+  time1: time('time1'),
+  time2: time('time2', { withTimezone: true }),
+  time3: time('time3', { precision: 6 }),
+	time4: time('time4', { precision: 6, withTimezone: true })
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"time" time,
+	"time1" time,
+	"time2" time with timezone,
+	"time3" time(6),
+	"time4" time(6) with timezone,
 );
-````
-</Section>
-
-<Section>
-```typescript
-import { time, sqliteTable } from "drizzle-orm/pg-core";
-
-const table = pgTable('table', {
-  time: time('time', { precision: 6, withTimezone: true }),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"time" time,
-	"time" time(6) with time zone,
-);
-````
+```
 </Section>
 
 #### timestamp
-
+`timestamp` `timestamptz` `timestamp with time zone` `timestamp without time zone`  
+Date and time with or without time zone  
+PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)  
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
 import { timestamp, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-  timestamp: timestamp('timestamp'),
-	timestamp2: timestamp('timestamp2', { mode: 'date',  precision: 6, withTimezone: true }),
+  timestamp1: timestamp('timestamp1'),
+	timestamp2: timestamp('timestamp2', { precision: 6, withTimezone: true }),
+	timestamp3: timestamp('timestamp3').defaultNow(),
+	timestamp4: timestamp('timestamp4').default(sql`now()`),
 });
-
-
-````
-
+```
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"timestamp" timestamp,
-	"timestamp2": timestamp (6) with time zone,
+	"timestamp1" timestamp,
+	"timestamp2" timestamp (6) with time zone,
+	"timestamp3" timestamp default now(),
+	"timestamp4" timestamp default now(),
 );
-````
+```
 </Section>
 
-<Section>
+You can specify either `date` or `string` infer modes
 ```typescript
-import { timestamp, sqliteTable } from "drizzle-orm/pg-core";
+// will infer as date
+timestamp: timestamp('timestamp', { mode: "date" }),
 
-const table = pgTable('table', {
-	timestamp: timestamp('timestamp').defaultNow(),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"timestamp" timestamp DEFAULT now(),
-);
-````
-</Section>
+// will infer as string
+timestamp: timestamp('timestamp', { mode: "string" }),
+```
 
 #### date
-
+`date`  
+Calendar date (year, month, day)  
+PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html) 
 <Section>
 ```typescript
 import { date, sqliteTable } from "drizzle-orm/pg-core";
@@ -528,85 +524,78 @@ import { date, sqliteTable } from "drizzle-orm/pg-core";
 const table = pgTable('table', {
 	date: date('date'),
 });
-
-date('...', { mode: 'string' | 'date' })
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"date" date,
 );
-````
+```
 </Section>
+You can specify either `date` or `string` infer modes
+```typescript
+// will infer as date
+date: date('date', { mode: "date" }),
 
+// will infer as string
+date: date('date', { mode: "string" }),
+```
 #### interval
+`interval`  
+Time span  
+PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)  
 
 <Section>
 ```typescript
 import { interval, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	interval: interval('interval'),
-  intervalDay: interval('interval_day', { fields: 'day' , precision: 6 }),
-  intervalMonth: interval('interval_month', { fields: 'month' }),
+	interval1: interval('interval1'),
+  interval2: interval('interval2', { fields: 'day' }),
+  interval3: interval('interval3', { fields: 'month' , precision: 6 }),
 });
 
-interval('...', { fields: 'day' | 'month' | '...' , precision: 0..6 })
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"interval" interval,
-	"interval_day" interval day(6),
-	"interval_month" interval month,
+	"interval1" interval,
+	"interval2" interval day,
+	"interval3" interval(6) month,
 );
-````
+```
 </Section>
 
-#### enumColumn
+#### enum 
+`enum` `enumerated types`  
+Enumerated (enum) types are data types that comprise a static, ordered set of values. 
+They are equivalent to the enum types supported in a number of programming languages. 
+An example of an enum type might be the days of the week, or a set of status values for a piece of data.
 
-
+PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-enum.html)
 <Section>
 ```typescript
 import { pgEnum, sqliteTable } from "drizzle-orm/pg-core";
 
-const popularityEnum = pgEnum('popularity', ['unknown', 'known', 'popular']);
+const moodEnum = pgEnum('mood', ['sad', 'ok', 'happy']);
 
 const table = pgTable('table', {
-  column: popularityEnum('column'),
+  mood: moodEnum('mood'),
 });
-````
+```
 
 ```sql
+CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+
 CREATE TABLE IF NOT EXISTS "table" (
-	"column" popularity,
+	"mood" mood,
 );
-````
+```
 </Section>
 
-## Columns constraints
-#### Not null
-`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
-
-<Section>
-```typescript
-import { integer, sqliteTable } from "drizzle-orm/pg-core";
-
-const table = pgTable('table', {
-	integer: integer('integer').notNull(),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"integer" integer NOT NULL,
-);
-````
-</Section>
-
+## Constraints & defaults
 
 #### Default value
-
 The `DEFAULT` clause specifies a default value to use for the column if no value
 is explicitly provided by the user when doing an `INSERT`.
 If there is no explicit `DEFAULT` clause attached to a column definition,
@@ -617,53 +606,63 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
 import { integer, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	integer: integer('integer').default(3),
+	integer1: integer('integer1').default(42),
+	integer2: integer('integer2').default(sql`'42'::integer`),
+	uuid1: uuid('uuid1').defaultRandom(),
+	uuid2: uuid('uuid2').default(sql`get_random_uuid()`),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"integer" integer DEFAULT 3,
+	"integer1" integer DEFAULT 42,
+	"integer2" integer DEFAULT '42'::integer,
+	"uuid1" uuid DEFAULT gen_random_uuid(),
+	"uuid2" uuid DEFAULT gen_random_uuid()
 );
-````
+```
+</Section>
+
+
+#### Not null
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
+
+<Section>
+```typescript
+import { integer, sqliteTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+	integer: integer('integer').notNull(),
+});
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"integer" integer NOT NULL,
+);
+```
 </Section>
 
 
 #### Primary key
-
+A primary key constraint indicates that a column, or group of columns, can be used as a unique identifier for rows in the table. 
+This requires that the values be both unique and not null.
 <Section>
 ```typescript
 import { integer, sqliteTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	integer: integer('integer').primaryKey(),
+	id: serial('id').primaryKey(),
 });
-````
+```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"integer" integer PRIMARY KEY NOT NULL,
+	"integer" serial PRIMARY KEY NOT NULL,
 );
-````
-</Section>
-
-#### Default random
-
-<Section>
-```typescript
-import { uuid, sqliteTable } from "drizzle-orm/pg-core";
-
-const table = pgTable('table', {
-	uuid: uuid('uuid').defaultRandom(),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"uuid" uuid DEFAULT gen_random_uuid()
-);
-````
+```
 </Section>
