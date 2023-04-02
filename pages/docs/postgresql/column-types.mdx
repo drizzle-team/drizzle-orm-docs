@@ -5,8 +5,9 @@ import Section from "../../../components/Section/Section";
 We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
 
 #### Integer
-Signed four-byte integer, aliases - `integer` `int` `int4`  
-If you need `integer autoincrement` - please refer to [serial](#Serial)
+`integer` `int` `int4`  
+Signed 4-byte integer     
+If you need `integer autoincrement` - please refer to [serial](#serial)
 
 <Section>
 ```typescript
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
@@ -45,8 +47,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 </Section>
 
 #### Smallint
-Signed two-byte integer, aliases `smallint` `int2`  
-If you need `smallint autoincrement` - please refer to [smallserial](#Smallserial)
+`smallint` `int2`  
+Small-range signed 2-byte integer   
+If you need `smallint autoincrement` - please refer to [smallserial](#smallserial)
 <Section>
 ```typescript
 import { smallint, pgTable } from "drizzle-orm/pg-core";
@@ -65,24 +68,29 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 <Section>
 ```typescript
+import { sql } from "drizzle-orm";
 import { smallint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
 	smallint1: smallint('smallint1').default(10)
-	smallint2: smallint('smallint2').default(sql`'10'::int`)
+	smallint2: smallint('smallint2').default(sql`'10'::smallint`)
 });
 ````
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"smallint1" smallint DEFAULT 10
-	"smallint2" smallint DEFAULT '10'::int
+	"smallint2" smallint DEFAULT '10'::smallint
 );
 ````
 </Section>
 
-#### bigint
+#### Bigint
+`bigint` `int8`  
+Signed 8-byte integer  
+If you need `bigint autoincrement` - please refer to [bigserial](#bigserial)
 
+If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint  
 <Section>
 ```typescript
 import { bigint, pgTable } from "drizzle-orm/pg-core";
@@ -91,18 +99,105 @@ export const table = pgTable('table', {
 	bigint: bigint('bigint', { mode: 'number' })
 });
 
-bigint: bigint('bigint', { mode: 'bigint' })
+// will be inferred as `number`
+bigint: bigint('bigint', { mode: 'number' })
 
+// will be inferred as `bigint`
+bigint: bigint('bigint', { mode: 'bigint' })
 ````
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"bigint" bigint,
+	"bigint" bigint
 );
 ````
 </Section>
 
-#### boolean
+<Section>
+```typescript
+import { sql } from "drizzle-orm";
+import { bigint, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	bigint1: bigint('bigint1').default(10)
+	bigint2: bigint('bigint2').default(sql`'10'::bigint`)
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"bigint1" bigint DEFAULT 10
+	"bigint2" bigint DEFAULT '10'::bigint
+);
+````
+</Section>
+
+#### Serial
+`serial` `serial4`  
+Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+<Section>
+```typescript
+import { serial, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  serial: serial('serial'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"serial" serial NOT NULL,
+);
+````
+</Section>
+
+#### Smallserial
+`smallserial` `serial2`  
+Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+<Section>
+```typescript
+import { smallserial, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  smallserial: smallserial('smallserial'),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"smallserial" smallserial NOT NULL,
+);
+````
+</Section>
+
+#### Bigserial
+`bigserial` `serial8`  
+Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+
+If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint  
+<Section>
+```typescript
+import { bigserial, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+  bigserial: bigserial('bigserial', { mode: 'number' }),
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"bigserial" bigserial NOT NULL,
+);
+````
+</Section>
+
+
+#### Boolean
+PostgreSQL provides the standard SQL type boolean
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-boolean.html)  
 
 <Section>
 ```typescript
@@ -121,8 +216,12 @@ CREATE TABLE IF NOT EXISTS "table" (
 ````
 </Section>
 
-#### text
-
+#### Text
+`text`  
+Variable-length(unlimited) character string  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+  
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 <Section>
 ```typescript
 import { text, pgTable } from "drizzle-orm/pg-core";
@@ -131,7 +230,8 @@ export const table = pgTable('table', {
   text: text('text')
 });
 
-text<'union' | 'string' | 'type'>('union')
+// will be inferred as text: "value1" | "value2" | null
+text: text('text', { enum: ["value1", "value2"] })
 ````
 
 ```sql
@@ -141,90 +241,58 @@ CREATE TABLE IF NOT EXISTS "table" (
 ````
 </Section>
 
-#### varchar
+#### Varchar
+`character varying(n)` `varchar(n)`  
+Variable-length character string, can store strings up to **`n`** characters(not bytes)  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
 
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
+`length` parameter is optional due to PostgreSQL docs
 <Section>
 ```typescript
 import { varchar, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  varchar: varchar('varchar'),
+  varchar1: varchar('varchar1'),
+  varchar1: varchar('varchar2', { length: 256 }),
 });
 
-varchar<'union' | 'string' | 'type'>('union'),
+// will be inferred as text: "value1" | "value2" | null
+varchar: varchar('varchar', { enum: ["value1", "value2"] }),
 ````
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"varchar" varchar,
+	"varchar1" varchar,
+	"varchar2" varchar(256),
 );
 ````
 </Section>
 
+#### Char
+`character(n)` `char(n)`  
+Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes)  
+Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
+`length` parameter is optional due to PostgreSQL docs
 <Section>
 ```typescript
-import { varchar, pgTable } from "drizzle-orm/pg-core";
+import { char, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  varchar: varchar('varchar', { length: 256 }),
+  char1: char('char1'),
+  char2: char('char2', { length: 256 }),
 });
+
+// will be inferred as text: "value1" | "value2" | null
+char: char('char', { enum: ["value1", "value2"] }),
 ````
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"varchar" varchar(256),
-);
-````
-</Section>
-
-#### Serial
-
-<Section>
-```typescript
-import { serial, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  serial: serial('serial'),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"serial" serial NOT NULL,
-);
-````
-</Section>
-
-#### bigserial
-
-<Section>
-```typescript
-import { bigserial, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  bigserial: bigserial('bigserial', { mode: 'number' }),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"bigserial" bigserial NOT NULL,
-);
-````
-</Section>
-
-<Section>
-```typescript
-import { bigserial, pgTable } from "drizzle-orm/pg-core";
-
-export const table = pgTable('table', {
-  bigserial: bigserial('bigserial', { mode: 'bigint' }),
-});
-````
-
-```sql
-CREATE TABLE IF NOT EXISTS "table" (
-	"bigserial" bigserial,
+	"char1" char,
+	"char2" char(256),
 );
 ````
 </Section>
