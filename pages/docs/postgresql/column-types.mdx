@@ -1,44 +1,52 @@
 import Section from "../../../components/Section/Section";
 
-## List of all PostrgreSQL column types
-
+  
+**List of all PostrgreSQL column types**  
 We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
 
 #### Integer
-
-A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
+Signed four-byte integer, aliases - `integer` `int` `int4`  
+If you need `integer autoincrement` - please refer to [serial](#Serial)
 
 <Section>
 ```typescript
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	id: integer('id')
+	int: integer('int')
 });
 
 ````
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"id" integer
+	"int" integer
 );
 ````
 </Section>
 
 <Section>
 ```typescript
-// to make integer primary key auto increment
-integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true })
-```
+import { integer, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	int1: integer('int1').default(10)
+	int2: integer('int2').default(sql`'10'::int`)
+});
+
+````
+
 ```sql
-CREATE TABLE `table` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+CREATE TABLE IF NOT EXISTS "table" (
+	"int1" integer DEFAULT 10
+	"int2" integer DEFAULT '10'::int
 );
-```
+````
 </Section>
 
-#### smallint
-
+#### Smallint
+Signed two-byte integer, aliases `smallint` `int2`  
+If you need `smallint autoincrement` - please refer to [smallserial](#Smallserial)
 <Section>
 ```typescript
 import { smallint, pgTable } from "drizzle-orm/pg-core";
@@ -46,12 +54,29 @@ import { smallint, pgTable } from "drizzle-orm/pg-core";
 export const table = pgTable('table', {
 	smallint: smallint('smallint')
 });
-
 ````
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"smallint" smallint
+);
+````
+</Section>
+
+<Section>
+```typescript
+import { smallint, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	smallint1: smallint('smallint1').default(10)
+	smallint2: smallint('smallint2').default(sql`'10'::int`)
+});
+````
+
+```sql
+CREATE TABLE IF NOT EXISTS "table" (
+	"smallint1" smallint DEFAULT 10
+	"smallint2" smallint DEFAULT '10'::int
 );
 ````
 </Section>
@@ -152,7 +177,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ````
 </Section>
 
-#### serial
+#### Serial
 
 <Section>
 ```typescript

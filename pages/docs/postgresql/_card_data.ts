@@ -10,7 +10,7 @@ const data: ICards = {
     darkIcon: {
       width: 24,
     },
-    description: 'Description',
+    description: 'Collection of nodejs modules to interact with PostgreSQL',
     href: './installation-and-db-connection/node-postgres',
   },
   postgresjs: {
@@ -23,7 +23,7 @@ const data: ICards = {
       width: 24,
       fill: '#f0f0f0',
     },
-    description: 'Description',
+    description: 'Fastest full featured PostgreSQL client for Node.js and Deno',
     href: './installation-and-db-connection/postgresjs',
   },
   'aws-data-api': {
@@ -35,7 +35,7 @@ const data: ICards = {
     darkIcon: {
       width: 24,
     },
-    description: 'Description',
+    description: 'Data API for AWS Aurora Serverless',
     href: './installation-and-db-connection/aws-data-api',
   },
   neon: {
@@ -49,8 +49,8 @@ const data: ICards = {
       width: 24,
       src: "/svg/neon-dark.svg"
     },
-    description: 'Description',
-    href: './installation-and-db-connection/aws-data-api',
+    description: 'Serverless multi-cloud fully managed Postgres',
+    href: './installation-and-db-connection/neon',
   },
 };
 

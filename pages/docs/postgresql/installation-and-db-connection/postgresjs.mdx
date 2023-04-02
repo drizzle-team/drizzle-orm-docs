@@ -1,5 +1,6 @@
 import { Tab, Tabs } from "nextra-theme-docs";
 
+### PostgresJS
 <Tabs items={['npm', 'pnpm', 'yarn']}>
   <Tab>
     ```bash copy
@@ -21,10 +22,20 @@ import { Tab, Tabs } from "nextra-theme-docs";
   </Tab>
 </Tabs>
 
+For the built in `migrate` function with DDL migrations we and drivers are strongly encourage you to use `max: 1` connection configuration.
+For querying purposes feel free to use pool size of your choice based on your business demands.
+
 ```typescript copy filename="index.ts"
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 
-const client = postgres(connectionString);
+// for migrations
+const migrationClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db", { max: 1 });
+migrate(drizzle(migrationClient), ...)
+
+// for query purposes
+const queryClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db");
 const db: PostgresJsDatabase = drizzle(client);
+await db.select().from(...)...
 ```
