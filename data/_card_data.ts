@@ -1,4 +1,4 @@
-import { ICards } from '../../../@types/SVGTypes';
+import { ICards } from '../@types/SVGTypes';
 
 const data: ICards = {
   'node-postgres': {
@@ -43,11 +43,11 @@ const data: ICards = {
     image: 'neon-serverless',
     lightIcon: {
       width: 24,
-      src: "/svg/neon-light.svg"
+      src: '/svg/neon-light.svg',
     },
     darkIcon: {
       width: 24,
-      src: "/svg/neon-dark.svg"
+      src: '/svg/neon-dark.svg',
     },
     description: 'Serverless multi-cloud fully managed Postgres',
     href: './installation-and-db-connection/neon',
