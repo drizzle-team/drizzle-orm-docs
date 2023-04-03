@@ -182,8 +182,8 @@ const Performance = () => {
     <div>
       <div className={styles.header_wrap}>
         <div className={styles.header}>Performance</div>
-        <ToggleButton isToggled={isPreparedStatements} toggle={togglePreparedStatements} value="Prepared Statements toggle" />
         <div className={styles.buttons}>
+          <ToggleButton isToggled={isPreparedStatements} toggle={togglePreparedStatements} value="Prepared Statements toggle" />
           <LeftButton setPage={prevPage} isAvailable={isAvailablePrev} />
           <RightButton setPage={nextPage} isAvailable={isAvailableNext} />
         </div>
