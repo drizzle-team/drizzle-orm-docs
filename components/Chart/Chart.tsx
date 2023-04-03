@@ -7,9 +7,10 @@ interface Props {
     time: number,
   },
   max: number,
+  isItemForMin?: boolean;
 }
 
-const Chart: React.FC<Props> = ({ item, max }) => {
+const Chart: React.FC<Props> = ({ item, max, isItemForMin }) => {
   const blockRef = useRef<HTMLDivElement>(null!);
   const size = 200;
   const maxHeight = (item.time / max) * size;
@@ -27,7 +28,7 @@ const Chart: React.FC<Props> = ({ item, max }) => {
         <div className={styles.block} ref={blockRef} />
       </div>
       <div>{item.time}</div>
-      <div className={styles.text}>iter/sec</div>
+      <div className={styles.text}>{isItemForMin ? 'iter/min' : 'iter/sec'}</div>
     </div>
   );
 };

@@ -3,15 +3,25 @@ import styles from './Performance.module.css';
 import Chart from '../../Chart/Chart';
 import LeftButton from './LeftButton';
 import RightButton from './RightButton';
+import ToggleButton from '../../common/ToggleButton';
 
 const Performance = () => {
   const [page, setPage] = useState(0);
+  const [isPreparedStatements, setIsPreparedStatements] = useState(false);
+
+  const togglePreparedStatements = () => {
+    setIsPreparedStatements((prev) => !prev);
+  };
   const benchmarks = [
     {
       query: 'select * from customer',
       tests: [{
         name: 'drizzle:p',
         time: 0.1269,
+      },
+      {
+        name: 'drizzle',
+        time: 0.1493,
       },
       {
         name: 'typeorm',
@@ -30,6 +40,10 @@ const Performance = () => {
         time: 0.76558,
       },
       {
+        name: 'drizzle',
+        time: 2.74,
+      },
+      {
         name: 'typeorm',
         time: 8.19,
       },
@@ -44,6 +58,10 @@ const Performance = () => {
       tests: [{
         name: 'drizzle:p',
         time: 1.75,
+      },
+      {
+        name: 'drizzle',
+        time: 0.1329,
       },
       {
         name: 'typeorm',
@@ -62,6 +80,10 @@ const Performance = () => {
         time: 0.12255,
       },
       {
+        name: 'drizzle',
+        time: 0.81061,
+      },
+      {
         name: 'typeorm',
         time: 2.67,
       },
@@ -75,7 +97,11 @@ const Performance = () => {
       query: 'SELECT * FROM supplier',
       tests: [{
         name: 'drizzle:p',
-        time: 0.4657,
+        time: 0.04657,
+      },
+      {
+        name: 'drizzle',
+        time: 0.0655,
       },
       {
         name: 'typeorm',
@@ -94,6 +120,10 @@ const Performance = () => {
         time: 132.6,
       },
       {
+        name: 'drizzle',
+        time: 132.51,
+      },
+      {
         name: 'typeorm',
         time: 6560,
       },
@@ -105,13 +135,37 @@ const Performance = () => {
     },
   ];
 
-  const benchmarkIterForSec = benchmarks.map((b) => ({
-    ...b,
-    tests: b.tests.map((t) => ({
-      ...t,
-      time: +(1000 / t.time).toFixed(),
-    })),
-  }));
+  const benchmarkIterForSec: {
+    query: string;
+    tests: {
+      name: string;
+      time: number;
+    }[];
+    isItenPerMin?: boolean;
+  }[] = [];
+
+  benchmarks.forEach((benchmark, index) => {
+    benchmarkIterForSec.push({
+      query: benchmark.query,
+      tests: [],
+    });
+    if (benchmark.tests.some((val) => val.time >= 1000)) {
+      benchmarkIterForSec[index].isItenPerMin = true;
+    }
+    benchmark.tests.forEach((test) => {
+      if (benchmarkIterForSec[index].isItenPerMin) {
+        benchmarkIterForSec[index].tests.push({
+          ...test,
+          time: +(60000 / test.time).toFixed(),
+        });
+      } else {
+        benchmarkIterForSec[index].tests.push({
+          ...test,
+          time: +(1000 / test.time).toFixed(),
+        });
+      }
+    });
+  });
 
   const prevPage = () => {
     setPage((prev) => (prev - 3 >= 0 ? prev - 3 : prev));
@@ -128,6 +182,7 @@ const Performance = () => {
     <div>
       <div className={styles.header_wrap}>
         <div className={styles.header}>Performance</div>
+        <ToggleButton isToggled={isPreparedStatements} toggle={togglePreparedStatements} value="Prepared Statements toggle" />
         <div className={styles.buttons}>
           <LeftButton setPage={prevPage} isAvailable={isAvailablePrev} />
           <RightButton setPage={nextPage} isAvailable={isAvailableNext} />
@@ -141,7 +196,7 @@ const Performance = () => {
             <div className={styles.chart} key={index}>
               <div className={styles.query}>{b.query}</div>
               <div className={styles.chart_block}>
-                {b.tests.map((t, key) => <Chart item={t} max={time} key={`${index} ${key}`} />)}
+                {b.tests.filter((t) => (isPreparedStatements ? t.name !== 'drizzle' : t.name !== 'drizzle:p')).map((t, key) => <Chart isItemForMin={b.isItenPerMin} item={t} max={time} key={`${index} ${key}`} />)}
               </div>
             </div>
           );
