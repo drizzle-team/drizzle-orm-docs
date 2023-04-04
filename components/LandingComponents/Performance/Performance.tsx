@@ -30,7 +30,7 @@ const Performance = () => {
         name: string;
         time: number;
       }[];
-      isItenPerMin?: boolean;
+      isItemPerMin?: boolean;
     }[] = [];
 
     benchmarks.filter((b) => b.type === chartsType)[0]
@@ -41,10 +41,10 @@ const Performance = () => {
           tests: [],
         });
         if (benchmark.tests.some((val) => val.time >= 1000)) {
-          copyWithFilteredCharts[index].isItenPerMin = true;
+          copyWithFilteredCharts[index].isItemPerMin = true;
         }
         benchmark.tests.forEach((test) => {
-          if (copyWithFilteredCharts[index].isItenPerMin) {
+          if (copyWithFilteredCharts[index].isItemPerMin) {
             copyWithFilteredCharts[index].tests.push({
               ...test,
               time: +(60000 / test.time).toFixed(),

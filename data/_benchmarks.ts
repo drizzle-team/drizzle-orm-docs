@@ -127,11 +127,11 @@ const data: BenchmarksWithType = [
         },
         {
           name: 'typeorm',
-          time: 257,
+          time: 0.257,
         },
         {
           name: 'prisma',
-          time: 282,
+          time: 0.282,
         },
         ],
       },
