@@ -1,5 +1,6 @@
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import TwitterIcon from './components/TwitterIcon';
+import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 
 const config: DocsThemeConfig = {
   useNextSeoProps() {
@@ -30,8 +31,14 @@ const config: DocsThemeConfig = {
   gitTimestamp: <></>,
   main: ({ children }) => <div style={{ maxWidth: 1024, margin: '0 auto' }}>{children}</div>,
   navbar: {
-    extraContent: <TwitterIcon />,
+    extraContent: <>
+      <TwitterIcon />
+      <ThemeToggle />
+    </>,
   },
+  themeSwitch: {
+  },
+  darkMode: false,
   nextThemes: {
     defaultTheme: 'system',
   },

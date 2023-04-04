@@ -14,21 +14,20 @@ const Chart: React.FC<Props> = ({ item, max, isItemForMin }) => {
   const blockRef = useRef<HTMLDivElement>(null!);
   const size = 200;
   const maxHeight = (item.time / max) * size;
-
   useEffect(() => {
     if (blockRef.current) {
       blockRef.current.style.height = `${maxHeight}px`;
     }
-  }, [item.time]);
+  }, [item.time, max]);
 
   return (
     <div className={styles.wrap}>
-      <div>{item.name}</div>
+      <div>{item.time}</div>
+      <div className={styles.text}>{isItemForMin ? 'iter/min' : 'iter/sec'}</div>
       <div className={styles.chart_block}>
         <div className={styles.block} ref={blockRef} />
       </div>
-      <div>{item.time}</div>
-      <div className={styles.text}>{isItemForMin ? 'iter/min' : 'iter/sec'}</div>
+      <div className={styles.name}>{item.name}</div>
     </div>
   );
 };
