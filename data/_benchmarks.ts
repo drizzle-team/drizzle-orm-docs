@@ -424,19 +424,19 @@ const data: BenchmarksWithType = [
         query: 'SELECT * FROM product LEFT JOIN supplier WHERE product.id = ?',
         tests: [{
           name: 'drizzle:p',
-          time: 40.57,
+          time: 38.25,
         },
         {
           name: 'drizzle',
-          time: 47.43,
+          time: 46.33,
         },
         {
           name: 'typeorm',
-          time: 96.51,
+          time: 100.94,
         },
         {
           name: 'prisma',
-          time: 142.41,
+          time: 115.84,
         },
         ],
       },
@@ -444,19 +444,19 @@ const data: BenchmarksWithType = [
         query: 'SELECT * FROM product WHERE product.name LIKE ?',
         tests: [{
           name: 'drizzle:p',
-          time: 28.1,
+          time: 27.54,
         },
         {
           name: 'drizzle',
-          time: 29.39,
+          time: 28.68,
         },
         {
           name: 'typeorm',
-          time: 31.35,
+          time: 31.16,
         },
         {
           name: 'prisma',
-          time: 68.54,
+          time: 73.17,
         },
         ],
       },
@@ -472,7 +472,7 @@ const data: BenchmarksWithType = [
         },
         {
           name: 'typeorm',
-          time: 14.97,
+          time: 15.3,
         },
         {
           name: 'prisma',
@@ -524,7 +524,7 @@ const data: BenchmarksWithType = [
         query: 'SELECT * FROM order_detail WHERE order_id = ?',
         tests: [{
           name: 'drizzle:p',
-          time: 129.02,
+          time: 125.55,
         },
         {
           name: 'drizzle',
@@ -532,11 +532,11 @@ const data: BenchmarksWithType = [
         },
         {
           name: 'typeorm',
-          time: 223.47,
+          time: 227.04,
         },
         {
           name: 'prisma',
-          time: 555.24,
+          time: 533.38,
         },
         ],
       },
