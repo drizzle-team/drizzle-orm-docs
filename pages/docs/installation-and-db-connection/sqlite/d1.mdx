@@ -1,0 +1,40 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+## Cloudflare D1
+Due to their [official website](https://developers.cloudflare.com/d1/), 
+D1 is Cloudflare's first queryable relational database.  
+  
+Drizzle ORM fully supports D1 database and Cloudflare Workers environment, 
+we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+```bash copy
+npm install drizzle-orm
+npm install -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+pnpm add drizzle-orm
+pnpm add -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+yarn add drizzle-orm
+yarn add -D drizzle-kit 
+```
+  </Tab>
+</Tabs>
+
+```typescript copy
+import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+const sqlite = new Database('sqlite.db');
+const db: BetterSQLite3Database = drizzle(sqlite);
+
+const result = await db.select().from(users).all()
+```

@@ -1,0 +1,46 @@
+import { Tab, Tabs } from "nextra-theme-docs";
+
+## PostgresJS
+Due to their [official website](https://github.com/porsager/postgres), 
+PostgresJS is the fastest full featured PostgreSQL client for Node.js and Deno  
+
+Drizzle ORM natively supports `postgresjs` driver with `drizzle-orm/postgres-js` package
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+    ```bash copy
+    npm i drizzle-orm postgres
+    npm i -D drizzle-kit
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy
+    pnpm add drizzle-orm postgres
+    pnpm add -D drizzle-kit
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy
+    yarn add drizzle-orm postgres
+    yarn add -D drizzle-kit
+    ```
+  </Tab>
+</Tabs>
+
+For the built in `migrate` function with DDL migrations we strongly encourage you to use `max: 1` connection configuration.  
+For querying purposes feel free to use pool size of your choice based on your business demands.
+
+```typescript copy filename="index.ts"
+import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import postgres from 'postgres';
+
+// for migrations
+const migrationClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db", { max: 1 });
+migrate(drizzle(migrationClient), ...)
+
+// for query purposes
+const queryClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db");
+const db: PostgresJsDatabase = drizzle(client);
+await db.select().from(...)...
+```

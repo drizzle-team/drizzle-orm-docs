@@ -1,0 +1,46 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+## Bun SQLite
+Due to their [official website](https://bun.sh/), Bun is a fast all-in-one JavaScript runtime  
+
+Drizzle ORM natively supports [`bun:sqlite`](https://bun.sh/docs/api/sqlite) module and it's crazy fast 🚀  
+We embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
+for synchronous drivers like `bun:sqlite` we have a **sync API** and we mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+<Tabs items={['bun', 'npm', 'pnpm', 'yarn']}>
+<Tab>
+```bash copy
+bun add drizzle-orm
+bun add -d drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+npm install drizzle-orm
+npm install -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+pnpm add drizzle-orm
+pnpm add -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+yarn add drizzle-orm
+yarn add -D drizzle-kit 
+```
+  </Tab>
+</Tabs>
+
+```typescript copy
+import { drizzle, BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
+
+const sqlite = new Database('sqlite.db');
+const db: BunSQLiteDatabase = drizzle(sqlite);
+
+const result = db.select().from(users).all()
+```

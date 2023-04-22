@@ -1,0 +1,40 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+## BetterSqlite3
+Due to their [official docs](https://github.com/WiseLibs/better-sqlite3), 
+BetterSqlite3 is the fastest and simplest library for SQLite3 in Node.js.
+
+Drizzle ORM embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
+for synchronous drivers like `better-sqlite3` we have a **sync API** and we mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntaxs.  
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+```bash copy
+npm install drizzle-orm better-sqlite3
+npm install -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+pnpm add drizzle-orm better-sqlite3
+pnpm add -D drizzle-kit 
+```
+  </Tab>
+  <Tab>
+```bash copy
+yarn add drizzle-orm better-sqlite3
+yarn add -D drizzle-kit 
+```
+  </Tab>
+</Tabs>
+
+```typescript copy
+import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+const sqlite = new Database('sqlite.db');
+const db: BetterSQLite3Database = drizzle(sqlite);
+
+const result = db.select().from(users).all()
+```

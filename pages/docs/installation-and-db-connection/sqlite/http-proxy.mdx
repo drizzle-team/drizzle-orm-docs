@@ -1,0 +1,16 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+## HTTP proxy
+
+```typescript copy
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from sqlite proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```

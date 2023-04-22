@@ -1,0 +1,41 @@
+import { Tab, Tabs } from "nextra-theme-docs";
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+    ```bash copy
+    npm i drizzle-orm @aws-sdk/client-rds-data @aws-sdk/credential-providers
+    npm i -D drizzle-kit
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy
+    pnpm add drizzle-orm @aws-sdk/client-rds-data @aws-sdk/credential-providers
+    pnpm add -D drizzle-kit
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy
+    yarn add drizzle-orm @aws-sdk/client-rds-data @aws-sdk/credential-providers
+    yarn add -D drizzle-kit
+    ```
+  </Tab>
+</Tabs>
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/aws-data-api/pg';
+import { RDSDataClient } from '@aws-sdk/client-rds-data';
+import { fromIni } from '@aws-sdk/credential-providers';
+
+const rdsClient = new RDSDataClient({
+  	credentials: fromIni({ profile: process.env['PROFILE'] }),
+		region: 'us-east-1',
+});
+
+const db = drizzle(rdsClient, {
+  database: process.env['DATABASE']!,
+  secretArn: process.env['SECRET_ARN']!,
+  resourceArn: process.env['RESOURCE_ARN']!,
+});
+
+await db.select().from(...)...;
+```
