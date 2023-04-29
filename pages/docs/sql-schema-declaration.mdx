@@ -1,0 +1,190 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+# SQL schema declaration
+
+You declare SQL schema in TypeScript in either one `schema.ts` file 
+or you can group them logically in multiple logically grouped files, whichever you prefer, all the freedom!
+
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📜 schema.ts
+```
+
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📂 schema
+          ├ 📜 users.ts
+          ├ 📜 countries.ts
+          ├ 📜 cities.ts
+          ├ 📜 products.ts
+          ├ 📜 clients.ts
+          ├ 📜 enums.ts
+          └ 📜 etc.ts
+```
+```plaintext
+📦 <project root>
+ └ 📂 src
+    ├ 📂 get-user
+    |  ├ 📜 user.ts
+    |  └ 📜 handler.ts
+    ├ 📂 get-city
+    |  ├ 📜 city.ts
+    |  └ 📜 handler.ts    
+    ├  ...
+```
+
+You can declare tables, indexes and constraints, foreign keys and enums.  
+Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#migrations)
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+  ```typescript copy
+  import { pgEnum, pgTable, serial, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+
+  // declaring enum in database
+  export const popularityEnum = pgEnum('popularity', ['unknown', 'known', 'popular']);
+
+  export const countries = pgTable('countries', {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 256 }),
+  }, (countries) => {
+    return {
+      nameIndex: uniqueIndex('name_idx').on(countries.name),
+    }
+  });
+
+  export const cities = pgTable('cities', {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 256 }),
+    countryId: integer('country_id').references(() => countries.id),
+    popularity: popularityEnum('popularity'),
+  });
+  ```
+
+  Database and table explicit entity types:
+  ```typescript copy
+  import { pgTable, InferModel, serial, text, varchar } from 'drizzle-orm/pg-core';
+  import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
+
+  const users = pgTable('users', {
+    id: serial('id').primaryKey(),
+    fullName: text('full_name'),
+    phone: varchar('phone', { length: 256 }),
+  });
+
+  export type User = InferModel<typeof users>; // return type when queried
+  export type NewUser = InferModel<typeof users, 'insert'>; // insert type
+  ...
+
+  const db: NodePgDatabase = drizzle(...);
+
+  const result: User[] = await db.select().from(users);
+
+  export async function insertUser(user: NewUser): Promise<User> {
+    return db.insert(users).values(user).returning();
+  }
+  ```
+  </Tab>
+  <Tab>
+  ```typescript copy
+  import { int, mysqlEnum, mysqlTable, serial, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
+
+  // declaring enum in database
+  export const countries = mysqlTable('countries', {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 256 }),
+  }, (countries) => ({
+    nameIndex: uniqueIndex('name_idx').on(countries.name),
+  }));
+
+  export const cities = mysqlTable('cities', {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 256 }),
+    countryId: int('country_id').references(() => countries.id),
+    popularity: mysqlEnum('popularity', ['unknown', 'known', 'popular']),
+  });
+  ```
+
+  Database and table explicit entity types:  
+  ```typescript copy
+  import { InferModel, MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+  import mysql from 'mysql2/promise';
+  import { drizzle } from 'drizzle-orm/mysql2';
+
+  const users = mysqlTable('users', {
+    id: serial('id').primaryKey(),
+    fullName: text('full_name'),
+    phone: varchar('phone', { length: 256 }),
+  });
+
+  export type User = InferModel<typeof users>; // return type when queried
+  export type NewUser = InferModel<typeof users, 'insert'>; // insert type
+  ...
+
+  // init mysql2 Pool or Client
+  const poolConnection = mysql.createPool({
+      host:'localhost', 
+      user: 'root',
+      database: 'test'
+  });
+
+  export const db: MySqlDatabase = drizzle(poolConnection);
+
+  const result: User[] = await db.select().from(users);
+
+  async function insertUser(user: NewUser): Promise<MySqlRawQueryResult> {
+    return db.insert(users).values(user);
+  }
+  ```
+  </Tab>
+  <Tab>
+  ```typescript copy
+  import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
+
+  export const countries = sqliteTable('countries', {
+      id: integer('id').primaryKey(),
+      name: text('name'),
+    }, (countries) => ({
+      nameIdx: uniqueIndex('nameIdx').on(countries.name),
+    })
+  );
+
+  export const cities = sqliteTable('cities', {
+    id: integer('id').primaryKey(),
+    name: text('name'),
+    countryId: integer('country_id').references(() => countries.id),
+  })
+  ```
+
+  Database and table explicit entity types
+
+  ```typescript copy
+  import { InferModel, text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+  const users = sqliteTable('users', {
+    id: integer('id').primaryKey(),
+    fullName: text('full_name'),
+    phone: text('phone'),
+  })
+
+  export type User = InferModel<typeof users> // return type when queried
+  export type InsertUser = InferModel<typeof users, 'insert'> // insert type
+  ...
+  import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+  import Database from 'better-sqlite3';
+
+  const sqlite = new Database('sqlite.db');
+  const db: BetterSQLite3Database = drizzle(sqlite);
+
+  const result: User[] = db.select().from(users).all();
+
+  const insertUser = (user: InsertUser) => {
+    return db.insert(users).values(user).run()
+  }
+  ```
+  </Tab>
+</Tabs>
+
