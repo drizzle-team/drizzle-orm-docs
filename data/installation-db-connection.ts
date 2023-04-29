@@ -86,6 +86,19 @@ export const mysql: ICards = {
 };
 
 export const sqlite: ICards = {
+  turso: {
+    title: 'Turso',
+    image: 'turso',
+    lightIcon: {
+      width: 28,
+      src: '/svg/turso-light.svg',
+    },
+    darkIcon: {
+      width: 28,
+    },
+    description: 'Turso is an edge SQLite database',
+    href: './installation-and-db-connection/sqlite/turso',
+  },
   cloudflared1: {
     title: 'Cloudflare D1',
     image: 'database',

@@ -1,0 +1,41 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+## Turso
+Due to their [official website](https://turso.tech/), 
+Turso is a [libSQL](https://github.com/libsql/libsql) powered edge SQLite database as a service
+  
+Drizzle ORM natively supports libSQL driver, 
+we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Tab>
+    ```bash copy
+    npm install drizzle-orm @libsql/client
+    npm install -D drizzle-kit 
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy
+    pnpm add drizzle-orm @libsql/client
+    pnpm add -D drizzle-kit 
+    ```
+  </Tab>
+  <Tab>
+    ```bash copy
+    yarn add drizzle-orm @libsql/client
+    yarn add -D drizzle-kit 
+    ```
+  </Tab>
+</Tabs>
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
+
+const client = createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' });
+
+const db = drizzle(client);
+
+const result = await db.select().from(users).all()
+```
