@@ -1,14 +1,17 @@
-# Create Read Update Delete
+import Section from '../../components/Section/Section';
 
-## Querying, sorting and filtering. 
 
-We also support partial select.
-
+# Quering with SQL-like syntax
+Drizzle ORM provide you the most SQL-like way to query your relational database.  
+We natively support mostly every query feature capability of every dialect 
+and whatever we do not yet support - can be done with our powerful `sql` operator
+  
+When you declare schema([see docs](./sql-schema-declaration)) in typescript - you can instantly 
+use our typed query builder to insert, update, select and delete.  
+All types are infered instantly without any need for code generation.
 ```typescript copy
-...
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { and, asc, desc, eq, or } from 'drizzle-orm/expressions';
+import { drizzle } from 'drizzle-orm/postgresjs';
 
 const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -16,33 +19,56 @@ const users = pgTable('users', {
 });
 
 const db = drizzle(...);
-
-await db.select().from(users);
-await db.select().from(users).where(eq(users.id, 42));
-
-// you can combine filters with and(...) / or(...)
-await db.select().from(users).where(and(eq(users.id, 42), eq(users.name, 'Dan')));
-
-await db.select().from(users).where(or(eq(users.id, 42), eq(users.id, 1)));
-
-// partial select
-const result = await db.select({
-    mapped1: users.id,
-    mapped2: users.name,
-  }).from(users);
-const { mapped1, mapped2 } = result[0];
-
-// limit, offset & order by
-await db.select().from(users).limit(10).offset(10);
-await db.select().from(users).orderBy(users.name);
-await db.select().from(users).orderBy(desc(users.name));
-// you can pass multiple order args
-await db.select().from(users).orderBy(asc(users.name), desc(users.name));
 ```
 
-#### Conditionally select fields
+## SQL Select
+### Basic and partial select
+Getting a list of all users and you will have a typed result set  
+TODO: why we return array and there's no `.findOne`, `.findMany`
+<Section>
+```typescript
+const result: User[] = await db.select().from(users);
 
+result[0].id
+result[0].name
+```
+```sql
+select * from 'users';
+```
+</Section>
+
+Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons.  
+You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results
+<Section>
 ```typescript copy
+const result = await db.select({
+    field1: users.id,
+    field2: users.name,
+  }).from(users);
+
+const { field1, field2 } = result[0];
+```
+```sql
+select "user"."id" as "field1", "user"."name" as "field2" from "users" 
+```
+</Section>
+
+With partial select you can apply sql transformations with `sql` operator
+
+<Section>
+```typescript
+const result = await db.select({
+    id: users.id,
+    lowerName: sql`lower(${users.name})`,
+  }).from(users);
+```
+```sql
+select "user"."id", lower("user"."name") as "lowerName" from "users"
+```
+</Section>
+
+You can also select fields conditionally
+```typescript
 async function selectUsers(withName: boolean) {
   return db
     .select({
@@ -55,24 +81,166 @@ async function selectUsers(withName: boolean) {
 const users = await selectUsers(true);
 ```
 
-#### WITH clause
+### Select filters
+You can filter SQL results with our list of [filter operators](./operators)
+<Section>
+```typescript copy
+import { eq, lt, gte, ne } from "drizzle-orm";
 
+await db.select().from(users).where(eq(users.id, 42));
+await db.select().from(users).where(lt(users.id, 42));
+await db.select().from(users).where(gte(users.id, 42));
+await db.select().from(users).where(ne(users.id, 42));
+...
+```
+```sql
+select * from 'users' where 'id' = 42;
+select * from 'users' where 'id' < 42;
+select * from 'users' where 'id' >= 42;
+select * from 'users' where 'id' <> 42;
+```
+</Section>
+
+Any filter operator is a `sql` operator under the hood, for full SQL potential 
+you can utilise it directly and build type safe and future safe queries  
+You can safely alter schema, rename tables and columns and it will automatically reflect in queries, 
+as opposed to having regular string raw SQL queries
+<Section>
+```typescript copy
+import { sql } from "drizzle-orm";
+
+await db.select().from(users).where(sql`${users.id} < 42`);
+await db.select().from(users).where(sql`${users.id} = 42`);
+await db.select().from(users).where(sql`${users.id} >= 42`);
+await db.select().from(users).where(sql`${users.id} <> 42`);
+await db.select().from(users).where(sql`lower(${users.name}) = "aaron"`);
+```
+```sql
+select * from 'users' where 'id' = 42;
+select * from 'users' where 'id' < 42;
+select * from 'users' where 'id' <> 42;
+select * from 'users' where 'id' >= 42;
+select * from 'users' where lower('name') = "aaron";
+```
+</Section>
+
+Inverting condition with a `not` operator
+<Section>
+```typescript copy
+import { eq, not, sql } from "drizzle-orm";
+
+await db.select().from(users).where(not(eq(users.id, 42)));
+await db.select().from(users).where(sql`not ${users.id} = 42`);
+```
+```sql
+select * from 'users' where not 'id' = 42;
+select * from 'users' where not 'id' = 42;
+```
+</Section>
+
+### Combining filters
+You can logically combile filter operators with conditional `and` and `or` operators 
+<Section>
+```typescript copy
+import { eq, and, sql } from "drizzle-orm";
+
+await db.select().from(users).where(
+  and(
+    eq(users.id, 42), 
+    eq(users.name, 'Dan')
+  )
+);
+await db.select().from(users).where(sql`${users.id} = 42 and ${users.name} = "Dan"`);
+```
+```sql
+select * from 'users' where 'id' = 42 and 'name' = "Dan";
+select * from 'users' where 'id' = 42 and 'name' = "Dan";
+```
+</Section>
+
+<Section>
+```typescript copy
+import { eq, or, sql } from "drizzle-orm";
+
+await db.select().from(users).where(
+  or(
+    eq(users.id, 42), 
+    eq(users.name, 'Dan')
+  )
+);
+await db.select().from(users).where(sql`${users.id} = 42 or ${users.name} = "Dan"`);
+```
+```sql
+select * from 'users' where 'id' = 42 or 'name' = "Dan";
+select * from 'users' where 'id' = 42 or 'name' = "Dan";
+```
+</Section>
+
+### Limit & Offset
+You can apply `limit` and `offset` to the query
+<Section>
+```typescript
+await db.select().from(users).limit(10);
+await db.select().from(users).limit(10).offset(10);
+```
+```sql
+select * from "users" limit 10;
+select * from "users" limit 10 offset 10;
+```
+</Section>
+
+### Order By
+You can sort results with `orderBy` operator
+<Section>
+```typescript
+import { asc, desc } from "drizzle-orm";
+
+await db.select().from(users).orderBy(users.name);
+await db.select().from(users).orderBy(desc(users.name));
+
+// you can pass multiple order args
+await db.select().from(users).orderBy(users.name, users.name2);
+await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
+```
+```sql
+select * from "users" order by "name";
+select * from "users" order by "name" desc;
+
+select * from "users" order by "name" "name2";
+select * from "users" order by "name" asc "name2" desc;
+```
+</Section>
+
+### WITH clause
+SQL `with` clause - is a statement scoped view, helpful to organise complex queries
+<Section>
 ```typescript copy
 const sq = db.select().from(users).where(eq(users.id, 42)).prepareWithSubquery('sq');
+
 const result = await db.with(sq).select().from(sq);
 ```
+```sql
+with sq as (select * from "users" where "users"."id" = 42)
+select * from sq;
+```
+</Section>
 
-> **Note**: Keep in mind that if you need to select raw `sql` in a WITH subquery and reference that field in other queries, you must add an alias to it:
-
+To select raw `sql` in a WITH subquery and reference that field in other queries, 
+you must add an alias to it  
 ```typescript copy
-const sq = db.$with('sq').as(db.select({ name: sql<string>`upper(${users.name})`.as('name') }).from(users));
+const sq = db.select({ 
+    name: sql<string>`upper(${users.name})`.as('name') 
+  })
+  .from(users)
+  .prepareWithSubquery('sq');
+
 const result = await db.with(sq).select({ name: sq.name }).from(sq);
 ```
+If you don't provide an alias - field type will become `DrizzleTypeError` and you won't be able to reference it in other queries. 
+If you ignore the type error and still try to reference the field, 
+you will get a runtime error, since there's no way to reference that field without an alias.
 
-Otherwise, the field type will become `DrizzleTypeError` and you won't be able to reference it in other queries. If you ignore the type error and still try to reference the field, you will get a runtime error, because we cannot reference that field without an alias.
-
-#### Select from subquery
-
+### Select from subquery
 ```typescript copy
 const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
