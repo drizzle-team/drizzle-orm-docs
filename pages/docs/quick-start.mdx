@@ -26,6 +26,8 @@ import { Tab, Tabs } from 'nextra-theme-docs';
 
 #### Declare your first schema file
 ```typescript filename="schema.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
@@ -34,7 +36,7 @@ export const users = pgTable('users', {
 ```
 
 #### Run your first query, that's it!
-```typescript copy filename="db.ts"
+```typescript copy filename="index.ts"
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { users } from './schema';
