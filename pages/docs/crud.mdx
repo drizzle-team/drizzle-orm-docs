@@ -291,7 +291,7 @@ insertUser(newUser)
 ```
 
 ### Insert returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`
+`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
 You can insert a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
@@ -349,7 +349,7 @@ await db.update(users)
 ```
 
 ### Update with returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`
+`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
 You can update a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
@@ -371,7 +371,7 @@ await db.delete(users).where(eq(users.name, 'Dan'));
 ```
 
 ### Delete with return
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`
+`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
 You can delete a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const deletedUser = await db.delete(users)
