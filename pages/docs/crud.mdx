@@ -1,7 +1,7 @@
 import Section from '../../components/Section/Section';
 
 
-# Quering with SQL-like syntax
+# Quering with SQL-like syntax [CRUD]
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
 We natively support mostly every query feature capability of every dialect 
 and whatever we do not yet support - can be done with our powerful `sql` operator
@@ -12,11 +12,15 @@ All types are infered instantly without any need for code generation.
 ```typescript copy
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/postgresjs';
+import { InferModel } from 'drizzle-orm';
 
-const users = pgTable('users', {
+export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('full_name'),
 });
+
+type User = InferModel<typeof users, "select">
+type NewUser = InferModel<typeof users, "insert">
 
 const db = drizzle(...);
 ```
@@ -215,7 +219,7 @@ select * from "users" order by "name" asc "name2" desc;
 SQL `with` clause - is a statement scoped view, helpful to organise complex queries
 <Section>
 ```typescript copy
-const sq = db.select().from(users).where(eq(users.id, 42)).prepareWithSubquery('sq');
+const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
 
 const result = await db.with(sq).select().from(sq);
 ```
@@ -228,11 +232,11 @@ select * from sq;
 To select raw `sql` in a WITH subquery and reference that field in other queries, 
 you must add an alias to it  
 ```typescript copy
-const sq = db.select({ 
+
+const sq = db.$with('sq').as(db.select({ 
     name: sql<string>`upper(${users.name})`.as('name') 
   })
-  .from(users)
-  .prepareWithSubquery('sq');
+  .from(users));
 
 const result = await db.with(sq).select({ name: sq.name }).from(sq);
 ```
@@ -241,89 +245,90 @@ If you ignore the type error and still try to reference the field,
 you will get a runtime error, since there's no way to reference that field without an alias.
 
 ### Select from subquery
+Just like in SQL - you can embed SQL queries into other SQL queries by using `subquery` API
+<Section>
 ```typescript copy
 const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
+```sql
+select * from (select * from "user" where "user"."id" = 42) "sq"
+```
+</Section>
 
-Subqueries in joins are supported, too:
-
+You can also use subqueries in joins
 ```typescript copy
 const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
 
-## Inserting
+## SQL Insert
+Drizzle ORM provides you the most SQL-like way to insert rows into the database tables
 
-```typescript copy
-import { pgTable, serial, text, timestamp, InferModel } from 'drizzle-orm/pg-core';
-import { drizzle } from 'drizzle-orm/node-postgres';
-const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name'),
-  createdAt: timestamp('created_at'),
-});
-type NewUser = InferModel<typeof users>;
-const db = drizzle(...);
-const newUser: NewUser = {
-  name: 'Andrew',
-  createdAt: new Date(),
-};
-await db.insert(users).values(newUser);
-const insertedUsers/*: NewUser[]*/ = await db.insert(users).values(...newUsers).returning();
-const insertedUsersIds/*: { insertedId: number }[]*/ = await db.insert(users)
-  .values(...newUsers)
-  .returning({ insertedId: users.id });
+### Insert one row
+Inserting data with Drizzle is extremely straightfoward and sql-like
+
+<Section>
+```typescript copy 
+await db.insert(users).values({ name: 'Andrew' })
+```
+```sql
+insert into "users" ("name") values ("Andrew")
+```
+</Section>
+
+If you need insert type for a particular table - you can use `InferModel<typeof table, "insert">` syntax
+```typescript copy 
+import { InferModel } from "drizzle-orm";
+
+type NewUser = InferModel<typeof users, "insert">;
+
+const insertUser = async (user: NewUser) => {
+  return db.insert(users).values(user)
+}
+
+const newUser: NewUser = { name: "Alef" }
+insertUser(newUser)
 ```
 
-#### Insert several items
-
+### Insert returning
+`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`
+You can insert a row and get it back in PostgreSQL and SQLite
 ```typescript copy
-await db.insert(users)
-  .values(
-    {
-      name: 'Andrew',
-      createdAt: new Date(),
-    },
-    {
-      name: 'Dan',
-      createdAt: new Date(),
-    },
-  );
+await db.insert(users).values({ name: "Dan" }).returning();
+
+// partial return
+await db.insert(users).value({ name: "Partial Dan" }).returning({ insertedId: users.id })
 ```
 
-#### Insert array of items
-
+### Insert multiple rows
 ```typescript copy
-const newUsers: NewUser[] = [
-  {
-      name: 'Andrew',
-      createdAt: new Date(),
-  },
-  {
-    name: 'Dan',
-    createdAt: new Date(),
-  },
-];
-
-await db.insert(users).values(...newUsers);
+await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }])
 ```
 
-
-## Upsert (Insert with on conflict statement)
-
+### Upsert [insert or update]
+Insert user and if user with `id=1` exists - update his name to Jogn
 ```typescript copy
 await db.insert(users)
   .values({ id: 1, name: 'Dan' })
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
+```
 
+Insert John, and if user with primaryKey equals 1 exists, do nothing
+```typescript
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing();
+```
 
+Insert John, and if user with `id=1` exists, do nothing
+```typescript
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing({ target: users.id });
+```
 
+Upsert with where statement
+```typescript
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoUpdate({
@@ -334,12 +339,19 @@ await db.insert(users)
 ```
 
 ## Update
+Drizzle ORM supports SQL-like update syntax
 
+### Basic update
 ```typescript copy
 await db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(users.name, 'Dan'));
+```
 
+### Update with returning
+`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`
+You can update a row and get it back in PostgreSQL and SQLite
+```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(users.name, 'Dan'))
@@ -347,21 +359,27 @@ const updatedUserId: { updatedId: number }[] = await db.update(users)
 ```
 
 ## Delete
-
+Drizzle ORM supports SQL-like delete syntax
+### Basic detele
+You can delete all rows in the table
 ```typescript copy
-const updatedUser: InferModel<typeof users> = await db.delete(users)
-  .set({ name: 'Mr. Dan' })
+await db.delete(users);
+```
+And you can delete with filters and conditions
+```typescript copy
+await db.delete(users).where(eq(users.name, 'Dan'));
+```
+
+### Delete with return
+`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`
+You can delete a row and get it back in PostgreSQL and SQLite
+```typescript copy
+const deletedUser = await db.delete(users)
   .where(eq(users.name, 'Dan'))
   .returning();
 
-await db.delete(users)
-  .where(eq(users.name, 'Dan'));
-
-const deletedUser: InferModel<typeof users> = await db.delete(users)
-  .where(eq(users.name, 'Dan'))
-  .returning();
-
-const deletedUserId: { deletedId: number }[] = await db.delete(users)
+// partial return
+const deletedUserIds: { deletedId: number }[] = await db.delete(users)
   .where(eq(users.name, 'Dan'))
   .returning({ deletedId: users.id });
 ```
