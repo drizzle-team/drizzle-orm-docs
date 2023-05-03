@@ -19,8 +19,8 @@ export const users = pgTable('users', {
   name: text('full_name'),
 });
 
-type User = InferModel<typeof users, "select">
-type NewUser = InferModel<typeof users, "insert">
+type User = InferModel<typeof users, "select">;
+type NewUser = InferModel<typeof users, "insert">;
 
 const db = drizzle(...);
 ```
@@ -33,8 +33,8 @@ TODO: why we return array and there's no `.findOne`, `.findMany`
 ```typescript
 const result: User[] = await db.select().from(users);
 
-result[0].id
-result[0].name
+result[0].id;
+result[0].name;
 ```
 ```sql
 select * from 'users';
@@ -53,7 +53,7 @@ const result = await db.select({
 const { field1, field2 } = result[0];
 ```
 ```sql
-select "user"."id" as "field1", "user"."name" as "field2" from "users" 
+select "user"."id" as "field1", "user"."name" as "field2" from "users";
 ```
 </Section>
 
@@ -67,7 +67,7 @@ const result = await db.select({
   }).from(users);
 ```
 ```sql
-select "user"."id", lower("user"."name") as "lowerName" from "users"
+select "user"."id", lower("user"."name") as "lowerName" from "users";
 ```
 </Section>
 
@@ -252,7 +252,7 @@ const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
 ```sql
-select * from (select * from "user" where "user"."id" = 42) "sq"
+select * from (select * from "user" where "user"."id" = 42) "sq";
 ```
 </Section>
 
@@ -269,10 +269,10 @@ Inserting data with Drizzle is extremely straightfoward and sql-like
 
 <Section>
 ```typescript copy 
-await db.insert(users).values({ name: 'Andrew' })
+await db.insert(users).values({ name: 'Andrew' });
 ```
 ```sql
-insert into "users" ("name") values ("Andrew")
+insert into "users" ("name") values ("Andrew");
 ```
 </Section>
 
@@ -283,11 +283,11 @@ import { InferModel } from "drizzle-orm";
 type NewUser = InferModel<typeof users, "insert">;
 
 const insertUser = async (user: NewUser) => {
-  return db.insert(users).values(user)
+  return db.insert(users).values(user);
 }
 
-const newUser: NewUser = { name: "Alef" }
-insertUser(newUser)
+const newUser: NewUser = { name: "Alef" };
+await insertUser(newUser);
 ```
 
 ### Insert returning
@@ -297,34 +297,32 @@ You can insert a row and get it back in PostgreSQL and SQLite
 await db.insert(users).values({ name: "Dan" }).returning();
 
 // partial return
-await db.insert(users).value({ name: "Partial Dan" }).returning({ insertedId: users.id })
+await db.insert(users).value({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
 ### Insert multiple rows
 ```typescript copy
-await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }])
+await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 ```
 
-### Upsert [insert or update]
-Insert user and if user with `id=1` exists - update his name to Jogn
-```typescript copy
-await db.insert(users)
-  .values({ id: 1, name: 'Dan' })
-  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
-```
-
-Insert John, and if user with primaryKey equals 1 exists, do nothing
-```typescript
+### OnConflict and Upsert [insert or update]
+You can run insert statements with on conflict clause to `do nothing` or `update`  
+```typescript copyt
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing();
-```
 
-Insert John, and if user with `id=1` exists, do nothing
-```typescript
+// explicitely specify conflict target
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing({ target: users.id });
+```
+
+This is how you upsert with `onConflictDoUpdate`
+```typescript
+await db.insert(users)
+  .values({ id: 1, name: 'Dan' })
+  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
 
 Upsert with where statement
