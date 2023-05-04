@@ -1,5 +1,5 @@
 import Section from '../../components/Section/Section';
-
+import { Tab, Tabs } from 'nextra-theme-docs';
 
 # Quering with SQL-like syntax [CRUD]
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
@@ -260,6 +260,158 @@ You can also use subqueries in joins
 ```typescript copy
 const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
+### Aggregations
+With Drizzle ORM you can do aggregations with functions like `sum`, `count`, `avg`, etc. by 
+grouping and filterin with `groupBy` and `having` respectfully, just like you do in SQL
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+    ```typescript copy {10-11}
+    import { pgTable, serial, text, doublePrecision } from 'drizzle-orm/pg-core';
+    import { gte } from 'drizzle-orm';
+
+    export const product = pgTable('product', {
+      id: serial('id').primaryKey(),
+      name: text('name'),
+      unitPrice: doublePrecision("unit_price")
+    });
+
+    await db.select({ count: sql<number>`count(*)` }).from(product);
+    await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
+    ```
+    ```sql
+    select count(*) from "product";
+    select count(*) from "product" where "unit_price" >= 4;
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```typescript copy {10-11}
+      import { mysqlTable, serial, text, double } from 'drizzle-orm/mysql-core';
+      import { gte } from 'drizzle-orm';
+
+      export const product = mysqlTable('product', {
+        id: serial('id').primaryKey(),
+        name: text('name'),
+        unitPrice: double("unit_price")
+      });
+
+      await db.select({ count: sql<number>`count(*)` }).from(product);
+      await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
+      ```
+      ```sql
+      select count(*) from "product";
+      select count(*) from "product" where "unit_price" >= 4;
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+      <Section>
+      ```typescript copy {10-11}
+      import { sqliteTable, serial, text, real } from 'drizzle-orm/sqlite-core';
+      import { gte } from 'drizzle-orm';
+
+      export const product = sqliteTable('product', {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        name: text('name'),
+        unitPrice: real("unit_price")
+      });
+
+      await db.select({ count: sql<number>`count(*)` }).from(product);
+      await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
+      ```
+      ```sql
+      select count(*) from "product";
+      select count(*) from "product" where "unit_price" >= 4;
+      ```
+    </Section>
+  </Tab>
+</Tabs>
+
+Lets have a quick look on how to group and filter grouped using a `having`
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+    ```typescript copy {9-11,13-17}
+    import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+    export const user = pgTable('user', {
+      id: serial('id').primaryKey(),
+      name: text('name'),
+      city: text("city"),
+    });
+
+    await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
+      .from(user)
+      .groupBy(({ city }) => city)
+    
+    await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
+      .from(user)
+      .groupBy(({ city }) => city)
+      .having(({ count }) => count)
+    ```
+    ```sql
+    select count("id"), "city" from "user" group by "user"."city";
+    select count("id"), "city" from "user" group by "user"."city" having count("user"."id");
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```typescript copy {9-11,13-17}
+      import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core';
+
+      export const user = mysqlTable('user', {
+        id: serial('id').primaryKey(),
+        name: text('name'),
+        city: text("city"),
+      });
+
+      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
+        .from(user)
+        .groupBy(({ city }) => city)
+      
+      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
+        .from(user)
+        .groupBy(({ city }) => city)
+        .having(({ count }) => count)
+      ```
+      ```sql
+      select count("id"), "city" from "user" group by "user"."city";
+      select count("id"), "city" from "user" group by "user"."city" having count("user"."id");
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+      <Section>
+      ```typescript copy {9-11,13-17}
+      import { sqliteTable, serial, text } from 'drizzle-orm/sqlite-core';
+
+      export const user = sqliteTable('user', {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        name: text('name'),
+        city: text("city"),
+      });
+
+      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
+        .from(user)
+        .groupBy(({ city }) => city)
+      
+      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
+        .from(user)
+        .groupBy(({ city }) => city)
+        .having(({ count }) => count)
+      ```
+      ```sql
+      select count("id"), "city" from "user" group by "user"."city";
+      select count("id"), "city" from "user" group by "user"."city" having count("user"."id");
+      ```
+    </Section>
+  </Tab>
+</Tabs>
+
+
 
 ## SQL Insert
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables
@@ -312,7 +464,7 @@ await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing();
 
-// explicitely specify conflict target
+// explicitly specify conflict target
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing({ target: users.id });
