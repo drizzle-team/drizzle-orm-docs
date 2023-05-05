@@ -1,9 +1,25 @@
-# Drizzle ORM - Joins
+# Joins
+
+Join clause is used to combine 2 or more tables, based on related columns between them.  
+  
+We embrace each dialect and implemented full list of dialect-available join types.  
+Drizzle ORM joins syntax is a balance between the SQL-likeness and type safety.  
 
 ## Overview
+## Partial select
+## Aliases
+## Selfjoins
+## Aggregating results
+## Join types
+### Left Join
+### Right Join
+### Inner Join
+### Full Join
+### NATURAL Join
+## One to one
+## Many to one
+## Many to many
 
-As with other parts of Drizzle ORM, the joins syntax is a balance between the SQL-likeness and type safety.
-Here's an example of how a common `1-to-many` relationship can be modelled.
 
 ```typescript copy
 const users = pgTable('users', {
@@ -211,7 +227,7 @@ But what happens if you group columns from multiple tables in the same nested ob
 }
 ```
 
-## Aggregating results
+
 
 OK, so you have obtained all the cities and the users for every city. But what you **really** wanted is a **list** of users for every city, and what you currently have is an array of `city-user?` combinations. So, how do you transform it?
 That's the neat part - you can do that however you'd like! No hand-holding here.

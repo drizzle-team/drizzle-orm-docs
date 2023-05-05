@@ -262,11 +262,13 @@ const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
 ### Aggregations
 With Drizzle ORM you can do aggregations with functions like `sum`, `count`, `avg`, etc. by 
-grouping and filterin with `groupBy` and `having` respectfully, just like you do in SQL
+grouping and filtering with `groupBy` and `having` respectfully, just like you do in SQL.  
+  
+With our powerful `sql` operator you can infer aggregations functions return types using `sql<number>` syntax
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
-    ```typescript copy {10-11}
+    ```typescript copy {10,13}
     import { pgTable, serial, text, doublePrecision } from 'drizzle-orm/pg-core';
     import { gte } from 'drizzle-orm';
 
@@ -276,8 +278,11 @@ grouping and filterin with `groupBy` and `having` respectfully, just like you do
       unitPrice: doublePrecision("unit_price")
     });
 
-    await db.select({ count: sql<number>`count(*)` }).from(product);
+    const result = await db.select({ count: sql<number>`count(*)` }).from(product);
+    result[0].count // will be number type
+
     await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
+
     ```
     ```sql
     select count(*) from "product";
@@ -287,7 +292,7 @@ grouping and filterin with `groupBy` and `having` respectfully, just like you do
   </Tab>
   <Tab>
     <Section>
-      ```typescript copy {10-11}
+      ```typescript copy {10,13}
       import { mysqlTable, serial, text, double } from 'drizzle-orm/mysql-core';
       import { gte } from 'drizzle-orm';
 
@@ -297,7 +302,9 @@ grouping and filterin with `groupBy` and `having` respectfully, just like you do
         unitPrice: double("unit_price")
       });
 
-      await db.select({ count: sql<number>`count(*)` }).from(product);
+      const result = await db.select({ count: sql<number>`count(*)` }).from(product);
+      result[0].count // will be number type
+
       await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
       ```
       ```sql
@@ -308,7 +315,7 @@ grouping and filterin with `groupBy` and `having` respectfully, just like you do
   </Tab>
   <Tab>
       <Section>
-      ```typescript copy {10-11}
+      ```typescript copy {10,13}
       import { sqliteTable, serial, text, real } from 'drizzle-orm/sqlite-core';
       import { gte } from 'drizzle-orm';
 
@@ -318,7 +325,9 @@ grouping and filterin with `groupBy` and `having` respectfully, just like you do
         unitPrice: real("unit_price")
       });
 
-      await db.select({ count: sql<number>`count(*)` }).from(product);
+      const result = await db.select({ count: sql<number>`count(*)` }).from(product);
+      result[0].count // will be number type
+
       await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
       ```
       ```sql
