@@ -135,7 +135,6 @@ CREATE TABLE table (
 	`numInt` integer NOT NULL
 );
 ```
-
 </Section>
 
 #### Default value
@@ -158,14 +157,13 @@ int1: integer('int1').default(42),
 int2: integer('int2').default(sql`(abs(42))`)
 });
 
-````
-
+```
 ```sql
 CREATE TABLE `table` (
 	`int1` integer DEFAULT 42
 	`int2` integer DEFAULT (abs(42))
 );
-````
+```
 </Section>
 
 A default value may also be one of the special case-independent keywords `CURRENT_TIME`, `CURRENT_DATE` or `CURRENT_TIMESTAMP`

@@ -200,6 +200,8 @@ Lets say you need to fetch users with their parents
 <Code fileNames={["index.ts", "schema.ts"]}>
 <Section>
 ```typescript copy
+import { user } from "./schema";
+
 const parent = alias(user, "parent")
 const result = db
   .select()
