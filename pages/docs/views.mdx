@@ -1,22 +1,278 @@
-## Views (WIP)
+import { Callout } from 'nextra-theme-docs';
+import { Tab, Tabs } from "nextra-theme-docs";
+import Section from "../../components/Section/Section";
 
-> **Warning**: views are currently only implemented on the ORM side. That means you can query the views that already exist in the database, but they won't be added to drizzle-kit migrations or `db push` yet.
 
-There are two types of views in PostgreSQL: [regular](https://www.postgresql.org/docs/current/sql-createview.html) and [materialized](https://www.postgresql.org/docs/current/sql-creatematerializedview.html).
+# Views (WIP)
+<Callout type="warning" emoji="⚠️">
+  Views are currently only implemented in the `drizzle-orm`, `drizzle-kit` does not support views yet. 
+  You can query the views that already exist in the database, but they won't be added to `drizzle-kit` migrations or `db push` as of now.
+</Callout>
 
-### Creating a view
+Due to their official docs, PostgreSQL has [`regular`](https://www.postgresql.org/docs/current/sql-createview.html) 
+and [`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html) views and Drizzle ORM provides APIs for both of them
+
+## Views declaration
+There're several ways you can declare views with Drizzle ORM.  
+You can declare views that have to be created or you can declare views that already exist in the database.  
+You can declare views statements with an inline `query builder` syntax, with `standalone query builder` and with raw `sql` operators.  
+When views are created with either inlined or standalone query builders - view columns schema will be automatically infered, 
+yet when you use `sql` - you have to explicitly declare view columns schema.
+
+### Declaring views
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```ts filename="schema.ts" copy {13-14}
+      import { pgTable, pgView, serial, text, timestamp } from "drizzle-orm/pg-core";
+
+      export const user = pgTable("user", {
+        id: serial("id"),
+        name: text("name"),
+        email: text("email"),
+        password: text("password"),
+        role: text("role").$type<"admin" | "customer">(),
+        createdAt: timestamp("created_at"),
+        updatedAt: timestamp("updated_at"),
+      });
+
+      export const userView = pgView("user_view").as((qb) => qb.select().from(user));
+      export const customersView = pgView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "cusotmer")));
+      ```
+      ```sql
+      CREATE VIEW "user_view" AS SELECT * FROM "user";
+      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```ts filename="schema.ts" copy {13-14}
+      import { text, mysqlTable, mysqlView, int, timestamp } from "drizzle-orm/mysql-core";
+
+      export const user = mysqlTable("user", {
+        id: int("id").primaryKey().autoincrement(),
+        name: text("name"),
+        email: text("email"),
+        password: text("password"),
+        role: text("role").$type<"admin" | "customer">(),
+        createdAt: timestamp("created_at"),
+        updatedAt: timestamp("updated_at"),
+      });
+
+      export const userView = mysqlView("user_view").as((qb) => qb.select().from(user));
+      export const customersView = mysqlView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "cusotmer")));
+      ```
+      ```sql
+      CREATE VIEW "user_view" AS SELECT * FROM "user";
+      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```ts filename="schema.ts" copy {13-14}
+      import { integer, text, sqliteView, sqliteTable } from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable("user", {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        name: text("name"),
+        email: text("email"),
+        password: text("password"),
+        role: text("role").$type<"admin" | "customer">(),
+        createdAt: integer("created_at"),
+        updatedAt: integer("updated_at"),
+      });
+
+      export const userView = sqliteView("user_view").as((qb) => qb.select().from(user));
+      export const customersView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
+      ```
+      ```sql
+      CREATE VIEW "user_view" AS SELECT * FROM "user";
+      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      ```
+    </Section>
+  </Tab>
+</Tabs>
+
+If you need a subset of columns - you can use `.select({ ... })` method in query builder
+<Section>
+  ```ts {4-6}
+  export const customersView = pgView("customers_view").as((qb) => {
+    return qb
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      })
+      .from(user);
+  });
+  ```
+  ```sql
+  CREATE VIEW "customers_view" AS SELECT "id", "name", "email" FROM "user" WHERE "role" = 'customer';
+  ```
+</Section>
+
+You can also declare views using `standalone query builder`, it works exactly the same way
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```ts filename="schema.ts" copy {3, 15-16}
+      import { pgTable, pgView, serial, text, timestamp, QueryBuilder} from "drizzle-orm/pg-core";
+      
+      const qb = new QueryBuilder();
+
+      export const user = pgTable("user", {
+        id: serial("id"),
+        name: text("name"),
+        email: text("email"),
+        password: text("password"),
+        role: text("role").$type<"admin" | "customer">(),
+        createdAt: timestamp("created_at"),
+        updatedAt: timestamp("updated_at"),
+      });
+
+      export const userView = pgView("user_view").as(qb.select().from(user));
+      export const customersView = pgView("customers_view").as(qb.select().from(user).where(eq(user.role, "cusotmer")));
+      ```
+      ```sql
+      CREATE VIEW "user_view" AS SELECT * FROM "user";
+      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```ts filename="schema.ts" copy {3, 15-16}
+      import { text, mysqlTable, mysqlView, int, timestamp, QueryBuilder } from "drizzle-orm/mysql-core";
+
+      const qb = new QueryBuilder();
+
+      export const user = mysqlTable("user", {
+        id: int("id").primaryKey().autoincrement(),
+        name: text("name"),
+        email: text("email"),
+        password: text("password"),
+        role: text("role").$type<"admin" | "customer">(),
+        createdAt: timestamp("created_at"),
+        updatedAt: timestamp("updated_at"),
+      });
+
+      export const userView = mysqlView("user_view").as(qb.select().from(user));
+      export const customersView = mysqlView("customers_view").as(qb.select().from(user).where(eq(user.role, "cusotmer")));
+      ```
+      ```sql
+      CREATE VIEW "user_view" AS SELECT * FROM "user";
+      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```ts filename="schema.ts" copy {3, 15-16}
+      import { integer, text, sqliteView, sqliteTable, QueryBuilder } from "drizzle-orm/sqlite-core";
+
+      const qb = new QueryBuilder();
+
+      export const user = sqliteTable("user", {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        name: text("name"),
+        email: text("email"),
+        password: text("password"),
+        role: text("role").$type<"admin" | "customer">(),
+        createdAt: integer("created_at"),
+        updatedAt: integer("updated_at"),
+      });
+
+      export const userView = sqliteView("user_view").as((qb) => qb.select().from(user));
+      export const customerView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
+      ```
+      ```sql
+      CREATE VIEW "user_view" AS SELECT * FROM "user";
+      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      ```
+    </Section>
+  </Tab>
+</Tabs>
+
+### Declaring views with raw SQL
+Whenever you need to declare view using a syntax that is not supported by the query builder, 
+you can directly use `sql` operator and explicitly specify view columns schema.
 
 ```ts copy
-import { pgView } from 'drizzle-orm/pg-core';
-
 // regular view
-const newYorkers = pgView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
+const newYorkers = pgView('new_yorkers', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  cityId: integer('city_id').notNull(),
+}).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
 
 // materialized view
-const newYorkers = pgMaterializedView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
+const newYorkers = pgMaterializedView('new_yorkers', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  cityId: integer('city_id').notNull(),
+}).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
 ```
 
-#### Full view definition syntax
+### Declaring existing views
+When you're provided with a read only access to an existing view in the database - you should use `.existing()` view configuration, 
+`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration
+```ts
+export const user = pgTable("user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  role: text("role").$type<"admin" | "customer">(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
+
+// regular view
+export const trimmedUser = pgView("trimmed_user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+}).existing();
+
+// materialized view won't make any difference, yet you can use it for consistency
+export const trimmedUser = pgMaterializedView("trimmed_user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+}).existing();
+```
+
+### Materialized views
+`✓ PostgreSQL` `✕ MySQL` `✕ SQLite`  
+Materialized views in PostgreSQL use the rule system like views do, but persist the results in a table-like form  
+Drizzle ORM natively supports PostgreSQL materialized views
+
+<Section>
+```ts filename="schema.ts" copy
+
+
+const newYorkers = pgMaterializedView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
+```
+```sql
+CREATE MATERIALIZED VIEW "new_yorkers" AS SELECT * FROM "users";
+```
+</Section>
+
+You can then refresh materialized vies in the application runtime
+```ts copy
+await db.refreshMaterializedView(newYorkers);
+
+await db.refreshMaterializedView(newYorkers).concurrently();
+
+await db.refreshMaterializedView(newYorkers).withNoData();
+```
+
+### Extended example
+<Callout type="info" emoji="ℹ️">
+All the parameters inside the query will be inlined, instead of replaced by `$1`, `$2`, etc.
+</Callout>
 
 ```ts copy
 // regular view
@@ -60,66 +316,4 @@ const newYorkers2 = pgMaterializedView('new_yorkers')
       );
     return qb.with(sq).select().from(sq).where(sql`${users.homeCity} = 1`);
   });
-```
-
-> **Warning**: All the parameters inside the query will be inlined, instead of replaced by `$1`, `$2`, etc.
-
-You can also use the [`queryBuilder` instance](./query-builder) directly instead of passing a callback, if you already have it imported.
-
-```ts copy
-import { queryBuilder as qb } from 'drizzle-orm/pg-core';
-
-// regular view
-const newYorkers = pgView('new_yorkers').as(qb.select().from(users2Table).where(eq(users2Table.cityId, 1)));
-
-// materialized view
-const newYorkers = pgMaterializedView('new_yorkers').as(qb.select().from(users2Table).where(eq(users2Table.cityId, 1)));
-```
-
-### Using raw SQL in a view query
-
-In case you need to specify the view query using a syntax that is not supported by the query builder, you can directly use SQL. In that case, you also need to specify the view shape.
-
-```ts copy
-// regular view
-const newYorkers = pgView('new_yorkers', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  cityId: integer('city_id').notNull(),
-}).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
-
-// materialized view
-const newYorkers = pgMaterializedView('new_yorkers', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  cityId: integer('city_id').notNull(),
-}).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
-```
-
-### Describing existing views
-
-There are cases when you are given readonly access to an existing view. In such cases you can just describe the view shape without specifying the query itself or using it in the migrations.
-
-```ts copy
-// regular view
-const newYorkers = pgView('new_yorkers', {
-  userId: integer('user_id').notNull(),
-  cityId: integer('city_id'),
-}).existing();
-
-// materialized view won't make any difference in this case, but you can still use it for consistency
-const newYorkers = pgMaterializedView('new_yorkers', {
-  userId: integer('user_id').notNull(),
-  cityId: integer('city_id'),
-}).existing();
-```
-
-### Refreshing materialized views
-
-```ts copy
-await db.refreshMaterializedView(newYorkers);
-
-await db.refreshMaterializedView(newYorkers).concurrently();
-
-await db.refreshMaterializedView(newYorkers).withNoData();
 ```
