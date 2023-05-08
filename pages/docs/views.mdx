@@ -9,9 +9,6 @@ import Section from "../../components/Section/Section";
   You can query the views that already exist in the database, but they won't be added to `drizzle-kit` migrations or `db push` as of now.
 </Callout>
 
-Due to their official docs, PostgreSQL has [`regular`](https://www.postgresql.org/docs/current/sql-createview.html) 
-and [`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html) views and Drizzle ORM provides APIs for both of them
-
 ## Views declaration
 There're several ways you can declare views with Drizzle ORM.  
 You can declare views that have to be created or you can declare views that already exist in the database.  
@@ -246,6 +243,9 @@ export const trimmedUser = pgMaterializedView("trimmed_user", {
 
 ### Materialized views
 `✓ PostgreSQL` `✕ MySQL` `✕ SQLite`  
+Due to their official docs, PostgreSQL has [`regular`](https://www.postgresql.org/docs/current/sql-createview.html) 
+and [`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html)  
+  
 Materialized views in PostgreSQL use the rule system like views do, but persist the results in a table-like form  
 Drizzle ORM natively supports PostgreSQL materialized views
 

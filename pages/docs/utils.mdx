@@ -1,0 +1,118 @@
+import { Tab, Tabs } from "nextra-theme-docs";
+
+## Logging
+
+To enable default query logging, just pass `{ logger: true }` to the `drizzle` initialization function:
+```typescript copy
+import { drizzle } from 'drizzle-orm/...'; // driver specific
+
+const db = drizzle(pool, { logger: true });
+```
+
+You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
+```typescript copy
+import { DefaultLogger, LogWriter } from 'drizzle-orm/logger';
+import { drizzle } from 'drizzle-orm/...'; // driver specific
+
+class MyLogWriter implements LogWriter {
+  write(message: string) {
+    // Write to file, stdout, etc.
+  }
+}
+
+const logger = new DefaultLogger({ writer: new MyLogWriter() });
+const db = drizzle(pool, { logger });
+```
+
+You can also create a custom logger:
+```typescript copy
+import { Logger } from 'drizzle-orm/logger';
+import { drizzle } from 'drizzle-orm/...'; // driver specific
+
+class MyLogger implements Logger {
+  logQuery(query: string, params: unknown[]): void {
+    console.log({ query, params });
+  }
+}
+
+const db = drizzle(pool, { logger: new MyLogger() });
+```
+
+## Printing SQL query
+You can print SQL queries with `db` instance or by using [`standalone query builder`](#standalone-query-builder)
+```typescript copy
+const query = db
+  .select({ id: users.id, name: users.name })
+  .from(users)
+  .groupBy(users.id)
+  .toSQL();
+// query:
+{
+  sql: 'select 'id', 'name' from 'users' group by 'users'.'id'',
+  params: [],
+}
+```
+
+## Raw SQL queries execution
+If you have some complex queries to execute and drizzle-orm can't handle them yet, 
+you can use the `db.execute` method to execute raw `parametrized` queries. 
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+    <Tab>
+    ```ts
+    const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+    const res: postgres.RowList<Record<string, unknown>[]> = await db.execute(sql``)
+    ```
+    </Tab>
+    <Tab>
+    ```typescript copy
+    import { ..., MySqlQueryResult } from "drizzle-orm/mysql2";
+
+    const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+    const res: MySqlRawQueryResult = await db.execute(statement);
+    ```
+    </Tab>
+    <Tab>
+    ```ts
+    const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+    const res: Database.RunResult = db.run(statement)
+    ```
+    </Tab>
+</Tabs>
+
+
+## Standalone query builder
+Drizzle ORM provides a standalone query builder that allows you to build queries 
+without creating a database instance and get generated SQL
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+    <Tab>
+        ```typescript copy
+        import { QueryBuilder } from 'drizzle-orm/pg-core';
+
+        const qb = new QueryBuilder();
+
+        const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+        const { sql, params } = query.toSQL();
+        ```
+    </Tab>
+    <Tab>
+        ```typescript copy
+        import { QueryBuilder } from 'drizzle-orm/mysql-core';
+
+        const qb = new QueryBuilder();
+
+        const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+        const { sql, params } = query.toSQL();
+        ```
+    </Tab>
+    <Tab>
+        ```typescript copy
+        import { QueryBuilder } from 'drizzle-orm/sqlite-core';
+
+        const qb = new QueryBuilder();
+
+        const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+        const { sql, params } = query.toSQL();
+        ```
+    </Tab>
+</Tabs>
