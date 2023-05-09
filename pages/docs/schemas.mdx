@@ -1,0 +1,69 @@
+# Table schemas
+`✓ PostgreSQL` `✓ MySQL` `✕ SQLite`  
+
+Drizzle ORM provides you an API for declaring SQL schemas for PostgreSQL and MySQL dialects  
+If you declare table within a schema - query builder will prepend schema names in queries `select * from "custom_schema"."users"`
+
+> **Warning**
+> If you will have tables with same names in different schemas then drizzle will respond with `never[]` error in result types and error from database
+>
+> In this case you may use [alias syntax](./joins#join-aliases-and-self-joins)
+
+### Usage example
+
+```typescript copy
+// Table in default schema
+const publicUsersTable = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  verified: boolean('verified').notNull().default(false),
+  jsonb: jsonb<string[]>('jsonb'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+
+// Table in custom schema
+const mySchema = pgSchema('mySchema');
+
+const usersTable = mySchema('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  verified: boolean('verified').notNull().default(false),
+  jsonb: jsonb<string[]>('jsonb'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+```
+
+
+## Table schemas
+
+> **Warning**
+> If you have tables with same names in different schemas, Drizzle will set result types to `never[]` and return an error from the database.
+>
+> In this case you may use [alias syntax](#join-aliases-and-self-joins).
+
+---
+
+Usage example
+
+```typescript copy
+// Table in default schema
+const publicUsersTable = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  verified: boolean('verified').notNull().default(false),
+  jsonb: json<string[]>('jsonb'),
+  createdAt: timestamp('created_at', { fsp: 2 }).notNull().defaultNow(),
+});
+
+// Table in custom schema
+const mySchema = mysqlSchema('mySchema');
+
+const mySchemaUsersTable = mySchema('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  verified: boolean('verified').notNull().default(false),
+  jsonb: json<string[]>('jsonb'),
+  createdAt: timestamp('created_at', { fsp: 2 }).notNull().defaultNow(),
+});
+```
