@@ -1,0 +1,92 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+
+html[class~=dark] .text {
+  --tw-text-opacity: 1;
+  color: rgba(115,115,115,var(--tw-text-opacity));
+}
+
+html[class~=dark] .icon {
+  --tw-text-opacity: 1;
+  --tw-bg-opacity: 1;
+  color: rgba(115,115,115,var(--tw-text-opacity));
+  fill: rgba(255,255,255,0.2);
+}
+
+html[class~=dark] .selected {
+  .text {
+    --tw-text-opacity: 1;
+    color: hsl(var(--nextra-primary-hue)100% 45%/var(--tw-text-opacity));
+  }
+  .icon {
+    --tw-text-opacity: 1;
+    color: hsl(var(--nextra-primary-hue)100% 45%/var(--tw-text-opacity));
+  }
+}
+
+html[class~=dark] .button:not(.selected):hover { 
+  .text {
+    --tw-text-opacity: 1;
+    color: rgba(249,250,251,var(--tw-text-opacity));
+  }
+  .icon {
+    --tw-text-opacity: 1;
+    color: rgba(249,250,251,var(--tw-text-opacity));
+  }
+}
+
+.selected {
+  .icon {
+    --tw-text-opacity: 1;
+    color: hsl(var(--nextra-primary-hue)100% 32%/var(--tw-text-opacity));
+  }
+  .text {
+    --tw-text-opacity: 1;
+    color: hsl(var(--nextra-primary-hue)100% 32%/var(--tw-text-opacity));
+  }
+}
+
+.icon {
+  --tw-bg-opacity: 1;
+  padding: 4px;
+  transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
+  transition-duration: .15s;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  --tw-text-opacity: 1;
+  fill: rgba(107,114,128,var(--tw-text-opacity));
+}
+
+.text {
+  --tw-text-opacity: 1;
+  color: rgba(107,114,128,var(--tw-text-opacity));
+  transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
+  transition-duration: .15s;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+
+
+
+/* HOVER */
+
+.button:not(.selected):hover { 
+  .text {
+    --tw-text-opacity: 1;
+    color: rgba(17,24,39,var(--tw-text-opacity));
+  }
+  .icon {
+    --tw-text-opacity: 1;
+    color: rgba(17,24,39,var(--tw-text-opacity));
+  }
+}
