@@ -1,7 +1,7 @@
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import TwitterIcon from './components/TwitterIcon';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
-import ToggleLib from './components/common/ToggleLib/ToggleLib';
+import TitleComponent from './components/TitleComponent/TitleComponent';
 
 const config: DocsThemeConfig = {
   useNextSeoProps() {
@@ -35,7 +35,7 @@ const config: DocsThemeConfig = {
     extraContent: <>
       <TwitterIcon />
       <ThemeToggle />
-    </>,
+                  </>,
   },
   themeSwitch: {
   },
@@ -45,14 +45,7 @@ const config: DocsThemeConfig = {
   },
   sidebar: {
     defaultMenuCollapseLevel: 1,
-    titleComponent: ({ title }) => {
-      if (title === 'DRIZZLE ORM' || title === 'DRIZZLE KIT') {
-        return (
-          <ToggleLib title={title} />
-        );
-      }
-      return title;
-    },
+    titleComponent: TitleComponent,
   },
   editLink: {
     text: '',
