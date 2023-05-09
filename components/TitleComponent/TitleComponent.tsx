@@ -11,7 +11,7 @@ const TitleComponent: React.FC<Props> = ({ title }) => {
       <ToggleLib title={title} />
     );
   }
-  return <>title</>;
+  return <>{title}</>;
 };
 
 export default TitleComponent;
