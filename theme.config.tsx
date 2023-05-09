@@ -1,6 +1,7 @@
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import TwitterIcon from './components/TwitterIcon';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
+import TitleComponent from './components/TitleComponent/TitleComponent';
 
 const config: DocsThemeConfig = {
   useNextSeoProps() {
@@ -34,7 +35,7 @@ const config: DocsThemeConfig = {
     extraContent: <>
       <TwitterIcon />
       <ThemeToggle />
-    </>,
+                  </>,
   },
   themeSwitch: {
   },
@@ -44,6 +45,7 @@ const config: DocsThemeConfig = {
   },
   sidebar: {
     defaultMenuCollapseLevel: 1,
+    titleComponent: TitleComponent,
   },
   editLink: {
     text: '',
