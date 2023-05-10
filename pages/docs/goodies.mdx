@@ -1,5 +1,5 @@
 import { Tab, Tabs } from "nextra-theme-docs";
-import Code from "../../components/Code/Code";
+import {CodeTabs} from "../../components/CodeTabs/CodeTabs";
 
 ## Logging
 
@@ -55,8 +55,8 @@ const query = db
 ```
 
 ## Raw SQL queries execution
-If you have some complex queries to execute and drizzle-orm can't handle them yet, 
-you can use the `db.execute` method to execute raw `parametrized` queries. 
+If you have some complex queries to execute and drizzle-orm can't handle them yet,
+you can use the `db.execute` method to execute raw `parametrized` queries.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
     <Tab>
@@ -83,7 +83,7 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
 
 
 ## Standalone query builder
-Drizzle ORM provides a standalone query builder that allows you to build queries 
+Drizzle ORM provides a standalone query builder that allows you to build queries
 without creating a database instance and get generated SQL
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
     <Tab>
@@ -119,78 +119,78 @@ without creating a database instance and get generated SQL
 </Tabs>
 
 ## Get typed table columns
-You can get a typed table columns map, 
+You can get a typed table columns map,
 very useful when you need to omit certain columns upon selection
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
-    <Code fileNames={["index.ts", "schema.ts"]}>
-    ```ts
-    import { getTableColumns} from "drizzle-orm";
-    import { user } from "./schema"
+      <CodeTabs items={["index.ts", "schema.ts"]}>
+          ```ts
+          import { getTableColumns} from "drizzle-orm";
+          import { user } from "./schema"
 
-    const { password, role, ...rest} = getTableColumns(user)
+          const { password, role, ...rest} = getTableColumns(user)
 
-    await db.select({ ...rest }).from(users);
-    ```
-    ```ts
-    import { serial, text, pgTable } from "drizzle-orm/pg-core";
+          await db.select({ ...rest }).from(users);
+          ```
+          ```ts
+          import { serial, text, pgTable } from "drizzle-orm/pg-core";
 
-    export const user = pgTable("user", {
-      id: int("id").primaryKey().autoincrement(),
-      name: text("name"),
-      email: text("email"),
-      password: text("password"),
-      role: text("role").$type<"admin" | "customer">(),
-    });
-    ```
-    </Code>
+          export const user = pgTable("user", {
+          id: int("id").primaryKey().autoincrement(),
+          name: text("name"),
+          email: text("email"),
+          password: text("password"),
+          role: text("role").$type<"admin" | "customer">(),
+      });
+          ```
+      </CodeTabs>
   </Tab>
   <Tab>
-    <Code fileNames={["index.ts", "schema.ts"]}>
-    ```ts
-    import { getTableColumns} from "drizzle-orm";
-    import { user } from "./schema"
+      <CodeTabs items={["index.ts", "schema.ts"]}>
+        ```ts
+        import { getTableColumns} from "drizzle-orm";
+        import { user } from "./schema"
 
-    const { password, role, ...rest} = getTableColumns(user)
+        const { password, role, ...rest} = getTableColumns(user)
 
-    await db.select({ ...rest }).from(users);
-    ```
-    ```ts
-    import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
+        await db.select({ ...rest }).from(users);
+        ```
+        ```ts
+        import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
 
-    export const user = mysqlTable("user", {
-      id: int("id").primaryKey().autoincrement(),
-      name: text("name"),
-      email: text("email"),
-      password: text("password"),
-      role: text("role").$type<"admin" | "customer">(),
-    });
-    ```
-    </Code>
+        export const user = mysqlTable("user", {
+          id: int("id").primaryKey().autoincrement(),
+          name: text("name"),
+          email: text("email"),
+          password: text("password"),
+          role: text("role").$type<"admin" | "customer">(),
+        });
+        ```
+      </CodeTabs>
   </Tab>
   <Tab>
-    <Code fileNames={["index.ts", "schema.ts"]}>
-    ```ts
-    import { getTableColumns} from "drizzle-orm";
-    import { user } from "./schema"
+      <CodeTabs items={["index.ts", "schema.ts"]}>
+        ```ts
+        import { getTableColumns} from "drizzle-orm";
+        import { user } from "./schema"
 
-    const { password, role, ...rest} = getTableColumns(user)
+        const { password, role, ...rest} = getTableColumns(user)
 
-    await db.select({ ...rest }).from(users);
-    ```
-    ```ts
-    import { integer, text, sqliteView } from "drizzle-orm/sqlite-core";
+        await db.select({ ...rest }).from(users);
+        ```
+        ```ts
+        import { integer, text, sqliteView } from "drizzle-orm/sqlite-core";
 
-    export const user = pgTable("user", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
-      name: text("name"),
-      email: text("email"),
-      password: text("password"),
-      role: text("role").$type<"admin" | "customer">(),
-    });
-    ```
-    </Code>
+        export const user = pgTable("user", {
+          id: integer("id").primaryKey({ autoIncrement: true }),
+          name: text("name"),
+          email: text("email"),
+          password: text("password"),
+          role: text("role").$type<"admin" | "customer">(),
+        });
+        ```
+      </CodeTabs>
   </Tab>
 </Tabs>
 

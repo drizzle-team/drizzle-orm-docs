@@ -1,0 +1,88 @@
+/*CODE TABS*/
+
+.codetabs_wrapper {
+    margin-top: 1.5rem;
+}
+
+.codetabs_wrapper pre {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+html[class~=dark] .codetabs_tabs {
+    background-color: #1f282f;
+}
+
+.codetabs_tabs {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 10px 10px 0;
+    background-color: #f4f7fc;
+    border-top-left-radius: .75rem;
+    border-top-right-radius: .75rem;
+}
+
+html[class~=dark] .codetabs_tab, html[class~=dark] .codetabs_active_tab {
+    background-color: #161e23;
+    color: #b0b6c2;
+    border: 1px solid #2c3c47;
+}
+
+.codetabs_tab, .codetabs_active_tab {
+    background-color: #eaf0fa;
+    cursor: pointer;
+    user-select: none;
+    color: #374152;
+    font-size: 13px;
+    padding: 4px 12px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid #eaf0fa;
+
+}
+
+html[class~=dark] .codetabs_active_tab {
+    border: 1px solid #e5e7eb;
+    color: #FFFFFF;
+}
+
+
+.codetabs_active_tab {
+    border: 1px solid #9bb8e7;
+}
+
+.codetabs_codeBlock {
+
+}
+
+/*CODE TAB*/
+
+.codetab_wrapper {
+}
+
+.codetab_wrapper > div {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.codetab_wrapper > div > pre {
+    border-radius: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.codetab_wrapper > div:first-child > pre {
+}
+
+.codetab_wrapper > div:last-child > pre {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
+.codetab_wrapper > div:not(:last-child) {
+    border-bottom: 1px solid #e0e8f6;
+}
+
+html[class~=dark] .codetab_wrapper > div:not(:last-child) {
+    border-bottom: 1px solid #2e3e49;
+}

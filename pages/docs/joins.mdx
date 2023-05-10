@@ -1,12 +1,12 @@
-import Code from "../../components/Code/Code";
 import Section from '../../components/Section/Section';
+import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
 
 # Joins [SQL]
-Join clause in SQL is used to combine 2 or more tables, based on related columns between them.   
-Drizzle ORM joins syntax is a balance between the SQL-likeness and type safety.  
+Join clause in SQL is used to combine 2 or more tables, based on related columns between them.
+Drizzle ORM joins syntax is a balance between the SQL-likeness and type safety.
 
 ## Join types
-Drizzle ORM has APIs for `INNER JOIN`, `FULL JOIN`, `LEFT JOIN` and `RIGHT JOIN`  
+Drizzle ORM has APIs for `INNER JOIN`, `FULL JOIN`, `LEFT JOIN` and `RIGHT JOIN`
 Lets have a quick look at examples based on below table schemas:
 ```typescript copy
 export const users = pgTable('users', {
@@ -116,7 +116,7 @@ const result: {
 </Section>
 
 ## Partial select
-If you need to select a particular subset of fields or to have a flat response type - Drizzle ORM 
+If you need to select a particular subset of fields or to have a flat response type - Drizzle ORM
 supports joins with partial select and will automatically infer return type based on `.select({ ... })` structure
 <Section>
 ```typescript copy
@@ -136,9 +136,9 @@ const result: {
 }[];
 ```
 </Section>
-You might've noticed that `petId` can be null now, it's because we're left joining and there can be users without a pet.  
-  
-It's very important to keep in mind when using `sql` operator for partial selection fields and aggregations when needed, 
+You might've noticed that `petId` can be null now, it's because we're left joining and there can be users without a pet.
+
+It's very important to keep in mind when using `sql` operator for partial selection fields and aggregations when needed,
 you should to use `sql<type | null>` for proper result type inference, that one is on you!
 <Section>
 ```typescript copy
@@ -163,7 +163,7 @@ const result: {
 }[];
 ```
 </Section>
-To avoid plethora of nullable fields when joining tables with lots of columns - we can utilise our nested select object syntax  
+To avoid plethora of nullable fields when joining tables with lots of columns - we can utilise our nested select object syntax
 Our smart type inference will make whole object nullable instead of making all table fields nullable!
 <Section>
 ```typescript copy
@@ -195,10 +195,11 @@ const result: {
 </Section>
 
 ## Aliases & Selfjoins
-Drizzle ORM supports table aliases which comes really handy when you need to do selfjoins  
+Drizzle ORM supports table aliases which comes really handy when you need to do selfjoins
 Lets say you need to fetch users with their parents
-<Code fileNames={["index.ts", "schema.ts"]}>
-<Section>
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+<CodeTab>
 ```typescript copy
 import { user } from "./schema";
 
@@ -226,7 +227,8 @@ const result: {
     } | null;
 }[];
 ```
-</Section>
+</CodeTab>
+
 ```typescript
 export const user = pgTable("user", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -234,10 +236,11 @@ export const user = pgTable("user", {
   parentId: integer("parent_id").notNull().references((): AnySQLiteColumn => user.id)
 });
 ```
-</Code>
+
+</CodeTabs>
 
 ## Aggregating results
-Drizzle ORM delivers name-mapped results from the driver without changing the structure.  
+Drizzle ORM delivers name-mapped results from the driver without changing the structure.
 You're free to operate with results the way you want and here's an example of mapping many-one relational data
 ```typescript
 type User = InferModel<typeof users>;
@@ -277,20 +280,20 @@ const result: Record<number, {
 ```typescript
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
- 
+
 const cities = sqliteTable('cities', {
   id: integer('id').primaryKey(),
   name: text('name'),
 });
- 
+
 const users = sqliteTable('users', {
   id: integer('id').primaryKey(),
   name: text('name'),
   cityId: integer('city_id').references(() => cities.id)
 });
- 
+
 const db = drizzle(sqlite);
- 
+
 const result = db.select().from(cities).leftJoin(users, eq(cities2.id, users2.cityId)).all();
 ```
 ## Many-to-many example
@@ -299,18 +302,18 @@ const users = sqliteTable('users', {
   id: integer('id').primaryKey(),
   name: text('name'),
 });
- 
+
 const chatGroups = sqliteTable('chat_groups', {
   id: integer('id').primaryKey(),
   name: text('name'),
 });
- 
+
 const usersToChatGroups = sqliteTable('usersToChatGroups', {
   userId: integer('user_id').notNull().references(() => users.id),
   groupId: integer('group_id').notNull().references(() => chatGroups.id),
 });
- 
- 
+
+
 // querying user group with id 1 and all the participants(users)
 db.select()
   .from(usersToChatGroups)
