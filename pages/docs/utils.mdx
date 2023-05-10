@@ -1,4 +1,5 @@
 import { Tab, Tabs } from "nextra-theme-docs";
+import Code from "../../components/Code/Code";
 
 ## Logging
 
@@ -115,4 +116,80 @@ without creating a database instance and get generated SQL
         const { sql, params } = query.toSQL();
         ```
     </Tab>
+</Tabs>
+
+## Get typed table columns
+You can get a typed object that contains all columns from the table, 
+very useful when you need to omit certain columns upon selection
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Code fileNames={["index.ts", "schema.ts"]}>
+    ```ts
+    import { getTableColumns} from "drizzle-orm";
+    import { user } from "./schema"
+
+    const { password, role, ...rest} = getTableColumns(user)
+
+    await db.select({ ...rest }).from(users);
+    ```
+    ```ts
+    import { serial, text, pgTable } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      email: text("email"),
+      password: text("password"),
+      role: text("role").$type<"admin" | "customer">(),
+    });
+    ```
+    </Code>
+  </Tab>
+  <Tab>
+    <Code fileNames={["index.ts", "schema.ts"]}>
+    ```ts
+    import { getTableColumns} from "drizzle-orm";
+    import { user } from "./schema"
+
+    const { password, role, ...rest} = getTableColumns(user)
+
+    await db.select({ ...rest }).from(users);
+    ```
+    ```ts
+    import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
+
+    export const user = mysqlTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      email: text("email"),
+      password: text("password"),
+      role: text("role").$type<"admin" | "customer">(),
+    });
+    ```
+    </Code>
+  </Tab>
+  <Tab>
+    <Code fileNames={["index.ts", "schema.ts"]}>
+    ```ts
+    import { getTableColumns} from "drizzle-orm";
+    import { user } from "./schema"
+
+    const { password, role, ...rest} = getTableColumns(user)
+
+    await db.select({ ...rest }).from(users);
+    ```
+    ```ts
+    import { integer, text, sqliteView } from "drizzle-orm/sqlite-core";
+
+    export const user = pgTable("user", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+      email: text("email"),
+      password: text("password"),
+      role: text("role").$type<"admin" | "customer">(),
+    });
+    ```
+    </Code>
+  </Tab>
 </Tabs>
