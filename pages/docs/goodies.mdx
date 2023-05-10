@@ -119,7 +119,7 @@ without creating a database instance and get generated SQL
 </Tabs>
 
 ## Get typed table columns
-You can get a typed object that contains all columns from the table, 
+You can get a typed table columns map, 
 very useful when you need to omit certain columns upon selection
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
@@ -193,3 +193,61 @@ very useful when you need to omit certain columns upon selection
     </Code>
   </Tab>
 </Tabs>
+
+## Get table information
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    ```ts copy
+    import { getTableConfig, pgTable } from 'drizzle-orm/pg-core';
+
+    export const table = pgTable(...);
+
+    const {
+      columns,
+      indexes,
+      foreignKeys,
+      checks,
+      primaryKeys,
+      name,
+      schema,
+    } = await getTableConfig(table);
+    ```
+  </Tab>
+  <Tab>
+  ```ts copy
+  import { getTableConfig, mysqlTable } from 'drizzle-orm/mysql-core';
+
+  export const table = mysqlTable(...);
+
+  const {
+    columns,
+    indexes,
+    foreignKeys,
+    checks,
+    primaryKeys,
+    name,
+    schema,
+  } = await getTableConfig(table);
+  ```
+  </Tab>
+  <Tab>
+  ```ts copy
+  import { getTableConfig, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+  export const table = sqliteTable(...);
+
+  const {
+    columns,
+    indexes,
+    foreignKeys,
+    checks,
+    primaryKeys,
+    name,
+    schema,
+  } = await getTableConfig(table);
+  ```
+  </Tab>
+</Tabs>
+
+
+
