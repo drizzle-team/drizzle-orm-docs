@@ -1,0 +1,91 @@
+## Configuration files
+
+`drizzle.config.ts` example (recommended)
+
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./schema.ts",
+  connectionString: process.env.DB_URL,
+} satisfies Config;
+```
+
+`drizzle.config.js` example (recommended)
+
+```js
+import type { Config } from "drizzle-kit";
+
+/** @type { import("drizzle-kit").Config } */
+export default {
+  schema: "./schema.ts",
+  connectionString: process.env.DB_URL,
+};
+```
+
+`drizzle.config.json` example
+
+```json
+{
+  "out": "./migrations-folder",
+  "schema": "./src/db",
+  "breakpoints": false
+}
+```
+
+List of all possible config settings:
+
+* `out` - path to the output directory where migrations will be saved;
+* `schema` - path to TypeScript schema file or folder with multiple schema files
+
+You can define 1 schema file path
+
+```ts
+{
+  schema: "./schema.ts"
+}
+  ```
+
+You can define multiple schema file paths
+
+```ts
+schema: ["./auth.schema.ts", "./messaging.schema.ts"]
+  ```
+
+You can define single/multiple glob patterns for file paths
+
+```ts
+ schema: ["./core/**/*.ts", "./db/**/*.sql.ts"]
+  ```
+
+* `breakpoints` - whether to execute each statement in the migrations individually. Set to `true` if you are using SQLite or MySQL (as they don't support multiple DDL statements in a transaction).
+
+* `connectionString` - connection url to your database. used for `introspect` and `push` commands
+
+* `port` - database port
+
+* `password` - database password
+
+* `host` - database host
+
+* `user` - database user
+
+* `database` - database name
+
+* `tablesFilter` - is available in `drizzle-kit push` only. It's useful if you want to use only specific tables that apply to regex defined by you
+
+In current example db push will only detect and use tables starts with `prefix_`
+
+```ts
+{
+  tablesFilter: ["prefix_*"]
+}
+  ```
+
+In current example db push will only detect and use tables starts with `prefix_` OR ends with `_push`
+
+```ts
+{
+  tablesFilter: ["prefix_*", "*_push"]
+}
+  ```

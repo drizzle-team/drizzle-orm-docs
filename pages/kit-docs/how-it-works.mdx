@@ -1,0 +1,47 @@
+## How it works
+
+`drizzle-kit` will traverse `schema folder` or `schema file`, generate schema snapshot and compare it to the previous version, if there's one.
+Based on the difference it will generate all needed SQL migrations and if there are any `automatically unresolvable` cases like `renames` it will prompt user for input.
+
+For schema file:
+
+```ts filename="./src/db/schema.ts"
+import { integer, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+const users = pgTable("users", {
+    id: serial("id").primaryKey(),
+    fullName: varchar("full_name", { length: 256 }),
+  }, (table) => ({
+    nameIdx: index("name_idx", table.fullName),
+  })
+);
+
+export const authOtp = pgTable("auth_otp", {
+  id: serial("id").primaryKey(),
+  phone: varchar("phone", { length: 256 }),
+  userId: integer("user_id").references(() => users.id),
+});
+```
+
+It will generate:
+
+```sql
+CREATE TABLE IF NOT EXISTS auth_otp (
+ "id" SERIAL PRIMARY KEY,
+ "phone" character varying(256),
+ "user_id" INT
+);
+
+CREATE TABLE IF NOT EXISTS users (
+ "id" SERIAL PRIMARY KEY,
+ "full_name" character varying(256)
+);
+
+DO $$ BEGIN
+ ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_fkey FOREIGN KEY ("user_id") REFERENCES users(id);
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
+```
