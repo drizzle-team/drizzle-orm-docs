@@ -1,10 +1,8 @@
 import React from 'react';
-import { TypeAnimation } from 'react-type-animation';
 
 import styles from './Header.module.css';
 
 const Header = () => {
-  const timeout = 3000;
 
   const typingText = [
     'that performs',
