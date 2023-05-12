@@ -3,7 +3,6 @@ import React from 'react';
 import styles from './Header.module.css';
 
 const Header = () => {
-
   const typingText = [
     'that performs',
     'that lasts',
