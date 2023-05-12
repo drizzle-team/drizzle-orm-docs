@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styles from './Performance.module.css';
 import LeftButton from './LeftButton';
 import RightButton from './RightButton';
-import ToggleButton from '../../common/ToggleButton';
+import ToggleButton from '../../../../common/ToggleButton';
 import Charts from './Charts/Charts';
-import benchmarks, { Benchmarks } from '../../../data/_benchmarks';
-import DropDown from '../../common/DropDown/DropDown';
+import benchmarks, { Benchmarks } from '../../../../../data/_benchmarks';
+import DropDown from '../../../../common/DropDown/DropDown';
 
 const Performance = () => {
   const [page, setPage] = useState(0);

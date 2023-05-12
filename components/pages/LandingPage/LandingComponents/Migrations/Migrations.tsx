@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import ArrowIcon from '../../ArrowIcon';
+import ArrowIcon from '../../../../ArrowIcon';
 import styles from './Migration.module.css';
 
 interface Props {

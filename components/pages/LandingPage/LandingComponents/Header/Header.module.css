@@ -1,0 +1,110 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.text_block {
+  display: flex;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+.block_wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 48px;
+}
+
+.typing {
+  margin-top: 12px;
+  font-size: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.typing_anim {
+  line-height: 24px;
+}
+
+.text {
+  font-size: 16px;
+}
+
+.button {
+  padding: 6px 12px;
+  border: 1px solid #ffffff;
+  width: fit-content;
+  border-radius: 4px;
+}
+
+.img_block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+}
+
+.img_wrapper {
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+
+.image {
+  width: 100%;
+}
+
+.scroller {
+  height: 24px;
+  line-height: 24px;
+  position: relative;
+  overflow: hidden;
+  font-size: 20px;
+  text-align: center;
+  width: 700px;
+}
+.scroller > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  animation: slide 10s infinite;
+}
+@keyframes slide {
+  0% {
+    top: 0;
+  }
+  13% {
+    top: -24px;
+  }
+  25% {
+    top: -48px;
+  }
+  37% {
+    top: -72px;
+  }
+  49% {
+    top: -96px;
+  }
+  61% {
+    top: -120px;
+  }
+  73% {
+    top: -144px;
+  }
+  85% {
+    top: -168px;
+  }
+  100% {
+    top: -192px;
+  }
+}
