@@ -1,11 +1,14 @@
 
-## Migrations
-### Automatic SQL migrations generation with drizzle-kit
-
-[DrizzleKit](https://www.npmjs.com/package/drizzle-kit) - is a CLI migrator tool for DrizzleORM. It is probably one and only tool that lets you completely automatically generate SQL migrations and covers ~95% of the common cases like deletions and renames by prompting user input.
-Check out the [docs for DrizzleKit](https://github.com/drizzle-team/drizzle-kit-mirror)
-For schema file:
-```typescript copy
+# Migrations
+The most important thing about Drizzle ORM is that you can use it as a source of truth for database schema.  
+[DrizzleKit](/kit-docs) - is a CLI companion for DrizzleORM, it lets generate SQL statements for schema creation and alternations 
+or apply changes directly to the database.  
+  
+See detailed [docs](/kit-docs) for extended examples and walk throughs
+  
+## Quick start
+Declare your schema
+```typescript copy filename="./src/schema.ts"
 import { index, integer, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
@@ -22,8 +25,11 @@ export const authOtps = mysqlTable('auth_otp', {
 });
 ```
 
-It will generate:
-
+Run CLI migration command
+```bash
+$ pnpm drizzle-kit generate:mysql --schema=./src/schema.ts
+```
+And it will generate a migration SQL file
 ```sql copy
 CREATE TABLE `users` (
  `id` int PRIMARY KEY,
@@ -42,8 +48,9 @@ ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_users_id_fk FOREIGN KEY (`u
 CREATE INDEX name_idx ON users (`full_name`);
 ```
 
-And you can run migrations manually or using our embedded migrations module
-
+We've designed Drizzle ORM to be an opt-in solution at any point of your development flow.  
+You can opt-in to run generated migrations with Drizzle or run it elsewhere wherever its suitable for you  
+To run them with Drizzle
 ```typescript copy
 import { drizzle } from 'drizzle-orm/mysql2';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
@@ -63,151 +70,3 @@ const db = drizzle(poolConnection);
 await migrate(db, { migrationsFolder: './drizzle' });
 ```
 
-
-
-## Migrations
-
-### Automatic SQL migrations generation with drizzle-kit
-
-[DrizzleKit](https://www.npmjs.com/package/drizzle-kit) - is a CLI migrator tool for DrizzleORM. It is probably one and only tool that lets you completely automatically generate SQL migrations and covers ~95% of the common cases like deletions and renames by prompting user input.
-
-Check out the [docs for DrizzleKit](https://github.com/drizzle-team/drizzle-kit-mirror)
-
-For schema file:
-
-```typescript copy
-import { index, integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
-
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: varchar('full_name', { length: 256 }),
-}, (users) => ({
-  nameIdx: index('name_idx').on(users.fullName),
-}));
-
-export const authOtps = pgTable('auth_otp', {
-  id: serial('id').primaryKey(),
-  phone: varchar('phone', { length: 256 }),
-  userId: integer('user_id').references(() => users.id),
-});
-```
-
-It will generate:
-
-```sql copy
-CREATE TABLE IF NOT EXISTS auth_otp (
-  'id' SERIAL PRIMARY KEY,
-  'phone' character varying(256),
-  'user_id' INT
-);
-
-CREATE TABLE IF NOT EXISTS users (
-  'id' SERIAL PRIMARY KEY,
-  'full_name' character varying(256)
-);
-
-DO $$ BEGIN
- ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_fkey FOREIGN KEY ('user_id') REFERENCES users(id);
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
-```
-
-And you can run migrations manually or using our embedded migrations module
-
-```typescript copy
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: 'postgres://user:password@host:port/db',
-});
-const db = drizzle(pool);
-
-// this will automatically run needed migrations on the database
-await migrate(db, { migrationsFolder: './drizzle' });
-```
-
-### Porstgres.JS
-
-In order to run the migrations, [you need to use `max: 1` in the postgres.js connection options](https://github.com/porsager/postgres#unsafe_transaction). You can create a separate connection instance for migrations with that setting.
-
-```typescript copy
-import postgres from 'postgres';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-
-const migrationsClient = postgres(connectionString, {
-  max: 1,
-});
-const db = drizzle(migrationsClient);
-await migrate(db, { migrationsFolder: '...' });
-```
-
-
-
-# sqlite3
-## 🗄 Migrations
-
-### Automatic SQL migrations generation with drizzle-kit
-
-[DrizzleKit](https://www.npmjs.com/package/drizzle-kit) - is a CLI migrator tool for DrizzleORM. It is probably one and only tool that lets you completely automatically generate SQL migrations and covers ~95% of the common cases like deletions and renames by prompting user input.
-Check out the [docs for DrizzleKit](https://github.com/drizzle-team/drizzle-kit-mirror)
-
-For schema file:
-
-```typescript copy
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-
-export const users = sqliteTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-}, (users) => ({
-  nameIdx: index('name_idx', users.fullName),
-}));
-
-export const authOtps = sqliteTable('auth_otp', {
-  id: integer('id').primaryKey(),
-  phone: text('phone'),
-  userId: integer('user_id').references(() => users.id),
-});
-```
-
-It will generate:
-
-```sql copy
-CREATE TABLE IF NOT EXISTS auth_otp (
-  'id' INTEGER PRIMARY KEY,
-  'phone' TEXT,
-  'user_id' INTEGER
-);
-
-CREATE TABLE IF NOT EXISTS users (
-  'id' INTEGER PRIMARY KEY,
-  'full_name' TEXT
-);
-
-DO $$ BEGIN
- ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_fkey FOREIGN KEY ('user_id') REFERENCES users(id);
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
-```
-
-And you can run migrations manually or using our embedded migrations module
-
-```typescript copy
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import Database from 'better-sqlite3';
-
-const sqlite = new Database('sqlite.db');
-const db = drizzle(sqlite);
-
-// this will automatically run needed migrations on the database
-migrate(db, { migrationsFolder: './drizzle' });
-```
