@@ -14,4 +14,13 @@ module.exports = withNextra({
     });
     return config;
   },
+  redirects: () => {
+    return [
+      {
+        source: "/docs",
+        destination: "/docs/quick-start",
+        statusCode: 301,
+      },
+    ];
+  },
 })
