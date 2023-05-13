@@ -21,6 +21,11 @@ module.exports = withNextra({
         destination: "/docs/quick-start",
         statusCode: 301,
       },
+      {
+        source: "/kit-docs",
+        destination: "/kit-docs/how-it-works",
+        statusCode: 301,
+      },
     ];
   },
 })
