@@ -1,0 +1,111 @@
+import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+
+# Drizzle Kit
+Our most fundamental design principles of Drizzle ORM is to always stay explicit, 
+provide opt-in solutions and never interfere  
+Our migrations toolkit is not an exception
+
+## Overview
+Drizzle Kit - is a CLI companion for automatic SQL migrations generation and rapid prototyping  
+You can use it to generate SQL migrations from Drizzle ORM schema declaration and upon changes, 
+pull schema from the database and push schema changes to the one.  
+
+Migrations history is stored in the migrations folder folder
+```plaintext {3,5-8}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ ├ 📜 0000_premium_mister_fear.sql
+ │ ├ 📜 0001_absurd_toad.sql
+ │ ├ 📜 0002_adorable_human_torch.sql
+ │ └ 📜 0003_purple_master_chief.sql
+ ├ ...
+ ├ 📂 src
+ ├ 📜 package.json
+ └ ...
+```
+Each SQL migration file contains statements which you apply to the database through 
+Drizzle ORM migration package or any other way suitable for your business case or personal preference
+
+<CodeTabs items={["0000_premium_mister_fear.sql", "schema.ts"]}>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "user" (
+    "id" serial,
+    "name" text,
+    "email" text,
+    "password" text,
+    "role" text,
+    "created_at" timestamp,
+    "updated_at" timestamp
+  );
+  ```
+  ```typescript
+  export const user = pgTable("user", {
+    id: serial("id"),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    role: text("role").$type<"admin" | "customer">(),
+    createdAt: timestamp("created_at"),
+    updatedAt: timestamp("updated_at"),
+  });
+  ```
+</CodeTabs>
+
+
+
+### example
+
+## installation
+
+## configuration
+cli params and configuration files - ts, js, json
+
+## 
+
+`drizzle-kit` will traverse `schema folder` or `schema file`, generate schema snapshot and compare it to the previous version, if there's one.
+Based on the difference it will generate all needed SQL migrations and if there are any `automatically unresolvable` cases like `renames` it will prompt user for input.
+
+For schema file:
+
+```ts filename="./src/db/schema.ts"
+import { integer, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+const users = pgTable("users", {
+    id: serial("id").primaryKey(),
+    fullName: varchar("full_name", { length: 256 }),
+  }, (table) => ({
+    nameIdx: index("name_idx", table.fullName),
+  })
+);
+
+export const authOtp = pgTable("auth_otp", {
+  id: serial("id").primaryKey(),
+  phone: varchar("phone", { length: 256 }),
+  userId: integer("user_id").references(() => users.id),
+});
+```
+
+It will generate:
+
+```sql
+CREATE TABLE IF NOT EXISTS auth_otp (
+ "id" SERIAL PRIMARY KEY,
+ "phone" character varying(256),
+ "user_id" INT
+);
+
+CREATE TABLE IF NOT EXISTS users (
+ "id" SERIAL PRIMARY KEY,
+ "full_name" character varying(256)
+);
+
+DO $$ BEGIN
+ ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_fkey FOREIGN KEY ("user_id") REFERENCES users(id);
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
+```
