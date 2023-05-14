@@ -1,0 +1,48 @@
+.contentTitle {
+}
+
+@keyframes blank {
+    0% {
+        opacity: 0;
+    }
+
+    25% {
+        opacity: 1;
+    }
+
+    75% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+
+html[class~=dark] .cursor {
+    background-color: rgb(241,245,249);
+    color: rgb(241,245,249);
+}
+
+.cursor {
+    display: inline-block;
+    position: relative;
+    width: 2px;
+    color: rgb(15,23,42);
+    background-color: rgb(15,23,42);
+    line-height: 1;
+    left: -2px;
+    animation-name: blank;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.underline {
+    text-decoration: underline #4bb74a;
+}
+
+html[class~=dark] .underline {
+    text-decoration: underline #c5f74f;
+}

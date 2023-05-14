@@ -1,10 +1,49 @@
 .wrap {
+    margin-top: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 20px;
+    grid-template-columns: max-content max-content max-content;
+    grid-column-gap: 60px;
     grid-row-gap: 20px;
 }
 
 .item {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    font-weight: 600;
+}
 
+
+.svgBg {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #4bb74a;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.svgBg svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 4;
+    color: #FFFFFF;
+}
+
+html[class~=dark] .svgBg svg {
+    color: #111111;
 }

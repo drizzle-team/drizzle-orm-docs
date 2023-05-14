@@ -1,23 +1,28 @@
 import React from 'react';
 
 import styles from './Advantages.module.css';
+import CheckIcon from '../../../../CheckIcon';
 
 const Advantages: React.FC = () => {
   const advantages: string[] = [
-    'Edge ready, commonjs and ESM ready',
-    'Performance',
+    'Lightweight & edge ready',
+    'Top-notch performance',
     'Hassle-free SQL migrations',
     'No code generation',
-    'Lightweight, zero dependencies, 9kb minified gzipped treeshakable',
+    'Zero dependencies',
     'Feature reach SQL dialects',
-    'Meme game',
-    'Community',
   ];
   return (
     <div className={styles.wrap}>
-      {advantages.map((a, index) => (
-        <div className={styles.item} key={index}>{a}</div>
-      ))}
+      <div className={styles.title}>We&apos;ve got your back</div>
+      <div className={styles.grid}>
+        {advantages.map((a, index) => (
+          <div className={styles.item} key={index}>
+            <div className={styles.svgBg}><CheckIcon /></div>
+            {a}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

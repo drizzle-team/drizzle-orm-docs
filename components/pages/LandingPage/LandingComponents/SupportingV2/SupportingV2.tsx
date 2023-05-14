@@ -1,6 +1,6 @@
 import React from 'react';
 import SVG from 'react-inlinesvg';
-import styles from './Supporting.module.css';
+import styles from './SupportingV2.module.css';
 import { SVGProps } from '../../../../../@types/SVGTypes';
 
 interface Props {
@@ -14,12 +14,14 @@ interface Props {
     isImage?: boolean,
   } },
 }
-const Supporting: React.FC<Props> = ({
+const SupportingV2: React.FC<Props> = ({
   title, description, items, data,
 }) => (
   <div className={styles.wrap}>
-    <div className={styles.title}>{title}</div>
-    <div className={styles.description}>{description}</div>
+    <div className={styles.text_block}>
+      <div className={styles.title}>{title}</div>
+      <div className={styles.description}>{description}</div>
+    </div>
     <div className={styles.grid}>
       {items.map((a, index) => {
         const {
@@ -45,4 +47,4 @@ const Supporting: React.FC<Props> = ({
   </div>
 );
 
-export default Supporting;
+export default SupportingV2;
