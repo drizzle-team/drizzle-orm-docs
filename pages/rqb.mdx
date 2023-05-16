@@ -5,14 +5,15 @@ import Section from "../components/Section/Section";
 
 # Relational queries
 
-Drizzle ORM is designed to be a thin typed layer on top of SQL, we truly believe we've designed the best way to operate
-SQL database from TypeScript and it's time to make it better.  
-
-Relational queries are meant to provide you great developer experience for querying nested relational data from SQL database, 
-avoiding multiple joins and complex data mappings.
-
-**`Relational queries`** is an extension to existing schema definition and query builder, you can opt-in to use it based on your needs. 
-We made sure you have both the best in class developer experience and performance.  
+Drizzle ORM is designed to be a thin typed layer on top of SQL. 
+We truly believe we've designed the best way to operate an SQL database from TypeScript and it's time to make it better.  
+  
+Relational queries are meant to provide you with a great developer experience for querying 
+nested relational data from an SQL database, avoiding multiple joins and complex data mappings.  
+  
+**`Relational queries`** is an extension to the existing schema definition and query builder. 
+You can opt-in to use it based on your needs. 
+We've made sure you have both the best-in-class developer experience and performance.  
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
 	<CodeTab>
@@ -420,7 +421,7 @@ When both `exclude` and `include` select options are declared, the include optio
 </Callout>
 
 If you include the `name` field and exclude the `id` field, `id` exclusion will be redundant, 
-all fields apart from `name` would be excluded anyways. 
+all fields apart from `name` would be excluded anyways.  
 **Exclude and Include fields in the same query**
 <Section>
 ```typescript copy
@@ -580,7 +581,7 @@ await db.query.posts.findMany({
 
 ### Include custom fields
 Relational query API lets you add custom additional fields. 
-It's useful when you neetd to retrieve data and apply additional functions to it.
+It's useful when you need to retrieve data and apply additional functions to it.
 
 <Section>
 ```typescript copy {5}
