@@ -2,15 +2,21 @@ import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
 
 # Drizzle Kit
 Our most fundamental design principles of Drizzle ORM is to always stay explicit, 
-provide opt-in solutions and never interfere  
-Our migrations toolkit is not an exception
+provide opt-in solutions and never interfere. Our migrations toolkit is not an exception.
 
 ## Overview
-Drizzle Kit - is a CLI companion for automatic SQL migrations generation and rapid prototyping  
-You can use it to generate SQL migrations from Drizzle ORM schema declaration and upon changes, 
-pull schema from the database and push schema changes to the one.  
+**Drizzle Kit** - is a CLI companion for automatic SQL migrations generation and rapid prototyping  
+  
+Conceptually it's very simple, you just declare Drizzle ORM TypeScript schema and you generate SQL migration from it. 
+Then you can change that TypeScript schema and Drizzle Kit will generate you alternation migrations.
+That way you can have DDL source of truth in one type-safe place and under version control  
+  
+Drizzle Kit lets you have your schema being split in multiple schema files and even have multiple schemas for different databases in one project  
+You can rapidly prototype database schema and push it directly to the database  
+And last but not least - you can pull schema from the existing database in the matter of seconds  
 
-Migrations history is stored in the migrations folder folder
+## Migration files
+Migrations history is stored in `.sql` files in the migrations folder
 ```plaintext {3,5-8}
 📦 <project root>
  ├ ...
@@ -19,15 +25,15 @@ Migrations history is stored in the migrations folder folder
  │ ├ 📜 0000_premium_mister_fear.sql
  │ ├ 📜 0001_absurd_toad.sql
  │ ├ 📜 0002_adorable_human_torch.sql
- │ └ 📜 0003_purple_master_chief.sql
+ │ └ 📜 0003_boring_silver_sable.sql
  ├ ...
  ├ 📂 src
  ├ 📜 package.json
  └ ...
 ```
+
 Each SQL migration file contains statements which you apply to the database through 
 Drizzle ORM migration package or any other way suitable for your business case or personal preference
-
 <CodeTabs items={["0000_premium_mister_fear.sql", "schema.ts"]}>
   ```sql
   CREATE TABLE IF NOT EXISTS "user" (
@@ -53,16 +59,38 @@ Drizzle ORM migration package or any other way suitable for your business case o
   ```
 </CodeTabs>
 
+## Schema updates
+Whenever you apply changes to the schema - you just rerun `$ drizzle-kit generate...{:bash}` and 
+it will generate SQL migration for you completely automatically in most of the cases
+<CodeTabs items={["0001_absurd_toad.sql", "schema.ts"]}>
+  ```sql
+  ALTER TABLE "user" ADD COLUMN "is_verified" boolean;
+  ```
+  ```typescript {6}
+  export const user = pgTable("user", {
+    id: serial("id"),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    isVerified: boolean("is_verified"),
+    role: text("role").$type<"admin" | "customer">(),
+    createdAt: timestamp("created_at"),
+    updatedAt: timestamp("updated_at"),
+  });
+  ```
+</CodeTabs>
+
+## Running migrations
+
+## Prototyping
 
 
-### example
-
-## installation
-
-## configuration
+## Configuration
+Drizzle Kit supports 
 cli params and configuration files - ts, js, json
 
-## 
+
+## Pulling
 
 `drizzle-kit` will traverse `schema folder` or `schema file`, generate schema snapshot and compare it to the previous version, if there's one.
 Based on the difference it will generate all needed SQL migrations and if there are any `automatically unresolvable` cases like `renames` it will prompt user for input.
