@@ -100,7 +100,7 @@ export const usersConfig = relations(users, ({ one, many }) => ({
 
 Another example would be a user having a profile information stored in separate table
 <Callout type="info" emoji="ℹ️">
-Foreign keys are SQL entities and completely separate from `relations`
+Foreign keys are SQL entities and used to check relational constrains, they're not mandatory for `relations` module
 </Callout>
 ```typescript copy {9-14}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
@@ -243,9 +243,10 @@ Relation queries are extension to our original [query builder](./docs/crud).
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
 initialization and then just use `db.query` API.
 <Callout type="info" emoji="ℹ️">
-`drizzle` import depends on the [database driver]((/docs/installation-and-db-connection)) you're using
+`drizzle` import depends on the [database driver](/docs/installation-and-db-connection) you're using
 </Callout>
 <CodeTabs items={["index.ts", "schema.ts"]}>
+<CodeTab>
 ```ts
 import * as schema from './schema';
 import { drizzle } from 'drizzle-orm/...';
@@ -254,6 +255,17 @@ const db = drizzle(client, { schema });
 
 await db.query.users.findMany(...);
 ```
+```ts
+// if you have schema in multiple files
+import * as schema1 from './schema1';
+import * as schema2 from './schema2';
+import { drizzle } from 'drizzle-orm/...';
+
+const db = drizzle(client, { schema: { ...schema1, ...schema2 } });
+
+await db.query.users.findMany(...);
+```
+</CodeTab>
 ```typescript copy
 	import { type AnyPgColumn, boolean, integer, pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
@@ -372,7 +384,7 @@ const result: {
 
 ### Include relations
 
-With operator lets you combine data from multiple related tables and properly aggregate results
+`With` operator lets you combine data from multiple related tables and properly aggregate results
 
 **Getting all posts with comments**
 ```typescript copy
@@ -393,7 +405,7 @@ const post = await db.query.posts.findFirst({
 ```
 
 You can chain nested with statements as much as necessary.  
-For any nested `includes` Drizzle will infer types using `InferModel` from Core API  
+For any nested `with` queries Drizzle will infer types using `InferModel` from Core API  
   
 **Get all users with posts. Each post should contain a list of comments**
 ```typescript copy
@@ -409,7 +421,7 @@ const users = await db.query.users.findMany({
 ```
 
 ### Partial select
-Select operator lets you include or omit columns you want to get from the database
+`Fields` operator lets you include or omit columns you want to get from the database
 
 <Callout>
   Drizzle performs partial selects on the query level, no additional data is transfered from the database
@@ -421,8 +433,10 @@ const posts = await db.query.posts.findMany({
 	fields: {
 		id: true,
 		content: true,
-		comments: true,
 	},
+	with: {
+		comments: true,
+	}
 });
 ```
 
@@ -543,7 +557,7 @@ await db.query.posts.findMany({
 ```
 
 ### Limit & Offset
-Drizzle ORM provides `limit` & `offset` API for root query and for the nested entities.
+Drizzle ORM provides `limit` & `offset` API for queries and for the nested entities.
   
 **Find 5 posts**
 ```typescript copy
@@ -564,7 +578,7 @@ await db.query.posts.findMany({
 ```
 
 <Callout type="warning" emoji="⚠️">
-  `offset` is available only for tables you are querying
+  `offset` is only available for top-lvl query
 </Callout>
 ```typescript 
 await db.query.posts.findMany({
@@ -573,8 +587,7 @@ await db.query.posts.findMany({
 	offset: 2,
 	with: {
 		comments: {
-			// error: DrizzleTypeError<"Offset is not allowed in nested queries">
-			offset: 3,
+			offset: 3, // forbidden
 			limit: 3,
 		},
 	},
@@ -654,7 +667,7 @@ await db.query.users.findMany({
 </Callout>
 
 <Callout type="warning" emoji="⚠️">
-	As of now aggregations are not supported in `includeCustom`, please use [`core queries`](./crud) for that
+	As of now aggregations are not supported in `extras`, please use [`core queries`](./crud) for that
 </Callout>
 
 To retrieve all users with groups, but with the fullName field included (which is a concatenation of firstName and lastName), 
