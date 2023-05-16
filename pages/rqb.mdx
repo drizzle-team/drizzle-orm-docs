@@ -23,11 +23,30 @@ We've made sure you have both the best-in-class developer experience and perform
 
 	const db = drizzle(client, { schema });
 
-	const users = await db.query.users.findMany({
-		include: {
-			posts: true
+	const result = await db.query.users.findMany({
+		with: {
+			posts: true			
 		},
 	});
+	```
+
+	```ts
+	[{
+		id: 10,
+		name: "Dan",
+		posts: [
+			{
+				id: 1,
+				content: "SQL is awesome",
+				authorId: 10,
+			},
+			{
+				id: 2,
+				content: "But check relational queries",
+				authorId: 10,
+			}
+		]
+	}]
 	```
 	</CodeTab>
 
@@ -37,7 +56,7 @@ We've made sure you have both the best-in-class developer experience and perform
 
 	export const users = pgTable('users', {
 		id: serial('id').primaryKey(),
-		name: text('name'),
+		name: text('name').notNull(),
 	});
 
 	export const usersConfig = relations(users, ({ many }) => ({
@@ -46,8 +65,8 @@ We've made sure you have both the best-in-class developer experience and perform
 
 	export const posts = pgTable('posts', {
 		id: serial('id').primaryKey(),
-		content: text('content'),
-		authorId: integer('author_id'),
+		content: text('content').notNull(),
+		authorId: integer('author_id').notNull(),
 	});
 
 	export const postsConfig = relations(posts, ({ one }) => ({
@@ -351,14 +370,14 @@ const result: {
 ```
 </Section>
 
-### Include
+### Include relations
 
-Include operator lets you combine data from multiple related tables and properly aggregate results
+With operator lets you combine data from multiple related tables and properly aggregate results
 
 **Getting all posts with comments**
 ```typescript copy
 const posts = await db.query.posts.findMany({
-	include: {
+	with: {
 		comments: true,
 	},
 });
@@ -367,21 +386,21 @@ const posts = await db.query.posts.findMany({
 **Getting first post with comments**
 ```typescript copy
 const post = await db.query.posts.findFirst({
-	include: {
+	with: {
 		comments: true,
 	},
 });
 ```
 
-You can chain nested include statements as much as necessary.  
+You can chain nested with statements as much as necessary.  
 For any nested `includes` Drizzle will infer types using `InferModel` from Core API  
   
 **Get all users with posts. Each post should contain a list of comments**
 ```typescript copy
 const users = await db.query.users.findMany({
-	include: {
+	with: {
 		posts: {
-			include: {
+			with: {
 				comments: true,
 			},
 		},
@@ -399,7 +418,7 @@ Select operator lets you include or omit columns you want to get from the databa
 **Get all posts with just `id`, `content` and include `comments`**
 ```typescript copy
 const posts = await db.query.posts.findMany({
-	select: {
+	fields: {
 		id: true,
 		content: true,
 		comments: true,
@@ -410,7 +429,7 @@ const posts = await db.query.posts.findMany({
 **Get all posts without `content`**
 ```typescript copy
 const posts = await db.query.posts.findMany({
-	select: {
+	fields: {
 		content: false,
 	},
 });
@@ -422,11 +441,12 @@ When both `exclude` and `include` select options are declared, the include optio
 
 If you include the `name` field and exclude the `id` field, `id` exclusion will be redundant, 
 all fields apart from `name` would be excluded anyways.  
+  
 **Exclude and Include fields in the same query**
 <Section>
 ```typescript copy
 const users = await db.query.users.findMany({
-	select: {
+	fields: {
 		name: true,
 		id: false //ignored
 	},
@@ -440,18 +460,43 @@ const users: {
 ```
 </Section>
 
+**Only include fields from nested relations**
+<Section>
+```typescript copy
+const res = await db.query.users.findMany({
+	fields: {},
+	with: {
+		posts: true
+	}
+});
+```
+```ts
+// result type
+const res: {
+	posts: {
+		id: number,
+		text: string
+	}
+}[];
+```
+</Section>
+
 ### Nested partial select
 Just like with [`partial select`](#partial-select), you can include or exclude columns of nested included tables  
 ```typescript copy
 const posts = await db.query.posts.findMany({
-	select: {
+	fields: {
+		id: true,
 		content: true,
+	},
+	with: {
 		comments: {
-			select: {
+			fields: {
 				id: true,
+				text: true,
 			}
 		}
-	},
+	}
 });
 ```
 
@@ -479,7 +524,7 @@ For example, if you need to retrieve all users who have more than 0 posts.
 ```typescript copy {2}
 const usersWithPosts = await db.query.users.findMany({
 	where: (table, { sql }) => (sql`json_array_length(${table.posts}) > 0`),
-	include: {
+	with: {
 		posts: true,
 	},
 });
@@ -489,7 +534,7 @@ Find post with `id=1` and comments that were created before particular date
 ```typescript copy
 await db.query.posts.findMany({
 	where: (posts, { eq }) => (eq(posts.id, 1)),
-	include: {
+	with: {
 		comments: {
 			where: (comments, { lt }) => lt(comments.createdAt, new Date()),
 		},
@@ -510,7 +555,7 @@ await db.query.posts.findMany({
 **Find posts and get 3 comments at most**
 ```typescript copy
 await db.query.posts.findMany({
-	include: {
+	with: {
 		comments: {
 			limit: 3,
 		},
@@ -526,7 +571,7 @@ await db.query.posts.findMany({
 	limit: 5,
 	// will work well ✅
 	offset: 2,
-	include: {
+	with: {
 		comments: {
 			// error: DrizzleTypeError<"Offset is not allowed in nested queries">
 			offset: 3,
@@ -541,7 +586,7 @@ Find posts with comments from the 5th to the 10th post
 await db.query.posts.findMany({
 	limit: 5,
   offset: 5,
-	include: {
+	with: {
 		comments: true,
 	},
 });
@@ -571,7 +616,7 @@ Order by asc + desc
 ```typescript copy
 await db.query.posts.findMany({
 	orderBy: (posts, { asc }) => [asc(posts.id)],
-	include: {
+	with: {
 		comments: {
 			orderBy: (comments, { desc }) => [desc(comments.id)],
 		},
@@ -588,14 +633,14 @@ It's useful when you need to retrieve data and apply additional functions to it.
 import { sql } from 'drizzle-orm';
 
 await db.query.users.findMany({
-	includeCustom: {
+	extras: {
 		loweredName: sql`lower(${users.name})`.as('lowered_name'),
 	},
 })
 ```
 ```typescript copy {3}
 await db.query.users.findMany({
-	includeCustom: {
+	extras: {
 		loweredName: (users, { sql }) => sql`lower(${users.name})`.as('lowered_name'),
 	},
 })
@@ -618,12 +663,12 @@ you can use the following query with the Drizzle relational query builder.
 <Section>
 ```typescript copy
 const res = await db.query.users.findMany({
-	includeCustom: {
+	extras: {
 		fullName: sql<string>`concat(${users.name}, " ", ${users.name})`.as('full_name'),
 	},
-	include: {
+	with: {
 		usersToGroups: {
-			select: {
+			fields: {
 				group: true,
 			},
 		},
@@ -655,12 +700,12 @@ To retrieve all posts with comments and add an additional field to calculate the
 <Section>
 ```typescript copy
 const res = await db.query.posts.findMany({
-	includeCustom: (table, { sql }) => ({
+	extras: (table, { sql }) => ({
 		contentLength: (sql<number>`length(${table.content})`).as('content_length'),
 	}),
-	include: {
+	with: {
 		comments: {
-			includeCustom: {
+			extras: {
 				commentSize: sql<number>`length(${comments.content})`.as('comment_size'),
 			},
 		},
@@ -704,7 +749,7 @@ using the Drizzle relational query builder.
     ```ts copy
     const prepared = db.query.users.findMany({
 		where: (({ id }, { eq }) => eq(id, placeholder('id'))),
-		include: {
+		with: {
 			posts: {
 				where: (({ id }, { eq }) => eq(id, 1)),
 			},
@@ -720,7 +765,7 @@ using the Drizzle relational query builder.
       ```ts copy
       const prepared = db.query.users.findMany({
 		where: (({ id }, { eq }) => eq(id, placeholder('id'))),
-		include: {
+		with: {
 			posts: {
 				where: (({ id }, { eq }) => eq(id, 1)),
 			},
@@ -736,7 +781,7 @@ using the Drizzle relational query builder.
       ```ts copy
       const prepared = db.query.users.findMany({
 		where: (({ id }, { eq }) => eq(id, placeholder('id'))),
-		include: {
+		with: {
 			posts: {
 				where: (({ id }, { eq }) => eq(id, 1)),
 			},
@@ -756,7 +801,7 @@ using the Drizzle relational query builder.
     <Section>
       ```ts copy
       const prepared = db.query.users.findMany({
-		include: {
+		with: {
 			posts: {
 				limit: placeholder('limit'),
 			},
@@ -771,7 +816,7 @@ using the Drizzle relational query builder.
     <Section>
       ```ts copy
       const prepared = db.query.users.findMany({
-		include: {
+		with: {
 			posts: {
 				limit: placeholder('limit'),
 			},
@@ -786,7 +831,7 @@ using the Drizzle relational query builder.
     <Section>
       ```ts copy
       const prepared = db.query.users.findMany({
-		include: {
+		with: {
 			posts: {
 				limit: placeholder('limit'),
 			},
@@ -807,7 +852,7 @@ using the Drizzle relational query builder.
       ```ts copy
       const prepared = db.query.users.findMany({
         offset: placeholder('offset'),
-		include: {
+		with: {
 			posts: true,
 		},
 	}).prepare('query_name');
@@ -821,7 +866,7 @@ using the Drizzle relational query builder.
       ```ts copy
       const prepared = db.query.users.findMany({
         offset: placeholder('offset'),
-		include: {
+		with: {
 			posts: true,
 		},
 	}).prepare();
@@ -835,7 +880,7 @@ using the Drizzle relational query builder.
       ```ts copy
       const prepared = db.query.users.findMany({
         offset: placeholder('offset'),
-		include: {
+		with: {
 			posts: true,
 		},
 	}).prepare();
@@ -855,7 +900,7 @@ using the Drizzle relational query builder.
 		limit: placeholder('uLimit'),
 		offset: placeholder('uOffset'),
 		where: (({ id }, { eq, or }) => or(eq(id, placeholder('id')), eq(id, 3))),
-		include: {
+		with: {
 			posts: {
 				where: (({ id }, { eq }) => eq(id, placeholder('pid'))),
 				limit: placeholder('pLimit'),
@@ -874,7 +919,7 @@ using the Drizzle relational query builder.
 		limit: placeholder('uLimit'),
 		offset: placeholder('uOffset'),
 		where: (({ id }, { eq, or }) => or(eq(id, placeholder('id')), eq(id, 3))),
-		include: {
+		with: {
 			posts: {
 				where: (({ id }, { eq }) => eq(id, placeholder('pid'))),
 				limit: placeholder('pLimit'),
@@ -893,7 +938,7 @@ using the Drizzle relational query builder.
 		limit: placeholder('uLimit'),
 		offset: placeholder('uOffset'),
 		where: (({ id }, { eq, or }) => or(eq(id, placeholder('id')), eq(id, 3))),
-		include: {
+		with: {
 			posts: {
 				where: (({ id }, { eq }) => eq(id, placeholder('pid'))),
 				limit: placeholder('pLimit'),
