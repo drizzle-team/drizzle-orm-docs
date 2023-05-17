@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'next-themes';
 import Typer from './Typer/Typer';
@@ -12,6 +12,10 @@ import ParticlePicDark from './Images/ParticlePic_dark.png';
 
 const Header = () => {
   const { theme } = useTheme();
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    setIsDark(!(theme === 'light'));
+  }, [theme]);
   return (
     <div className={styles.wrap}>
       <div className={styles.content}>
@@ -20,14 +24,14 @@ const Header = () => {
           <Typer />
         </div>
         <div className={styles.picture_wrapper}>
-          <img className={styles.text_image} src={theme === 'light' ? SecondPic.src : SecondPicDark.src} alt="Second" />
+          <img className={styles.text_image} src={!isDark ? SecondPic.src : SecondPicDark.src} alt="Second" />
         </div>
       </div>
       <div className={styles.picture_wrapper}>
         <div className={styles.picture_block}>
-          <img className={styles.addition_image} src={theme === 'light' ? SecondPic.src : SecondPicDark.src} alt="Second" />
-          <img className={styles.picture} src={theme === 'light' ? MainPic.src : MainPicDark.src} alt="Main" />
-          <img className={styles.particle} src={theme === 'light' ? ParticlePic.src : ParticlePicDark.src} alt="Particle" />
+          <img className={styles.addition_image} src={!isDark ? SecondPic.src : SecondPicDark.src} alt="Second" />
+          <img className={styles.picture} src={!isDark ? MainPic.src : MainPicDark.src} alt="Main" />
+          <img className={styles.particle} src={!isDark ? ParticlePic.src : ParticlePicDark.src} alt="Particle" />
         </div>
       </div>
     </div>
