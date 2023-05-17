@@ -2,85 +2,84 @@ import { SVGProps } from '../../../../../@types/SVGTypes';
 
 const Runtimes: {
   [key: string]: {
-    image: string,
-    lightIcon?: SVGProps,
-    darkIcon?: SVGProps,
-    isImage?: boolean,
+    src: string,
+    srcDark?: string,
+    lightStyles?: SVGProps,
+    darkStyles?: SVGProps,
   },
 } = {
   'Cloudflare Workers': {
-    image: 'cloudflareworker',
-    lightIcon: {
+    src: 'cloudflareworker.svg',
+    lightStyles: {
       width: 32,
     },
-    darkIcon: {
+    darkStyles: {
       width: 32,
     },
   },
   'Supabase functions': {
-    image: 'supabase',
-    lightIcon: {
+    src: 'supabase.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
     },
   },
   Bun: {
-    image: 'bun',
-    lightIcon: {
-      width: 32,
+    src: 'bun.svg',
+    lightStyles: {
+      width: 30,
     },
-    darkIcon: {
-      width: 32,
+    darkStyles: {
+      width: 30,
     },
   },
   'Deno deploy': {
-    image: 'deno',
-    lightIcon: {
+    src: 'deno.svg',
+    lightStyles: {
       width: 36,
     },
-    darkIcon: {
+    darkStyles: {
       width: 36,
       fill: '#cccccc',
     },
   },
   Browser: {
-    image: 'browser',
-    lightIcon: {
-      width: 24,
+    src: 'browser.svg',
+    lightStyles: {
+      width: 30,
     },
-    darkIcon: {
-      width: 24,
+    darkStyles: {
+      width: 30,
       color: '#cccccc',
     },
   },
   ElectronJS: {
-    image: 'electron',
-    lightIcon: {
+    src: 'electron.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
       filter: 'brightness(200%)',
     },
   },
   Lagon: {
-    isImage: true,
-    image: 'lagon',
-    lightIcon: {
+    src: 'lagon.png',
+    lightStyles: {
       filter: 'brightness(-100%)',
     },
-    darkIcon: {
+    darkStyles: {
       filter: 'brightness(80%)',
     },
   },
   'Vercel functions': {
-    image: 'vercel',
-    lightIcon: {
+    src: 'vercel.svg',
+    lightStyles: {
       width: 32,
     },
-    darkIcon: {
+    darkStyles: {
       fill: '#000000',
       width: 32,
     },

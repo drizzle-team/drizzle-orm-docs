@@ -1,8 +1,14 @@
 .wrap {
-    margin-top: 120px;
+    margin: 200px auto 0;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    max-width: 910px;
+    gap: 40px;
+}
+
+.text_block {
+
 }
 
 .title {
@@ -20,12 +26,19 @@ html[class~=dark] .description {
     color: rgba(255, 255, 255, 0.8);
 }
 
+.leftside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+}
+
 .grid {
-    margin-top: 40px;
     display: grid;
-    grid-template-columns: 220px 220px 220px 220px;
+    grid-template-columns: 220px 220px;
     grid-column-gap: 10px;
     grid-row-gap: 10px;
+    height: fit-content;
 }
 
 .item {
@@ -43,21 +56,7 @@ html[class~=dark] .item {
     background-color: #282828;
 }
 
-html[class~=dark] .img_light {
-    visibility: hidden;
-}
-
-.img_light {
-    visibility: visible;
-    position: absolute;
-}
-
-html[class~=dark] .img_dark {
-    visibility: visible;
-}
-
-.img_dark {
-    visibility: hidden;
+.img_block {
     position: absolute;
 }
 
@@ -75,4 +74,8 @@ html[class~=dark] .img_dark {
 
 .icon img {
     height: 24px;
+}
+
+.image {
+    width: 40%;
 }
