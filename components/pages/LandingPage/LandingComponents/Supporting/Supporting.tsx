@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import SVG from 'react-inlinesvg';
 import { StaticImageData } from 'next/image';
 import { useTheme } from 'next-themes';
@@ -6,7 +6,7 @@ import styles from './Supporting.module.css';
 import { SVGProps } from '../../../../../@types/SVGTypes';
 import LiveOnTheEdge from './Images/LiveOnTheEdge.png';
 import ConnectEverywhere from './Images/ConnectEverywhere.png';
-import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
+// import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
 
 interface Props {
   title: string,
@@ -23,19 +23,17 @@ interface Props {
 const Supporting: React.FC<Props> = ({
   title, description, items, data, imageType,
 }) => {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
+  const [isLight, setIsLight] = useState(false);
+  useEffect(() => {
+    setIsLight(theme === 'light');
+  }, [theme]);
   const images: {
     [key: string]: StaticImageData;
   } = {
     liveontheedge: LiveOnTheEdge,
-    connecteverywhere: theme === 'light' ? ConnectEverywhere : ConnectEverywhereDark,
+    connecteverywhere: isLight ? ConnectEverywhere : ConnectEverywhere,
   };
-  useEffect(() => {
-    if (theme === 'system') {
-      const isLight = document.documentElement.classList.contains('light');
-      setTheme(isLight ? 'light' : 'dark');
-    }
-  }, []);
   return (
     <div className={styles.wrap}>
       <div className={styles.leftside}>
@@ -43,7 +41,7 @@ const Supporting: React.FC<Props> = ({
           <div className={styles.title}>{title}</div>
           <div className={styles.description}>{description}</div>
         </div>
-        <img className={styles.image} src={images[imageType].src} alt="live on the edge" />
+        <img className={`${styles.image} ${imageType === 'connecteverywhere' ? styles.bigImage : ''}`} src={images[imageType].src} alt="live on the edge" />
       </div>
       <div className={styles.grid}>
         {items.map((a, index) => {
@@ -57,13 +55,13 @@ const Supporting: React.FC<Props> = ({
                 <div className={styles.img_block}>
                   {data[a].src.includes('.svg') ? (
                     <>
-                      {theme === 'light' ? <SVG src={`/svg/${data[a].src}`} {...lightStyles} />
+                      {isLight ? <SVG src={`/svg/${data[a].src}`} {...lightStyles} />
                         : <SVG src={`/svg/${data[a].srcDark || data[a].src}`} {...darkStyles} />}
                     </>
                   ) : (
                     <img
-                      src={theme === 'light' ? `/svg/${data[a].src}` : `/svg/${data[a].srcDark || data[a].src}`}
-                      style={theme === 'light' ? { ...lightStyles } : { ...darkStyles as any }}
+                      src={isLight ? `/svg/${data[a].src}` : `/svg/${data[a].srcDark || data[a].src}`}
+                      style={isLight ? { ...lightStyles } : { ...darkStyles as any }}
                       alt={a}
                     />
                   )}

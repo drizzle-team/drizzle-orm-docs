@@ -10,6 +10,13 @@ const ThemeToggle = () => {
     setIsDark(theme === 'dark');
   }, [theme]);
 
+  useEffect(() => {
+    if (theme === 'system') {
+      const isLight = document.documentElement.classList.contains('light');
+      setTheme(isLight ? 'light' : 'dark');
+    }
+  }, []);
+
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
