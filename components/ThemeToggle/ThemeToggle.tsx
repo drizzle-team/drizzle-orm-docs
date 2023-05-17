@@ -1,31 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 import styles from './ThemeToggle.module.css';
 
 const ThemeToggle = () => {
   const [isDark, setIsDark] = useState<boolean | null>(null);
+  const { theme, setTheme } = useTheme();
+
   useEffect(() => {
-    const dark = !(document.documentElement.classList.contains('light'));
-    setIsDark(dark);
-  }, []);
+    setIsDark(theme === 'dark');
+  }, [theme]);
+
   const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.replace('dark', 'light');
-      localStorage.setItem('theme', 'light');
-      document.documentElement.setAttribute('style', 'color-scheme: light;');
-      document.querySelector('meta[name="theme-color"]')!.setAttribute('content', '#fff');
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.replace('light', 'dark');
-      localStorage.setItem('theme', 'dark');
-      const node = document.querySelectorAll('button[title="Change theme"]');
-      node.forEach((n) => {
-        const parent = n.parentElement!;
-        parent.innerHTML = '<button title="Change theme" class="nx-h-7 nx-rounded-md nx-px-2 nx-text-left nx-text-xs nx-font-medium nx-text-gray-600 nx-transition-colors dark:nx-text-gray-400 hover:nx-bg-gray-100 hover:nx-text-gray-900 dark:hover:nx-bg-primary-100/5 dark:hover:nx-text-gray-50" id="headlessui-listbox-button-:R2njcm:" type="button" aria-haspopup="listbox" aria-expanded="false" data-headlessui-state=""><div class="nx-flex nx-items-center nx-gap-2 nx-capitalize"><svg fill="none" viewBox="2 2 20 20" width="12" height="12" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="currentColor" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg><span class="">dark</span></div></button>';
-      });
-      document.documentElement.setAttribute('style', 'color-scheme: dark;');
-      document.querySelector('meta[name="theme-color"]')!.setAttribute('content', '#111');
-      setIsDark(true);
-    }
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
   return (
     <div className={styles.container} onClick={toggleTheme}>

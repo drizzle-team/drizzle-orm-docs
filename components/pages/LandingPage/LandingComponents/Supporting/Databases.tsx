@@ -2,86 +2,98 @@ import { SVGProps } from '../../../../../@types/SVGTypes';
 
 const Databases: {
   [key: string]: {
-    image: string,
-    lightIcon?: SVGProps,
-    darkIcon?: SVGProps,
+    src: string,
+    srcDark?: string,
+    lightStyles?: SVGProps,
+    darkStyles?: SVGProps,
     isImage?: boolean,
   },
 } = {
   Neon: {
-    image: 'neon-serverless',
-    lightIcon: {
+    src: 'neon-light.svg',
+    srcDark: 'neon-dark.svg',
+    lightStyles: {
       width: 24,
-      src: '/svg/neon-light.svg',
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
-      src: '/svg/neon-dark.svg',
     },
   },
   PlanetScale: {
-    image: 'planetscale',
-    lightIcon: {
+    src: 'planetscale.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
-      fill: '#f0f0f0',
+      color: '#f0f0f0',
+    },
+  },
+  'Vercel storage': {
+    src: 'vercel.svg',
+    lightStyles: {
+      width: 32,
+    },
+    darkStyles: {
+      fill: '#000000',
+      width: 32,
     },
   },
   Turso: {
-    image: 'turso',
-    lightIcon: {
+    src: 'turso.svg',
+    lightStyles: {
       width: 28,
       src: '/svg/turso-light.svg',
     },
-    darkIcon: {
+    darkStyles: {
       width: 28,
     },
   },
   Supabase: {
-    image: 'supabase',
-    lightIcon: {
+    src: 'supabase.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
     },
   },
   PostgreSQL: {
-    image: 'postgres-js',
-    lightIcon: {
+    src: 'postgresql.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
       fill: '#f0f0f0',
     },
   },
   MySQL: {
-    image: 'server',
-    lightIcon: {
+    src: 'mysql.svg',
+    lightStyles: {
       width: 24,
+      fill: '#00546B',
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
+      fill: '#F0F0F0',
     },
   },
   SQLite: {
-    image: 'server',
-    lightIcon: {
+    src: 'sqlite.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
     },
   },
   'Web SQLite': {
-    image: 'server',
-    lightIcon: {
+    src: 'server.svg',
+    lightStyles: {
       width: 24,
     },
-    darkIcon: {
+    darkStyles: {
       width: 24,
     },
   },
