@@ -5,7 +5,8 @@ import { useTheme } from 'next-themes';
 import styles from './Supporting.module.css';
 import { SVGProps } from '../../../../../@types/SVGTypes';
 import LiveOnTheEdge from './Images/LiveOnTheEdge.png';
-import ConnectEverywhere from './Images/ConnectEverywhereDark.png';
+import ConnectEverywhere from './Images/ConnectEverywhere.png';
+import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
 
 interface Props {
   title: string,
@@ -27,7 +28,7 @@ const Supporting: React.FC<Props> = ({
     [key: string]: StaticImageData;
   } = {
     liveontheedge: LiveOnTheEdge,
-    connecteverywhere: ConnectEverywhere,
+    connecteverywhere: theme === 'light' ? ConnectEverywhere : ConnectEverywhereDark,
   };
   useEffect(() => {
     if (theme === 'system') {
