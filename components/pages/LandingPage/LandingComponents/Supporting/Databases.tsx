@@ -89,7 +89,7 @@ const Databases: {
     },
   },
   'Web SQLite': {
-    src: 'server.svg',
+    src: 'database.svg',
     lightStyles: {
       width: 24,
     },
