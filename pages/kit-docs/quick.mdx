@@ -1,11 +1,123 @@
-## Installation & configuration
+import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+import Section from "../../components/Section/Section";
+import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
-```shell
+
+# Quick start
+Lets build a quick start app with `PostgreSQL` + `postgresjs` and run our first migration
+
+<Tabs items={["npm", "yarn", "pnpm"]}>
+<Tab>
+```shell copy
+npm install drizzle-orm postgresjs
 npm install -D drizzle-kit
 ```
-
-Running with CLI options
-
-```shell
-npx drizzle-kit generate:pg --out migrations-folder --schema src/db/schema.ts
+</Tab>
+<Tab>
+```shell copy
+yarn add drizzle-orm postgresjs
+yarn add -D drizzle-kit
 ```
+</Tab>
+<Tab>
+```shell copy
+pnpm add drizzle-orm postgresjs
+pnpm add -D drizzle-kit
+```
+</Tab>
+</Tabs>
+
+Lets declare our `schema.ts`
+
+```plaintext {4}
+📦 <project root>
+ ├ ...
+ ├ 📂 src
+ │ └ 📜 schema.ts
+ └ 📜 package.json
+```
+```ts copy filename="schema.ts"
+import { serial, text, timestamp, pgTable } from "drizzle-orm/pg-core";
+
+export const user = pgTable("user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  role: text("role").$type<"admin" | "customer">(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
+```
+
+Now lets add drizzle configuration file
+```plaintext {4}
+📦 <project root>
+ ├ ...
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/schema.ts",
+  out: "./drizzle",
+} satisfies Config;
+```
+
+Add generate command to `package.json` and run our first migrations generation
+
+```json filename="package.json" {5}
+{
+  "name": "first time?",
+  "version": "0.0.1",
+  "scripts": {
+    "generate": "drizzle-kit generate:pg",
+  }, 
+}
+```
+```shell filename="terminal"
+$ npm run generate
+...
+
+[✓] Your SQL migration file ➜ drizzle/0000_pale_mister_fear.sql 🚀
+```
+
+Done! We now have our first SQL migration file
+```plaintext {4}
+📦 <project root>
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ └ 📜 0000_pale_mister_fear.sql
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+Now lets run our first migration to the database
+
+```plaintext {5}
+📦 <project root>
+ ├ 📂 drizzle
+ ├ 📂 src
+ │ ├ 📜 schema.ts
+ │ └ 📜 index.ts
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+
+```ts copy filename="index.ts"
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
+
+const connectionString = "..."
+const sql = postgres(connectionString, { max: 1 })
+const db = drizzle(sql);
+
+await migrate(db, { migrationsFolder: "drizzle" });
+```
+
+That's it, folks!  
+My personal congratulations 🎉
