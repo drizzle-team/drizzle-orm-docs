@@ -1,8 +1,29 @@
 import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+import Section from "../../components/Section/Section";
+import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
 # Drizzle Kit
 Our most fundamental design principles of Drizzle ORM is to always stay explicit, 
 provide opt-in solutions and never interfere. Our migrations toolkit is not an exception.
+
+
+<Tabs items={["npm", "yarn", "pnpm"]}>
+<Tab>
+```shell copy
+npm install -D drizzle-kit
+```
+</Tab>
+<Tab>
+```shell copy
+yarn add -D drizzle-kit
+```
+</Tab>
+<Tab>
+```shell copy
+pnpm add -D drizzle-kit
+```
+</Tab>
+</Tabs>
 
 ## Overview
 **Drizzle Kit** - is a CLI companion for automatic SQL migrations generation and rapid prototyping  
@@ -81,59 +102,135 @@ it will generate SQL migration for you completely automatically in most of the c
 </CodeTabs>
 
 ## Running migrations
+We're unopinionated on how you should run your migrations.   
+you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle ORM**  
+  
+We provide you a useful way to run generated migrations with `migrate` function which we implement for each driver and dialect specifically.  
+Drizzle will automatically keep track of applied migrations in your database.
 
-## Prototyping
+<Callout type="info" emoji="ℹ️">
+`drizzle` and `migrate` imports depend on the [database driver](/docs/installation-and-db-connection) you're using
+</Callout>
 
+<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tab>
+```ts
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
+
+const sql = postgres("...", { max: 1 })
+const db = drizzle(sql);
+
+await migrate(db, { migrationsFolder: "drizzle" });
+```
+</Tab>
+<Tab>
+```ts
+import { drizzle } from "drizzle-orm/mysql2";
+import { migrate } from "drizzle-orm/mysql2/migrator";
+import { createConnection } from "mysql2";
+
+const connection = createConnection("...")
+const db = drizzle(connection);
+
+await migrate(db, { migrationsFolder: "drizzle" });
+```
+</Tab>
+<Tab>
+```ts
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import Database from "better-sqlite3";
+
+const betterSqlite = new Database(":memory:");
+const db = drizzle(betterSqlite);
+
+migrate(db, { migrationsFolder: "drizzle" });
+```
+</Tab>
+</Tabs>
+
+## Prototyping with db push
+Drizzle Kit lets you alter you database schema and rapidly move forward with a db [`push` command](./commands/push).  
+That's very handy when you have remote databases like Neon, Planetscale or Turso.  
+
+It introspects your database, detects changes and pushes them to remote/local database, 
+that even lets you have a `no sql migration files` enviroment which gets popular nowadays.
+
+```bash
+$ drizzle-kit push:mysql ...
+```
+For extended `push` examples - [see here](./commands/push)
+
+## Introspecting with db pull
+Drizzle Kit lets you pull DDL from existing database and prints you Drizzle TypeScript schema file completely automatically
+
+<Section>
+```bash
+$ drizzle-kit introspect:mysql ...
+```
+```plaintext {6}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ ├ 📜 0000_premium_mister_fear.sql
+ │ └ 📜 schema.ts
+ ├ ...
+ ├ 📂 src
+ ├ 📜 package.json
+ └ ...
+```
+```ts
+ export const user = pgTable("user", {
+    id: serial("id"),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    role: text("role").$type<"admin" | "customer">(),
+    createdAt: timestamp("created_at"),
+    updatedAt: timestamp("updated_at"),
+  });
+```
+</Section>
+For extended `introspect` examples - [see here](./commands/pull)
 
 ## Configuration
-Drizzle Kit supports 
-cli params and configuration files - ts, js, json
+Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
+You can have autocomplete experience and very convenient enviroment variables flow!
 
+<CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
+<CodeTab>
+```ts
+import type { Config } from "drizzle-kit";
 
-## Pulling
-
-`drizzle-kit` will traverse `schema folder` or `schema file`, generate schema snapshot and compare it to the previous version, if there's one.
-Based on the difference it will generate all needed SQL migrations and if there are any `automatically unresolvable` cases like `renames` it will prompt user for input.
-
-For schema file:
-
-```ts filename="./src/db/schema.ts"
-import { integer, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
-
-const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    fullName: varchar("full_name", { length: 256 }),
-  }, (table) => ({
-    nameIdx: index("name_idx", table.fullName),
-  })
-);
-
-export const authOtp = pgTable("auth_otp", {
-  id: serial("id").primaryKey(),
-  phone: varchar("phone", { length: 256 }),
-  userId: integer("user_id").references(() => users.id),
-});
+export default {
+  schema: "./schema.ts",
+  connectionString: process.env.DB_URL,
+} satisfies Config;
 ```
+</CodeTab>
+<CodeTab>
+```js
+import type { Config } from "drizzle-kit";
 
-It will generate:
-
-```sql
-CREATE TABLE IF NOT EXISTS auth_otp (
- "id" SERIAL PRIMARY KEY,
- "phone" character varying(256),
- "user_id" INT
-);
-
-CREATE TABLE IF NOT EXISTS users (
- "id" SERIAL PRIMARY KEY,
- "full_name" character varying(256)
-);
-
-DO $$ BEGIN
- ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_fkey FOREIGN KEY ("user_id") REFERENCES users(id);
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
+/** @type { import("drizzle-kit").Config } */
+export default {
+  schema: "./schema.ts",
+  connectionString: process.env.DB_URL,
+};
 ```
+</CodeTab>
+<CodeTab>
+```json
+{
+  "out": "./migrations-folder",
+  "schema": "./src/db",
+  "breakpoints": false
+}
+```
+</CodeTab>
+</CodeTabs>
+
+For list of all configuration params - [see here](./conf)
