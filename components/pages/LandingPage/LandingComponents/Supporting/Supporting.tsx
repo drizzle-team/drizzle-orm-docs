@@ -5,8 +5,9 @@ import { useTheme } from 'next-themes';
 import styles from './Supporting.module.css';
 import { SVGProps } from '../../../../../@types/SVGTypes';
 import LiveOnTheEdge from './Images/LiveOnTheEdge.png';
+import LiveOnTheEdgeDark from './Images/LiveOnTheEdgeDark.png';
 import ConnectEverywhere from './Images/ConnectEverywhere.png';
-// import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
+import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
 
 interface Props {
   title: string,
@@ -31,8 +32,8 @@ const Supporting: React.FC<Props> = ({
   const images: {
     [key: string]: StaticImageData;
   } = {
-    liveontheedge: LiveOnTheEdge,
-    connecteverywhere: isLight ? ConnectEverywhere : ConnectEverywhere,
+    liveontheedge: isLight ? LiveOnTheEdge : LiveOnTheEdgeDark,
+    connecteverywhere: isLight ? ConnectEverywhere : ConnectEverywhereDark,
   };
   return (
     <div className={styles.wrap}>
