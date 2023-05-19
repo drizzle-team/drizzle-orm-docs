@@ -8,12 +8,13 @@ let timeOut: NodeJS.Timeout;
 
 function Typer() {
   const words = [
-    'performs',
-    'lasts',
-    'has Twitter memes game',
-    'Dax should definitely try',
+    'performs and lasts',
+    'developers love',
     'is not as good as Django',
+    'lets you love SQL',
+    'Dax should definitely try',
     'is not as good as Laravel',
+    'is not yet VC backed',
   ];
 
   const [canAnimate, setCanAnimate] = React.useState(false);
