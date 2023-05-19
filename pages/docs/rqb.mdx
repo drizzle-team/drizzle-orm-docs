@@ -59,7 +59,7 @@ We've made sure you have both the best-in-class developer experience and perform
 		name: text('name').notNull(),
 	});
 
-	export const usersConfig = relations(users, ({ many }) => ({
+	export const usersRelations = relations(users, ({ many }) => ({
 		posts: many(posts),
 	}));
 
@@ -69,7 +69,7 @@ We've made sure you have both the best-in-class developer experience and perform
 		authorId: integer('author_id').notNull(),
 	});
 
-	export const postsConfig = relations(posts, ({ one }) => ({
+	export const postsRelations = relations(posts, ({ one }) => ({
 		author: one(users, { fields: [posts.authorId], references: [users.id] }),
 	}));
 	```
@@ -90,7 +90,7 @@ export const users = pgTable('users', {
 	invitedBy: integer('invited_by'),
 });
 
-export const usersConfig = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
 	invitee: one(users, {
 		fields: [users.invitedBy],
 		references: [users.id],
@@ -111,7 +111,7 @@ export const users = pgTable('users', {
 	name: text('name'),
 });
 
-export const usersConfig = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
 	profileInfo: one(users, {
 		fields: [profileInfo.userId],
 		references: [users.id],
@@ -139,7 +139,7 @@ export const users = pgTable('users', {
 	name: text('name'),
 });
 
-export const usersConfig = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
 	posts: many(posts),
 }));
 
@@ -149,7 +149,7 @@ export const posts = pgTable('posts', {
 	authorId: integer('author_id'),
 });
 
-export const postsConfig = relations(posts, ({ one }) => ({
+export const postsRelations = relations(posts, ({ one }) => ({
 	author: one(users, {
 		fields: [posts.ownerId],
 		references: [users.id],
@@ -167,7 +167,7 @@ export const posts = pgTable('posts', {
 	authorId: integer('author_id'),
 });
 
-export const postsConfig = relations(posts, ({ one, many }) => ({
+export const postsRelations = relations(posts, ({ one, many }) => ({
 	author: one(users, {
 		fields: [posts.ownerId],
 		references: [users.id],
@@ -182,7 +182,7 @@ export const comments = pgTable('comments', {
 	postId: integer('post_id'),
 });
 
-export const commentsConfig = relations(comments, ({ one }) => ({
+export const commentsRelations = relations(comments, ({ one }) => ({
 	post: one(posts, {
 		fields: [comments.postId],
 		references: [posts.id],
@@ -205,7 +205,7 @@ export const users = pgTable('users', {
 	name: text('name'),
 });
 
-export const usersConfig = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
 	usersToGroups: many(usersToGroupsTable),
 }));
 
@@ -214,7 +214,7 @@ export const groups = pgTable('groups', {
 	name: text('name'),
 });
 
-export const groupsConfig = relations(groups, ({ many }) => ({
+export const groupsRelations = relations(groups, ({ many }) => ({
 	usersToGroups: many(usersToGroups),
 }));
 
@@ -226,7 +226,7 @@ export const usersToGroups = pgTable('users_to_groups', {
 	}),
 );
 
-export const usersToGroupsConfig = relations(usersToGroups, ({ one }) => ({
+export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
 	group: one(groups, {
 		fields: [usersToGroups.groupId],
 		references: [groups.id],
@@ -277,7 +277,7 @@ await db.query.users.findMany(...);
 		invitedBy: integer('invited_by').references((): AnyPgColumn => users.id),
 	});
 
-	export const usersConfig = relations(users, ({ one, many }) => ({
+	export const usersRelations = relations(users, ({ one, many }) => ({
 		invitee: one(users, { fields: [users.invitedBy], references: [users.id] }),
 		usersToGroups: many(usersToGroups),
 		posts: many(posts),
@@ -289,7 +289,7 @@ await db.query.users.findMany(...);
 		description: text('description'),
 	});
 
-	export const groupsConfig = relations(groups, ({ many }) => ({
+	export const groupsRelations = relations(groups, ({ many }) => ({
 		usersToGroups: many(usersToGroups),
 	}));
 
@@ -301,7 +301,7 @@ await db.query.users.findMany(...);
 		pk: primaryKey(t.userId, t.groupId),
 	}));
 
-	export const usersToGroupsConfig = relations(usersToGroups, ({ one }) => ({
+	export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
 		group: one(groups, { fields: [usersToGroups.groupId], references: [groups.id] }),
 		user: one(users, { fields: [usersToGroups.userId], references: [users.id] }),
 	}));
@@ -313,7 +313,7 @@ await db.query.users.findMany(...);
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
-	export const postsConfig = relations(posts, ({ one, many }) => ({
+	export const postsRelations = relations(posts, ({ one, many }) => ({
 		author: one(users, { fields: [posts.ownerId], references: [users.id] }),
 		comments: many(comments),
 	}));
@@ -326,7 +326,7 @@ await db.query.users.findMany(...);
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
-	export const commentsConfig = relations(comments, ({ one, many }) => ({
+	export const commentsRelations = relations(comments, ({ one, many }) => ({
 		post: one(posts, { fields: [comments.postId], references: [posts.id] }),
 		author: one(users, { fields: [comments.creator], references: [users.id] }),
 		likes: many(commentLikes),
@@ -339,7 +339,7 @@ await db.query.users.findMany(...);
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
-	export const commentLikesConfig = relations(commentLikes, ({ one }) => ({
+	export const commentLikesRelations = relations(commentLikes, ({ one }) => ({
 		comment: one(comments, { fields: [commentLikes.commentId], references: [comments.id] }),
 		author: one(users, { fields: [commentLikes.creator], references: [users.id] }),
 	}));
