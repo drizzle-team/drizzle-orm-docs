@@ -9,6 +9,8 @@ html[class~=dark] .light {
 .wrap {
   display: flex;
   flex-direction: row;
+  max-height: 490px;
+  width: 100%;
 }
 
 .content {
@@ -45,6 +47,10 @@ html[class~=dark] .light {
   flex-direction: row;
 }
 
+.mainpicture_wrapper {
+  width: 100%;
+}
+
 .picture {
   width: 100%;
 }
@@ -52,13 +58,13 @@ html[class~=dark] .light {
 .particle {
   width: 18%;
   position: absolute;
-  right: -80px;
-  top: 40px;
+  right: -16%;
+  top: 8.5%;
 }
 
 .addition_image {
   display: none;
-  width: 14%;
+  width: 21%;
   height: fit-content;
   transform: rotateY(180deg);
 }
@@ -105,13 +111,75 @@ html[class~=dark] .light {
     align-items: flex-end;
     width: 100%;
   }
+  .mainpicture_wrapper {
+    width: 70%;
+  }
   .picture {
-    width: 50%;
+    width: 100%;
   }
   .addition_image {
     display: block;
   }
   .text_image {
     display: none;
+  }
+  .particle {
+    display: none;
+  }
+}
+
+.team {
+  position: absolute;
+  top: 130px;
+  right: 3px;
+  border-collapse: collapse;
+  font-family: 'FirstTimeWriting';
+  font-weight: bold;
+  font-size: 22px;
+  text-shadow: 0 0 0.5px black;
+  display: inline-grid;
+  grid-template-columns: max-content 150px 250px;
+  grid-auto-rows: 1fr;
+  border-bottom: 3px solid black;
+  border-left: 3px solid black;
+  transform: rotate(2deg);
+}
+
+.team > * {
+  border-radius: 0;
+  border-top: 3px solid black;
+  border-right: 3px solid black;
+  padding: 3px 30px;
+  background-color: #111111;
+  text-align: center;
+  margin: 0;
+  text-decoration: none;
+  position: relative;
+  color: black;
+}
+
+.team a.handle:hover:after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 8px;
+  right: 0;
+  bottom: 0;
+  color: transparent;
+  text-shadow: none;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
+  text-decoration-color: rgb(75, 183, 74);
+}
+
+@media (prefers-color-scheme: dark) {
+  .team > * {
+    color: white;
+  }
+  .team,
+  .team > * {
+    border-color: white;
   }
 }

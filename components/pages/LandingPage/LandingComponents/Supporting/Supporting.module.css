@@ -83,3 +83,36 @@ html[class~=dark] .item {
 .bigImage {
     width: 52%;
 }
+
+@media (max-width: 900px) {
+    .title {
+        font-size: 24px;
+    }
+    .description {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .image {
+        max-width: 18%;
+    }
+    .bigImage {
+        max-width: 30%;
+    }
+    .wrap {
+        margin-top: 160px;
+        width: 100%;
+        flex-direction: column;
+    }
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+

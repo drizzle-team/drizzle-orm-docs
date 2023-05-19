@@ -1,0 +1,38 @@
+.wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 160px;
+}
+
+.header {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-column-gap: 20px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+@media (max-width: 767px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+@media (max-width: 599px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
