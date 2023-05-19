@@ -355,10 +355,10 @@ const users = await db.query.users.findMany();
 ```ts
 // result type
 const result: {
-		id: number;
-		name: string;
-		verified: boolean;
-		invitedBy: number | null;
+	id: number;
+	name: string;
+	verified: boolean;
+	invitedBy: number | null;
 }[];
 ```
 </Section>
@@ -374,10 +374,10 @@ const user = await db.query.users.findFirst();
 ```ts
 // result type
 const result: {
-		id: number;
-		name: string;
-		verified: boolean;
-		invitedBy: number | null;
+	id: number;
+	name: string;
+	verified: boolean;
+	invitedBy: number | null;
 };
 ```
 </Section>
@@ -688,18 +688,18 @@ const res = await db.query.users.findMany({
 ```ts
 // result type
 const res: {
-    id: number;
-    name: string;
-    verified: boolean;
-    invitedBy: number | null;
-    fullName: string;
-    usersToGroups: {
-        group: {
-            id: number;
-            name: string;
-            description: string | null;
-        };
-    }[];
+	id: number;
+	name: string;
+	verified: boolean;
+	invitedBy: number | null;
+	fullName: string;
+	usersToGroups: {
+			group: {
+					id: number;
+					name: string;
+					description: string | null;
+			};
+	}[];
 }[];
 
 ```
@@ -725,19 +725,19 @@ const res = await db.query.posts.findMany({
 ```ts
 // result type
 const res: {
-    id: number;
-    createdAt: Date;
-    content: string;
-    ownerId: number | null;
-    contentLength: number;
-    comments: {
-        id: number;
-        createdAt: Date;
-        content: string;
-        creator: number | null;
-        postId: number | null;
-        commentSize: number;
-    }[];
+	id: number;
+	createdAt: Date;
+	content: string;
+	ownerId: number | null;
+	contentLength: number;
+	comments: {
+			id: number;
+			createdAt: Date;
+			content: string;
+			creator: number | null;
+			postId: number | null;
+			commentSize: number;
+	}[];
 };
 ```
 </Section>
