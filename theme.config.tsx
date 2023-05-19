@@ -1,12 +1,21 @@
-import { DocsThemeConfig } from 'nextra-theme-docs';
+import { DocsThemeConfig, useConfig } from 'nextra-theme-docs';
+import { useRouter } from 'next/router';
 import TwitterIcon from './components/TwitterIcon';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import TitleComponent from './components/TitleComponent/TitleComponent';
 
 const config: DocsThemeConfig = {
   useNextSeoProps() {
+    const { asPath } = useRouter();
+    if (asPath !== '/') {
+      return {
+        titleTemplate: '%s – DrizzleORM',
+        description: 'Drizzle ORM | %s',
+      };
+    }
     return {
-      titleTemplate: '%s – DrizzleORM',
+      titleTemplate: 'DrizzleORM - next gen TypeScript ORM',
+      description: 'Drizzle ORM is a lightweigh and performant TypeScript ORM with developer experience in mind',
     };
   },
   logo: (
