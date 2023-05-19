@@ -750,210 +750,210 @@ using the Drizzle relational query builder.
 
 **Placeholder in `where`**
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-    ```ts copy
-    const prepared = db.query.users.findMany({
-			where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-			with: {
-				posts: {
-					where: ((users, { eq }) => eq(users.id, 1)),
-				},
-			},
-		}).prepare('query_name');
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+where: ((users, { eq }) => eq(users.id, placeholder('id'))),
+with: {
+	posts: {
+		where: ((users, { eq }) => eq(users.id, 1)),
+	},
+},
+}).prepare('query_name');
 
-		const usersWithPosts = await prepared.execute({ id: 1 });
-    ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-				with: {
-					posts: {
-						where: ((users, { eq }) => eq(users.id, 1)),
-					},
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ id: 1 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
+	with: {
+		posts: {
+			where: ((users, { eq }) => eq(users.id, 1)),
+		},
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ id: 1 });
-			```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-				with: {
-					posts: {
-						where: ((users, { eq }) => eq(users.id, 1)),
-					},
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ id: 1 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
+	with: {
+		posts: {
+			where: ((users, { eq }) => eq(users.id, 1)),
+		},
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ id: 1 });
-      ```
-    </Section>
-  </Tab>
+const usersWithPosts = await prepared.execute({ id: 1 });
+```
+</Section>
+</Tab>
 </Tabs>
 
 
 **Placeholder in `limit`**
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				with: {
-					posts: {
-						limit: placeholder('limit'),
-					},
-				},
-			}).prepare('query_name');
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	with: {
+		posts: {
+			limit: placeholder('limit'),
+		},
+	},
+}).prepare('query_name');
 
-			const usersWithPosts = await prepared.execute({ limit: 1 });
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				with: {
-					posts: {
-						limit: placeholder('limit'),
-					},
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ limit: 1 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	with: {
+		posts: {
+			limit: placeholder('limit'),
+		},
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ limit: 1 });
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				with: {
-					posts: {
-						limit: placeholder('limit'),
-					},
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ limit: 1 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	with: {
+		posts: {
+			limit: placeholder('limit'),
+		},
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ limit: 1 });
-      ```
-    </Section>
-  </Tab>
+const usersWithPosts = await prepared.execute({ limit: 1 });
+```
+</Section>
+</Tab>
 </Tabs>
 
 
 **Placeholder in `offset`**
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-        offset: placeholder('offset'),
-				with: {
-					posts: true,
-				},
-			}).prepare('query_name');
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	offset: placeholder('offset'),
+	with: {
+		posts: true,
+	},
+}).prepare('query_name');
 
-			const usersWithPosts = await prepared.execute({ offset: 1 });
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-        offset: placeholder('offset'),
-				with: {
-					posts: true,
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ offset: 1 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	offset: placeholder('offset'),
+	with: {
+		posts: true,
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ offset: 1 });
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-        offset: placeholder('offset'),
-				with: {
-					posts: true,
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ offset: 1 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	offset: placeholder('offset'),
+	with: {
+		posts: true,
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ offset: 1 });
-      ```
-    </Section>
-  </Tab>
+const usersWithPosts = await prepared.execute({ offset: 1 });
+```
+</Section>
+</Tab>
 </Tabs>
 
 **Multiple placeholders**
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				limit: placeholder('uLimit'),
-				offset: placeholder('uOffset'),
-				where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
-				with: {
-					posts: {
-						where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-						limit: placeholder('pLimit'),
-					},
-				},
-			}).prepare('query_name');
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	limit: placeholder('uLimit'),
+	offset: placeholder('uOffset'),
+	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
+	with: {
+		posts: {
+			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
+			limit: placeholder('pLimit'),
+		},
+	},
+}).prepare('query_name');
 
-			const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				limit: placeholder('uLimit'),
-				offset: placeholder('uOffset'),
-				where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
-				with: {
-					posts: {
-						where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-						limit: placeholder('pLimit'),
-					},
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	limit: placeholder('uLimit'),
+	offset: placeholder('uOffset'),
+	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
+	with: {
+		posts: {
+			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
+			limit: placeholder('pLimit'),
+		},
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```ts copy
-      const prepared = db.query.users.findMany({
-				limit: placeholder('uLimit'),
-				offset: placeholder('uOffset'),
-				where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
-				with: {
-					posts: {
-						where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-						limit: placeholder('pLimit'),
-					},
-				},
-			}).prepare();
+const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts copy
+const prepared = db.query.users.findMany({
+	limit: placeholder('uLimit'),
+	offset: placeholder('uOffset'),
+	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
+	with: {
+		posts: {
+			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
+			limit: placeholder('pLimit'),
+		},
+	},
+}).prepare();
 
-			const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
-      ```
-    </Section>
-  </Tab>
+const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
+```
+</Section>
+</Tab>
 </Tabs>
