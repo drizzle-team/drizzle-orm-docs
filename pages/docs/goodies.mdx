@@ -2,7 +2,6 @@ import { Tab, Tabs } from "nextra-theme-docs";
 import {CodeTabs} from "../../components/CodeTabs/CodeTabs";
 
 ## Logging
-
 To enable default query logging, just pass `{ logger: true }` to the `drizzle` initialization function:
 ```typescript copy
 import { drizzle } from 'drizzle-orm/...'; // driver specific
@@ -38,6 +37,52 @@ class MyLogger implements Logger {
 
 const db = drizzle(pool, { logger: new MyLogger() });
 ```
+
+
+## Multi-project schema
+`table creator` operator lets you define customise table names.  
+It's very useful when you need to keep schemas of different projects in one database.  
+For db push docs - [see here](/kit-docs/conf#multi-project-schema)
+<Tabs items={["PostgreSQL","MySQL","SQLite"]}>
+<Tab>
+```ts {3}
+import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
+
+const pgTable = pgTableCreator((name) => `project1_${name}`);
+
+const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
+</Tab>
+<Tab>
+```ts {3}
+import { int, text, mysqlTableCreator } from 'drizzle-orm/mysql-core';
+
+const mysqlTable = mysqlTableCreator((name) => `project1_${name}`);
+
+const users = mysqlTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
+</Tab>
+<Tab>
+```ts {3}
+import { int, text, sqliteTableCreator } from 'drizzle-orm/sqlite-core';
+
+const sqliteTable = sqliteTableCreator((name) => `project1_${name}`);
+
+const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
+</Tab>
+</Tabs>
+
+
 
 ## Printing SQL query
 You can print SQL queries with `db` instance or by using [`standalone query builder`](#standalone-query-builder)

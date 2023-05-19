@@ -151,6 +151,45 @@ migrate(db, { migrationsFolder: "drizzle" });
 </Tab>
 </Tabs>
 
+## Configuration
+Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
+You can have autocomplete experience and very convenient enviroment variables flow!
+
+<CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
+<CodeTab>
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./schema.ts",
+  connectionString: process.env.DB_URL,
+} satisfies Config;
+```
+</CodeTab>
+<CodeTab>
+```js
+import type { Config } from "drizzle-kit";
+
+/** @type { import("drizzle-kit").Config } */
+export default {
+  schema: "./schema.ts",
+  connectionString: process.env.DB_URL,
+};
+```
+</CodeTab>
+<CodeTab>
+```json
+{
+  "out": "./migrations-folder",
+  "schema": "./src/db",
+  "breakpoints": false
+}
+```
+</CodeTab>
+</CodeTabs>
+
+For list of all configuration params - [see here](./conf)
+
 ## Prototyping with db push
 Drizzle Kit lets you alter you database schema and rapidly move forward with a db [`push` command](./commands/push).  
 That's very handy when you have remote databases like Neon, Planetscale or Turso.  
@@ -195,42 +234,3 @@ $ drizzle-kit introspect:mysql ...
 ```
 </Section>
 For extended `introspect` examples - [see here](./commands/pull)
-
-## Configuration
-Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
-You can have autocomplete experience and very convenient enviroment variables flow!
-
-<CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
-<CodeTab>
-```ts
-import type { Config } from "drizzle-kit";
-
-export default {
-  schema: "./schema.ts",
-  connectionString: process.env.DB_URL,
-} satisfies Config;
-```
-</CodeTab>
-<CodeTab>
-```js
-import type { Config } from "drizzle-kit";
-
-/** @type { import("drizzle-kit").Config } */
-export default {
-  schema: "./schema.ts",
-  connectionString: process.env.DB_URL,
-};
-```
-</CodeTab>
-<CodeTab>
-```json
-{
-  "out": "./migrations-folder",
-  "schema": "./src/db",
-  "breakpoints": false
-}
-```
-</CodeTab>
-</CodeTabs>
-
-For list of all configuration params - [see here](./conf)
