@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style type="text/css">
+			@font-face {
+				font-family: 'FirstTimeWriting';
+				src: url('FirstTimeWriting!.ttf') format('truetype');
+			}
+
+			#team {
+				margin-top: 20px;
+				margin-left: 20px;
+				border-collapse: collapse;
+				font-family: 'FirstTimeWriting';
+				font-weight: bold;
+				font-size: 22px;
+				text-shadow: 0 0 0.5px black;
+				display: inline-grid;
+				grid-template-columns: max-content 150px 250px;
+				grid-auto-rows: 1fr;
+				border-bottom: 3px solid black;
+				border-left: 3px solid black;
+				transform: rotate(2deg);
+			}
+
+			#team > * {
+				border-top: 3px solid black;
+				border-right: 3px solid black;
+				padding: 7px 15px 7px;
+				text-align: center;
+				margin: 0;
+				text-decoration: none;
+				position: relative;
+				color: black;
+			}
+
+			#team a.handle:hover:after {
+				content: attr(data-text);
+				position: absolute;
+				left: 0;
+				top: 8px;
+				right: 0;
+				bottom: 0;
+				color: transparent;
+				text-shadow: none;
+				white-space: nowrap;
+				text-decoration: underline;
+				text-decoration-style: wavy;
+				text-underline-offset: 3px;
+				text-decoration-color: rgb(75, 183, 74);
+			}
+
+			@media (prefers-color-scheme: dark) {
+				body {
+					background-color: black;
+				}
+				#team > * {
+					color: white;
+				}
+				#team,
+				#team > * {
+					border-color: white;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="team">
+			<div>id</div>
+			<div>name</div>
+			<div>twitter_handle</div>
+			<div>1</div>
+			<div>Dan</div>
+			<a
+				class="handle"
+				href="https://twitter.com/bloberenober"
+				target="_blank"
+				data-text="@bloberenober"
+			>
+				@bloberenober
+			</a>
+			<div>2</div>
+			<div>Andrew</div>
+			<a
+				class="handle"
+				href="https://twitter.com/andrii_sherman"
+				target="_blank"
+				data-text="@andrii_sherman"
+			>
+				@andrii_sherman</a
+			>
+			<div>3</div>
+			<div>Alex</div>
+			<a
+				class="handle"
+				href="https://twitter.com/_alexblokh"
+				target="_blank"
+				data-text="@_alexblokh"
+				>@_alexblokh</a
+			>
+		</div>
+	</body>
+</html>
