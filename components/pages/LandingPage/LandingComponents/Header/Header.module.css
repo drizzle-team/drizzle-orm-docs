@@ -49,6 +49,58 @@ html[class~=dark] .light {
 
 .mainpicture_wrapper {
   width: 100%;
+  position: relative;
+}
+
+.mainpicture_wrapper .team {
+  position: absolute;
+  left: 1.35%;
+  top: 28.7%;
+  right: 0.6%;
+  bottom: 36.9%;
+  background: white;
+  font-family: 'FirstTimeWriting';
+  font-weight: bold;
+  font-size: 20px;
+  text-shadow: 0 0 0.5px black;
+  display: inline-grid;
+  grid-template-columns: max-content 1.5fr 2.5fr;
+  grid-auto-rows: 1fr;
+  border-bottom: 3px solid black;
+  border-left: 3px solid black;
+  transform: rotate(1.6deg);
+}
+
+.mainpicture_wrapper .team > * {
+  border-top: 3px solid black;
+  border-right: 3px solid black;
+  text-align: center;
+  text-decoration: none;
+  position: relative;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainpicture_wrapper .team .id {
+  min-width: 50px;
+}
+
+.mainpicture_wrapper .team a.handle:hover:after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 8%;
+  right: 0;
+  bottom: 0;
+  color: transparent;
+  text-shadow: none;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
+  text-decoration-color: rgb(75, 183, 74);
 }
 
 .picture {
@@ -69,6 +121,18 @@ html[class~=dark] .light {
   transform: rotateY(180deg);
 }
 
+@media (max-width: 1071px) {
+  .mainpicture_wrapper .team {
+    font-size: 1.865vw;
+  }
+}
+
+@media (max-width: 950px) {
+  .mainpicture_wrapper .team a.handle:hover:after {
+    top: 0;
+  }
+}
+
 @media (max-width: 1023px) {
   .typing {
     font-size: 32px;
@@ -80,6 +144,12 @@ html[class~=dark] .light {
   }
 }
 
+@media (max-width: 850px) {
+  .mainpicture_wrapper .team a.handle:hover:after {
+    top: -1px;
+  }
+}
+
 @media (max-width: 767px) {
   .typing {
     font-size: 24px;
@@ -88,6 +158,10 @@ html[class~=dark] .light {
   }
   .text_image {
     right: 40px;
+  }
+
+  .mainpicture_wrapper .team {
+    font-size: 1.7vw;
   }
 }
 
@@ -123,60 +197,12 @@ html[class~=dark] .light {
   .particle {
     display: none;
   }
-}
 
-.team {
-  position: absolute;
-  top: 130px;
-  right: 3px;
-  border-collapse: collapse;
-  font-family: 'FirstTimeWriting';
-  font-weight: bold;
-  font-size: 22px;
-  text-shadow: 0 0 0.5px black;
-  display: inline-grid;
-  grid-template-columns: max-content 150px 250px;
-  grid-auto-rows: 1fr;
-  border-bottom: 3px solid black;
-  border-left: 3px solid black;
-  transform: rotate(2deg);
-}
-
-.team > * {
-  border-radius: 0;
-  border-top: 3px solid black;
-  border-right: 3px solid black;
-  padding: 3px 30px;
-  background-color: #111111;
-  text-align: center;
-  margin: 0;
-  text-decoration: none;
-  position: relative;
-  color: black;
-}
-
-.team a.handle:hover:after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 8px;
-  right: 0;
-  bottom: 0;
-  color: transparent;
-  text-shadow: none;
-  white-space: nowrap;
-  text-decoration: underline;
-  text-decoration-style: wavy;
-  text-underline-offset: 3px;
-  text-decoration-color: rgb(75, 183, 74);
-}
-
-@media (prefers-color-scheme: dark) {
-  .team > * {
-    color: white;
+  .mainpicture_wrapper .team {
+    font-size: 2.5vw;
   }
-  .team,
-  .team > * {
-    border-color: white;
+
+  .mainpicture_wrapper .team a.handle:hover:after {
+    top: 0;
   }
 }
