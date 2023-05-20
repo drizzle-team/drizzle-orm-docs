@@ -46,19 +46,19 @@ const Comments: IComment[] = [
     text: 'Y\'all should just copy everything Eloquent has',
   },
   {
-    avatar: 'https://placehold.co/400',
+    avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
     name: 'YouTube Commentor',
     login: 'dont_know',
     text: 'That was in PHP in 2007',
   },
   {
-    avatar: 'https://placehold.co/400',
+    avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
     name: 'Regular Twitter Comment',
     login: 'dont_know',
     text: 'It\'s not yet production ready',
   },
   {
-    avatar: 'https://placehold.co/400',
+    avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
     name: 'Some Body',
     login: 'dont_know',
     text: 'Django had it in 2008',
@@ -76,7 +76,7 @@ const Comments: IComment[] = [
     text: 'I will accept 1% advisor shares',
   },
   {
-    avatar: 'https://placehold.co/400',
+    avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
     name: 'tslamoon',
     login: 'tslamoon1',
     text: 'But when is MSSQL support?',
