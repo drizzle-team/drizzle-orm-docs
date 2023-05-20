@@ -86,19 +86,26 @@ html[class~=dark] .item {
 
 @media (max-width: 900px) {
     .title {
-        font-size: 24px;
+        font-size: 20px;
     }
     .description {
-        font-size: 16px;
+        font-size: 14px;
     }
 }
 
 @media (max-width: 767px) {
     .image {
         max-width: 18%;
+        transform: rotateY(180deg);
     }
     .bigImage {
         max-width: 30%;
+        transform: none;
+    }
+    .leftside {
+        flex-direction: row;
+        gap: 0;
+        align-items: center;
     }
     .wrap {
         margin-top: 160px;
@@ -111,8 +118,40 @@ html[class~=dark] .item {
 }
 
 @media (max-width: 500px) {
+    .scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100vw;
+        margin-left: -24px;
+    }
+    .scroll::-webkit-scrollbar {
+        display: none;
+    }
+    .scroll {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .grid_wrapper {
+        margin: 0 24px;
+        width: fit-content;
+    }
+    .image {
+        max-width: 70px;
+    }
+    .bigImage {
+        max-width: 120px;
+    }
     .grid {
-        grid-template-columns: 1fr;
+        grid-auto-flow: column;
+        grid-template-rows: repeat(3,1fr);
+        grid-template-columns: none;
+        grid-auto-columns: 220px;
+    }
+    .grid-template-3 {
+        grid-template-rows: repeat(3,1fr);
+    }
+    .grid-template-4 {
+        grid-template-rows: repeat(4,1fr);
     }
 }
 
