@@ -11,6 +11,15 @@ const TitleComponent: React.FC<Props> = ({ title }) => {
       <ToggleLib title={title} />
     );
   }
+  if (title === 'drizzle-zod') {
+    return (
+      <>
+        {title}
+        {' '}
+        123
+      </>
+    );
+  }
   return <>{title}</>;
 };
 
