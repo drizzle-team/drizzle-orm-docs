@@ -100,7 +100,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 Another example would be a user having a profile information stored in separate table
 <Callout type="info" emoji="ℹ️">
-Foreign keys are SQL entities and used to check relational constrains, they're not mandatory for `relations` module
+`relations` do not require `foreign keys` and work in databases that don't support them, like Planetscale
 </Callout>
 ```typescript copy {9-14}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
