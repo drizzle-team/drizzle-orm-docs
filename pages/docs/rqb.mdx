@@ -99,9 +99,6 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 ```
 
 Another example would be a user having a profile information stored in separate table
-<Callout type="info" emoji="ℹ️">
-`relations` do not require `foreign keys` and work in databases that don't support them, like Planetscale
-</Callout>
 ```typescript copy {9-14}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -123,7 +120,6 @@ export const profileInfo = pgTable('profile_info', {
 	userId: integer("user_id").references(() => users.id),
 	metadata: jsonb("metadata"),
 });
-
 ```
 
 ## One-to-many
@@ -237,6 +233,57 @@ export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
 	}),
 }));
 ```
+
+## Foreign keys
+Drizzle ORM lets you define [foreign keys](indexes-constraints#foreign-key) in SQL schema with `.references()` and `foreignKey()` operators.  
+While that's very useful for the database level constraint checks, it is not necessary for `relations` module to work.  
+
+These two examples will work exactly the same from the perspective of Drizzle relational queries.
+<CodeTabs items={["schema1.ts", "schema2.ts"]}>
+<CodeTab>
+```ts {15}
+export const users = pgTable('users', {
+	id: serial('id').primaryKey(),
+	name: text('name'),
+});
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+	profileInfo: one(users, {
+		fields: [profileInfo.userId],
+		references: [users.id],
+	}),
+}));
+
+export const profileInfo = pgTable('profile_info', {
+	id: serial('id').primaryKey(),
+	userId: integer("user_id"),
+	metadata: jsonb("metadata"),
+});
+```
+</CodeTab>
+<CodeTab>
+```ts {15}
+export const users = pgTable('users', {
+	id: serial('id').primaryKey(),
+	name: text('name'),
+});
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+	profileInfo: one(users, {
+		fields: [profileInfo.userId],
+		references: [users.id],
+	}),
+}));
+
+export const profileInfo = pgTable('profile_info', {
+	id: serial('id').primaryKey(),
+	userId: integer("user_id").references(() => users.id),
+	metadata: jsonb("metadata"),
+});
+```
+</CodeTab>
+</CodeTabs>
+That lets you use `relational queries` on the databases, that do not support foreign keys, like PlanetScale. 
 
 ## Querying
 Relation queries are extension to our original [query builder](./docs/crud).  
@@ -754,12 +801,12 @@ using the Drizzle relational query builder.
 <Section>
 ```ts copy
 const prepared = db.query.users.findMany({
-where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-with: {
-	posts: {
-		where: ((users, { eq }) => eq(users.id, 1)),
+	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
+	with: {
+		posts: {
+			where: ((users, { eq }) => eq(users.id, 1)),
+		},
 	},
-},
 }).prepare('query_name');
 
 const usersWithPosts = await prepared.execute({ id: 1 });
