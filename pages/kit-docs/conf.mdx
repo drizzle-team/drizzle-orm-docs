@@ -1,10 +1,11 @@
-import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+import { CodeTab, CodeTabs } from "../../components/CodeTabs/CodeTabs";
 import Section from "../../components/Section/Section";
-import { Tab, Tabs, Callout } from 'nextra-theme-docs';
+import { Tab, Tabs, Callout } from "nextra-theme-docs";
 
 # Configuration files
+
 Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
-You can have autocomplete experience and very convenient enviroment variables flow!  
+You can have autocomplete experience and very convenient enviroment variables flow!
 
 ```plaintext {5}
 📦 <project root>
@@ -30,12 +31,13 @@ export default {
 ```js
 import type { Config } from "drizzle-kit";
 
-/** @type { import("drizzle-kit").Config } */
+/\*_ @type { import("drizzle-kit").Config } _/
 export default {
-  schema: "./src/schema.ts",
-  out: "./drizzle",
+schema: "./src/schema.ts",
+out: "./drizzle",
 };
-```
+
+````
 </CodeTab>
 <CodeTab>
 ```json
@@ -43,15 +45,17 @@ export default {
   "schema": "./src/schema.ts",
   "out": "./drizzle",
 }
-```
+````
+
 </CodeTab>
 </CodeTabs>
 
 ## Schema files paths
+
 `schema` param lets you define where your schema file/files live.  
-You can have as many separate schema files as you want and define paths to them using 
+You can have as many separate schema files as you want and define paths to them using
 [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)
- or array of globs syntax.
+or array of globs syntax.
 
 <Tabs items={["Example 1", "Example 2", "Example 3"]}>
 <Tab>
@@ -130,15 +134,17 @@ export default {
 </Tab>
 </Tabs>
 
-
 ## Migrations folder
+
 `out` param lets you define folder for your migrations, it's optional and `drizzle` by default.  
-It's very useful since you can have many separate schemas for different databases in the same project 
-and have different migration folders for them.  
-  
+It's very useful since you can have many separate schemas for different databases in the same project
+and have different migration folders for them.
+
 Migration folder contains `.sql` migration files and `_meta` folder which is used by `drizzle-kit`
+
 <Callout type="warning" emoji="⚠️">
-	Don't delete any files manually, please refer to [`drizzle-kit drop`](./commands/drop) command
+  Don't delete any files manually, please refer to [`drizzle-kit
+  drop`](./commands/drop) command
 </Callout>
 
 <Section>
@@ -165,9 +171,11 @@ export default {
 </Section>
 
 ## SQL breakpoints
-`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default, 
-it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite) 
+
+`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default,
+it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite)
 and Drizzle ORM has to apply them sequentially one by one.
+
 ```sql {5}
 CREATE TABLE `book` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -180,8 +188,10 @@ CREATE TABLE `book_to_author` (
 	PRIMARY KEY(`book_id`, `author_id`)
 );
 ```
+
 ## Push and Pull
-Drizzle Kit provides you [introspect](./commands/pull) and [push](./commands/push) APIs.  
+
+Drizzle Kit provides you [introspect](./commands/#pull) and [push](./commands/#push) APIs.  
 We mirror connection params of database drivers
 
 <Tabs items={["Connection URI", "Connection params"]}>
@@ -214,8 +224,9 @@ export default {
 </Tabs>
 
 ## Multi-project schema
-`tablesFilter` param lets you filter tables with [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
-syntax for db [`push`](./commands/push) command.  
+
+`tablesFilter` param lets you filter tables with [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)
+syntax for db [`push`](./commands/#push) command.  
 It's useful when you have only one database avaialable for several separate projects with separate sql schemas.  
 How to define multi-project tables with Drizzle ORM - [see here](/docs/goodies#multi-project-schema)
 
@@ -226,10 +237,11 @@ import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
 const pgTable = pgTableCreator((name) => `project1_${name}`);
 
 const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+id: serial('id').primaryKey(),
+name: text('name').notNull(),
 });
-```
+
+````
 ```ts {7}
 import type { Config } from "drizzle-kit";
 
@@ -239,10 +251,12 @@ export default {
   connectionString: "DATABASE_URL",
   tablesFilter: ["project1_*"],
 } satisfies Config;
-```
+````
+
 </Section>
 
 You can apply multiple `or` filters
+
 ```ts
-tablesFilter: ["project1_*", "project2_*"]
+tablesFilter: ["project1_*", "project2_*"];
 ```
