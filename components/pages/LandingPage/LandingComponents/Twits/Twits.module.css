@@ -12,9 +12,17 @@
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-column-gap: 20px;
+    column-gap: 20px;
+    column-fill: initial;
+    column-count: 3;
+}
+.grid > * {
+    break-inside: avoid;
+    margin-bottom: 20px;
+}
+
+.top_twits {
+    display: none;
 }
 
 .column {
@@ -31,14 +39,18 @@
 
 @media (max-width: 767px) {
     .grid {
-        grid-template-columns: 1fr 1fr;
+        column-count: 2;
     }
 }
 
 
 @media (max-width: 599px) {
     .grid {
-        grid-template-columns: 1fr;
+        display: none;
     }
-
+    .top_twits {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 }
