@@ -192,7 +192,7 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 Drizzle ORM provides you an API to define `many-to-many` relations between tables through so called `junction` or `join` tables,
 they have to be explicitly defined and store associations between related tables.  
   
-Example of `one-to-many` relation between users and groups. 
+Example of `many-to-many` relation between users and groups. 
 ```typescript copy {9-11, 18-20, 30-39}
 import { pgTable, serial, text, integer, boolean, primaryKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -203,7 +203,7 @@ export const users = pgTable('users', {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-	usersToGroups: many(usersToGroupsTable),
+	usersToGroups: many(usersToGroups),
 }));
 
 export const groups = pgTable('groups', {
