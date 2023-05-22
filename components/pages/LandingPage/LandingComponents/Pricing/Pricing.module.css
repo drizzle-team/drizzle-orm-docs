@@ -1,0 +1,109 @@
+.wrap {
+    margin: 160px auto 0;
+    width: 100%;
+
+}
+
+.title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.description {
+    font-size: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.buttons_wrap {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.leftside, .rightside {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    flex: 1;
+    max-width: 300px;
+}
+
+.buttons_description {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+
+.button {
+    background-color: #434b55;
+    border: none;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 16px 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.github {
+    background-color: #24292e;
+}
+
+.twitter {
+    background-color: #1DA1F2;
+}
+
+.discord {
+    background-color: #7289DA;
+}
+
+.github svg {
+    fill: #e2e8f0;
+}
+
+.twitter svg {
+    fill: #e2e8f0;
+    color: #e2e8f0;
+}
+
+.github svg {
+    fill: #e2e8f0;
+}
+
+@media (max-width: 599px) {
+    .title {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+    .description {
+        font-size: 14px;
+    }
+    .buttons_description {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 740px) {
+    .buttons_wrap {
+        flex-direction: column;
+        align-items: center;
+        gap: 60px;
+    }
+    .button {
+        font-size: 14px;
+        width: 274px;
+    }
+    .rightside {
+        /*align-items: center;*/
+    }
+}

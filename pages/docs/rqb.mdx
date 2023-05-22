@@ -75,8 +75,9 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 </CodeTabs>
 
+## Declaring relations
 
-## One-to-one
+### One-to-one
 Drizzle ORM provides you an API to define `one-to-one` relations between tables with `relations` operator.  
 Example of `one-to-one` relation between users and users who invited them to the service, self reference
 
@@ -122,7 +123,7 @@ export const profileInfo = pgTable('profile_info', {
 });
 ```
 
-## One-to-many
+### One-to-many
 Drizzle ORM provides you an API to define `one-to-many` relations between tables with `relations` operator.  
 Example of `one-to-many` relation between users and posts they've written. 
 
@@ -187,7 +188,7 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 ```
 
 
-## Many-to-many
+### Many-to-many
 Drizzle ORM provides you an API to define `many-to-many` relations between tables through so called `junction` or `join` tables,
 they have to be explicitly defined and store associations between related tables.  
   
@@ -234,11 +235,20 @@ export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
 }));
 ```
 
-## Foreign keys
-Drizzle ORM lets you define [foreign keys](indexes-constraints#foreign-key) in SQL schema with `.references()` and `foreignKey()` operators.  
-While that's very useful for the database level constraint checks, it is not necessary for `relations` module to work.  
+### Foreign keys
 
-These two examples will work exactly the same from the perspective of Drizzle relational queries.
+You might've noticed that `relations` look similar to foreign keys -
+they even have a `references` property. So what's the difference?
+
+While foreign keys serve a similar purpose - defining relations between tables, they work on a different level compared to `relations`.
+Foreign keys are a database level constraint, they are checked on every `insert`/`update`/`delete` operation and throw an error if a constraint is violated.
+On the other hand, `relations` are a higher level abstraction, they are used to define relations between tables on the application level only.
+They do not affect the database schema in any way and do not create foreign keys implicitly.
+
+What this means is `relations` and foreign keys can be used together, but they are not dependent on each other.
+You can define `relations` without using foreign keys (and vice versa), which allows them to be used with databases that do not support foreign keys, like PlanetScale.
+
+The following two examples will work exactly the same in terms of querying the data using Drizzle relational queries.
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
 ```ts {15}
@@ -283,14 +293,13 @@ export const profileInfo = pgTable('profile_info', {
 ```
 </CodeTab>
 </CodeTabs>
-That lets you use `relational queries` on the databases, that do not support foreign keys, like PlanetScale. 
 
 ## Querying
-Relation queries are extension to our original [query builder](./docs/crud).  
+Relational queries are an extension to Drizzle's original [query builder](./docs/crud).
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
-initialization and then just use `db.query` API.
+initialization and then just use the `db.query` API.
 <Callout type="info" emoji="ℹ️">
-`drizzle` import depends on the [database driver](/docs/installation-and-db-connection) you're using
+`drizzle` import path depends on the [database driver](/docs/installation-and-db-connection) you're using
 </Callout>
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
@@ -393,7 +402,7 @@ await db.query.users.findMany(...);
 ```
 </CodeTabs>
 
-Drizzle provides `.findMany()` and `.findFirst()` API
+Drizzle provides `.findMany()` and `.findFirst()` APIs.
 ### Find many
 <Section>
 ```typescript copy

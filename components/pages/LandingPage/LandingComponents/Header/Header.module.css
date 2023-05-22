@@ -64,16 +64,18 @@ html[class~=dark] .light {
   font-size: 20px;
   text-shadow: 0 0 0.5px black;
   display: inline-grid;
-  grid-template-columns: max-content 1.5fr 2.5fr;
+  grid-template-columns: 0.5fr 1.5fr 2.5fr;
   grid-auto-rows: 1fr;
   border-bottom: 3px solid black;
   border-left: 3px solid black;
+  border-radius: 0;
   transform: rotate(1.6deg);
 }
 
 .mainpicture_wrapper .team > * {
   border-top: 3px solid black;
   border-right: 3px solid black;
+  border-radius: 0;
   text-align: center;
   text-decoration: none;
   position: relative;
@@ -81,10 +83,6 @@ html[class~=dark] .light {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.mainpicture_wrapper .team .id {
-  min-width: 50px;
 }
 
 .mainpicture_wrapper .team a.handle:hover:after {
@@ -124,6 +122,16 @@ html[class~=dark] .light {
 @media (max-width: 1071px) {
   .mainpicture_wrapper .team {
     font-size: 1.865vw;
+  }
+
+  .mainpicture_wrapper .team {
+    border-bottom-width: max(0.280vw, 2px);
+    border-left-width: max(0.280vw, 2px);
+  }
+  
+  .mainpicture_wrapper .team > * {
+    border-top-width: max(0.280vw, 2px);
+    border-right-width: max(0.280vw, 2px);
   }
 }
 

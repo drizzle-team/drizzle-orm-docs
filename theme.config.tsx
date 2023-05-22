@@ -1,6 +1,6 @@
-import { DocsThemeConfig, useConfig } from 'nextra-theme-docs';
+import { DocsThemeConfig } from 'nextra-theme-docs';
 import { useRouter } from 'next/router';
-import TwitterIcon from './components/TwitterIcon';
+import TwitterIcon from './components/Icons/TwitterIcon';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import TitleComponent from './components/TitleComponent/TitleComponent';
 
@@ -41,10 +41,11 @@ const config: DocsThemeConfig = {
   gitTimestamp: <></>,
   main: ({ children }) => <div style={{ maxWidth: 1024, margin: '0 auto' }}>{children}</div>,
   navbar: {
-    extraContent: <>
-      <TwitterIcon />
-      <ThemeToggle />
-                  </>,
+    extraContent:
+  <>
+    <TwitterIcon />
+    <ThemeToggle />
+  </>,
   },
   themeSwitch: {
   },

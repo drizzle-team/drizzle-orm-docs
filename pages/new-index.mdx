@@ -1,44 +1,4 @@
-import LandingPage from './../components/pages/LandingPage/LandingPage.tsx';
-import Migrations from '../components/pages/LandingPage/LandingComponents/Migrations/Migrations.tsx';
+import LandingPageTest from "../components/pages/LandingPage/LandingPageTest";
 
-<LandingPage />
+<LandingPageTest />
 
-<Migrations>
-```typescript
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-
-export const users = sqliteTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-}, (users) => ({
-  nameIdx: index('name_idx', users.fullName),
-}));
-
-export const authOtps = sqliteTable('auth_otp', {
-  id: integer('id').primaryKey(),
-  phone: text('phone'),
-  userId: integer('user_id').references(() => users.id),
-});
-```
-
-```sql
-CREATE TABLE IF NOT EXISTS auth_otp (
-  'id' INTEGER PRIMARY KEY,
-  'phone' TEXT,
-  'user_id' INTEGER
-);
-
-CREATE TABLE IF NOT EXISTS users (
-  'id' INTEGER PRIMARY KEY,
-  'full_name' TEXT
-);
-
-DO $$ BEGIN
- ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_fkey FOREIGN KEY ('user_id') REFERENCES users(id);
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
-```
-</Migrations>
