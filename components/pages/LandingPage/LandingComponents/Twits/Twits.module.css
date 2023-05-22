@@ -45,8 +45,24 @@
 
 
 @media (max-width: 599px) {
-    .grid {
+    .grid_scroll {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100vw;
+        margin-left: -24px;
+    }
+    .grid_scroll::-webkit-scrollbar {
         display: none;
+    }
+    .grid_wrapper {
+        width: fit-content;
+    }
+    .grid {
+        column-count: 3;
+        width: 100%;
+        padding: 0 24px;
     }
     .top_twits {
         display: flex;
