@@ -21,7 +21,6 @@
     flex-direction: row;
     justify-content: space-around;
     margin-top: 30px;
-    gap: 100px;
 }
 
 .leftside, .rightside {
@@ -53,6 +52,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
 }
 
 .github {
@@ -78,4 +78,32 @@
 
 .github svg {
     fill: #e2e8f0;
+}
+
+@media (max-width: 599px) {
+    .title {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+    .description {
+        font-size: 14px;
+    }
+    .buttons_description {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 740px) {
+    .buttons_wrap {
+        flex-direction: column;
+        align-items: center;
+        gap: 60px;
+    }
+    .button {
+        font-size: 14px;
+        width: 274px;
+    }
+    .rightside {
+        /*align-items: center;*/
+    }
 }
