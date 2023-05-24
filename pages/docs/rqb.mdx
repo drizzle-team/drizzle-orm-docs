@@ -109,10 +109,10 @@ export const users = pgTable('users', {
 	name: text('name'),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
+export const usersRelations = relations(users, ({ one }) => ({
+	profileInfo: one(profileInfo, {
+		fields: [user.id],
+		references: [profileInfo.userId],
 	}),
 }));
 
