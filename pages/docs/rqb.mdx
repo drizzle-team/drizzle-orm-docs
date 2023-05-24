@@ -148,7 +148,7 @@ export const posts = pgTable('posts', {
 
 export const postsRelations = relations(posts, ({ one }) => ({
 	author: one(users, {
-		fields: [posts.ownerId],
+		fields: [posts.authorId],
 		references: [users.id],
 	}),
 }));
@@ -166,7 +166,7 @@ export const posts = pgTable('posts', {
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
 	author: one(users, {
-		fields: [posts.ownerId],
+		fields: [posts.authorId],
 		references: [users.id],
 	}),
 	comments: many(comments)
@@ -365,12 +365,12 @@ await db.query.users.findMany(...);
 	export const posts = pgTable('posts', {
 		id: serial('id').primaryKey(),
 		content: text('content').notNull(),
-		ownerId: integer('owner_id').references(() => users.id),
+		authorId: integer('author_id').references(() => users.id),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
 	export const postsRelations = relations(posts, ({ one, many }) => ({
-		author: one(users, { fields: [posts.ownerId], references: [users.id] }),
+		author: one(users, { fields: [posts.authorId], references: [users.id] }),
 		comments: many(comments),
 	}));
 
@@ -784,7 +784,7 @@ const res: {
 	id: number;
 	createdAt: Date;
 	content: string;
-	ownerId: number | null;
+	authorId: number | null;
 	contentLength: number;
 	comments: {
 			id: number;
