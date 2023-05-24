@@ -181,7 +181,7 @@ CREATE TABLE `book_to_author` (
 );
 ```
 ## Push and Pull
-Drizzle Kit provides you [introspect](./commands/pull) and [push](./commands/push) APIs.  
+Drizzle Kit provides you [introspect](./commands#introspect--pull) and [push](./commands#prototype--push) APIs.  
 We mirror connection params of database drivers
 
 <Tabs items={["Connection URI", "Connection params"]}>
@@ -215,7 +215,7 @@ export default {
 
 ## Multi-project schema
 `tablesFilter` param lets you filter tables with [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
-syntax for db [`push`](./commands/push) command.  
+syntax for db [`push`](./commands#prototype--push) command.  
 It's useful when you have only one database avaialable for several separate projects with separate sql schemas.  
 How to define multi-project tables with Drizzle ORM - [see here](/docs/goodies#multi-project-schema)
 

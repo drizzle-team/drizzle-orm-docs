@@ -295,7 +295,7 @@ export const profileInfo = pgTable('profile_info', {
 </CodeTabs>
 
 ## Querying
-Relational queries are an extension to Drizzle's original [query builder](./docs/crud).
+Relational queries are an extension to Drizzle's original [query builder](/docs/crud).
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
 initialization and then just use the `db.query` API.
 <Callout type="info" emoji="ℹ️">
@@ -571,7 +571,7 @@ const posts = await db.query.posts.findMany({
 
 ### Select filters
 Just like in our SQL-like query builder, 
-relational queries API lets you define filters and conditions with the list of our [`operators`](./docs/operators).  
+relational queries API lets you define filters and conditions with the list of our [`operators`](/docs/operators).  
 You can either import them from `drizzle-orm` or use from the callback syntax.
 <Section>
 ```typescript copy
@@ -695,7 +695,7 @@ await db.query.posts.findMany({
 Relational query API lets you add custom additional fields. 
 It's useful when you need to retrieve data and apply additional functions to it.
 <Callout type="warning" emoji="⚠️">
-	As of now aggregations are not supported in `extras`, please use [`core queries`](./crud) for that
+	As of now aggregations are not supported in `extras`, please use [`core queries`](/docs/crud) for that
 </Callout>
 
 <Section>
