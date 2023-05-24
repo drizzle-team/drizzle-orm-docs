@@ -195,6 +195,10 @@ export default {
   connectionString: "postgresql://postgres:password@host:port/db",
 } satisfies Config;
 ```
+<Callout type="info" emoji="ℹ️">
+When using the PlanetScale driver, your connection string must end with `?ssl={"rejectUnauthorized":true}` instead of `?sslaccept=strict`.
+</Callout>
+
 </Tab>
 <Tab>
 ```ts {6-10}
