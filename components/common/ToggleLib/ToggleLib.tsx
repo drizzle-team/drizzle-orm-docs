@@ -15,7 +15,7 @@ const ToggleLib = ({ title } : { title: string }) => (
         <div className={styles.text}>Drizzle ORM</div>
       </div>
     </Link>
-    <Link href="../kit-docs/overview">
+    <Link href="/kit-docs/overview">
       <div className={`${styles.button} ${title === 'DRIZZLE KIT' ? styles.selected : ''}`}>
         <div className={styles.icon}>
           {title === 'DRIZZLE KIT' ? <TerminalActiveIcon /> : <TerminalIcon /> }
