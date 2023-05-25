@@ -9,6 +9,7 @@ let timeOut: NodeJS.Timeout;
 function Typer() {
   const words = [
     'performs and lasts',
+    'is query builder on steroids',
     'developers love',
     'is not as good as Django',
     'lets you love SQL',

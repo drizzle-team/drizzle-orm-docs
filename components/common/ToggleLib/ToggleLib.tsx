@@ -7,7 +7,7 @@ import {
 
 const ToggleLib = ({ title } : { title: string }) => (
   <div className={styles.wrap}>
-    <Link href="../docs/quick-start">
+    <Link href="/docs/quick-start">
       <div className={`${styles.button} ${title === 'DRIZZLE ORM' ? styles.selected : ''}`}>
         <div className={styles.icon}>
           {title === 'DRIZZLE ORM' ? <CloudRainActiveIcon /> : <CloudRainIcon /> }
@@ -15,7 +15,7 @@ const ToggleLib = ({ title } : { title: string }) => (
         <div className={styles.text}>Drizzle ORM</div>
       </div>
     </Link>
-    <Link href="../kit-docs/overview">
+    <Link href="/kit-docs/overview">
       <div className={`${styles.button} ${title === 'DRIZZLE KIT' ? styles.selected : ''}`}>
         <div className={styles.icon}>
           {title === 'DRIZZLE KIT' ? <TerminalActiveIcon /> : <TerminalIcon /> }

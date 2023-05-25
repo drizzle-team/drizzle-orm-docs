@@ -170,34 +170,34 @@ very useful when you need to omit certain columns upon selection
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
-          ```ts
-          import { getTableColumns} from "drizzle-orm";
-          import { user } from "./schema"
+        ```ts
+        import { getTableColumns } from "drizzle-orm";
+        import { user } from "./schema";
 
-          const { password, role, ...rest} = getTableColumns(user)
+        const { password, role, ...rest } = getTableColumns(user);
 
-          await db.select({ ...rest }).from(users);
-          ```
-          ```ts
-          import { serial, text, pgTable } from "drizzle-orm/pg-core";
+        await db.select({ ...rest }).from(users);
+        ```
+        ```ts
+        import { serial, text, pgTable } from "drizzle-orm/pg-core";
 
-          export const user = pgTable("user", {
-          id: int("id").primaryKey().autoincrement(),
+        export const user = pgTable("user", {
+          id: serial("id").primaryKey(),
           name: text("name"),
           email: text("email"),
           password: text("password"),
           role: text("role").$type<"admin" | "customer">(),
-      });
-          ```
+        });
+        ```
       </CodeTabs>
   </Tab>
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns} from "drizzle-orm";
-        import { user } from "./schema"
+        import { getTableColumns } from "drizzle-orm";
+        import { user } from "./schema";
 
-        const { password, role, ...rest} = getTableColumns(user)
+        const { password, role, ...rest } = getTableColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
@@ -217,10 +217,10 @@ very useful when you need to omit certain columns upon selection
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns} from "drizzle-orm";
-        import { user } from "./schema"
+        import { getTableColumns } from "drizzle-orm";
+        import { user } from "./schema";
 
-        const { password, role, ...rest} = getTableColumns(user)
+        const { password, role, ...rest } = getTableColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
