@@ -2,7 +2,7 @@ import { Tab, Tabs } from 'nextra-theme-docs';
 
 # SQL schema declaration
 
-You declare SQL schema in TypeScript in either one `schema.ts` file 
+You declare SQL schema in TypeScript in either one `schema.ts` file
 or you can group them logically in multiple logically grouped files, whichever you prefer, all the freedom!
 
 ```plaintext
@@ -25,6 +25,7 @@ or you can group them logically in multiple logically grouped files, whichever y
           ├ 📜 enums.ts
           └ 📜 etc.ts
 ```
+
 ```plaintext
 📦 <project root>
  └ 📂 src
@@ -33,12 +34,13 @@ or you can group them logically in multiple logically grouped files, whichever y
     │  └ 📜 handler.ts
     ├ 📂 get-city
     │  ├ 📜 city.ts
-    │  └ 📜 handler.ts    
+    │  └ 📜 handler.ts
     ├  ...
 ```
 
 You can declare tables, indexes and constraints, foreign keys and enums.  
 Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#migrations)
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
   ```typescript copy
@@ -66,7 +68,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:
   ```typescript copy
-  import { pgTable, InferModel, serial, text, varchar } from 'drizzle-orm/pg-core';
+  import type { InferModel } from 'drizzle-orm';
+  import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
   import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 
   const users = pgTable('users', {
@@ -77,7 +80,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   export type User = InferModel<typeof users>; // return type when queried
   export type NewUser = InferModel<typeof users, 'insert'>; // insert type
-  ...
+  // ...
 
   const db: NodePgDatabase = drizzle(...);
 
@@ -110,9 +113,11 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:  
   ```typescript copy
-  import { InferModel, MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
-  import mysql from 'mysql2/promise';
+  import type { InferModel } from 'drizzle-orm';
+  import { mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+  import type { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
   import { drizzle } from 'drizzle-orm/mysql2';
+  import mysql from 'mysql2/promise';
 
   const users = mysqlTable('users', {
     id: serial('id').primaryKey(),
@@ -122,16 +127,16 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   export type User = InferModel<typeof users>; // return type when queried
   export type NewUser = InferModel<typeof users, 'insert'>; // insert type
-  ...
+  // ...
 
   // init mysql2 Pool or Client
-  const poolConnection = mysql.createPool({
+  const connection = mysql.createPool({
       host:'localhost', 
       user: 'root',
       database: 'test'
   });
 
-  export const db: MySqlDatabase = drizzle(poolConnection);
+  export const db = drizzle(connection);
 
   const result: User[] = await db.select().from(users);
 
@@ -172,7 +177,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   export type User = InferModel<typeof users> // return type when queried
   export type InsertUser = InferModel<typeof users, 'insert'> // insert type
-  ...
+  // ...
+
   import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
   import Database from 'better-sqlite3';
 
@@ -187,4 +193,3 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   ```
   </Tab>
 </Tabs>
-
