@@ -60,6 +60,9 @@ const config: DocsThemeConfig = {
   editLink: {
     text: '',
   },
+  footer: {
+    component: () => <div />,
+  },
 };
 
 export default config;
