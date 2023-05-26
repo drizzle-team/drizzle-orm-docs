@@ -57,16 +57,16 @@ import { migrate } from 'drizzle-orm/mysql2/migrator';
 import mysql from 'mysql2/promise';
 
 // create the connection
-const poolConnection = mysql.createPool({
+const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   database: 'test',
   multipleStatements: true,
 });
 
-const db = drizzle(poolConnection);
+const db = drizzle(pool);
 
 // this will automatically run needed migrations on the database
-await migrate(db, { migrationsFolder: './drizzle' });
+await migrate(db, { migrationsFolder: 'drizzle' });
 ```
 

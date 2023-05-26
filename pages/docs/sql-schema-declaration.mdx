@@ -130,13 +130,13 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   // ...
 
   // init mysql2 Pool or Client
-  const connection = mysql.createPool({
+  const pool = mysql.createPool({
       host:'localhost', 
       user: 'root',
       database: 'test'
   });
 
-  export const db = drizzle(connection);
+  export const db = drizzle(pool);
 
   const result: User[] = await db.select().from(users);
 
