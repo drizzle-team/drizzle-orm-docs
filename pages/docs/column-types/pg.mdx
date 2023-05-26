@@ -332,7 +332,7 @@ Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-num
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { real, sqliteTable } from "drizzle-orm/pg-core";  
+import { real, pgTable } from "drizzle-orm/pg-core";  
 
 const table = pgTable('table', {
 	real1: real('real1'),
@@ -358,7 +358,7 @@ Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-num
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { doublePrecision, sqliteTable } from "drizzle-orm/pg-core";
+import { doublePrecision, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	double1: doublePrecision('double1'),
@@ -383,7 +383,7 @@ Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-jso
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { json, sqliteTable } from "drizzle-orm/pg-core";
+import { json, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	json1: json('json1'),
@@ -420,7 +420,7 @@ Binary JSON data, decomposed
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
 <Section>
 ```typescript
-import { jsonb, sqliteTable } from "drizzle-orm/pg-core";
+import { jsonb, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	jsonb1: jsonb('jsonb1'),
@@ -458,7 +458,7 @@ PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html
 
 <Section>
 ```typescript
-import { time, sqliteTable } from "drizzle-orm/pg-core";
+import { time, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
   time1: time('time1'),
@@ -485,7 +485,7 @@ PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { timestamp, sqliteTable } from "drizzle-orm/pg-core";
+import { timestamp, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
   timestamp1: timestamp('timestamp1'),
@@ -519,7 +519,7 @@ Calendar date (year, month, day)
 PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html) 
 <Section>
 ```typescript
-import { date, sqliteTable } from "drizzle-orm/pg-core";
+import { date, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	date: date('date'),
@@ -547,7 +547,7 @@ PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html
 
 <Section>
 ```typescript
-import { interval, sqliteTable } from "drizzle-orm/pg-core";
+import { interval, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	interval1: interval('interval1'),
@@ -575,7 +575,7 @@ An example of an enum type might be the days of the week, or a set of status val
 PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-enum.html)
 <Section>
 ```typescript
-import { pgEnum, sqliteTable } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "drizzle-orm/pg-core";
 
 const moodEnum = pgEnum('mood', ['sad', 'ok', 'happy']);
 
@@ -607,7 +607,7 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable } from "drizzle-orm/pg-core";
+import { integer, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	integer1: integer('integer1').default(42),
@@ -633,7 +633,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 <Section>
 ```typescript
-import { integer, sqliteTable } from "drizzle-orm/pg-core";
+import { integer, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	integer: integer('integer').notNull(),
@@ -653,7 +653,7 @@ A primary key constraint indicates that a column, or group of columns, can be us
 This requires that the values be both unique and not null.
 <Section>
 ```typescript
-import { integer, sqliteTable } from "drizzle-orm/pg-core";
+import { integer, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	id: serial('id').primaryKey(),
