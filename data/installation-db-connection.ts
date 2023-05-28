@@ -43,6 +43,18 @@ export const pgDatabases: ICards = {
     description: 'Serverless multi-cloud fully managed Postgres',
     href: '/docs/installation-and-db-connection/postgresql/neon',
   },
+  vercel: {
+    title: 'Vercel Postgres',
+    image: 'vercel',
+    lightIcon: {
+      width: 24,
+    },
+    darkIcon: {
+      width: 24,
+    },
+    description: 'Serverless SQL database designed to integrate with Vercel Functions',
+    href: '/docs/installation-and-db-connection/postgresql/vercel',
+  },
   'aws-data-api': {
     title: 'AWS Data API',
     image: 'database',
