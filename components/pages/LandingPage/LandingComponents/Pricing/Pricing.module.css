@@ -1,7 +1,6 @@
 .wrap {
     margin: 160px auto 0;
     width: 100%;
-
 }
 
 .title {
@@ -14,70 +13,86 @@
     font-size: 20px;
     text-align: center;
     font-weight: 500;
+    margin-bottom: 80px;
+}
+
+.blocks_wrap {
+    display: flex;
+    gap: 40px;
+}
+
+.block {
+    display: flex;
+    align-items: flex-end;
+    width: 50%;
+}
+
+.image_wrap {
+    width: 25%;
+    margin-right: 40px;
 }
 
 .buttons_wrap {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    margin-top: 30px;
-}
-
-.leftside, .rightside {
-    display: flex;
     flex-direction: column;
-    gap: 30px;
-    flex: 1;
-    max-width: 300px;
+    gap: 10px;
 }
 
-.buttons_description {
-    font-size: 20px;
-    font-weight: 500;
-    text-align: center;
+html[class~=dark] .button {
+    color: #cccccc;
+    background-color: rgba(255,255,255,0.05);
 }
+
 
 
 .button {
-    background-color: #434b55;
-    border: none;
     border-radius: 3px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
+    color: #282b3b;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1;
-    padding: 16px 24px;
+    padding: 10px 20px;
     cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
+    border: 1px solid rgba(33, 39, 46, 0.12);
+    background-color: rgba(240, 241, 242, 0.27);
 }
 
-.github {
-    background-color: #24292e;
+html[class~=dark] .sponsor_button {
+    color: #FFFFFF;
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
-.twitter {
-    background-color: #1DA1F2;
+.sponsor_button {
+    font-size: 18px;
+    padding: 15px 24px 15px 20px;
+    font-weight: 700;
+    border: 1px solid rgba(33, 39, 46, 0.12);
+    background-color: rgba(240, 241, 242, 0.27);
 }
 
-.discord {
-    background-color: #7289DA;
+html[class~=dark] .button svg {
+    fill: #cccccc;
+    color: #cccccc;
 }
 
-.github svg {
-    fill: #e2e8f0;
+.button svg {
+    width: 20px;
+    fill: #2b2b2b;
+    color: #2b2b2b;
 }
 
-.twitter svg {
-    fill: #e2e8f0;
-    color: #e2e8f0;
-}
+ html[class~=dark] .sponsor_button svg {
+     fill: rgba(255,255,255,0.1);
+     color: #FFFFFF;
+ }
 
-.github svg {
-    fill: #e2e8f0;
+.sponsor_button svg {
+    width: 32px;
+    fill: rgba(255,255,255,0.1);
 }
 
 @media (max-width: 599px) {
