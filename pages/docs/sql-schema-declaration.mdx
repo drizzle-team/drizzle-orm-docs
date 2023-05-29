@@ -66,7 +66,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:
   ```typescript copy
-  import { pgTable, InferModel, serial, text, varchar } from 'drizzle-orm/pg-core';
+  import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
+  import { InferModel } from 'drizzle-orm';
   import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 
   const users = pgTable('users', {
@@ -110,7 +111,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:  
   ```typescript copy
-  import { InferModel, MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+  import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+  import { InferModel } from 'drizzle-orm';
   import mysql from 'mysql2/promise';
   import { drizzle } from 'drizzle-orm/mysql2';
 
