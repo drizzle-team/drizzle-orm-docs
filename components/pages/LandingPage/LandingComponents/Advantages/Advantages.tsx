@@ -10,7 +10,7 @@ const Advantages: React.FC = () => {
     'Hassle-free SQL migrations',
     'No code generation',
     'Zero dependencies',
-    'Feature reach SQL dialects',
+    'Feature rich SQL dialects',
   ];
   return (
     <div className={styles.wrap}>
