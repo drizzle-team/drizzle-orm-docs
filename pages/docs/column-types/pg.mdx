@@ -247,7 +247,7 @@ Variable-length character string, can store strings up to **`n`** characters(not
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
 
 You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
-`length` parameter is optional due to PostgreSQL docs
+`length` parameter is optional according to PostgreSQL docs
 <Section>
 ```typescript
 import { varchar, pgTable } from "drizzle-orm/pg-core";
@@ -275,7 +275,7 @@ Fixed-length, blank padded character string, can store strings up to **`n`** cha
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
 
 You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
-`length` parameter is optional due to PostgreSQL docs
+`length` parameter is optional according to PostgreSQL docs
 <Section>
 ```typescript
 import { char, pgTable } from "drizzle-orm/pg-core";
