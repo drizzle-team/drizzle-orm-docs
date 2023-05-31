@@ -121,6 +121,10 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
     <Tab>
     ```ts
     const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+
+    const res: unknown[] = db.all(statement)
+    const res: unknown = db.get(statement)
+    const res: unknown[][] = db.values(statement)
     const res: Database.RunResult = db.run(statement)
     ```
     </Tab>
