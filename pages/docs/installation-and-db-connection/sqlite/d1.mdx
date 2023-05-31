@@ -8,6 +8,29 @@ Drizzle ORM fully supports D1 database and Cloudflare Workers environment,
 we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
 SQLite-like `all`, `get`, `values` and `run` query methods syntax.
 
+To setup project for your Cloudflare D1 - please refer to [official docs](https://developers.cloudflare.com/d1/)
+
+```toml
+## your wrangler.toml will look something like this
+
+name = "YOUR PROJECT NAME"
+main = "src/index.ts"
+compatibility_date = "2022-11-07"
+node_compat = true
+
+[[ d1_databases ]]
+binding = "DB"
+database_name = "YOUR DB NAME"
+database_id = "YOUR DB ID"
+```
+
+To init local database and run server locally
+```bash
+wrangler d1 execute <DATABASE_NAME> --local --file=./drizzle/0000_short_lockheed.sql
+wrangler dev --local --persist
+```
+
+Install Drizzle ORM
 <Tabs items={['npm', 'pnpm', 'yarn']}>
   <Tab>
 ```bash copy
@@ -29,12 +52,19 @@ yarn add -D drizzle-kit
   </Tab>
 </Tabs>
 
+Make your first D1 query
 ```typescript copy
-import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/d1';
 
-const sqlite = new Database('sqlite.db');
-const db: BetterSQLite3Database = drizzle(sqlite);
+export interface Env {
+  <BINDING_NAME>: D1Database;
+}
 
-const result = await db.select().from(users).all()
+export default {
+  async fetch(request: Request, env: Env) {
+    const db = drizzle(env.<BINDING_NAME>);
+    const result = await db.select().from(users).all()
+    return Response.json(results);
+  },
+};
 ```
