@@ -1,11 +1,11 @@
 
 # Migrations
-The most important thing about Drizzle ORM is that you can use it as a source of truth for database schema.  
-[DrizzleKit](/kit-docs) - is a CLI companion for DrizzleORM, it lets generate SQL statements for schema creation and alternations 
-or apply changes directly to the database.  
-  
+The most important thing about Drizzle ORM is that you can use it as a source of truth for database schema.
+[DrizzleKit](/kit-docs) - is a CLI companion for DrizzleORM, it lets generate SQL statements for schema creation and alternations
+or apply changes directly to the database.
+
 See detailed [docs](/kit-docs) for extended examples and walk throughs
-  
+
 ## Quick start
 Declare your schema
 ```typescript copy filename="./src/schema.ts"
@@ -13,14 +13,14 @@ import { index, integer, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-c
 
 export const users = mysqlTable('users', {
   id: serial('id').primaryKey(),
-  fullName: varchar('full_name', { length: 256 }),
+  fullName: varchar('full_name', { length: 255 }),
 }, (users) => ({
   nameIdx: index('name_idx').on(users.fullName),
 }));
 
 export const authOtps = mysqlTable('auth_otp', {
   id: serial('id').primaryKey(),
-  phone: varchar('phone', { length: 256 }),
+  phone: varchar('phone', { length: 255 }),
   userId: int('user_id').references(() => users.id),
 });
 ```
@@ -33,13 +33,13 @@ And it will generate a migration SQL file
 ```sql copy
 CREATE TABLE `users` (
  `id` int PRIMARY KEY,
- `full_name` varchar(256)
+ `full_name` varchar(255)
 );
 
 
 CREATE TABLE `auth_otp` (
  `id` serial PRIMARY KEY,
- `phone` varchar(256),
+ `phone` varchar(255),
  `user_id` int
 );
 
@@ -48,8 +48,8 @@ ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_users_id_fk FOREIGN KEY (`u
 CREATE INDEX name_idx ON users (`full_name`);
 ```
 
-We've designed Drizzle ORM to be an opt-in solution at any point of your development flow.  
-You can opt-in to run generated migrations with Drizzle or run it elsewhere wherever its suitable for you  
+We've designed Drizzle ORM to be an opt-in solution at any point of your development flow.
+You can opt-in to run generated migrations with Drizzle or run it elsewhere wherever its suitable for you
 To run them with Drizzle
 ```typescript copy
 import { drizzle } from 'drizzle-orm/mysql2';

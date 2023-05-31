@@ -2,7 +2,7 @@ import { Tab, Tabs } from 'nextra-theme-docs';
 
 # SQL schema declaration
 
-You declare SQL schema in TypeScript in either one `schema.ts` file 
+You declare SQL schema in TypeScript in either one `schema.ts` file
 or you can group them logically in multiple logically grouped files, whichever you prefer, all the freedom!
 
 ```plaintext
@@ -33,11 +33,11 @@ or you can group them logically in multiple logically grouped files, whichever y
     │  └ 📜 handler.ts
     ├ 📂 get-city
     │  ├ 📜 city.ts
-    │  └ 📜 handler.ts    
+    │  └ 📜 handler.ts
     ├  ...
 ```
 
-You can declare tables, indexes and constraints, foreign keys and enums.  
+You can declare tables, indexes and constraints, foreign keys and enums.
 Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](#migrations)
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -49,7 +49,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   export const countries = pgTable('countries', {
     id: serial('id').primaryKey(),
-    name: varchar('name', { length: 256 }),
+    name: varchar('name', { length: 255 }),
   }, (countries) => {
     return {
       nameIndex: uniqueIndex('name_idx').on(countries.name),
@@ -58,7 +58,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   export const cities = pgTable('cities', {
     id: serial('id').primaryKey(),
-    name: varchar('name', { length: 256 }),
+    name: varchar('name', { length: 255 }),
     countryId: integer('country_id').references(() => countries.id),
     popularity: popularityEnum('popularity'),
   });
@@ -73,7 +73,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   const users = pgTable('users', {
     id: serial('id').primaryKey(),
     fullName: text('full_name'),
-    phone: varchar('phone', { length: 256 }),
+    phone: varchar('phone', { length: 255 }),
   });
 
   export type User = InferModel<typeof users>; // return type when queried
@@ -96,20 +96,20 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   // declaring enum in database
   export const countries = mysqlTable('countries', {
     id: serial('id').primaryKey(),
-    name: varchar('name', { length: 256 }),
+    name: varchar('name', { length: 255 }),
   }, (countries) => ({
     nameIndex: uniqueIndex('name_idx').on(countries.name),
   }));
 
   export const cities = mysqlTable('cities', {
     id: serial('id').primaryKey(),
-    name: varchar('name', { length: 256 }),
+    name: varchar('name', { length: 255 }),
     countryId: int('country_id').references(() => countries.id),
     popularity: mysqlEnum('popularity', ['unknown', 'known', 'popular']),
   });
   ```
 
-  Database and table explicit entity types:  
+  Database and table explicit entity types:
   ```typescript copy
   import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
   import { InferModel } from 'drizzle-orm';
@@ -119,7 +119,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   const users = mysqlTable('users', {
     id: serial('id').primaryKey(),
     fullName: text('full_name'),
-    phone: varchar('phone', { length: 256 }),
+    phone: varchar('phone', { length: 255 }),
   });
 
   export type User = InferModel<typeof users>; // return type when queried
@@ -128,7 +128,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   // init mysql2 Pool or Client
   const poolConnection = mysql.createPool({
-      host:'localhost', 
+      host:'localhost',
       user: 'root',
       database: 'test'
   });
