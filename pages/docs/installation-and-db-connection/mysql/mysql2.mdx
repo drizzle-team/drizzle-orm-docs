@@ -41,7 +41,7 @@ For querying purposes feel free to use either `client` or `pool` based on your b
     host: "host",
     user: "user",
     database: "database",
-    ...
+    // ...
   });
 
   const db = drizzle(connection);
@@ -53,14 +53,14 @@ For querying purposes feel free to use either `client` or `pool` based on your b
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
-  const poolConnection = mysql.createPool({
+  const pool = mysql.createPool({
     host: "host",
     user: "user",
     database: "database",
-    ...
+    // ...
   });
 
-  const db = drizzle(connection);
+  const db = drizzle(pool);
   ```
   </Tab>
 </Tabs>
