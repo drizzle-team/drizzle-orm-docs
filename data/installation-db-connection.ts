@@ -55,6 +55,18 @@ export const pgDatabases: ICards = {
     description: 'Serverless SQL database designed to integrate with Vercel Functions',
     href: '/docs/installation-and-db-connection/postgresql/vercel',
   },
+  Supabase: {
+    title: 'Supabase',
+    image: 'supabase',
+    lightIcon: {
+      width: 24,
+    },
+    darkIcon: {
+      width: 24,
+    },
+    description: 'Open source Firebase alternative for building secure and performant Postgres backends',
+    href: '/docs/installation-and-db-connection/postgresql/supabase',
+  },
   'aws-data-api': {
     title: 'AWS Data API',
     image: 'database',
