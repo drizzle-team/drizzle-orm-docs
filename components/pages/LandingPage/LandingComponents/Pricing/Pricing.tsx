@@ -26,7 +26,7 @@ const Pricing = () => {
     <div className={styles.wrap}>
       <div className={styles.title}>Pricing</div>
       <div className={styles.description}>
-        Omg, just joking, Drizzle is free
+        Omg, just joking, Drizzle is free&nbsp;
         <span className={styles.break}>
           <br />
         </span>
