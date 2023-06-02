@@ -1,5 +1,5 @@
 .wrap {
-    margin: 160px auto 0;
+    margin: 160px auto;
     width: 100%;
 }
 
@@ -16,26 +16,64 @@
     margin-bottom: 80px;
 }
 
+.buttons_description {
+    font-size: 12px;
+    text-align: center;
+    color: #999;
+    font-weight: 500;
+}
+
 .blocks_wrap {
     display: flex;
+    justify-content: center;
+}
+
+.left_block {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 50%;
+    gap: 40px;
+    max-width: 362px;
+}
+
+.buttons_wrap_sponsor {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.right_block {
+    width: 50%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    max-width: 362px;
     gap: 40px;
 }
 
-.block {
-    display: flex;
-    align-items: flex-end;
-    width: 50%;
+.divider {
+    margin: 0 40px;
+    border-right: 1px solid #F0F0F0;
+    width: 1px;
+}
+
+.right_block img {
+    transform: rotateY(180deg);
 }
 
 .image_wrap {
-    width: 25%;
-    margin-right: 40px;
+    width: 32%;
 }
 
 .buttons_wrap {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.break {
+    display: none;
 }
 
 html[class~=dark] .button {
@@ -46,6 +84,7 @@ html[class~=dark] .button {
 
 
 .button {
+    width: 212px;
     border-radius: 3px;
     color: #282b3b;
     font-size: 14px;
@@ -66,14 +105,6 @@ html[class~=dark] .sponsor_button {
     border: 1px solid rgba(255,255,255,0.2);
 }
 
-.sponsor_button {
-    font-size: 18px;
-    padding: 15px 24px 15px 20px;
-    font-weight: 700;
-    border: 1px solid rgba(33, 39, 46, 0.12);
-    background-color: rgba(240, 241, 242, 0.27);
-}
-
 html[class~=dark] .button svg {
     fill: #cccccc;
     color: #cccccc;
@@ -91,8 +122,40 @@ html[class~=dark] .button svg {
  }
 
 .sponsor_button svg {
-    width: 32px;
     fill: rgba(255,255,255,0.1);
+}
+
+@media (max-width: 900px) {
+    .left_block, .right_block {
+        gap: 20px;
+    }
+    .divider {
+        margin: 0 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .button {
+        font-size: 14px;
+    }
+    .blocks_wrap {
+        flex-direction: column;
+        gap: 80px;
+        align-items: center;
+    }
+    .left_block, .right_block {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .divider {
+        display: none;
+    }
+    .image_wrap {
+        margin-right: 0;
+    }
+    .break {
+        display: inline;
+    }
 }
 
 @media (max-width: 599px) {
@@ -103,22 +166,5 @@ html[class~=dark] .button svg {
     .description {
         font-size: 14px;
     }
-    .buttons_description {
-        font-size: 14px;
-    }
 }
 
-@media (max-width: 740px) {
-    .buttons_wrap {
-        flex-direction: column;
-        align-items: center;
-        gap: 60px;
-    }
-    .button {
-        font-size: 14px;
-        width: 274px;
-    }
-    .rightside {
-        /*align-items: center;*/
-    }
-}
