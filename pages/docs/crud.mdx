@@ -53,7 +53,7 @@ const result = await db.select({
 const { field1, field2 } = result[0];
 ```
 ```sql
-select "user"."id" as "field1", "user"."name" as "field2" from "users";
+select "users"."id" as "field1", "users"."name" as "field2" from "users";
 ```
 </Section>
 
@@ -67,7 +67,7 @@ const result = await db.select({
   }).from(users);
 ```
 ```sql
-select "user"."id", lower("user"."name") as "lowerName" from "users";
+select "users"."id", lower("users"."name") as "lowerName" from "users";
 ```
 </Section>
 
