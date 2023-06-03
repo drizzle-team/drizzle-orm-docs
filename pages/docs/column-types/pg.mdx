@@ -231,7 +231,7 @@ export const table = pgTable('table', {
 });
 
 // will be inferred as text: "value1" | "value2" | null
-text: text('text', { enum: ["value1", "value2"] })
+text: text('text', { enum: ["value1", "value2"] });
 ```
 
 ```sql
@@ -592,6 +592,17 @@ CREATE TABLE IF NOT EXISTS "table" (
 );
 ```
 </Section>
+
+### Customizing column data type
+
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with branded types.
+
+```ts
+const users = pgTable('users', {
+  id: serial('id').$type<UserId>().primaryKey(),
+  jsonField: json('json_field').$type<Data>(),
+});
+```
 
 ## Constraints & defaults
 

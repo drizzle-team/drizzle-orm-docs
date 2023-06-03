@@ -298,6 +298,7 @@ CREATE TABLE `table` (
 
 #### varchar
 
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 <Section>
 ```typescript
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
@@ -305,6 +306,9 @@ import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
 const table = mysqlTable('table', {
 	varchar: varchar('varchar', { length: 2 }),
 });
+
+// will be inferred as text: "value1" | "value2" | null
+varchar: varchar('varchar', {length: 6, enum: ["value1", "value2"] }),
 ```
 
 ```sql
@@ -316,6 +320,8 @@ CREATE TABLE `table` (
 
 #### text
 
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
+
 <Section>
 ```typescript
 import { text, mysqlTable } from "drizzle-orm/mysql-core";
@@ -323,6 +329,9 @@ import { text, mysqlTable } from "drizzle-orm/mysql-core";
 const table = mysqlTable('table', {
 	text: text('text'),
 });
+
+// will be inferred as text: "value1" | "value2" | null
+text: text('text', { enum: ["value1", "value2"] });
 ```
 
 ```sql
@@ -507,9 +516,6 @@ import { json, mysqlTable } from "drizzle-orm/mysql-core";
 const table = mysqlTable('table', {
 	json: json('json'),
 });
-
-json<...>('...');
-json<string[]>('...')
 ```
 
 ```sql
@@ -518,6 +524,19 @@ CREATE TABLE `table` (
 );
 ```
 </Section>
+
+You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
+It provides compile time protection for default values, insert and select schemas.
+```typescript
+// will be infered as { foo: string }
+json: json('json').$type<{ foo: string }>();
+
+// will be infered as string[]
+json: json('json').$type<string[]>();
+
+// won't compile
+json: json('json').$type<string[]>().default({});
+```
 
 
 ### enumColumn
@@ -537,6 +556,17 @@ CREATE TABLE `table` (
 );
 ```
 </Section>
+
+### Customizing column data type
+
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with branded types.
+
+```ts
+const users = mysqlTable('users', {
+  id: serial('id').$type<UserId>().primaryKey(),
+  jsonField: json('json_field').$type<Data>(),
+});
+```
 
 ## Columns constraints
 #### Not null

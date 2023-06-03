@@ -64,7 +64,7 @@ const table = sqliteTable('table', {
 CREATE TABLE `table` (
 	`real` real
 );
-````
+```
 
 </Section>
 
@@ -72,6 +72,7 @@ CREATE TABLE `table` (
 
 A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).
 
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 <Section>
 ```typescript
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
@@ -80,9 +81,8 @@ const table = sqliteTable('table', {
 	text: text('text')
 });
 
-text('text')
-text<'union' | 'string' | 'type'>('union')
-
+// will be inferred as text: "value1" | "value2" | null
+text: text('text', { enum: ["value1", "value2"] })
 ````
 
 ```sql
@@ -108,7 +108,7 @@ const table = sqliteTable('table', {
 blob('blob')
 blob('blob', { mode: 'buffer' })
 blob('blob', { mode: 'json' })
-blob<{ foo: string }>('blob', { mode: 'json' })
+blob('blob', { mode: 'bigint' })
 
 ````
 
@@ -118,7 +118,31 @@ CREATE TABLE `table` (
 );
 ````
 
+You can specify `.$type<..>()` for blob inference, it **won't** check runtime values. 
+It provides compile time protection for default values, insert and select schemas.
+```typescript
+// will be infered as { foo: string }
+json: blob('json', { mode: 'json' }).$type<{ foo: string }>();
+
+// will be infered as string[]
+json: blob('json', { mode: 'json' }).$type<string[]>();
+
+// won't compile
+json: blob('json', { mode: 'json' }).$type<string[]>().default({});
+```
+
 </Section>
+
+### Customizing column data type
+
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with branded types.
+
+```ts
+const users = sqliteTable('users', {
+  id: integer('id').$type<UserId>().primaryKey(),
+  jsonField: blob('json_field').$type<Data>(),
+});
+```
 
 ## Columns constraints
 #### Not null
