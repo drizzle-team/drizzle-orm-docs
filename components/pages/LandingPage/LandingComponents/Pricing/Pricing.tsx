@@ -6,9 +6,7 @@ import {
   DiscordIcon, GiftIcon, StarIcon, TwitterIcon,
 } from '../../../../Icons/Icons';
 import MoneyImage from './Images/Money.png';
-import MoneyImageDark from './Images/MoneyDark.png';
 import WithoutMoneyImage from './Images/WithoutMoney.png';
-import WithoutMoneyImageDark from './Images/WithoutMoneyDark.png';
 
 const Pricing = () => {
   const { theme } = useTheme();
@@ -19,18 +17,14 @@ const Pricing = () => {
   const images: {
     [key: string]: StaticImageData;
   } = {
-    withoutMoney: isLight ? WithoutMoneyImage : WithoutMoneyImageDark,
-    money: isLight ? MoneyImage : MoneyImageDark,
+    withoutMoney: WithoutMoneyImage,
+    money: MoneyImage,
   };
   return (
     <div className={styles.wrap}>
       <div className={styles.title}>Pricing</div>
       <div className={styles.description}>
-        Omg, just joking, Drizzle is free&nbsp;
-        <span className={styles.break}>
-          <br />
-        </span>
-        and open-source ofc
+        Just joking, Drizzle is free&nbsp;and open-source
         <br />
         You can still make your contribution!
       </div>
