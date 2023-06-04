@@ -9,7 +9,7 @@ const Pricing = () => (
   <div className={styles.wrap}>
     <div className={styles.title}>Pricing</div>
     <div className={styles.description}>
-      Just joking, Drizzle is free&nbsp;and open-source
+      Just kidding, Drizzle is free&nbsp;and open-source
       <br />
       You can still make your contribution!
     </div>
