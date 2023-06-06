@@ -559,11 +559,17 @@ CREATE TABLE `table` (
 
 ### Customizing column data type
 
-Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with branded types.
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
 
 ```ts
+type UserId = number & { __brand: 'user_id' };
+type Data = {
+	foo: string;
+	bar: number;
+};
+
 const users = mysqlTable('users', {
-  id: serial('id').$type<UserId>().primaryKey(),
+  id: int('id').$type<UserId>().primaryKey(),
   jsonField: json('json_field').$type<Data>(),
 });
 ```
