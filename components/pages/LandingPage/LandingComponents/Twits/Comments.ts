@@ -58,10 +58,10 @@ const Comments: IComment[] = [
     text: 'It\'s not yet production ready',
   },
   {
-    avatar: 'https://pbs.twimg.com/profile_images/1503487031330197518/J4i7ofgt_normal.jpg',
-    name: 'Aaron Francis',
-    login: 'aarondfrancis',
-    text: 'I will accept 1% advisor shares',
+    avatar: 'https://pbs.twimg.com/profile_images/1535515556643606529/RRGbBC6T_normal.jpg',
+    name: 'Ray',
+    login: '_raynirola',
+    text: 'DrizzleOrm is not an "ORM", it\'s merely a overrated typesafe sql wrapper, not even a query builder.',
   },
   {
     avatar: 'https://pbs.twimg.com/profile_images/1503487031330197518/J4i7ofgt_normal.jpg',

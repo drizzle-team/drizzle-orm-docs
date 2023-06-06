@@ -8,7 +8,7 @@ const config: DocsThemeConfig = {
   banner: {
     key: 'rqb',
     text: (
-      <a href="https://medium.com/@aleksandrblokh/best-typescript-orm-just-got-better-5a33688b8d2e" target="_blank" rel="nofollow noreferrer">
+      <a href="https://medium.com/@aleksandrblokh/best-typescript-orm-just-got-better-5a33688b8d2e?utm_source=drizzle-orm" target="_blank" rel="nofollow noreferrer">
         🎉 We&apos;ve built relational queries! Read more →
       </a>
     ),

@@ -34,7 +34,7 @@ yet when you use `sql` - you have to explicitly declare view columns schema.
       });
 
       export const userView = pgView("user_view").as((qb) => qb.select().from(user));
-      export const customersView = pgView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "cusotmer")));
+      export const customersView = pgView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
       CREATE VIEW "user_view" AS SELECT * FROM "user";
@@ -58,7 +58,7 @@ yet when you use `sql` - you have to explicitly declare view columns schema.
       });
 
       export const userView = mysqlView("user_view").as((qb) => qb.select().from(user));
-      export const customersView = mysqlView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "cusotmer")));
+      export const customersView = mysqlView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
       CREATE VIEW "user_view" AS SELECT * FROM "user";
@@ -130,7 +130,7 @@ You can also declare views using `standalone query builder`, it works exactly th
       });
 
       export const userView = pgView("user_view").as(qb.select().from(user));
-      export const customersView = pgView("customers_view").as(qb.select().from(user).where(eq(user.role, "cusotmer")));
+      export const customersView = pgView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
       CREATE VIEW "user_view" AS SELECT * FROM "user";
@@ -156,7 +156,7 @@ You can also declare views using `standalone query builder`, it works exactly th
       });
 
       export const userView = mysqlView("user_view").as(qb.select().from(user));
-      export const customersView = mysqlView("customers_view").as(qb.select().from(user).where(eq(user.role, "cusotmer")));
+      export const customersView = mysqlView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
       CREATE VIEW "user_view" AS SELECT * FROM "user";
