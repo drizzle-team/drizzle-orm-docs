@@ -483,6 +483,8 @@ CREATE TABLE `table` (
 </Section>
 
 <Section>
+If you are using PlanetScale `defaultNow()` will not work. A PlanetScale alternative `defaultCurrentTimestamp()` will be released in the future. In the meantime use `default(sql'CURRENT_TIMESTAMP')`
+<br />
 ```typescript
 import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
 
