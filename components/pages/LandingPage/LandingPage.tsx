@@ -12,8 +12,8 @@ import Pricing from './LandingComponents/Pricing/Pricing';
 import PricingTag from './LandingComponents/Pricing/PricingTag';
 
 const LandingPage = () => {
-  const runtimes: string[] = ['Cloudflare Workers', 'Supabase functions', 'Vercel functions', 'Deno deploy', 'Bun', 'Lagon', 'ElectronJS', 'Browser'];
-  const databases: string[] = ['Neon', 'PlanetScale', 'Vercel storage', 'Turso', 'Supabase', 'PostgreSQL', 'MySQL', 'SQLite', 'Web SQLite'];
+  const runtimes: string[] = ['Cloudflare Workers', 'Supabase functions', 'Vercel functions', 'Deno deploy', 'Bun', 'Lagon', 'Fly.io', 'ElectronJS', 'Browser'];
+  const databases: string[] = ['Neon', 'PlanetScale', 'Vercel storage', 'Turso', 'Supabase', 'PostgreSQL', 'MySQL', 'LiteFS', 'SQLite', 'Web SQLite'];
   return (
     <div className={styles.wrap}>
       <Header />
