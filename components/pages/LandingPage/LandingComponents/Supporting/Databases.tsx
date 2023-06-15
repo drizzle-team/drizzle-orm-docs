@@ -97,6 +97,15 @@ const Databases: {
       width: 24,
     },
   },
+  LiteFS: {
+    src: 'flyio.svg',
+    lightStyles: {
+      width: 28,
+    },
+    darkStyles: {
+      width: 28,
+    },
+  },
 };
 
 export default Databases;
