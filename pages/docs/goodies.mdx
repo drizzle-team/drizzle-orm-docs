@@ -298,5 +298,21 @@ very useful when you need to omit certain columns upon selection
   </Tab>
 </Tabs>
 
+## Compare objects types (instanceof alternative)
 
+You can check if an object is of a specific Drizzle type by using the `is()` function. 
+You can use it with any available type in Drizzle
 
+**Few examples**
+```ts
+import { Column, SQL, Subquery, Table, View} from 'drizzle-orm'
+
+...
+is(value, Column)
+is(c, SQL)
+is(table, Subquery)
+is(table, Table)
+is(table, View)
+...
+
+```
