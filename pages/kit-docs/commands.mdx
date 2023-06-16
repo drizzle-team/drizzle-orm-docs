@@ -59,20 +59,19 @@ $ drizzle-kit generate:pg --custom
 `drizzle-kit introspect:{dialect}` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
 Either [`connectionString`](./conf#push-and-pull) or [`user:password@host:port/db`](./conf#push-and-pull) params are mandatory
 
-| param                             | required | description                                   |
-| :-------------------------------- | :------- | :-------------------------------------------- |
-| [`out`](./conf#migrations-folder) | no       | migrations folder, default=`./drizzle`        |
-| `connectionString`                | no       | database connection string                    |
-| `user`                            | no       | database user                                 |
-| `password`                        | no       | database password                             |
-| `host`                            | no       | host                                          |
-| `port`                            | no       | port                                          |
-| `database`                        | no       | database name                                 |
-| `config`                          | no       | config file path, default=`drizzle.config.ts` |
+| param                                 | required | description                                   |
+| :-----------------------------------  | :------- | :-------------------------------------------- |
+| driver                                | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
+| [`out`](./conf#migrations-folder)     | no       | migrations folder, default=`./drizzle`        |
+| `connectionString`                    | no       | database connection string                    |
+| `user`                                | no       | database user                                 |
+| `password`                            | no       | database password                             |
+| `host`                                | no       | host                                          |
+| `port`                                | no       | port                                          |
+| `database`                            | no       | database name                                 |
+| `config`                              | no       | config file path, default=`drizzle.config.ts` |
+| `introspect-casing`                   | no       | strategy for JS keys creation in columns, tables, etc. (`preserve`, `camel`) |
 
-<Callout type="warning" emoji="⚠️">
-  `drizzle-kit introspect:sqlite` is not yet supported
-</Callout>
 
 <Section>
 
@@ -82,6 +81,10 @@ $ drizzle-kit introspect:pg
 
 ```shell
 $ drizzle-kit introspect:mysql
+```
+
+```shell
+$ drizzle-kit introspect:sqlite
 ```
 
 </Section>
@@ -140,12 +143,13 @@ Planetscale, Neon, Turso and others.
 Either [`connectionString`](./conf#push-and-pull) or [`user:password@host:port/db`](./conf#push-and-pull) params are **required**
 
 <Callout type="warning" emoji="⚠️">
-  `drizzle-kit push` does not support PostgreSQL and SQLite yet
+  `drizzle-kit push` does not support PostgreSQL yet
 </Callout>
 
 | param                                         | required | description                                                         |
 | :-------------------------------------------- | :------- | :------------------------------------------------------------------ |
 | [`schema`](./conf#schema-file-paths)          | yes      | path to typescript schema file or folder with multiple schema files |
+| driver                                        | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
 | [`tablesFilter`](./conf#multi-project-schema) | no       | table name filter                                                   |
 | `connectionString`                            | no       | database connection string                                          |
 | `user`                                        | no       | database user                                                       |
@@ -154,10 +158,20 @@ Either [`connectionString`](./conf#push-and-pull) or [`user:password@host:port/d
 | `port`                                        | no       | port                                                                |
 | `database`                                    | no       | database name                                                       |
 | `config`                                      | no       | config file path, default=`drizzle.config.ts`                       |
+| `verbose`                                     | no       | print all queries that will be executed                             |
+| `strict`                                      | no       | always ask for an approve before pushing the schema                 |
+
+<Section>
 
 ```shell
 $ drizzle-kit push:mysql
 ```
+
+```shell
+$ drizzle-kit push:sqlite
+```
+
+</Section>
 
 If you want to use custom named config file
 
