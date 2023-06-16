@@ -81,7 +81,7 @@ const table = sqliteTable('table', {
 });
 
 text('text')
-text<'union' | 'string' | 'type'>('union')
+text('union').$type<'union' | 'string' | 'type'>()
 
 ````
 
@@ -108,7 +108,7 @@ const table = sqliteTable('table', {
 blob('blob')
 blob('blob', { mode: 'buffer' })
 blob('blob', { mode: 'json' })
-blob<{ foo: string }>('blob', { mode: 'json' })
+blob('blob', { mode: 'json' }).$type<{ foo: string }>()
 
 ````
 
@@ -153,8 +153,8 @@ import { sql } from "drizzle-orm";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-int1: integer('int1').default(42),
-int2: integer('int2').default(sql`(abs(42))`)
+	int1: integer('int1').default(42),
+	int2: integer('int2').default(sql`(abs(42))`)
 });
 
 ```

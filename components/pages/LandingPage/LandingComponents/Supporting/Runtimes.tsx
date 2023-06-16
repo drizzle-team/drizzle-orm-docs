@@ -84,6 +84,15 @@ const Runtimes: {
       width: 32,
     },
   },
+  'Fly.io': {
+    src: 'flyio.svg',
+    lightStyles: {
+      width: 28,
+    },
+    darkStyles: {
+      width: 28,
+    },
+  },
 };
 
 export default Runtimes;
