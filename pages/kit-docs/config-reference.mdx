@@ -10,7 +10,7 @@ By default, Drizzle reads the `drizzle.config.ts` file located in the project's 
 If you need to specify a different configuration file, you can utilize the `--config=<path>`
 command-line option after any drizzle-kit command.
 
-Drizzle Kit supports multiple formats for the configuration file, including `.ts`, `.js`, and `.json`.
+Drizzle Kit supports multiple formats for the configuration file, including `.ts`, `.js`.
 This flexibility allows you to choose the format that best suits your needs and preferences.
 Here are some examples of each file format usage:
 
@@ -33,19 +33,11 @@ export default {
 };
 ```
 
-**Json example**
-```json
-{
-  "schema": "./db", 
-  "out": "./drizzle"
-}
-```
-
 ## Options
 
 ### schema
 
-- **Type**: `string`
+- **Type**: `string | string[]`
 - **Commands**: `generate`, `check`, `up`, `push`, `drop`
 
 `schema` param lets you define where your schema file/files live.  
@@ -54,7 +46,7 @@ You can have as many separate schema files as you want and define paths to them 
 or array of globs syntax.
 
 **Usage**
-<Tabs items={["single", "multiple", "glob"]}>
+<Tabs items={["Single file", "Multiple files", "Glob pattern"]}>
 <Tab>
 ```ts
 export default {
@@ -128,7 +120,7 @@ export default {
 </Callout>
 
 **PostgresCredentials** (`pg`)
-<Tabs items={["option 1", "option 2"]}>
+<Tabs items={["Option 1", "Option 2"]}>
 <Tab>
 ```ts
 export default {
@@ -155,7 +147,7 @@ export default {
 </Tabs>
 
 **MySQLCredentials** (`mysql2`)
-<Tabs items={["option 1", "option 2"]}>
+<Tabs items={["Option 1", "Option 2"]}>
 <Tab>
 ```ts
 export default {
