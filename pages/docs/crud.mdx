@@ -191,9 +191,12 @@ or set of columns in a query result. It eliminates duplicate rows, returning onl
 ```ts
 await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
 
-await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id, usersTable.name);
+await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
 ```
 ```sql
+select distinct "id", "name" from "users" order by "users"."id", "users"."name";
+
+select distinct "id" from "users" order by "users"."id";
 ```
 </Section>
 
@@ -214,6 +217,9 @@ await db.selectDistinctOn([users.name], { name: users.name })
         .orderBy(users.name);
 ```
 ```sql
+select distinct on ("users"."id") "id", "name" from "users" order by "users"."id";
+
+select distinct on ("users"."name") "name" from "users" order by "users"."name";
 ```
 </Section>
 
