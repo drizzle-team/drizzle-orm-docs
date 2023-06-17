@@ -1,5 +1,6 @@
 import Section from '../../components/Section/Section';
 import { Tab, Tabs } from 'nextra-theme-docs';
+import { Callout } from 'nextra-theme-docs'
 
 # Quering with SQL-like syntax [CRUD]
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
@@ -143,7 +144,7 @@ select * from 'users' where not 'id' = 42;
 </Section>
 
 ### Combining filters
-You can logically combile filter operators with conditional `and` and `or` operators 
+You can logically combine filter operators with conditional `and` and `or` operators 
 <Section>
 ```typescript copy
 import { eq, and, sql } from "drizzle-orm";
@@ -179,6 +180,46 @@ select * from 'users' where 'id' = 42 or 'name' = "Dan";
 select * from 'users' where 'id' = 42 or 'name' = "Dan";
 ```
 </Section>
+
+### Distinct
+
+You can use the `distinct` keyword to retrieve unique or distinct values from a column 
+or set of columns in a query result. It eliminates duplicate rows, returning only the unique values.
+<Section>
+```ts
+await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
+
+await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
+```
+```sql
+select distinct "id", "name" from "users" order by "users"."id", "users"."name";
+
+select distinct "id" from "users" order by "users"."id";
+```
+</Section>
+
+Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too
+<Callout>
+    `DISTINCT ON` is only available in PostgreSQL
+</Callout>
+
+<Section>
+```ts
+await db.selectDistinctOn([users.id])
+        .from(users)
+        .orderBy(users.id);
+
+await db.selectDistinctOn([users.name], { name: users.name })
+        .from(users)
+        .orderBy(users.name);
+```
+```sql
+select distinct on ("users"."id") "id", "name" from "users" order by "users"."id";
+
+select distinct on ("users"."name") "name" from "users" order by "users"."name";
+```
+</Section>
+
 
 ### Limit & Offset
 You can apply `limit` and `offset` to the query

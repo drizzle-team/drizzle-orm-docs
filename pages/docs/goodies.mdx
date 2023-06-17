@@ -1,5 +1,6 @@
 import { Tab, Tabs } from "nextra-theme-docs";
 import {CodeTabs} from "../../components/CodeTabs/CodeTabs";
+import { Callout } from "nextra-theme-docs";
 
 ## Logging
 To enable default query logging, just pass `{ logger: true }` to the `drizzle` initialization function:
@@ -298,5 +299,20 @@ very useful when you need to omit certain columns upon selection
   </Tab>
 </Tabs>
 
+## Compare objects types (instanceof alternative)
 
+You can check if an object is of a specific Drizzle type using the `is()` function. 
+You can use it with any available type in Drizzle.
 
+<Callout>
+  You should always use `is()` instead of `instanceof`
+</Callout>
+
+**Few examples**
+```ts
+import { Column, is } from 'drizzle-orm';
+
+if (is(value, Column)) {
+  // value's type is narrowed to Column
+}
+```
