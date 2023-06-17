@@ -185,8 +185,6 @@ select * from 'users' where 'id' = 42 or 'name' = "Dan";
 
 You can use the `distinct` keyword to retrieve unique or distinct values from a column 
 or set of columns in a query result. It eliminates duplicate rows, returning only the unique values.
-
-**Distinct**
 <Section>
 ```ts
 await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
@@ -200,10 +198,9 @@ select distinct "id" from "users" order by "users"."id";
 ```
 </Section>
 
-**Distinct on**
-
+Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too
 <Callout>
-    `distinct on` is only available in PostgreSQL
+    `DISTINCT ON` is only available in PostgreSQL
 </Callout>
 
 <Section>
