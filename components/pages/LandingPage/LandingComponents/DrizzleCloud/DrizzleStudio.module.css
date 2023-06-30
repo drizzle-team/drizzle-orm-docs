@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
   margin-top: 160px;
 }
 
@@ -22,21 +22,41 @@
 }
 
 .image_container {
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 8px 8px 0 0;
+  padding: 4px 4px 0;
   background-color: #ffffff;
   border: 1px solid #e8e8e8;
+  border-bottom: none;
+  overflow: hidden;
+  position: relative;
+}
+
+.image_container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -200px;
+  width: 100%;
+  height: 400px;
+  background: radial-gradient(70% 30% at center, rgba(17, 17, 21, 0.2) 60%, rgba(17, 17, 21, 0));
 }
 
 .image {
-  border-radius: 8px;
+  border-radius: 4px 4px 0 0;
+}
+
+.image_container_separator {
+  height: 1px;
+  width: calc(100% + 48px);
+  margin-left: -24px;
+  background: #e8e8e8;
 }
 
 .buttons {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap: 30px;
+  gap: 16px;
 }
 
 .button {
@@ -60,10 +80,10 @@
   width: 212px;
   border-radius: 3px;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   line-height: 1;
-  padding: 10px 20px;
+  height: 48px;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -91,7 +111,12 @@ html[class~='dark'] .docs {
 
 html[class~='dark'] .image_container {
   border: 1px solid rgb(64, 64, 64);
+  border-bottom: none;
   background-color: #282828;
+}
+
+html[class~='dark'] .image_container_separator {
+  background: rgb(64, 64, 64);
 }
 
 @media (max-width: 900px) {
