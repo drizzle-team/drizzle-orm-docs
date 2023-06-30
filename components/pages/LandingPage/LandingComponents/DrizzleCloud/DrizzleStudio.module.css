@@ -1,19 +1,33 @@
-.wrap {
+.container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
   margin-top: 160px;
+}
+
+.text_container {
+  text-align: center;
+  max-width: 514px;
+  margin: 0 auto;
 }
 
 .title {
   font-size: 32px;
-  line-height: 150%;
   font-weight: 600;
-  text-align: center;
+}
+
+.description {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.image_container {
+  padding: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
 }
 
 .image {
-  border-radius: 8px 8px 0 0;
 }
 
 .buttons {
@@ -40,18 +54,21 @@
   background-color: rgba(240, 241, 242, 0.27);
 }
 
-.docs {
-  margin-top: 16px;
-  border-radius: 12px;
-  padding: 12px;
-  border: 1px solid #e8e8e8;
-  color: #282b3b;
-  background-color: #ffffff;
-}
-
-.link {
-  margin: 0 6px 0;
-  text-decoration: underline #4bb74a;
+.button_accent {
+  width: 212px;
+  border-radius: 3px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #282b3b;
 }
 
 html[class~='dark'] .button {
@@ -59,10 +76,20 @@ html[class~='dark'] .button {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+html[class~='dark'] .button_accent {
+  color: #282828;
+  background-color: rgb(226, 232, 240);
+}
+
 html[class~='dark'] .docs {
   border: 1px solid rgb(64, 64, 64);
   background-color: #282828;
   color: rgb(226, 232, 240);
+}
+
+html[class~='dark'] .image_container {
+  border: 1px solid rgb(64, 64, 64);
+  background-color: #282828;
 }
 
 @media (max-width: 900px) {
