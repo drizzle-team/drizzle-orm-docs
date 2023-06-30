@@ -34,9 +34,9 @@ yarn add -D drizzle-kit
 
 ### Create your models
 
+```typescript copy filename="schema.ts"
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
-```typescript copy filename="schema.ts"
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
