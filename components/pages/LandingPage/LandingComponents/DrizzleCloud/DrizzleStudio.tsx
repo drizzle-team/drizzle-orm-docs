@@ -6,18 +6,26 @@ import useGetTheme from '../../../../hooks/useGetTheme';
 const DrizzleStudio = () => {
   const isLight = useGetTheme();
   return (
-    <div className={styles.wrap}>
-      <div className={styles.header}>Drizzle Studio</div>
+    <div className={styles.container}>
+      <div className={styles.text_container}>
+        <div className={styles.title}>Drizzle Studio</div>
+        <div className={styles.description}>
+          Explore and manipulate your data
+        </div>
+      </div>
+      <div className={styles.gradient_container}>
+        <div className={styles.image_container}>
+          <img className={styles.image} src={!isLight ? DrizzleImgDark.src : DrizzleImgLight.src} alt="Drizzle Studio" />
+        </div>
+        <div className={styles.image_container_separator} />
+      </div>
       <div className={styles.buttons}>
         <a className={styles.button} href="https://github.com/drizzle-team/drizzle-orm">
           Documentation
         </a>
-        <a className={styles.button} href="https://github.com/drizzle-team/drizzle-orm">
-          Live Demo
+        <a className={styles.button_accent} href="https://demo.drizzle.team/">
+          Live demo
         </a>
-      </div>
-      <div className={styles.image_wrap}>
-        <img className={styles.image} src={!isLight ? DrizzleImgDark.src : DrizzleImgLight.src} alt="Drizzle Studio" />
       </div>
     </div>
   );
