@@ -1,60 +1,79 @@
 .wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    margin-top: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 160px;
 }
 
-.header {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 600;
-}
-
-.image_wrap {
-    
+.title {
+  font-size: 32px;
+  line-height: 150%;
+  font-weight: 600;
+  text-align: center;
 }
 
 .image {
-    border-radius: 8px;
+  border-radius: 8px 8px 0 0;
 }
 
 .buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 30px;
 }
 
 .button {
-    width: 212px;
-    border-radius: 3px;
-    color: #282b3b;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1;
-    padding: 10px 20px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(33, 39, 46, 0.12);
-    background-color: rgba(240, 241, 242, 0.27);
+  width: 212px;
+  border-radius: 3px;
+  color: #282b3b;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(33, 39, 46, 0.12);
+  background-color: rgba(240, 241, 242, 0.27);
 }
 
-html[class~=dark] .button {
-    color: #cccccc;
-    background-color: rgba(255,255,255,0.05);
+.docs {
+  margin-top: 16px;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  color: #282b3b;
+  background-color: #ffffff;
+}
+
+.link {
+  margin: 0 6px 0;
+  text-decoration: underline #4bb74a;
+}
+
+html[class~='dark'] .button {
+  color: #cccccc;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+html[class~='dark'] .docs {
+  border: 1px solid rgb(64, 64, 64);
+  background-color: #282828;
+  color: rgb(226, 232, 240);
 }
 
 @media (max-width: 900px) {
-    .header {
-        font-size: 20px;
-    }
+  .header {
+    font-size: 20px;
+  }
+
+  .docs {
+    font-size: 14px;
+  }
 }
 
-
 @media (max-width: 599px) {
-    
 }

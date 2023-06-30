@@ -7,17 +7,24 @@ const DrizzleStudio = () => {
   const isLight = useGetTheme();
   return (
     <div className={styles.wrap}>
-      <div className={styles.header}>Drizzle Studio</div>
+      <div className={styles.title}>Drizzle Studio</div>
       <div className={styles.buttons}>
-        <a className={styles.button} href="https://github.com/drizzle-team/drizzle-orm">
-          Documentation
-        </a>
         <a className={styles.button} href="https://github.com/drizzle-team/drizzle-orm">
           Live Demo
         </a>
       </div>
-      <div className={styles.image_wrap}>
+      <div>
         <img className={styles.image} src={!isLight ? DrizzleImgDark.src : DrizzleImgLight.src} alt="Drizzle Studio" />
+      </div>
+      <div className={styles.docs}>
+        The easiest way to explore and
+        manipulate your data in all of your Drizzle projects.
+        <span className={styles.link}>
+          <a href="https://github.com/drizzle-team/drizzle-orm">
+            Head over to the docs
+          </a>
+        </span>
+        to learn more!
       </div>
     </div>
   );
