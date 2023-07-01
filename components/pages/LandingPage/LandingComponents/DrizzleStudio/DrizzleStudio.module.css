@@ -125,14 +125,37 @@ html[class~='dark'] .image_container_separator {
 }
 
 @media (max-width: 900px) {
-  .header {
+  .title {
     font-size: 20px;
   }
-
-  .docs {
+  .description {
     font-size: 14px;
   }
 }
 
 @media (max-width: 599px) {
+  .container {
+    gap: 20px;
+  }
+
+  .buttons {
+    gap: 10px;
+  }
+
+  .button,
+  .button_accent {
+    font-size: 14px;
+    height: 46px;
+  }
+
+  .gradient_container {
+    padding: 0 12px;
+  }
+
+  .gradient_container::after {
+    left: -12px;
+    width: calc(100% + 24px);
+    bottom: -100px;
+    height: 200px;
+  }
 }

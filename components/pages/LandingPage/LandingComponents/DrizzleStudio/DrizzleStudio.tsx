@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import styles from './DrizzleStudio.module.css';
 import DrizzleImgLight from './images/drizzle-studio-light.png';
 import DrizzleImgDark from './images/drizzle-studio-dark.png';
@@ -15,7 +16,14 @@ const DrizzleStudio = () => {
       </div>
       <div className={styles.gradient_container}>
         <div className={styles.image_container}>
-          <img className={styles.image} src={!isLight ? DrizzleImgDark.src : DrizzleImgLight.src} alt="Drizzle Studio" />
+          <Image
+            className={styles.image}
+            src={!isLight ? DrizzleImgDark.src : DrizzleImgLight.src}
+            alt="Drizzle Studio"
+            width={0}
+            height={0}
+            style={{ width: '100%', height: 'auto' }}
+          />
         </div>
         <div className={styles.image_container_separator} />
       </div>

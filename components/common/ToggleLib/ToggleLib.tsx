@@ -29,7 +29,7 @@ const ToggleLib = ({ title } : { title: string }) => (
       </div>
     </Link>
     <Link href="/drizzle-studio/overview">
-      <div className={`${styles.button} ${title === 'DRIZZLE CLOUD' ? styles.selected : ''}`}>
+      <div className={`${styles.button} ${title === 'DRIZZLE STUDIO' ? styles.selected : ''}`}>
         <div className={`${styles.icon}`}>
           {title === 'DRIZZLE STUDIO' ? <LayoutActiveIcon /> : <LayoutIcon /> }
         </div>
