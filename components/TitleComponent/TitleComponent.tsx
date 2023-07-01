@@ -6,7 +6,7 @@ interface Props {
 }
 
 const TitleComponent: React.FC<Props> = ({ title }) => {
-  if (title === 'DRIZZLE ORM' || title === 'DRIZZLE KIT') {
+  if (title === 'DRIZZLE ORM' || title === 'DRIZZLE KIT' || title === 'DRIZZLE CLOUD') {
     return (
       <ToggleLib title={title} />
     );
