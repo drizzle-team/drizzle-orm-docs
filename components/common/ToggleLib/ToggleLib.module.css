@@ -14,62 +14,51 @@
 
 
 html[class~=dark] .text {
-  --tw-text-opacity: 1;
-  color: rgba(115,115,115,var(--tw-text-opacity));
+  color: rgb(115,115,115);
 }
 
 html[class~=dark] .icon {
-  --tw-text-opacity: 1;
-  --tw-bg-opacity: 1;
-  color: rgba(115,115,115,var(--tw-text-opacity));
+  color: rgb(115,115,115);
   fill: rgba(255,255,255,0.2);
 }
 
 html[class~=dark] .selected {
   .text {
-    --tw-text-opacity: 1;
-    color: hsl(var(--nextra-primary-hue)100% 45%/var(--tw-text-opacity));
+    color: hsl(var(--nextra-primary-hue)100% 45%);
   }
-  .icon {
-    --tw-text-opacity: 1;
-    color: hsl(var(--nextra-primary-hue)100% 45%/var(--tw-text-opacity));
+  .layout {
+    fill: none;
   }
 }
 
 html[class~=dark] .button:not(.selected):hover { 
   .text {
-    --tw-text-opacity: 1;
-    color: rgba(249,250,251,var(--tw-text-opacity));
+    color: rgb(249,250,251);
   }
   .icon {
-    --tw-text-opacity: 1;
-    color: rgba(249,250,251,var(--tw-text-opacity));
+    fill: rgb(249,250,251);
   }
 }
 
 .selected {
-  .icon {
-    --tw-text-opacity: 1;
-    color: hsl(var(--nextra-primary-hue)100% 32%/var(--tw-text-opacity));
-  }
   .text {
-    --tw-text-opacity: 1;
-    color: hsl(var(--nextra-primary-hue)100% 32%/var(--tw-text-opacity));
+    color: hsl(var(--nextra-primary-hue)100% 32%);
+  }
+  .layout {
+    fill: #E0EEFE;
   }
 }
 
 .icon {
-  --tw-bg-opacity: 1;
   transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
   transition-duration: .15s;
   transition-timing-function: cubic-bezier(.4,0,.2,1);
-  --tw-text-opacity: 1;
-  fill: rgba(107,114,128,var(--tw-text-opacity));
+  fill: rgb(107,114,128);
+  color: rgb(107,114,128);
 }
 
 .text {
-  --tw-text-opacity: 1;
-  color: rgba(107,114,128,var(--tw-text-opacity));
+  color: rgb(107,114,128);
   transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
   transition-duration: .15s;
   transition-timing-function: cubic-bezier(.4,0,.2,1);
@@ -81,11 +70,6 @@ html[class~=dark] .button:not(.selected):hover {
 
 .button:not(.selected):hover { 
   .text {
-    --tw-text-opacity: 1;
-    color: rgba(17,24,39,var(--tw-text-opacity));
-  }
-  .icon {
-    --tw-text-opacity: 1;
-    color: rgba(17,24,39,var(--tw-text-opacity));
+    color: rgba(17,24,39);
   }
 }

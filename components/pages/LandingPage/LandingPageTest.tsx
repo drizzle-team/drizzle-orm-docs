@@ -9,7 +9,7 @@ import Runtimes from './LandingComponents/Supporting/Runtimes';
 import Databases from './LandingComponents/Supporting/Databases';
 import Twits from './LandingComponents/Twits/Twits';
 import Pricing from './LandingComponents/Pricing/Pricing';
-import DrizzleStudio from './LandingComponents/DrizzleCloud/DrizzleStudio';
+import DrizzleStudio from './LandingComponents/DrizzleStudio/DrizzleStudio';
 
 const LandingPage = () => {
   const runtimes: string[] = ['Cloudflare Workers', 'Supabase functions', 'Vercel functions', 'Deno deploy', 'Bun', 'Lagon', 'ElectronJS', 'Browser'];

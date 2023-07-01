@@ -2,7 +2,12 @@ import Link from 'next/link';
 import React from 'react';
 import styles from './ToggleLib.module.css';
 import {
-  TerminalActiveIcon, TerminalIcon, CloudRainIcon, CloudRainActiveIcon,
+  TerminalActiveIcon,
+  TerminalIcon,
+  CloudRainIcon,
+  CloudRainActiveIcon,
+  LayoutActiveIcon,
+  LayoutIcon,
 } from '../../Icons/Icons';
 
 const ToggleLib = ({ title } : { title: string }) => (
@@ -21,6 +26,14 @@ const ToggleLib = ({ title } : { title: string }) => (
           {title === 'DRIZZLE KIT' ? <TerminalActiveIcon /> : <TerminalIcon /> }
         </div>
         <div className={styles.text}>Drizzle Kit</div>
+      </div>
+    </Link>
+    <Link href="/drizzle-studio/overview">
+      <div className={`${styles.button} ${title === 'DRIZZLE CLOUD' ? styles.selected : ''}`}>
+        <div className={`${styles.icon}`}>
+          {title === 'DRIZZLE STUDIO' ? <LayoutActiveIcon /> : <LayoutIcon /> }
+        </div>
+        <div className={styles.text}>Drizzle Studio</div>
       </div>
     </Link>
   </div>
