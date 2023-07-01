@@ -20,7 +20,7 @@ const DrizzleStudio = () => {
         <div className={styles.image_container_separator} />
       </div>
       <div className={styles.buttons}>
-        <a className={styles.button} href="/drizzle-cloud/overview">
+        <a className={styles.button} href="/drizzle-studio/overview">
           Documentation
         </a>
         <a className={styles.button_accent} href="https://demo.drizzle.team/">
