@@ -97,7 +97,9 @@ import type { Config } from "drizzle-kit";
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  connectionString: "postgresql://postgres:password@host:port/db",
+  dbCredentials: {
+    connectionString: "postgresql://postgres:password@host:port/db",
+  },
 } satisfies Config;
 ```
 </Tab>
