@@ -1,9 +1,10 @@
 import { Tab, Tabs } from "nextra-theme-docs";
 import Section from "../../components/Section/Section";
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # Table schemas
 
-`✓ PostgreSQL` `✓ MySQL` `✕ SQLite`
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': false }} />
 
 Drizzle ORM provides you an API for declaring SQL schemas for PostgreSQL and MySQL dialects  
 If you declare table within a schema - query builder will prepend schema names in queries `select * from "schema"."users"`

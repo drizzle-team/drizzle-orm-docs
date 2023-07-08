@@ -1,6 +1,7 @@
 import Section from '../../components/Section/Section';
 import { Tab, Tabs } from 'nextra-theme-docs';
 import { Callout } from 'nextra-theme-docs'
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # Quering with SQL-like syntax [CRUD]
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
@@ -538,7 +539,7 @@ await insertUser(newUser);
 ```
 
 ### Insert returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can insert a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
@@ -594,7 +595,7 @@ await db.update(users)
 ```
 
 ### Update with returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can update a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
@@ -616,7 +617,7 @@ await db.delete(users).where(eq(users.name, 'Dan'));
 ```
 
 ### Delete with return
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can delete a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const deletedUser = await db.delete(users)
