@@ -157,7 +157,152 @@ Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniquene
 A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
 However, you can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
 
-NOT YET IMPLEMENTED IN DRIZZLE ORM
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { integer, text, unique, pgTable } from "drizzle-orm/pg-core";
+
+      export const user = pgTable('user', {
+        id: integer('id').unique(),
+      });
+
+      export const table = pgTable('table', {
+        id: integer('id').unique('custom_name'),
+      });
+
+      export const composite = pgTable('composite_example', {
+        id: integer('id'),
+        name: text('name'),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+
+      // In Postgres 15.0+ NULLS NOT DISTINCT is available
+      // This example demonstrates both available usages
+      export const userNulls = pgTable('user_nulls_example', {
+        id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
+      }, (t) => ({
+        unq: unique().on(t.id).nullsNotDistinct()
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE IF NOT EXISTS "composite_example" (
+	    "id" integer,
+        "name" text,
+        CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
+        CONSTRAINT "custom_name" UNIQUE("id","name")
+      );
+
+      CREATE TABLE IF NOT EXISTS "table" (
+      	"id" integer,
+      	CONSTRAINT "custom_name" UNIQUE("id")
+      );
+
+      CREATE TABLE IF NOT EXISTS "user" (
+      	"id" integer,
+      	CONSTRAINT "user_id_unique" UNIQUE("id")
+      );
+
+      CREATE TABLE IF NOT EXISTS "user_nulls_example" (
+	    "id" integer,
+	    CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
+	    CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
+      );
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, varchar, unique, mysqlTable } from "drizzle-orm/mysql-core";
+
+      export const user = mysqlTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = mysqlTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = mysqlTable('composite_example', {
+        id: int('id'),
+        name: varchar('name', { length: 256 }),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+      	`id` int,
+      	CONSTRAINT `user_id_unique` UNIQUE(`id`)
+      );
+
+      CREATE TABLE `table` (
+      	`id` int,
+      	CONSTRAINT `custom_name` UNIQUE(`id`)
+      );
+
+      CREATE TABLE `composite_example` (
+	    `id` int,
+	    `name` varchar(256),
+	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+      );
+      ```
+    </Section>
+
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy
+      import { int, text, unique, sqliteTable } from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = sqliteTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = sqliteTable('composite_example', {
+        id: int('id'),
+        name: text('name'),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+	      `id` integer
+      );
+
+      CREATE TABLE `table` (
+      	`id` integer
+      );
+
+      CREATE TABLE `composite_example` (
+      	`id` integer,
+      	`name` text
+      );
+
+      CREATE UNIQUE INDEX `composite_example_id_name_unique` ON `composite_example` (`id`,`name`);
+      CREATE UNIQUE INDEX `custom_name` ON `composite_example` (`id`,`name`);
+      CREATE UNIQUE INDEX `custom_name` ON `table` (`id`);
+      CREATE UNIQUE INDEX `user_id_unique` ON `user` (`id`);
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
 
 ### Check
 
