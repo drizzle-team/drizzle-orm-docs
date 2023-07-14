@@ -93,6 +93,16 @@ const Runtimes: {
       width: 28,
     },
   },
+  EdgeNode: {
+    src: 'edgenode.svg',
+    srcDark: 'edgenode-dark.svg',
+    lightStyles: {
+      width: 28,
+    },
+    darkStyles: {
+      width: 28,
+    },
+  },
 };
 
 export default Runtimes;
