@@ -7,18 +7,19 @@ interface IProps {
 
 const Video: FC<IProps> = (props) => {
   const { videoId } = props;
-  const videoURL = `https://www.youtube.com/embed/${videoId}`;
+  const imglink = `https://i3.ytimg.com/vi/${videoId}/hq720.jpg?sqp=-oaymwFBCNAFEJQDSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIHBACGAYgATgB8AEB-AHuCIAC0AWKAgwIABABGH8gPigTMA8=&rs=AOn4CLB58ROFA_Vf6s9vUMYJH1AOPUVGYQ`;
+  const link = `https://www.youtube.com/watch?v=${videoId}`;
 
   return (
-    <iframe
-      className={styles.video}
-      title="Video"
-      width="100%"
-      src={videoURL}
-      frameBorder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowFullScreen
-    />
+    <a href={link} target="_blank" rel="nofollow noreferrer">
+      <div className={styles.video}>
+        <div className={styles.overlay} />
+        <div className={styles.play_button}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-play"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+        </div>
+        <img src={imglink} alt="Drizzle Studio" />
+      </div>
+    </a>
   );
 };
 
