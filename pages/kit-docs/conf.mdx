@@ -215,51 +215,13 @@ export default {
   schema: "./src/schema/*",
   out: "./drizzle",
   driver: 'pg',
-    dbCredentials: {
+  dbCredentials: {
     user: "postgres",
     password: process.env.DATABASE_PASSWORD,
     host: "127.0.0.1",
     port: 5432,
     database: "db",
   }
-} satisfies Config;
-```
-</Tab>
-</Tabs>
-
-<Callout type="warning">
-  For versions `<0.19.0` you should use flat object with credentials
-</Callout>
-
-<Tabs items={["Connection URI", "Connection params"]}>
-<Tab>
-```ts {6}
-import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
-
-export default {
-  schema: "./src/schema/*",
-  out: "./drizzle",
-  connectionString: process.env.DB_URL,
-} satisfies Config;
-```
-
-</Tab>
-<Tab>
-```ts {6-10}
-import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
-
-export default {
-  schema: "./src/schema/*",
-  out: "./drizzle",
-  user: "postgres",
-  password: process.env.DATABASE_PASSWORD,
-  host: "127.0.0.1",
-  port: 5432,
-  database: "db",
 } satisfies Config;
 ```
 </Tab>
