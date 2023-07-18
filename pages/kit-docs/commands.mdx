@@ -91,28 +91,34 @@ $ drizzle-kit introspect:sqlite
 
 <Tabs items={["Example 1", "Example 2"]}>
 <Tab>
-```ts {6}
+```ts {8}
 import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  connectionString: "postgresql://postgres:password@host:port/db",
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: "postgresql://postgres:password@host:port/db",
+  }
 } satisfies Config;
 ```
 </Tab>
 <Tab>
-```ts {6-10}
+```ts {8-12}
 import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  user: "postgres",
-  password: "password",
-  host: "127.0.0.1",
-  port: 5432,
-  db: "db",
+  driver: 'pg',
+  dbCredentials: {
+    user: "postgres",
+    password: "password",
+    host: "127.0.0.1",
+    port: 5432,
+    db: "db",
+  }
 } satisfies Config;
 ```
 </Tab>
