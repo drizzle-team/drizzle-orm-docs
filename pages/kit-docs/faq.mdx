@@ -80,3 +80,18 @@ Drizzle Kit has a current set of priorities for reading config options:
 
 If you specify both config parameters and CLI options, an error will be thrown, and you should use 
 either CLI options or have a config file defined in your project.
+
+### `push:pg` command is attempting to apply changes even when there are no changes in the code
+
+There are 2 known issues for `primaryKey` and `foreignKey`:
+
+1. Before you have the possibility to define a custom name for the `primary key constraint`,
+please ensure the following:
+
+    - Define `.primaryKey()` on a column level if you have a single-column primary key.
+    - Define `primaryKey()` in the 3rd parameter for pgTable only if you have 2 or more columns in the primary key.
+
+2. Before you have the possibility to define a custom name for the foreign key constraint, 
+you may encounter issues if the foreign key constraint name exceeds 64 characters. 
+
+Drizzle generates the foreign key using the following pattern - `${tableFrom}_${columnsFrom}_${tableTo}_${columnsTo}`
