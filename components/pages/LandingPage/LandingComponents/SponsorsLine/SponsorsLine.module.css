@@ -1,0 +1,174 @@
+.container {
+  width: 100%;
+  margin: 160px auto 0;
+}
+
+.header {
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+}
+
+html[class~=dark] .wrapper {
+  background-color: #1c1c1c;
+}
+
+.wrapper {
+  margin: 30px 0 0;
+  background-color: #f8f8f8;
+  padding: 15px 0;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.scroll {
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: row;
+  height: 306px;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.gradient {
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 40px;
+  background: linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.type_header {
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.emoji {
+  line-height: 20px;
+  font-size: 14px;
+  padding-right: 4px;
+}
+
+.avatar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.card_image {
+  width: 66px;
+  height: 66px;
+}
+
+.card_image img {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  background-color: #ffffff;
+}
+
+.card_name {
+  text-align: center;
+  font-size: 14px;
+  color: #434a54;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+
+
+.sponsors_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+
+.sponsors {
+  height: 100%;
+}
+
+.sponsors:first-child .cards, .sponsors:first-child .sponsors_header {
+  padding-left: 20px;
+}
+
+.sponsors:last-child .cards, .sponsors:last-child .sponsors_header {
+  padding-right: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: 134px 134px;
+  grid-auto-columns: 110px;
+  padding: 0 40px;
+  height: 274px;
+}
+
+.hero {
+  grid-template-rows: repeat(2, auto);
+  grid-auto-columns: 110px;
+  grid-gap: 10px;
+}
+
+.gold {
+  grid-template-rows: repeat(2, 116px);
+  grid-auto-columns: 90px;
+  grid-gap: 10px;
+}
+
+.silver {
+  grid-template-rows: repeat(3, 74px);
+  grid-auto-columns: 58px;
+  grid-gap: 10px;
+}
+
+.bronze {
+  grid-template-rows: repeat(5, 42px);
+  grid-auto-columns: 42px;
+  grid-gap: 10px;
+}
+
+.ramen {
+  grid-template-rows: repeat(6, 38px);
+  grid-auto-columns: 38px;
+  grid-gap: 3px;
+}
+
+.coffee {
+  grid-template-rows: repeat(7, 35px);
+  grid-auto-columns: 35px;
+  grid-gap: 3px;
+}
+
+.past {
+  grid-template-rows: repeat(9, 25px);
+  grid-auto-columns: 25px;
+  grid-gap: 5px;
+}
+
+.with_name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.styled_card {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+}
