@@ -42,7 +42,6 @@ const SponsorItem:FC<Props> = ({
         </div>
         {hasName && (
           <div id="card-name" className={styles.card_name}>
-            {isUser && '@'}
             {sponsor.sponsorEntity.name}
           </div>
         )}
