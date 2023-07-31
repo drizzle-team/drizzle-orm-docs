@@ -1,0 +1,146 @@
+.type_header {
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.emoji {
+  line-height: 20px;
+  font-size: 14px;
+  padding-right: 4px;
+}
+
+.avatar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.card_image {
+  width: 66px;
+  height: 66px;
+}
+
+
+.card_image img {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  background-color: #ffffff;
+}
+
+.card_name {
+  text-align: center;
+  font-size: 14px;
+  color: #434a54;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+
+
+.sponsors_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+
+.sponsors {
+  height: 100%;
+}
+
+.sponsors:first-child .cards, .sponsors:first-child .sponsors_header {
+  padding-left: 20px;
+}
+
+.sponsors:last-child .cards, .sponsors:last-child .sponsors_header {
+  padding-right: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: 134px 134px;
+  grid-auto-columns: 110px;
+  padding: 0 40px;
+  height: 274px;
+}
+
+.hero {
+  grid-template-rows: repeat(2, auto);
+  grid-auto-columns: 110px;
+  grid-gap: 10px;
+}
+
+.gold {
+  grid-template-rows: repeat(2, 116px);
+  grid-auto-columns: 90px;
+  grid-gap: 10px;
+}
+
+.silver {
+  grid-template-rows: repeat(3, 74px);
+  grid-auto-columns: 58px;
+  grid-gap: 10px;
+}
+
+.bronze {
+  grid-template-rows: repeat(5, 42px);
+  grid-auto-columns: 42px;
+  grid-gap: 10px;
+}
+
+.ramen {
+  grid-template-rows: repeat(6, 38px);
+  grid-auto-columns: 38px;
+  grid-gap: 3px;
+}
+
+.coffee {
+  grid-template-rows: repeat(7, 35px);
+  grid-auto-columns: 35px;
+  grid-gap: 3px;
+}
+
+.past {
+  grid-template-rows: repeat(9, 25px);
+  grid-auto-columns: 25px;
+  grid-gap: 5px;
+}
+
+.with_name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+html[class~=dark] .card_name {
+  color: #E2E8F0;
+}
+
+html[class~=dark] .styled_card {
+  background-color: #282828;
+  border: 1px solid #111111;
+}
+
+.styled_card {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+}
+
+.round-20 {
+  border-radius: 20%;
+}
+
+.round-50 {
+  border-radius: 50%;
+}
