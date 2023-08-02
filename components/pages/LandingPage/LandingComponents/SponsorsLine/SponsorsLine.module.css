@@ -1,13 +1,20 @@
 .container {
   width: 100%;
   margin: 160px auto 0;
+  text-align: center;
+  gap: 24px;
 }
 
-.header {
+.title {
   font-size: 32px;
   font-weight: 600;
-  text-align: center;
 }
+
+.description {
+  font-size: 20px;
+  font-weight: 500;
+}
+
 
 html[class~=dark] .wrapper {
   background-color: #1c1c1c;
@@ -172,3 +179,52 @@ html[class~=dark] .wrapper {
   background-color: #ffffff;
   border: 1px solid #e8e8e8;
 }
+
+.button_accent {
+  margin: 0 auto;
+  width: 212px;
+  border-radius: 3px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #282b3b;
+}
+
+html[class~='dark'] .button_accent {
+  color: #282828;
+  background-color: rgb(226, 232, 240);
+}
+
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 20px;
+  }
+  .description {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 599px) {
+  .container {
+    gap: 20px;
+  }
+
+  .buttons {
+    gap: 10px;
+  }
+
+  .button_accent {
+    font-size: 14px;
+    height: 46px;
+  }
+}
+
