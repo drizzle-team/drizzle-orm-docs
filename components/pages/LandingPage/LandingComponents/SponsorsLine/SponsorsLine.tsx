@@ -21,8 +21,13 @@ const SponsorsLine = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        Our Sponsors
+      <div>
+        <div className={styles.title}>
+          Our Sponsors
+        </div>
+        <div className={styles.description}>
+          You help us build a better future
+        </div>
       </div>
       <div className={styles.wrapper}>
         <div className={styles.scroll}>
@@ -51,6 +56,9 @@ const SponsorsLine = () => {
           ))}
         </div>
       </div>
+      <a className={styles.button_accent} href="https://github.com/sponsors/drizzle-team" target="_blank" rel="nofollow noreferrer">
+        Become a sponsor
+      </a>
     </div>
   );
 };
