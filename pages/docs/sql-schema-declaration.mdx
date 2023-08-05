@@ -84,7 +84,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   const result: User[] = await db.select().from(users);
 
-  export async function insertUser(user: NewUser): Promise<User> {
+  export async function insertUser(user: NewUser): Promise<User[]> {
     return db.insert(users).values(user).returning();
   }
   ```
