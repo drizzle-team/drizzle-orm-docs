@@ -577,9 +577,9 @@ PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-enum.html)
 ```typescript
 import { pgEnum, pgTable } from "drizzle-orm/pg-core";
 
-const moodEnum = pgEnum('mood', ['sad', 'ok', 'happy']);
+export const moodEnum = pgEnum('mood', ['sad', 'ok', 'happy']);
 
-const table = pgTable('table', {
+export const table = pgTable('table', {
   mood: moodEnum('mood'),
 });
 ```
