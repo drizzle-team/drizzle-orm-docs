@@ -29,7 +29,7 @@ const db = drizzle(...);
 ## SQL Select
 ### Basic and partial select
 Getting a list of all users and you will have a typed result set  
-TODO: why we return array and there's no `.findOne`, `.findMany`
+
 <Section>
 ```typescript
 const result: User[] = await db.select().from(users);
@@ -544,7 +544,7 @@ You can insert a row and get it back in PostgreSQL and SQLite
 await db.insert(users).values({ name: "Dan" }).returning();
 
 // partial return
-await db.insert(users).value({ name: "Partial Dan" }).returning({ insertedId: users.id });
+await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
 ### Insert multiple rows

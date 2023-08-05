@@ -125,7 +125,7 @@ export default {
 ```ts
 export default {
   dbCredentials: {
-    connectionsString: '',
+    connectionString: '',
   }
 } satisfies Config;
 ```
@@ -152,7 +152,7 @@ export default {
 ```ts
 export default {
   dbCredentials: {
-    connectionsString: '',
+    connectionString: '',
   }
 } satisfies Config;
 ```
@@ -239,6 +239,28 @@ export default {
 
 In this case, only tables that start with `project1_` will be synced with the database
 
+### schemaFilter
+
+- **Type**: `string | string[]`
+- **Default**: `["public"]`
+- **Commands**: `push`, `introspect`
+- **Available databases**: `PostgreSQL`
+
+
+The `schemaFilter` parameter allows you to define which schema in PostgreSQL should be used for either `introspect` 
+or `push` commands.
+This parameter accepts a single schema as a string or an array of schemas as strings. No glob pattern is supported here. 
+By default, drizzle will use the `public` schema for both commands, but you can add any schema you need.
+
+For example, having `schemaFilter: ["my_schema"]` will only look for tables in both the database and 
+drizzle schema that are a part of the `my_schema` schema
+
+**Usage**
+```ts
+export default {
+  schemaFilter: ["public", "my_schema"],
+} satisfies Config;
+```
 ### verbose
 
 - **Type**: `boolean`

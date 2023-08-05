@@ -71,6 +71,7 @@ Either [`connectionString`](./conf#push-and-pull) or [`user:password@host:port/d
 | `database`                            | no       | database name                                 |
 | `config`                              | no       | config file path, default=`drizzle.config.ts` |
 | `introspect-casing`                   | no       | strategy for JS keys creation in columns, tables, etc. (`preserve`, `camel`) |
+| [`schemaFilter`](./config-reference#schemaFilter)                                | no       | Schema name filter. Default: `["public"]`                  |
 
 
 <Section>
@@ -91,28 +92,34 @@ $ drizzle-kit introspect:sqlite
 
 <Tabs items={["Example 1", "Example 2"]}>
 <Tab>
-```ts {6}
+```ts {8}
 import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  connectionString: "postgresql://postgres:password@host:port/db",
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: "postgresql://postgres:password@host:port/db",
+  }
 } satisfies Config;
 ```
 </Tab>
 <Tab>
-```ts {6-10}
+```ts {8-12}
 import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  user: "postgres",
-  password: "password",
-  host: "127.0.0.1",
-  port: 5432,
-  db: "db",
+  driver: 'pg',
+  dbCredentials: {
+    user: "postgres",
+    password: "password",
+    host: "127.0.0.1",
+    port: 5432,
+    db: "db",
+  }
 } satisfies Config;
 ```
 </Tab>
@@ -146,15 +153,12 @@ for rapid local development(prototyping) and when working with remote databases 
 
 Either [`connectionString`](./conf#push-and-pull) or [`user:password@host:port/db`](./conf#push-and-pull) params are **required**
 
-<Callout type="warning" emoji="⚠️">
-  `drizzle-kit push` does not support PostgreSQL yet
-</Callout>
-
 | param                                         | required | description                                                         |
 | :-------------------------------------------- | :------- | :------------------------------------------------------------------ |
 | [`schema`](./conf#schema-file-paths)          | yes      | path to typescript schema file or folder with multiple schema files |
 | driver                                        | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
 | [`tablesFilter`](./conf#multi-project-schema) | no       | table name filter                                                   |
+| [`schemaFilter`](./config-reference#schemaFilter)                                | no       | Schema name filter. Default: `["public"]`                  |
 | `connectionString`                            | no       | database connection string                                          |
 | `user`                                        | no       | database user                                                       |
 | `password`                                    | no       | database password                                                   |
@@ -173,6 +177,10 @@ $ drizzle-kit push:mysql
 
 ```shell
 $ drizzle-kit push:sqlite
+```
+
+```shell
+$ drizzle-kit push:pg
 ```
 
 </Section>
