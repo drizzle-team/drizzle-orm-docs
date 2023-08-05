@@ -1,7 +1,7 @@
 import { Callout } from 'nextra-theme-docs';
 import { Tab, Tabs } from "nextra-theme-docs";
 import Section from "../../components/Section/Section";
-
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # Views (WIP)
 <Callout type="warning" emoji="⚠️">
@@ -242,7 +242,8 @@ export const trimmedUser = pgMaterializedView("trimmed_user", {
 ```
 
 ### Materialized views
-`✓ PostgreSQL` `✕ MySQL` `✕ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
+
 According to their official docs, PostgreSQL has [`regular`](https://www.postgresql.org/docs/current/sql-createview.html) 
 and [`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html)  
   
