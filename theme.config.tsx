@@ -27,7 +27,7 @@ const config: DocsThemeConfig = {
     }
     return {
       titleTemplate: 'DrizzleORM - next gen TypeScript ORM',
-      description: 'Drizzle ORM is a lightweigh and performant TypeScript ORM with developer experience in mind',
+      description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind',
     };
   },
   logo: <Logo />,
