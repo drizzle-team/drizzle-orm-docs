@@ -164,7 +164,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   Database and table explicit entity types
 
   ```typescript copy
-  import { InferModel, text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+  import type { InferModel } from 'drizzle-orm';
+  import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 
   export const users = sqliteTable('users', {
     id: integer('id').primaryKey(),
