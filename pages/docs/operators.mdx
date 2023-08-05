@@ -1,5 +1,6 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
 import Section from '../../components/Section/Section';
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # Filter and conditional operators
 We natively support all dialect specific filter and conditional operators  
@@ -9,7 +10,7 @@ import { eq, ne, gt, gte, ... } from "drizzle-orm";
 ```
 
 ### eq
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value equal to `n`
 <Section>
@@ -40,7 +41,7 @@ SELECT * FROM table WHERE table.column1 = table.column2
 
 
 ### ne
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is not equal to `n`  
 <Section>
@@ -70,7 +71,7 @@ SELECT * FROM table WHERE table.column1 <> table.column2
 
 
 ### gt
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} /> 
   
 Value is greater than `n`
 <Section>
@@ -99,7 +100,7 @@ SELECT * FROM table WHERE table.column1 > table.column2
 </Section>
 
 ### gte
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is greater than or equal to `n`
 <Section>
@@ -128,7 +129,7 @@ SELECT * FROM table WHERE table.column1 >= table.column2
 </Section>
 
 ### lt
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is less than `n`
 <Section>
@@ -157,7 +158,7 @@ SELECT * FROM table WHERE table.column1 < table.column2
 </Section>
 
 ### lte
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is less than or equal to `n`.
 
@@ -187,7 +188,7 @@ SELECT * FROM table WHERE table.column1 <= table.column2
 
 
 ### isNull
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is `null`
 <Section>
@@ -204,7 +205,7 @@ SELECT * FROM table WHERE table.column IS NULL
 
 
 ### isNotNull
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is not `null`
 <Section>
@@ -220,7 +221,7 @@ SELECT * FROM table WHERE table.column IS NOT NULL
 </Section>
 
 ### inArray
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is in array of values
 <Section>
@@ -249,7 +250,7 @@ SELECT * FROM table WHERE table.column IN (SELECT table2.column FROM table2)
 </Section>
 
 ### notInArray
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is not in array of values
 <Section>
@@ -278,7 +279,7 @@ SELECT * FROM table WHERE table.column NOT IN (SELECT table2.column FROM table2)
 </Section>
 
 ### exists
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value exists
 <Section>
@@ -310,7 +311,7 @@ SELECT * FROM table WHERE NOT EXISTS (SELECT * from table2)
 </Section>
 
 ### between
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is between two values
 <Section>
@@ -326,7 +327,7 @@ SELECT * FROM table WHERE table.column BETWEEN 2 AND 7
 </Section>
 
 ### notBetween
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is not between two value
 <Section>
@@ -342,7 +343,7 @@ SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7
 </Section>
 
 ### like
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is like other value, case sensitive
 <Section>
@@ -358,7 +359,7 @@ SELECT * FROM table  WHERE table.column LIKE '%llo wor%'
 </Section>
 
 ### ilike
-`✓ PostgreSQL` `✕ MySQL` `✕ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
   
 Value is like some other value, case insensitive
 <Section>
@@ -374,7 +375,7 @@ SELECT * FROM table WHERE table.column ILIKE '%llo wor%'
 </Section>
 
 ### notIlike
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 Value is not like some other value, case insensitive
 <Section>
@@ -390,7 +391,7 @@ SELECT * FROM table WHERE table.column NOT ILIKE '%llo wor%'
 </Section>
 
 ### not
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 All conditions must return `false`.
 
@@ -407,7 +408,7 @@ SELECT * FROM table WHERE NOT (table.column = 5)
 </Section>
 
 ### and
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 All conditions must return `true`.
 
@@ -424,7 +425,7 @@ SELECT * FROM table WHERE (table.column > 5 AND table.column < 7)
 </Section>
 
 ### or
-`✓ PostgreSQL` `✓ MySQL` `✓ SQLite`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
 One or more conditions must return `true`.
 

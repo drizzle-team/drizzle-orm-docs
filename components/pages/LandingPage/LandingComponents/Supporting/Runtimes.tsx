@@ -1,12 +1,7 @@
-import { SVGProps } from '../../../../../@types/SVGTypes';
+import { ISupportingElement } from '@/@types/Supporting';
 
 const Runtimes: {
-  [key: string]: {
-    src: string,
-    srcDark?: string,
-    lightStyles?: SVGProps,
-    darkStyles?: SVGProps,
-  },
+  [key: string]: ISupportingElement,
 } = {
   'Cloudflare Workers': {
     src: 'cloudflareworker.svg',

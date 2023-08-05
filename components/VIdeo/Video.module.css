@@ -1,0 +1,52 @@
+.video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  background-position: center;
+  background-size: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: -webkit-gradient(linear, left bottom, left top, from(rgba(0,0,0,0.2)), color-stop(10%, rgba(255,255,255,0)), color-stop(90%, rgba(255,255,255,0)), to(rgba(0,0,0,0.2)));
+  background: -o-linear-gradient(bottom, rgba(0,0,0,0.2) 0%, rgba(255,255,255,0) 10%, rgba(255,255,255,0) 90%, rgba(0,0,0,0.2) 100%);
+  background: linear-gradient(0deg, rgba(0,0,0,0.2) 0%, rgba(255,255,255,0) 10%, rgba(255,255,255,0) 90%, rgba(0,0,0,0.2) 100%);
+}
+
+.play_button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 68px;
+  height: 48px;
+  background-color: black;
+  border-radius: 8px;
+  color: #FBFBFB;
+}
+
+.play_button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.video img {
+  width: 100%;
+}

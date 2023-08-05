@@ -1,5 +1,7 @@
 import Section from '../../components/Section/Section';
 import { Tab, Tabs } from 'nextra-theme-docs';
+import { Callout } from 'nextra-theme-docs'
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # Querying with SQL-like syntax [CRUD]
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
@@ -28,7 +30,7 @@ const db = drizzle(...);
 ## SQL Select
 ### Basic and partial select
 Getting a list of all users and you will have a typed result set  
-TODO: why we return array and there's no `.findOne`, `.findMany`
+
 <Section>
 ```typescript
 const result: User[] = await db.select().from(users);
@@ -179,6 +181,46 @@ select * from 'users' where 'id' = 42 or 'name' = "Dan";
 select * from 'users' where 'id' = 42 or 'name' = "Dan";
 ```
 </Section>
+
+### Distinct
+
+You can use the `distinct` keyword to retrieve unique or distinct values from a column 
+or set of columns in a query result. It eliminates duplicate rows, returning only the unique values.
+<Section>
+```ts
+await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
+
+await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
+```
+```sql
+select distinct "id", "name" from "users" order by "users"."id", "users"."name";
+
+select distinct "id" from "users" order by "users"."id";
+```
+</Section>
+
+Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too
+<Callout>
+    `DISTINCT ON` is only available in PostgreSQL
+</Callout>
+
+<Section>
+```ts
+await db.selectDistinctOn([users.id])
+        .from(users)
+        .orderBy(users.id);
+
+await db.selectDistinctOn([users.name], { name: users.name })
+        .from(users)
+        .orderBy(users.name);
+```
+```sql
+select distinct on ("users"."id") "id", "name" from "users" order by "users"."id";
+
+select distinct on ("users"."name") "name" from "users" order by "users"."name";
+```
+</Section>
+
 
 ### Limit & Offset
 You can apply `limit` and `offset` to the query
@@ -497,13 +539,13 @@ await insertUser(newUser);
 ```
 
 ### Insert returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can insert a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
 
 // partial return
-await db.insert(users).value({ name: "Partial Dan" }).returning({ insertedId: users.id });
+await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
 ### Insert multiple rows
@@ -553,7 +595,7 @@ await db.update(users)
 ```
 
 ### Update with returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can update a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
@@ -575,7 +617,7 @@ await db.delete(users).where(eq(users.name, 'Dan'));
 ```
 
 ### Delete with return
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can delete a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const deletedUser = await db.delete(users)

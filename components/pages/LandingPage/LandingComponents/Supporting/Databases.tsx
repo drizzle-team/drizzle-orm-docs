@@ -1,13 +1,7 @@
-import { SVGProps } from '../../../../../@types/SVGTypes';
+import { ISupportingElement } from '@/@types/Supporting';
 
 const Databases: {
-  [key: string]: {
-    src: string,
-    srcDark?: string,
-    lightStyles?: SVGProps,
-    darkStyles?: SVGProps,
-    isImage?: boolean,
-  },
+  [key: string]: ISupportingElement,
 } = {
   Neon: {
     src: 'neon-light.svg',
@@ -48,6 +42,7 @@ const Databases: {
     darkStyles: {
       width: 28,
     },
+    sponsorUrl: 'https://turso.tech/',
   },
   Supabase: {
     src: 'supabase.svg',

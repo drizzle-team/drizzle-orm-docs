@@ -1,0 +1,95 @@
+import Image from 'next/image'
+import { Tab, Tabs, Steps } from 'nextra-theme-docs'
+
+# Meet Drizzle Studio
+Drizzle Studio is a new way for you to explore SQL database on Drizzle projects
+
+![Drizzle Studio](../../assets/drizzle-studio.jpg)
+
+Drizzle studio grabs your drizzle config file, connects to your database and lets you browse, add, 
+delete and update everything based on your existing drizzle sql schema. It supports explicit `null` and `empty string` values, 
+`booleans`, `numbers` and `big integers`, `json objects` and `json arrays`  
+
+## Quick start
+<Steps>
+
+### Install dependencies
+Check out extended docs for [SQL dialect and drivers](/docs/installation-and-db-connection)
+<Tabs items={["npm", "pnpm", "yarn"]}>
+<Tab>
+```bash copy
+npm i drizzle-orm
+npm i -D drizzle-kit
+```
+</Tab>
+<Tab>
+```bash copy
+pnpm add drizzle-orm
+pnpm add -D drizzle-kit
+```
+</Tab>
+<Tab>
+```bash copy
+yarn add drizzle-orm
+yarn add -D drizzle-kit
+```
+</Tab>
+</Tabs>
+
+### Prepare your database schema
+Check out extended schema declaration [docs](/docs/sql-schema-declaration)
+```typescript copy filename="schema.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name'),
+  phone: varchar('phone', { length: 256 }),
+});
+```
+
+### Prepare config file
+Check out extended config file [docs](/kit-docs/conf)
+```typescript copy filename="drizzle.config.ts"
+import type { Config } from "drizzle-kit";
+import * as dotenv from "dotenv";
+dotenv.config();
+ 
+export default {
+  schema: "./schema/*",
+  out: "./drizzle",
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  }
+} satisfies Config;
+```
+### Launch Drizzle Studio
+<Tabs items={["npm", "pnpm", "yarn"]}>
+<Tab>
+```bash copy
+npx drizzle-kit studio
+```
+</Tab>
+<Tab>
+```bash copy
+pnpm drizzle-kit studio
+```
+</Tab>
+<Tab>
+```bash copy
+yarn drizzle-kit studio
+```
+</Tab>
+</Tabs>
+
+You can launch studio with `port` cli flag to customise process port and `verbose` flag for extended SQL statements logging
+```bash
+yarn drizzle-kit studio --port 3000 --verbose
+```
+</Steps>
+
+
+## What's next?
+We're going to massively improve and extend Drizzle Studio in the upcoming months!   
+Subscribe on [Twitter](https://twitter.com/drizzleorm) and welcome to our [Discord](https://driz.li/discord)

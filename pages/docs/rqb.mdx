@@ -111,7 +111,7 @@ export const users = pgTable('users', {
 
 export const usersRelations = relations(users, ({ one }) => ({
 	profileInfo: one(profileInfo, {
-		fields: [user.id],
+		fields: [users.id],
 		references: [profileInfo.userId],
 	}),
 }));
@@ -734,7 +734,7 @@ const res = await db.query.users.findMany({
 	},
 	with: {
 		usersToGroups: {
-			columns: {
+			with: {
 				group: true,
 			},
 		},

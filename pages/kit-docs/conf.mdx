@@ -194,7 +194,10 @@ dotenv.config();
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  connectionString: process.env.DATABASE_URL,
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  }
 } satisfies Config;
 ```
 <Callout type="info" emoji="ℹ️">
@@ -211,11 +214,14 @@ dotenv.config();
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  user: "postgres",
-  password: process.env.DATABASE_PASSWORD,
-  host: "127.0.0.1",
-  port: 5432,
-  db: "db",
+  driver: 'pg',
+  dbCredentials: {
+    user: "postgres",
+    password: process.env.DATABASE_PASSWORD,
+    host: "127.0.0.1",
+    port: 5432,
+    database: "db",
+  }
 } satisfies Config;
 ```
 </Tab>
@@ -246,7 +252,10 @@ dotenv.config();
 export default {
   schema: "./src/schema/*",
   out: "./drizzle",
-  connectionString: process.env.DATABASE_URL,
+  driver: "mysql2",
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL,
+  }
   tablesFilter: ["project1_*"],
 } satisfies Config;
 ```

@@ -162,7 +162,10 @@ import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./schema.ts",
-  connectionString: process.env.DB_URL,
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  }
 } satisfies Config;
 ```
 </CodeTab>
@@ -171,7 +174,10 @@ export default {
 /** @type { import("drizzle-kit").Config } */
 export default {
   schema: "./schema.ts",
-  connectionString: process.env.DB_URL,
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  }
 };
 ```
 </CodeTab>
@@ -192,11 +198,31 @@ For list of all configuration params - [see here](./conf)
 Drizzle Kit lets you alter you database schema and rapidly move forward with a db [`push` command](./commands#prototype--push).  
 That's very handy when you have remote databases like Neon, Planetscale or Turso.  
 
-It introspects your database, detects changes and pushes them to remote/local database, 
-that even lets you have a `no sql migration files` environment which gets popular nowadays.
+### Overview
+
+If you want to iterate quickly during local development or if your project doesn't require
+migration files, drizzle offers a useful command called `drizzle-kit push`
+
+When do you need to use the 'push' command?
+
+1. During the prototyping and experimentation phase of your schema on a local environment.
+2. When you are utilizing an external provider that manages migrations and schema changes for you (e.g., PlanetScale).
+3. If you are comfortable modifying the database schema before your code changes can be deployed.
+
+### How it works?
+
+When you run the command `drizzle-kit push` drizzle executes the following steps:
+
+1. It retrieves your schema from the database and converts it to the "drizzle-schema" format.
+2. The command reads all your schema files containing drizzle tables and converts them to 
+the "drizzle-schema" format as well.
+3. Drizzle then compares the two schemas and generates a set of statements that need to be executed against your database. 
+These statements ensure that the database is synchronized with the schemas defined in your code.
 
 ```bash
-$ drizzle-kit push:mysql ...
+$ drizzle-kit push:mysql
+
+$ drizzle-kit push:sqlite
 ```
 For extended `push` examples - [see here](./commands#prototype--push)
 
@@ -232,3 +258,14 @@ $ drizzle-kit introspect:mysql ...
 ```
 </Section>
 For extended `introspect` examples - [see here](./commands/#introspect--pull)
+
+## Drizzle Studio [NEW]
+Drizzle Kit comes with bundled [Drizzle Studio](/drizzle-studio/overview) 
+database browser and lets you launch it locally with one command.  
+Studio requires drizzle config file with `schema` and `dbCredentials` provided.
+```bash
+drizzle-kit studio
+
+drizzle-kit studio --port 3000 ## custom port
+drizzle-kit studio --verbose   ## log all sql statements
+```
