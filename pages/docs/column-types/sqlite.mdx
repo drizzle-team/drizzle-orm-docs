@@ -1,7 +1,7 @@
 import Section from "../../../components/Section/Section";
 import { Callout } from "nextra-theme-docs";
 
-### SQLite column types
+# SQLite column types
 
 Based on official [SQLite docs](https://www.sqlite.org/datatype3.html),
 each value stored in an SQLite database (or manipulated by the database engine)
@@ -9,7 +9,7 @@ has one of the following storage classes `NULL`, `INTEGER`, `REAL`, `TEXT` and `
 
 We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
 
-#### Integer
+### Integer
 
 A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
 
@@ -27,13 +27,13 @@ integer('id', { mode: 'boolean' })
 integer('id', { mode: 'timestamp_ms' })
 integer('id', { mode: 'timestamp' }) // Date
 
-````
+```
 
 ```sql
 CREATE TABLE `table` (
 	`id` integer
 );
-````
+```
 
 </Section>
 
@@ -49,7 +49,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### Real
+### Real
 
 A floating point value, stored as an `8-byte IEEE` floating point number.
 
@@ -61,20 +61,20 @@ const table = sqliteTable('table', {
 	real: real('real')
 });
 
-````
+```
 
 ```sql
 CREATE TABLE `table` (
 	`real` real
 );
-````
+```
 
 </Section>
 
-#### Text
+### Text
 
-A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).
-
+A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).  
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 <Section>
 ```typescript
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
@@ -83,20 +83,19 @@ const table = sqliteTable('table', {
 	text: text('text')
 });
 
-text('text')
-text('union').$type<'union' | 'string' | 'type'>()
-
-````
+// will be inferred as text: "value1" | "value2" | null
+text: text('text', { enum: ["value1", "value2"] })
+```
 
 ```sql
 CREATE TABLE `table` (
 	`text` text
 );
-````
+```
 
 </Section>
 
-#### Blob
+### Blob
 
 A blob of data, stored exactly as it was input.
 
@@ -114,17 +113,30 @@ blob('blob', { mode: 'bigint' })
 blob('blob', { mode: 'json' })
 blob('blob', { mode: 'json' }).$type<{ foo: string }>()
 
-````
+```
 
 ```sql
 CREATE TABLE `table` (
 	`blob` blob
 );
-````
+```
+
+You can specify `.$type<..>()` for blob inference, it **won't** check runtime values. 
+It provides compile time protection for default values, insert and select schemas.
+```typescript
+// will be infered as { foo: string }
+json: blob('json', { mode: 'json' }).$type<{ foo: string }>();
+
+// will be infered as string[]
+json: blob('json', { mode: 'json' }).$type<string[]>();
+
+// won't compile
+json: blob('json', { mode: 'json' }).$type<string[]>().default({});
+```
 
 </Section>
 
-#### Boolean
+### Boolean
 
 SQLite does not have native `boolean` data type, yet you can specify `integer` column to be in a `boolean` mode. 
 This allows you to operate boolean values in your code and Drizzle stores them as 0 and 1 integer
@@ -138,17 +150,17 @@ import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 const table = sqliteTable('table', {
 	id: integer('id', { mode: 'boolean' })
 });
-````
+```
 
 ```sql
 CREATE TABLE `table` (
 	`id` integer
 );
-````
+```
 
 </Section>
 
-#### Bigint
+### Bigint
 
 Since there is no `bigint` data type in SQLite, Drizzle offers a special `bigint` mode for `blob` columns. 
 This mode allows you to work with BigInt instances in your code, and Drizzle stores them as blob values in the database.
@@ -162,18 +174,32 @@ const table = sqliteTable('table', {
 	id: blob('id', { mode: 'bigint' })
 });
 
-````
+```
 
 ```sql
 CREATE TABLE `table` (
 	`id` blob
 );
-````
-
+```
 </Section>
 
+## Customizing column data type
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
+```ts
+type UserId = number & { __brand: 'user_id' };
+type Data = {
+	foo: string;
+	bar: number;
+};
+
+const users = sqliteTable('users', {
+  id: integer('id').$type<UserId>().primaryKey(),
+  jsonField: blob('json_field').$type<Data>(),
+});
+```
+
 ## Columns constraints
-#### Not null
+### Not null
 `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
 <Section>
 ```typescript
@@ -189,7 +215,7 @@ CREATE TABLE table (
 ```
 </Section>
 
-#### Default value
+### Default value
 
 The `DEFAULT` clause specifies a default value to use for the column if no value
 is explicitly provided by the user when doing an `INSERT`.

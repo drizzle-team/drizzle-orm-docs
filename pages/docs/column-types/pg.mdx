@@ -1,10 +1,10 @@
 import Section from "../../../components/Section/Section";
 
   
-### PostgreSQL column types
+# PostgreSQL column types
 We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
 
-#### integer
+### integer
 `integer` `int` `int4`  
 Signed 4-byte integer     
 If you need `integer autoincrement` - please refer to [serial](#serial)
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### smallint
+### smallint
 `smallint` `int2`  
 Small-range signed 2-byte integer   
 If you need `smallint autoincrement` - please refer to [smallserial](#smallserial)
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### bigint
+### bigint
 `bigint` `int8`  
 Signed 8-byte integer  
 If you need `bigint autoincrement` - please refer to [bigserial](#bigserial)
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### serial
+### serial
 `serial` `serial4`  
 Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### smallserial
+### smallserial
 `smallserial` `serial2`  
 Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### bigserial
+### bigserial
 `bigserial` `serial8`  
 Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 </Section>
 
 
-#### boolean
+### boolean
 PostgreSQL provides the standard SQL type boolean
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-boolean.html)  
 
@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### text
+### text
 `text`  
 Variable-length(unlimited) character string  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### varchar
+### varchar
 `character varying(n)` `varchar(n)`  
 Variable-length character string, can store strings up to **`n`** characters(not bytes)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### char
+### char
 `character(n)` `char(n)`  
 Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### numeric
+### numeric
 `numeric` `decimal`  
 Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)  
@@ -321,10 +321,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### decimal
+### decimal
 Is an alias of [numeric](#numeric)
 
-#### real
+### real
 `real` `float4`  
 Single precision floating-point number (4 bytes)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
@@ -350,7 +350,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### double precision
+### double precision
 `double precision` `float8`  
 Double precision floating-point number (8 bytes)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
@@ -376,7 +376,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### json
+### json
 `json`  
 Textual JSON data, as specified in [RFC 7159](https://tools.ietf.org/html/rfc7159)  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
@@ -414,7 +414,7 @@ json: json('json').$type<string[]>();
 json: json('json').$type<string[]>().default({});
 ```
 
-#### jsonb
+### jsonb
 `jsonb`  
 Binary JSON data, decomposed  
 Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
@@ -451,7 +451,7 @@ jsonb: jsonb('jsonb').$type<string[]>();
 jsonb: jsonb('jsonb').$type<string[]>().default({});
 ```
 
-#### time
+### time
 `time` `timetz` `time with timezone` `time without timezone`  
 Time of day with or without time zone  
 PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)
@@ -478,7 +478,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### timestamp
+### timestamp
 `timestamp` `timestamptz` `timestamp with time zone` `timestamp without time zone`  
 Date and time with or without time zone  
 PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)  
@@ -513,7 +513,7 @@ timestamp: timestamp('timestamp', { mode: "date" }),
 timestamp: timestamp('timestamp', { mode: "string" }),
 ```
 
-#### date
+### date
 `date`  
 Calendar date (year, month, day)  
 PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html) 
@@ -540,7 +540,7 @@ date: date('date', { mode: "date" }),
 // will infer as string
 date: date('date', { mode: "string" }),
 ```
-#### interval
+### interval
 `interval`  
 Time span  
 PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)  
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-#### enum 
+### enum 
 `enum` `enumerated types`  
 Enumerated (enum) types are data types that comprise a static, ordered set of values. 
 They are equivalent to the enum types supported in a number of programming languages. 
@@ -593,9 +593,25 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+## Customizing column data type
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. 
+This is useful, for example, with unknown or branded types.
+```ts
+type UserId = number & { __brand: 'user_id' };
+type Data = {
+	foo: string;
+	bar: number;
+};
+
+const users = pgTable('users', {
+  id: serial('id').$type<UserId>().primaryKey(),
+  jsonField: json('json_field').$type<Data>(),
+});
+```
+
 ## Constraints & defaults
 
-#### Default value
+### Default value
 The `DEFAULT` clause specifies a default value to use for the column if no value
 is explicitly provided by the user when doing an `INSERT`.
 If there is no explicit `DEFAULT` clause attached to a column definition,
@@ -628,7 +644,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 </Section>
 
 
-#### Not null
+### Not null
 `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
 
 <Section>
@@ -648,7 +664,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 </Section>
 
 
-#### Primary key
+### Primary key
 A primary key constraint indicates that a column, or group of columns, can be used as a unique identifier for rows in the table. 
 This requires that the values be both unique and not null.
 <Section>
