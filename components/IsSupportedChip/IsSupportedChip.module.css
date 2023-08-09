@@ -5,8 +5,8 @@
   padding: 1px 6px;
   border-radius: 5px;
   flex-shrink: 0;
-  background: #292829;
-  border: 1px solid #3F3D3F;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .is-supported-yes {
@@ -31,7 +31,7 @@
   font-size: 14px;
   font-weight: 500;
   font-family: monospace, 'Menlo';
-  color: #D8DEE6;
+  color: #334155;
 }
 
 .is-supported-chip-group {
@@ -60,4 +60,14 @@
 .is-supported-chip-group-joined .is-supported-chip:last-child {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
+}
+
+
+html[class~=dark] .is-supported-chip {
+  background: #292829;
+  border: 1px solid #3F3D3F;
+}
+
+html[class~=dark] .is-supported-text {
+  color: #D8DEE6;
 }
