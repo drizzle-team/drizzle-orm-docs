@@ -299,13 +299,6 @@ export const users = pgTable('users', {
 	name: text('name'),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
-	}),
-}));
-
 export const profileInfo = pgTable('profile_info', {
 	id: serial('id').primaryKey(),
 	userId: integer("user_id").references(() => users.id),
