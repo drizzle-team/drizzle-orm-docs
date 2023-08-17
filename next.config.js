@@ -3,6 +3,11 @@ const withNextra = require('nextra')({
   themeConfig: './theme.config.tsx',
 })
 
+// http://localhost:3000/docs/installation-and-db-connection/postgresql/postgresjs
+const legacyRedirects = {
+  
+}
+
 module.exports = withNextra({
   images: {
     unoptimized: true
