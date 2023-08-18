@@ -75,6 +75,27 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 </CodeTabs>
 
+## Modes
+Drizzle relational queries always generate exactly one SQL statement to run on the database and it has certain caveats. 
+To have best in class support for every database out there we've introduced **`modes`**.  
+
+Drizzle relational queries use lateral joins of subqueries under the hood and for now PlanetScale does not support them.
+
+When using **mysql2** driver with regular **MySQL** database - you should specify `mode: "default"`.  
+When using **mysql2** driver with **PlanetScale** - you need to specify `mode: "planetscale"`.  
+
+```ts copy
+import * as schema from './schema';
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
+
+const connection = await mysql.createConnection({
+  uri: process.env.PLANETSCALE_DATABASE_URL,
+});
+
+const db = drizzle(connection, { schema, mode: 'planetscale' });
+```
+
 ## Declaring relations
 
 ### One-to-one
@@ -111,7 +132,7 @@ export const users = pgTable('users', {
 
 export const usersRelations = relations(users, ({ one }) => ({
 	profileInfo: one(profileInfo, {
-		fields: [user.id],
+		fields: [users.id],
 		references: [profileInfo.userId],
 	}),
 }));
@@ -480,7 +501,7 @@ const users = await db.query.users.findMany({
 `columns` parameter lets you include or omit columns you want to get from the database
 
 <Callout>
-  Drizzle performs partial selects on the query level, no additional data is transfered from the database
+  Drizzle performs partial selects on the query level, no additional data is transferred from the database
 </Callout>
 
 **Get all posts with just `id`, `content` and include `comments`**
@@ -587,17 +608,6 @@ const users = await db.query.users.findMany({
 })
 ```
 </Section>
-
-This callback is useful in situations where you need to query against relations, which are only available in the callback. 
-For example, if you need to retrieve all users who have more than 0 posts.
-```typescript copy {2}
-const usersWithPosts = await db.query.users.findMany({
-	where: (table, { sql }) => (sql`json_array_length(${table.posts}) > 0`),
-	with: {
-		posts: true,
-	},
-});
-```
 
 Find post with `id=1` and comments that were created before particular date
 ```typescript copy
@@ -734,7 +744,7 @@ const res = await db.query.users.findMany({
 	},
 	with: {
 		usersToGroups: {
-			columns: {
+			with: {
 				group: true,
 			},
 		},

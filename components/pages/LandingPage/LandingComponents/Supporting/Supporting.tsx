@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import SVG from 'react-inlinesvg';
 import { StaticImageData } from 'next/image';
 import { useTheme } from 'next-themes';
 import styles from './Supporting.module.css';
-import { SVGProps } from '../../../../../@types/SVGTypes';
 import LiveOnTheEdge from './Images/LiveOnTheEdge.png';
 import LiveOnTheEdgeDark from './Images/LiveOnTheEdgeDark.png';
 import ConnectEverywhere from './Images/ConnectEverywhere.png';
 import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
+import { ISupportingElement } from '@/@types/Supporting';
+import SupportingElement from './SupportingElement/SupportingElement';
 
 interface Props {
   title: string,
   description: string,
   items: string[],
   rowsNum: number,
-  data: { [key: string]: {
-    src: string,
-    srcDark?: string,
-    lightStyles?: SVGProps,
-    darkStyles?: SVGProps,
-  } },
+  data: { [key: string]: ISupportingElement },
   imageType: string,
 }
 const Supporting: React.FC<Props> = ({
@@ -48,36 +43,11 @@ const Supporting: React.FC<Props> = ({
       <div className={styles.scroll}>
         <div className={styles.grid_wrapper}>
           <div className={`${styles.grid} ${styles[`grid-template-${rowsNum}`]}`}>
-            {items.map((a, index) => {
-              const {
-                lightStyles,
-                darkStyles,
-              } = data[a];
-              return (
-                <div className={styles.item} key={index}>
-                  <div className={styles.icon}>
-                    <div className={styles.img_block}>
-                      {data[a].src.includes('.svg') ? (
-                        <>
-                          {isLight ? <SVG src={`/svg/${data[a].src}`} {...lightStyles} />
-                            : <SVG src={`/svg/${data[a].srcDark || data[a].src}`} {...darkStyles} />}
-                        </>
-                      ) : (
-                        <img
-                          src={isLight ? `/svg/${data[a].src}` : `/svg/${data[a].srcDark || data[a].src}`}
-                          style={isLight ? { ...lightStyles } : { ...darkStyles as any }}
-                          alt={a}
-                        />
-                      )}
-                    </div>
-                  </div>
-                  {a}
-                </div>
-              );
-            })}
+            {items.map((a) => (
+              <SupportingElement item={data[a]} name={a} />
+            ))}
           </div>
         </div>
-
       </div>
     </div>
   );

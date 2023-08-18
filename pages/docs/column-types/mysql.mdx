@@ -1,10 +1,10 @@
 import Section from "../../../components/Section/Section";
 
-### MySQL column types
+# MySQL column types
 
 We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
 
-#### Integer
+### Integer
 
 A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
 
@@ -24,7 +24,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### tinyint
+### tinyint
 
 <Section>
 ```typescript
@@ -42,7 +42,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### smallint
+### smallint
 
 <Section>
 ```typescript
@@ -60,7 +60,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### mediumint
+### mediumint
 
 <Section>
 ```typescript
@@ -78,7 +78,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### bigint
+### bigint
 
 <Section>
 ```typescript
@@ -98,7 +98,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### real
+### real
 
 <Section>
 ```typescript
@@ -134,7 +134,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### decimal
+### decimal
 
 <Section>
 ```typescript
@@ -170,7 +170,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### double
+### double
 
 <Section>
 ```typescript
@@ -206,7 +206,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### float
+### float
 
 <Section>
 ```typescript
@@ -224,7 +224,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### serial
+### serial
 
 <Section>
 ```typescript
@@ -242,7 +242,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### binary
+### binary
 
 <Section>
 ```typescript
@@ -260,7 +260,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### varbinary
+### varbinary
 
 <Section>
 ```typescript
@@ -278,7 +278,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### char
+### char
 
 <Section>
 ```typescript
@@ -296,8 +296,8 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### varchar
-
+### varchar
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 <Section>
 ```typescript
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
@@ -305,6 +305,9 @@ import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
 const table = mysqlTable('table', {
 	varchar: varchar('varchar', { length: 2 }),
 });
+
+// will be inferred as text: "value1" | "value2" | null
+varchar: varchar('varchar', { length: 6, enum: ["value1", "value2"] })
 ```
 
 ```sql
@@ -314,7 +317,9 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### text
+### text
+
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 
 <Section>
 ```typescript
@@ -323,6 +328,9 @@ import { text, mysqlTable } from "drizzle-orm/mysql-core";
 const table = mysqlTable('table', {
 	text: text('text'),
 });
+
+// will be inferred as text: "value1" | "value2" | null
+text: text('text', { enum: ["value1", "value2"] });
 ```
 
 ```sql
@@ -332,7 +340,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### boolean
+### boolean
 
 <Section>
 ```typescript
@@ -350,7 +358,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### date
+### date
 
 <Section>
 ```typescript
@@ -368,7 +376,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### datetime
+### datetime
 
 <Section>
 ```typescript
@@ -405,7 +413,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### time 
+### time 
 
 <Section>
 ```typescript
@@ -427,7 +435,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### year
+### year
 
 <Section>
 ```typescript
@@ -445,7 +453,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### timestamp
+### timestamp
 
 <Section>
 ```typescript
@@ -498,7 +506,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### json
+### json
 
 <Section>
 ```typescript
@@ -508,8 +516,6 @@ const table = mysqlTable('table', {
 	json: json('json'),
 });
 
-json<...>('...');
-json<string[]>('...')
 ```
 
 ```sql
@@ -519,8 +525,20 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
+It provides compile time protection for default values, insert and select schemas.
+```typescript
+// will be infered as { foo: string }
+json: json('json').$type<{ foo: string }>();
 
-### enumColumn
+// will be infered as string[]
+json: json('json').$type<string[]>();
+
+// won't compile
+json: json('json').$type<string[]>().default({});
+```
+
+## enumColumn
 
 <Section>
 ```typescript
@@ -538,8 +556,26 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+
+## Customizing column data type
+
+Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
+
+```ts
+type UserId = number & { __brand: 'user_id' };
+type Data = {
+	foo: string;
+	bar: number;
+};
+
+const users = mysqlTable('users', {
+  id: int('id').$type<UserId>().primaryKey(),
+  jsonField: json('json_field').$type<Data>(),
+});
+```
+
 ## Columns constraints
-#### Not null
+### Not null
 `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
 
 <Section>
@@ -558,7 +594,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### Default value
+### Default value
 
 The `DEFAULT` clause specifies a default value to use for the column if no value
 is explicitly provided by the user when doing an `INSERT`.
@@ -584,7 +620,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### Primary key 
+### Primary key 
 
 <Section>
 ```typescript
@@ -602,7 +638,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-#### Auto increment
+### Auto increment
 
 <Section>
 ```typescript

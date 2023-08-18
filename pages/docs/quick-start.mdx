@@ -4,7 +4,7 @@ import { Tab, Tabs } from 'nextra-theme-docs';
 For the quick start example we're going to use PostgresJS driver
 
 #### Install the dependencies
-<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
   <Tab>
     ```bash copy
     npm i drizzle-orm postgres
@@ -23,10 +23,16 @@ For the quick start example we're going to use PostgresJS driver
     yarn add -D drizzle-kit
     ```
   </Tab>
+  <Tab>
+    ```bash copy
+    bun add drizzle-orm postgres
+    bun add -D drizzle-kit
+    ```
+  </Tab>
 </Tabs>
 
 #### Declare your first schema file
-```typescript filename="schema.ts"
+```typescript copy filename="schema.ts"
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {

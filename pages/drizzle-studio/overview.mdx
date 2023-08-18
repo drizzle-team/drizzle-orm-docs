@@ -15,7 +15,7 @@ delete and update everything based on your existing drizzle sql schema. It suppo
 
 ### Install dependencies
 Check out extended docs for [SQL dialect and drivers](/docs/installation-and-db-connection)
-<Tabs items={["npm", "pnpm", "yarn"]}>
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab>
 ```bash copy
 npm i drizzle-orm
@@ -32,6 +32,12 @@ pnpm add -D drizzle-kit
 ```bash copy
 yarn add drizzle-orm
 yarn add -D drizzle-kit
+```
+</Tab>
+<Tab>
+```bash copy
+bun add drizzle-orm
+bun add -D drizzle-kit
 ```
 </Tab>
 </Tabs>
@@ -65,7 +71,7 @@ export default {
 } satisfies Config;
 ```
 ### Launch Drizzle Studio
-<Tabs items={["npm", "pnpm", "yarn"]}>
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab>
 ```bash copy
 npx drizzle-kit studio
@@ -79,6 +85,11 @@ pnpm drizzle-kit studio
 <Tab>
 ```bash copy
 yarn drizzle-kit studio
+```
+</Tab>
+<Tab>
+```bash copy
+bunx drizzle-kit studio
 ```
 </Tab>
 </Tabs>

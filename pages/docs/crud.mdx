@@ -1,15 +1,16 @@
 import Section from '../../components/Section/Section';
 import { Tab, Tabs } from 'nextra-theme-docs';
 import { Callout } from 'nextra-theme-docs'
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
-# Quering with SQL-like syntax [CRUD]
+# Querying with SQL-like syntax [CRUD]
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
 We natively support mostly every query feature capability of every dialect 
 and whatever we do not yet support - can be done with our powerful `sql` operator
   
 When you declare schema([see docs](./sql-schema-declaration)) in typescript - you can instantly 
 use our typed query builder to insert, update, select and delete.  
-All types are infered instantly without any need for code generation.
+All types are inferred instantly without any need for code generation.
 ```typescript copy
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/postgresjs';
@@ -538,13 +539,13 @@ await insertUser(newUser);
 ```
 
 ### Insert returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can insert a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
 
 // partial return
-await db.insert(users).value({ name: "Partial Dan" }).returning({ insertedId: users.id });
+await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
 ### Insert multiple rows
@@ -554,7 +555,7 @@ await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 
 ### OnConflict and Upsert [insert or update]
 You can run insert statements with on conflict clause to `do nothing` or `update`  
-```typescript copyt
+```typescript copy
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing();
@@ -594,7 +595,7 @@ await db.update(users)
 ```
 
 ### Update with returning
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can update a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
@@ -616,7 +617,7 @@ await db.delete(users).where(eq(users.name, 'Dan'));
 ```
 
 ### Delete with return
-`✓ PostgreSQL` `✓ SQLite` `✕ MySQL`  
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 You can delete a row and get it back in PostgreSQL and SQLite
 ```typescript copy
 const deletedUser = await db.delete(users)
