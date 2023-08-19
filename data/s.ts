@@ -28,7 +28,7 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: 'Organization',
-      login: 'kinde',
+      login: 'kinde.com',
       name: 'Kinde',
       avatarUrl: kinde.src,
     },
@@ -43,7 +43,7 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: 'Organization',
-      login: 'zolplay',
+      login: 'zolplay.com',
       name: 'Zolplay',
       avatarUrl: zolplay.src,
     },
