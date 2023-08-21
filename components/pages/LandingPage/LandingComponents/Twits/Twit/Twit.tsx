@@ -23,4 +23,5 @@ const Twit: React.FC<Props> = ({ twit }) => (
     <div className={styles.content}>{twit.text}</div>
   </div>
 );
+
 export default Twit;

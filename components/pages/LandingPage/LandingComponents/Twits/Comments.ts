@@ -40,6 +40,12 @@ const Comments: IComment[] = [
     text: 'That was in PHP in 2007',
   },
   {
+    avatar: '',
+    name: '',
+    login: '',
+    text: '',
+  },
+  {
     avatar: 'https://pbs.twimg.com/profile_images/1605762947686375425/lsoGWWty_normal.jpg',
     name: 'Theo',
     login: 't3dotgg',
