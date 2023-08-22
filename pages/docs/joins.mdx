@@ -243,8 +243,8 @@ export const user = pgTable("user", {
 Drizzle ORM delivers name-mapped results from the driver without changing the structure.
 You're free to operate with results the way you want and here's an example of mapping many-one relational data
 ```typescript
-type User = InferModel<typeof users>;
-type Pet = InferModel<typeof pets>;
+type User = usersTable.$inferSelect;
+type Pet = usersTable.$inferSelect;
 
 const rows = db.select({
     user: users,

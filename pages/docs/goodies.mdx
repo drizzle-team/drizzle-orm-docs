@@ -2,6 +2,75 @@ import { Tab, Tabs } from "nextra-theme-docs";
 import {CodeTabs} from "../../components/CodeTabs/CodeTabs";
 import { Callout } from "nextra-theme-docs";
 
+
+## Type API
+
+To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers
+
+<Tabs items={["PostgreSQL","MySQL","SQLite"]}>
+<Tab>
+```ts
+import { serial, text, pgTable } from 'drizzle-orm/pg-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = users.$inferSelect;
+type InsertUser = users.$inferInsert;
+// or
+type SelectUser = users._.$inferSelect;
+type InsertUser = users._.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+</Tab>
+<Tab>
+```ts
+import { int, text, mysqlTable } from 'drizzle-orm/mysql-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = mysqlTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = users.$inferSelect;
+type InsertUser = users.$inferInsert;
+// or
+type SelectUser = users._.$inferSelect;
+type InsertUser = users._.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+</Tab>
+<Tab>
+```ts
+import { int, text, sqliteTable } from 'drizzle-orm/sqlite-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = users.$inferSelect;
+type InsertUser = users.$inferInsert;
+// or
+type SelectUser = users._.$inferSelect;
+type InsertUser = users._.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+</Tab>
+</Tabs>
+
+
 ## Logging
 To enable default query logging, just pass `{ logger: true }` to the `drizzle` initialization function:
 ```typescript copy
