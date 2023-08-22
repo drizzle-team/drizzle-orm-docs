@@ -5,8 +5,8 @@ According to their [official docs](https://github.com/WiseLibs/better-sqlite3),
 BetterSqlite3 is the fastest and simplest library for SQLite3 in Node.js.
 
 Drizzle ORM embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
-for synchronous drivers like `better-sqlite3` we have a **sync API** and we mirror most popular 
-SQLite-like `all`, `get`, `values` and `run` query methods syntaxs.  
+for synchronous drivers like `better-sqlite3` both **async** and **sync** APIs and we mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.  
 
 <Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
   <Tab>
@@ -42,5 +42,5 @@ import Database from 'better-sqlite3';
 const sqlite = new Database('sqlite.db');
 const db: BetterSQLite3Database = drizzle(sqlite);
 
-const result = db.select().from(users).all()
+const result = await db.select().from(users);
 ```

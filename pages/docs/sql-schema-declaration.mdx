@@ -67,7 +67,6 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   Database and table explicit entity types:
   ```typescript copy
   import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
-  import { InferModel } from 'drizzle-orm';
   import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 
   export const users = pgTable('users', {
@@ -76,8 +75,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     phone: varchar('phone', { length: 256 }),
   });
 
-  export type User = InferModel<typeof users>; // return type when queried
-  export type NewUser = InferModel<typeof users, 'insert'>; // insert type
+  export type User = typeof users.$inferSelect; // return type when queried
+  export type NewUser = typeof users.$inferInsert; // insert type
   ...
 
   const db: NodePgDatabase = drizzle(...);
@@ -112,7 +111,6 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   Database and table explicit entity types:  
   ```typescript copy
   import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
-  import { InferModel } from 'drizzle-orm';
   import mysql from 'mysql2/promise';
   import { drizzle } from 'drizzle-orm/mysql2';
 
@@ -122,8 +120,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     phone: varchar('phone', { length: 256 }),
   });
 
-  export type User = InferModel<typeof users>; // return type when queried
-  export type NewUser = InferModel<typeof users, 'insert'>; // insert type
+  export type User = typeof users.$inferSelect; // return type when queried
+  export type NewUser = typeof users.$inferInsert; // insert type
   ...
 
   // init mysql2 Pool or Client
@@ -164,7 +162,6 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   Database and table explicit entity types
 
   ```typescript copy
-  import type { InferModel } from 'drizzle-orm';
   import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 
   export const users = sqliteTable('users', {
@@ -173,8 +170,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     phone: text('phone'),
   })
 
-  export type User = InferModel<typeof users> // return type when queried
-  export type InsertUser = InferModel<typeof users, 'insert'> // insert type
+  export type User = typeof users.$inferSelect // return type when queried
+  export type InsertUser = typeof users.$inferInsert // insert type
   ...
   import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
   import Database from 'better-sqlite3';
