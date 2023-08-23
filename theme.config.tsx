@@ -12,7 +12,7 @@ const config: DocsThemeConfig = {
   banner: {
     key: 'rqb',
     text: (
-      <a href="https://medium.com/@aleksandrblokh/71282a8b0206" target="_blank" rel="nofollow noreferrer">
+      <a href="https://driz.li/821days" target="_blank" rel="nofollow noreferrer">
         🎉 Drizzle got FASTER! Read more →
       </a>
     ),
