@@ -266,3 +266,20 @@ CREATE TABLE `table` (
 );
 ```
 </Section>
+
+When using `$default()` or `$defaultFn()`, which are simply different aliases for the same function, 
+you can generate defaults at runtime and use these values in all insert queries. 
+These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more
+
+<Callout>
+	Note: This value does not affect the drizzle-kit behavior, it is only used at runtime in drizzle-orm
+</Callout>
+
+```ts
+import { text, sqliteTable } from "drizzle-orm/sqlite-core";
+import { createId } from '@paralleldrive/cuid2';
+
+const table = sqliteTable('table', {
+	id: text('id').$defaultFn(() => createId()),
+});
+```

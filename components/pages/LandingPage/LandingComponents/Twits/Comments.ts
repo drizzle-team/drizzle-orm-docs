@@ -40,10 +40,10 @@ const Comments: IComment[] = [
     text: 'That was in PHP in 2007',
   },
   {
-    avatar: 'https://pbs.twimg.com/profile_images/1567269493608714241/6ACZo99k_normal.jpg',
-    name: 'Kent C. Dodds',
-    login: 'kentcdodds',
-    text: 'Prisma is still an awesome choice. I\'m not going anywhere',
+    avatar: '',
+    name: '',
+    login: '',
+    text: '',
   },
   {
     avatar: 'https://pbs.twimg.com/profile_images/1605762947686375425/lsoGWWty_normal.jpg',

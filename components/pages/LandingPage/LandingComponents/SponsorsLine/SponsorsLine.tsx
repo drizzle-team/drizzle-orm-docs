@@ -32,7 +32,8 @@ const SponsorsLine = () => {
       <div className={styles.wrapper}>
         <div className={styles.scroll}>
           {sponsors && sponsors.map((type) => (
-            <div className={styles.sponsors}>
+            type.items.length > 0 && (
+            <div key={type.name} className={styles.sponsors}>
               <header className={styles.sponsors_header}>
                 <div className={styles.type_header}>
                   <span className={styles.emoji}>{sponsorTypes[type.name].emoji}</span>
@@ -44,6 +45,7 @@ const SponsorsLine = () => {
               <div className={`${styles.cards} ${styles[type.name]}`}>
                 {type.items.map((sponsor) => (
                   <SponsorItem
+                    key={sponsor.sponsorEntity.login}
                     sponsor={sponsor}
                     hasName={sponsorTypes[type.name].hasName}
                     hasCard={sponsorTypes[type.name].hasCard}
@@ -53,6 +55,7 @@ const SponsorsLine = () => {
                 ))}
               </div>
             </div>
+            )
           ))}
         </div>
       </div>

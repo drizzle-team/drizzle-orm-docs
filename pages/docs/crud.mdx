@@ -14,15 +14,14 @@ All types are inferred instantly without any need for code generation.
 ```typescript copy
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/postgresjs';
-import { InferModel } from 'drizzle-orm';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('full_name'),
 });
 
-type User = InferModel<typeof users, "select">;
-type NewUser = InferModel<typeof users, "insert">;
+type User = typeof users.$inferSelect;
+type NewUser = typeof users.$inferInsert;
 
 const db = drizzle(...);
 ```
@@ -524,11 +523,9 @@ insert into "users" ("name") values ("Andrew");
 ```
 </Section>
 
-If you need insert type for a particular table - you can use `InferModel<typeof table, "insert">` syntax
+If you need insert type for a particular table - you can use `typeof usersTable.$inferInsert` syntax
 ```typescript copy 
-import { InferModel } from "drizzle-orm";
-
-type NewUser = InferModel<typeof users, "insert">;
+type NewUser = typeof users.$inferInsert;
 
 const insertUser = async (user: NewUser) => {
   return db.insert(users).values(user);
