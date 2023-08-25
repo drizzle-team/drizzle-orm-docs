@@ -40,10 +40,10 @@ const Comments: IComment[] = [
     text: 'That was in PHP in 2007',
   },
   {
-    avatar: '',
-    name: '',
-    login: '',
-    text: '',
+    avatar: 'https://pbs.twimg.com/profile_images/1664871184155185152/aqt7wx77_normal.jpg',
+    name: 'Anthony Shew',
+    login: 'anthonysheww',
+    text: 'I hate @DrizzleOrm so much that I wrote the Auth.js adapter for it.',
   },
   {
     avatar: 'https://pbs.twimg.com/profile_images/1605762947686375425/lsoGWWty_normal.jpg',
