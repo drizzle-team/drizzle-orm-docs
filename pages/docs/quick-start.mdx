@@ -42,6 +42,11 @@ export const users = pgTable('users', {
 });
 ```
 
+#### Push the schema to db
+```bash copy
+drizzle-kit push:pg --connectionString="postgres://postgres:postgres@localhost:5432/postgres" --schema="schema.ts" --driver=pg
+```
+
 #### Run your first query, that's it!
 ```typescript copy filename="index.ts"
 import { drizzle } from 'drizzle-orm/postgres-js';
