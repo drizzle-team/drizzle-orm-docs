@@ -42,7 +42,7 @@ const Databases: {
     darkStyles: {
       width: 28,
     },
-    sponsorUrl: 'https://turso.tech/',
+    sponsorUrl: 'https://turso.tech/drizzle',
   },
   Supabase: {
     src: 'supabase.svg',
