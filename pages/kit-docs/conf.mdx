@@ -188,8 +188,7 @@ We mirror connection params of database drivers
 <Tab>
 ```ts {6}
 import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 export default {
   schema: "./src/schema/*",
@@ -208,8 +207,7 @@ When using the PlanetScale driver, your connection string must end with `?ssl={"
 <Tab>
 ```ts {6-10}
 import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 export default {
   schema: "./src/schema/*",
@@ -246,8 +244,7 @@ const users = pgTable('users', {
 ```
 ```ts {7}
 import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 export default {
   schema: "./src/schema/*",

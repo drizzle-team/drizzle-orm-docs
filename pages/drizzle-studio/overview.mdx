@@ -58,8 +58,7 @@ export const users = pgTable('users', {
 Check out extended config file [docs](/kit-docs/conf)
 ```typescript copy filename="drizzle.config.ts"
 import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
  
 export default {
   schema: "./schema/*",
