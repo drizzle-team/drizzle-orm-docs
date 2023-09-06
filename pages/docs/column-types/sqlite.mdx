@@ -84,7 +84,9 @@ const table = sqliteTable('table', {
 });
 
 // will be inferred as text: "value1" | "value2" | null
-text: text('text', { enum: ["value1", "value2"] })
+text('text', { enum: ["value1", "value2"] })
+text('text', { mode: 'json' })
+text('text', { mode: 'json' }).$type<{ foo: string }>()
 ```
 
 ```sql
@@ -99,6 +101,16 @@ CREATE TABLE `table` (
 
 A blob of data, stored exactly as it was input.
 
+
+<Callout>
+It's recommended to use `text('', { mode: 'json' })` instead of `blob('', { mode: 'json' })`, 
+because it supports JSON functions:
+
+All JSON functions currently throw an error if any of their arguments are BLOBs because BLOBs 
+are reserved for a future enhancement in which BLOBs will store the binary encoding for JSON.
+https://www.sqlite.org/json1.html
+</Callout>
+
 <Section>
 ```typescript
 import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
@@ -110,6 +122,7 @@ const table = sqliteTable('table', {
 blob('blob')
 blob('blob', { mode: 'buffer' })
 blob('blob', { mode: 'bigint' })
+
 blob('blob', { mode: 'json' })
 blob('blob', { mode: 'json' }).$type<{ foo: string }>()
 
