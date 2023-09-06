@@ -440,3 +440,64 @@ db.select().from(table).where(or(gt(table.column, 5), lt(table.column, 7)));
 SELECT * FROM table WHERE (table.column > 5 OR table.column < 7)
 ```
 </Section>
+
+### arrayContains
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
+  
+Test that a column or expression contains all elements of the list passed as the second argument
+
+<Section>
+```typescript
+import { arrayContains } from "drizzle-orm";
+
+const contains = await db.select({ id: posts.id }).from(posts)
+  .where(arrayContains(posts.tags, ['Typescript', 'ORM']));
+
+const withSubQuery = await db.select({ id: posts.id }).from(posts)
+  .where(arrayContains(
+    posts.tags,
+    db.select({ tags: posts.tags }).from(posts).where(eq(posts.id, 1)),
+  ));
+```
+
+```sql
+select "id" from "posts" where "posts"."tags" @> {Typescript,ORM};
+select "id" from "posts" where "posts"."tags" @> (select "tags" from "posts" where "posts"."id" = 1);
+```
+</Section>
+
+### arrayContained
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
+  
+Test that the list passed as the second argument contains all elements of a column or expression
+
+<Section>
+```typescript
+import { arrayContained } from "drizzle-orm";
+
+const contained = await db.select({ id: posts.id }).from(posts)
+  .where(arrayContained(posts.tags, ['Typescript', 'ORM']));
+```
+
+```sql
+select "id" from "posts" where "posts"."tags" <@ {Typescript,ORM};
+```
+</Section>
+
+### arrayOverlaps
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
+  
+Test that a column or expression contains any elements of the list passed as the second argument.
+
+<Section>
+```typescript
+import { arrayOverlaps } from "drizzle-orm";
+
+const overlaps = await db.select({ id: posts.id }).from(posts)
+  .where(arrayOverlaps(posts.tags, ['Typescript', 'ORM']));
+```
+
+```sql
+select "id" from "posts" where "posts"."tags" && {Typescript,ORM}
+```
+</Section>
