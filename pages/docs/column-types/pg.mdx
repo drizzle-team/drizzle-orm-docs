@@ -629,7 +629,7 @@ const table = pgTable('table', {
 	integer1: integer('integer1').default(42),
 	integer2: integer('integer2').default(sql`'42'::integer`),
 	uuid1: uuid('uuid1').defaultRandom(),
-	uuid2: uuid('uuid2').default(sql`get_random_uuid()`),
+	uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
 });
 ```
 
