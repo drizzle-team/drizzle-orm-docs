@@ -76,10 +76,10 @@ const Comments: IComment[] = [
     text: 'Django had it in 2008',
   },
   {
-    avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
+    avatar: 'https://pbs.twimg.com/profile_images/1679868769584447489/cbEZlJOP_x96.jpg',
     name: 'tslamoon',
     login: 'tslamoon1',
-    text: 'But when is MSSQL support?',
+    text: "I'll shave my head if drizzle adds MSSQL support by the end of September.",
   },
   {
     avatar: 'https://pbs.twimg.com/profile_images/1629755042612887552/k4-mlreC_x96.jpg',
