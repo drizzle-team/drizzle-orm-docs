@@ -40,22 +40,22 @@ const Comments: IComment[] = [
     text: 'That was in PHP in 2007',
   },
   {
-    avatar: '',
-    name: '',
-    login: '',
-    text: '',
-  },
-  {
-    avatar: 'https://pbs.twimg.com/profile_images/1605762947686375425/lsoGWWty_normal.jpg',
-    name: 'Theo',
-    login: 't3dotgg',
-    text: 'Prisma is amazing',
+    avatar: 'https://pbs.twimg.com/profile_images/1664871184155185152/aqt7wx77_normal.jpg',
+    name: 'Anthony Shew',
+    login: 'anthonysheww',
+    text: 'I hate @DrizzleOrm so much that I wrote the Auth.js adapter for it.',
   },
   {
     avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
     name: 'Regular Twitter Comment',
     login: 'dont_know',
     text: 'It\'s not yet production ready',
+  },
+  {
+    avatar: 'https://pbs.twimg.com/profile_images/1605762947686375425/lsoGWWty_normal.jpg',
+    name: 'Theo',
+    login: 't3dotgg',
+    text: 'Prisma is amazing',
   },
   {
     avatar: 'https://pbs.twimg.com/profile_images/1535515556643606529/RRGbBC6T_normal.jpg',
@@ -76,10 +76,16 @@ const Comments: IComment[] = [
     text: 'Django had it in 2008',
   },
   {
-    avatar: 'https://placehold.co/100x100/lightgrey/lightgrey',
+    avatar: 'https://pbs.twimg.com/profile_images/1679868769584447489/cbEZlJOP_x96.jpg',
     name: 'tslamoon',
     login: 'tslamoon1',
-    text: 'But when is MSSQL support?',
+    text: "I'll shave my head if drizzle adds MSSQL support by the end of September.",
+  },
+  {
+    avatar: 'https://pbs.twimg.com/profile_images/1629755042612887552/k4-mlreC_x96.jpg',
+    name: 'AZ',
+    login: 'shalildev',
+    text: 'What I notice is also an understandable API, text is a text, a primary value is primaryKey and so on',
   },
 ];
 

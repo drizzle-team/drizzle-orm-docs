@@ -44,7 +44,7 @@ const Supporting: React.FC<Props> = ({
         <div className={styles.grid_wrapper}>
           <div className={`${styles.grid} ${styles[`grid-template-${rowsNum}`]}`}>
             {items.map((a) => (
-              <SupportingElement item={data[a]} name={a} />
+              <SupportingElement key={a} item={data[a]} name={a} />
             ))}
           </div>
         </div>

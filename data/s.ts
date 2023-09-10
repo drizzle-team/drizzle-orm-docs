@@ -58,7 +58,7 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: 'Organization',
-      login: 'turso.tech',
+      login: 'turso.tech/drizzle',
       name: 'Turso',
       avatarUrl: 'https://avatars.githubusercontent.com/u/89849441?v=4',
     },
