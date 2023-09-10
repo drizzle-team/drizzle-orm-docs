@@ -47,18 +47,14 @@ All the familiar [SQL schema](/docs/sql-schema-declaration), [queries](/docs/sel
 <CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
 ```typescript copy
 // Access your data
-import { drizzle } from 'drizzle-orm/postgresjs';
-import * as schema, { countries } from './schema'
-
-const db: NodePgDatabase = drizzle(..., { schema });
-
-await db.select().from(countries)
-await db.query.countries.findMany()
+await db
+	.select()
+	.from(countries)
+	.leftJoin(cities, eq(cities.countryId, countries.id))
+	.where(eq(countries.id, 10))
 ```
 ```typescript copy
 // manage your schema
-import { integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
-
 export const countries = pgTable('countries', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 256 }),
