@@ -1,0 +1,22 @@
+import Section from '../../components/Section/Section';
+import { Tab, Tabs } from 'nextra-theme-docs';
+import { Callout } from 'nextra-theme-docs'
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
+
+# SQL Update
+
+```typescript copy
+await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'));
+```
+
+### Update with returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+You can update a row and get it back in PostgreSQL and SQLite
+```typescript copy
+const updatedUserId: { updatedId: number }[] = await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'))
+  .returning({ updatedId: users.id });
+```

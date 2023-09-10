@@ -1,0 +1,77 @@
+import Section from '../../components/Section/Section';
+import { Tab, Tabs } from 'nextra-theme-docs';
+import { Callout } from 'nextra-theme-docs'
+import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
+
+# SQL Insert
+Drizzle ORM provides you the most SQL-like way to insert rows into the database tables
+
+## Insert one row
+Inserting data with Drizzle is extremely straightfoward and sql-like
+
+<Section>
+```typescript copy 
+await db.insert(users).values({ name: 'Andrew' });
+```
+```sql
+insert into "users" ("name") values ("Andrew");
+```
+</Section>
+
+If you need insert type for a particular table - you can use `typeof usersTable.$inferInsert` syntax
+```typescript copy 
+type NewUser = typeof users.$inferInsert;
+
+const insertUser = async (user: NewUser) => {
+  return db.insert(users).values(user);
+}
+
+const newUser: NewUser = { name: "Alef" };
+await insertUser(newUser);
+```
+
+## Insert returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+You can insert a row and get it back in PostgreSQL and SQLite
+```typescript copy
+await db.insert(users).values({ name: "Dan" }).returning();
+
+// partial return
+await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
+```
+
+## Insert multiple rows
+```typescript copy
+await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
+```
+
+## OnConflict and Upsert [insert or update]
+You can run insert statements with on conflict clause to `do nothing` or `update`  
+```typescript copy
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoNothing();
+
+// explicitly specify conflict target
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoNothing({ target: users.id });
+```
+
+This is how you upsert with `onConflictDoUpdate`
+```typescript
+await db.insert(users)
+  .values({ id: 1, name: 'Dan' })
+  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
+```
+
+Upsert with where statement
+```typescript
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { name: 'John1' },
+    where: sql`${users.createdAt} > '2023-01-01'::date`,
+  });
+```

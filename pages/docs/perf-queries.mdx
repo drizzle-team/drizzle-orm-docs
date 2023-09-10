@@ -1,7 +1,7 @@
 import Section from '../../components/Section/Section';
 import { Tab, Tabs } from 'nextra-theme-docs';
 
-# Performance
+# Query performance
 When it comes to Drizzle - we're a thin TypeScript layer on top of SQL with 
 almost 0 overhead and to make it actual 0 - you can utilise our prepared statements API  
   
@@ -124,20 +124,3 @@ Whenever you need to embed a dynamic runtime value - you can use a `placeholder(
     ```
   </Tab> 
 </Tabs>
-
-## Serverless environments
-You can get immense benefits with `serverless functions` like AWS lambdas or Vercel Server functions(they're AWS lambdas based), 
-since they can live up to 15mins and reuse both database connections and prepared statements  
-On the other hand `edge functions` tend to clean up straight after they're invoked which leads to little to no perf benefits  
-  
-To reuse your database connection and prepared statements - you just have to declare them outside of handler scope
-```ts
-const databaseConnection = ...;
-const db = drizzle(databaseConnection);
-const prepared = db.select().from(...).prepare();
-
-// AWS handler
-export const handler = async (event: APIGatewayProxyEvent) => {
-  return prepared.execute();
-}
-```

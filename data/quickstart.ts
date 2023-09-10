@@ -12,7 +12,7 @@ export const pgDrivers: ICards = {
       fill: '#f0f0f0',
     },
     description: 'Fastest full featured PostgreSQL client for Node.js and Deno',
-    href: '/docs/installation-and-db-connection/postgresql/postgresjs',
+    href: '/docs/quick-postgresql/postgresjs',
   },
   'node-postgres': {
     title: 'node-postgres',
@@ -24,7 +24,7 @@ export const pgDrivers: ICards = {
       width: 24,
     },
     description: 'Collection of nodejs modules to interact with PostgreSQL',
-    href: '/docs/installation-and-db-connection/postgresql/node-postgres',
+    href: '/docs/quick-postgresql/node-postgres',
   },
 };
 
@@ -41,7 +41,7 @@ export const pgDatabases: ICards = {
       src: '/svg/neon-dark.svg',
     },
     description: 'Serverless multi-cloud fully managed Postgres',
-    href: '/docs/installation-and-db-connection/postgresql/neon',
+    href: '/docs/quick-postgresql//neon',
   },
   vercel: {
     title: 'Vercel Postgres',
@@ -53,7 +53,7 @@ export const pgDatabases: ICards = {
       width: 24,
     },
     description: 'Serverless SQL database designed to integrate with Vercel Functions',
-    href: '/docs/installation-and-db-connection/postgresql/vercel',
+    href: '/docs/quick-postgresql/vercel',
   },
   Supabase: {
     title: 'Supabase',
@@ -65,7 +65,7 @@ export const pgDatabases: ICards = {
       width: 24,
     },
     description: 'Open source Firebase alternative for building secure and performant Postgres backends',
-    href: '/docs/installation-and-db-connection/postgresql/supabase',
+    href: '/docs/quick-postgresql//supabase',
   },
   'aws-data-api': {
     title: 'AWS Data API',
@@ -77,7 +77,7 @@ export const pgDatabases: ICards = {
       width: 24,
     },
     description: 'Data API for AWS Aurora Serverless',
-    href: '/docs/installation-and-db-connection/postgresql/aws-data-api',
+    href: '/docs/quick-postgresql//aws-data-api',
   },
 };
 
@@ -93,7 +93,7 @@ export const mysql: ICards = {
       fill: '#f0f0f0',
     },
     description: 'World\'s most advanced serverless MySQL platform',
-    href: '/docs/installation-and-db-connection/mysql/planetscale',
+    href: '/docs/quick-mysql/planetscale',
   },
   mysql2: {
     title: 'MySQL 2',
@@ -105,7 +105,7 @@ export const mysql: ICards = {
       width: 24,
     },
     description: 'MySQL client for Node.js with focus on performance',
-    href: '/docs/installation-and-db-connection/mysql/mysql2',
+    href: '/docs/quick-mysql/mysql2',
   },
 };
 
@@ -121,7 +121,7 @@ export const sqlite: ICards = {
       width: 28,
     },
     description: 'Turso is an edge SQLite database',
-    href: '/docs/installation-and-db-connection/sqlite/turso',
+    href: '/docs/quick-sqlite/turso',
   },
   cloudflared1: {
     title: 'Cloudflare D1',
@@ -133,7 +133,7 @@ export const sqlite: ICards = {
       width: 24,
     },
     description: 'D1 is Cloudflare\'s first queryable relational database',
-    href: '/docs/installation-and-db-connection/sqlite/d1',
+    href: '/docs/quick-sqlite/d1',
   },
   bun: {
     title: 'Bun SQLite',
@@ -145,7 +145,7 @@ export const sqlite: ICards = {
       width: 32,
     },
     description: 'Fast all-in-one JavaScript runtime',
-    href: '/docs/installation-and-db-connection/sqlite/bun',
+    href: '/docs/quick-sqlite/bun',
   },
   better: {
     title: 'better-sqlite3',
@@ -157,7 +157,7 @@ export const sqlite: ICards = {
       width: 24,
     },
     description: 'Library for SQLite3 in Node.js',
-    href: '/docs/installation-and-db-connection/sqlite/better-sqlite3',
+    href: '/docs/quick-sqlite/better-sqlite3',
   },
   http: {
     title: 'SQLite HTTP proxy',
@@ -169,6 +169,6 @@ export const sqlite: ICards = {
       width: 24,
     },
     description: 'SQLite3 HTTP proxy implementation',
-    href: '/docs/installation-and-db-connection/sqlite/http-proxy',
+    href: '/docs/quick-sqlite/http-proxy',
   },
 };

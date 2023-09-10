@@ -13,7 +13,7 @@ import DrizzleStudio from './LandingComponents/DrizzleStudio/DrizzleStudio';
 
 const LandingPage = () => {
   const runtimes: string[] = ['Cloudflare Workers', 'Supabase functions', 'Vercel functions', 'Deno deploy', 'Bun', 'Lagon', 'ElectronJS', 'Browser'];
-  const databases: string[] = ['Neon', 'PlanetScale', 'Vercel storage', 'Turso', 'Supabase', 'PostgreSQL', 'MySQL', 'SQLite', 'Web SQLite'];
+  const databases: string[] = ['Neon', 'PlanetScale', 'Vercel Postgres', 'Turso', 'Supabase', 'PostgreSQL', 'MySQL', 'SQLite', 'Web SQLite'];
   return (
     <div className={styles.wrap}>
       <Header />

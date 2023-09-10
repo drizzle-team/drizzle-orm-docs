@@ -23,7 +23,7 @@ const Databases: {
       color: '#f0f0f0',
     },
   },
-  'Vercel storage': {
+  'Vercel Postgres': {
     src: 'vercel.svg',
     lightStyles: {
       width: 32,

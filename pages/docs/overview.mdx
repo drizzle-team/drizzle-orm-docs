@@ -1,0 +1,133 @@
+import Section from "../../components/Section/Section";
+import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+import Image from 'next/image'
+
+# Drizzle ORM  
+Drizzle ORM is a headless TypeScript ORM with a head.  
+It looks and feels simple, will perform on day 1000 of your project, 
+it will let you do things your way and help when you need help  
+
+> Drizzle is a good friend who's there for you when necessary and doesn't bother when you need some space
+
+It is the only ORM with both [relational](/docs/rqb) and [SQL-like](/docs/select) query APIs 
+providing you best of both worlds when it comes to accessing your relational data. 
+Drizzle is lightweight, performant, typesafe, non lactose, gluten-free, flexible and serverless-ready **by design**.  
+
+  
+[![Drizzle bestofjs](/images/bestofjs.jpg)](https://bestofjs.org/projects/drizzle-orm)
+
+## Headless ORM? 
+First and foremost Drizzle is a library and a set of complementary opt-in tools. 
+ORM stands for object relational mapping and developers tend to call Django-like or Spring-like tools an ORM. 
+We trully believe it's a misconception based on legacy and we call them Data Frameworks.
+
+With data frameworks you have to build projects **around them** and not **with them**.  
+Drizzle lets you build your project the way you want or need, lets you be productive and does not interfere. 
+It lets you solve SQL problems with SQL toolkit and provide you a variety of opt in tools 
+to take your developer experience through the roof.  
+
+Drizzle lets you define and manage database schema in typescript, lets you access your data in SQL-like 
+or relational way, has a massive variety of opt-in tools which makes Drizzle an ultimate tool for managing
+and accessing your SQL data.  
+
+## Why SQL-like?
+**If you know SQL - you know Drizzle**.
+> SQL has been here for 49 years, it aint going anywhere and only gets better
+  
+Other ORMs and data frameworks tend to deviate/abstract you away from SQL which 
+leads to a double learning curve - you will need to know both SQL and the framework API.  
+  
+Drizzle is the opposite. 
+We embrace SQL and built Drizzle to be SQL-like by default at its core, so you can have zero to none 
+learning curve and access to the full power of SQL.  
+  
+All the familiar [SQL schema](/docs/sql-schema-declaration), [queries](/docs/select), 
+[automatic migrations](/docs/migrations) and [one more thing](/docs/queries).
+
+<CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
+```typescript copy
+// Access your data
+import { drizzle } from 'drizzle-orm/postgresjs';
+import * as schema, { countries } from './schema'
+
+const db: NodePgDatabase = drizzle(..., { schema });
+
+await db.select().from(countries)
+await db.query.countries.findMany()
+```
+```typescript copy
+// manage your schema
+import { integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
+
+export const countries = pgTable('countries', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }),
+});
+
+export const cities = pgTable('cities', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }),
+  countryId: integer('country_id').references(() => countries.id),
+});
+```
+```sql
+-- generate migrations
+CREATE TABLE IF NOT EXISTS "countries" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(256)
+);
+
+CREATE TABLE IF NOT EXISTS "cities" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(256),
+	"country_id" integer
+);
+
+ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN KEY ("country_id") REFERENCES "countries"("id") ON DELETE no action ON UPDATE no action;
+```
+</CodeTabs>
+
+## Why not SQL-like?
+At Drizzle we're never settled and striving for a perfectly balanced solution and while SQL-like does cover 100% of the needs, 
+there're certain common scenarious when you can query data in a better way.  
+  
+We've build [Queries API](/docs/rqb) for you, so you can fetch relational nested data from database 
+in the most convenient and performant way and never think about joins and data mapping.  
+  
+It always generates exactly 1 SQL, feel free to use it with serverless databases and never worry about performance 
+
+```ts
+const result = await db.query.users.findMany({
+	with: {
+		posts: true			
+	},
+});
+```
+
+## Serverless?
+> Best part is no part - Drizzle has exactly **0 dependencies**
+
+![Drizzle is slim an Serverless ready](/images/drizzle31kb.jpg)
+  
+Drizzle ORM is dialect specific, slim, performant and serverless ready **by design**.  
+  
+We've spent a lot of time to make sure you have best in class SQL dialects support, 
+so you can have Postgres or MySQL or other dialect-specific stuff support.  
+  
+Drizzle is operating natively through industry standard database drivers.  
+We support all major [PostrgeSQL](/docs/quick-postgresql), 
+[MySQL](/docs/quick-mysql) or [SQLite](/docs/quick-sqlite) drivers out there 
+and we're adding new ones [really fast](https://twitter.com/DrizzleORM/status/1653082492742647811?s=20).  
+
+
+## Welcome on board
+
+Drizzle is not just a library, it's an experience.  
+  
+More and more companies adopt Drizzle into their production projects experiencing immense benefits 
+in both DX and performance and we're always there to help!  
+  
+Don't hesitate to reach us out - we'll gladly assist you in your Drizzle journey!  
+We have an outstanding [Discord community](https://driz.li/discord) and welcome to our [Twitter](twitter.com/drizzleorm)  
+  
+Now go build something awesome with Drizzle and your [PostrgeSQL](/docs/quick-postgresql), [MySQL](/docs/quick-mysql) or [SQLite](/docs/quick-sqlite)!
