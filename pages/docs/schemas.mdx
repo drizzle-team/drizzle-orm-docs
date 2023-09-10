@@ -18,7 +18,7 @@ If you declare table within a schema - query builder will prepend schema names i
     export const mySchema = pgSchema("my_schema")
 
     export const mySchemaUsers = mySchema.table('users', {
-      id: serial('id').primaryKey(),
+      id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
       name: text('name'),
     });
     ```

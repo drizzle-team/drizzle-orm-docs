@@ -319,7 +319,7 @@ With our powerful `sql` operator you can infer aggregations functions return typ
       import { gte } from 'drizzle-orm';
 
       export const product = mysqlTable('product', {
-        id: serial('id').primaryKey(),
+        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
         name: text('name'),
         unitPrice: double("unit_price")
       });
@@ -394,7 +394,7 @@ Lets have a quick look on how to group and filter grouped using a `having`
       import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core';
 
       export const user = mysqlTable('user', {
-        id: serial('id').primaryKey(),
+        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
         name: text('name'),
         city: text("city"),
       });

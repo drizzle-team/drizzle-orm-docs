@@ -94,14 +94,14 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   // declaring enum in database
   export const countries = mysqlTable('countries', {
-    id: serial('id').primaryKey(),
+    id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
     name: varchar('name', { length: 256 }),
   }, (countries) => ({
     nameIndex: uniqueIndex('name_idx').on(countries.name),
   }));
 
   export const cities = mysqlTable('cities', {
-    id: serial('id').primaryKey(),
+    id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
     name: varchar('name', { length: 256 }),
     countryId: int('country_id').references(() => countries.id),
     popularity: mysqlEnum('popularity', ['unknown', 'known', 'popular']),
@@ -110,12 +110,12 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:  
   ```typescript copy
-  import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, serial, text, varchar } from 'drizzle-orm/mysql-core';
+  import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, bigint, text, varchar } from 'drizzle-orm/mysql-core';
   import mysql from 'mysql2/promise';
   import { drizzle } from 'drizzle-orm/mysql2';
 
   export const users = mysqlTable('users', {
-    id: serial('id').primaryKey(),
+    id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
     fullName: text('full_name'),
     phone: varchar('phone', { length: 256 }),
   });
