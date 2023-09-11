@@ -110,10 +110,10 @@ const usersTable = pgTable('users', {
 ```typescript copy
 import { customType } from 'drizzle-orm/mysql-core';
 
-const customSerial = customType<{ data: number; notNull: true; default: true }>(
+const customInt = customType<{ data: number; notNull: false; default: false }>(
   {
     dataType() {
-      return 'serial';
+      return 'int';
     },
   },
 );
@@ -189,7 +189,7 @@ Usage for all types will be same as defined functions in Drizzle ORM
 
 ```typescript copy
 const usersTable = mysqlTable('userstest', {
-  id: customSerial('id').primaryKey(),
+  id: customInt('id').primaryKey(),
   name: customText('name').notNull(),
   verified: customBoolean('verified').notNull().default(false),
   jsonb: customJson<string[]>('jsonb'),

@@ -9,17 +9,17 @@ See detailed [docs](/kit-docs) for extended examples and walk throughs
 ## Quick start
 Declare your schema
 ```typescript copy filename="./src/schema.ts"
-import { index, integer, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
+import { index, integer, mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
-  id: serial('id').primaryKey(),
+  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
   fullName: varchar('full_name', { length: 256 }),
 }, (users) => ({
   nameIdx: index('name_idx').on(users.fullName),
 }));
 
 export const authOtps = mysqlTable('auth_otp', {
-  id: serial('id').primaryKey(),
+  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
   phone: varchar('phone', { length: 256 }),
   userId: int('user_id').references(() => users.id),
 });
@@ -32,13 +32,13 @@ $ pnpm drizzle-kit generate:mysql --schema=./src/schema.ts
 And it will generate a migration SQL file
 ```sql copy
 CREATE TABLE `users` (
- `id` int PRIMARY KEY,
+ `id` bigint primary key auto_increment,
  `full_name` varchar(256)
 );
 
 
 CREATE TABLE `auth_otp` (
- `id` serial PRIMARY KEY,
+ `id` bigint primary key auto_increment,
  `phone` varchar(256),
  `user_id` int
 );

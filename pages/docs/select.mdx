@@ -315,11 +315,11 @@ With our powerful `sql` operator you can infer aggregations functions return typ
   <Tab>
     <Section>
       ```typescript copy {10,13}
-      import { mysqlTable, serial, text, double } from 'drizzle-orm/mysql-core';
+      import { mysqlTable, bigint, text, double } from 'drizzle-orm/mysql-core';
       import { gte } from 'drizzle-orm';
 
       export const product = mysqlTable('product', {
-        id: serial('id').primaryKey(),
+        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
         name: text('name'),
         unitPrice: double("unit_price")
       });
@@ -391,10 +391,10 @@ Lets have a quick look on how to group and filter grouped using a `having`
   <Tab>
     <Section>
       ```typescript copy {9-11,13-17}
-      import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core';
+      import { mysqlTable, bigint, text } from 'drizzle-orm/mysql-core';
 
       export const user = mysqlTable('user', {
-        id: serial('id').primaryKey(),
+        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
         name: text('name'),
         city: text("city"),
       });
