@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### serial
 `serial` `serial4`  
 Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
 <Section>
 ```typescript
 import { serial, pgTable } from "drizzle-orm/pg-core";
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### smallserial
 `smallserial` `serial2`  
 Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
 <Section>
 ```typescript
 import { smallserial, pgTable } from "drizzle-orm/pg-core";
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### bigserial
 `bigserial` `serial8`  
 Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
 
 If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint  
 <Section>
@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### boolean
 PostgreSQL provides the standard SQL type boolean
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-boolean.html)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-boolean.html)  
 
 <Section>
 ```typescript
@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### text
 `text`  
 Variable-length(unlimited) character string  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
   
 You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
 <Section>
@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### varchar
 `character varying(n)` `varchar(n)`  
 Variable-length character string, can store strings up to **`n`** characters(not bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
 
 You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
 `length` parameter is optional according to PostgreSQL docs
@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### char
 `character(n)` `char(n)`  
 Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
 
 You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
 `length` parameter is optional according to PostgreSQL docs
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### numeric
 `numeric` `decimal`  
 Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)  
 <Section>
 ```typescript
 import { numeric, pgTable } from "drizzle-orm/pg-core";
@@ -327,7 +327,7 @@ Is an alias of [numeric](#numeric)
 ### real
 `real` `float4`  
 Single precision floating-point number (4 bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
 
 <Section>
 ```typescript
@@ -353,7 +353,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### double precision
 `double precision` `float8`  
 Double precision floating-point number (8 bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
 
 <Section>
 ```typescript
@@ -379,7 +379,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### json
 `json`  
 Textual JSON data, as specified in [RFC 7159](https://tools.ietf.org/html/rfc7159)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
@@ -417,7 +417,7 @@ json: json('json').$type<string[]>().default({});
 ### jsonb
 `jsonb`  
 Binary JSON data, decomposed  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
+Official PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
 <Section>
 ```typescript
 import { jsonb, pgTable } from "drizzle-orm/pg-core";
