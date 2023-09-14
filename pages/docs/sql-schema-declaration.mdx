@@ -2,43 +2,62 @@ import { Tab, Tabs, FileTree, Callout, Cards, Card } from 'nextra-theme-docs';
 
 # SQL schema declaration
 
-You declare SQL schema in TypeScript in either one `schema.ts` file 
-or you can group them logically in multiple logically grouped files, whichever you prefer, all the freedom!
+You can declare your SQL schema directly in TypeScript either in a single `schema.ts` file,
+or you can spread them around — whichever you prefer, all the freedom!
 
-```plaintext
-📦 <project root>
- └ 📂 src
-    └ 📂 db
-       └ 📜 schema.ts
-```
 
-```plaintext
-📦 <project root>
- └ 📂 src
-    └ 📂 db
-       └ 📂 schema
-          ├ 📜 users.ts
-          ├ 📜 countries.ts
-          ├ 📜 cities.ts
-          ├ 📜 products.ts
-          ├ 📜 clients.ts
-          ├ 📜 enums.ts
-          └ 📜 etc.ts
-```
-```plaintext
-📦 <project root>
- └ 📂 src
-    ├ 📂 get-user
-    │  ├ 📜 user.ts
-    │  └ 📜 handler.ts
-    ├ 📂 get-city
-    │  ├ 📜 city.ts
-    │  └ 📜 handler.ts    
-    ├  ...
-```
+<Tabs items={['1 File', 'Separate Files', 'Separate Folders']}>
+  <Tab>
+    Everything in 1 file:
+    <FileTree>
+      <FileTree.Folder name="root" defaultOpen>
+        <FileTree.Folder name="src" defaultOpen>
+          <FileTree.Folder name="db" defaultOpen>
+            <FileTree.File name="schema.ts" />
+          </FileTree.Folder>
+        </FileTree.Folder>
+      </FileTree.Folder>
+    </FileTree>
+  </Tab>
+   <Tab>
+    Scattered across multiple files:
+    <FileTree>
+      <FileTree.Folder name="root" defaultOpen>
+        <FileTree.Folder name="src" defaultOpen>
+          <FileTree.Folder name="db" defaultOpen>
+            <FileTree.File name="schema.ts" />
+            <FileTree.File name="countries.ts" />
+            <FileTree.File name="cities.ts" />
+            <FileTree.File name="products.ts" />
+            <FileTree.File name="clients.ts" />
+            <FileTree.File name="enums.ts" />
+            <FileTree.File name="etc.ts" />
+          </FileTree.Folder>
+        </FileTree.Folder>
+      </FileTree.Folder>
+    </FileTree>
+  </Tab>
+   <Tab>
+    In separate/domain-specific folders:
+    <FileTree>
+      <FileTree.Folder name="root" defaultOpen>
+        <FileTree.Folder name="src" defaultOpen>
+          <FileTree.Folder name="get-user" defaultOpen>
+            <FileTree.File name="user.ts" />
+            <FileTree.File name="handler.ts" />
+          </FileTree.Folder>
+          <FileTree.Folder name="get-city" defaultOpen>
+            <FileTree.File name="city.ts" />
+            <FileTree.File name="handler.ts" />
+          </FileTree.Folder>
+        </FileTree.Folder>
+      </FileTree.Folder>
+    </FileTree>
+  </Tab>
+</Tabs>
 
-You can declare tables, indexes and constraints, foreign keys and enums.  
-Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](/docs/migrations)
+You can declare `tables`, `indexes` and `constraints`, `foreign keys` and `enums`.  
+
 <Callout type="warning" emoji="⚠️">
   Pay attention to the mandatory `export` keyword, if you're using **[drizzle-kit SQL migrations generator.](/docs/migrations)**
 </Callout>
