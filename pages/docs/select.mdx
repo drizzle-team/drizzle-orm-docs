@@ -24,8 +24,10 @@ select * from 'users';
 ```
 </Section>
 
-Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons.  
-You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results
+Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons. 
+
+You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results.
+See this example below:
 <Section>
 ```typescript copy
 const result = await db.select({
@@ -127,7 +129,7 @@ select * from 'users' where not 'id' = 42;
 </Section>
 
 ## Combining filters
-You can logically combine filter operators with conditional `and` and `or` operators 
+You can logically combine filter operators with conditional `and` and `or` operators, like this:
 <Section>
 ```typescript copy
 import { eq, and, sql } from "drizzle-orm";
@@ -240,7 +242,7 @@ select * from "users" order by "name" asc "name2" desc;
 </Section>
 
 ## WITH clause
-SQL `with` clause - is a statement scoped view, helpful to organise complex queries
+SQL `with` clause is a statement scoped view, helpful to organise complex queries like such:
 <Section>
 ```typescript copy
 const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
@@ -444,7 +446,8 @@ Lets have a quick look on how to group and filter grouped using a `having`:
   </Tab>
 </Tabs>
 
-Here's a more advanced example
+Here's a more advanced example. This query will return a list of orders with their details,
+and will calculate total price, total quantity and total products count for each order.
 ```typescript copy
 const orders = sqliteTable('order', {
   id: integer('id').primaryKey(),

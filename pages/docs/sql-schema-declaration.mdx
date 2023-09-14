@@ -1,4 +1,4 @@
-import { Tab, Tabs } from 'nextra-theme-docs';
+import { Tab, Tabs, FileTree, Callout, Cards, Card } from 'nextra-theme-docs';
 
 # SQL schema declaration
 
@@ -39,6 +39,10 @@ or you can group them logically in multiple logically grouped files, whichever y
 
 You can declare tables, indexes and constraints, foreign keys and enums.  
 Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](/docs/migrations)
+<Callout type="warning" emoji="⚠️">
+  Pay attention to the mandatory `export` keyword, if you're using **[drizzle-kit SQL migrations generator.](/docs/migrations)**
+</Callout>
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
   ```typescript copy
@@ -87,6 +91,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     return db.insert(users).values(user).returning();
   }
   ```
+
+  Check out all supported PostgreSQL column types **[here.](/docs/column-types/pg)**
   </Tab>
   <Tab>
   ```typescript copy
@@ -139,6 +145,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     return db.insert(users).values(user);
   }
   ```
+
+    Check out all supported MySQL column types **[here.](/docs/column-types/mysql)**
   </Tab>
   <Tab>
   ```typescript copy
@@ -185,6 +193,13 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     return db.insert(users).values(user).run()
   }
   ```
+
+    Check out all supported SQLite column types **[here.](/docs/column-types/sqlite)**
   </Tab>
 </Tabs>
 
+<Cards>
+  <Card  title="PostgreSQL" href="/docs/guide/built-ins/callout" />
+  <Card title="MySQL" href="/docs/guide/built-ins/tabs" />
+  <Card  title="SQLite" href="/docs/guide/built-ins/steps" />
+</Cards>

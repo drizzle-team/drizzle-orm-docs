@@ -4,7 +4,8 @@ import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
 # Configuration files
 Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
-You can have autocomplete experience and very convenient environment variables flow!  
+
+You can have autocomplete experience and a very convenient environment variables flow!  
 
 ```plaintext {5}
 📦 <project root>
@@ -166,8 +167,10 @@ export default {
 </Section>
 
 ## SQL breakpoints
-`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default, 
-it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite) 
+`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations.
+
+It's optional and `true` by default, 
+it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction (MySQL, SQLite) 
 and Drizzle ORM has to apply them sequentially one by one.
 ```sql {5}
 CREATE TABLE `book` (

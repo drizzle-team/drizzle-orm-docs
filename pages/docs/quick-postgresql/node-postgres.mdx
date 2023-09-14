@@ -1,4 +1,4 @@
-import { Tab, Tabs } from "nextra-theme-docs";
+import { Tab, Tabs, Callout } from "nextra-theme-docs";
 
 # node-postgres
 According to the **[official website](https://node-postgres.com/)**, node-postgres is a collection 
@@ -31,11 +31,7 @@ Drizzle ORM natively supports `pg` with `drizzle-orm/pg` package.
     ```
   </Tab>
 </Tabs>
-
-There're two ways you can connect to the PostgreSQL with `pg` driver - it's either single `client` connection or a `pool`.
-For the built in `migrate` function with DDL migrations we and drivers are strongly encourage you to use single `client` connection.  
-For querying purposes feel free to use either `client` or `pool` based on your business demands.
-
+You can connect to a PostgreSQL database either using a single `client` connection or a `pool`.
 <Tabs items={['Client connection', 'Pool connection']}>
   <Tab>
 ```typescript copy filename="index.ts"
@@ -83,3 +79,9 @@ const db = drizzle(pool);
 ```
 </Tab>
 </Tabs>
+
+<Callout type="warning" emoji="⚙️">
+  For the built in `migrate` function with DDL migrations we strongly encourage you to use `max: 1` connection configuration. 
+
+  For querying purposes feel free to use pool size of your choice based on your business demands.
+</Callout>

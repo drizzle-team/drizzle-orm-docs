@@ -34,13 +34,15 @@ bun add -D drizzle-kit
 ## Overview
 **Drizzle Kit** — is a CLI companion for automatic SQL migrations generation and rapid prototyping.
   
-Conceptually it's very simple, you just declare Drizzle ORM TypeScript schema and you generate SQL migration from it. 
-Then you can change that TypeScript schema and Drizzle Kit will generate you alternation migrations.
-That way you can have DDL source of truth in one type-safe place and under version control  
+Conceptually it's very simple, you just declare a Drizzle ORM TypeScript schema and generate an SQL migration from it. 
+
+You can then change the original schema and Drizzle Kit will generate new migrations, that way you can 
+have DDL source of truth in one type-safe place and under version control. 
   
-Drizzle Kit lets you have your schema being split in multiple schema files and even have multiple schemas for different databases in one project  
-You can rapidly prototype database schema and push it directly to the database  
-And last but not least - you can pull schema from the existing database in the matter of seconds  
+Drizzle Kit lets you split your schema in different files and even have multiple schemas for different databases in one project.
+You can rapidly prototype database schema and push it directly to the database.
+
+Last but not least — you can pull the schema from an existing database in a matter of seconds ⚡️
 
 ## Migration files
 Migrations history is stored in `.sql` files in the migrations folder
@@ -108,8 +110,7 @@ it will generate SQL migration for you completely automatically in most of the c
 </CodeTabs>
 
 ## Running migrations
-We're unopinionated on how you should run your migrations.   
-you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle ORM**  
+We're unopinionated on how you should run your migrations, you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle ORM**.
   
 We provide you a useful way to run generated migrations with `migrate` function which we implement for each driver and dialect specifically.  
 
@@ -160,7 +161,8 @@ migrate(db, { migrationsFolder: "drizzle" });
 
 ## Configuration
 Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
-You can have autocomplete experience and very convenient environment variables flow!
+
+You can have autocomplete experience and a very convenient environment variables flow!
 
 <CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
 <CodeTab>

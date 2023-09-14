@@ -74,7 +74,11 @@ CREATE TABLE `table` (
 ### Text
 
 A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).  
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
+
+<Callout type="info" emoji="ℹ️">
+	You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+</Callout>
+
 <Section>
 ```typescript
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
@@ -101,14 +105,14 @@ CREATE TABLE `table` (
 
 A blob of data, stored exactly as it was input.
 
+<Callout type="info" emoji="ℹ️">
+	It's recommended to use `text('', { mode: 'json' })` instead of `blob('', { mode: 'json' })`, 
+	because it supports JSON functions:
 
-<Callout>
-It's recommended to use `text('', { mode: 'json' })` instead of `blob('', { mode: 'json' })`, 
-because it supports JSON functions:
+	All JSON functions currently throw an error if any of their arguments are BLOBs because BLOBs 
+	are reserved for a future enhancement in which BLOBs will store the binary encoding for JSON.
 
-All JSON functions currently throw an error if any of their arguments are BLOBs because BLOBs 
-are reserved for a future enhancement in which BLOBs will store the binary encoding for JSON.
-https://www.sqlite.org/json1.html
+	See **https://www.sqlite.org/json1.html**.
 </Callout>
 
 <Section>
@@ -135,7 +139,8 @@ CREATE TABLE `table` (
 ```
 
 You can specify `.$type<..>()` for blob inference, it **won't** check runtime values. 
-It provides compile time protection for default values, insert and select schemas.
+It provides compile time protection for default values, insert and select schemas.  
+
 ```typescript
 // will be infered as { foo: string }
 json: blob('json', { mode: 'json' }).$type<{ foo: string }>();
@@ -285,7 +290,7 @@ you can generate defaults at runtime and use these values in all insert queries.
 These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more.
 
 <Callout>
-	Note: This value does not affect the drizzle-kit behavior, it is only used at runtime in drizzle-orm
+	Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`
 </Callout>
 
 ```ts

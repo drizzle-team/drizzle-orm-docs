@@ -6,14 +6,13 @@ import Section from "../../components/Section/Section";
 
 ## Constraints
 
-SQL constraints are the rules enforced on data columns on table.  
-These are used to prevent invalid data from being entered into the database.  
-This ensures the accuracy and reliability of the data in the database.
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
 
 ### Default
 
-The `DEFAULT` clause specifies a default value to use for the column if no value
-is explicitly provided by the user when doing an `INSERT`.
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
 If there is no explicit `DEFAULT` clause attached to a column definition,
 then the default value of the column is `NULL`.
 
@@ -90,8 +89,8 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 
 ### Not null
 
-By default, a column can hold **NULL** values.  
-The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
 This enforces a field to always contain a value, which means that you cannot insert a new record,
 or update a record without adding a value to this field.
 
@@ -153,9 +152,14 @@ or update a record without adding a value to this field.
 ### Unique
 
 The `UNIQUE` constraint ensures that all values in a column are different.  
-Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
 A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
-However, you can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -306,12 +310,15 @@ However, you can have many `UNIQUE` constraints per table, but only one `PRIMARY
 
 ### Check
 
-The `CHECK` constraint is used to limit the value range that can be placed in a column.  
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
 If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
 
 If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
 
-NOT YET IMPLEMENTED IN DRIZZLE ORM
+<Callout type="error" emoji="🛑">
+  NOT YET IMPLEMENTED IN DRIZZLE ORM
+</Callout>
 
 ### Primary Key
 
@@ -784,11 +791,11 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
     ```
     </Section>
-    
-    Drizzle ORM provides set of all params for index creation
     <Callout type="warning" emoji="⚠️">
       As of now `drizzle-kit` only supports index `name` and `on()` param.
     </Callout>
+
+    Drizzle ORM provides set of all params for index creation:
 
     ```typescript
     // Index declaration reference
@@ -827,11 +834,11 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
-
-    Drizzle ORM provides set of all params for index creation
     <Callout type="warning" emoji="⚠️">
       As of now `drizzle-kit` only supports index `name` and `on()` param.
     </Callout>
+
+     Drizzle ORM provides set of all params for index creation:
 
     ```typescript
     // Index declaration reference
@@ -867,12 +874,12 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
-    
-    Drizzle ORM provides set of all params for index creation
     <Callout type="warning" emoji="⚠️">
       As of now `drizzle-kit` only supports index `name` and `on()` param.
     </Callout>
 
+     Drizzle ORM provides set of all params for index creation:
+     
     ```typescript
     // Index declaration reference
     index("name")

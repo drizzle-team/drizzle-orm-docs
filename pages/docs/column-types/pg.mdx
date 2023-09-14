@@ -595,7 +595,7 @@ Enumerated (enum) types are data types that comprise a static, ordered set of va
 They are equivalent to the enum types supported in a number of programming languages. 
 An example of an enum type might be the days of the week, or a set of status values for a piece of data.
 
-PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-enum.html)
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-enum.html)**
 <Section>
 ```typescript
 import { pgEnum, pgTable } from "drizzle-orm/pg-core";
@@ -618,7 +618,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ## Customizing column data type
 Every column builder has a `.$type()` method, which allows you to customize the data type of the column. 
-This is useful, for example, with unknown or branded types.
+
+This is useful, for example, with unknown or branded types:
 ```ts
 type UserId = number & { __brand: 'user_id' };
 type Data = {

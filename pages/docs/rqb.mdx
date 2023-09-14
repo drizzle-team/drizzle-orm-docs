@@ -260,10 +260,10 @@ export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
 
 ### Foreign keys
 
-You might've noticed that `relations` look similar to foreign keys -
-they even have a `references` property. So what's the difference?
+You might've noticed that `relations` look similar to foreign keys — they even have a `references` property. So what's the difference?
 
-While foreign keys serve a similar purpose - defining relations between tables, they work on a different level compared to `relations`.
+While foreign keys serve a similar purpose, defining relations between tables, they work on a different level compared to `relations`.
+
 Foreign keys are a database level constraint, they are checked on every `insert`/`update`/`delete` operation and throw an error if a constraint is violated.
 On the other hand, `relations` are a higher level abstraction, they are used to define relations between tables on the application level only.
 They do not affect the database schema in any way and do not create foreign keys implicitly.
@@ -502,8 +502,10 @@ const users = await db.query.users.findMany({
 ### Partial fields select
 `columns` parameter lets you include or omit columns you want to get from the database.
 
-<Callout>
-  Drizzle performs partial selects on the query level, no additional data is transferred from the database
+<Callout type="info" emoji="ℹ️">
+  Drizzle performs partial selects on the query level, no additional data is transferred from the database.
+
+  Keep in mind that **a single SQL statement is outputted by Drizzle.**
 </Callout>
 
 **Get all posts with just `id`, `content` and include `comments`:**

@@ -1,4 +1,4 @@
-import { Tab, Tabs } from "nextra-theme-docs";
+import { Tab, Tabs, Callout } from "nextra-theme-docs";
 
 # Node MySQL 2 
 According to the **[official website](https://github.com/sidorares/node-mysql2)**, 
@@ -11,14 +11,16 @@ Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
     ```bash copy
     npm i drizzle-orm mysql2
     npm i -D drizzle-kit
-    ```    </Tab>
+    ```
+    </Tab>
     <Tab> 
     ```bash copy
     pnpm add drizzle-orm mysql2
     pnpm add -D drizzle-kit
     ```
     </Tab>
-    <Tab>    ```bash copy
+    <Tab>
+    ```bash copy
     yarn add drizzle-orm mysql2
     yarn add -D drizzle-kit
     ```
@@ -31,9 +33,7 @@ Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
     </Tab>
 </Tabs>
 
-There're two ways you can connect to the MySQL with `mysql2` driver - it's either single `client` connection or a `pool`.
-For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.  
-For querying purposes feel free to use either `client` or `pool` based on your business demands.
+There're two ways you can connect to the MySQL with `mysql2` driver, either single `client` connection or a `pool`.
 
 <Tabs items={['Client connection', 'Pool connection']}>
   <Tab>
@@ -68,3 +68,9 @@ For querying purposes feel free to use either `client` or `pool` based on your b
   ```
   </Tab>
 </Tabs>
+
+<Callout type="warning" emoji="⚙️">
+  For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.  
+
+  For querying purposes feel free to use either `client` or `pool` based on your business demands.
+</Callout>
