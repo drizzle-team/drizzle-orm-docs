@@ -1,6 +1,7 @@
 import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
 import Section from "../../components/Section/Section";
 import { Tab, Tabs, Callout } from 'nextra-theme-docs';
+import { Button } from 'nextra/components';
 
 # Drizzle Kit
 Our most fundamental design principles of Drizzle ORM is to always stay explicit, 
@@ -270,6 +271,8 @@ For extended `introspect` examples — **[see here.](./commands/#introspect--pul
 Drizzle Kit comes with bundled **[Drizzle Studio](/drizzle-studio/overview)**
 database browser and lets you launch it locally with one command.  
 
+![Drizzle Studio](../../assets/drizzle-studio.jpg)
+
 Studio requires drizzle config file with `schema` and `dbCredentials` provided.
 ```bash
 drizzle-kit studio
@@ -277,3 +280,8 @@ drizzle-kit studio
 drizzle-kit studio --port 3000 ## custom port
 drizzle-kit studio --verbose   ## log all sql statements
 ```
+
+<Button as="a">
+  <a href="http://0.0.0.0:3000">🖥 Open Drizzle Studio</a>
+</Button>
+
