@@ -2,12 +2,13 @@ import Section from "../../../components/Section/Section";
 import { Callout } from 'nextra-theme-docs';
   
 # PostgreSQL column types
-We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
+We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
 
 ### integer
 `integer` `int` `int4`  
 Signed 4-byte integer     
-If you need `integer autoincrement` - please refer to [serial](#serial)
+
+If you need `integer autoincrement` please refer to **[serial.](#serial)**
 
 <Section>
 ```typescript
@@ -49,7 +50,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### smallint
 `smallint` `int2`  
 Small-range signed 2-byte integer   
-If you need `smallint autoincrement` - please refer to [smallserial](#smallserial)
+
+If you need `smallint autoincrement` please refer to **[smallserial.](#smallserial)**
 <Section>
 ```typescript
 import { smallint, pgTable } from "drizzle-orm/pg-core";
@@ -88,9 +90,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 ### bigint
 `bigint` `int8`  
 Signed 8-byte integer  
-If you need `bigint autoincrement` - please refer to [bigserial](#bigserial)
 
-If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint  
+If you need `bigint autoincrement` please refer to **[bigserial.](#bigserial)**
+
+If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint.
 <Section>
 ```typescript
 import { bigint, pgTable } from "drizzle-orm/pg-core";
@@ -134,8 +137,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### serial
 `serial` `serial4`  
-Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
+
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
 <Section>
 ```typescript
 import { serial, pgTable } from "drizzle-orm/pg-core";
@@ -154,8 +159,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### smallserial
 `smallserial` `serial2`  
-Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
 <Section>
 ```typescript
 import { smallserial, pgTable } from "drizzle-orm/pg-core";
@@ -174,10 +180,11 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### bigserial
 `bigserial` `serial8`  
-Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)  
+Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).
 
-If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint  
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
+
+If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint.
 <Section>
 ```typescript
 import { bigserial, pgTable } from "drizzle-orm/pg-core";
@@ -196,8 +203,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 
 ### boolean
-PostgreSQL provides the standard SQL type boolean
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-boolean.html)  
+PostgreSQL provides the standard SQL type boolean.
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-boolean.html)**
 
 <Section>
 ```typescript
@@ -218,10 +226,11 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### text
 `text`  
-Variable-length(unlimited) character string  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+Variable-length(unlimited) character string.
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-character.html)**
   
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
 <Section>
 ```typescript
 import { text, pgTable } from "drizzle-orm/pg-core";
@@ -243,11 +252,13 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### varchar
 `character varying(n)` `varchar(n)`  
-Variable-length character string, can store strings up to **`n`** characters(not bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+Variable-length character string, can store strings up to **`n`** characters (not bytes). 
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
-`length` parameter is optional according to PostgreSQL docs
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-character.html)**
+
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+
+The `length` parameter is optional according to PostgreSQL docs.
 <Section>
 ```typescript
 import { varchar, pgTable } from "drizzle-orm/pg-core";
@@ -271,11 +282,13 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### char
 `character(n)` `char(n)`  
-Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-character.html)  
+Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes).
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values  
-`length` parameter is optional according to PostgreSQL docs
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-character.html)**
+
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+
+The `length` parameter is optional according to PostgreSQL docs.
 <Section>
 ```typescript
 import { char, pgTable } from "drizzle-orm/pg-core";
@@ -299,8 +312,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### numeric
 `numeric` `decimal`  
-Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)  
+Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point.
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)**
+
 <Section>
 ```typescript
 import { numeric, pgTable } from "drizzle-orm/pg-core";
@@ -322,12 +337,13 @@ CREATE TABLE IF NOT EXISTS "table" (
 </Section>
 
 ### decimal
-Is an alias of [numeric](#numeric)
+An alias of **[numeric.](#numeric)**
 
 ### real
 `real` `float4`  
-Single precision floating-point number (4 bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
+Single precision floating-point number (4 bytes)
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html)**  
 
 <Section>
 ```typescript
@@ -352,8 +368,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### double precision
 `double precision` `float8`  
-Double precision floating-point number (8 bytes)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-numeric.html)  
+Double precision floating-point number (8 bytes)
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html)**  
 
 <Section>
 ```typescript
@@ -378,8 +395,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### json
 `json`  
-Textual JSON data, as specified in [RFC 7159](https://tools.ietf.org/html/rfc7159)  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
+Textual JSON data, as specified in **[RFC 7159.](https://tools.ietf.org/html/rfc7159)**
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-json.html)**
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
@@ -416,8 +434,9 @@ json: json('json').$type<string[]>().default({});
 
 ### jsonb
 `jsonb`  
-Binary JSON data, decomposed  
-Official PostrgreSQL [docs](https://www.postgresql.org/docs/current/datatype-json.html)
+Binary JSON data, decomposed.
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-json.html)**
 <Section>
 ```typescript
 import { jsonb, pgTable } from "drizzle-orm/pg-core";
@@ -453,8 +472,9 @@ jsonb: jsonb('jsonb').$type<string[]>().default({});
 
 ### time
 `time` `timetz` `time with timezone` `time without timezone`  
-Time of day with or without time zone  
-PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)
+Time of day with or without time zone.
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-datetime.html)**
 
 <Section>
 ```typescript
@@ -480,8 +500,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### timestamp
 `timestamp` `timestamptz` `timestamp with time zone` `timestamp without time zone`  
-Date and time with or without time zone  
-PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)  
+Date and time with or without time zone.
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-datetime.html)**
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
@@ -504,7 +525,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-You can specify either `date` or `string` infer modes
+You can specify either `date` or `string` infer modes:
 ```typescript
 // will infer as date
 timestamp: timestamp('timestamp', { mode: "date" }),
@@ -515,8 +536,9 @@ timestamp: timestamp('timestamp', { mode: "string" }),
 
 ### date
 `date`  
-Calendar date (year, month, day)  
-PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html) 
+Calendar date (year, month, day)
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-datetime.html)**
 <Section>
 ```typescript
 import { date, pgTable } from "drizzle-orm/pg-core";
@@ -532,7 +554,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 );
 ```
 </Section>
-You can specify either `date` or `string` infer modes
+You can specify either `date` or `string` infer modes:
 ```typescript
 // will infer as date
 date: date('date', { mode: "date" }),
@@ -542,8 +564,9 @@ date: date('date', { mode: "string" }),
 ```
 ### interval
 `interval`  
-Time span  
-PostgreSQL [docs](https://www.postgresql.org/docs/current/datatype-datetime.html)  
+Time span
+
+For more info please refer to the official PostrgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-datetime.html)** 
 
 <Section>
 ```typescript
@@ -662,7 +685,7 @@ const table = pgTable('table', {
 
 
 ### Not null
-`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 
 <Section>
 ```typescript

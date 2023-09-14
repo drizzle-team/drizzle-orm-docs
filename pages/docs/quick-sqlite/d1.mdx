@@ -1,17 +1,17 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
 
 # Cloudflare D1
-According to their [official website](https://developers.cloudflare.com/d1/), 
+According to the **[official website](https://developers.cloudflare.com/d1/)**, 
 D1 is Cloudflare's first queryable relational database.  
   
 Drizzle ORM fully supports D1 database and Cloudflare Workers environment, 
 we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
 SQLite-like `all`, `get`, `values` and `run` query methods syntax.
 
-To setup project for your Cloudflare D1 - please refer to [official docs](https://developers.cloudflare.com/d1/)
+To setup project for your Cloudflare D1 please refer to **[official docs.](https://developers.cloudflare.com/d1/)**
 
 ```toml
-## your wrangler.toml will look something like this
+## your wrangler.toml will look something like this:
 
 name = "YOUR PROJECT NAME"
 main = "src/index.ts"
@@ -24,13 +24,13 @@ database_name = "YOUR DB NAME"
 database_id = "YOUR DB ID"
 ```
 
-To init local database and run server locally
+Initialize local database and run server locally:
 ```bash
 wrangler d1 execute <DATABASE_NAME> --local --file=./drizzle/0000_short_lockheed.sql
 wrangler dev --local --persist
 ```
 
-Install Drizzle ORM
+Install Drizzle ORM:
 <Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
   <Tab>
 ```bash copy
@@ -58,7 +58,7 @@ bun add -D drizzle-kit
   </Tab>
 </Tabs>
 
-Make your first D1 query
+Make your first D1 query:
 ```typescript copy
 import { drizzle } from 'drizzle-orm/d1';
 

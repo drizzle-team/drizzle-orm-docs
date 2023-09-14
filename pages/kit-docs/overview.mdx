@@ -31,7 +31,7 @@ bun add -D drizzle-kit
 </Tabs>
 
 ## Overview
-**Drizzle Kit** - is a CLI companion for automatic SQL migrations generation and rapid prototyping  
+**Drizzle Kit** — is a CLI companion for automatic SQL migrations generation and rapid prototyping.
   
 Conceptually it's very simple, you just declare Drizzle ORM TypeScript schema and you generate SQL migration from it. 
 Then you can change that TypeScript schema and Drizzle Kit will generate you alternation migrations.
@@ -58,8 +58,8 @@ Migrations history is stored in `.sql` files in the migrations folder
  └ ...
 ```
 
-Each SQL migration file contains statements which you apply to the database through 
-Drizzle ORM migration package or any other way suitable for your business case or personal preference
+Each SQL migration file contains statements which you apply to the database through.
+Drizzle ORM migration package or any other way suitable for your business case or personal preference.
 <CodeTabs items={["0000_premium_mister_fear.sql", "schema.ts"]}>
   ```sql
   CREATE TABLE IF NOT EXISTS "user" (
@@ -86,8 +86,8 @@ Drizzle ORM migration package or any other way suitable for your business case o
 </CodeTabs>
 
 ## Schema updates
-Whenever you apply changes to the schema - you just rerun `$ drizzle-kit generate...{:bash}` and 
-it will generate SQL migration for you completely automatically in most of the cases
+Whenever you apply changes to the schema you just rerun `$ drizzle-kit generate...{:bash}` and 
+it will generate SQL migration for you completely automatically in most of the cases.
 <CodeTabs items={["0001_absurd_toad.sql", "schema.ts"]}>
   ```sql
   ALTER TABLE "user" ADD COLUMN "is_verified" boolean;
@@ -111,10 +111,11 @@ We're unopinionated on how you should run your migrations.
 you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle ORM**  
   
 We provide you a useful way to run generated migrations with `migrate` function which we implement for each driver and dialect specifically.  
+
 Drizzle will automatically keep track of applied migrations in your database.
 
 <Callout type="info" emoji="ℹ️">
-`drizzle` and `migrate` imports depend on the [database driver](/docs/installation-and-db-connection) you're using
+`drizzle` and `migrate` imports depend on the [database driver](/docs/installation-and-db-connection) you're using.
 </Callout>
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
@@ -197,16 +198,17 @@ export default {
 </CodeTab>
 </CodeTabs>
 
-For list of all configuration params - [see here](./conf)
+For list of all configuration params — **[see here.](./conf)**
 
 ## Prototyping with db push
-Drizzle Kit lets you alter you database schema and rapidly move forward with a db [`push` command](./commands#prototype--push).  
-That's very handy when you have remote databases like Neon, Planetscale or Turso.  
+Drizzle Kit lets you alter you database schema and rapidly move forward with a db **[`push` command](./commands#prototype--push)**.  
+
+That's very handy when you have remote databases like **[Neon](/docs/quick-postgresql/neon)**, **[Planetscale](/docs/quick-mysql/planetscale)** or **[Turso](/docs/quick-sqlite/turso)**.  
 
 ### Overview
 
 If you want to iterate quickly during local development or if your project doesn't require
-migration files, drizzle offers a useful command called `drizzle-kit push`
+migration files, Drizzle offers a useful command called `drizzle-kit push`.
 
 When do you need to use the 'push' command?
 
@@ -229,10 +231,10 @@ $ drizzle-kit push:mysql
 
 $ drizzle-kit push:sqlite
 ```
-For extended `push` examples - [see here](./commands#prototype--push)
+For extended `push` examples **[see here.](./commands#prototype--push)**
 
 ## Introspecting with db pull
-Drizzle Kit lets you pull DDL from existing database and prints you Drizzle TypeScript schema file completely automatically
+Drizzle Kit lets you pull DDL from existing database and prints a TypeScript schema file completely automatically.
 
 <Section>
 ```bash
@@ -262,11 +264,12 @@ $ drizzle-kit introspect:mysql ...
   });
 ```
 </Section>
-For extended `introspect` examples - [see here](./commands/#introspect--pull)
+For extended `introspect` examples — **[see here.](./commands/#introspect--pull)**
 
 ## Drizzle Studio [NEW]
-Drizzle Kit comes with bundled [Drizzle Studio](/drizzle-studio/overview) 
+Drizzle Kit comes with bundled **[Drizzle Studio](/drizzle-studio/overview)**
 database browser and lets you launch it locally with one command.  
+
 Studio requires drizzle config file with `schema` and `dbCredentials` provided.
 ```bash
 drizzle-kit studio

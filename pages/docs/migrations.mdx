@@ -1,13 +1,15 @@
 
 # Migrations
-The most important thing about Drizzle ORM is that you can use it as a source of truth for database schema.  
-[DrizzleKit](/kit-docs) - is a CLI companion for DrizzleORM, it lets generate SQL statements for schema creation and alternations 
+The most important thing about Drizzle ORM is that you can use it as a source of truth for database schema.
+This means that you can declare your schema in code and then generate SQL migrations from it, keeping everything in sync.
+
+**[DrizzleKit](/kit-docs)** — a CLI companion for DrizzleORM, it lets generate SQL statements for schema creation and alternations 
 or apply changes directly to the database.  
   
-See detailed [docs](/kit-docs) for extended examples and walk throughs
+See detailed **[docs](/kit-docs)** for extended examples and walkthroughs.
   
 ## Quick start
-Declare your schema
+Declare your schema:
 ```typescript copy filename="./src/schema.ts"
 import { index, integer, mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
 
@@ -25,11 +27,11 @@ export const authOtps = mysqlTable('auth_otp', {
 });
 ```
 
-Run CLI migration command
+Run CLI migration command:
 ```bash
 $ pnpm drizzle-kit generate:mysql --schema=./src/schema.ts
 ```
-And it will generate a migration SQL file
+This will generate a migration SQL file that looks like this:
 ```sql copy
 CREATE TABLE `users` (
  `id` bigint primary key auto_increment,
@@ -49,8 +51,9 @@ CREATE INDEX name_idx ON users (`full_name`);
 ```
 
 We've designed Drizzle ORM to be an opt-in solution at any point of your development flow.  
-You can opt-in to run generated migrations with Drizzle or run it elsewhere wherever its suitable for you  
-To run them with Drizzle
+You can opt-in to run generated migrations with Drizzle or run it elsewhere wherever its suitable for you.
+
+To run them with Drizzle:
 ```typescript copy
 import { drizzle } from 'drizzle-orm/mysql2';
 import { migrate } from 'drizzle-orm/mysql2/migrator';

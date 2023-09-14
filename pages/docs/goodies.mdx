@@ -5,7 +5,7 @@ import { Callout } from "nextra-theme-docs";
 
 ## Type API
 
-To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers
+To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers.
 
 <Tabs items={["PostgreSQL","MySQL","SQLite"]}>
 <Tab>
@@ -111,8 +111,9 @@ const db = drizzle(pool, { logger: new MyLogger() });
 
 ## Multi-project schema
 `table creator` operator lets you define customise table names.  
-It's very useful when you need to keep schemas of different projects in one database.  
-For db push docs - [see here](/kit-docs/conf#multi-project-schema)
+It's very useful when you need to keep schemas of different projects in one database.
+
+For db push docs — **[see here.](/kit-docs/conf#multi-project-schema)**
 <Tabs items={["PostgreSQL","MySQL","SQLite"]}>
 <Tab>
 ```ts {3}
@@ -155,7 +156,7 @@ const users = sqliteTable('users', {
 
 
 ## Printing SQL query
-You can print SQL queries with `db` instance or by using [`standalone query builder`](#standalone-query-builder)
+You can print SQL queries with `db` instance or by using **[`standalone query builder`](#standalone-query-builder)**.
 ```typescript copy
 const query = db
   .select({ id: users.id, name: users.name })
@@ -170,7 +171,7 @@ const query = db
 ```
 
 ## Raw SQL queries execution
-If you have some complex queries to execute and drizzle-orm can't handle them yet,
+If you have some complex queries to execute and `drizzle-orm` can't handle them yet,
 you can use the `db.execute` method to execute raw `parametrized` queries.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
@@ -203,7 +204,7 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
 
 ## Standalone query builder
 Drizzle ORM provides a standalone query builder that allows you to build queries
-without creating a database instance and get generated SQL
+without creating a database instance and get generated SQL.
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
     <Tab>
         ```typescript copy
@@ -239,7 +240,7 @@ without creating a database instance and get generated SQL
 
 ## Get typed table columns
 You can get a typed table columns map,
-very useful when you need to omit certain columns upon selection
+very useful when you need to omit certain columns upon selection.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>

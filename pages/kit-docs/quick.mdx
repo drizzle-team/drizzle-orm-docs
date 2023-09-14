@@ -4,7 +4,7 @@ import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
 
 # Quick start
-Lets build a quick start app with `PostgreSQL` + `postgresjs` and run our first migration
+Lets build a quick start app with `PostgreSQL` + `postgresjs` and run our first migration.
 
 <Tabs items={["npm", "yarn", "pnpm", "bun"]}>
 <Tab>
@@ -33,7 +33,7 @@ bun add -D drizzle-kit
 </Tab>
 </Tabs>
 
-Lets declare our `schema.ts`
+Lets declare our `schema.ts`:
 
 ```plaintext {4}
 📦 <project root>
@@ -56,7 +56,7 @@ export const user = pgTable("user", {
 });
 ```
 
-Now lets add drizzle configuration file
+Now lets add drizzle configuration file:
 ```plaintext {4}
 📦 <project root>
  ├ ...
@@ -73,7 +73,7 @@ export default {
 } satisfies Config;
 ```
 
-Add generate command to `package.json` and run our first migrations generation
+Add generate command to `package.json` and run our first migrations generation:
 
 ```json filename="package.json" {5}
 {
@@ -101,7 +101,7 @@ Done! We now have our first SQL migration file
  ├ 📜 drizzle.config.ts
  └ 📜 package.json
 ```
-Now lets run our first migration to the database
+Now lets run our first migration to the database:
 
 ```plaintext {5}
 📦 <project root>

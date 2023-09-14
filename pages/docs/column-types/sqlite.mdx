@@ -3,15 +3,15 @@ import { Callout } from "nextra-theme-docs";
 
 # SQLite column types
 
-Based on official [SQLite docs](https://www.sqlite.org/datatype3.html),
+Based on the official **[SQLite docs](https://www.sqlite.org/datatype3.html)**,
 each value stored in an SQLite database (or manipulated by the database engine)
-has one of the following storage classes `NULL`, `INTEGER`, `REAL`, `TEXT` and `BLOB`
+has one of the following storage classes `NULL`, `INTEGER`, `REAL`, `TEXT` and `BLOB`.
 
-We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
+We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
 
 ### Integer
 
-A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
+A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
 
 <Section>
 ```typescript
@@ -213,7 +213,7 @@ const users = sqliteTable('users', {
 
 ## Columns constraints
 ### Not null
-`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 <Section>
 ```typescript
 const table = sqliteTable('table', { 
@@ -257,7 +257,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-A default value may also be one of the special case-independent keywords `CURRENT_TIME`, `CURRENT_DATE` or `CURRENT_TIMESTAMP`
+A default value may also be one of the special case-independent keywords `CURRENT_TIME`, `CURRENT_DATE` or `CURRENT_TIMESTAMP`.
 
 <Section>
 ```typescript
@@ -282,7 +282,7 @@ CREATE TABLE `table` (
 
 When using `$default()` or `$defaultFn()`, which are simply different aliases for the same function, 
 you can generate defaults at runtime and use these values in all insert queries. 
-These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more
+These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more.
 
 <Callout>
 	Note: This value does not affect the drizzle-kit behavior, it is only used at runtime in drizzle-orm

@@ -3,11 +3,11 @@ import { Callout } from 'nextra-theme-docs';
 
 # MySQL column types
 
-We have native support for all of them, yet if that's not enough for you - feel free to create [custom types](../custom-types).
+We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
 
 ### Integer
 
-A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value
+A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
 
 <Section>
 ```typescript
@@ -229,7 +229,7 @@ CREATE TABLE `table` (
 
 <Section>
 
-`SERIAL` is an alias for `BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE`
+`SERIAL` is an alias for `BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE`.
 
 ```typescript
 import { serial, mysqlTable } from "drizzle-orm/mysql-core";
@@ -301,7 +301,7 @@ CREATE TABLE `table` (
 </Section>
 
 ### varchar
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
 <Section>
 ```typescript
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
@@ -323,7 +323,7 @@ CREATE TABLE `table` (
 
 ### text
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values
+You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
 
 <Section>
 ```typescript
@@ -580,7 +580,7 @@ const users = mysqlTable('users', {
 
 ## Columns constraints
 ### Not null
-`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value
+`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 
 <Section>
 ```typescript
@@ -626,7 +626,7 @@ CREATE TABLE `table` (
 
 When using `$default()` or `$defaultFn()`, which are simply different aliases for the same function, 
 you can generate defaults at runtime and use these values in all insert queries. 
-These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more
+These functions can assist you in utilizing various implementations such as `uuid`, `cuid`, `cuid2`, and many more.
 
 <Callout>
 	Note: This value does not affect the drizzle-kit behavior, it is only used at runtime in drizzle-orm

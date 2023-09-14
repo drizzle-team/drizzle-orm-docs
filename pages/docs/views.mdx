@@ -110,7 +110,7 @@ If you need a subset of columns - you can use `.select({ ... })` method in query
   ```
 </Section>
 
-You can also declare views using `standalone query builder`, it works exactly the same way
+You can also declare views using `standalone query builder`, it works exactly the same way:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -213,8 +213,8 @@ const newYorkers = pgMaterializedView('new_yorkers', {
 ```
 
 ### Declaring existing views
-When you're provided with a read only access to an existing view in the database - you should use `.existing()` view configuration, 
-`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration
+When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
+`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
 ```ts
 export const user = pgTable("user", {
   id: serial("id"),
@@ -244,8 +244,8 @@ export const trimmedUser = pgMaterializedView("trimmed_user", {
 ### Materialized views
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
 
-According to their official docs, PostgreSQL has [`regular`](https://www.postgresql.org/docs/current/sql-createview.html) 
-and [`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html)  
+According to the official docs, PostgreSQL has both **[`regular`](https://www.postgresql.org/docs/current/sql-createview.html)**
+and **[`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html)** views.
   
 Materialized views in PostgreSQL use the rule system like views do, but persist the results in a table-like form  
 Drizzle ORM natively supports PostgreSQL materialized views
@@ -261,7 +261,7 @@ CREATE MATERIALIZED VIEW "new_yorkers" AS SELECT * FROM "users";
 ```
 </Section>
 
-You can then refresh materialized vies in the application runtime
+You can then refresh materialized views in the application runtime:
 ```ts copy
 await db.refreshMaterializedView(newYorkers);
 

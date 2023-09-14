@@ -4,7 +4,7 @@ import { Callout } from 'nextra-theme-docs'
 import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # SQL Insert
-Drizzle ORM provides you the most SQL-like way to insert rows into the database tables
+Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
 
 ## Insert one row
 Inserting data with Drizzle is extremely straightfoward and sql-like
@@ -18,7 +18,7 @@ insert into "users" ("name") values ("Andrew");
 ```
 </Section>
 
-If you need insert type for a particular table - you can use `typeof usersTable.$inferInsert` syntax
+If you need insert type for a particular table you can use `typeof usersTable.$inferInsert` syntax. 
 ```typescript copy 
 type NewUser = typeof users.$inferInsert;
 
@@ -32,7 +32,7 @@ await insertUser(newUser);
 
 ## Insert returning
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
-You can insert a row and get it back in PostgreSQL and SQLite
+You can insert a row and get it back in PostgreSQL and SQLite like such:
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
 
@@ -46,7 +46,7 @@ await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 ```
 
 ## OnConflict and Upsert [insert or update]
-You can run insert statements with on conflict clause to `do nothing` or `update`  
+You can run insert statements with on conflict clause to `do nothing` or `update`:
 ```typescript copy
 await db.insert(users)
   .values({ id: 1, name: 'John' })
@@ -65,7 +65,7 @@ await db.insert(users)
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
 
-Upsert with where statement
+Upsert with where statement:
 ```typescript
 await db.insert(users)
   .values({ id: 1, name: 'John' })
