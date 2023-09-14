@@ -45,6 +45,19 @@ const db: BetterSQLite3Database = drizzle(sqlite);
 const result = await db.select().from(users);
 ```
 
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](http://localhost:3000/docs/column-types/sqlite)**
+
 If you want to use **sync** APIs:
 ```typescript copy
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/bun-sqlite';
