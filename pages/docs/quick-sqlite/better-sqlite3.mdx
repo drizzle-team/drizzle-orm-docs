@@ -1,4 +1,4 @@
-import { Tab, Tabs } from 'nextra-theme-docs';
+import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
 # BetterSqlite3
 According to the **[official docs](https://github.com/WiseLibs/better-sqlite3)**, 
@@ -57,6 +57,10 @@ const users = sqliteTable('users', {
 });
 ```
 For more details about column types, see the **[SQLite column types in Drizzle.](http://localhost:3000/docs/column-types/sqlite)**
+
+<Callout type="info" emoji="ℹ️">
+  If your `db.insert()` returns data, append `all()` to your query, otherwise append `run()`
+</Callout>
 
 If you want to use **sync** APIs:
 ```typescript copy
