@@ -1,12 +1,9 @@
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import { useRouter } from 'next/router';
-import TwitterLink from './components/Icons/TwitterLink';
-import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import TitleComponent from './components/TitleComponent/TitleComponent';
-import GithubLink from './components/Icons/GithubLink';
-import DiscordLink from './components/Icons/DiscordLink';
 import Footer from './components/Footer/Footer';
 import Logo from './components/Logo/Logo';
+import Navigation from './components/Navigation/Navigation';
 
 const config: DocsThemeConfig = {
   banner: {
@@ -35,15 +32,7 @@ const config: DocsThemeConfig = {
   gitTimestamp: <></>,
   main: ({ children }) => <div style={{ maxWidth: 1024, margin: '0 auto' }}>{children}</div>,
   navbar: {
-    extraContent:
-  <>
-    <div className="social-networks">
-      <GithubLink />
-      <DiscordLink />
-      <TwitterLink />
-    </div>
-    <ThemeToggle />
-  </>,
+    component: <Navigation />,
   },
   themeSwitch: {
   },
