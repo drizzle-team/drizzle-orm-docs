@@ -32,7 +32,7 @@ const Navigation = () => {
 
   return (
     <>
-      <div className={styles.nav_container}>
+      <div className={`${styles.nav_container}`}>
         <div className={styles.nav_container_blur} />
         <div className={styles.nav_content_wrap}>
           <div onClick={navigateToMainPage} className={styles.nav_logo}>
