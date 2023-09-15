@@ -35,8 +35,11 @@ const Navigation = () => {
             <Socials />
             <ThemeToggle />
           </div>
-          <div className={styles.nav_mobile} onClick={toggleMenu}>
-            <div className={`${styles.burger} ${isOpened ? styles.open : styles.close}`}>
+          <div className={styles.nav_mobile}>
+            <div className={styles.toggle}>
+              <ThemeToggle />
+            </div>
+            <div onClick={toggleMenu} className={`${styles.burger} ${isOpened ? styles.open : styles.close}`}>
               <BurgerIcon />
             </div>
           </div>
