@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import styles from './Navigation.module.css';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import Logo from '../Logo/Logo';
@@ -10,6 +10,7 @@ import MobileNav from './components/MobileNav/MobileNav';
 import Socials from './components/Socials/Socials';
 
 const Navigation = () => {
+  const router = useRouter();
   const [isOpened, setIsOpened] = useState(false);
   const toggleMenu = () => {
     if (isOpened) {
@@ -19,14 +20,24 @@ const Navigation = () => {
     }
     setIsOpened((prev) => !prev);
   };
+
+  const navigateToMainPage = () => {
+    if (isOpened) {
+      toggleMenu();
+    }
+    if (router.pathname !== '/') {
+      router.push('/');
+    }
+  };
+
   return (
     <>
-      <div className={styles.nav_container}>
+      <div className={`${styles.nav_container}`}>
         <div className={styles.nav_container_blur} />
         <div className={styles.nav_content_wrap}>
-          <Link href="/" className={styles.nav_logo}>
+          <div onClick={navigateToMainPage} className={styles.nav_logo}>
             <Logo />
-          </Link>
+          </div>
           <div className={styles.nav_desktop}>
             <NavItem value="Pricing" href="/#pricing" activeKeywords={['/#pricing']} />
             <NavItem value="Studio" href="/drizzle-studio/overview" activeKeywords={['drizzle-studio']} />
