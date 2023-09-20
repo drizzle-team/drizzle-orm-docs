@@ -30,11 +30,12 @@ html[class~=dark] .circle {
   justify-content: center;
   width: 20px;
   height: 20px;
-  border-radius: 10px;
+  border-radius: 50%;
   background-color: rgb(229, 231, 235);
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+  will-change: left;
   transition: all ease-in-out 0.1s;
 }
 
@@ -44,4 +45,21 @@ html[class~=dark] .circle {
 
 .light {
   left: 16%;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    width: 24px;
+  }
+  .dark {
+    left: 50%;
+  }
+  .light {
+    left: 50%;
+  }
+
+  .circle {
+    width: 24px;
+    height: 24px;
+  }
 }

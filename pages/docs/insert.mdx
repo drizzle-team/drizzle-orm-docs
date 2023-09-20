@@ -45,8 +45,14 @@ await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: u
 await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 ```
 
-## OnConflict and Upsert [insert or update]
-You can run insert statements with on conflict clause to `do nothing` or `update`:
+## Upserts and conflicts
+Drizzle ORM provides simple interfaces for handling upserts and conflicts.
+
+### On conflict do nothing
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+
+`onConflictDoNothing` will cancel the insert if there's a conflict:
+
 ```typescript copy
 await db.insert(users)
   .values({ id: 1, name: 'John' })
@@ -58,14 +64,18 @@ await db.insert(users)
   .onConflictDoNothing({ target: users.id });
 ```
 
-This is how you upsert with `onConflictDoUpdate`. You can specify `set` and `where` clauses:
+This is how you upsert with `onConflictDoUpdate`, you can specify `set` and `where` clauses.
+
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+
+`onConflictDoUpdate` will update the row if there's a conflict:
 ```typescript
 await db.insert(users)
   .values({ id: 1, name: 'Dan' })
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
 
-Upsert with where statement:
+Upsert with `where` clause for `onConflictDoUpdate`:
 ```typescript
 await db.insert(users)
   .values({ id: 1, name: 'John' })
@@ -74,4 +84,28 @@ await db.insert(users)
     set: { name: 'John1' },
     where: sql`${users.createdAt} > '2023-01-01'::date`,
   });
+```
+
+### On duplicate key update
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true }} />
+
+MySQL supports [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html) instead of `ON CONFLICT` clauses. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if *any* unique index conflicts.
+
+Drizzle supports this through the `onDuplicateKeyUpdate` method:
+
+```typescript
+// Note that MySQL automatically determines targets based on the primary key and unique indexes
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { name: 'John' } });
+```
+
+While MySQL does not directly support doing nothing on conflict, you can perform a no-op by setting any column's value to itself and achieve the same effect:
+
+```typescript
+import { sql } from 'drizzle-orm';
+
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { id: sql`id` } });
 ```

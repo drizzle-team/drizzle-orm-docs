@@ -178,7 +178,7 @@ export default {
 ```ts
 export default {
   dbCredentials: {
-    url: '',
+    url: '', // 👈 this could also be a path to the local sqlite file
   }
 } satisfies Config;
 ```
@@ -222,7 +222,7 @@ export default {
 } satisfies Config;
 ```
 
-### tableFilters
+### tablesFilters
 
 - **Type**: `string | string[]`
 - **Commands**: `push`
@@ -312,8 +312,7 @@ This section is a reference to `introspect` object inside `drizzle.config.*` fil
 - **Default**: `camel`
 - **Commands**: 
 
-This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting 
-your databse.
+This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting your databse.
 
 **Usage**
 ```ts

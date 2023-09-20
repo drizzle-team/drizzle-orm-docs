@@ -438,7 +438,7 @@ const searchParam = "Ale"
 
 await db.select()
         .from(usersTable)
-        .where(sql`to_tsvector('simple', ${usersTable.name}) @@ to_tsquery('simple', '${searchParam}')`)
+        .where(sql`to_tsvector('simple', ${usersTable.name}) @@ to_tsquery('simple', ${searchParam})`)
 ```
 ```sql
 select * from "users" where to_tsvector('simple', "users"."name") @@ to_tsquery('simple', '$1'); --> [ "Ale" ]

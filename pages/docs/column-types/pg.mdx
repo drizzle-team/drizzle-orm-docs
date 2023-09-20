@@ -139,7 +139,6 @@ CREATE TABLE IF NOT EXISTS "table" (
 `serial` `serial4`  
 Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
 
-
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
 <Section>
 ```typescript
@@ -653,7 +652,7 @@ const table = pgTable('table', {
 	integer1: integer('integer1').default(42),
 	integer2: integer('integer2').default(sql`'42'::integer`),
 	uuid1: uuid('uuid1').defaultRandom(),
-	uuid2: uuid('uuid2').default(sql`get_random_uuid()`),
+	uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
 });
 ```
 

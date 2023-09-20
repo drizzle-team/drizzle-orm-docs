@@ -1,6 +1,6 @@
 import DiscordLink from '../Icons/DiscordLink';
 import GithubLink from '../Icons/GithubLink';
-import TwitterIcon from '../Icons/TwitterLink';
+import TwitterLink from '../Icons/TwitterLink';
 import styles from './Footer.module.css';
 
 const Footer = () => (
@@ -8,7 +8,7 @@ const Footer = () => (
     <div className={styles.container}>
       <GithubLink />
       <DiscordLink />
-      <TwitterIcon />
+      <TwitterLink />
     </div>
   </div>
 );
