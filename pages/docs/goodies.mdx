@@ -18,11 +18,11 @@ const users = pgTable('users', {
   name: text('name').notNull(),
 });
 
-type SelectUser = users.$inferSelect;
-type InsertUser = users.$inferInsert;
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
 // or
-type SelectUser = users._.$inferSelect;
-type InsertUser = users._.$inferInsert;
+type SelectUser = typeof users._.$inferSelect;
+type InsertUser = typeof users._.$inferInsert;
 // or
 type SelectUser = InferSelectModel<typeof users>;
 type InsertUser = InferInsertModel<typeof users>;
@@ -38,11 +38,11 @@ const users = mysqlTable('users', {
   name: text('name').notNull(),
 });
 
-type SelectUser = users.$inferSelect;
-type InsertUser = users.$inferInsert;
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
 // or
-type SelectUser = users._.$inferSelect;
-type InsertUser = users._.$inferInsert;
+type SelectUser = typeof users._.$inferSelect;
+type InsertUser = typeof users._.$inferInsert;
 // or
 type SelectUser = InferSelectModel<typeof users>;
 type InsertUser = InferInsertModel<typeof users>;
@@ -58,11 +58,11 @@ const users = sqliteTable('users', {
   name: text('name').notNull(),
 });
 
-type SelectUser = users.$inferSelect;
-type InsertUser = users.$inferInsert;
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
 // or
-type SelectUser = users._.$inferSelect;
-type InsertUser = users._.$inferInsert;
+type SelectUser = typeof users._.$inferSelect;
+type InsertUser = typeof users._.$inferInsert;
 // or
 type SelectUser = InferSelectModel<typeof users>;
 type InsertUser = InferInsertModel<typeof users>;
