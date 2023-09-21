@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 export interface ISponsor {
   tier: {
     name: string;
@@ -12,6 +14,8 @@ export interface ISponsor {
   createdAt: string;
   isActive: boolean;
   imageType?: ImageType;
+  lightStyle?: CSSProperties;
+  darkStyle?: CSSProperties;
 }
 
 export enum ImageType {
