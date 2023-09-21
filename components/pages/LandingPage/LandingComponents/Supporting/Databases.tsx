@@ -44,6 +44,16 @@ const Databases: {
     },
     sponsorUrl: 'https://turso.tech/drizzle',
   },
+  Xata: {
+    src: 'xata.svg',
+    lightStyles: {
+      width: 32,
+    },
+    darkStyles: {
+      width: 32,
+    },
+    sponsorUrl: 'https://xata.io/',
+  },
   Supabase: {
     src: 'supabase.svg',
     lightStyles: {
