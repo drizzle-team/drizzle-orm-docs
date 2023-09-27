@@ -101,17 +101,6 @@ html[class~=dark] .gradient-left {
   background-color: #ffffff;
 }
 
-.card_name {
-  text-align: center;
-  font-size: 14px;
-  color: #434a54;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-}
-
-
 .sponsors_header {
   display: flex;
   flex-direction: row;
@@ -210,34 +199,9 @@ html[class~='dark'] .button_accent {
   background-color: rgb(226, 232, 240);
 }
 
-
-@media (max-width: 900px) {
-  .title {
-    font-size: 20px;
-  }
-  .description {
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 599px) {
-  .container {
-    gap: 20px;
-  }
-
-  .buttons {
-    gap: 10px;
-  }
-
-  .button_accent {
-    font-size: 14px;
-    height: 46px;
-  }
-}
-
 .stream-link {
   text-decoration: underline;
-  margin-right: 4px;
+  margin: 0 4px;
 }
 
 html[class~=dark] .special-sponsors_wrap {
@@ -275,7 +239,7 @@ html[class~=dark] .special-sponsors_wrap {
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 html[class~=dark] .special-sponsor_card_image  {
@@ -296,6 +260,7 @@ html[class~=dark] .special-sponsor_card_name  {
 .special-sponsor_card_name {
   color: #434a54;
   font-size: 14px;
+  line-height: 14px;
 }
 
 html[class~=dark] .light-image {
@@ -312,4 +277,37 @@ html[class~=dark] .dark-image {
 
 .dark-image {
   display: block;
+}
+
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 20px;
+  }
+  .description {
+    font-size: 14px;
+  }
+}
+
+
+@media (max-width: 767px) {
+  .wrapper, .special-sponsors_wrap {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+}
+
+@media (max-width: 599px) {
+  .container {
+    gap: 20px;
+  }
+
+  .buttons {
+    gap: 10px;
+  }
+
+  .button_accent {
+    font-size: 14px;
+    height: 46px;
+  }
 }
