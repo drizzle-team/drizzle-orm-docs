@@ -69,6 +69,7 @@ const SponsorsLine = () => {
             <header className={styles['special-sponsors_header']}>
               <div className={styles.type_header}>
                 <span>
+                  ❤️
                   <a
                     className={styles['stream-link']}
                     href="https://www.twitch.tv/videos/1920358375"
