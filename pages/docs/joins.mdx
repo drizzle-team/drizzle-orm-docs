@@ -122,11 +122,11 @@ supports joins with partial select and will automatically infer return type base
 ```typescript copy
 await db.select({
   userId: users.id,
-  petId: pets.is,
+  petId: pets.id,
 }).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
-select "users"."id", "pets","id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
+select "users"."id", "pets"."id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
 ```
 ```typescript
 // result type
