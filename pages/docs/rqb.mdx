@@ -102,7 +102,7 @@ const db = drizzle(connection, { schema, mode: 'planetscale' });
 
 Drizzle ORM provides you an API to define `one-to-one` relations between tables with the `relations` operator.
 
-An example of a `one-to-one` relation between users and users, where a user invite another to an event (this example uses a self reference):
+An example of a `one-to-one` relation between users and users, where a user can invite another (this example uses a self reference):
 
 ```typescript copy {10-15}
 import { pgTable, serial, text, integer, boolean } from "drizzle-orm/pg-core";
