@@ -99,49 +99,52 @@ const db = drizzle(connection, { schema, mode: 'planetscale' });
 ## Declaring relations
 
 ### One-to-one
-Drizzle ORM provides you an API to define `one-to-one` relations between tables with `relations` operator.  
-Example of `one-to-one` relation between users and users who invited them to the service, self reference
+
+Drizzle ORM provides you an API to define `one-to-one` relations between tables with the `relations` operator.
+
+An example of a `one-to-one` relation between users and users, where a user invite another to an event (this example uses a self reference):
 
 ```typescript copy {10-15}
-import { pgTable, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { pgTable, serial, text, integer, boolean } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
-	invitedBy: integer('invited_by'),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: text("name"),
+  invitedBy: integer("invited_by"),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
-	invitee: one(users, {
-		fields: [users.invitedBy],
-		references: [users.id],
-	}),
+  invitee: one(users, {
+    fields: [users.invitedBy],
+    references: [users.id],
+  }),
 }));
 ```
 
-Another example would be a user having a profile information stored in separate table
-```typescript copy {9-14}
-import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+```typescript copy {9-17}
+import { pgTable, serial, text, integer, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: text("name"),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
-	profileInfo: one(profileInfo, {
-		fields: [users.id],
-		references: [profileInfo.userId],
-	}),
+  profileInfo: one(profileInfo),
 }));
 
-export const profileInfo = pgTable('profile_info', {
-	id: serial('id').primaryKey(),
-	userId: integer("user_id").references(() => users.id),
-	metadata: jsonb("metadata"),
+export const profileInfo = pgTable("profile_info", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  metadata: jsonb("metadata"),
 });
+
+const user = await queryUserWithProfileInfo();
+//____^? type { id: number, profileInfo: { ... } | null  }
 ```
 
 ### One-to-many
