@@ -1,0 +1,108 @@
+import Section from '../../components/Section/Section';
+import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+
+
+
+# Create an Instance of the drizzle client
+
+
+If you're getting this error for postgres client
+
+
+```bash
+PostgresError: remaining connection slots are reserved for non-replication superuser connections
+```
+
+
+Create a global instance for postgres client to avoid pool getting exhausted by a single user instance
+
+<Section>
+
+<CodeTabs items={["Single file schema", "Multi file schema"]}>
+```typescript copy
+
+//db.ts
+
+
+// Create a global instance for drizzle client
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema"
+
+
+declare module global {
+  let postgresSqlClient: ReturnType<typeof postgres> | undefined;
+}
+
+let postgresSqlClient;
+
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is missing')
+}
+
+
+const databaseUrl = process.env.DATABASE_URL;
+
+if (process.env.NODE_ENV !== "production") {
+  if (!global.postgresSqlClient) {
+    global.postgresSqlClient = postgres(databaseUrl);
+  }
+  postgresSqlClient = global.postgresSqlClient;
+} else {
+  postgresSqlClient = postgres(databaseUrl);
+}
+
+export const db = drizzle(postgresSqlClient, {
+  schema: schema,
+});
+```
+
+```typescript copy
+//Create a global instance
+// For multilple schema
+
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as auth from "@/schema/auth";
+import * as list from "@/schema/list";
+import * as profile from "@/schema/profile";
+import * as enums from "@/schema/enums";
+declare module global {
+  let postgresSqlClient: ReturnType<typeof postgres> | undefined;
+}
+
+let postgresSqlClient;
+
+const databaseUrl = process.env.DATABASE_URL!;
+
+if (process.env.NODE_ENV !== "production") {
+  if (!global.postgresSqlClient) {
+    global.postgresSqlClient = postgres(databaseUrl);
+  }
+  postgresSqlClient = global.postgresSqlClient;
+} else {
+  postgresSqlClient = postgres(databaseUrl);
+}
+
+export const db = drizzle(postgresSqlClient, {
+  schema: {
+    ...auth,
+    ...list,
+    ...profile,
+    ...enums,
+  },
+});
+```
+</CodeTabs>
+</Section>
+
+
+
+
+Shout out to [@hawkup](https://github.com/hawkup) for this solution
+
+
+If you're still facing some issues, please consider opening an issue at the repo with steps to reproduce.
+
+Happy Coding :)
