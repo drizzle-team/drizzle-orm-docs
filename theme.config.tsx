@@ -16,14 +16,8 @@ const config: DocsThemeConfig = {
   },
   useNextSeoProps() {
     const { asPath } = useRouter();
-    if (asPath !== '/') {
-      return {
-        titleTemplate: '%s - DrizzleORM',
-        description: 'Drizzle ORM | %s',
-      };
-    }
     return {
-      titleTemplate: 'DrizzleORM - next gen TypeScript ORM',
+      titleTemplate: asPath === '/' ? 'DrizzleORM - next gen TypeScript ORM' : '%s - DrizzleORM',
       description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind',
     };
   },
