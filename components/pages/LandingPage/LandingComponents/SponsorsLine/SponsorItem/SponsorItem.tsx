@@ -18,7 +18,7 @@ const SponsorItem:FC<Props> = ({
   const isLight = useGetTheme();
   const imgSrc = sponsor.imageType === ImageType.SVG
     ? `data:image/svg+xml;base64,${btoa(sponsor.sponsorEntity.avatarUrl)}`
-    : sponsor.sponsorEntity.avatarUrl;
+    : `${sponsor.sponsorEntity.avatarUrl.split('?')[0]}?size=${imgSize * 2}`;
 
   const imageWrapperStyles = {
     width: `${imgSize}px`,
