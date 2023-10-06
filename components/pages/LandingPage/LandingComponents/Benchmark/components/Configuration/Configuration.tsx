@@ -15,7 +15,7 @@ const Configuration: FC<IProps> = ({
   setSelectedItems,
   isOpened,
 }) => {
-  const [currentTab, setCurrentTab] = React.useState<string>('dbSize');
+  const [currentTab, setCurrentTab] = React.useState<string>('traffic');
   const [params, setParams] = useState<IParams | null>(null);
 
   const changeTab = (tab: string) => {

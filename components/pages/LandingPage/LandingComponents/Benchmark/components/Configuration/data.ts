@@ -9,6 +9,32 @@ const data: {
   }[];
 }[] = [
   {
+    value: 'Traffic size',
+    key: 'traffic',
+    items: [
+      {
+        id: '500vus',
+        value: 'Medium',
+        description: '500VUs, 600k reqs',
+      },
+      {
+        id: '1000vus',
+        value: 'High',
+        description: '1k VUs, 1M reqs',
+      },
+      {
+        id: 'stepped',
+        value: 'Stepped',
+        disabled: true,
+      },
+      {
+        id: 'spikes',
+        value: 'Traffic spikes',
+        disabled: true,
+      },
+    ],
+  },
+  {
     value: 'Database size',
     key: 'dbSize',
     items: [
@@ -83,32 +109,7 @@ const data: {
       },
     ],
   },
-  {
-    value: 'Traffic size',
-    key: 'traffic',
-    items: [
-      {
-        id: '500vus',
-        value: 'Medium',
-        description: '500VUs, 600k reqs',
-      },
-      {
-        id: '1000vus',
-        value: 'High',
-        description: '1k VUs, 1M reqs',
-      },
-      {
-        id: 'stepped',
-        value: 'Stepped',
-        disabled: true,
-      },
-      {
-        id: 'spikes',
-        value: 'Traffic spikes',
-        disabled: true,
-      },
-    ],
-  },
+
 ];
 
 export default data;

@@ -15,6 +15,8 @@ function ControlPanel() {
     setIsTimerActive, isTimerActive, time, setTime, intervalId,
   } = useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
+  const [isBlurred, setIsBlurred] = useState<boolean>(true);
+  const [isShaking, setIsShaking] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<IParams>({
     dbSize: 'm',
     projectType: 'ecommerce',
@@ -86,6 +88,21 @@ function ControlPanel() {
     setIsTimerActive(true);
   };
 
+  const start = () => {
+    if (window.innerWidth < 940 && !isShaking) {
+      setIsShaking(true);
+      setTimeout(() => {
+        setIsShaking(false);
+      }, 2000);
+      return;
+    }
+    if (isShaking) return;
+    rerun();
+    setTimeout(() => {
+      setIsBlurred(false);
+    }, 200);
+  };
+
   useEffect(() => {
     getFile().then((data) => {
       if (!data.drizzleData || !data.compareData) return;
@@ -98,6 +115,12 @@ function ControlPanel() {
       setCompareData(null);
     };
   }, [selectedItems]);
+
+  useEffect(() => {
+    if (isBlurred) {
+      skipToResults();
+    }
+  }, [drizzleData, compareData]);
 
   return (
     <div className={styles.wrap}>
@@ -118,6 +141,15 @@ function ControlPanel() {
           </button>
         </div>
         <div className={styles.container}>
+          <div className={isBlurred ? styles.blurred : styles['hide-blur']}>
+            {drizzleData && compareData
+            && (
+            <div className={styles['blur-content']}>
+              {isShaking && <div className={styles['only-desktop']}>Only available on Desktop 🖥️</div>}
+              <button onClick={start} type="button" className={isShaking ? styles['start-shaked'] : styles.start}>Launch your DevOps experience 🚀</button>
+            </div>
+            )}
+          </div>
           <Performance
             isConfigOpen={isConfigOpen}
             speed={speed}

@@ -7,10 +7,19 @@ const Benchmark = () => (
   <BenchmarkProvider>
     <div className={styles.wrap}>
       <div className={styles.header}>
-        Benchmarks
+        Performance
       </div>
       <div className={styles.charts}>
         <ControlPanel />
+        <div className={styles.bottom}>
+          <a href="https://google.com" target="_blank" rel="nofollow noreferrer" className={styles['how-it-works']}>How it works?</a>
+          <div>
+            |
+          </div>
+          <a href="https://google.com" target="_blank" rel="nofollow noreferrer" className={styles.github}>
+            Open on Github ↗︎
+          </a>
+        </div>
       </div>
     </div>
   </BenchmarkProvider>

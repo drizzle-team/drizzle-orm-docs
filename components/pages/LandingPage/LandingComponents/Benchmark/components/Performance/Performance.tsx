@@ -112,13 +112,23 @@ const Performance: FC<Props> = ({
         <div className={styles['compare-icon-wrap']}>
           <DrizzleLogo />
         </div>
-        Drizzle
+        <div>
+          <div className={styles.name}>Drizzle</div>
+          <div className={styles.version}>
+            v0.28.6
+          </div>
+        </div>
       </div>
       <div className={styles['compare-item']}>
         <div className={styles['compare-icon-wrap']}>
           <PrismaIcon />
         </div>
-        Prisma
+        <div>
+          <div className={styles.name}>Prisma</div>
+          <div className={styles.version}>
+            v5.4.1
+          </div>
+        </div>
       </div>
       <div className={styles.block}>
         <LatencyChart

@@ -72,7 +72,7 @@ const CustomBarChart: FC<IProps> = ({
     </g>
   );
 
-  const calculateRect = () => pathArray.map(() => `v-${svgHeight}h${(itemSize / 2).toFixed(2)}v${svgHeight}h${(itemSize / 2).toFixed(2)}`).join('');
+  const calculateRect = () => (pathArray.length > 0 ? pathArray.map(() => `v-${svgHeight}h${(itemSize / 2).toFixed(2)}v${svgHeight}h${(itemSize / 2).toFixed(2)}`).join('') : '0');
 
   const generateRect = (
     <path
