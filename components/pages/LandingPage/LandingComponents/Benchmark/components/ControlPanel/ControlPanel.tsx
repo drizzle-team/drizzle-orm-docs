@@ -21,7 +21,7 @@ function ControlPanel() {
     dbSize: 'm',
     projectType: 'ecommerce',
     database: 'postgres',
-    traffic: '500vus',
+    traffic: '1000vus',
   });
 
   const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
@@ -129,6 +129,7 @@ function ControlPanel() {
           <div className={styles.time}>
             <Timer time={time} />
             <SpeedSelector speed={speed} setSpeed={setSpeed} />
+            <div className={styles.divider} />
             {isTimerActive && !isConfigOpen && (
             <button type="button" className={styles['play-wrap']} onClick={skipToResults}>Skip to results</button>
             )}

@@ -104,21 +104,31 @@ html[class~=dark] .start, html[class~=dark] .start-shaked {
 .time {
 	display: flex;
 	align-items: center;
+	gap: 16px;
 }
 
-.time > div:not(:first-child) {
-  padding-left: 16px;
+html[class~=dark] .time > div:first-child {
+	border-right: 1px solid #555;
 }
 
-.time > div:not(:last-child) {
-  border-right: 1px solid #e6e6e6;
+.time > div:first-child {
+  border-right: 1px solid #f0f0f0;
   padding-right: 16px;
+}
+
+html[class~=dark] .divider {
+	background-color: #555;
+}
+
+.divider {
+	background-color: #f0f0f0;
+	height: 20px;
+	width: 1px;
 }
 
 .play-wrap {
 	user-select: none;
 	font-size: 14px;
-	margin-left: 16px;
 	border: none;
 	cursor: pointer;
 	text-decoration: underline;

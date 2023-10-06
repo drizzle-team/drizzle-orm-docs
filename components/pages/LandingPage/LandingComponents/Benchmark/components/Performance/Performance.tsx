@@ -115,7 +115,7 @@ const Performance: FC<Props> = ({
         <div>
           <div className={styles.name}>Drizzle</div>
           <div className={styles.version}>
-            v0.28.6
+            v0.28.1
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@ const Performance: FC<Props> = ({
         <div>
           <div className={styles.name}>Prisma</div>
           <div className={styles.version}>
-            v5.4.1
+            v5.1.1
           </div>
         </div>
       </div>
