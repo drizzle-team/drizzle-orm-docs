@@ -21,6 +21,11 @@
   height: 100%;
 }
 
+html[class~=dark] .stats, html[class~=dark] .tooltip {
+	background-color: rgb(17, 17, 17);
+	box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px, rgba(0, 0, 0, 0.075) 0px 2px 4px 0px;
+}
+
 .stats {
   position: absolute;
 	z-index: 10;
@@ -51,6 +56,10 @@
   margin-top: 8px;
 }
 
+html[class~=dark] .accent-text {
+	color: #f0f0f0;
+}
+
 .accent-text {
 	white-space: nowrap;
   color: #222;
@@ -74,6 +83,10 @@
 
 .tooltip-wrap-underline:hover .tooltip {
   display: flex;
+}
+
+html[class~=dark] .tooltip {
+	color: #f0f0f0;
 }
 
 .tooltip {
@@ -110,4 +123,47 @@
   color: #13862e;
   width: 100%;
   height: 100%;
+}
+
+
+html[class~=dark] .line {
+	stroke: #47b7f8;
+}
+
+.line {
+	stroke: #0b6ec5;
+}
+
+html[class~=dark] .color-stop-polygon {
+	stop-color: #08204e;
+}
+
+.color-stop-polygon {
+	stop-color: #e2f4ff;
+}
+
+html[class~=dark] .dashed-line {
+	stroke: #414141;
+}
+
+.dashed-line {
+	stroke: #e1e1e1;
+}
+
+html[class~=dark] .circle {
+	fill: #111;
+	stroke: #47b7f8;
+}
+
+.circle {
+	fill: #ffffff;
+	stroke: #0b6ec5;
+}
+
+html[class~=dark] .selected-line {
+	stroke: #47b7f8;
+}
+
+.selected-line {
+	stroke: #111;
 }

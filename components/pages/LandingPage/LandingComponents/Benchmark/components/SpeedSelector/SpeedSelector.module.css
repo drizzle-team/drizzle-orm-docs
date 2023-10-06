@@ -12,6 +12,11 @@
     monospace;
 }
 
+html[class~=dark] .button {
+	border: 1px solid #414141;
+	background-color: #111111;
+}
+
 .button {
 	padding: 8px 20px;
 	width: 70px;
@@ -22,9 +27,14 @@
 	cursor: pointer;
 }
 
+html[class~=dark] .items-wrap {
+	color: #f0f0f0;
+	background-color: rgb(17, 17, 17);
+	box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px, rgba(0, 0, 0, 0.075) 0px 2px 4px 0px;
+}
+
 .items-wrap {
 	position: absolute;
-	border: 1px solid rgb(235, 235, 235);
 	border-radius: 8px;
 	background-color: #ffffff;
 	padding: 16px;
@@ -50,6 +60,17 @@
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 8px;
+}
+
+
+html[class~=dark] .item {
+	background-color: transparent;
+	border: 1px solid #414141;
+}
+
+html[class~=dark] .active-item {
+	background-color: rgba(71, 183, 248, 0.1);
+	border: 1px solid #47b7f8;
 }
 
 .item, .active-item {

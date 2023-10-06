@@ -31,6 +31,12 @@
 	justify-content: center;
 }
 
+html[class~=dark] .only-desktop {
+	color: #f0f0f0;
+	background-color: rgb(17, 17, 17);
+	box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px, rgba(0, 0, 0, 0.075) 0px 2px 4px 0px;
+}
+
 .only-desktop {
 	transform: translateY(-14px);
 	font-size: 14px;
@@ -44,6 +50,11 @@
 	flex-direction: column;
 	align-items: flex-start;
 	height: 100%;
+}
+
+html[class~=dark] .start, html[class~=dark] .start-shaked {
+	color: #282828;
+  background-color: rgb(226, 232, 240);
 }
 
 .start, .start-shaked {
@@ -106,13 +117,17 @@
 
 .play-wrap {
 	user-select: none;
-  background-color: #fff;
 	font-size: 14px;
 	margin-left: 16px;
 	border: none;
 	cursor: pointer;
 	text-decoration: underline;
 	text-decoration-style: dashed;
+}
+
+html[class~=dark] .config-button {
+	border: 1px solid #414141;
+	background-color: #111111;
 }
 
 .config-button {
@@ -122,7 +137,12 @@
 	border-radius: 6px;
 	font-size: 12px;
 	background-color: #ffffff;
-	cursor: pointer; 
+	cursor: pointer;
+}
+
+html[class~=dark] .container {
+	border: 1px solid #2b2b2b;
+	background-color: #1a1a1a;
 }
 
 .container {

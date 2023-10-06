@@ -8,10 +8,6 @@ import CheckIcon from '@/components/CheckIcon';
 import {
   SVGViewBoxHeight,
   SVGViewBoxWidth,
-  BAR_CHART_COLOR_PLACEHOLDER_HOVER,
-  BAR_CHART_COLOR_HOVER,
-  BAR_CHART_COLOR_PLACEHOLDER,
-  BAR_CHART_COLOR,
 } from '../../constants';
 import { IData } from '../../types';
 import fixedHelper from '../../utils/fixedHelper';
@@ -63,7 +59,7 @@ const CustomBarChart: FC<IProps> = ({
   const getPolylines = (
     <g>
       <polyline
-        fill={BAR_CHART_COLOR}
+        className={styles['bar-chart']}
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -76,7 +72,7 @@ const CustomBarChart: FC<IProps> = ({
 
   const generateRect = (
     <path
-      fill={BAR_CHART_COLOR_PLACEHOLDER}
+      className={styles['bar-chart-empty']}
       strokeWidth="2"
       strokeLinejoin="round"
       strokeLinecap="round"
@@ -174,14 +170,14 @@ const CustomBarChart: FC<IProps> = ({
             <g>
               <rect
                 ref={selectedBarRef}
-                fill={BAR_CHART_COLOR_PLACEHOLDER_HOVER}
+                className={styles['bar-chart-empty-hover']}
                 width={itemSize / 2}
                 height={svgHeight}
                 x={selectedItemIndex * itemSize}
                 y={0}
               />
               <rect
-                fill={BAR_CHART_COLOR_HOVER}
+                className={styles['selected-bar']}
                 width={itemSize / 2}
                 x={selectedItemIndex * itemSize}
                 y={svgHeight - (svgHeight * pathArray[selectedItemIndex].reqs) / max}
@@ -197,7 +193,7 @@ const CustomBarChart: FC<IProps> = ({
               y2="0"
               fill="none"
               strokeWidth="1"
-              stroke={BAR_CHART_COLOR}
+              className={styles['bar-chart-axis']}
               transform={`translate(0, ${svgHeight})`}
             />
             <g onMouseLeave={removeSelectedItemIndex}>

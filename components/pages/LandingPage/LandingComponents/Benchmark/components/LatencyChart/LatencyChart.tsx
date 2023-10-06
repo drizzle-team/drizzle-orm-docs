@@ -2,7 +2,7 @@ import {
   FC, useEffect, useMemo, useRef, useState,
 } from 'react';
 
-import { SVGViewBoxHeight, SVGViewBoxWidth, DATA_CHART_PARAMS } from '../../constants';
+import { SVGViewBoxHeight, SVGViewBoxWidth } from '../../constants';
 import CheckIcon from '@/components/CheckIcon';
 import { IData } from '../../types';
 import fixedHelper from '../../utils/fixedHelper';
@@ -58,7 +58,7 @@ const LatencyChart: FC<IProps> = ({
   const getLines = useMemo(() => (
     <>
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -67,7 +67,7 @@ const LatencyChart: FC<IProps> = ({
         strokeDasharray="12, 12"
       />
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -76,7 +76,7 @@ const LatencyChart: FC<IProps> = ({
         strokeDasharray="12, 12"
       />
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -85,7 +85,7 @@ const LatencyChart: FC<IProps> = ({
         strokeDasharray="12, 12"
       />
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -112,8 +112,7 @@ const LatencyChart: FC<IProps> = ({
       <circle
         key={index}
         strokeWidth="3"
-        fill="#ffffff"
-        stroke={DATA_CHART_PARAMS[param].color}
+        className={styles[`${param}-circle`]}
         r="3.5"
         data-screenshot-exclude="true"
         {...calculateCirclePosition(pathArray, param)}
@@ -125,14 +124,14 @@ const LatencyChart: FC<IProps> = ({
     <g key={index}>
       <polyline
         fill="none"
-        stroke={DATA_CHART_PARAMS[param].color}
+        className={styles[`${param}-line`]}
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
         points={calculatePath(pathArray, param)}
       />
       <polyline
-        fill={DATA_CHART_PARAMS[param].gradientColor}
+        className={styles[`${param}-polygon`]}
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -165,8 +164,7 @@ const LatencyChart: FC<IProps> = ({
       <circle
         key={index}
         strokeWidth="3"
-        fill="#ffffff"
-        stroke={DATA_CHART_PARAMS[param].color}
+        className={styles[`${param}-circle`]}
         r="3.5"
         data-screenshot-exclude="true"
         cx={selectedItemIndex * itemSize}
@@ -237,6 +235,7 @@ const LatencyChart: FC<IProps> = ({
             {selectedItemIndex !== null && (
             <line
               ref={lineRef}
+              className={styles['selected-line']}
               stroke="#000000"
               strokeWidth="1"
               x1={selectedItemIndex * itemSize}
@@ -259,10 +258,7 @@ const LatencyChart: FC<IProps> = ({
         >
           <div className={styles['stats-item']}>
             <div
-              className={styles.circle}
-              style={{
-                backgroundColor: DATA_CHART_PARAMS.avg.color,
-              }}
+              className={`${styles.circle} ${styles['stats-avg']}`}
             />
             avg:
             <div className={styles['accent-text']}>
@@ -271,8 +267,7 @@ const LatencyChart: FC<IProps> = ({
           </div>
           <div className={styles['stats-item']}>
             <div
-              className={styles.circle}
-              style={{ backgroundColor: DATA_CHART_PARAMS.p90.color }}
+              className={`${styles.circle} ${styles['stats-p90']}`}
             />
             p90:
             <div className={styles['accent-text']}>
@@ -281,8 +276,7 @@ const LatencyChart: FC<IProps> = ({
           </div>
           <div className={styles['stats-item']}>
             <div
-              className={styles.circle}
-              style={{ backgroundColor: DATA_CHART_PARAMS.p95.color }}
+              className={`${styles.circle} ${styles['stats-p95']}`}
             />
             p95:
             <div className={styles['accent-text']}>
@@ -291,8 +285,7 @@ const LatencyChart: FC<IProps> = ({
           </div>
           <div className={styles['stats-item']}>
             <div
-              className={styles.circle}
-              style={{ backgroundColor: DATA_CHART_PARAMS.p99.color }}
+              className={`${styles.circle} ${styles['stats-p99']}`}
             />
             p99:
             <div className={styles['accent-text']}>

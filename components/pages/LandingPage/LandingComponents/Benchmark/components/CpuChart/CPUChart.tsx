@@ -3,7 +3,7 @@ import {
 } from 'react';
 
 import CheckIcon from '@/components/CheckIcon';
-import { SVGViewBoxHeight, SVGViewBoxWidth, DATA_CHART_PARAMS } from '../../constants';
+import { SVGViewBoxHeight, SVGViewBoxWidth } from '../../constants';
 import { IData } from '../../types';
 import fixedHelper from '../../utils/fixedHelper';
 
@@ -59,7 +59,7 @@ const CPUChart: FC<IProps> = ({
   const getLines = useMemo(() => (
     <>
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -68,7 +68,7 @@ const CPUChart: FC<IProps> = ({
         strokeDasharray="12, 12"
       />
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -77,7 +77,7 @@ const CPUChart: FC<IProps> = ({
         strokeDasharray="12, 12"
       />
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -86,7 +86,7 @@ const CPUChart: FC<IProps> = ({
         strokeDasharray="12, 12"
       />
       <line
-        stroke="#e1e1e1"
+        className={styles['dashed-line']}
         strokeWidth="1"
         x1={0}
         x2={svgWidth}
@@ -106,9 +106,8 @@ const CPUChart: FC<IProps> = ({
 
   const getCircles = useMemo(() => (
     <circle
+      className={styles.circle}
       strokeWidth="3"
-      fill="#ffffff"
-      stroke={DATA_CHART_PARAMS.avg.color}
       r="3.5"
       data-screenshot-exclude="true"
       {...calculateCirclePosition(pathArray)}
@@ -119,14 +118,14 @@ const CPUChart: FC<IProps> = ({
     <g>
       <polyline
         fill="none"
-        stroke={DATA_CHART_PARAMS.avg.color}
+        className={styles.line}
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
         points={calculatePath(pathArray)}
       />
       <polyline
-        fill="url(#linegraph-blue-gradient-0)"
+        fill="url(#linegraph-blue-gradient)"
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -156,8 +155,7 @@ const CPUChart: FC<IProps> = ({
     return (
       <circle
         strokeWidth="3"
-        fill="#ffffff"
-        stroke={DATA_CHART_PARAMS.avg.color}
+        className={styles.circle}
         r="3.5"
         data-screenshot-exclude="true"
         cx={selectedItemIndex * itemSize}
@@ -228,20 +226,20 @@ const CPUChart: FC<IProps> = ({
         >
           <defs>
             <linearGradient
-              id="linegraph-blue-gradient-0"
+              id="linegraph-blue-gradient"
               x1="0"
               x2="0"
               y1="0"
               y2="1"
             >
               <stop
+                className={styles['color-stop-polygon']}
                 offset="0%"
-                stopColor={DATA_CHART_PARAMS.avg.gradientColor}
                 stopOpacity="0.85"
               />
               <stop
+                className={styles['color-stop-polygon']}
                 offset="90%"
-                stopColor={DATA_CHART_PARAMS.avg.gradientColor}
                 stopOpacity="0.1"
               />
             </linearGradient>
@@ -254,7 +252,7 @@ const CPUChart: FC<IProps> = ({
             {selectedItemIndex !== null && (
             <line
               ref={lineRef}
-              stroke="#000000"
+              className={styles['selected-line']}
               strokeWidth="1"
               x1={selectedItemIndex * itemSize}
               x2={selectedItemIndex * itemSize}
