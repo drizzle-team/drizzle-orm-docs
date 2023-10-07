@@ -19,12 +19,12 @@ const config: DocsThemeConfig = {
     if (asPath !== '/') {
       return {
         titleTemplate: '%s - Drizzle ORM',
-        description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind',
+        description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.',
       };
     }
     return {
       titleTemplate: 'Drizzle ORM - next gen TypeScript ORM',
-      description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind',
+      description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.',
     };
   },
   logo: <Logo />,
