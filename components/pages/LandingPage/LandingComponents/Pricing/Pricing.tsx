@@ -23,7 +23,7 @@ const Pricing = () => (
             <StarIcon />
             Give us a star
           </a>
-          <a className={`${styles.button} ${styles.twitter}`} target="_blank" href="https://mobile.twitter.com/DrizzleOrm" aria-label="Drizzle twitter" rel="nofollow noreferrer">
+          <a className={`${styles.button} ${styles.twitter}`} target="_blank" href="https://mobile.twitter.com/DrizzleORM" aria-label="Drizzle twitter" rel="nofollow noreferrer">
             <TwitterIcon />
             Subscribe on Twitter
           </a>
