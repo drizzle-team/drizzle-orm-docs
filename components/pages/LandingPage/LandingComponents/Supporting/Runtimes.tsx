@@ -61,7 +61,7 @@ const Runtimes: {
     },
   },
   Lagon: {
-    src: 'lagon.png',
+    src: 'lagon.webp',
     lightStyles: {
       filter: 'brightness(15%)',
     },
