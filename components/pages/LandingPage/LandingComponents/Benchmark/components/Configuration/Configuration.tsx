@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import styles from './Configuration.module.css';
 
-import data from './data';
+import data from '../../configurationData';
 import { IModalInputDataItem, IParams } from '../../types';
 
 interface IProps {
@@ -15,19 +15,19 @@ const Configuration: FC<IProps> = ({
   setSelectedItems,
   isOpened,
 }) => {
-  const [currentTab, setCurrentTab] = React.useState<string>('traffic');
+  const [currentTab, setCurrentTab] = React.useState<string>('orm');
   const [params, setParams] = useState<IParams | null>(null);
 
   const changeTab = (tab: string) => {
     setCurrentTab(tab);
   };
 
-  const selectItem = (item: IModalInputDataItem) => {
-    if (item.disabled || !params) return;
-    if (params[currentTab as keyof IParams] === item.id) return;
+  const selectItem = (option: IModalInputDataItem, item: string) => {
+    if (option.disabled || !params) return;
+    if (params[currentTab as keyof IParams] === item) return;
     setParams({
       ...selectedItems,
-      [currentTab]: item.id,
+      [currentTab]: item,
     });
   };
 
@@ -53,42 +53,49 @@ const Configuration: FC<IProps> = ({
   return (
     <div className={isOpened ? styles['wrap-opened'] : styles.wrap}>
       <div className={styles.tabs}>
-        {data.map((item) => (
-          <button
-            type="button"
-            className={currentTab === item.key ? styles['active-tab'] : styles.tab}
-            key={item.key}
-            onClick={() => changeTab(item.key)}
-          >
-            {item.value}
-          </button>
-        ))}
+        {
+          Object.keys(selectedItems).map((item) => (
+            <button
+              type="button"
+              className={currentTab === item ? styles['active-tab'] : styles.tab}
+              key={item}
+              onClick={() => changeTab(item)}
+            >
+              {data[item].value}
+            </button>
+          ))
+        }
       </div>
       <div className={styles.options}>
-        {params
-					&& data.find((item) => item.key === currentTab)?.items.map((item) => (
-  <button
-    type="button"
-    className={params[currentTab as keyof IParams] === item.id ? styles['active-option'] : styles.option}
-    key={item.id}
-    onClick={() => selectItem(item)}
-    disabled={item.disabled}
-  >
-    <div className={styles.text}>
-      <div className={styles.title}>
-        {item.value}
-        {!item.disabled && item.description && (
-        <div className={styles.description}>
-          →
-          {' '}
-          {item.description}
-        </div>
-        )}
-      </div>
-      {item.disabled && <div className={styles.disabled}>coming soon</div>}
-    </div>
-  </button>
-					))}
+        {
+          params
+          && Object.keys(data[currentTab].items).map((item) => {
+            const option = data[currentTab].items[item];
+            return (
+              <button
+                type="button"
+                className={params[currentTab as keyof IParams] === item ? styles['active-option'] : styles.option}
+                key={item}
+                onClick={() => selectItem(option, item)}
+                disabled={data[currentTab].items[item].disabled}
+              >
+                <div className={styles.text}>
+                  <div className={styles.title}>
+                    {option.value}
+                    {!option.disabled && option.description && (
+                    <div className={styles.description}>
+                      →
+                      {' '}
+                      {option.description}
+                    </div>
+                    )}
+                  </div>
+                  {option.disabled && <div className={styles.disabled}>coming soon</div>}
+                </div>
+              </button>
+            );
+          })
+        }
       </div>
     </div>
   );

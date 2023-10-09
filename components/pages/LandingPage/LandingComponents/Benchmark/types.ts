@@ -31,6 +31,7 @@ export interface IInputData {
 }
 
 export interface IParams {
+  orm: string;
   dbSize: string;
   projectType: string;
   database: string;
@@ -44,7 +45,6 @@ export interface IModalInputData {
 }
 
 export interface IModalInputDataItem {
-  id: string;
   value: string;
   description?: string;
   disabled?: boolean;

@@ -4,17 +4,18 @@ import {
 
 import styles from './Performance.module.css';
 
-import { IData } from '../../types';
+import { IData, IParams } from '../../types';
 import { useBenchmarkContext } from '@/components/pages/LandingPage/LandingComponents/Benchmark/context/useBenchmarkContext';
 import { DELAY } from '../../constants';
 import getSubArray from '../../utils/getSubArray';
-import DrizzleLogo from '@/components/Icons/DrizzleLogo';
-import PrismaIcon from '@/components/Icons/PrismaIcon';
 import LatencyChart from '../LatencyChart/LatencyChart';
 import ReqsChart from '../ReqsChart/ReqsChart';
 import CPUChart from '../CpuChart/CPUChart';
+import Logo from '../../utils/Logo';
+import configurationData from '../../configurationData';
 
 interface Props {
+  selectedItems: IParams;
   isConfigOpen: boolean;
   maxElements: number;
   data: IData[] | null;
@@ -24,6 +25,7 @@ interface Props {
 }
 
 const Performance: FC<Props> = ({
+  selectedItems,
   isConfigOpen,
   maxElements,
   data,
@@ -110,23 +112,25 @@ const Performance: FC<Props> = ({
     <div className={isConfigOpen ? styles['wrap-hide'] : styles.wrap}>
       <div className={styles['compare-item']}>
         <div className={styles['compare-icon-wrap']}>
-          <DrizzleLogo />
+          <Logo logo="drizzle" />
         </div>
         <div>
           <div className={styles.name}>Drizzle</div>
           <div className={styles.version}>
-            v0.28.1
+            {configurationData.orm.items[selectedItems.orm].drizzle_version}
           </div>
         </div>
       </div>
       <div className={styles['compare-item']}>
         <div className={styles['compare-icon-wrap']}>
-          <PrismaIcon />
+          <Logo logo={selectedItems.orm} />
         </div>
         <div>
-          <div className={styles.name}>Prisma</div>
+          <div className={styles.name}>
+            {selectedItems.orm}
+          </div>
           <div className={styles.version}>
-            v5.1.1
+            {configurationData.orm.items[selectedItems.orm].compare_version}
           </div>
         </div>
       </div>

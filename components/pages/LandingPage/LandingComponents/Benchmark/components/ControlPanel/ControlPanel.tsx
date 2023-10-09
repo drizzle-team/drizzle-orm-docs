@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import styles from './ControlPanel.module.css';
-// import Variant from './Application/Variant';
 import { IData, IInputData, IParams } from '../../types';
 import Timer from '../Timer/Timer';
 
@@ -9,6 +8,10 @@ import SpeedSelector from '../SpeedSelector/SpeedSelector';
 import Configuration from '../Configuration/Configuration';
 import Performance from '../Performance/Performance';
 import { useBenchmarkContext } from '@/components/pages/LandingPage/LandingComponents/Benchmark/context/useBenchmarkContext';
+import OptionsIcon from '@/components/Icons/OptionsIcon';
+import BenchmarkConifg from '../BenchmarkConfig/BenchmarkConfig';
+import getBenchmarkPaths from '../../utils/getBenchmarkPaths';
+import ArrowRight from '@/components/Icons/ArrowRight';
 
 function ControlPanel() {
   const {
@@ -18,10 +21,11 @@ function ControlPanel() {
   const [isBlurred, setIsBlurred] = useState<boolean>(true);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<IParams>({
-    dbSize: 'm',
+    orm: 'prisma',
+    traffic: '1000vus',
+    dbSize: 'micro',
     projectType: 'ecommerce',
     database: 'postgres',
-    traffic: '1000vus',
   });
 
   const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
@@ -42,26 +46,19 @@ function ControlPanel() {
     drizzleData: IData[] | null;
     compareData: IData[] | null;
   }> => {
+    const paths = getBenchmarkPaths(selectedItems);
+    if (!paths) {
+      return {
+        drizzleData: null,
+        compareData: null,
+      };
+    }
     let d: IInputData | null = null;
     let c: IInputData | null = null;
-    if (selectedItems.traffic === '500vus') {
-      [d, c] = await Promise.all([
-        import('../../data/drizzle-500vus.json'),
-        import('../../data/prisma-500vus.json'),
-      ]);
-    }
-    if (selectedItems.traffic === '1000vus') {
-      [d, c] = await Promise.all([
-        import('../../data/drizzle-1000vus.json'),
-        import('../../data/prisma-1000vus.json'),
-      ]);
-    }
-    if (selectedItems.traffic === 'spikes') {
-      [d, c] = await Promise.all([
-        import('../../data/drizzle-spikes.json'),
-        import('../../data/prisma-spikes.json'),
-      ]);
-    }
+    [d, c] = await Promise.all([
+      import(`../../data/${paths.drizzleFileName}.json`),
+      import(`../../data/${paths.compareFileName}.json`),
+    ]);
     if (d && c) {
       return { drizzleData: d.data, compareData: c.data };
     }
@@ -137,9 +134,22 @@ function ControlPanel() {
             <button type="button" className={styles['play-wrap']} onClick={rerun}>Rerun</button>
             )}
           </div>
-          <button type="button" className={styles['config-button']} onClick={openConfigModal}>
-            Configure benchmark
-          </button>
+          <div className={styles.config}>
+            <div className={styles['config-wrap']}>
+              <div className={styles['config-popup']}>
+                <BenchmarkConifg selectedItems={selectedItems} />
+              </div>
+              <div className={styles['config-info']}>
+                Benchmark Config
+              </div>
+            </div>
+            <div className={styles['arrow-wrap']}>
+              <ArrowRight />
+            </div>
+            <button type="button" className={styles['config-button']} onClick={openConfigModal}>
+              <OptionsIcon />
+            </button>
+          </div>
         </div>
         <div className={styles.container}>
           <div className={isBlurred ? styles.blurred : styles['hide-blur']}>
@@ -152,6 +162,7 @@ function ControlPanel() {
             )}
           </div>
           <Performance
+            selectedItems={selectedItems}
             isConfigOpen={isConfigOpen}
             speed={speed}
             data={drizzleData}
