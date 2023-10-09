@@ -1,11 +1,11 @@
 import React from 'react';
 import Typer from './Typer/Typer';
 import styles from './Header.module.css';
-import MainPic from './Images/MainPic.png';
-import SecondPic from './Images/SecondPic.png';
-import SecondPicDark from './Images/SecondPic_dark.png';
-import ParticlePic from './Images/ParticlePic.png';
-import ParticlePicDark from './Images/ParticlePic_dark.png';
+import MainPic from './Images/MainPic.webp';
+import SecondPic from './Images/SecondPic.webp';
+import SecondPicDark from './Images/SecondPic_dark.webp';
+import ParticlePic from './Images/ParticlePic.webp';
+import ParticlePicDark from './Images/ParticlePic_dark.webp';
 import useGetTheme from '../../../../hooks/useGetTheme';
 
 const Header = () => {
