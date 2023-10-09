@@ -9,8 +9,8 @@ const config: DocsThemeConfig = {
   banner: {
     key: 'rqb',
     text: (
-      <a href="https://driz.li/821days" target="_blank" rel="nofollow noreferrer">
-        🎉 Drizzle got FASTER! Read more →
+      <a href="https://driz.li/payload2.0" target="_blank" rel="nofollow noreferrer">
+        🎉 Payload is now powered by Drizzle! Read more →
       </a>
     ),
   },
