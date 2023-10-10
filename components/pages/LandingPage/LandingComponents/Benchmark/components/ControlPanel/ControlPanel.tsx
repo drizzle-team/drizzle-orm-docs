@@ -22,7 +22,7 @@ function ControlPanel() {
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<IParams>({
     orm: 'prisma',
-    traffic: '1000vus',
+    traffic: 'medium',
     dbSize: 'micro',
     projectType: 'ecommerce',
     database: 'postgres',

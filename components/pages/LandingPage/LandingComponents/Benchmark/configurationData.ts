@@ -36,26 +36,30 @@ const configurationData: {
         description: '0 users and 0 requests',
         config_info: 'Your startup(0 users)',
       },
-      '100vus': {
+      micro: {
+        value: 'Micro',
+        disabled: true,
+      },
+      small: {
         value: 'Small',
-        disabled: true,
-      },
-      '500vus': {
-        value: 'Medium',
         description: '500VUs, 600k reqs',
-        config_info: 'Medium traffic size(500VUs)',
+        config_info: 'Small traffic size(500VUs)',
       },
-      '1000vus': {
-        value: 'High',
+      medium: {
+        value: 'Medium',
         description: '1k VUs, 1M reqs',
-        config_info: 'High traffic size(1000VUs)',
+        config_info: 'Medium traffic size(1000VUs)',
       },
-      stepped: {
-        value: 'Stepped',
+      high: {
+        value: 'High',
         disabled: true,
       },
-      spikes: {
-        value: 'Traffic spikes',
+      huge: {
+        value: 'Huge',
+        disabled: true,
+      },
+      Extreme: {
+        value: 'Extreme',
         disabled: true,
       },
     },
@@ -68,24 +72,24 @@ const configurationData: {
         description: '43mb',
         config_info: 'Micro database size',
       },
-      s: {
+      small: {
         value: 'Small',
         disabled: true,
       },
-      m: {
+      medium: {
         value: 'Medium',
         disabled: true,
       },
-      l: {
+      large: {
         value: 'Large',
         disabled: true,
       },
-      xl: {
-        value: 'Extra large',
+      huge: {
+        value: 'Huge',
         disabled: true,
       },
-      xxl: {
-        value: 'Extra extra large',
+      extreme: {
+        value: 'Extreme',
         disabled: true,
       },
     },
@@ -100,6 +104,14 @@ const configurationData: {
       social: {
         value: 'Social with messaging',
         config_info: 'Social with messaging',
+        disabled: true,
+      },
+      geo: {
+        value: 'Geo queries heavy',
+        disabled: true,
+      },
+      analytics: {
+        value: 'Analytics with time series',
         disabled: true,
       },
     },
