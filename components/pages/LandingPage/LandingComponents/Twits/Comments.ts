@@ -87,6 +87,12 @@ const Comments: IComment[] = [
     login: 'shalildev',
     text: 'What I notice is also an understandable API, text is a text, a primary value is primaryKey and so on',
   },
+  {
+    avatar: 'https://pbs.twimg.com/profile_images/1689960573683863552/FuuDSnJi_x96.jpg',
+    name: 'Ofelquis Gimenes',
+    login: 'imfelquis',
+    text: 'unpredictable results is what feeds the human race, ban Drizzle now and all this typing gibberish all together',
+  },
 ];
 
 export { TopThreeComments, Comments };
