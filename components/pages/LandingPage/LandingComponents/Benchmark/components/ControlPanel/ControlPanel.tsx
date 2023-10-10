@@ -175,6 +175,18 @@ function ControlPanel() {
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
           />
+          {!isConfigOpen && selectedItems.traffic === 'your_startup' && (
+            <div className={styles['sticker-wrap']}>
+              <div className={styles.congrats}>
+                <div className={styles['congrats-text']}>
+                  At least you have 100 Lighthouse score!
+                </div>
+              </div>
+              <div className={styles.sticker}>
+                <img src="/images/sticker.webp" alt="sticker" />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

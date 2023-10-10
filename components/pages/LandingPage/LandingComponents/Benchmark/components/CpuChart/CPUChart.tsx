@@ -189,8 +189,8 @@ const CPUChart: FC<IProps> = ({
   }, [selectedItemIndex]);
 
   const xTimes = () => {
-    const a = average || 1;
-    const b = averageCompare || 1;
+    const a = average || 0;
+    const b = averageCompare || 0;
     return fixedHelper(b / a, 2);
   };
 

@@ -41,10 +41,12 @@ const SpeedSelector: FC<IProps> = ({ speed, setSpeed }) => {
 
   return (
     <div className={styles.wrap} ref={dropdownRef}>
-      <button type="button" className={styles.button} onClick={toggle}>
-        {speed}
-        X
-      </button>
+      <div className={styles.button} onClick={toggle}>
+        <div>
+          {speed}
+          X
+        </div>
+      </div>
       {isOpened && (
       <div className={styles['items-wrap']}>
         <div className={styles.block}>

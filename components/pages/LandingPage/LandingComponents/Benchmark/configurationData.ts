@@ -31,6 +31,15 @@ const configurationData: {
   traffic: {
     value: 'Traffic size',
     items: {
+      your_startup: {
+        value: 'Your startup',
+        description: '0 users and 0 requests',
+        config_info: 'Your startup(0 users)',
+      },
+      '100vus': {
+        value: 'Small',
+        disabled: true,
+      },
       '500vus': {
         value: 'Medium',
         description: '500VUs, 600k reqs',
@@ -56,6 +65,7 @@ const configurationData: {
     items: {
       micro: {
         value: 'Micro',
+        description: '43mb',
         config_info: 'Micro database size',
       },
       s: {
