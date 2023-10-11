@@ -179,7 +179,7 @@ function ControlPanel() {
             <div className={styles['sticker-wrap']}>
               <div className={styles.congrats}>
                 <div className={styles['congrats-text']}>
-                  At least you have 100 Lighthouse score!
+                  At least you have great Lighthouse score!
                 </div>
               </div>
               <div className={styles.sticker}>
