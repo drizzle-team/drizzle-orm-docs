@@ -323,7 +323,6 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
 ### Primary Key
 
 The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
-
 Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
 
 A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
@@ -534,7 +533,8 @@ The `FOREIGN KEY` constraint is used to prevent actions that would destroy links
 A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
 The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
 
-Drizzle ORM provides several ways to declare foreign keys. You can declare them in a column declaration statement:
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>

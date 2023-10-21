@@ -9,50 +9,42 @@ or you can spread them around — whichever you prefer, all the freedom!
 <Tabs items={['1 File', 'Separate Files', 'Separate Folders']}>
   <Tab>
     Everything in 1 file:
-    <FileTree>
-      <FileTree.Folder name="root" defaultOpen>
-        <FileTree.Folder name="src" defaultOpen>
-          <FileTree.Folder name="db" defaultOpen>
-            <FileTree.File name="schema.ts" />
-          </FileTree.Folder>
-        </FileTree.Folder>
-      </FileTree.Folder>
-    </FileTree>
+    ```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📜 schema.ts
+    ```
   </Tab>
    <Tab>
     Scattered across multiple files:
-    <FileTree>
-      <FileTree.Folder name="root" defaultOpen>
-        <FileTree.Folder name="src" defaultOpen>
-          <FileTree.Folder name="db" defaultOpen>
-            <FileTree.File name="schema.ts" />
-            <FileTree.File name="countries.ts" />
-            <FileTree.File name="cities.ts" />
-            <FileTree.File name="products.ts" />
-            <FileTree.File name="clients.ts" />
-            <FileTree.File name="enums.ts" />
-            <FileTree.File name="etc.ts" />
-          </FileTree.Folder>
-        </FileTree.Folder>
-      </FileTree.Folder>
-    </FileTree>
+    ```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📂 schema
+          ├ 📜 users.ts
+          ├ 📜 countries.ts
+          ├ 📜 cities.ts
+          ├ 📜 products.ts
+          ├ 📜 clients.ts
+          ├ 📜 enums.ts
+          └ 📜 etc.ts
+    ```
   </Tab>
    <Tab>
     In separate/domain-specific folders:
-    <FileTree>
-      <FileTree.Folder name="root" defaultOpen>
-        <FileTree.Folder name="src" defaultOpen>
-          <FileTree.Folder name="get-user" defaultOpen>
-            <FileTree.File name="user.ts" />
-            <FileTree.File name="handler.ts" />
-          </FileTree.Folder>
-          <FileTree.Folder name="get-city" defaultOpen>
-            <FileTree.File name="city.ts" />
-            <FileTree.File name="handler.ts" />
-          </FileTree.Folder>
-        </FileTree.Folder>
-      </FileTree.Folder>
-    </FileTree>
+   ```plaintext
+📦 <project root>
+ └ 📂 src
+    ├ 📂 get-user
+    │  ├ 📜 user.ts
+    │  └ 📜 handler.ts
+    ├ 📂 get-city
+    │  ├ 📜 city.ts
+    │  └ 📜 handler.ts    
+    ├  ...
+    ```
   </Tab>
 </Tabs>
 
