@@ -36,22 +36,22 @@ bun add -D drizzle-kit
 </Tabs>
 
 ```typescript copy
-import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 
 const sqlite = new Database('sqlite.db');
-const db: BetterSQLite3Database = drizzle(sqlite);
+const db = drizzle(sqlite);
 
 const result = await db.select().from(users);
 ```
 
 If you want to use **sync** APIs:
 ```typescript copy
-import { drizzle, BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('sqlite.db');
-const db: BunSQLiteDatabase = drizzle(sqlite);
+const db = drizzle(sqlite);
 
 const result = db.select().from(users).all();
 const result = db.select().from(users).get();
