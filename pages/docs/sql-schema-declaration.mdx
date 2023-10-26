@@ -79,7 +79,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   export type NewUser = typeof users.$inferInsert; // insert type
   ...
 
-  const db: NodePgDatabase = drizzle(...);
+  const db = drizzle(...);
 
   const result: User[] = await db.select().from(users);
 
@@ -110,7 +110,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:  
   ```typescript copy
-  import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, bigint, text, varchar } from 'drizzle-orm/mysql-core';
+  import { MySqlRawQueryResult, mysqlTable, bigint, text, varchar } from 'drizzle-orm/mysql-core';
   import mysql from 'mysql2/promise';
   import { drizzle } from 'drizzle-orm/mysql2';
 
@@ -131,7 +131,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
       database: 'test'
   });
 
-  export const db: MySqlDatabase = drizzle(poolConnection);
+  export const db = drizzle(poolConnection);
 
   const result: User[] = await db.select().from(users);
 
@@ -173,11 +173,11 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   export type User = typeof users.$inferSelect // return type when queried
   export type InsertUser = typeof users.$inferInsert // insert type
   ...
-  import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+  import { drizzle } from 'drizzle-orm/better-sqlite3';
   import Database from 'better-sqlite3';
 
   const sqlite = new Database('sqlite.db');
-  const db: BetterSQLite3Database = drizzle(sqlite);
+  const db = drizzle(sqlite);
 
   const result: User[] = db.select().from(users).all();
 

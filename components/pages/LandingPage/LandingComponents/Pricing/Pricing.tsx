@@ -2,8 +2,8 @@ import styles from './Pricing.module.css';
 import {
   DiscordIcon, GiftIcon, StarIcon, TwitterIcon,
 } from '../../../../Icons/Icons';
-import MoneyImage from './Images/Money.png';
-import WithoutMoneyImage from './Images/WithoutMoney.png';
+import MoneyImage from './Images/Money.webp';
+import WithoutMoneyImage from './Images/WithoutMoney.webp';
 
 const Pricing = () => (
   <div className={styles.wrap}>
