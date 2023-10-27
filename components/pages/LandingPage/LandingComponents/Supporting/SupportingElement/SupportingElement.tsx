@@ -20,7 +20,10 @@ const SupportingElement:FC<Props> = ({ item, name }) => {
       <a href={item.sponsorUrl} target="_blank" rel="nofollow noreferrer">
         <div className={styles.item}>
           <div className={styles.icon}>
-            <div className={styles.img_block}>
+            <div
+              style={{ width: lightStyles?.width, height: lightStyles?.width }}
+              className={styles.img_block}
+            >
               {item.src.includes('.svg') ? (
                 <>
                   {isLight ? <SVG src={`/svg/${item.src}`} {...lightStyles} />
@@ -46,7 +49,10 @@ const SupportingElement:FC<Props> = ({ item, name }) => {
       {!item.sponsorUrl && (
         <div className={styles.item}>
           <div className={styles.icon}>
-            <div className={styles.img_block}>
+            <div
+              style={{ width: lightStyles?.width, height: lightStyles?.width }}
+              className={styles.img_block}
+            >
               {item.src.includes('.svg') ? (
                 <>
                   {isLight ? <SVG src={`/svg/${item.src}`} {...lightStyles} />
