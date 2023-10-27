@@ -38,7 +38,8 @@ const configurationData: {
       },
       micro: {
         value: 'Micro',
-        disabled: true,
+        description: '200VUs, 240k reqs',
+        config_info: 'Micro traffic size(200VUs)',
       },
       small: {
         value: 'Small',

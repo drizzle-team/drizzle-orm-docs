@@ -28,6 +28,15 @@ const paths = [
     drizzleFileName: 'drizzle-1000vus',
     compareFileName: 'prisma-1000vus',
   },
+  {
+    orm: 'prisma',
+    dbSize: 'micro',
+    projectType: 'ecommerce',
+    database: 'postgres',
+    traffic: 'micro',
+    drizzleFileName: 'drizzle-200vus',
+    compareFileName: 'prisma-200vus',
+  },
 ];
 
 const getBenchmarkPaths = (params: IParams) => {
