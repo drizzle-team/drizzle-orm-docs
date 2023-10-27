@@ -33,7 +33,7 @@ Drizzle ORM natively supports `postgresjs` driver with `drizzle-orm/postgres-js`
 </Tabs>
 
 ```typescript copy filename="index.ts"
-import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 
@@ -43,7 +43,7 @@ migrate(drizzle(migrationClient), ...)
 
 // for query purposes
 const queryClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db");
-const db: PostgresJsDatabase = drizzle(queryClient);
+const db = drizzle(queryClient);
 await db.select().from(...)...
 ```
 

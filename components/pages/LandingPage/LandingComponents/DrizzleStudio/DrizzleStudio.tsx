@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './DrizzleStudio.module.css';
-import DrizzleImgLight from './images/drizzle-studio-light.png';
-import DrizzleImgDark from './images/drizzle-studio-dark.png';
+import DrizzleImgLight from './images/drizzle-studio-light.webp';
+import DrizzleImgDark from './images/drizzle-studio-dark.webp';
 import useGetTheme from '../../../../hooks/useGetTheme';
 
 const DrizzleStudio = () => {

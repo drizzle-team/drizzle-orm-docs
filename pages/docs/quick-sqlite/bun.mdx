@@ -37,11 +37,11 @@ yarn add -D drizzle-kit
 </Tabs>
 
 ```typescript copy
-import { drizzle, BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('sqlite.db');
-const db: BunSQLiteDatabase = drizzle(sqlite);
+const db = drizzle(sqlite);
 
 const result = await db.select().from(users);
 ```
@@ -61,11 +61,11 @@ For more details about column types, see the **[SQLite column types in Drizzle.]
 
 If you want to use **sync** APIs:
 ```typescript copy
-import { drizzle, BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('sqlite.db');
-const db: BunSQLiteDatabase = drizzle(sqlite);
+const db = drizzle(sqlite);
 
 const result = db.select().from(users).all();
 const result = db.select().from(users).get();

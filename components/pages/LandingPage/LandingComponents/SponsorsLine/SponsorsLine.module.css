@@ -24,7 +24,6 @@ html[class~=dark] .wrapper {
   margin: 30px 0 0;
   background-color: #f8f8f8;
   padding: 15px 0;
-  margin-bottom: 40px;
   position: relative;
 }
 
@@ -35,20 +34,38 @@ html[class~=dark] .wrapper {
   display: flex;
   flex-direction: row;
   height: 306px;
+  padding: 0 20px;
+  gap: 80px;
 }
 
 .scroll::-webkit-scrollbar {
   display: none;
 }
 
-.gradient {
+.gradient-left, .gradient-right {
   pointer-events: none;
   position: absolute;
-  right: 0;
   top: 0;
   height: 100%;
-  width: 40px;
-  background: linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  width: 20px;
+}
+
+html[class~=dark] .gradient-right {
+  background: linear-gradient(to right, rgba(28, 28, 28, 0) 0%, rgba(28, 28, 28, 0.7) 50%, rgba(28, 28, 28, 1) 100%);
+}
+
+html[class~=dark] .gradient-left {
+  background: linear-gradient(to left, rgba(28, 28, 28, 0) 0%, rgba(28, 28, 28, 0.7) 50%, rgba(28, 28, 28, 1) 100%);
+}
+
+.gradient-left {
+  left: 0;
+  background: linear-gradient(to left, rgba(248, 248, 248, 0) 0%, rgba(248, 248, 248, 0.7) 50%, rgba(248, 248, 248, 1) 100%);
+}
+
+.gradient-right {
+  right: 0;
+  background: linear-gradient(to right, rgba(248, 248, 248, 0) 0%, rgba(248, 248, 248, 0.7) 50%, rgba(248, 248, 248, 1) 100%);
 }
 
 .type_header {
@@ -84,34 +101,14 @@ html[class~=dark] .wrapper {
   background-color: #ffffff;
 }
 
-.card_name {
-  text-align: center;
-  font-size: 14px;
-  color: #434a54;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-}
-
-
 .sponsors_header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 40px;
 }
 
 .sponsors {
   height: 100%;
-}
-
-.sponsors:first-child .cards, .sponsors:first-child .sponsors_header {
-  padding-left: 20px;
-}
-
-.sponsors:last-child .cards, .sponsors:last-child .sponsors_header {
-  padding-right: 20px;
 }
 
 .cards {
@@ -119,7 +116,6 @@ html[class~=dark] .wrapper {
   grid-auto-flow: column;
   grid-template-rows: 134px 134px;
   grid-auto-columns: 110px;
-  padding: 0 40px;
   height: 274px;
 }
 
@@ -130,14 +126,14 @@ html[class~=dark] .wrapper {
 }
 
 .gold {
-  grid-template-rows: repeat(2, 116px);
+  grid-template-rows: repeat(2, 112px);
   grid-auto-columns: 90px;
   grid-gap: 10px;
 }
 
 .silver {
   grid-template-rows: repeat(3, 74px);
-  grid-auto-columns: 58px;
+  grid-auto-columns: 63px;
   grid-gap: 10px;
 }
 
@@ -203,6 +199,86 @@ html[class~='dark'] .button_accent {
   background-color: rgb(226, 232, 240);
 }
 
+.stream-link {
+  text-decoration: underline;
+  margin: 0 4px;
+}
+
+html[class~=dark] .special-sponsors_wrap {
+  background-color: #1c1c1c;
+}
+
+.special-sponsors_wrap {
+  margin: 10px 0 0;
+  background-color: #f8f8f8;
+  padding: 15px 20px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.special-sponsors_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.special-sponsors_content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+.special-sponsors_cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 63px;
+}
+
+.special-sponsor_card {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+html[class~=dark] .special-sponsor_card_image  {
+  background: #282828;
+  border: 1px solid #111111;
+}
+
+.special-sponsor_card_image {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 50%;
+}
+
+html[class~=dark] .special-sponsor_card_name  {
+  color: #E2E8F0;
+}
+
+.special-sponsor_card_name {
+  color: #434a54;
+  font-size: 14px;
+  line-height: 14px;
+}
+
+html[class~=dark] .light-image {
+  display: block;
+}
+
+html[class~=dark] .dark-image {
+  display: none;
+}
+
+.light-image {
+  display: none;
+}
+
+.dark-image {
+  display: block;
+}
+
 
 @media (max-width: 900px) {
   .title {
@@ -210,6 +286,14 @@ html[class~='dark'] .button_accent {
   }
   .description {
     font-size: 14px;
+  }
+}
+
+
+@media (max-width: 767px) {
+  .wrapper, .special-sponsors_wrap {
+    margin-left: -24px;
+    margin-right: -24px;
   }
 }
 
@@ -227,4 +311,3 @@ html[class~='dark'] .button_accent {
     height: 46px;
   }
 }
-

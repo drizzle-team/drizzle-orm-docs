@@ -42,7 +42,17 @@ const Databases: {
     darkStyles: {
       width: 28,
     },
-    sponsorUrl: 'https://turso.tech/drizzle',
+    sponsorUrl: 'https://driz.li/turso',
+  },
+  Xata: {
+    src: 'xata.svg',
+    lightStyles: {
+      width: 32,
+    },
+    darkStyles: {
+      width: 32,
+    },
+    sponsorUrl: 'https://driz.li/xataio',
   },
   Supabase: {
     src: 'supabase.svg',
