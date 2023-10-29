@@ -82,7 +82,7 @@ You can declare `tables`, `indexes` and `constraints`, `foreign keys` and `enums
   Database and table explicit entity types:
   ```typescript copy
   import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
-  import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
+  import { drizzle } from 'drizzle-orm/node-postgres';
 
   export const users = pgTable('users', {
     id: serial('id').primaryKey(),
@@ -210,7 +210,7 @@ You can declare `tables`, `indexes` and `constraints`, `foreign keys` and `enums
 </Tabs>
 
 <Cards>
-  <Card  title="PostgreSQL" href="/docs/guide/built-ins/callout" />
-  <Card title="MySQL" href="/docs/guide/built-ins/tabs" />
-  <Card  title="SQLite" href="/docs/guide/built-ins/steps" />
+  <Card title="PostgreSQL column types" href="/docs/column-types/pg" />
+  <Card title="MySQL column types" href="/docs/column-types/mysql" />
+  <Card title="SQLite column types" href="/docs/column-types/sqlite" />
 </Cards>
