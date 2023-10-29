@@ -6,14 +6,13 @@ import Section from "../../components/Section/Section";
 
 ## Constraints
 
-SQL constraints are the rules enforced on data columns on table.  
-These are used to prevent invalid data from being entered into the database.  
-This ensures the accuracy and reliability of the data in the database.
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
 
 ### Default
 
-The `DEFAULT` clause specifies a default value to use for the column if no value
-is explicitly provided by the user when doing an `INSERT`.
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
 If there is no explicit `DEFAULT` clause attached to a column definition,
 then the default value of the column is `NULL`.
 
@@ -90,8 +89,8 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 
 ### Not null
 
-By default, a column can hold **NULL** values.  
-The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
 This enforces a field to always contain a value, which means that you cannot insert a new record,
 or update a record without adding a value to this field.
 
@@ -153,9 +152,14 @@ or update a record without adding a value to this field.
 ### Unique
 
 The `UNIQUE` constraint ensures that all values in a column are different.  
-Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
 A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
-However, you can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -306,16 +310,21 @@ However, you can have many `UNIQUE` constraints per table, but only one `PRIMARY
 
 ### Check
 
-The `CHECK` constraint is used to limit the value range that can be placed in a column.  
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
 If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+
 If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
 
-NOT YET IMPLEMENTED IN DRIZZLE ORM
+<Callout type="error" emoji="🛑">
+  NOT YET IMPLEMENTED IN DRIZZLE ORM
+</Callout>
 
 ### Primary Key
 
 The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
 Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
+
 A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
@@ -401,9 +410,9 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
 ### Composite Primary Key
 
-Just like `PRIMARY KEY`, composite primary key uniquely each record in a table using multiple fields  
-Drizzle ORM provides a standalone `primaryKey` operator for that
+Just like `PRIMARY KEY`, composite primary key uniquely each record in a table using multiple fields.
 
+Drizzle ORM provides a standalone `primaryKey` operator for that:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -524,8 +533,8 @@ The `FOREIGN KEY` constraint is used to prevent actions that would destroy links
 A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
 The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
 
-Drizzle ORM provides several ways to declare foreign keys  
-You can declare them in a column declaration statement
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -582,7 +591,7 @@ You can declare them in a column declaration statement
 </Tabs>
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
-set return type for reference callback or user a standalone `foreignKey` operator
+set return type for reference callback or user a standalone `foreignKey` operator.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -664,7 +673,7 @@ set return type for reference callback or user a standalone `foreignKey` operato
 
   </Tab>
 </Tabs>
-To declare multicolumn foreign keys you can use a dedicated `foreignKey` operator
+To declare multicolumn foreign keys you can use a dedicated `foreignKey` operator:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     ```typescript copy {4-5,14-15,18-21}
@@ -754,7 +763,7 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
 
 ## Indexes
 
-Drizzle ORM provides API for both `index` and `unique index` declaration
+Drizzle ORM provides API for both `index` and `unique index` declaration:
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -782,11 +791,11 @@ Drizzle ORM provides API for both `index` and `unique index` declaration
     CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
     ```
     </Section>
-    
-    Drizzle ORM provides set of all params for index creation
     <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param
+      As of now `drizzle-kit` only supports index `name` and `on()` param.
     </Callout>
+
+    Drizzle ORM provides set of all params for index creation:
 
     ```typescript
     // Index declaration reference
@@ -825,11 +834,11 @@ Drizzle ORM provides API for both `index` and `unique index` declaration
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
-
-    Drizzle ORM provides set of all params for index creation
     <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param
+      As of now `drizzle-kit` only supports index `name` and `on()` param.
     </Callout>
+
+     Drizzle ORM provides set of all params for index creation:
 
     ```typescript
     // Index declaration reference
@@ -865,12 +874,12 @@ Drizzle ORM provides API for both `index` and `unique index` declaration
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
-    
-    Drizzle ORM provides set of all params for index creation
     <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param
+      As of now `drizzle-kit` only supports index `name` and `on()` param.
     </Callout>
 
+     Drizzle ORM provides set of all params for index creation:
+     
     ```typescript
     // Index declaration reference
     index("name")

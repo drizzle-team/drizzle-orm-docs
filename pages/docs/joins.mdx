@@ -6,7 +6,7 @@ Join clause in SQL is used to combine 2 or more tables, based on related columns
 Drizzle ORM joins syntax is a balance between the SQL-likeness and type safety.
 
 ## Join types
-Drizzle ORM has APIs for `INNER JOIN`, `FULL JOIN`, `LEFT JOIN` and `RIGHT JOIN`
+Drizzle ORM has APIs for `INNER JOIN`, `FULL JOIN`, `LEFT JOIN` and `RIGHT JOIN`.
 Lets have a quick look at examples based on below table schemas:
 ```typescript copy
 export const users = pgTable('users', {
@@ -116,8 +116,8 @@ const result: {
 </Section>
 
 ## Partial select
-If you need to select a particular subset of fields or to have a flat response type - Drizzle ORM
-supports joins with partial select and will automatically infer return type based on `.select({ ... })` structure
+If you need to select a particular subset of fields or to have a flat response type, Drizzle ORM
+supports joins with partial select and will automatically infer return type based on `.select({ ... })` structure.
 <Section>
 ```typescript copy
 await db.select({
@@ -163,8 +163,8 @@ const result: {
 }[];
 ```
 </Section>
-To avoid plethora of nullable fields when joining tables with lots of columns - we can utilise our nested select object syntax
-Our smart type inference will make whole object nullable instead of making all table fields nullable!
+To avoid plethora of nullable fields when joining tables with lots of columns we can utilise our **nested select object syntax**,
+our smart type inference will make whole object nullable instead of making all table fields nullable!
 <Section>
 ```typescript copy
 await db.select({
@@ -195,9 +195,9 @@ const result: {
 </Section>
 
 ## Aliases & Selfjoins
-Drizzle ORM supports table aliases which comes really handy when you need to do selfjoins
-Lets say you need to fetch users with their parents
+Drizzle ORM supports table aliases which comes really handy when you need to do selfjoins.
 
+Lets say you need to fetch users with their parents:
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 ```typescript copy
@@ -241,7 +241,8 @@ export const user = pgTable("user", {
 
 ## Aggregating results
 Drizzle ORM delivers name-mapped results from the driver without changing the structure.
-You're free to operate with results the way you want and here's an example of mapping many-one relational data
+
+You're free to operate with results the way you want, here's an example of mapping many-one relational data:
 ```typescript
 type User = typeof usersTable.$inferSelect;
 type Pet = typeof usersTable.$inferSelect;

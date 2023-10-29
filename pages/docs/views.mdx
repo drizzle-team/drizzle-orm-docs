@@ -11,10 +11,13 @@ import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedCh
 
 ## Views declaration
 There're several ways you can declare views with Drizzle ORM.  
-You can declare views that have to be created or you can declare views that already exist in the database.  
-You can declare views statements with an inline `query builder` syntax, with `standalone query builder` and with raw `sql` operators.  
-When views are created with either inlined or standalone query builders - view columns schema will be automatically inferred, 
-yet when you use `sql` - you have to explicitly declare view columns schema.
+
+You can declare views that have to be created or you can declare views that already exist in the database. 
+
+You can declare views statements with an inline `query builder` syntax, with `standalone query builder` and with raw `sql` operators. 
+
+When views are created with either inlined or standalone query builders, view columns schema will be automatically inferred, 
+yet when you use `sql` you have to explicitly declare view columns schema.
 
 ### Declaring views
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
@@ -92,7 +95,7 @@ yet when you use `sql` - you have to explicitly declare view columns schema.
   </Tab>
 </Tabs>
 
-If you need a subset of columns - you can use `.select({ ... })` method in query builder
+If you need a subset of columns you can use `.select({ ... })` method in query builder, like this:
 <Section>
   ```ts {4-6}
   export const customersView = pgView("customers_view").as((qb) => {
@@ -110,7 +113,7 @@ If you need a subset of columns - you can use `.select({ ... })` method in query
   ```
 </Section>
 
-You can also declare views using `standalone query builder`, it works exactly the same way
+You can also declare views using `standalone query builder`, it works exactly the same way:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -213,8 +216,8 @@ const newYorkers = pgMaterializedView('new_yorkers', {
 ```
 
 ### Declaring existing views
-When you're provided with a read only access to an existing view in the database - you should use `.existing()` view configuration, 
-`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration
+When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
+`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
 ```ts
 export const user = pgTable("user", {
   id: serial("id"),
@@ -244,11 +247,14 @@ export const trimmedUser = pgMaterializedView("trimmed_user", {
 ### Materialized views
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
 
-According to their official docs, PostgreSQL has [`regular`](https://www.postgresql.org/docs/current/sql-createview.html) 
-and [`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html)  
+According to the official docs, PostgreSQL has both **[`regular`](https://www.postgresql.org/docs/current/sql-createview.html)**
+and **[`materialized`](https://www.postgresql.org/docs/current/sql-creatematerializedview.html)** views.
   
-Materialized views in PostgreSQL use the rule system like views do, but persist the results in a table-like form  
-Drizzle ORM natively supports PostgreSQL materialized views
+Materialized views in PostgreSQL use the rule system like views do, but persist the results in a table-like form.
+{/* This means that when a query is executed against a materialized view, the results are returned directly from the materialized view,
+like from a table, rather than being reconstructed by executing the query against the underlying base tables that make up the view. */}
+
+Drizzle ORM natively supports PostgreSQL materialized views:
 
 <Section>
 ```ts filename="schema.ts" copy
@@ -261,7 +267,7 @@ CREATE MATERIALIZED VIEW "new_yorkers" AS SELECT * FROM "users";
 ```
 </Section>
 
-You can then refresh materialized vies in the application runtime
+You can then refresh materialized views in the application runtime:
 ```ts copy
 await db.refreshMaterializedView(newYorkers);
 
