@@ -334,8 +334,8 @@ export const users = pgTable('users', {
 });
  
 export const usersRelations = relations(users, ({ many }) => ({
-	writtenPosts: many(posts, { relationName: 'writtenPosts' }),
-	reviewedPosts: many(posts, { relationName: 'reviewedPosts' }),
+	author: many(posts, { relationName: 'author' }),
+	reviewer: many(posts, { relationName: 'reviewer' }),
 }));
  
 export const posts = pgTable('posts', {
@@ -349,12 +349,12 @@ export const postsRelations = relations(posts, ({ one }) => ({
 	author: one(users, {
 		fields: [posts.authorId],
 		references: [users.id],
-		relationName: 'writtenPosts',
+		relationName: 'author',
 	}),
 	reviewer: one(users, {
 		fields: [posts.reviewerId],
 		references: [users.id],
-		relationName: 'reviewedPosts',
+		relationName: 'reviewer',
 	}),
 }));
 ```
