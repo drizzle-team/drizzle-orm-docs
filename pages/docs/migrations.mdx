@@ -27,6 +27,17 @@ export const authOtps = mysqlTable('auth_otp', {
 });
 ```
 
+Ensure all schemas and tables are exported, otherwise the SQL migrations for non-exported schemas and tables will not be generated.
+```typescript copy filename="./src/schema.ts"
+import { pgSchema } from "drizzle-orm/pg-core";
+
+// Will not generate SQL migration
+const financeSchema = pgSchema('finance_schema');
+
+// Will correctly generate SQL migration
+export const userSchema = pgSchema('user_schema')
+```
+
 Run CLI migration command:
 ```bash
 $ pnpm drizzle-kit generate:mysql --schema=./src/schema.ts
