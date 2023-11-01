@@ -13,7 +13,7 @@ await db.update(users)
 
 ### Update with returning
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
-You can update a row and get it back in PostgreSQL and SQLite
+You can update a row and get it back in PostgreSQL and SQLite:
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
   .set({ name: 'Mr. Dan' })

@@ -5,11 +5,12 @@ import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedCh
 
 # SQL Select
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
+
 We natively support mostly every query feature capability of every dialect 
-and whatever we do not yet support - can be done with our powerful [`sql`](/docs/sql) operator
+and whatever we do not yet support can be done with our powerful **[`sql`](/docs/sql)** operator.
 
 ## Basic and partial select
-Getting a list of all users and you will have a typed result set  
+Getting a list of all users and you will have a typed result set:
 
 <Section>
 ```typescript
@@ -23,8 +24,10 @@ select * from 'users';
 ```
 </Section>
 
-Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons.  
-You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results
+Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons. 
+
+You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results.
+See this example below:
 <Section>
 ```typescript copy
 const result = await db.select({
@@ -39,7 +42,7 @@ select "users"."id" as "field1", "users"."name" as "field2" from "users";
 ```
 </Section>
 
-With partial select you can apply sql transformations with `sql` operator
+With partial select you can apply sql transformations with `sql` operator:
 
 <Section>
 ```typescript
@@ -53,7 +56,7 @@ select "users"."id", lower("users"."name") as "lowerName" from "users";
 ```
 </Section>
 
-You can also select fields conditionally
+You can also select fields conditionally:
 ```typescript
 async function selectUsers(withName: boolean) {
   return db
@@ -68,7 +71,7 @@ const users = await selectUsers(true);
 ```
 
 ## Select filters
-You can filter SQL results with our list of [filter operators](/docs/operators)
+You can filter SQL results with our list of **[filter operators](/docs/operators)**:
 <Section>
 ```typescript copy
 import { eq, lt, gte, ne } from "drizzle-orm";
@@ -88,9 +91,10 @@ select * from 'users' where 'id' <> 42;
 </Section>
 
 Any filter operator is a `sql` operator under the hood, for full SQL potential 
-you can utilise it directly and build type safe and future safe queries  
+you can utilise it directly and build type safe and future safe queries.
+
 You can safely alter schema, rename tables and columns and it will automatically reflect in queries, 
-as opposed to having regular string raw SQL queries
+as opposed to having regular string raw SQL queries.
 <Section>
 ```typescript copy
 import { sql } from "drizzle-orm";
@@ -110,7 +114,7 @@ select * from 'users' where lower('name') = "aaron";
 ```
 </Section>
 
-Inverting condition with a `not` operator
+Inverting condition with a `not` operator:
 <Section>
 ```typescript copy
 import { eq, not, sql } from "drizzle-orm";
@@ -125,7 +129,7 @@ select * from 'users' where not 'id' = 42;
 </Section>
 
 ## Combining filters
-You can logically combine filter operators with conditional `and` and `or` operators 
+You can logically combine filter operators with conditional `and` and `or` operators, like this:
 <Section>
 ```typescript copy
 import { eq, and, sql } from "drizzle-orm";
@@ -179,9 +183,9 @@ select distinct "id" from "users" order by "users"."id";
 ```
 </Section>
 
-Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too
+Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too.
 <Callout>
-    `DISTINCT ON` is only available in PostgreSQL
+    `DISTINCT ON` is only available in PostgreSQL.
 </Callout>
 
 <Section>
@@ -203,7 +207,7 @@ select distinct on ("users"."name") "name" from "users" order by "users"."name";
 
 
 ## Limit & Offset
-You can apply `limit` and `offset` to the query
+You can apply `limit` and `offset` to the query:
 <Section>
 ```typescript
 await db.select().from(users).limit(10);
@@ -216,7 +220,7 @@ select * from "users" limit 10 offset 10;
 </Section>
 
 ## Order By
-You can sort results with `orderBy` operator
+You can sort results with `orderBy` operator:
 <Section>
 ```typescript
 import { asc, desc } from "drizzle-orm";
@@ -238,7 +242,7 @@ select * from "users" order by "name" asc "name2" desc;
 </Section>
 
 ## WITH clause
-SQL `with` clause - is a statement scoped view, helpful to organise complex queries
+SQL `with` clause is a statement scoped view, helpful to organise complex queries like such:
 <Section>
 ```typescript copy
 const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
@@ -252,7 +256,7 @@ select * from sq;
 </Section>
 
 To select raw `sql` in a WITH subquery and reference that field in other queries, 
-you must add an alias to it  
+you must add an alias to it:
 ```typescript copy
 
 const sq = db.$with('sq').as(db.select({ 
@@ -262,12 +266,12 @@ const sq = db.$with('sq').as(db.select({
 
 const result = await db.with(sq).select({ name: sq.name }).from(sq);
 ```
-If you don't provide an alias - field type will become `DrizzleTypeError` and you won't be able to reference it in other queries. 
+If you don't provide an alias, the field `type` will become `DrizzleTypeError` and you won't be able to reference it in other queries. 
 If you ignore the type error and still try to reference the field, 
 you will get a runtime error, since there's no way to reference that field without an alias.
 
 ## Select from subquery
-Just like in SQL - you can embed SQL queries into other SQL queries by using `subquery` API
+Just like in SQL, you can embed SQL queries into other SQL queries by using `subquery` API.
 <Section>
 ```typescript copy
 const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
@@ -278,7 +282,7 @@ select * from (select * from "user" where "user"."id" = 42) "sq";
 ```
 </Section>
 
-You can also use subqueries in joins
+You can also use subqueries in joins:
 ```typescript copy
 const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
@@ -286,7 +290,7 @@ const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 With Drizzle ORM you can do aggregations with functions like `sum`, `count`, `avg`, etc. by 
 grouping and filtering with `groupBy` and `having` respectfully, just like you do in SQL.  
   
-With our powerful `sql` operator you can infer aggregations functions return types using `sql<number>` syntax
+With our powerful `sql` operator you can infer aggregations functions return types using `sql<number>` syntax:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -360,7 +364,7 @@ With our powerful `sql` operator you can infer aggregations functions return typ
   </Tab>
 </Tabs>
 
-Lets have a quick look on how to group and filter grouped using a `having`
+Lets have a quick look on how to group and filter grouped using a `having`:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -442,7 +446,8 @@ Lets have a quick look on how to group and filter grouped using a `having`
   </Tab>
 </Tabs>
 
-Here's a more advanced example
+Here's a more advanced example. This query will return a list of orders with their details,
+and will calculate total price, total quantity and total products count for each order.
 ```typescript copy
 const orders = sqliteTable('order', {
   id: integer('id').primaryKey(),
