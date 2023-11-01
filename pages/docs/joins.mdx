@@ -122,7 +122,7 @@ supports joins with partial select and will automatically infer return type base
 ```typescript copy
 await db.select({
   userId: users.id,
-  petId: pets.is,
+  petId: pets.id,
 }).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
