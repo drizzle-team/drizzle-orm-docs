@@ -5,7 +5,7 @@ import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 # Configuration files
 Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
 
-You can have autocomplete experience and a very convenient environment variables flow!  
+You can have an autocomplete experience and a very convenient environment variables flow!  
 
 ```plaintext {5}
 📦 <project root>
@@ -49,11 +49,11 @@ export default {
 </CodeTabs>
 
 ## Schema files paths
-`schema` param lets you define where your schema file/files live.  
+The `schema` param lets you define where your schema file or files live.  
 
-You can have as many separate schema files as you want and define paths to them using 
+You can have as many separate schema files as you want and define paths to them using a 
 **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
- or array of globs syntax.
+or an array of globs.
 
 <Tabs items={["Example 1", "Example 2", "Example 3"]}>
 <Tab>
@@ -134,13 +134,13 @@ export default {
 
 
 ## Migrations folder
-`out` param lets you define folder for your migrations, it's optional and `drizzle` by default.  
-It's very useful since you can have many separate schemas for different databases in the same project 
+The `out` param allows you to define a folder for your migrations. It's optional and `drizzle` is the default.  
+This is very useful since you can have many separate schemas for different databases in the same project 
 and have different migration folders for them.  
   
-Migration folder contains `.sql` migration files and `_meta` folder which is used by `drizzle-kit`
+The migration folder contains `.sql` migration files and `_meta` folder which are used by `drizzle-kit`
 <Callout type="warning" emoji="⚠️">
-	Don't delete any files manually, please refer to [`drizzle-kit drop`](./commands#drop-migration) command
+	Don't delete any files manually, please refer to the [`drizzle-kit drop`](./commands#drop-migration) command.
 </Callout>
 
 <Section>
@@ -167,7 +167,7 @@ export default {
 </Section>
 
 ## SQL breakpoints
-`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations.
+The `breakpoints` param lets you enable or disable SQL statement breakpoints in generated migrations.
 
 It's optional and `true` by default, 
 it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction (MySQL, SQLite) 
@@ -233,7 +233,7 @@ export default {
 </Tabs>
 
 ## Multi-project schema
-`tablesFilter` param lets you filter tables with **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)** 
+The `tablesFilter` param lets you filter tables with the **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)** 
 syntax for db **[`push`](./commands#prototype--push)** command. It's useful when you have only one database available for several separate projects with separate sql schemas.  
 
 How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**

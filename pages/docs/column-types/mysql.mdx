@@ -3,7 +3,7 @@ import { Callout } from 'nextra-theme-docs';
 
 # MySQL column types
 
-We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
+We have native support for all of them. Yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
 
 ### Integer
 
@@ -301,7 +301,7 @@ CREATE TABLE `table` (
 </Section>
 
 ### varchar
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+You can define the `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types. This **won't** check runtime values.
 <Section>
 ```typescript
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
@@ -323,7 +323,7 @@ CREATE TABLE `table` (
 
 ### text
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+You can define the `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types. This **won't** check runtime values.
 
 <Section>
 ```typescript
@@ -529,7 +529,7 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
+You can specify `.$type<..>()` for json object inference. This **won't** check runtime values. 
 It provides compile time protection for default values, insert and select schemas.
 ```typescript
 // will be infered as { foo: string }

@@ -5,19 +5,19 @@ import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedCh
 
 # Views (WIP)
 <Callout type="warning" emoji="⚠️">
-  Views are currently only implemented in the `drizzle-orm`, `drizzle-kit` does not support views yet. 
+  Views are currently only implemented in `drizzle-orm`. `drizzle-kit` does not support views yet. 
   You can query the views that already exist in the database, but they won't be added to `drizzle-kit` migrations or `db push` as of now.
 </Callout>
 
 ## Views declaration
-There're several ways you can declare views with Drizzle ORM.  
+There are several ways you can declare views with Drizzle ORM.  
 
 You can declare views that have to be created or you can declare views that already exist in the database. 
 
-You can declare views statements with an inline `query builder` syntax, with `standalone query builder` and with raw `sql` operators. 
+You can declare views statements with an inline `query builder` syntax, with the `standalone query builder` and with raw `sql` operators. 
 
-When views are created with either inlined or standalone query builders, view columns schema will be automatically inferred, 
-yet when you use `sql` you have to explicitly declare view columns schema.
+When views are created with either the inline or standalone query builder, the view columns schema will be automatically inferred. 
+However when you use `sql` you have to explicitly declare the view columns schema.
 
 ### Declaring views
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
@@ -95,7 +95,7 @@ yet when you use `sql` you have to explicitly declare view columns schema.
   </Tab>
 </Tabs>
 
-If you need a subset of columns you can use `.select({ ... })` method in query builder, like this:
+If you need a subset of columns you can use the `.select({ ... })` method in the query builder, like this:
 <Section>
   ```ts {4-6}
   export const customersView = pgView("customers_view").as((qb) => {
@@ -113,7 +113,7 @@ If you need a subset of columns you can use `.select({ ... })` method in query b
   ```
 </Section>
 
-You can also declare views using `standalone query builder`, it works exactly the same way:
+You can also declare views using the `standalone query builder`. It works exactly the same way:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -196,8 +196,8 @@ You can also declare views using `standalone query builder`, it works exactly th
 </Tabs>
 
 ### Declaring views with raw SQL
-Whenever you need to declare view using a syntax that is not supported by the query builder, 
-you can directly use `sql` operator and explicitly specify view columns schema.
+Whenever you need to declare a view using a syntax that is not supported by the query builder, 
+you can directly use the `sql` operator and explicitly specify the view columns schema.
 
 ```ts copy
 // regular view
@@ -216,8 +216,8 @@ const newYorkers = pgMaterializedView('new_yorkers', {
 ```
 
 ### Declaring existing views
-When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
-`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
+When you're provided with read only access to an existing view in the database, you should use the `.existing()` view configuration. 
+`drizzle-kit` will ignore it and will not generate a `create view` statement in the generated migration.
 ```ts
 export const user = pgTable("user", {
   id: serial("id"),

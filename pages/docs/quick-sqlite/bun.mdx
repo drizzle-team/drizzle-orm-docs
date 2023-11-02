@@ -1,13 +1,12 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
 
 # Bun SQLite
-According to the **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
+According to their **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
 
-Drizzle ORM natively supports **[`bun:sqlite`](https://bun.sh/docs/api/sqlite)** module and it's crazy fast 🚀  
+Drizzle ORM natively supports the **[`bun:sqlite`](https://bun.sh/docs/api/sqlite)** module and it's crazy fast 🚀  
 
-We embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
-for synchronous drivers like `bun:sqlite` we have both **async** and **sync** APIs and we mirror most popular 
-SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+We embrace SQL dialects as well as dialect specific drivers and syntax and unlike any other ORM, for synchronous drivers like `bun:sqlite` we offer both **async** and **sync** APIs. We also mirror the most popular SQLite-like query methods, such as `all`, `get`, `values` and `run`.
 
 <Tabs items={['bun', 'npm', 'pnpm', 'yarn']}>
 <Tab>
@@ -72,4 +71,3 @@ const result = db.select().from(users).get();
 const result = db.select().from(users).values();
 const result = db.select().from(users).run();
 ```
-More on **sync** and **async** APIs for sqlite - read here.

@@ -34,7 +34,7 @@ const batchResponse: BatchResponse = await db.batch([
 	db.select({ id: usersTable.id, invitedBy: usersTable.invitedBy }).from(usersTable),
 ]);
 ```
-Type for `batchResponse` in this example would be:
+The type for `batchResponse` in this example would be:
 ```ts
 type BatchResponse = [
 	{

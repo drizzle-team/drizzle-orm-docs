@@ -10,7 +10,7 @@ By default, Drizzle reads the `drizzle.config.ts` file located in the project's 
 If you need to specify a different configuration file, you can utilize the `--config=<path>`
 command-line option after any drizzle-kit command.
 
-Drizzle Kit supports multiple formats for the configuration file, including `.ts`, `.js`.
+Drizzle Kit supports multiple formats for the configuration file, including `.ts` and `.js`.
 This flexibility allows you to choose the format that best suits your needs and preferences.
 
 Here are some examples of each file format usage:
@@ -41,11 +41,11 @@ export default {
 - **Type**: `string | string[]`
 - **Commands**: `generate`, `check`, `up`, `push`, `drop`
 
-`schema` param lets you define where your schema file/files live.  
+The `schema` param lets you define where your schema file or files live.  
 
-You can have as many separate schema files as you want and define paths to them using 
+You can have as many separate schema files as you want and define paths to them using a 
 **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
-or array of globs syntax.
+or an array of globs.
 
 **Usage**
 <Tabs items={["Single file", "Multiple files", "Glob pattern"]}>
@@ -98,7 +98,7 @@ export default {
 - **Commands**: `push`, `introspect`
 
 <Callout type="warning" emoji="⚠️">
-	Current param is available in `drizzle-kit@0.19.0` and higher. In previous versions you should not use this param
+	Current param is available in `drizzle-kit@0.19.0` and higher. In previous versions you should not use this param.
 </Callout>
 
 The `driver` parameter is responsible for explicitly providing a driver to use when accessing a database 
@@ -199,8 +199,8 @@ export default {
 - **Default**: `true` (starting from `drizzle-kit@0.19.0`)
 - **Commands**: `generate`, `introspect`
 
-`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default, 
-it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite) 
+The `breakpoints` param lets you enable or disable SQL statement breakpoints in generated migrations. This is optional and `true` by default. 
+It's necessary to properly apply migrations on databases that do not support multiple DDL alteration statements in one transaction (MySQL, SQLite), 
 and Drizzle ORM has to apply them sequentially one by one.
 ```sql {5}
 CREATE TABLE `book` (
@@ -228,8 +228,8 @@ export default {
 - **Commands**: `push`
 
 
-`tablesFilter` param lets you filter tables with glob(opens in a new tab) syntax for db push command.
-It's useful when you have only one database avaialable for several separate projects with separate sql schemas.
+The `tablesFilter` param lets you filter tables with the **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)** syntax for db push command.
+It's useful when you have only one database available for several separate projects with separate sql schemas.
 
 How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**
 
@@ -240,7 +240,7 @@ export default {
 } satisfies Config;
 ```
 
-In this case, only tables that start with `project1_` will be synced with the database
+In this case, only tables that start with `project1_` will be synced with the database.
 
 ### schemaFilter
 
@@ -250,13 +250,13 @@ In this case, only tables that start with `project1_` will be synced with the da
 - **Available databases**: `PostgreSQL`
 
 
-The `schemaFilter` parameter allows you to define which schema in PostgreSQL should be used for either `introspect` 
+The `schemaFilter` parameter allows you to define which schema in PostgreSQL should be used for either the `introspect` 
 or `push` commands.
 This parameter accepts a single schema as a string or an array of schemas as strings. No glob pattern is supported here. 
-By default, drizzle will use the `public` schema for both commands, but you can add any schema you need.
+By default, Drizzle will use the `public` schema for both commands, but you can add any schema you need.
 
-For example, having `schemaFilter: ["my_schema"]` will only look for tables in both the database and 
-drizzle schema that are a part of the `my_schema` schema.
+For example, setting `schemaFilter: ["my_schema"]` will make Drizzle search only for tables in both the database and 
+drizzle schema that are part of the `my_schema` schema.
 
 **Usage**
 ```ts
@@ -304,7 +304,7 @@ export default {
 
 - **Type**: `object`
 
-This section is a reference to `introspect` object inside `drizzle.config.*` file.
+This section is a reference to the `introspect` object inside a `drizzle.config.*` file.
 
 #### casing
 
@@ -312,7 +312,7 @@ This section is a reference to `introspect` object inside `drizzle.config.*` fil
 - **Default**: `camel`
 - **Commands**: 
 
-This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting your databse.
+This command determines the strategy for selecting JS key names for columns, tables, and constraints when introspecting your database.
 
 **Usage**
 ```ts

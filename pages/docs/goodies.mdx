@@ -110,7 +110,7 @@ const db = drizzle(pool, { logger: new MyLogger() });
 
 
 ## Multi-project schema
-`table creator` operator lets you define customise table names.  
+The `table creator` operator lets you define customise table names.  
 It's very useful when you need to keep schemas of different projects in one database.
 
 For db push docs — **[see here.](/kit-docs/conf#multi-project-schema)**
@@ -156,7 +156,7 @@ const users = sqliteTable('users', {
 
 
 ## Printing SQL query
-You can print SQL queries with `db` instance or by using **[`standalone query builder`](#standalone-query-builder)**.
+You can print SQL queries with the `db` instance or by using the **[`standalone query builder`](#standalone-query-builder)**.
 ```typescript copy
 const query = db
   .select({ id: users.id, name: users.name })
@@ -239,8 +239,7 @@ without creating a database instance and get generated SQL.
 </Tabs>
 
 ## Get typed table columns
-You can get a typed table columns map,
-very useful when you need to omit certain columns upon selection.
+You can get a typed table columns map. Very useful when you need to omit certain columns upon selection.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>

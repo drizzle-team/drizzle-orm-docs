@@ -6,11 +6,10 @@ import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedCh
 # SQL Select
 Drizzle ORM provide you the most SQL-like way to query your relational database.  
 
-We natively support mostly every query feature capability of every dialect 
-and whatever we do not yet support can be done with our powerful **[`sql`](/docs/sql)** operator.
+We natively support most query feature capabilities for every dialect and whatever we don't yet support can be achieved using our powerful **[`sql`](/docs/sql)** operator.
 
 ## Basic and partial select
-Getting a list of all users and you will have a typed result set:
+Retrieve a list of all users, and you will receive a typed result set:
 
 <Section>
 ```typescript
@@ -24,10 +23,11 @@ select * from 'users';
 ```
 </Section>
 
-Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons. 
+For SQL tables with many columns, you might not want to select all of them due to performance or security reasons.
 
-You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results.
-See this example below:
+
+You can omit them by using our partial query syntax, which will generate a partial SQL select and automatically map the results.
+See the example below:
 <Section>
 ```typescript copy
 const result = await db.select({
@@ -42,7 +42,7 @@ select "users"."id" as "field1", "users"."name" as "field2" from "users";
 ```
 </Section>
 
-With partial select you can apply sql transformations with `sql` operator:
+With partial select you can apply SQL transformations with the `sql` operator:
 
 <Section>
 ```typescript
@@ -90,11 +90,11 @@ select * from 'users' where 'id' <> 42;
 ```
 </Section>
 
-Any filter operator is a `sql` operator under the hood, for full SQL potential 
+Any filter operator is an `sql` operator under the hood. For full SQL potential 
 you can utilise it directly and build type safe and future safe queries.
 
-You can safely alter schema, rename tables and columns and it will automatically reflect in queries, 
-as opposed to having regular string raw SQL queries.
+You can safely alter the schema, rename tables and columns, and these changes will automatically reflect in queries, unlike with regular raw SQL string queries.
+
 <Section>
 ```typescript copy
 import { sql } from "drizzle-orm";
@@ -183,7 +183,7 @@ select distinct "id" from "users" order by "users"."id";
 ```
 </Section>
 
-Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too.
+Drizzle ORM supports the `DISTINCT ON` PostgreSQL operator too.
 <Callout>
     `DISTINCT ON` is only available in PostgreSQL.
 </Callout>
@@ -220,7 +220,7 @@ select * from "users" limit 10 offset 10;
 </Section>
 
 ## Order By
-You can sort results with `orderBy` operator:
+You can sort results with the `orderBy` operator:
 <Section>
 ```typescript
 import { asc, desc } from "drizzle-orm";
@@ -242,7 +242,7 @@ select * from "users" order by "name" asc "name2" desc;
 </Section>
 
 ## WITH clause
-SQL `with` clause is a statement scoped view, helpful to organise complex queries like such:
+The SQL `with` clause is a statement scoped view, useful for organizing complex queries like the following:
 <Section>
 ```typescript copy
 const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
@@ -290,7 +290,7 @@ const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 With Drizzle ORM you can do aggregations with functions like `sum`, `count`, `avg`, etc. by 
 grouping and filtering with `groupBy` and `having` respectfully, just like you do in SQL.  
   
-With our powerful `sql` operator you can infer aggregations functions return types using `sql<number>` syntax:
+With our powerful `sql` operator you can infer aggregation functions return types using `sql<number>` syntax:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
@@ -364,7 +364,7 @@ With our powerful `sql` operator you can infer aggregations functions return typ
   </Tab>
 </Tabs>
 
-Lets have a quick look on how to group and filter grouped using a `having`:
+Lets have a quick look on how to group and filter grouped using `having`:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
