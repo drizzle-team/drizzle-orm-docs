@@ -17,6 +17,9 @@ export const sponsorsData: ISponsor[] = [
     createdAt: '2023-04-03T13:32:16Z',
     isActive: true,
     imageType: ImageType.SVG,
+    lightStyle: {
+      filter: 'invert(1)',
+    },
   },
   {
     tier: {
