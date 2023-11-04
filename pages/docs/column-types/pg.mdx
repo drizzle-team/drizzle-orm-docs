@@ -2,13 +2,13 @@ import Section from "../../../components/Section/Section";
 import { Callout } from 'nextra-theme-docs';
   
 # PostgreSQL column types
-We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
+We have native support for all of them. Yet if that's not enough for you, feel free to create **[custom types](../custom-types)**.
 
 ### integer
 `integer` `int` `int4`  
 Signed 4-byte integer     
 
-If you need `integer autoincrement` please refer to **[serial.](#serial)**
+If you need `integer autoincrement`, please refer to **[serial.](#serial)**
 
 <Section>
 ```typescript
@@ -49,9 +49,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### smallint
 `smallint` `int2`  
-Small-range signed 2-byte integer   
+Small-range signed 2-byte integer.
 
-If you need `smallint autoincrement` please refer to **[smallserial.](#smallserial)**
+If you need `smallint autoincrement`, please refer to **[smallserial.](#smallserial)**
 <Section>
 ```typescript
 import { smallint, pgTable } from "drizzle-orm/pg-core";
@@ -91,9 +91,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 `bigint` `int8`  
 Signed 8-byte integer  
 
-If you need `bigint autoincrement` please refer to **[bigserial.](#bigserial)**
+If you need `bigint autoincrement`, please refer to **[bigserial.](#bigserial)**
 
-If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint.
+If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript numbers as opposed to bigints.
 <Section>
 ```typescript
 import { bigint, pgTable } from "drizzle-orm/pg-core";
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### serial
 `serial` `serial4`  
-Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
+Auto incrementing 4-bytes integer, a notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
 <Section>
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### smallserial
 `smallserial` `serial2`  
-Auto incrementing 2-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
+Auto incrementing 2-bytes integer, a notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
 <Section>
@@ -179,11 +179,11 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### bigserial
 `bigserial` `serial8`  
-Auto incrementing 8-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).
+Auto incrementing 8-bytes integer, a notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases).
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL)**
 
-If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript number as opposed to bigint.
+If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'number'` and deal with javascript numbers as opposed to bigints.
 <Section>
 ```typescript
 import { bigserial, pgTable } from "drizzle-orm/pg-core";
@@ -229,7 +229,7 @@ Variable-length(unlimited) character string.
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-character.html)**
   
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+You can define the `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types. This **won't** check runtime values.
 <Section>
 ```typescript
 import { text, pgTable } from "drizzle-orm/pg-core";
@@ -255,7 +255,7 @@ Variable-length character string, can store strings up to **`n`** characters (no
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-character.html)**
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+You can define the `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types. This **won't** check runtime values.
 
 The `length` parameter is optional according to PostgreSQL docs.
 <Section>
@@ -281,13 +281,13 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### char
 `character(n)` `char(n)`  
-Fixed-length, blank padded character string, can store strings up to **`n`** characters(not bytes).
+Fixed-length, blank padded character string which can store strings up to **`n`** characters (not bytes).
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-character.html)**
 
-You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
+You can define the `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types. This **won't** check runtime values.
 
-The `length` parameter is optional according to PostgreSQL docs.
+The `length` parameter is optional according to the PostgreSQL docs.
 <Section>
 ```typescript
 import { char, pgTable } from "drizzle-orm/pg-core";
@@ -311,7 +311,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 
 ### numeric
 `numeric` `decimal`  
-Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point.
+Exact numeric with selectable precision. It can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point.
 
 For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL)**
 
@@ -418,8 +418,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
   
-You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
-It provides compile time protection for default values, insert and select schemas.
+You can specify `.$type<..>()` for json object inference. This **won't** check runtime values. 
+It provides compile time protection for default values, as well as insert and select schemas.
 ```typescript
 // will be infered as { foo: string }
 json: json('json').$type<{ foo: string }>();
@@ -455,8 +455,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
-It provides compile time protection for default values, insert and select schemas.
+You can specify `.$type<..>()` for json object inference. This **won't** check runtime values. 
+It provides compile time protection for default values, as well as insert and select schemas.
 
 ```typescript
 // will be infered as { foo: string }
@@ -686,7 +686,7 @@ const table = pgTable('table', {
 
 
 ### Not null
-`NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
+The `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 
 <Section>
 ```typescript

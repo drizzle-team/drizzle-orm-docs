@@ -81,8 +81,8 @@ To have best in class support for every database out there we've introduced **`m
 
 Drizzle relational queries use lateral joins of subqueries under the hood and for now PlanetScale does not support them.
 
-When using **mysql2** driver with regular **MySQL** database — you should specify `mode: "default"`
-When using **mysql2** driver with **PlanetScale** — you need to specify `mode: "planetscale"`
+When using the **mysql2** driver with a regular **MySQL** database — you should specify `mode: "default"`.
+When using the **mysql2** driver with **PlanetScale** — you need to specify `mode: "planetscale"`.
 
 ```ts copy
 import * as schema from './schema';
@@ -99,9 +99,9 @@ const db = drizzle(connection, { schema, mode: 'planetscale' });
 ## Declaring relations
 
 ### One-to-one
-Drizzle ORM provides you an API to define `one-to-one` relations between tables with `relations` operator.  
+Drizzle ORM provides you an API to define `one-to-one` relations between tables with the `relations` operator.  
 
-Example of `one-to-one` relation between users and users who invited them to the service, self reference:
+Example of `one-to-one` relations between users and users who invited them to the service, self reference:
 
 ```typescript copy {10-15}
 import { pgTable, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
@@ -121,7 +121,7 @@ export const usersRelations = relations(users, ({ one }) => ({
 }));
 ```
 
-Another example would be a user having a profile information stored in separate table:
+Another example would be a user having profile information stored in a separate table:
 ```typescript copy {9-14}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -146,9 +146,9 @@ export const profileInfo = pgTable('profile_info', {
 ```
 
 ### One-to-many
-Drizzle ORM provides you an API to define `one-to-many` relations between tables with `relations` operator. 
+Drizzle ORM provides you an API to define `one-to-many` relations between tables with the `relations` operator. 
 
-Example of `one-to-many` relation between users and posts they've written:
+Example of a `one-to-many` relation between users and the posts they've written:
 
 ```typescript copy {9-11, 19-24}
 import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
@@ -212,10 +212,9 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 
 
 ### Many-to-many
-Drizzle ORM provides you an API to define `many-to-many` relations between tables through so called `junction` or `join` tables,
-they have to be explicitly defined and store associations between related tables.  
+Drizzle ORM provides you an API to define `many-to-many` relations between tables through so-called `junction` or `join` tables. They have to be explicitly defined and store associations between related tables.  
   
-Example of `many-to-many` relation between users and groups:
+Example of a `many-to-many` relation between users and groups:
 ```typescript copy {9-11, 18-20, 30-39}
 import { pgTable, serial, text, integer, boolean, primaryKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -268,7 +267,7 @@ Foreign keys are a database level constraint, they are checked on every `insert`
 On the other hand, `relations` are a higher level abstraction, they are used to define relations between tables on the application level only.
 They do not affect the database schema in any way and do not create foreign keys implicitly.
 
-What this means is `relations` and foreign keys can be used together, but they are not dependent on each other.
+What this means is that `relations` and foreign keys can be used together, but they are not dependent on each other.
 You can define `relations` without using foreign keys (and vice versa), which allows them to be used with databases that do not support foreign keys, like PlanetScale.
 
 The following two examples will work exactly the same in terms of querying the data using Drizzle relational queries.
@@ -364,7 +363,7 @@ Relational queries are an extension to Drizzle's original **[query builder](/doc
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
 initialization and then just use the `db.query` API.
 <Callout type="info" emoji="ℹ️">
-	`drizzle` import path depends on the **[database driver](/docs/installation-and-db-connection)** you're using.
+	The `drizzle` import path depends on the **[database driver](/docs/installation-and-db-connection)** you're using.
 </Callout>
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
@@ -505,7 +504,7 @@ const result: {
 
 ### Include relations
 
-`With` operator lets you combine data from multiple related tables and properly aggregate results.
+The `with` operator lets you combine data from multiple related tables and properly aggregate results.
 
 **Getting all posts with comments:**
 ```typescript copy
@@ -525,7 +524,7 @@ const post = await db.query.posts.findFirst({
 });
 ```
 
-You can chain nested with statements as much as necessary.  
+You can chain nested `with` statements as much as necessary.  
 For any nested `with` queries Drizzle will infer types using [Core Type API](./goodies#type-api).
   
 **Get all users with posts. Each post should contain a list of comments:**
@@ -542,7 +541,7 @@ const users = await db.query.users.findMany({
 ```
 
 ### Partial fields select
-`columns` parameter lets you include or omit columns you want to get from the database.
+The `columns` parameter lets you include or omit columns you want to get from the database.
 
 <Callout type="info" emoji="ℹ️">
   Drizzle performs partial selects on the query level, no additional data is transferred from the database.
@@ -576,8 +575,7 @@ const posts = await db.query.posts.findMany({
 When both `true` and `false` select options are present, all `false` options are ignored.
 </Callout>
 
-If you include the `name` field and exclude the `id` field, `id` exclusion will be redundant, 
-all fields apart from `name` would be excluded anyways.  
+If you include the `name` field and exclude the `id` field, the `id` exclusion becomes redundant because all fields other than name would be excluded anyway.  
   
 **Exclude and Include fields in the same query:**
 <Section>
@@ -637,8 +635,7 @@ const posts = await db.query.posts.findMany({
 ```
 
 ### Select filters
-Just like in our SQL-like query builder, 
-relational queries API lets you define filters and conditions with the list of our **[`operators`](/docs/operators)**.  
+Just like in our SQL-like query builder, the relational queries API allows you to define filters and conditions using our list of **[`operators`](/docs/operators)**.  
 
 You can either import them from `drizzle-orm` or use from the callback syntax:
 <Section>
@@ -656,7 +653,7 @@ const users = await db.query.users.findMany({
 ```
 </Section>
 
-Find post with `id=1` and comments that were created before particular date:
+Find the post with `id=1` and comments that were created before the specified date:
 ```typescript copy
 await db.query.posts.findMany({
 	where: (posts, { eq }) => (eq(posts.id, 1)),
@@ -669,7 +666,7 @@ await db.query.posts.findMany({
 ```
 
 ### Limit & Offset
-Drizzle ORM provides `limit` & `offset` API for queries and for the nested entities.
+Drizzle ORM provides a `limit` & `offset` API for queries and for the nested entities.
   
 **Find 5 posts:**
 ```typescript copy
@@ -717,9 +714,9 @@ await db.query.posts.findMany({
 ```
 
 ### Order By
-Drizzle provides API for ordering in the relational query builder.  
+Drizzle provides an API for ordering in the relational query builder.  
 
-You can use same ordering **[core API](/docs/crud#order-by)** or use
+You can use the same ordering **[core API](/docs/crud#order-by)** or use
 `order by` operator from the callback with no imports.  
 
 <Section>
@@ -750,7 +747,7 @@ await db.query.posts.findMany({
 ```
 
 ### Include custom fields
-Relational query API lets you add custom additional fields. 
+The relational query API lets you add custom additional fields. 
 It's useful when you need to retrieve data and apply additional functions to it.
 <Callout type="warning" emoji="⚠️">
 	As of now aggregations are not supported in `extras`, please use **[`core queries`](/docs/crud)** for that.
@@ -775,7 +772,7 @@ await db.query.users.findMany({
 ```
 </Section>
 
-`lowerName` as a key will be included to all fields in returned object.
+`lowerName` as a key will be included to all fields in the returned object.
 
 <Callout type="warning" emoji="⚠️">
   You have to explicitly specify `.as("<name_for_column>")`

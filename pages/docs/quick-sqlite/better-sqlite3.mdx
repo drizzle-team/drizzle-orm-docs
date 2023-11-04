@@ -4,9 +4,7 @@ import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 According to the **[official docs](https://github.com/WiseLibs/better-sqlite3)**, 
 BetterSqlite3 is the fastest and simplest library for SQLite3 in Node.js.
 
-Drizzle ORM embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
-for synchronous drivers like `better-sqlite3` both **async** and **sync** APIs and we mirror most popular 
-SQLite-like `all`, `get`, `values` and `run` query methods syntax.  
+Drizzle ORM embraces SQL dialects, their specific drivers and syntax and unlike any other ORM, for synchronous drivers like `better-sqlite3` we offer both **async** and **sync** APIs. We also mirror the most popular SQLite-like query methods, such as `all`, `get`, `values` and `run`.
 
 <Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
   <Tab>
@@ -75,4 +73,3 @@ const result = db.select().from(users).get();
 const result = db.select().from(users).values();
 const result = db.select().from(users).run();
 ```
-More on **sync** and **async** APIs for sqlite - read here.

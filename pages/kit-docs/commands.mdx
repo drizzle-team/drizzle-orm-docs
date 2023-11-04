@@ -37,13 +37,13 @@ export default {
 ```
 </Section>
 
-If you want to use custom named config file
+If you want to use a custom named config file.
 
 ```shell
 $ drizzle-kit generate:pg --config=custom.config.ts
 ```
 
-If you want to have all params as CLI options
+If you want to have all params as CLI options.
 
 ```shell
 $ drizzle-kit generate:pg --schema=./src/schema.ts --out=./drizzle
@@ -57,7 +57,7 @@ $ drizzle-kit generate:pg --custom
 
 ## Introspect / Pull
 
-`drizzle-kit introspect:{dialect}` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
+The `drizzle-kit introspect:{dialect}` command lets you pull DDL from an existing database and generate `schema.ts` file in a matter of seconds.  
 
 Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are mandatory.
 
@@ -127,13 +127,13 @@ export default {
 </Tab>
 </Tabs>
 
-If you want to use custom named config file
+If you want to use a custom named config file.
 
 ```shell
 $ drizzle-kit introspect:pg --config=custom.config.ts
 ```
 
-If you want to have all params as CLI options
+If you want to have all params as CLI options.
 
 ```shell
 $ drizzle-kit introspect:pg --out=migrations/ --connectionString=postgresql://user:pass@host:port/db_name
@@ -147,7 +147,7 @@ $ drizzle-kit introspect:pg --out=migrations/ --host=0.0.0.0 --port=5432 --user=
 `drizzle-kit push:{dialect}` lets you push your schema changes directly to the
 database and omit managing SQL migration files.
 
-This has proven to be very useful for rapid local development(prototyping) and when working with remote databases like
+This has proven to be very useful for rapid local development (prototyping) and when working with remote databases like
 **[Planetscale](https://planetscale.com/)**, **[Neon](https://neon.tech/)**, **[Turso](https://turso.tech/drizzle)** and others.
 
 <Callout type="info">
@@ -188,13 +188,13 @@ $ drizzle-kit push:pg
 
 </Section>
 
-If you want to use custom named config file
+If you want to use a custom named config file.
 
 ```shell
 $ drizzle-kit push:mysql --config=custom.config.ts
 ```
 
-If you want to have all params as CLI options
+If you want to have all params as CLI options.
 
 ```shell
 $ drizzle-kit push:mysql --schema=src/schema.ts --connectionString=postgresql://user:pass@host:port/db_name
@@ -203,7 +203,7 @@ $ drizzle-kit push:mysql --schema=src/schema.ts --host=0.0.0.0 --port=5432 --use
 
 ## Drop migration
 
-`drizzle-kit drop` lets you delete previously generated migrations from migrations folder
+`drizzle-kit drop` lets you delete previously generated migrations from the migrations folder.
 
 <Callout type="warning" emoji="⚠️">
   Please don't delete any files in migrations folder manually, it might break
@@ -219,13 +219,13 @@ $ drizzle-kit push:mysql --schema=src/schema.ts --host=0.0.0.0 --port=5432 --use
 $ drizzle-kit drop
 ```
 
-If you want to use custom named config file
+If you want to use a custom named config file.
 
 ```shell
 $ drizzle-kit drop --config=custom.config.ts
 ```
 
-If you want to have all params as CLI options
+If you want to have all params as CLI options.
 
 ```shell
 $ drizzle-kit drop --out=drizzle
@@ -235,7 +235,8 @@ $ drizzle-kit drop --out=drizzle
 
 
 ## Maintain stale metadata
-We're rapidly evolving Drizzle Kit APIs and from time to time there's a need to upgrade underlying metadata structure.  
+We're rapidly evolving Drizzle Kit APIs and from time to time there's a need to upgrade the underlying metadata structure.
+
 `drizzle-kit up:{dialect}` is a utility command to keep all metadata up to date.  
 
 | param                             | required | description                                   |
@@ -255,13 +256,13 @@ $ drizzle-kit up:sqlite
 ```
 </Section>
 
-If you want to use custom named config file
+If you want to use a custom named config file.
 
 ```shell
 $ drizzle-kit up:pg --config=custom.config.ts
 ```
 
-If you want to have all params as CLI options
+If you want to have all params as CLI options.
 
 ```shell
 $ drizzle-kit up:pg --out=drizzle
@@ -271,9 +272,7 @@ $ drizzle-kit up:pg --out=drizzle
 
 
 ## Check
-`drizzle-kit check:{dialect}` is a very powerful tool for you to check consistency of your migrations.  
-That's extremely useful when you have multiple people on the project, altering database schema on different branches.  
-Drizzle Kit will check for all collisions and inconsistencies.
+`drizzle-kit check:{dialect}` is a very powerful tool for you to check consistency of your migrations. It's extremely useful when you have multiple people on the project, altering the database schema on different branches. Drizzle Kit will check for all collisions and inconsistencies.
 
 | param                             | required | description                                   |
 | :-------------------------------- | :------- | :-------------------------------------------- |
@@ -292,20 +291,20 @@ $ drizzle-kit check:sqlite
 ```
 </Section>
 
-If you want to use custom named config file
+If you want to use a custom named config file.
 
 ```shell
 $ drizzle-kit check:pg --config=custom.config.ts
 ```
 
-If you want to have all params as CLI options
+If you want to have all params as CLI options.
 
 ```shell
 $ drizzle-kit check:pg --out=drizzle
 ```
 
 ## Drizzle Studio [NEW]
-`drizzle-kit studio` lets you launch **[Drizzle Studio](/drizzle-studio/overview)** database browser locally from you config file.  
+`drizzle-kit studio` lets you launch the **[Drizzle Studio](/drizzle-studio/overview)** database browser locally from you config file.  
 
 | param     | required | description              |
 | :-------- | :------- | :----------------------- |

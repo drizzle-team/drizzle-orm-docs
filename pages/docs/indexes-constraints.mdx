@@ -12,7 +12,7 @@ This ensures the accuracy and reliability of your data in the database.
 
 ### Default
 
-The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
+The `DEFAULT` clause specifies a default value to use for the column if no value is provided by the user when doing an `INSERT`.
 If there is no explicit `DEFAULT` clause attached to a column definition,
 then the default value of the column is `NULL`.
 
@@ -92,7 +92,7 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
 
 This enforces a field to always contain a value, which means that you cannot insert a new record,
-or update a record without adding a value to this field.
+or update a record without providing a value to this field.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -153,7 +153,7 @@ or update a record without adding a value to this field.
 
 The `UNIQUE` constraint ensures that all values in a column are different.  
 
-Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+Both the `UNIQUE` and `PRIMARY KEY` constraints ensure uniqueness for a column or set of columns.
 
 A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
 
@@ -312,7 +312,7 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
 
 The `CHECK` constraint is used to limit the value range that can be placed in a column.
 
-If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+If you define a `CHECK` constraint on a column it allows only certain values for this column.  
 
 If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
 
@@ -410,7 +410,7 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
 ### Composite Primary Key
 
-Just like `PRIMARY KEY`, composite primary key uniquely each record in a table using multiple fields.
+Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
 
 Drizzle ORM provides a standalone `primaryKey` operator for that:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
@@ -590,8 +590,7 @@ You can declare them in a column declaration statement:
   </Tab>
 </Tabs>
 
-If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
-set return type for reference callback or user a standalone `foreignKey` operator.
+If you want to create a self-reference, due to TypeScript limitations, you either need to explicitly set the return type for the reference callback or use a standalone `foreignKey` operator.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -763,7 +762,7 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
 
 ## Indexes
 
-Drizzle ORM provides API for both `index` and `unique index` declaration:
+Drizzle ORM provides APIs for both `index` and `unique index` declaration:
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -792,10 +791,10 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     ```
     </Section>
     <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param.
+      As of now `drizzle-kit` only supports the index `name` and `on()` params.
     </Callout>
 
-    Drizzle ORM provides set of all params for index creation:
+    Drizzle ORM provides a set of all the params for index creation:
 
     ```typescript
     // Index declaration reference
