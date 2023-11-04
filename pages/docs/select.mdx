@@ -4,7 +4,7 @@ import { Callout } from 'nextra-theme-docs'
 import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # SQL Select
-Drizzle provides you the most SQL-like way to query your relational database, while remaining type-safe and composable.
+Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
 It natively supports mostly every query feature and capability of every dialect,
 and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
 
@@ -235,7 +235,7 @@ import { eq, and, sql } from 'drizzle-orm';
 
 await db.select().from(users).where(
   and(
-    eq(users.id, 42), 
+    eq(users.id, 42),
     eq(users.name, 'Dan')
   )
 );
@@ -285,17 +285,11 @@ In PostgreSQL, you can also use the `distinct on` clause to specify how the uniq
 
 <Section>
 ```ts
-await db.selectDistinctOn([users.id])
-  .from(users)
-  .orderBy(users.id);
-
-await db.selectDistinctOn([users.name], { name: users.name })
-  .from(users)
-  .orderBy(users.name);
+await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
+await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
 ```
 ```sql
 select distinct on ("id") "id", "name" from "users" order by "id";
-
 select distinct on ("name") "name" from "users" order by "name";
 ```
 </Section>
@@ -335,8 +329,8 @@ await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
 select "id", "name", "age" from "users" order by "name";
 select "id", "name", "age" from "users" order by "name" desc;
 
-select "id", "name", "age" from "users" order by "name" "name2";
-select "id", "name", "age" from "users" order by "name" asc "name2" desc;
+select "id", "name", "age" from "users" order by "name", "name2";
+select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 ```
 </Section>
 
@@ -349,9 +343,7 @@ const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
 const result = await db.with(sq).select().from(sq);
 ```
 ```sql
-with sq as (
-  select "id", "name", "age" from "users" where "id" = 42
-)
+with sq as (select "id", "name", "age" from "users" where "id" = 42)
 select "id", "name", "age" from sq;
 ```
 </Section>
@@ -399,103 +391,41 @@ select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"
 With Drizzle, you can do aggregations using functions like `sum`, `count`, `avg`, etc. by
 grouping and filtering with `.groupBy()` and `.having()` respectfully, same as you would do in raw SQL:
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-    ```typescript copy {10,13}
-    import { pgTable, serial, text, doublePrecision } from 'drizzle-orm/pg-core';
-    import { gte } from 'drizzle-orm';
-
-    export const product = pgTable('product', {
-      id: serial('id').primaryKey(),
-      name: text('name'),
-      unitPrice: doublePrecision("unit_price")
-    });
-
-    const result = await db.select({ count: sql<number>`cast(count(*) as int)` }).from(product);
-    /* result type is { count: number }[] */
-
-    await db.select({ count: sql<number>`cast(count(*) as int)` }).from(product).where(gte(product.unitPrice, 4));
-
-    ```
-    ```sql
-    select cast(count(*) as int) from "product";
-    select cast(count(*) as int) from "product" where "unit_price" >= 4;
-    ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```typescript copy {10,13}
-      import { mysqlTable, bigint, text, double } from 'drizzle-orm/mysql-core';
-      import { gte } from 'drizzle-orm';
-
-      export const product = mysqlTable('product', {
-        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-        name: text('name'),
-        unitPrice: double("unit_price")
-      });
-
-      const result = await db.select({ count: sql<number>`cast(count(*) as int)` }).from(product);
-      /* result type is { count: number }[] */
-
-      await db.select({ count: sql<number>`cast(count(*) as int)` }).from(product).where(gte(product.unitPrice, 4));
-      ```
-      ```sql
-      select cast(count(*) as int) from `product`;
-      select cast(count(*) as int) from `product` where `unit_price` >= 4;
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```typescript copy {10,13}
-      import { sqliteTable, serial, text, real } from 'drizzle-orm/sqlite-core';
-      import { gte } from 'drizzle-orm';
-
-      export const product = sqliteTable('product', {
-        id: integer('id').primaryKey({ autoIncrement: true }),
-        name: text('name'),
-        unitPrice: real('unit_price'),
-      });
-
-      const result = await db.select({ count: sql<number>`count(*)` }).from(product);
-      /* result type is { count: number }[] */
-
-      await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
-      ```
-      ```sql
-      select count(*) from "product";
-      select count(*) from "product" where "unit_price" >= 4;
-      ```
-  </Section>
-  </Tab>
-</Tabs>
-
-<Callout type="info">
-Casting to `int` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
-Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
-</Callout>
-
-Lets take a quick look at grouping and filtering grouped values using a `having` clause:
 <Section>
 ```typescript
 import { gt } from 'drizzle-orm';
 
 await db.select({
-  count: sql<number>`count(${user.id})::int`,
-  city: user.city,
+  age: users.age,
+  count: sql<number>`cast(count(${users.id}) as int)`,
 })
-  .from(user)
-  .groupBy(({ city }) => city)
-  .having(({ count }) => gt(count, 1))
+  .from(users)
+  .groupBy(users.age);
+
+await db.select({
+  age: users.age,
+  count: sql<number>`cast(count(${users.id}) as int)`,
+})
+  .from(users)
+  .groupBy(users.age)
+  .having(({ count }) => gt(count, 1));
 ```
 ```sql
-select cast(count("id") as int), "city" from "users"
-  group by "city"
+select "age", cast(count("id") as int)
+  from "users"
+  group by "age";
+
+select "age", cast(count("id") as int)
+  from "users"
+  group by "age"
   having cast(count("id") as int) > 1;
 ```
 </Section>
+
+<Callout type="info">
+`cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
+Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
+</Callout>
 
 A more advanced example:
 

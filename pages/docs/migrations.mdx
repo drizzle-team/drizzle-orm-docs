@@ -93,7 +93,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as schema from './schema';
 
-export const pool = mysql.createPool({
+export const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -101,19 +101,19 @@ export const pool = mysql.createPool({
   multipleStatements: true,
 });
 
-export const db = drizzle(pool, { schema });
+export const db = drizzle(connection, { schema });
 ```
 
 ```typescript copy filename="src/migrate.ts"
 import 'dotenv/config';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
-import { db, pool } from './db';
+import { db, connection } from './db';
 
 // This will run migrations on the database, skipping the ones already applied
 await migrate(db, { migrationsFolder: './drizzle' });
 
 // Don't forget to close the connection, otherwise the script will hang
-await pool.end();
+await connection.end();
 ```
 
 ```bash
