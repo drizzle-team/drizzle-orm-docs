@@ -131,10 +131,7 @@ export const users = pgTable('users', {
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
-	profileInfo: one(profileInfo, {
-		fields: [users.id],
-		references: [profileInfo.userId],
-	}),
+	profileInfo: one(profileInfo),
 }));
 
 export const profileInfo = pgTable('profile_info', {

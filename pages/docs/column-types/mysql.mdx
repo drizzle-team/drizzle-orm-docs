@@ -86,15 +86,20 @@ CREATE TABLE `table` (
 import { bigint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	bigint: bigint('bigint')
+	bigint: bigint('bigint', { mode: 'number' })
+	bigintUnsigned: bigint('bigintU', { mode: 'number', unsigned: true })
 });
 
 bigint('...', { mode: 'number' | 'bigint' });
+
+// You can also specify unsigned option for bigint
+bigint('...', { mode: 'number' | 'bigint', unsigned: true })
 ```
 
 ```sql
 CREATE TABLE `table` (
 	`bigint` bigint,
+	`bigintU` bigint unsigned,
 );
 ```
 </Section>

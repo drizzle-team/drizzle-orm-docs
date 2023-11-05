@@ -16,12 +16,12 @@ Here are some examples of each file format usage:
 
 **Typescript example**
 ```ts
-import { Config } from "drizzle-kit";
+import { defineConfig } from 'drizzle-kit/utils'
 
-export default {
+export default defineConfig({
   schema: "./schema.ts",
   out: "./drizzle"
-} satisfies Config;
+})
 ```
 
 **JavaScript example**
