@@ -1,14 +1,18 @@
+import { Callout, Steps } from 'nextra-theme-docs';
 
 # Migrations
-The most important thing about Drizzle ORM is that you can use it as a source of truth for database schema.  
-[DrizzleKit](/kit-docs) - is a CLI companion for Drizzle ORM, it lets generate SQL statements for schema creation and alternations 
-or apply changes directly to the database.
-  
-See detailed [docs](/kit-docs) for extended examples and walk-throughs.
-  
+The most important thing about Drizzle is that you can use its schema as a source of truth for everything else.<br />
+[drizzle-kit](/kit-docs) is a CLI companion for Drizzle ORM which you can use to generate SQL migrations automatically based on your schema changes
+or apply those changes directly to the database.
+
+See [detailed docs](/kit-docs) for extended examples and walk-throughs.
+
 ## Quick start
-Declare your schema:
-```typescript copy filename="./src/schema.ts"
+
+<Steps>
+### Declare your schema
+
+```typescript copy filename="src/schema.ts"
 import { index, integer, mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
@@ -25,12 +29,42 @@ export const authOtps = mysqlTable('auth_otp', {
 });
 ```
 
-Run CLI migration command:
-```bash
-$ pnpm drizzle-kit generate:mysql --schema=./src/schema.ts
+<Callout type="warning">
+The schema files **SHOULD NOT** contain any runtime logic besides defining your DB schema.
+In particular, your DB connection should be defined separately.
+Otherwise, that logic will be executed whenever you run any drizzle-kit commands.
+
+Schema-related type definitions, on the other hand, are allowed and even encouraged, as they are not executed at runtime.
+</Callout>
+
+### Create the config
+
+Create a `drizzle.config.ts` file in your project root:
+
+```typescript copy filename="drizzle.config.ts"
+import 'dotenv/config';
+import type { Config } from 'drizzle-kit';
+
+export default {
+	schema: './src/schema.ts',
+	out: './drizzle/migrations',
+	driver: 'mysql2', // 'pg' | 'mysql2' | 'better-sqlite' | 'libsql' | 'turso'
+	dbCredentials: {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+	},
+} satisfies Config;
 ```
-And it will generate a migration SQL file:
-```sql copy
+
+### Generate the migration
+
+```bash
+pnpm drizzle-kit generate:mysql
+```
+This will generate a migration SQL file:
+```sql copy filename="drizzle/migrations/0000_better_than_prisma.sql"
 CREATE TABLE `users` (
  `id` bigint primary key auto_increment,
  `full_name` varchar(256)
@@ -48,24 +82,41 @@ ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_users_id_fk FOREIGN KEY (`u
 CREATE INDEX name_idx ON users (`full_name`);
 ```
 
-We've designed Drizzle ORM to be an opt-in solution at any point of your development flow.  
-You can opt-in to run generated migrations with Drizzle, or run it elsewhere wherever its suitable for you to run them with Drizzle:
-```typescript copy
-import { drizzle } from 'drizzle-orm/mysql2';
-import { migrate } from 'drizzle-orm/mysql2/migrator';
-import mysql from 'mysql2/promise';
+### Run the migrations
 
-// create the connection
-const poolConnection = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  database: 'test',
+Drizzle ORM is designed to be an opt-in solution at any point of your development flow.
+You can either run the generated migrations via Drizzle, or treat them as generic SQL migrations and run them with any other tool.
+
+To run the migrations with Drizzle, you can use the `migrate()` helper, available for every supported driver:
+```typescript copy filename="src/db.ts"
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2/promise';
+import * as schema from './schema';
+
+export const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   multipleStatements: true,
 });
 
-const db = drizzle(poolConnection);
-
-// this will automatically run needed migrations on the database
-await migrate(db, { migrationsFolder: './drizzle' });
+export const db = drizzle(connection, { schema });
 ```
 
+```typescript copy filename="src/migrate.ts"
+import 'dotenv/config';
+import { migrate } from 'drizzle-orm/mysql2/migrator';
+import { db, connection } from './db';
+
+// This will run migrations on the database, skipping the ones already applied
+await migrate(db, { migrationsFolder: './drizzle' });
+
+// Don't forget to close the connection, otherwise the script will hang
+await connection.end();
+```
+
+```bash
+pnpm tsx src/migrate.ts
+```
+</Steps>
