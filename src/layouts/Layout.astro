@@ -1,0 +1,58 @@
+---
+
+import Banner from '@components/layout/Banner.astro';
+import GlobalStyles from '@components/layout/GlobalStyles.astro';
+import NavigationAstro from '@components/layout/NavigationAstro.astro';
+import Footer from '@components/layout/Footer.astro';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+		<link rel="preconnect" href="https://MXZNUT59HV-dsn.algolia.net" crossorigin />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<GlobalStyles />
+		<Banner />
+		<NavigationAstro />
+		<main class="landing-wrap scrollbar">
+			<div class="landing-content">
+				<slot />
+			</div>
+			<div class="bottom-margin"></div>
+			<Footer />
+		</main>
+	</body>
+	<style is:inline>
+		.landing-wrap {
+			max-height: calc(100vh - 64px);
+			width: 100%;
+			overflow-x: hidden;
+			overflow-wrap: break-word;
+			padding-left: max(env(safe-area-inset-left),1.5rem);
+			padding-right: max(env(safe-area-inset-right),1.5rem);
+			color: #334155;
+		}
+
+		.landing-content {
+			max-width: 1024px;
+    	margin: 0 auto;
+		}
+
+		.bottom-margin {
+			margin-bottom: 4rem;
+		}
+	</style>
+</html>

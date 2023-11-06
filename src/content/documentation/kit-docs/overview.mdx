@@ -1,0 +1,275 @@
+import CodeTab from '@components/markdown/CodeTab.astro';
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import Section from '@components/markdown/Section.astro';
+import Tab from '@components/markdown/Tab.astro';
+import Tabs from '@components/markdown/Tabs.astro';
+import Callout from '@components/markdown/Callout.astro';
+import Button from '@components/markdown/Button.astro';
+import Npm from '@components/markdown/Npm.astro';
+
+# Drizzle Kit
+Our most fundamental design principles of Drizzle ORM is to always stay explicit, 
+provide opt-in solutions and never interfere. Our migrations toolkit is not an exception.
+
+<Npm>
+-D drizzle-kit
+</Npm>
+
+## Overview
+**Drizzle Kit** — is a CLI companion for automatic SQL migrations generation and rapid prototyping.
+  
+Conceptually it's very simple, you just declare a Drizzle ORM TypeScript schema and generate an SQL migration from it. 
+
+You can then change the original schema and Drizzle Kit will generate new migrations, that way you can 
+have DDL source of truth in one type-safe place and under version control. 
+  
+Drizzle Kit lets you split your schema in different files and even have multiple schemas for different databases in one project.
+You can rapidly prototype database schema and push it directly to the database.
+
+Last but not least — you can pull the schema from an existing database in a matter of seconds ⚡️
+
+## Migration files
+Migrations history is stored in `.sql` files in the migrations folder
+```plaintext {3,5-8}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ ├ 📜 0000_premium_mister_fear.sql
+ │ ├ 📜 0001_absurd_toad.sql
+ │ ├ 📜 0002_adorable_human_torch.sql
+ │ └ 📜 0003_boring_silver_sable.sql
+ ├ ...
+ ├ 📂 src
+ ├ 📜 package.json
+ └ ...
+```
+
+Each SQL migration file contains statements which you apply to the database through.
+Drizzle ORM migration package or any other way suitable for your business case or personal preference.
+<CodeTabs items={["0000_premium_mister_fear.sql", "schema.ts"]}>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "user" (
+    "id" serial,
+    "name" text,
+    "email" text,
+    "password" text,
+    "role" text,
+    "created_at" timestamp,
+    "updated_at" timestamp
+  );
+  ```
+  ```typescript
+  export const user = pgTable("user", {
+    id: serial("id"),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    role: text("role").$type<"admin" | "customer">(),
+    createdAt: timestamp("created_at"),
+    updatedAt: timestamp("updated_at"),
+  });
+  ```
+</CodeTabs>
+
+## Schema updates
+Whenever you apply changes to the schema you just rerun `$ drizzle-kit generate...{:bash}` and 
+it will generate SQL migration for you completely automatically in most of the cases.
+<CodeTabs items={["0001_absurd_toad.sql", "schema.ts"]}>
+  ```sql
+  ALTER TABLE "user" ADD COLUMN "is_verified" boolean;
+  ```
+  ```typescript {6}
+  export const user = pgTable("user", {
+    id: serial("id"),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    isVerified: boolean("is_verified"),
+    role: text("role").$type<"admin" | "customer">(),
+    createdAt: timestamp("created_at"),
+    updatedAt: timestamp("updated_at"),
+  });
+  ```
+</CodeTabs>
+
+## Running migrations
+We're unopinionated on how you should run your migrations, you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle ORM**.
+  
+We provide you a useful way to run generated migrations with `migrate` function which we implement for each driver and dialect specifically.  
+
+Drizzle will automatically keep track of applied migrations in your database.
+
+<Callout type="info" emoji="ℹ️">
+`drizzle` and `migrate` imports depend on the [database driver](/docs/installation-and-db-connection) you're using.
+</Callout>
+
+<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tab>
+```ts
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
+
+const sql = postgres("...", { max: 1 })
+const db = drizzle(sql);
+
+await migrate(db, { migrationsFolder: "drizzle" });
+```
+</Tab>
+<Tab>
+```ts
+import { drizzle } from "drizzle-orm/mysql2";
+import { migrate } from "drizzle-orm/mysql2/migrator";
+import { createConnection } from "mysql2";
+
+const connection = createConnection("...")
+const db = drizzle(connection);
+
+await migrate(db, { migrationsFolder: "drizzle" });
+```
+</Tab>
+<Tab>
+```ts
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import Database from "better-sqlite3";
+
+const betterSqlite = new Database(":memory:");
+const db = drizzle(betterSqlite);
+
+migrate(db, { migrationsFolder: "drizzle" });
+```
+</Tab>
+</Tabs>
+
+## Configuration
+Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
+
+You can have autocomplete experience and a very convenient environment variables flow!
+
+<CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
+<CodeTab>
+```ts
+import { defineConfig } from 'drizzle-kit/utils'
+
+export default defineConfig({
+ schema: "./schema.ts",
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  },
+  verbose: true,
+  strict: true,
+})
+```
+</CodeTab>
+<CodeTab>
+```js
+/** @type { import("drizzle-kit").Config } */
+export default {
+  schema: "./schema.ts",
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  }
+};
+```
+</CodeTab>
+<CodeTab>
+```json
+{
+  "out": "./migrations-folder",
+  "schema": "./src/db",
+  "breakpoints": false
+}
+```
+</CodeTab>
+</CodeTabs>
+
+For list of all configuration params — **[see here.](./conf)**
+
+## Prototyping with db push
+Drizzle Kit lets you alter you database schema and rapidly move forward with a db **[`push` command](./commands#prototype--push)**.  
+
+That's very handy when you have remote databases like **[Neon](/docs/quick-postgresql/neon)**, **[Planetscale](/docs/quick-mysql/planetscale)** or **[Turso](/docs/quick-sqlite/turso)**.  
+
+### Overview
+
+If you want to iterate quickly during local development or if your project doesn't require
+migration files, Drizzle offers a useful command called `drizzle-kit push`.
+
+When do you need to use the 'push' command?
+
+1. During the prototyping and experimentation phase of your schema on a local environment.
+2. When you are utilizing an external provider that manages migrations and schema changes for you (e.g., PlanetScale).
+3. If you are comfortable modifying the database schema before your code changes can be deployed.
+
+### How it works?
+
+When you run the command `drizzle-kit push` drizzle executes the following steps:
+
+1. It retrieves your schema from the database and converts it to the "drizzle-schema" format.
+2. The command reads all your schema files containing drizzle tables and converts them to 
+the "drizzle-schema" format as well.
+3. Drizzle then compares the two schemas and generates a set of statements that need to be executed against your database. 
+These statements ensure that the database is synchronized with the schemas defined in your code.
+
+```bash
+$ drizzle-kit push:mysql
+
+$ drizzle-kit push:sqlite
+```
+For extended `push` examples **[see here.](./commands#prototype--push)**
+
+## Introspecting with db pull
+Drizzle Kit lets you pull DDL from existing database and prints a TypeScript schema file completely automatically.
+
+<Section>
+```bash
+$ drizzle-kit introspect:mysql ...
+```
+```plaintext {6}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ ├ 📜 0000_premium_mister_fear.sql
+ │ └ 📜 schema.ts
+ ├ ...
+ ├ 📂 src
+ ├ 📜 package.json
+ └ ...
+```
+```ts
+ export const user = pgTable("user", {
+    id: serial("id"),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    role: text("role").$type<"admin" | "customer">(),
+    createdAt: timestamp("created_at"),
+    updatedAt: timestamp("updated_at"),
+  });
+```
+</Section>
+For extended `introspect` examples — **[see here.](./commands/#introspect--pull)**
+
+## Drizzle Studio [NEW]
+Drizzle Kit comes with bundled **[Drizzle Studio](/drizzle-studio/overview)**
+database browser and lets you launch it locally with one command.  
+
+![Drizzle Studio](@/assets/images/drizzle-studio.jpg)
+
+Studio requires drizzle config file with `schema` and `dbCredentials` provided.
+```bash
+drizzle-kit studio
+
+drizzle-kit studio --port 3000 ## custom port
+drizzle-kit studio --verbose   ## log all sql statements
+```
+
+<Button href="https://demo.drizzle.studio" value="🖥 Drizzle Studio Demo"/>
+
+<Button href="https://local.drizzle.studio" value="🖥 Open Drizzle Studio"/>
+

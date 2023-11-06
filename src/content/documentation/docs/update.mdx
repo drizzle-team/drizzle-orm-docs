@@ -1,0 +1,19 @@
+import IsSupportedChipGroup from '@components/markdown/IsSupportedChipGroup.astro';
+
+# SQL Update
+
+```typescript copy
+await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'));
+```
+
+### Update with returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+You can update a row and get it back in PostgreSQL and SQLite:
+```typescript copy
+const updatedUserId: { updatedId: number }[] = await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'))
+  .returning({ updatedId: users.id });
+```

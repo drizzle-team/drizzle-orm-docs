@@ -1,0 +1,608 @@
+<div class="container">
+  <div>
+    <div class="title">Our Sponsors</div>
+    <div class="description">
+      You help us build a better future
+    </div>
+  </div>
+  <div class={"wrapper"}>
+    <div id="sponsors-scroll" class={"scroll"}></div>
+    <div class={'gradient-left'} />
+    <div class={'gradient-right'} />
+  </div>
+  <a
+    class="sponsors_button_accent"
+    href="https://github.com/sponsors/drizzle-team"
+    target="_blank"
+    rel="nofollow noreferrer"
+  >
+    Become a sponsor
+  </a>
+</div>
+
+<template id="sponsor-cards">
+  <div class={"sponsors"}>
+    <header class={"sponsors_header"}>
+      <div class={"type_header"}>
+        <span class={"emoji"} id="emoji"></span>
+        <span id="header-text"></span>
+      </div>
+    </header>
+    <div id="cards-block"></div>
+  </div>
+</template>
+
+<template id="sponsor-card-with-name">
+  <a id="git-link" href={`https://github.com/`} target="_blank" rel="nofollow">
+    <div id="card-wrapper">
+      <div id="img-wrapper" class={"card_image"}>
+        <img id="avatar-dark" loading="lazy" />
+        <img id="avatar-light" loading="lazy" />
+      </div>
+      <div id="card-name" class={"card_name"}></div>
+    </div>
+  </a>
+</template>
+
+<template id="sponsor-card-without-name">
+  <a id="git-link" href={`https://github.com/`} target="_blank" rel="nofollow">
+    <div class={"avatar"}>
+      <div id="img-wrapper" class={"card_image"}>
+        <img id="avatar-dark" loading="lazy" />
+        <img id="avatar-light" loading="lazy" />
+      </div>
+    </div>
+  </a>
+</template>
+<script>
+  import sponsorsHandler from "@/utils/sponsorsHandler";
+  import sponsorTypes from "@/data/sponsor-types";
+  import { ImageType } from "@/types/Sponsors";
+import type { CSSProperties } from "react";
+
+  const getStyleString = (style: CSSProperties) => {
+    return Object.keys(style).reduce((acc, key) => {
+      return acc + `${key}: ${style[key as keyof CSSProperties]};`;
+    }, "");
+  };
+  const sponsors = await sponsorsHandler();
+  const sponsorsScroll = document.querySelector("#sponsors-scroll");
+  const getImgLink = (link: string, size: number) => {
+    return link.split('?')[0] + '?size=' + size * 2;
+  }
+  //templates
+  const sponsorCardsTemplate = document.querySelector(
+    "#sponsor-cards"
+  ) as HTMLTemplateElement;
+  const sponsorCardWithNameTemplate = document.querySelector(
+    "#sponsor-card-with-name"
+  ) as HTMLTemplateElement;
+  const sponsorCardWithoutNameTemplate = document.querySelector(
+    "#sponsor-card-without-name"
+  ) as HTMLTemplateElement;
+  if (
+    sponsorCardsTemplate &&
+    sponsorCardWithNameTemplate &&
+    sponsorCardWithoutNameTemplate &&
+    sponsorsScroll
+  ) {
+    sponsors.forEach((type) => {
+      if (type.items.length) {
+        const cards = sponsorCardsTemplate.content.cloneNode(
+          true
+        ) as HTMLElement;
+        const headerName = cards.querySelector("#header-text")!;
+        headerName.textContent = `${sponsorTypes[type.name].header} sponsors`;
+        const emoji = cards.querySelector("#emoji")!;
+        emoji.textContent = sponsorTypes[type.name].emoji;
+        const cardsBlock = cards.querySelector("#cards-block")!;
+        cardsBlock.className = `${type.name} cards`;
+        type.items.forEach((item) => {
+          if (sponsorTypes[type.name].hasName) {
+            //WITH NAME
+            const card = sponsorCardWithNameTemplate.content.cloneNode(
+              true
+            ) as HTMLDivElement;
+
+            //dark image
+            const imgDark = card.querySelector("#avatar-dark")! as HTMLImageElement;
+            if (item.imageType === ImageType.IMAGE) {
+              imgDark.src = item.sponsorEntity.avatarUrl;
+            }
+            if (item.imageType === ImageType.SVG) {
+              imgDark.src =
+                "data:image/svg+xml;base64," +
+                btoa(item.sponsorEntity.avatarUrl);
+            }
+            if (!item.imageType) {
+              imgDark.src = getImgLink(item.sponsorEntity.avatarUrl, sponsorTypes[type.name].size);
+            }
+            imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+            const roundPercentages =
+              item.sponsorEntity.__typename === "User" ? 50 : 20;
+              imgDark.setAttribute("style", `border-radius: ${roundPercentages}%; ${getStyleString(item.darkStyle || {})}`);
+
+            //light image
+
+            const imgLight = card.querySelector("#avatar-light")! as HTMLImageElement;
+            if (item.imageType === ImageType.IMAGE) {
+              imgLight.src = item.sponsorEntity.avatarUrl;
+            }
+            if (item.imageType === ImageType.SVG) {
+              imgLight.src =
+                "data:image/svg+xml;base64," +
+                btoa(item.sponsorEntity.avatarUrl);
+            }
+            if (!item.imageType) {
+              imgLight.src = getImgLink(item.sponsorEntity.avatarUrl, sponsorTypes[type.name].size);
+            }
+            imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+            imgLight.setAttribute("style", `border-radius: ${roundPercentages}%; ${getStyleString(item.lightStyle || {})}`);
+
+            const imgWrapper = card.querySelector(
+              "#img-wrapper"
+            )! as HTMLDivElement;
+            imgWrapper.setAttribute(
+              "style",
+              `width: ${sponsorTypes[type.name].size}px; height: ${
+                sponsorTypes[type.name].size
+              }px`
+            );
+            const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
+            if (item.imageType) {
+              gitLink.href = `https://${item.sponsorEntity.login}`;
+            } else {
+              gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
+            }
+            gitLink.rel = "nofollow";
+            const cardName = card.querySelector(
+              "#card-name"
+            )! as HTMLDivElement;
+            if (item.sponsorEntity.name) {
+              cardName.textContent = item.sponsorEntity.name;
+            } else {
+              cardName.textContent =
+                item.sponsorEntity.__typename === "User"
+                  ? "@"
+                  : "" + item.sponsorEntity.login;
+            }
+            const cardWrapper = card.querySelector(
+              "#card-wrapper"
+            )! as HTMLDivElement;
+            cardWrapper.classList.add("with_name");
+            if (sponsorTypes[type.name].hasCard) {
+              cardWrapper.classList.add("styled_card");
+            }
+            cardsBlock.append(card);
+          } else {
+            //WITHOUT NAME
+            const card = sponsorCardWithoutNameTemplate.content.cloneNode(
+              true
+            ) as HTMLDivElement;
+
+            //dark image
+            const imgDark = card.querySelector("#avatar-dark")! as HTMLImageElement;
+            const roundPercentages =
+              item.sponsorEntity.__typename === "User" ? 50 : 20;
+              imgDark.setAttribute("style", `border-radius: ${roundPercentages}%`);
+            imgDark.setAttribute("style", `border-radius: ${roundPercentages}%; ${getStyleString(item.darkStyle || {})}`);
+            if (item.imageType === ImageType.IMAGE) {
+              imgDark.src = item.sponsorEntity.avatarUrl;
+            }
+            if (item.imageType === ImageType.SVG) {
+              imgDark.src =
+                "data:image/svg+xml;base64," +
+                btoa(item.sponsorEntity.avatarUrl);
+            }
+            if (!item.imageType) {
+              imgDark.src = getImgLink(item.sponsorEntity.avatarUrl, sponsorTypes[type.name].size);
+            }
+            imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+
+
+            //light image
+            const imgLight = card.querySelector("#avatar-light")! as HTMLImageElement;
+            imgLight.setAttribute("style", `border-radius: ${roundPercentages}%`);
+            imgLight.setAttribute("style", `border-radius: ${roundPercentages}%; ${getStyleString(item.lightStyle || {})}`);
+            if (item.imageType === ImageType.IMAGE) {
+              imgLight.src = item.sponsorEntity.avatarUrl;
+            }
+            if (item.imageType === ImageType.SVG) {
+              imgLight.src =
+                "data:image/svg+xml;base64," +
+                btoa(item.sponsorEntity.avatarUrl);
+            }
+            if (!item.imageType) {
+              imgLight.src = getImgLink(item.sponsorEntity.avatarUrl, sponsorTypes[type.name].size);
+            }
+            imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+            
+            const imgWrapper = card.querySelector(
+              "#img-wrapper"
+            )! as HTMLDivElement;
+            imgWrapper.setAttribute(
+              "style",
+              `width: ${sponsorTypes[type.name].size}px; height: ${
+                sponsorTypes[type.name].size
+              }px`
+            );
+            const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
+            if (item.imageType) {
+              gitLink.href = `https://${item.sponsorEntity.login}`;
+            } else {
+              gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
+            }
+            gitLink.rel = "nofollow";
+            cardsBlock.append(card);
+          }
+        });
+        sponsorsScroll.append(cards);
+      }
+    });
+  }
+</script>
+<style>
+
+</style>
+<style is:global>
+.card_image {
+  width: 66px;
+  height: 66px;
+}
+
+.card_image img {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+}
+
+.sponsors_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.sponsors {
+  height: 100%;
+}
+
+.cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: 134px 134px;
+  grid-auto-columns: 110px;
+  height: 274px;
+}
+
+.hero {
+  grid-template-rows: repeat(2, auto);
+  grid-auto-columns: 110px;
+  grid-gap: 10px;
+}
+
+.gold {
+  grid-template-rows: repeat(2, 112px);
+  grid-auto-columns: 90px;
+  grid-gap: 10px;
+}
+
+.silver {
+  grid-template-rows: repeat(3, 74px);
+  grid-auto-columns: 63px;
+  grid-gap: 10px;
+}
+
+.bronze {
+  grid-template-rows: repeat(5, 42px);
+  grid-auto-columns: 42px;
+  grid-gap: 10px;
+}
+
+.ramen {
+  grid-template-rows: repeat(6, 38px);
+  grid-auto-columns: 38px;
+  grid-gap: 3px;
+}
+
+.coffee {
+  grid-template-rows: repeat(7, 35px);
+  grid-auto-columns: 35px;
+  grid-gap: 3px;
+}
+
+.past {
+  grid-template-rows: repeat(9, 25px);
+  grid-auto-columns: 25px;
+  grid-gap: 5px;
+}
+
+.sponsors_button_accent {
+  margin: 0 auto;
+  width: 212px;
+  border-radius: 3px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #282b3b;
+}
+
+html[class~='dark'] .sponsors_button_accent {
+  color: #282828;
+  background-color: rgb(226, 232, 240);
+}
+
+.stream-link {
+  text-decoration: underline;
+  margin: 0 4px;
+}
+
+html[class~=dark] .special-sponsors_wrap {
+  background-color: #1c1c1c;
+}
+
+.special-sponsors_wrap {
+  margin: 10px 0 0;
+  background-color: #f8f8f8;
+  padding: 15px 20px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.special-sponsors_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.special-sponsors_content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+.special-sponsors_cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 63px;
+}
+
+.special-sponsor_card {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+html[class~=dark] .special-sponsor_card_image  {
+  background: #282828;
+  border: 1px solid #111111;
+}
+
+.special-sponsor_card_image {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 50%;
+}
+
+html[class~=dark] .special-sponsor_card_name  {
+  color: #E2E8F0;
+}
+
+.special-sponsor_card_name {
+  color: #434a54;
+  font-size: 14px;
+  line-height: 14px;
+}
+
+html[class~=dark] .light-image {
+  display: block;
+}
+
+html[class~=dark] .dark-image {
+  display: none;
+}
+
+.light-image {
+  display: none;
+}
+
+.dark-image {
+  display: block;
+}
+
+
+
+
+.card_name {
+  text-align: center;
+  font-size: 14px;
+  color: #434a54;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  line-height: 14px;
+}
+
+.with_name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+}
+
+html[class~=dark] .card_name {
+  color: #E2E8F0;
+}
+
+html[class~=dark] .styled_card {
+  background-color: #282828;
+  border: 1px solid #111111;
+}
+
+.styled_card {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+}
+
+.round-20 {
+  border-radius: 20%;
+}
+
+.round-50 {
+  border-radius: 50%;
+}
+
+html[class~=dark] #avatar-dark {
+  display: block;
+}
+
+html[class~=dark] #avatar-light {
+  display: none;
+}
+
+#avatar-dark {
+  display: none;
+}
+
+#avatar-light {
+  display: block;
+}
+
+</style>
+<style>
+.container {
+  width: 100%;
+  margin: 160px auto 0;
+  text-align: center;
+  gap: 24px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.description {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+
+html[class~=dark] .wrapper {
+  background-color: #1c1c1c;
+}
+
+.wrapper {
+  margin: 30px 0 40px;
+  background-color: #f8f8f8;
+  padding: 15px 0;
+  position: relative;
+}
+
+.scroll {
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: row;
+  height: 306px;
+  padding: 0 20px;
+  gap: 80px;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.gradient-left, .gradient-right {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 20px;
+}
+
+html[class~=dark] .gradient-right {
+  background: linear-gradient(to right, rgba(28, 28, 28, 0) 0%, rgba(28, 28, 28, 0.7) 50%, rgba(28, 28, 28, 1) 100%);
+}
+
+html[class~=dark] .gradient-left {
+  background: linear-gradient(to left, rgba(28, 28, 28, 0) 0%, rgba(28, 28, 28, 0.7) 50%, rgba(28, 28, 28, 1) 100%);
+}
+
+.gradient-left {
+  left: 0;
+  background: linear-gradient(to left, rgba(248, 248, 248, 0) 0%, rgba(248, 248, 248, 0.7) 50%, rgba(248, 248, 248, 1) 100%);
+}
+
+.gradient-right {
+  right: 0;
+  background: linear-gradient(to right, rgba(248, 248, 248, 0) 0%, rgba(248, 248, 248, 0.7) 50%, rgba(248, 248, 248, 1) 100%);
+}
+
+.type_header {
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.emoji {
+  line-height: 20px;
+  font-size: 14px;
+  padding-right: 4px;
+}
+
+.avatar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 20px;
+  }
+  .description {
+    font-size: 14px;
+  }
+}
+
+
+@media (max-width: 767px) {
+  .wrapper, .special-sponsors_wrap {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+}
+
+@media (max-width: 599px) {
+  .container {
+    gap: 20px;
+  }
+
+  .buttons {
+    gap: 10px;
+  }
+
+  .sponsors_button_accent {
+    font-size: 14px;
+    height: 46px;
+  }
+}
+</style>

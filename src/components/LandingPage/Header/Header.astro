@@ -1,0 +1,294 @@
+---
+import { Image } from 'astro:assets';
+import Typer from './Typer.astro';
+
+import MainPic from "./Images/MainPic_Halloween_dark.webp";
+import SecondPicDark from "./Images/SecondPic_Halloween_dark.webp";
+import ParticlePicDark from "./Images/ParticlePic_dark.webp";
+---
+<div class="wrap">
+  <div class="content">
+    <div class="typing">
+      <h1>TypeScript ORM that</h1>
+      <Typer />
+    </div>
+    <div class="picture_wrapper">
+      <Image
+        loading="eager"
+        class="text_image"
+        src={SecondPicDark}
+        alt="Second"
+      />
+    </div>
+  </div>
+  <div class="picture_wrapper">
+    <div class="picture_block">
+      <div class="mainpicture_wrapper">
+        <Image class="picture" src={MainPic} alt="Main" />
+        <div class="team">
+          <div class="id">id</div>
+          <div>name</div>
+          <div>twitter_handle</div>
+          <div class="id">1</div>
+          <div>Dan</div>
+          <a
+            class="handle"
+            href="https://twitter.com/bloberenober"
+            target="_blank"
+            data-text="@bloberenober"
+            rel="noreferrer"
+          >
+            @bloberenober
+          </a>
+          <div class="id">2</div>
+          <div>Andrew</div>
+          <a
+            class="handle"
+            href="https://twitter.com/andrii_sherman"
+            target="_blank"
+            data-text="@andrii_sherman"
+            rel="noreferrer"
+          >
+            @andrii_sherman
+          </a>
+          <div class="id">3</div>
+          <div>Alex</div>
+          <a
+            class="handle"
+            href="https://twitter.com/_alexblokh"
+            target="_blank"
+            data-text="@_alexblokh"
+            rel="noreferrer"
+          >
+            @_alexblokh
+          </a>
+        </div>
+        <Image
+          class="particle"
+          src={ParticlePicDark}
+          alt="Particle"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  html[class~=dark] .dark {
+    display: contents;
+  }
+
+  html[class~=dark] .light {
+    display: none;
+  }
+
+  .wrap {
+    display: flex;
+    flex-direction: row;
+    max-height: 490px;
+    width: 100%;
+  }
+
+  .content {
+    position: relative;
+    width: 50%;
+  }
+
+  .typing {
+    margin-top: 150px;
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 48px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .text_image {
+    width: 29%;
+    right: 80px;
+    bottom: 0;
+    position: absolute;
+    margin-left: auto;
+  }
+
+  .picture_wrapper {
+    display: contents;
+  }
+
+  .picture_block {
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    width: 50%;
+    flex-direction: row;
+  }
+
+  .mainpicture_wrapper {
+    width: 100%;
+    position: relative;
+  }
+
+  .mainpicture_wrapper .team {
+    position: absolute;
+    left: 1.35%;
+    top: 28.7%;
+    right: 0.6%;
+    bottom: 36.9%;
+    background: white;
+    font-family: 'FirstTimeWriting';
+    font-weight: bold;
+    font-size: 20px;
+    text-shadow: 0 0 0.5px black;
+    display: inline-grid;
+    grid-template-columns: 0.5fr 1.5fr 2.5fr;
+    grid-auto-rows: 1fr;
+    border-bottom: 3px solid black;
+    border-left: 3px solid black;
+    border-radius: 0;
+    transform: rotate(1.6deg);
+  }
+
+  .mainpicture_wrapper .team > * {
+    border-top: 3px solid black;
+    border-right: 3px solid black;
+    border-radius: 0;
+    text-align: center;
+    text-decoration: none;
+    position: relative;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mainpicture_wrapper .team a.handle:hover:after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 8%;
+    right: 0;
+    bottom: 0;
+    color: transparent;
+    text-shadow: none;
+    white-space: nowrap;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-underline-offset: 3px;
+    text-decoration-color: rgb(75, 183, 74);
+  }
+
+  .picture {
+    width: 100%;
+  }
+
+  .particle {
+    width: 18%;
+    position: absolute;
+    right: -16%;
+    top: 8.5%;
+  }
+
+  .addition_image {
+    display: none;
+    width: 21%;
+    height: auto;
+    transform: rotateY(180deg);
+  }
+
+  @media (max-width: 1071px) {
+    .mainpicture_wrapper .team {
+      font-size: 1.865vw;
+    }
+
+    .mainpicture_wrapper .team {
+      border-bottom-width: max(0.280vw, 2px);
+      border-left-width: max(0.280vw, 2px);
+    }
+    
+    .mainpicture_wrapper .team > * {
+      border-top-width: max(0.280vw, 2px);
+      border-right-width: max(0.280vw, 2px);
+    }
+  }
+
+  @media (max-width: 950px) {
+    .mainpicture_wrapper .team a.handle:hover:after {
+      top: 0;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .typing {
+      font-size: 32px;
+      line-height: 40px;
+      margin-top: 120px;
+    }
+    .text_image {
+      right: 40px;
+    }
+  }
+
+  @media (max-width: 850px) {
+    .mainpicture_wrapper .team a.handle:hover:after {
+      top: -1px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .typing {
+      font-size: 24px;
+      line-height: 30px;
+      margin-top: 80px;
+    }
+    .text_image {
+      right: 40px;
+    }
+
+    .mainpicture_wrapper .team {
+      font-size: 1.7vw;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .wrap {
+      flex-direction: column;
+    }
+    .content {
+      width: 100%;
+    }
+    .typing {
+      margin-top: 40px;
+      font-size: 20px;
+      line-height: 24px;
+    }
+    .picture_block {
+      display: flex;
+      margin-top: 10px;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-end;
+      width: 100%;
+    }
+    .mainpicture_wrapper {
+      width: 70%;
+    }
+    .picture {
+      width: 100%;
+    }
+    .text_image {
+      display: none;
+    }
+    .particle {
+      display: none;
+    }
+
+    .mainpicture_wrapper .team {
+      font-size: 2.5vw;
+    }
+
+    .mainpicture_wrapper .team a.handle:hover:after {
+      top: 0;
+    }
+  }
+
+</style>

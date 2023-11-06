@@ -1,0 +1,86 @@
+---
+import Header from './Header/Header.astro';
+import Advantages from './Advantages/Advantages.astro';
+import Supporting from './Supporting/Supporting.astro';
+import Runtimes from "./Supporting/Runtimes";
+import Databases from "./Supporting/Databases";
+import DrizzleStudio from './DrizzleStudio/DrizzleStudio.astro';
+import Pricing from './Pricing/Pricing.astro';
+import Twits from './Twits/Twits.astro';
+import SponsorsLine from './SponsorsLine/SponsorsLine.astro';
+import Benchmark from './Benchmark/Benchmark';
+
+const runtimes: string[] = [
+  "Cloudflare Workers",
+  "Supabase functions",
+  "Vercel functions",
+  "Deno deploy",
+  "Bun",
+  "Lagon",
+  "Fly.io",
+  "ElectronJS",
+  "Browser",
+];
+const databases: string[] = [
+  "PlanetScale",
+  "Neon",
+  "Vercel Postgres",
+  "Turso",
+  "Supabase",
+  "Xata",
+  "PostgreSQL",
+  "MySQL",
+  "LiteFS",
+  "SQLite",
+  "Web SQLite",
+];
+---
+<div class="wrap">
+  <Header />
+  <Advantages />
+  <div id="performance" />
+  <Benchmark client:load />
+  <Supporting
+    rowsNum={4}
+    imageType="liveontheedge"
+    title="Live on the edge"
+    description="We support every major serverful and serverless runtime"
+    items={runtimes}
+    data={Runtimes}
+  />
+  <Supporting
+    rowsNum={3}
+    imageType="connecteverywhere"
+    title="Connect to any database"
+    description="We support all platform-specific, tcp, http and websocket based drivers"
+    items={databases}
+    data={Databases}
+  />
+  <DrizzleStudio />
+  <SponsorsLine />
+  <div id="pricing"/>
+  <Pricing />
+  <Twits />
+</div>
+  
+<style>
+  .wrap {
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 20px 32px 20px;
+    display: flex;
+    flex-direction: column;
+    color: #222;
+  }
+
+  html[class~=dark] .wrap {
+    color: rgb(226,232,240);
+  }
+
+  @media (max-width: 599px) {
+    .wrap {
+      padding: 20px 0 32px 0;
+    }
+  }
+</style>

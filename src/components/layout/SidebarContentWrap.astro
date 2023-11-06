@@ -1,0 +1,152 @@
+---
+import type { IHeading, TreeNode } from '@/types/astro';
+import ToggleLib from './ToggleLib.astro';
+import AsideAstro from './AsideAstro.astro';
+
+interface Props {
+  slug?: string;
+  tree: TreeNode[];
+  filteredHeadings: IHeading[];
+}
+
+const { slug, tree, filteredHeadings } = Astro.props;
+---
+<ToggleLib slug={slug!}/>
+<AsideAstro tree={tree} headings={filteredHeadings} slug={slug!}/>
+<style is:global>
+  
+  html[class~=dark] .nav-item {
+    color: rgb(156, 163, 175);
+    border-left: 1px solid #303030;
+  }
+
+  html[class~=dark] .nav-item--active, html[class~=dark] .nav-item:hover {
+    color: rgb(243, 244, 246);
+    border-left: 1px solid rgb(243, 244, 246);
+  }
+
+  html[class~=dark] .nav-toc-item {
+    color: rgb(156, 163, 175);
+    border-left: 1px solid #303030;
+  }
+
+  html[class~=dark] .nav-toc-item--active, html[class~=dark] .nav-toc-item:hover {
+    color: rgb(243, 244, 246);
+    border-left: 1px solid rgb(243, 244, 246);
+  }
+
+  .aside-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100vh - 64px);
+  }
+
+  .nav-items {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+    padding: 16px 16px 16px 24px;
+  }
+
+  .nav-item--active {
+    border-left: 1px solid rgb(59, 63, 75);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgb(59 63 75);
+  }
+
+  .nav-item--active:hover {
+    border-color: rgb(59 63 75);
+    color: rgb(20 21 26);
+  }
+
+  .nav-item {
+    border-left: 1px solid rgb(229, 231, 235);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 15px;
+    color: rgb(59 63 75);
+    display: block;
+  }
+
+  .nav-item:hover {
+    border-color: rgb(59 63 75);
+    color: rgb(20 21 26);
+  }
+
+  
+  .nav-toc-item:hover, .nav-toc-item--active {
+    display: block;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;
+    color: rgb(107 114 128);
+    text-align: left;
+    border-left: 1px solid #9ca3af;
+  }
+
+  .nav-toc-item {
+    display: block;
+    border-left: 1px solid rgb(229, 231, 235);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;
+    color: rgb(107 114 128);
+    text-align: left;
+  }
+
+  html[class~=dark] .nav-separator {
+    color: rgb(243, 244, 246);
+  }
+
+  .nav-separator {
+    white-space: nowrap;
+    padding-bottom: 8px;
+    font-size: 14px;
+    color: #111827;
+    font-weight: 600;
+    font-variant: all-petite-caps;
+  }
+
+  .nav-separator:not(:first-child) {
+    padding-top: 32px;
+  }
+
+  .heading-1 {
+    padding-left: 16px;
+  }
+
+  .heading-2 {
+    padding-left: 28px;
+  }
+
+  .heading-3 {
+    padding-left: 40px;
+  }
+
+  .heading-4 {
+    padding-left: 52px;
+  }
+
+  .nav-item-1 {
+    padding-left: 16px;
+  }
+
+  .nav-item-2 {
+    padding-left: 28px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .aside {
+      display: none;
+    }
+
+    .aside-content {
+      height: inherit;
+      overflow: visible;
+    }
+  }
+</style>

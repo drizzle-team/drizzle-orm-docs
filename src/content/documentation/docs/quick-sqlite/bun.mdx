@@ -1,0 +1,56 @@
+---
+title: Bun SQLite
+---
+
+import Npm from "@components/markdown/Npm.astro";
+
+According to the **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
+
+Drizzle ORM natively supports **[`bun:sqlite`](https://bun.sh/docs/api/sqlite)** module and it's crazy fast 🚀  
+
+We embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
+for synchronous drivers like `bun:sqlite` we have both **async** and **sync** APIs and we mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
+
+const sqlite = new Database('sqlite.db');
+const db = drizzle(sqlite);
+
+const result = await db.select().from(users);
+```
+
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
+
+If you want to use **sync** APIs:
+```typescript copy
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
+
+const sqlite = new Database('sqlite.db');
+const db = drizzle(sqlite);
+
+const result = db.select().from(users).all();
+const result = db.select().from(users).get();
+const result = db.select().from(users).values();
+const result = db.select().from(users).run();
+```
+More on **sync** and **async** APIs for sqlite - read here.

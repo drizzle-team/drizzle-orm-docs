@@ -1,0 +1,68 @@
+---
+import MobileSideBar from "./MobileSideBar.astro";
+import MobileSocials from "./MobileSocials.astro";
+---
+<div
+  id="nav_mobile"
+  class="nav_wrap nav-container invisible"
+  >
+    <div class="nav_items">
+      <MobileSideBar />
+    </div>
+    <MobileSocials />
+  </div>
+<style>
+  html[class~=dark] .nav_wrap {
+    background-color: #111111;
+  }
+
+  body[class~=banner-shown] .nav_wrap {
+    top: 104px;
+  }
+
+  .nav_wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 64px;
+    bottom: 0;
+    z-index: 19;
+    background-color: #fff;
+    transition: opacity 0.3s;
+    overflow: auto;
+  }
+
+  .nav_items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nav_item {
+    height: 40px;
+    outline: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    color: #6b7280;
+    transition: all cubic-bezier(.4,0,.2,1) .15s;
+    }
+
+  .nav_item:hover {
+    background-color: #f3f4f6;
+    color: rgb(17,24,39);
+  }
+
+  .toggle_wrap {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 16px;
+  }
+</style>

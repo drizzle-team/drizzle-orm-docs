@@ -1,0 +1,60 @@
+---
+import type { IHeading, TreeNode } from '@/types/astro';
+import SidebarContentWrap from './SidebarContentWrap.astro';
+
+  interface Props {
+    tree: TreeNode[];
+    filteredHeadings: IHeading[];
+  }
+  const { slug } = Astro.params;
+  const { tree, filteredHeadings } = Astro.props;
+---
+<div class="aside">
+  <div class="aside-content aside-scroll scrollbar">
+    <SidebarContentWrap filteredHeadings={filteredHeadings}
+      slug={slug} tree={tree}
+    />
+  </div>
+</div>
+<script is:inline>
+  const leftSidebar = document.querySelector('.aside-scroll');
+  const leftSidebarScroll = localStorage.getItem('sidebar-scroll');
+  if (leftSidebarScroll !== null) {
+    leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
+  }
+  window.addEventListener('beforeunload', () => {
+    localStorage.setItem('sidebar-scroll', leftSidebar.scrollTop);
+  });
+</script>
+<style is:global>
+
+  html[class~=dark] .aside {
+    border-right: 1px solid #303030;
+  }
+
+  .aside {
+    border-right: 1px solid #efefef;
+    display: flex;
+    flex-direction: column;
+    transition-property: all;
+    transition-duration: .15s;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    position: sticky;
+    top: 4rem;
+    width: 16rem;
+    flex-shrink: 0;
+    align-self: flex-start;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.02) 0px 2px 4px 0px, rgba(0, 0, 0, 0.06) 1px 0px 0px 0px;
+    mask-image: linear-gradient(to bottom, #000, #000 calc(100% - 20px), transparent);
+  }
+
+  .aside-scroll {
+    padding-bottom: 80px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .aside {
+      display: none;
+    }
+  }
+</style>

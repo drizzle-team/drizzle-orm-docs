@@ -1,0 +1,362 @@
+import Tab from "@/components/markdown/Tab.astro";
+import Tabs from "@/components/markdown/Tabs.astro";
+import Callout from "@/components/markdown/Callout.astro";
+
+# Configuring Drizzle kit
+
+## Configuration
+
+By default, Drizzle reads the `drizzle.config.ts` file located in the project's root folder. 
+If you need to specify a different configuration file, you can utilize the `--config=<path>`
+command-line option after any drizzle-kit command.
+
+Drizzle Kit supports multiple formats for the configuration file, including `.ts`, `.js`.
+This flexibility allows you to choose the format that best suits your needs and preferences.
+
+Here are some examples of each file format usage:
+
+**Typescript example**
+```ts
+import { defineConfig } from 'drizzle-kit/utils'
+
+export default defineConfig({
+  schema: "./schema.ts",
+  out: "./drizzle"
+})
+```
+
+**JavaScript example**
+```js
+/** @type { import("drizzle-kit").Config } */
+export default {
+  schema: "./schema.ts",
+  out: "./drizzle"
+};
+```
+
+## Options
+
+### schema
+
+- **Type**: `string | string[]`
+- **Commands**: `generate`, `check`, `up`, `push`, `drop`
+
+`schema` param lets you define where your schema file/files live.  
+
+You can have as many separate schema files as you want and define paths to them using 
+**[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
+or array of globs syntax.
+
+**Usage**
+<Tabs items={["Single file", "Multiple files", "Glob pattern"]}>
+<Tab>
+```ts
+export default {
+  schema: "./schema.ts",
+} satisfies Config;
+```
+</Tab>
+<Tab>
+```ts
+export default {
+  schema: ["./user.sql.ts", "./post.sql.ts"],
+} satisfies Config;
+```
+</Tab>
+<Tab>
+```ts
+export default {
+  schema: "./schema/*.ts",
+} satisfies Config;
+```
+</Tab>
+</Tabs>
+
+### out
+
+- **Type**: `string | string[]`
+- **Default**: `drizzle`
+- **Commands**: `generate`, `check`, `up`, `drop`, `introspect`
+
+The `out` parameter allows you to define the folder for your migrations.
+
+In this folder, drizzle-kit will:
+
+1. Store migration files, `meta`, and `journal`
+2. Output the `schema.ts` file when running `drizzle-kit introspect`
+
+**Usage**
+```ts
+export default {
+  out: "./drizzle",
+} satisfies Config;
+```
+
+### driver
+
+- **Type**: `'pg' | 'mysql2' | 'better-sqlite' | 'libsql' | 'turso' | 'd1'`
+- **Commands**: `push`, `introspect`
+
+<Callout type="warning" emoji="⚠️">
+	Current param is available in `drizzle-kit@0.19.0` and higher. In previous versions you should not use this param
+</Callout>
+
+The `driver` parameter is responsible for explicitly providing a driver to use when accessing a database 
+for the introspect and push commands. It is also useful for HTTP-based databases where connecting using 
+a database connection url is not possible. For example, **[Turso](https://turso.tech/drizzle)** and **[Cloudflare D1](https://developers.cloudflare.com/d1/)**!
+
+**Usage**
+```ts
+export default {
+  driver: "d1"
+} satisfies Config;
+```
+
+### dbCredentials
+
+- **Type**: `PostgresCredentials, MySQLCredentials, SQLiteCredentials, TursoCredentials`
+- **Commands**: `push`, `introspect`
+
+<Callout>
+	Each `driver` should have `dbCredentials` field to provide a means of connecting to the database.
+</Callout>
+
+**PostgresCredentials** (`pg`)
+<Tabs items={["Option 1", "Option 2"]}>
+<Tab>
+```ts
+export default {
+  dbCredentials: {
+    connectionString: '',
+  }
+} satisfies Config;
+```
+</Tab>
+<Tab>
+```ts
+export default {
+  dbCredentials: {
+    host: "",
+    port: "",
+    user: "",
+    password: "",
+    database: "",
+    ssl: true,
+  }
+} satisfies Config;
+```
+</Tab>
+</Tabs>
+
+**MySQLCredentials** (`mysql2`)
+<Tabs items={["Option 1", "Option 2"]}>
+<Tab>
+```ts
+export default {
+  dbCredentials: {
+    uri: '',
+  }
+} satisfies Config;
+```
+</Tab>
+<Tab>
+```ts
+export default {
+  dbCredentials: {
+    host: "",
+    port: "",
+    user: "",
+    password: "",
+    database: "",
+  }
+} satisfies Config;
+```
+</Tab>
+</Tabs>
+
+**SQLiteCredentials** (`libsql`, `better-sqlite3`)
+```ts
+export default {
+  dbCredentials: {
+    url: '', // 👈 this could also be a path to the local sqlite file
+  }
+} satisfies Config;
+```
+
+**TursoCredentials** (`turso`)
+```ts
+export default {
+  dbCredentials: {
+    url: '',
+    authToken: ''
+  }
+} satisfies Config;
+```
+
+**D1Credentials** (`d1`)
+```ts
+export default {
+  dbCredentials: {
+    wranglerConfigPath: 'wrangler.toml',
+    dbName: "d1-test"
+  }
+} satisfies Config;
+```
+
+### breakpoints
+
+- **Type**: `boolean`
+- **Default**: `true` (starting from `drizzle-kit@0.19.0`)
+- **Commands**: `generate`, `introspect`
+
+`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default, 
+it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite) 
+and Drizzle ORM has to apply them sequentially one by one.
+```sql {5}
+CREATE TABLE `book` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text
+);
+--> statement-breakpoint
+CREATE TABLE `book_to_author` (
+	`author_id` integer,
+	`book_id` integer,
+	PRIMARY KEY(`book_id`, `author_id`)
+);
+```
+
+**Usage**
+```ts
+export default {
+  breakpoints: true
+} satisfies Config;
+```
+
+### tablesFilters
+
+- **Type**: `string | string[]`
+- **Commands**: `push`
+
+
+`tablesFilter` param lets you filter tables with glob(opens in a new tab) syntax for db push command.
+It's useful when you have only one database avaialable for several separate projects with separate sql schemas.
+
+How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**
+
+**Usage**
+```ts
+export default {
+  tablesFilter: ["project1_*"],
+} satisfies Config;
+```
+
+In this case, only tables that start with `project1_` will be synced with the database
+
+### schemaFilter
+
+- **Type**: `string | string[]`
+- **Default**: `["public"]`
+- **Commands**: `push`, `introspect`
+- **Available databases**: `PostgreSQL`
+
+
+The `schemaFilter` parameter allows you to define which schema in PostgreSQL should be used for either `introspect` 
+or `push` commands.
+This parameter accepts a single schema as a string or an array of schemas as strings. No glob pattern is supported here. 
+By default, drizzle will use the `public` schema for both commands, but you can add any schema you need.
+
+For example, having `schemaFilter: ["my_schema"]` will only look for tables in both the database and 
+drizzle schema that are a part of the `my_schema` schema.
+
+**Usage**
+```ts
+export default {
+  schemaFilter: ["public", "my_schema"],
+} satisfies Config;
+```
+### verbose
+
+- **Type**: `boolean`
+- **Default**: false
+- **Commands**: `push`
+
+This command is used for `drizzle-kit push` commands and prints all statements that will be executed.
+
+<Callout>
+    Note: This command will only print the statements that should be executed.
+    To approve them before applying, please refer to the `strict` command.
+</Callout>
+
+**Usage**
+```ts
+export default {
+  verbose: true
+} satisfies Config;
+```
+
+### strict
+
+- **Type**: `boolean`
+- **Default**: false
+- **Commands**: `push`
+
+This command is used for `drizzle-kit push` commands and will always ask for your confirmation, either 
+to execute all statements needed to sync your schema with the database or not.
+
+**Usage**
+```ts
+export default {
+  strict: true
+} satisfies Config;
+```
+
+### introspect
+
+- **Type**: `object`
+
+This section is a reference to `introspect` object inside `drizzle.config.*` file.
+
+#### casing
+
+- **Type**: `'preserve' | 'camel'`
+- **Default**: `camel`
+- **Commands**: 
+
+This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting your databse.
+
+**Usage**
+```ts
+export default {
+  introspect: {
+    casing: 'preserve'
+  }
+} satisfies Config;
+```
+
+**Example**
+<Tabs items={["preserve", "camel"]}>
+<Tab>
+```ts
+export const user_preferences = sqliteTable(
+  "user_preferences",
+  {
+    id: integer("id").primaryKey(),
+    name: integer("name").notNull(),
+    user_id: integer("user_id").notNull(),
+  }
+);
+```
+</Tab>
+<Tab>
+```ts
+export const userPreferences = sqliteTable(
+  "user_preferences",
+  {
+    id: integer("id").primaryKey(),
+    name: integer("name").notNull(),
+    userId: integer("user_id").notNull(),
+  }
+);
+```
+</Tab>
+</Tabs>

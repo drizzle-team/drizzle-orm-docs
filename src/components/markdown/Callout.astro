@@ -1,0 +1,16 @@
+---
+interface Props {
+  type: 'default' | 'info' | 'warning' | 'error';
+  emoji: string;
+}
+
+const { type = 'default', emoji = '💡' } = Astro.props;
+---
+<div class:list={["callout-wrap", type]}>
+  <div class="callout-emoji">
+    {emoji}
+  </div>
+  <div class="callout-content">
+    <slot/>
+  </div>
+</div>

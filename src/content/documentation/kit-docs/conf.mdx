@@ -1,0 +1,273 @@
+import CodeTab from "@/components/markdown/CodeTab.astro";
+import CodeTabs from "@/components/markdown/CodeTabs.astro";
+import Section from "@/components/markdown/Section.astro";
+import Tab from "@/components/markdown/Tab.astro";
+import Tabs from "@/components/markdown/Tabs.astro";
+import Callout from "@/components/markdown/Callout.astro";
+
+# Configuration files
+Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
+
+You can have autocomplete experience and a very convenient environment variables flow!  
+
+```plaintext {5}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+
+<CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
+<CodeTab>
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/schema.ts",
+  out: "./drizzle",
+} satisfies Config;
+```
+</CodeTab>
+<CodeTab>
+```js
+import type { Config } from "drizzle-kit";
+
+/** @type { import("drizzle-kit").Config } */
+export default {
+  schema: "./src/schema.ts",
+  out: "./drizzle",
+};
+```
+</CodeTab>
+<CodeTab>
+```json
+{
+  "schema": "./src/schema.ts",
+  "out": "./drizzle",
+}
+```
+</CodeTab>
+</CodeTabs>
+
+## Schema files paths
+`schema` param lets you define where your schema file/files live.  
+
+You can have as many separate schema files as you want and define paths to them using 
+**[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
+ or array of globs syntax.
+
+<Tabs items={["Example 1", "Example 2", "Example 3"]}>
+<Tab>
+<Section>
+```plaintext {7}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ ├ 📂 src
+ │ ├ ...
+ │ ├ 📜 index.ts
+ │ └ 📜 schema.ts 
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/schema.ts",
+} satisfies Config;
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```plaintext {7,10}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ ├ 📂 src
+ │ ├ 📂 user
+ │ │ ├ 📜 handler.ts 
+ │ │ └ 📜 schema.ts 
+ │ ├ 📂 posts
+ │ │ ├ 📜 handler.ts 
+ │ │ └ 📜 schema.ts 
+ │ └ 📜 index.ts
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/**/schema.ts",
+  //or
+  schema: ["./src/user/schema.ts", "./src/posts/schema.ts"]
+} satisfies Config;
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```plaintext {6-8}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ ├ 📂 src
+ │ ├ 📂 schema
+ │ │ ├ 📜 user.ts 
+ │ │ ├ 📜 post.ts 
+ │ │ └ 📜 comment.ts 
+ │ └ 📜 index.ts
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+```ts
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/schema/*",
+} satisfies Config;
+```
+</Section>
+</Tab>
+</Tabs>
+
+
+## Migrations folder
+`out` param lets you define folder for your migrations, it's optional and `drizzle` by default.  
+It's very useful since you can have many separate schemas for different databases in the same project 
+and have different migration folders for them.  
+  
+Migration folder contains `.sql` migration files and `_meta` folder which is used by `drizzle-kit`
+<Callout type="warning" emoji="⚠️">
+	Don't delete any files manually, please refer to [`drizzle-kit drop`](./commands#drop-migration) command
+</Callout>
+
+<Section>
+```plaintext {3}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ ├ 📜 user.ts 
+ │ ├ 📜 post.ts 
+ │ └ 📜 comment.ts 
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+```ts {5}
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/schema/*",
+  out: "./drizzle",
+} satisfies Config;
+```
+</Section>
+
+## SQL breakpoints
+`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations.
+
+It's optional and `true` by default, 
+it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction (MySQL, SQLite) 
+and Drizzle ORM has to apply them sequentially one by one.
+```sql {5}
+CREATE TABLE `book` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text
+);
+--> statement-breakpoint
+CREATE TABLE `book_to_author` (
+	`author_id` integer,
+	`book_id` integer,
+	PRIMARY KEY(`book_id`, `author_id`)
+);
+```
+## Push and Pull
+Drizzle Kit provides you **[introspect](./commands#introspect--pull)** and **[push](./commands#prototype--push)** APIs.  
+
+We mirror connection params of database drivers.
+
+<Tabs items={["Connection URI", "Connection params"]}>
+<Tab>
+```ts {6}
+import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/schema/*",
+  out: "./drizzle",
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DB_URL,
+  }
+} satisfies Config;
+```
+<Callout type="info" emoji="ℹ️">
+When using the PlanetScale driver, your connection string must end with `?ssl={"rejectUnauthorized":true}` instead of `?sslaccept=strict`.
+</Callout>
+
+</Tab>
+<Tab>
+```ts {6-10}
+import type { Config } from "drizzle-kit";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+export default {
+  schema: "./src/schema/*",
+  out: "./drizzle",
+  driver: 'pg',
+  dbCredentials: {
+    user: "postgres",
+    password: process.env.DATABASE_PASSWORD,
+    host: "127.0.0.1",
+    port: 5432,
+    database: "db",
+  }
+} satisfies Config;
+```
+</Tab>
+</Tabs>
+
+## Multi-project schema
+`tablesFilter` param lets you filter tables with **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)** 
+syntax for db **[`push`](./commands#prototype--push)** command. It's useful when you have only one database available for several separate projects with separate sql schemas.  
+
+How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**
+
+<Section>
+```ts {3}
+import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
+
+const pgTable = pgTableCreator((name) => `project1_${name}`);
+
+const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
+```ts {7}
+import type { Config } from "drizzle-kit";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+export default {
+  schema: "./src/schema/*",
+  out: "./drizzle",
+  driver: "mysql2",
+  dbCredentials: {
+    uri: process.env.DATABASE_URL,
+  }
+  tablesFilter: ["project1_*"],
+} satisfies Config;
+```
+</Section>
+
+You can apply multiple `or` filters:
+```ts
+tablesFilter: ["project1_*", "project2_*"]
+```

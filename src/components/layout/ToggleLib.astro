@@ -1,0 +1,159 @@
+---
+import CloudRainIcon from '@components/Icons/CloudRainIcon.astro';
+import CloudRainActiveIcon from '@components/Icons/CloudRainActiveIcon.astro';
+import TerminalActiveIcon from '@components/Icons/TerminalActiveIcon.astro';
+import TerminalIcon from '@components/Icons/TerminalIcon.astro';
+import LayoutActiveIcon from '@components/Icons/LayoutActiveIcon.astro';
+import LayoutIcon from '@components/Icons/LayoutIcon.astro';
+
+
+
+interface Props {
+  slug: string;
+}
+
+const { slug = '' } = Astro.props;
+---
+<div class="wrap">
+  <a href="/docs/overview">
+    <div
+      class:list={["button", slug.startsWith("docs") && "selected"]}
+    >
+      <div class="icon">
+        {slug.startsWith("docs") ? (
+          <CloudRainActiveIcon />
+        ) : (
+          <CloudRainIcon />
+        )}
+      </div>
+      <div class="text">Drizzle ORM</div>
+    </div>
+  </a>
+  <a href="/kit-docs/overview">
+    <div
+      class:list={["button", slug.startsWith("kit-docs") && "selected"]}
+    >
+      <div class="icon">
+        {slug.startsWith("kit-docs") ? (
+          <TerminalActiveIcon />
+        ) : (
+          <TerminalIcon />
+        )}
+      </div>
+      <div class="text">Drizzle Kit</div>
+    </div>
+  </a>
+  <a href="/drizzle-studio/overview">
+    <div
+      class:list={["button", slug.startsWith("drizzle-studio") && "selected"]}
+    >
+      <div class="icon">
+        {slug.startsWith("drizzle-studio") ? (
+          <LayoutActiveIcon />
+        ) : (
+          <LayoutIcon />
+        )}
+      </div>
+      <div class="text">Drizzle Studio</div>
+    </div>
+  </a>
+  <div class="fadeout"></div>
+</div>
+
+<style>
+  html[class~=dark] .wrap {
+    background-color: #111111;
+  }
+
+  .wrap {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px 16px 16px 24px;
+    background-color: #ffffff;
+  }
+
+  .button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  html[class~=dark] .selected .text {
+    color: rgb(0, 138, 230);
+  }
+
+  html[class~=dark] .selected .layout {
+    fill: none;
+  }
+
+  html[class~=dark] .text {
+    color: rgb(115,115,115);
+  }
+
+  html[class~=dark] .icon {
+    color: rgb(115,115,115);
+    fill: rgba(255,255,255,0.2);
+  }
+
+
+  html[class~=dark] .button:not(.selected):hover .text { 
+    color: rgb(249,250,251);
+  }
+
+  html[class~=dark] .button:not(.selected):hover .icon {
+    fill: rgb(249,250,251);
+
+  } 
+
+  .selected .text {
+    color: rgb(0, 98, 163);
+  }
+
+  .selected .layout {
+    fill: #E0EEFE;
+  }
+
+  .icon {
+    transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
+    transition-duration: .15s;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    fill: rgb(107,114,128);
+    color: rgb(107,114,128);
+  }
+
+  .text {
+    font-weight: 600;
+    color: rgb(107,114,128);
+    transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
+    transition-duration: .15s;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+  }
+
+
+
+  /* HOVER */
+
+  .button:not(.selected):hover .text { 
+    color: rgba(17,24,39);
+  }
+
+  html[class~=dark] .fadeout {
+    background: linear-gradient(to bottom, #111111 0%, transparent 100%);
+  }
+  
+  .fadeout {
+    position: absolute;
+    bottom: 0;
+    transform: translateY(100%);
+    z-index: 12312312;
+    height: 20px;
+    width: 100%;
+    background: linear-gradient(to bottom, #FFFFFF 0%, transparent 100%);
+    left: 0;
+    pointer-events: none;
+  }
+</style>

@@ -1,0 +1,25 @@
+import IsSupportedChipGroup from '@components/markdown/IsSupportedChipGroup.astro';
+
+# SQL Delete
+You can delete all rows in the table:
+```typescript copy
+await db.delete(users);
+```
+And you can delete with filters and conditions:
+```typescript copy
+await db.delete(users).where(eq(users.name, 'Dan'));
+```
+
+### Delete with return
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+You can delete a row and get it back in PostgreSQL and SQLite:
+```typescript copy
+const deletedUser = await db.delete(users)
+  .where(eq(users.name, 'Dan'))
+  .returning();
+
+// partial return
+const deletedUserIds: { deletedId: number }[] = await db.delete(users)
+  .where(eq(users.name, 'Dan'))
+  .returning({ deletedId: users.id });
+```

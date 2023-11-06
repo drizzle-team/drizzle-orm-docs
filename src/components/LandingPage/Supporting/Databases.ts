@@ -1,0 +1,121 @@
+import type { ISupportingElement } from "@/types/Supporting";
+
+const Databases: {
+  [key: string]: ISupportingElement;
+} = {
+  Neon: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/neon-light.svg",
+      darkThemeSrc: "/public/svg/neon-dark.svg",
+    },
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    sponsorUrl: "https://driz.li/neon",
+  },
+  PlanetScale: {
+    imageSrc: "/public/svg/planetscale.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+      color: "#f0f0f0",
+    },
+  },
+  "Vercel Postgres": {
+    imageSrc: "/public/svg/vercel.svg",
+    lightStyle: {
+      width: 32,
+    },
+    darkStyle: {
+      fill: "#000000",
+      width: 32,
+    },
+  },
+  Turso: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/turso-light.svg",
+      darkThemeSrc: "/public/svg/turso.svg",
+    },
+    lightStyle: {
+      width: 28,
+    },
+    darkStyle: {
+      width: 28,
+    },
+    sponsorUrl: "https://driz.li/turso",
+  },
+  Xata: {
+    imageSrc: "/public/svg/xata.svg",
+    lightStyle: {
+      width: 32,
+    },
+    darkStyle: {
+      width: 32,
+    },
+    sponsorUrl: "https://driz.li/xataio",
+  },
+  Supabase: {
+    imageSrc: "/public/svg/supabase.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+  },
+  PostgreSQL: {
+    imageSrc: "/public/svg/postgresql.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+      fill: "#f0f0f0",
+    },
+  },
+  MySQL: {
+    imageSrc: "/public/svg/mysql.svg",
+    lightStyle: {
+      width: 24,
+      fill: "#00546B",
+    },
+    darkStyle: {
+      width: 24,
+      fill: "#F0F0F0",
+    },
+  },
+  SQLite: {
+    imageSrc: "/public/svg/sqlite.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+  },
+  "Web SQLite": {
+    imageSrc: "/public/svg/database.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+  },
+  LiteFS: {
+    imageSrc: "/public/svg/flyio.svg",
+    lightStyle: {
+      width: 28,
+    },
+    darkStyle: {
+      width: 28,
+    },
+  },
+};
+
+export default Databases;

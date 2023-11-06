@@ -1,0 +1,122 @@
+<div class='container' onclick="togglePreference()">
+    <div class='line' />
+    <div class='circle'>
+        <div class='moon'>
+          <svg
+            fill="none"
+            viewBox="2 2 20 20"
+            width="12"
+            height="12"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              fill="currentColor"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+            />
+          </svg>
+        </div>
+        <div class='sun'>
+          <svg
+            fill="none"
+            viewBox="3 3 18 18"
+            width="12"
+            height="12"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              fill="currentColor"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+        </div>
+    </div>
+</div>
+
+<style>
+.container {
+  cursor: pointer;
+  margin: 8px;
+  user-select: none;
+  width: 36px;
+  height: 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+html[class~=dark] .line {
+  background-color: rgba(249,250,251,.1);
+}
+
+.line {
+  height: 10px;
+  width: 32px;
+  border-radius: 5px;
+  background-color: rgba(0,0,0,.05);
+}
+
+html[class~=dark] .circle {
+  background-color: #484848;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgb(229, 231, 235);
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  will-change: left;
+  transition: all ease-in-out 0.1s;
+}
+
+.circle {
+  left: 16%;
+}
+
+.moon {
+  display: none;
+}
+
+.sun {
+  display: block;
+}
+
+html[class~=dark] .circle {
+  left: 72%;
+}
+
+html[class~=dark] .sun {
+  display: none;
+}
+
+html[class~=dark] .moon {
+  display: block;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    width: 24px;
+  }
+
+  html[class~=dark] .circle {
+    left: 50%;
+  }
+
+  .circle {
+    width: 24px;
+    height: 24px;
+    left: 50%;
+  }
+}
+</style>

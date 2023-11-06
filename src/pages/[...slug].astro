@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+
+import Link from '@components/markdown/Link.astro';
+import MDXLayout from '../layouts/MDXLayout.astro';
+import CustomHeader from '@components/layout/CustomHeader.astro';
+
+export async function getStaticPaths() {
+  const metaFiles = await import.meta.glob('../content/**/*.json');
+  const slugs: string[] = [];
+  const regex = /\.\.\/content\/documentation\/(.*?)\/_meta\.json/;
+  
+  for(const meta in metaFiles) {
+    const {default: parsed} = await metaFiles[meta]();
+
+    const metaSlug = meta.match(regex);
+    if(metaSlug) {
+      const extractedText = metaSlug[1];
+      const parsedKeys = Object.keys(parsed);
+      parsedKeys.forEach((key) => {
+        if(typeof parsed[key] === 'string') {
+          slugs.push(`${extractedText}/${key}`);
+        }
+      })
+    }
+  }
+
+  const blogEntries = await getCollection("documentation", (entry) => {
+    return slugs.includes(entry.slug);
+  });
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug }, props: { entry, frontmatter: entry.data },
+  }));
+}
+
+const { entry, frontmatter } = Astro.props;
+
+const { Content, headings } = await entry.render();
+
+
+---
+<MDXLayout title={entry.data.title} headings={headings}>
+  {frontmatter?.title && <CustomHeader>{frontmatter.title}</CustomHeader>}
+  <Content components={{ a: Link }} />
+</MDXLayout>

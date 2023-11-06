@@ -1,0 +1,138 @@
+<div class="typer__container">
+  <span class="typer__underline">lets you be productive</span>{" "}
+  <div class="typer__cursor">&#8203;</div>
+</div>
+<script>
+  const underline = document.querySelector(".typer__underline")!;
+
+  function Typer() {
+    let indexWord = 1;
+    let timeOut: NodeJS.Timeout;
+    let canAnimate = false;
+    let reverse = true;
+    const words = [
+      "lets you be productive",
+      "is a query builder on steroids",
+      "performs and lasts",
+      "developers love",
+      "is not as good as Django",
+      "is production ready",
+      "lets you make friends with SQL",
+      "Dax should definitely try",
+      "is not as good as Laravel",
+      "is not VC backed yet",
+      "is familiar, but different",
+      "is JavaScript ORM too",
+      "will be here for a while",
+    ];
+
+    let index = 0;
+    let sentence = words[0];
+
+    const increaseText = () => {
+      underline.textContent = sentence;
+      const sentenceLength = sentence.length;
+      const wordLength = words[indexWord].length;
+      if (sentenceLength < wordLength) {
+        timeOut = setTimeout(() => {
+            sentence = sentence + words[indexWord][index];
+            ++index;
+            animateText();
+          }, 32);
+      } else {
+          clearTimeout(timeOut);
+          reverse = true;
+          if (indexWord === words.length - 1) {
+            indexWord = 0;
+          } else {
+            ++indexWord;
+          }
+          setTimeout(reduceText, 3000);
+        }
+    };
+
+    const reduceText = () => {
+      const sentenceLength = sentence.length;
+      underline.textContent = sentence;
+      timeOut = setTimeout(() => {
+        sentence = sentence.slice(0, -1);
+        index = 0;
+        animateText();
+      }, 32);
+
+      if(sentenceLength === 0) {
+        clearTimeout(timeOut);
+        reverse = false;
+        increaseText();
+      }
+    }
+
+    const animateText = () => {
+      if (canAnimate) {
+        if (reverse) {
+          reduceText();
+        } else {
+          increaseText();
+        }
+      }
+    }
+
+    setTimeout(() => {
+      reduceText();
+      canAnimate = true;
+    }, 3000);
+  }
+
+  Typer();
+</script>
+<style>
+  .typer__container {
+  }
+
+  @keyframes blank {
+      0% {
+        opacity: 0;
+      }
+
+      25% {
+        opacity: 1;
+      }
+
+      75% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+  }
+
+
+  html[class~=dark] .typer__cursor {
+    background-color: rgb(241,245,249);
+    color: rgb(241,245,249);
+  }
+
+  .typer__cursor {
+    display: inline-block;
+    position: relative;
+    width: 2px;
+    color: rgb(15,23,42);
+    background-color: rgb(15,23,42);
+    line-height: 1;
+    left: -2px;
+    animation-name: blank;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .typer__underline {
+    text-decoration: underline #4bb74a;
+  }
+
+  html[class~=dark] .typer__underline {
+    text-decoration: underline #4bb74a;
+  }
+
+</style>

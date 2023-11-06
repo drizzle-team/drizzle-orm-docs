@@ -1,0 +1,59 @@
+---
+title: Neon
+---
+
+import Tab from '@components/markdown/Tab.astro';
+import Tabs from '@components/markdown/Tabs.astro';
+import Npm from "@components/markdown/Npm.astro";
+
+According to their **[official website](https://neon.tech)**, Neon database is a multi-cloud fully managed Postgres. 
+  
+Drizzle ORM natively supports both **[Neon Serverless](https://github.com/neondatabase/serverless)** 
+driver with `drizzle-orm/neon-serverless` package and **[`postgres`](/docs/quick-postgresql/postgresjs)** or **[`pg`](/docs/quick-postgresql/node-postgres)** 
+drivers to access Neon database, as per the **[Neon nodejs docs.](https://neon.tech/docs/guides/node)**
+
+<Npm>
+drizzle-orm @neondatabase/serverless
+-D drizzle-kit
+</Npm>
+
+
+
+With Neon Serverless package [**[github](https://github.com/neondatabase/serverless)**, **[blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/)**] 
+you can access Neon database from serverless environments with no TCP available — like Cloudflare Workers — through websockets.
+
+<Tabs items={['HTTP', 'WebSockets']}>
+<Tab>
+```typescript copy filename="index.ts"
+import { neon, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+
+neonConfig.fetchConnectionCache = true;
+
+const sql = neon(process.env.DRIZZLE_DATABASE_URL!);
+const db = drizzle(sql);
+
+const result = await db.select().from(...);
+```
+</Tab>
+<Tab>
+Below is the example of using Drizzle ORM with Neon Serverless driver in Cloudflare Worker, for extensive example — **[see here.](http://driz.li/neon-cf-ex)**
+```typescript copy filename="index.ts"
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+
+export default {
+  async fetch(req, env, ctx) {
+    const pool = new Pool({ connectionString: env.DATABASE_URL });
+    const db = drizzle(pool)
+    const result = await db.select().from(...);
+    ctx.waitUntil(pool.end());
+    return new Response(now);
+  }
+}
+```
+</Tab>
+</Tabs>
+
+If you're unsure how to use Neon from a serverfull environments, you should just use PostgresJS driver 
+according to their **[official nodejs docs](https://neon.tech/docs/guides/node)** — see **[docs](/docs/quick-postgresql/postgresjs)**.

@@ -1,0 +1,46 @@
+---
+
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+
+---
+<div class="codetabs_wrapper">
+  <div class="codetabs_tabs">
+    {items.map((item, index) => <div class={index === 0 ? "codetabs_tab--active" : "codetabs_tab"} data-change-code-tab-btn>{item}</div>)}
+  </div>
+  <div class="code codetabs_codeBlock">
+    <slot />
+  </div>
+</div>
+
+<script>
+  const codeBlocks = document.querySelectorAll('.code');
+  codeBlocks.forEach((codeBlock) => {
+    Array.from(codeBlock.children).forEach((child, index) => {
+      child.classList.toggle('hidden', index !== 0);
+    });
+  });
+
+  document.querySelectorAll('[data-change-code-tab-btn]').forEach((button) => {
+  button.addEventListener('click', (e) => {
+    const target = e.target as Element;
+    const parent = target.parentElement as Element;
+    const index = Array.from(parent?.children || []).indexOf(target);
+    const code = parent.nextElementSibling as Element;
+    
+    if (code) {
+      Array.from(code.children).forEach((child, codeIndex) => {
+        child.classList.toggle('hidden', codeIndex !== index);
+      });
+    }
+    Array.from(parent.children).forEach((child, codeIndex) => {
+        child.classList.toggle('codetabs_tab', codeIndex !== index);
+        child.classList.toggle('codetabs_tab--active', codeIndex === index);
+    });
+  });
+});
+
+</script>

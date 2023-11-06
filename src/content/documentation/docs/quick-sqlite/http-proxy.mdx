@@ -1,0 +1,28 @@
+---
+title: HTTP proxy
+---
+
+```typescript copy
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from sqlite proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**

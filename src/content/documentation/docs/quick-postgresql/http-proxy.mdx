@@ -1,0 +1,58 @@
+---
+title: HTTP proxy
+---
+
+Example of driver implementation
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/pg-proxy';
+
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from pg proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```
+
+Example of server implementation
+
+```ts
+import { Client } from 'pg';
+import express from 'express';
+
+const app = express();
+
+app.use(express.json());
+const port = 3000;
+
+const client = new Client('postgres://postgres:postgres@localhost:5432/postgres');
+
+app.post('/query', async (req, res) => {
+	const { sql, params, method } = req.body;
+
+	// prevent multiple queries
+	const sqlBody = sql.replace(/;/g, '');
+
+    try {
+        const result = await client.query({
+            text: sqlBody,
+            values: params,
+            rowMode: method === 'all' ? 'array': undefined,
+        });
+		res.send(result.rows);
+	} catch (e: any) {
+		res.status(500).json({ error: e });
+	}
+
+	res.status(500).json({ error: 'Unknown method value' });
+});
+
+app.listen(port, () => {
+	console.log(`Example app listening on port ${port}`);
+});
+```
