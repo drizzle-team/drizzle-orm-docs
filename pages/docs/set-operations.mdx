@@ -131,7 +131,7 @@ Combine all results from two query blocks into a single result, omitting any dup
     });
     
     const customers = sqliteTable('customers', {
-        id: integer('id').primaryKey(),
+        id: int('id').primaryKey(),
         name: text('name').notNull(),
         city: text('city'),
         email: text('email').notNull()
@@ -261,17 +261,17 @@ you want to keep all the records and not eliminate duplicates
     <CodeTab>
 	```typescript copy
     const onlineSales = sqliteTable('online_sales', {
-        transactionId: integer('transaction_id').primaryKey(),
-        productId: integer('product_id').unique(),
-        quantitySold: integer('quantity_sold'),
-        saleDate: integer('sale_date', { mode: 'timestamp' }),
+        transactionId: int('transaction_id').primaryKey(),
+        productId: int('product_id').unique(),
+        quantitySold: int('quantity_sold'),
+        saleDate: int('sale_date', { mode: 'timestamp' }),
     });
     
     const inStoreSales = sqliteTable('in_store_sales', {
-        transactionId: integer('transaction_id').primaryKey(),
-        productId: integer('product_id').unique(),
-        quantitySold: integer('quantity_sold'),
-        saleDate: integer('sale_date', { mode: 'timestamp' }),
+        transactionId: int('transaction_id').primaryKey(),
+        productId: int('product_id').unique(),
+        quantitySold: int('quantity_sold'),
+        saleDate: int('sale_date', { mode: 'timestamp' }),
     });
     ```
     </CodeTab>
@@ -356,7 +356,7 @@ to count the same course multiple times even if multiple students from the same 
     });
     
     const depB = pgTable('department_b_courses', {
-        studentId: integer('student_id'),
+        studentId: int('student_id'),
         courseName: int('course_name', { length: 256 }).notNull(),
     });
     ```
@@ -387,13 +387,13 @@ to count the same course multiple times even if multiple students from the same 
     <CodeTab>
 	```typescript copy
     const depA = sqliteTable('department_a_courses', {
-        studentId: integer('student_id'),
-        courseName: varchar('course_name').notNull(),
+        studentId: int('student_id'),
+        courseName: text('course_name').notNull(),
     });
     
     const depB = sqliteTable('department_b_courses', {
-        studentId: integer('student_id'),
-        courseName: varchar('course_name').notNull(),
+        studentId: int('student_id'),
+        courseName: text('course_name').notNull(),
     });
     ```
     </CodeTab>
@@ -858,15 +858,15 @@ For two query blocks A and B, return all results from A which are not also prese
 	<CodeTab>
 	```typescript copy
     const regularCustomerOrders = sqliteTable('regular_customer_orders', {
-        customerId: integer('customer_id').primaryKey(),
-        productId: integer('product_id').notNull(),
-        quantityOrdered: integer('quantity_ordered').notNull(),
+        customerId: int('customer_id').primaryKey(),
+        productId: int('product_id').notNull(),
+        quantityOrdered: int('quantity_ordered').notNull(),
     });
     
     const vipCustomerOrders = sqliteTable('vip_customer_orders', {
-        customerId: integer('customer_id').primaryKey(),
-        productId: integer('product_id').notNull(),
-        quantityOrdered: integer('quantity_ordered').notNull(),
+        customerId: int('customer_id').primaryKey(),
+        productId: int('product_id').notNull(),
+        quantityOrdered: int('quantity_ordered').notNull(),
     });
     ```
     </CodeTab>
