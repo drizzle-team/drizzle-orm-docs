@@ -199,7 +199,7 @@ select "id", "name", "age" from "users" where lower("name") = 'aaron';
 All the values provided to filter operators and to the `sql` function are parameterized automatically.
 For example, this query:
 ```ts
-await db.select().from(users).where(equals(users.id, 42));
+await db.select().from(users).where(eq(users.id, 42));
 ```
 will be translated to:
 ```sql
