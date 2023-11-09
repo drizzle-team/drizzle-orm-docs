@@ -27,9 +27,9 @@ Get all names from customers and users tables without duplicates.
 	).limit(10);
     ```
     ```sql
-    select "name" from "sellers"
+    (select "name" from "sellers")
     union
-    select "name" from "customers" 
+    (select "name" from "customers")
     limit $1
     ```
     </CodeTab>
@@ -44,9 +44,9 @@ Get all names from customers and users tables without duplicates.
       .limit(10);
     ```
     ```sql
-    select "name" from "sellers"
+    (select "name" from "sellers")
     union
-    select "name" from "customers"
+    (select "name" from "customers")
     limit $1
     ```
 	</CodeTab>
@@ -85,9 +85,9 @@ Get all names from customers and users tables without duplicates.
 	).limit(10);
     ```
     ```sql
-    select `name` from `sellers`
+    (select `name` from `sellers`)
     union
-    select `name` from `customers` 
+    (select `name` from `customers`)
     limit ?
     ```
 	</CodeTab>
@@ -102,9 +102,9 @@ Get all names from customers and users tables without duplicates.
       .limit(10);
     ```
     ```sql
-    select `name` from `sellers`
+    (select `name` from `sellers`)
     union
-    select `name` from `customers`
+    (select `name` from `customers`)
     limit ?
     ```
     </CodeTab>
@@ -143,9 +143,9 @@ Get all names from customers and users tables without duplicates.
 	).limit(10);
     ```
     ```sql
-    select "name" from "sellers" 
+    (select "name" from "sellers")
     union 
-    select "name" from "customers" 
+    (select "name" from "customers")
     limit ?
     ```
 	</CodeTab>
@@ -280,7 +280,9 @@ you want to keep all the records and not eliminate duplicates.
       );
     ```
     ```sql
-    (select `transaction_id` from `online_sales`) union all (select `transaction_id` from `in_store_sales`)
+    (select `transaction_id` from `online_sales`)
+    union all 
+    (select `transaction_id` from `in_store_sales`)
     ```
 	</CodeTab>
     <CodeTab>
@@ -848,7 +850,7 @@ Let's consider a scenario where you have two tables containing data about custom
 identify products that are exclusively ordered by regular customers (without VIP customers). 
 In this case, you want to keep track of the quantity of each product, even if it's ordered multiple times by different regular customers.
 
-n this scenario, you want to find products that are exclusively ordered by regular customers and not 
+In this scenario, you want to find products that are exclusively ordered by regular customers and not 
 ordered by VIP customers. You want to retain the quantity information, even if the same product is ordered multiple times by different regular customers.
 
 <Tabs items={["PostgreSQL", "MySQL"]}>
