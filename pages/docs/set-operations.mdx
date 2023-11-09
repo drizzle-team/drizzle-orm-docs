@@ -4,12 +4,12 @@ import { CodeTab, CodeTabs } from "../../components/CodeTabs/CodeTabs";
 # Set Operations
 
 SQL set operations combine the results of multiple query blocks into a single result. 
-The SQL standard defines the following three set operations: `UNION`, `INTERSECT`, `EXCEPT`, `UNION ALL`, `INTERSECT ALL`, `EXCEPT ALL`
+The SQL standard defines the following three set operations: `UNION`, `INTERSECT`, `EXCEPT`, `UNION ALL`, `INTERSECT ALL`, `EXCEPT ALL`.
 
 ### Union
-Combine all results from two query blocks into a single result, omitting any duplicates
+Combine all results from two query blocks into a single result, omitting any duplicates.
 
-Get all names from customers and users tables without duplicates
+Get all names from customers and users tables without duplicates.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
   <Tab>
@@ -26,14 +26,20 @@ Get all names from customers and users tables without duplicates
 		db.select({ name: customers.name }).from(customers)
 	).limit(10);
     ```
+    ```sql
+    (select "name" from "sellers") union (select "name" from "customers") limit $1
+    ```
     </CodeTab>
     <CodeTab>
-    ```ts copy {4}
+    ```ts copy
     import { users, customers } from './schema'
 
     const result = await db.select({ name: users.name }).from(users)
             .union(db.select({ name: customers.name }).from(customers))
-            .limit(10)
+            .limit(10);
+    ```
+    ```sql
+    (select "name" from "sellers") union (select "name" from "customers") limit $1
     ```
 	</CodeTab>
     <CodeTab>
@@ -57,7 +63,6 @@ Get all names from customers and users tables without duplicates
   </CodeTabs>
   </Tab> 
   <Tab>
-    Get all names from customers and users tables without duplicates:
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
 	```typescript copy
@@ -71,14 +76,20 @@ Get all names from customers and users tables without duplicates
 		db.select({ name: customers.name }).from(customers)
 	).limit(10);
     ```
+    ```sql
+    (select `name` from `sellers`) union (select `name` from `customers`) limit ?
+    ```
 	</CodeTab>
     <CodeTab>
-    ```ts copy {4}
+    ```ts copy
     import { users, customers } from './schema'
 
     const result = await db.select({ name: users.name }).from(users)
             .union(db.select({ name: customers.name }).from(customers))
-            .limit(10)
+            .limit(10);
+    ```
+    ```sql
+    (select `name` from `sellers`) union (select `name` from `customers`) limit ?
     ```
     </CodeTab>
     <CodeTab>
@@ -102,7 +113,6 @@ Get all names from customers and users tables without duplicates
   </CodeTabs>
   </Tab> 
   <Tab>
-    Get all names from customers and users tables without duplicates:
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
 	```typescript copy
@@ -116,14 +126,20 @@ Get all names from customers and users tables without duplicates
 		db.select({ name: customers.name }).from(customers)
 	).limit(10);
     ```
+    ```sql
+    select "name" from "sellers" union select "name" from "customers" limit ?
+    ```
 	</CodeTab>
     <CodeTab>
-    ```ts copy {4}
+    ```ts copy
     import { users, customers } from './schema'
 
     const result = await db.select({ name: users.name }).from(users)
             .union(db.select({ name: customers.name }).from(customers))
-            .limit(10)
+            .limit(10);
+    ```
+    ```sql
+    select "name" from "sellers" union select "name" from "customers" limit ?
     ```
     </CodeTab>
     <CodeTab>
@@ -149,12 +165,12 @@ Get all names from customers and users tables without duplicates
 </Tabs>
 
 ### Union All
-Combine all results from two query blocks into a single result, with duplicates
+Combine all results from two query blocks into a single result, with duplicates.
 
 Let's consider a scenario where you have two tables, one representing online sales and the other 
 representing in-store sales. In this case, you want to combine the data from both tables into a
 single result set. Since there might be duplicate transactions, 
-you want to keep all the records and not eliminate duplicates
+you want to keep all the records and not eliminate duplicates.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
   <Tab>
@@ -169,15 +185,21 @@ you want to keep all the records and not eliminate duplicates
 
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
+    ```sql
+    (select "transaction_id" from "online_sales") union all (select "transaction_id" from "in_store_sales")
+    ```
     </CodeTab>
     <CodeTab>
-    ```ts copy {4-6}
+    ```ts copy
     import { onlineSales, inStoreSales } from './schema'
 
     const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
             .unionAll(
                 db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
-            )
+            );
+    ```
+    ```sql
+    (select "transaction_id" from "online_sales") union all (select "transaction_id" from "in_store_sales")
     ```
 	</CodeTab>
     <CodeTab>
@@ -213,15 +235,21 @@ you want to keep all the records and not eliminate duplicates
 
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
+    ```sql
+    (select `transaction_id` from `online_sales`) union all (select `transaction_id` from `in_store_sales`)
+    ```
     </CodeTab>
     <CodeTab>
-    ```ts copy {4-6}
+    ```ts copy
     import { onlineSales, inStoreSales } from './schema'
 
     const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
             .unionAll(
                 db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
-            )
+            );
+    ```
+    ```sql
+    (select `transaction_id` from `online_sales`) union all (select `transaction_id` from `in_store_sales`)
     ```
 	</CodeTab>
     <CodeTab>
@@ -257,15 +285,21 @@ you want to keep all the records and not eliminate duplicates
 
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
+    ```sql
+    select "transaction_id" from "online_sales" union all select "transaction_id" from "in_store_sales"
+    ```
     </CodeTab>
     <CodeTab>
-    ```ts copy {4-6}
+    ```ts copy
     import { onlineSales, inStoreSales } from './schema'
 
     const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
             .unionAll(
                 db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
-            )
+            );
+    ```
+    ```sql
+    select "transaction_id" from "online_sales" union all select "transaction_id" from "in_store_sales"
     ```
 	</CodeTab>
     <CodeTab>
@@ -300,7 +334,7 @@ but you want distinct course names, and you're not interested in counting multip
 enrollments of the same course by the same student.
 
 In this scenario, you want to find courses that are common between the two departments but don't want 
-to count the same course multiple times even if multiple students from the same department are enrolled in it
+to count the same course multiple times even if multiple students from the same department are enrolled in it.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
   <Tab>
@@ -315,6 +349,9 @@ to count the same course multiple times even if multiple students from the same 
 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
+    ```sql
+    (select "course_name" from "department_a_courses") intersect (select "course_name" from "department_b_courses")
+    ```
 	</CodeTab>
     <CodeTab>
     ```typescript copy
@@ -322,6 +359,9 @@ to count the same course multiple times even if multiple students from the same 
 
     const result = await db.select({ courseName: depA.courseName }).from(depA)
                            .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    ```
+    ```sql
+    (select "course_name" from "department_a_courses") intersect (select "course_name" from "department_b_courses")
     ```
     </CodeTab>
     <CodeTab>
@@ -353,6 +393,9 @@ to count the same course multiple times even if multiple students from the same 
 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
+    ```sql
+    (select `projects_name` from `department_a_projects`) intersect (select `projects_name` from `department_b_projects`)
+    ```
 	</CodeTab>
     <CodeTab>
     ```typescript copy
@@ -360,6 +403,9 @@ to count the same course multiple times even if multiple students from the same 
 
     const result = await db.select({ courseName: depA.courseName }).from(depA)
                            .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    ```
+    ```sql
+    (select `projects_name` from `department_a_projects`) intersect (select `projects_name` from `department_b_projects`)
     ```
     </CodeTab>
     <CodeTab>
@@ -391,6 +437,9 @@ to count the same course multiple times even if multiple students from the same 
 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
+    ```sql
+    select "course_name" from "department_a_courses" intersect select "course_name" from "department_b_courses"
+    ```
 	</CodeTab>
     <CodeTab>
     ```typescript copy
@@ -398,6 +447,9 @@ to count the same course multiple times even if multiple students from the same 
 
     const result = await db.select({ courseName: depA.courseName }).from(depA)
                            .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    ```
+    ```sql
+    select "course_name" from "department_a_courses" intersect select "course_name" from "department_b_courses"
     ```
     </CodeTab>
     <CodeTab>
@@ -425,11 +477,11 @@ Combine only those rows which the results of two query blocks have in common, wi
 let's consider a scenario where you have two tables containing data about customer orders, and you want 
 to identify products that are ordered by both regular customers and VIP customers. In this case, 
 you want to keep track of the quantity of each product, even if it's ordered multiple times by 
-different customers
+different customers.
 
 In this scenario, you want to find products that are ordered by both regular customers and VIP customers, 
 but you want to retain the quantity information, even if the same product is ordered multiple 
-times by different customers
+times by different customers.
 
 <Tabs items={["PostgreSQL", "MySQL"]}>
   <Tab>
@@ -451,6 +503,11 @@ times by different customers
 
     const result = await intersectAll(regularOrders, vipOrders);
     ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    intersect all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    ```
 	</CodeTab>
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
@@ -469,6 +526,11 @@ times by different customers
             })
             .from(vipCustomerOrders)
         );
+    ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    intersect all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
     ```
     <CodeTab>
 	```typescript copy
@@ -508,7 +570,13 @@ times by different customers
 
     const result = await intersectAll(regularOrders, vipOrders);
     ```
+    ```sql
+    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    intersect all
+    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    ```
 	</CodeTab>
+    <CodeTab>
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
 
@@ -527,6 +595,12 @@ times by different customers
             .from(vipCustomerOrders)
         );
     ```
+    ```sql
+    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    intersect all 
+    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    ```
+    </CodeTab>
     <CodeTab>
 	```typescript copy
     import { int, mysqlTable } from "drizzle-orm/mysql-core";
@@ -549,15 +623,15 @@ times by different customers
 </Tabs>
 
 ### Except
-For two query blocks A and B, return all results from A which are not also present in B, omitting any duplicates
+For two query blocks A and B, return all results from A which are not also present in B, omitting any duplicates.
 
 Suppose you have two tables that store information about employees' project assignments. 
 You want to find the projects that are unique to one department 
-and not shared with another department, excluding duplicates
+and not shared with another department, excluding duplicates.
 
 In this scenario, you want to identify the projects that are exclusive to one department and
 not shared with the other department. You don't want to count the same project 
-multiple times, even if multiple employees from the same department are assigned to it
+multiple times, even if multiple employees from the same department are assigned to it.
 
 <Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
   <Tab>
@@ -572,6 +646,11 @@ multiple times, even if multiple employees from the same department are assigned
 
     const result = await except(departmentACourses, departmentBCourses);
     ```
+    ```sql
+    select "projects_name" from "department_a_projects"
+    except
+    select "projects_name" from "department_b_projects"
+    ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
@@ -581,6 +660,11 @@ multiple times, even if multiple employees from the same department are assigned
         .select({ courseName: depA.projectsName })
         .from(depA)
         .except(db.select({ courseName: depB.projectsName }).from(depB));
+    ```
+    ```sql
+    select "projects_name" from "department_a_projects"
+    except
+    select "projects_name" from "department_b_projects"
     ```
     </CodeTab>
     <CodeTab>
@@ -612,6 +696,11 @@ multiple times, even if multiple employees from the same department are assigned
 
     const result = await except(departmentACourses, departmentBCourses);
     ```
+    ```sql
+    select `projects_name` from `department_a_projects`
+    except
+    select `projects_name` from `department_b_projects`
+    ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
@@ -621,6 +710,11 @@ multiple times, even if multiple employees from the same department are assigned
         .select({ courseName: depA.projectsName })
         .from(depA)
         .except(db.select({ courseName: depB.projectsName }).from(depB));
+    ```
+    ```sql
+    select `projects_name` from `department_a_projects`
+    except
+    select `projects_name` from `department_b_projects`
     ```
     </CodeTab>
     <CodeTab>
@@ -652,6 +746,9 @@ multiple times, even if multiple employees from the same department are assigned
 
     const result = await except(departmentACourses, departmentBCourses);
     ```
+    ```sql
+    select "projects_name" from "department_a_projects" except select "projects_name" from "department_b_projects"
+    ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
@@ -661,6 +758,9 @@ multiple times, even if multiple employees from the same department are assigned
         .select({ courseName: depA.projectsName })
         .from(depA)
         .except(db.select({ courseName: depB.projectsName }).from(depB));
+    ```
+    ```sql
+    select "projects_name" from "department_a_projects" except select "projects_name" from "department_b_projects"
     ```
     </CodeTab>
     <CodeTab>
@@ -683,7 +783,14 @@ multiple times, even if multiple employees from the same department are assigned
 </Tabs>
 
 ### Except All
-For two query blocks A and B, return all results from A which are not also present in B, with duplicates
+For two query blocks A and B, return all results from A which are not also present in B, with duplicates.
+
+Let's consider a scenario where you have two tables containing data about customer orders, and you want to 
+identify products that are exclusively ordered by regular customers (without VIP customers). 
+In this case, you want to keep track of the quantity of each product, even if it's ordered multiple times by different regular customers.
+
+n this scenario, you want to find products that are exclusively ordered by regular customers and not 
+ordered by VIP customers. You want to retain the quantity information, even if the same product is ordered multiple times by different regular customers.
 
 <Tabs items={["PostgreSQL", "MySQL"]}>
   <Tab>
@@ -705,6 +812,11 @@ For two query blocks A and B, return all results from A which are not also prese
 
     const result = await exceptAll(regularOrders, vipOrders);
     ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    except all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
@@ -724,6 +836,11 @@ For two query blocks A and B, return all results from A which are not also prese
             })
             .from(vipCustomerOrders)
         );
+    ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    except all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
     ```
     </CodeTab>
 	<CodeTab>
@@ -764,6 +881,11 @@ For two query blocks A and B, return all results from A which are not also prese
 
     const result = await exceptAll(regularOrders, vipOrders);
     ```
+    ```sql
+    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    except all
+    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
@@ -783,6 +905,11 @@ For two query blocks A and B, return all results from A which are not also prese
             })
             .from(vipCustomerOrders)
         );
+    ```
+    ```sql
+    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    except all
+    select `product_id`, `quantity_ordered` from `vip_customer_orders`
     ```
     </CodeTab>
 	<CodeTab>
