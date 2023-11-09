@@ -27,19 +27,27 @@ Get all names from customers and users tables without duplicates.
 	).limit(10);
     ```
     ```sql
-    (select "name" from "sellers") union (select "name" from "customers") limit $1
+    select "name" from "sellers"
+    union
+    select "name" from "customers" 
+    limit $1
     ```
     </CodeTab>
     <CodeTab>
     ```ts copy
     import { users, customers } from './schema'
 
-    const result = await db.select({ name: users.name }).from(users)
-            .union(db.select({ name: customers.name }).from(customers))
-            .limit(10);
+    const result = await db
+      .select({ name: users.name })
+      .from(users)
+      .union(db.select({ name: customers.name }).from(customers))
+      .limit(10);
     ```
     ```sql
-    (select "name" from "sellers") union (select "name" from "customers") limit $1
+    select "name" from "sellers"
+    union
+    select "name" from "customers"
+    limit $1
     ```
 	</CodeTab>
     <CodeTab>
@@ -77,19 +85,27 @@ Get all names from customers and users tables without duplicates.
 	).limit(10);
     ```
     ```sql
-    (select `name` from `sellers`) union (select `name` from `customers`) limit ?
+    select `name` from `sellers`
+    union
+    select `name` from `customers` 
+    limit ?
     ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
     import { users, customers } from './schema'
 
-    const result = await db.select({ name: users.name }).from(users)
-            .union(db.select({ name: customers.name }).from(customers))
-            .limit(10);
+    const result = await db
+      .select({ name: users.name })
+      .from(users)
+      .union(db.select({ name: customers.name }).from(customers))
+      .limit(10);
     ```
     ```sql
-    (select `name` from `sellers`) union (select `name` from `customers`) limit ?
+    select `name` from `sellers`
+    union
+    select `name` from `customers`
+    limit ?
     ```
     </CodeTab>
     <CodeTab>
@@ -127,16 +143,21 @@ Get all names from customers and users tables without duplicates.
 	).limit(10);
     ```
     ```sql
-    select "name" from "sellers" union select "name" from "customers" limit ?
+    select "name" from "sellers" 
+    union 
+    select "name" from "customers" 
+    limit ?
     ```
 	</CodeTab>
     <CodeTab>
     ```ts copy
     import { users, customers } from './schema'
 
-    const result = await db.select({ name: users.name }).from(users)
-            .union(db.select({ name: customers.name }).from(customers))
-            .limit(10);
+    const result = await db
+      .select({ name: users.name })
+      .from(users)
+      .union(db.select({ name: customers.name }).from(customers))
+      .limit(10);
     ```
     ```sql
     select "name" from "sellers" union select "name" from "customers" limit ?
@@ -186,20 +207,26 @@ you want to keep all the records and not eliminate duplicates.
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
     ```sql
-    (select "transaction_id" from "online_sales") union all (select "transaction_id" from "in_store_sales")
+    select "transaction_id" from "online_sales"
+    union all
+    select "transaction_id" from "in_store_sales"
     ```
     </CodeTab>
     <CodeTab>
     ```ts copy
     import { onlineSales, inStoreSales } from './schema'
 
-    const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
-            .unionAll(
-                db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
-            );
+    const result = await db
+      .select({ transaction: onlineSales.transactionId })
+      .from(onlineSales)
+      .unionAll(
+        db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
+      );
     ```
     ```sql
-    (select "transaction_id" from "online_sales") union all (select "transaction_id" from "in_store_sales")
+    select "transaction_id" from "online_sales"
+    union all
+    select "transaction_id" from "in_store_sales"
     ```
 	</CodeTab>
     <CodeTab>
@@ -236,17 +263,21 @@ you want to keep all the records and not eliminate duplicates.
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
     ```sql
-    (select `transaction_id` from `online_sales`) union all (select `transaction_id` from `in_store_sales`)
+    select `transaction_id` from `online_sales`
+    union all
+    select `transaction_id` from `in_store_sales`
     ```
     </CodeTab>
     <CodeTab>
     ```ts copy
     import { onlineSales, inStoreSales } from './schema'
 
-    const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
-            .unionAll(
-                db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
-            );
+    const result = await db
+      .select({ transaction: onlineSales.transactionId })
+      .from(onlineSales)
+      .unionAll(
+        db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
+      );
     ```
     ```sql
     (select `transaction_id` from `online_sales`) union all (select `transaction_id` from `in_store_sales`)
@@ -286,20 +317,26 @@ you want to keep all the records and not eliminate duplicates.
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
     ```sql
-    select "transaction_id" from "online_sales" union all select "transaction_id" from "in_store_sales"
+    select "transaction_id" from "online_sales" 
+    union all 
+    select "transaction_id" from "in_store_sales"
     ```
     </CodeTab>
     <CodeTab>
     ```ts copy
     import { onlineSales, inStoreSales } from './schema'
 
-    const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
-            .unionAll(
-                db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
-            );
+    const result = await db
+      .select({ transaction: onlineSales.transactionId })
+      .from(onlineSales)
+      .unionAll(
+        db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
+      );
     ```
     ```sql
-    select "transaction_id" from "online_sales" union all select "transaction_id" from "in_store_sales"
+    select "transaction_id" from "online_sales" 
+    union all 
+    select "transaction_id" from "in_store_sales"
     ```
 	</CodeTab>
     <CodeTab>
@@ -350,18 +387,24 @@ to count the same course multiple times even if multiple students from the same 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
     ```sql
-    (select "course_name" from "department_a_courses") intersect (select "course_name" from "department_b_courses")
+    select "course_name" from "department_a_courses"
+    intersect
+    select "course_name" from "department_b_courses"
     ```
 	</CodeTab>
     <CodeTab>
     ```typescript copy
     import { depA, depB } from './schema'
 
-    const result = await db.select({ courseName: depA.courseName }).from(depA)
-                           .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    const result = await db
+      .select({ courseName: depA.courseName })
+      .from(depA)
+      .intersect(db.select({ courseName: depB.courseName }).from(depB));
     ```
     ```sql
-    (select "course_name" from "department_a_courses") intersect (select "course_name" from "department_b_courses")
+    select "course_name" from "department_a_courses"
+    intersect
+    select "course_name" from "department_b_courses"
     ```
     </CodeTab>
     <CodeTab>
@@ -394,18 +437,24 @@ to count the same course multiple times even if multiple students from the same 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
     ```sql
-    (select `projects_name` from `department_a_projects`) intersect (select `projects_name` from `department_b_projects`)
+    select `projects_name` from `department_a_projects`
+    intersect
+    select `projects_name` from `department_b_projects`
     ```
 	</CodeTab>
     <CodeTab>
     ```typescript copy
     import { depA, depB } from './schema'
 
-    const result = await db.select({ courseName: depA.courseName }).from(depA)
-                           .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    const result = await db
+      .select({ courseName: depA.courseName })
+      .from(depA)
+      .intersect(db.select({ courseName: depB.courseName }).from(depB));
     ```
     ```sql
-    (select `projects_name` from `department_a_projects`) intersect (select `projects_name` from `department_b_projects`)
+    select `projects_name` from `department_a_projects`
+    intersect
+    select `projects_name` from `department_b_projects`
     ```
     </CodeTab>
     <CodeTab>
@@ -438,18 +487,24 @@ to count the same course multiple times even if multiple students from the same 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select "course_name" from "department_a_courses" intersect select "course_name" from "department_b_courses"
+    select "course_name" from "department_a_courses"
+    intersect
+    select "course_name" from "department_b_courses"
     ```
 	</CodeTab>
     <CodeTab>
     ```typescript copy
     import { depA, depB } from './schema'
 
-    const result = await db.select({ courseName: depA.courseName }).from(depA)
-                           .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    const result = await db
+      .select({ courseName: depA.courseName })
+      .from(depA)
+      .intersect(db.select({ courseName: depB.courseName }).from(depB));
     ```
     ```sql
-    select "course_name" from "department_a_courses" intersect select "course_name" from "department_b_courses"
+    select "course_name" from "department_a_courses" 
+    intersect 
+    select "course_name" from "department_b_courses"
     ```
     </CodeTab>
     <CodeTab>
@@ -747,7 +802,9 @@ multiple times, even if multiple employees from the same department are assigned
     const result = await except(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select "projects_name" from "department_a_projects" except select "projects_name" from "department_b_projects"
+    select "projects_name" from "department_a_projects" 
+    except 
+    select "projects_name" from "department_b_projects"
     ```
 	</CodeTab>
     <CodeTab>
@@ -760,7 +817,9 @@ multiple times, even if multiple employees from the same department are assigned
         .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     ```sql
-    select "projects_name" from "department_a_projects" except select "projects_name" from "department_b_projects"
+    select "projects_name" from "department_a_projects" 
+    except 
+    select "projects_name" from "department_b_projects"
     ```
     </CodeTab>
     <CodeTab>
