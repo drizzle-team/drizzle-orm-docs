@@ -9,10 +9,10 @@ The SQL standard defines the following three set operations: `UNION`, `INTERSECT
 ### Union
 Combine all results from two query blocks into a single result, omitting any duplicates
 
+Get all names from customers and users tables without duplicates
+
 <Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
   <Tab>
-
-  Get all names from customers and users tables without duplicates:
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
 	```typescript copy
@@ -31,13 +31,15 @@ Combine all results from two query blocks into a single result, omitting any dup
     ```ts copy {4}
     import { users, customers } from './schema'
 
-    const result = db.select({ name: users.name }).from(users)
+    const result = await db.select({ name: users.name }).from(users)
             .union(db.select({ name: customers.name }).from(customers))
             .limit(10)
     ```
 	</CodeTab>
     <CodeTab>
 	```typescript copy
+    import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
+
     const users = pgTable('sellers', {
         id: integer('id').primaryKey(),
         name: varchar('name', { length: 256 }).notNull(),
@@ -74,13 +76,15 @@ Combine all results from two query blocks into a single result, omitting any dup
     ```ts copy {4}
     import { users, customers } from './schema'
 
-    const result = db.select({ name: users.name }).from(users)
+    const result = await db.select({ name: users.name }).from(users)
             .union(db.select({ name: customers.name }).from(customers))
             .limit(10)
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, mysqlTable, text, varchar } from "drizzle-orm/mysql-core";
+
     const users = mysqlTable('sellers', {
         id: int('id').primaryKey(),
         name: varchar('name', { length: 256 }).notNull(),
@@ -117,13 +121,15 @@ Combine all results from two query blocks into a single result, omitting any dup
     ```ts copy {4}
     import { users, customers } from './schema'
 
-    const result = db.select({ name: users.name }).from(users)
+    const result = await db.select({ name: users.name }).from(users)
             .union(db.select({ name: customers.name }).from(customers))
             .limit(10)
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
     const users = sqliteTable('sellers', {
         id: int('id').primaryKey(),
         name: text('name').notNull(),
@@ -168,7 +174,7 @@ you want to keep all the records and not eliminate duplicates
     ```ts copy {4-6}
     import { onlineSales, inStoreSales } from './schema'
 
-    const result = db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
+    const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
             .unionAll(
                 db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
             )
@@ -176,6 +182,8 @@ you want to keep all the records and not eliminate duplicates
 	</CodeTab>
     <CodeTab>
 	```typescript copy
+    import { integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+
     const onlineSales = pgTable('online_sales', {
         transactionId: integer('transaction_id').primaryKey(),
         productId: integer('product_id').unique(),
@@ -210,7 +218,7 @@ you want to keep all the records and not eliminate duplicates
     ```ts copy {4-6}
     import { onlineSales, inStoreSales } from './schema'
 
-    const result = db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
+    const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
             .unionAll(
                 db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
             )
@@ -218,6 +226,8 @@ you want to keep all the records and not eliminate duplicates
 	</CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+
     const onlineSales = mysqlTable('online_sales', {
         transactionId: int('transaction_id').primaryKey(),
         productId: int('product_id').unique(),
@@ -252,7 +262,7 @@ you want to keep all the records and not eliminate duplicates
     ```ts copy {4-6}
     import { onlineSales, inStoreSales } from './schema'
 
-    const result = db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
+    const result = await db.select({ transaction: onlineSales.transactionId }).from(onlineSales)
             .unionAll(
                 db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
             )
@@ -260,6 +270,8 @@ you want to keep all the records and not eliminate duplicates
 	</CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, sqliteTable } from "drizzle-orm/sqlite-core";
+
     const onlineSales = sqliteTable('online_sales', {
         transactionId: int('transaction_id').primaryKey(),
         productId: int('product_id').unique(),
@@ -314,6 +326,8 @@ to count the same course multiple times even if multiple students from the same 
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+
     const depA = pgTable('department_a_courses', {
         studentId: integer('student_id'),
         courseName: varchar('course_name').notNull(),
@@ -350,6 +364,8 @@ to count the same course multiple times even if multiple students from the same 
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+
     const depA = mysqlTable('department_a_courses', {
         studentId: int('student_id'),
         courseName: varchar('course_name', { length: 256 }).notNull(),
@@ -357,7 +373,7 @@ to count the same course multiple times even if multiple students from the same 
     
     const depB = pgTable('department_b_courses', {
         studentId: int('student_id'),
-        courseName: int('course_name', { length: 256 }).notNull(),
+        courseName: varchar('course_name', { length: 256 }).notNull(),
     });
     ```
     </CodeTab>
@@ -386,6 +402,8 @@ to count the same course multiple times even if multiple students from the same 
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
     const depA = sqliteTable('department_a_courses', {
         studentId: int('student_id'),
         courseName: text('course_name').notNull(),
@@ -413,7 +431,7 @@ In this scenario, you want to find products that are ordered by both regular cus
 but you want to retain the quantity information, even if the same product is ordered multiple 
 times by different customers
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -437,20 +455,25 @@ times by different customers
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
 
-    const result = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders).intersectAll(
-        db.select({ 
-                productId: vipCustomerOrders.productId,
-                quantityOrdered: vipCustomerOrders.quantityOrdered 
-            }).from(vipCustomerOrders)
-    );
+    const result = await db
+        .select({
+          productId: regularCustomerOrders.productId,
+          quantityOrdered: regularCustomerOrders.quantityOrdered,
+        })
+        .from(regularCustomerOrders)
+        .intersectAll(
+          db
+            .select({
+              productId: vipCustomerOrders.productId,
+              quantityOrdered: vipCustomerOrders.quantityOrdered,
+            })
+            .from(vipCustomerOrders)
+        );
     ```
     <CodeTab>
-    </CodeTab>
-    <CodeTab>
 	```typescript copy
+    import { integer, pgTable } from "drizzle-orm/pg-core";
+
     const regularCustomerOrders = pgTable('regular_customer_orders', {
         customerId: integer('customer_id').primaryKey(),
         productId: integer('product_id').notNull(),
@@ -489,20 +512,25 @@ times by different customers
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
 
-    const result = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders).intersectAll(
-        db.select({ 
-                productId: vipCustomerOrders.productId,
-                quantityOrdered: vipCustomerOrders.quantityOrdered 
-            }).from(vipCustomerOrders)
-    );
+    const result = await db
+        .select({
+          productId: regularCustomerOrders.productId,
+          quantityOrdered: regularCustomerOrders.quantityOrdered,
+        })
+        .from(regularCustomerOrders)
+        .intersectAll(
+          db
+            .select({
+              productId: vipCustomerOrders.productId,
+              quantityOrdered: vipCustomerOrders.quantityOrdered,
+            })
+            .from(vipCustomerOrders)
+        );
     ```
     <CodeTab>
-    </CodeTab>
-    <CodeTab>
 	```typescript copy
+    import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
     const regularCustomerOrders = mysqlTable('regular_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
@@ -510,58 +538,6 @@ times by different customers
     });
     
     const vipCustomerOrders = mysqlTable('vip_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
-    });
-    ```
-    </CodeTab>
-  </CodeTabs>
-  </Tab> 
-  <Tab>
-    <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
-    import { intersectAll } from 'drizzle-orm/sqlite-core'
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
-
-    const regularOrders = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders);
-
-    const vipOrders = db.select({ 
-        productId: vipCustomerOrders.productId,
-        quantityOrdered: vipCustomerOrders.quantityOrdered }
-    ).from(vipCustomerOrders);
-
-    const result = await intersectAll(regularOrders, vipOrders);
-    ```
-	</CodeTab>
-    ```ts copy
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
-
-    const result = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders).intersectAll(
-        db.select({ 
-                productId: vipCustomerOrders.productId,
-                quantityOrdered: vipCustomerOrders.quantityOrdered 
-            }).from(vipCustomerOrders)
-    );
-    ```
-    <CodeTab>
-    </CodeTab>
-    <CodeTab>
-	```typescript copy
-    const regularCustomerOrders = sqliteTable('regular_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
-    });
-    
-    const vipCustomerOrders = sqliteTable('vip_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
         quantityOrdered: int('quantity_ordered').notNull(),
@@ -601,18 +577,16 @@ multiple times, even if multiple employees from the same department are assigned
     ```ts copy
     import { depA, depB } from './schema'
 
-    const departmentACourses = db.select({ courseName: depA.projectsName }).from(depA);
-    const departmentBCourses = db.select({ courseName: depB.projectsName }).from(depB);
-
-    const result = await db.select({ courseName: depA.projectsName })
-                        .from(depA)
-                        .except(
-                            db.select({ courseName: depB.projectsName }).from(depB)
-                        );
+    const result = await db
+        .select({ courseName: depA.projectsName })
+        .from(depA)
+        .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+
     const depA = pgTable('department_a_projects', {
         employeeId: integer('employee_id'),
         projectsName: varchar('projects_name').notNull(),
@@ -643,18 +617,16 @@ multiple times, even if multiple employees from the same department are assigned
     ```ts copy
     import { depA, depB } from './schema'
 
-    const departmentACourses = db.select({ courseName: depA.projectsName }).from(depA);
-    const departmentBCourses = db.select({ courseName: depB.projectsName }).from(depB);
-
-    const result = await db.select({ courseName: depA.projectsName })
-                        .from(depA)
-                        .except(
-                            db.select({ courseName: depB.projectsName }).from(depB)
-                        );
+    const result = await db
+        .select({ courseName: depA.projectsName })
+        .from(depA)
+        .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     </CodeTab>
     <CodeTab>
-	```typescript copy
+	```typescript 
+    import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+
     const depA = mysqlTable('department_a_projects', {
         employeeId: int('employee_id'),
         projectsName: varchar('projects_name', { length: 256 }).notNull(),
@@ -685,18 +657,16 @@ multiple times, even if multiple employees from the same department are assigned
     ```ts copy
     import { depA, depB } from './schema'
 
-    const departmentACourses = db.select({ courseName: depA.projectsName }).from(depA);
-    const departmentBCourses = db.select({ courseName: depB.projectsName }).from(depB);
-
-    const result = await db.select({ courseName: depA.projectsName })
-                        .from(depA)
-                        .except(
-                            db.select({ courseName: depB.projectsName }).from(depB)
-                        );
+    const result = await db
+        .select({ courseName: depA.projectsName })
+        .from(depA)
+        .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
+    import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
     const depA = sqliteTable('department_a_projects', {
         employeeId: int('employee_id'),
         projectsName: text('projects_name').notNull(),
@@ -715,7 +685,7 @@ multiple times, even if multiple employees from the same department are assigned
 ### Except All
 For two query blocks A and B, return all results from A which are not also present in B, with duplicates
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -740,19 +710,26 @@ For two query blocks A and B, return all results from A which are not also prese
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
  
-    const result = await db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders).exceptAll(
-        db.select({ 
-                productId: vipCustomerOrders.productId,
-                quantityOrdered: vipCustomerOrders.quantityOrdered 
-            }).from(vipCustomerOrders)
-    );
+    const result = await db
+        .select({
+          productId: regularCustomerOrders.productId,
+          quantityOrdered: regularCustomerOrders.quantityOrdered,
+        })
+        .from(regularCustomerOrders)
+        .exceptAll(
+          db
+            .select({
+              productId: vipCustomerOrders.productId,
+              quantityOrdered: vipCustomerOrders.quantityOrdered,
+            })
+            .from(vipCustomerOrders)
+        );
     ```
     </CodeTab>
 	<CodeTab>
 	```typescript copy
+    import { integer, pgTable } from "drizzle-orm/pg-core";
+
     const regularCustomerOrders = pgTable('regular_customer_orders', {
         customerId: integer('customer_id').primaryKey(),
         productId: integer('product_id').notNull(),
@@ -792,15 +769,20 @@ For two query blocks A and B, return all results from A which are not also prese
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
  
-    const result = await db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders).exceptAll(
-        db.select({ 
-                productId: vipCustomerOrders.productId,
-                quantityOrdered: vipCustomerOrders.quantityOrdered 
-            }).from(vipCustomerOrders)
-    );
+    const result = await db
+        .select({
+          productId: regularCustomerOrders.productId,
+          quantityOrdered: regularCustomerOrders.quantityOrdered,
+        })
+        .from(regularCustomerOrders)
+        .exceptAll(
+          db
+            .select({
+              productId: vipCustomerOrders.productId,
+              quantityOrdered: vipCustomerOrders.quantityOrdered,
+            })
+            .from(vipCustomerOrders)
+        );
     ```
     </CodeTab>
 	<CodeTab>
@@ -812,58 +794,6 @@ For two query blocks A and B, return all results from A which are not also prese
     });
     
     const vipCustomerOrders = mysqlTable('vip_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
-    });
-    ```
-    </CodeTab>
-  </CodeTabs>
-  </Tab> 
-  <Tab>
-  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
-    import { exceptAll } from 'drizzle-orm/sqlite-core'
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
-
-    const regularOrders = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders);
-
-    const vipOrders = db.select({ 
-        productId: vipCustomerOrders.productId,
-        quantityOrdered: vipCustomerOrders.quantityOrdered }
-    ).from(vipCustomerOrders);
-
-    const result = await exceptAll(regularOrders, vipOrders);
-    ```
-	</CodeTab>
-    <CodeTab>
-    ```ts copy
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
- 
-    const result = await db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders).exceptAll(
-        db.select({ 
-                productId: vipCustomerOrders.productId,
-                quantityOrdered: vipCustomerOrders.quantityOrdered 
-            }).from(vipCustomerOrders)
-    );
-    ```
-    </CodeTab>
-	<CodeTab>
-	```typescript copy
-    const regularCustomerOrders = sqliteTable('regular_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
-    });
-    
-    const vipCustomerOrders = sqliteTable('vip_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
         quantityOrdered: int('quantity_ordered').notNull(),
