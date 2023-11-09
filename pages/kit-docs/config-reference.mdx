@@ -12,6 +12,7 @@ command-line option after any drizzle-kit command.
 
 Drizzle Kit supports multiple formats for the configuration file, including `.ts`, `.js`.
 This flexibility allows you to choose the format that best suits your needs and preferences.
+
 Here are some examples of each file format usage:
 
 **Typescript example**
@@ -41,8 +42,9 @@ export default {
 - **Commands**: `generate`, `check`, `up`, `push`, `drop`
 
 `schema` param lets you define where your schema file/files live.  
+
 You can have as many separate schema files as you want and define paths to them using 
-[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)
+**[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
 or array of globs syntax.
 
 **Usage**
@@ -101,7 +103,7 @@ export default {
 
 The `driver` parameter is responsible for explicitly providing a driver to use when accessing a database 
 for the introspect and push commands. It is also useful for HTTP-based databases where connecting using 
-a database connection url is not possible. For example, [Turso](https://turso.tech/drizzle)
+a database connection url is not possible. For example, **[Turso](https://turso.tech/drizzle)**!
 
 **Usage**
 ```ts
@@ -116,7 +118,7 @@ export default {
 - **Commands**: `push`, `introspect`
 
 <Callout>
-	Each `driver` should have `dbCredentials` field to provide a means of connecting to the database
+	Each `driver` should have `dbCredentials` field to provide a means of connecting to the database.
 </Callout>
 
 **PostgresCredentials** (`pg`)
@@ -227,8 +229,9 @@ export default {
 
 
 `tablesFilter` param lets you filter tables with glob(opens in a new tab) syntax for db push command.
-It's useful when you have only one database available for several separate projects with separate sql schemas.
-How to define multi-project tables with Drizzle ORM - see here
+It's useful when you have only one database avaialable for several separate projects with separate sql schemas.
+
+How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**
 
 **Usage**
 ```ts
@@ -253,7 +256,7 @@ This parameter accepts a single schema as a string or an array of schemas as str
 By default, drizzle will use the `public` schema for both commands, but you can add any schema you need.
 
 For example, having `schemaFilter: ["my_schema"]` will only look for tables in both the database and 
-drizzle schema that are a part of the `my_schema` schema
+drizzle schema that are a part of the `my_schema` schema.
 
 **Usage**
 ```ts
@@ -267,11 +270,11 @@ export default {
 - **Default**: false
 - **Commands**: `push`
 
-This command is used for `drizzle-kit push` commands and prints all statements that will be executed
+This command is used for `drizzle-kit push` commands and prints all statements that will be executed.
 
 <Callout>
     Note: This command will only print the statements that should be executed.
-    To approve them before applying, please refer to the `strict` command
+    To approve them before applying, please refer to the `strict` command.
 </Callout>
 
 **Usage**
@@ -288,7 +291,7 @@ export default {
 - **Commands**: `push`
 
 This command is used for `drizzle-kit push` commands and will always ask for your confirmation, either 
-to execute all statements needed to sync your schema with the database or not
+to execute all statements needed to sync your schema with the database or not.
 
 **Usage**
 ```ts
@@ -301,7 +304,7 @@ export default {
 
 - **Type**: `object`
 
-This section is a reference to `introspect` object inside `drizzle.config.*` file
+This section is a reference to `introspect` object inside `drizzle.config.*` file.
 
 #### casing
 
@@ -309,8 +312,7 @@ This section is a reference to `introspect` object inside `drizzle.config.*` fil
 - **Default**: `camel`
 - **Commands**: 
 
-This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting 
-your database
+This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting your databse.
 
 **Usage**
 ```ts

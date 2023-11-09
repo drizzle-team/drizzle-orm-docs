@@ -25,7 +25,7 @@ This empowers you to create more robust and maintainable code within your applic
 
 ## sql`` template
 
-One of the most common usages you may encounter in other ORMs, as well, 
+One of the most common usages you may encounter in other ORMs as well 
 is the ability to use `sql` queries as-is for raw queries.
 
 ```typescript copy
@@ -51,7 +51,7 @@ This approach effectively prevents any potential SQL Injection vulnerabilities.
 
 ## `sql<T>`
 
-<Callout>
+<Callout type="info" emoji="ℹ️">
     Please note that `sql<T>` does not perform any runtime mapping. The type you define using `sql<T>` is
     purely a helper for Drizzle. It is important to understand that there is no feasible way to 
     determine the exact type dynamically, as SQL queries can be highly versatile and customizable. 
@@ -59,7 +59,7 @@ This approach effectively prevents any potential SQL Injection vulnerabilities.
 
 You can define a custom type in Drizzle to be used in places where fields require a specific type other than `unknown`.
 
-This feature is particularly useful in partial select queries, ensuring consistent typing for selected fields
+This feature is particularly useful in partial select queries, ensuring consistent typing for selected fields:
 
 ```typescript
 // without sql<T> type defined
@@ -77,10 +77,10 @@ const response: { id: string }[] = await db.select({
 
 For the cases you need to make a runtime mapping for values passed from database driver to drizzle you can use `.mapWith()`
 
-This function accepts different values, that will map response in runtime
+This function accepts different values, that will map response in runtime.
 
 You can replicate a specific column mapping strategy as long as
-the interface inside mapWith is the same interface that is implemented by Column
+the interface inside mapWith is the same interface that is implemented by Column.
 
 ```typescript
 const usersTable = pgTable('users', {
@@ -92,7 +92,7 @@ const usersTable = pgTable('users', {
 sql`...`.mapWith(usersTable.name);
 ```
 
-You can also pass your own implementation for the `DriverValueDecoder` interface
+You can also pass your own implementation for the `DriverValueDecoder` interface:
 
 ```ts 
 sql``.mapWith({
@@ -372,11 +372,11 @@ You can use the sql functionality in partial select queries as well. Partial sel
 retrieve specific fields or columns from a table rather than fetching the entire row.
 
 For more detailed information about partial select queries, you can refer to the Core API
-documentation available at [Core API docs](/docs/crud#basic-and-partial-select).
+documentation available at **[Core API docs](/docs/crud#basic-and-partial-select)**.
 
 **Select different custom fields from table**
 
-Here you can see a usage for [`sql<T>`](/docs/sql#sqlt), [`sql``.mapWith()`](/docs/sql#sqlmapwith), [`sql``.as<T>()`](/docs/sql#sqlast)
+Here you can see a usage for **[`sql<T>`](/docs/sql#sqlt)**, **[`sql``.mapWith()`](/docs/sql#sqlmapwith)**, **[`sql``.as<T>()`](/docs/sql#sqlast)**.
 
 <Section>
 ```typescript copy

@@ -4,7 +4,8 @@ import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
 # Configuration files
 Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
-You can have autocomplete experience and very convenient environment variables flow!  
+
+You can have autocomplete experience and a very convenient environment variables flow!  
 
 ```plaintext {5}
 📦 <project root>
@@ -49,8 +50,9 @@ export default {
 
 ## Schema files paths
 `schema` param lets you define where your schema file/files live.  
+
 You can have as many separate schema files as you want and define paths to them using 
-[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)
+**[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
  or array of globs syntax.
 
 <Tabs items={["Example 1", "Example 2", "Example 3"]}>
@@ -165,8 +167,10 @@ export default {
 </Section>
 
 ## SQL breakpoints
-`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default, 
-it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite) 
+`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations.
+
+It's optional and `true` by default, 
+it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction (MySQL, SQLite) 
 and Drizzle ORM has to apply them sequentially one by one.
 ```sql {5}
 CREATE TABLE `book` (
@@ -181,8 +185,9 @@ CREATE TABLE `book_to_author` (
 );
 ```
 ## Push and Pull
-Drizzle Kit provides you [introspect](./commands#introspect--pull) and [push](./commands#prototype--push) APIs.  
-We mirror connection params of database drivers
+Drizzle Kit provides you **[introspect](./commands#introspect--pull)** and **[push](./commands#prototype--push)** APIs.  
+
+We mirror connection params of database drivers.
 
 <Tabs items={["Connection URI", "Connection params"]}>
 <Tab>
@@ -228,10 +233,10 @@ export default {
 </Tabs>
 
 ## Multi-project schema
-`tablesFilter` param lets you filter tables with [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
-syntax for db [`push`](./commands#prototype--push) command.  
-It's useful when you have only one database available for several separate projects with separate sql schemas.  
-How to define multi-project tables with Drizzle ORM - [see here](/docs/goodies#multi-project-schema)
+`tablesFilter` param lets you filter tables with **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)** 
+syntax for db **[`push`](./commands#prototype--push)** command. It's useful when you have only one database available for several separate projects with separate sql schemas.  
+
+How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**
 
 <Section>
 ```ts {3}
@@ -261,7 +266,7 @@ export default {
 ```
 </Section>
 
-You can apply multiple `or` filters
+You can apply multiple `or` filters:
 ```ts
 tablesFilter: ["project1_*", "project2_*"]
 ```

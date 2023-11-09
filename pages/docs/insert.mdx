@@ -7,7 +7,7 @@ import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedCh
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
 
 ## Insert one row
-Inserting data with Drizzle is extremely straightfoward and sql-like
+Inserting data with Drizzle is extremely straightfoward and sql-like. See for yourself:
 
 <Section>
 ```typescript copy 
@@ -18,7 +18,7 @@ insert into "users" ("name") values ("Andrew");
 ```
 </Section>
 
-If you need insert type for a particular table - you can use `typeof usersTable.$inferInsert` syntax
+If you need insert type for a particular table you can use `typeof usersTable.$inferInsert` syntax. 
 ```typescript copy 
 type NewUser = typeof users.$inferInsert;
 
@@ -32,7 +32,7 @@ await insertUser(newUser);
 
 ## Insert returning
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
-You can insert a row and get it back in PostgreSQL and SQLite
+You can insert a row and get it back in PostgreSQL and SQLite like such:
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
 
@@ -45,10 +45,6 @@ await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: u
 await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 ```
 
-{/* ## OnConflict and Upsert [insert or update]
-You can run insert statements with on conflict clause to `do nothing` or `update`  
-### OnConflict and Upsert [insert or update]
-You can run insert statements with on conflict clause to `do nothing` or `update`   */}
 ## Upserts and conflicts
 Drizzle ORM provides simple interfaces for handling upserts and conflicts.
 
@@ -68,8 +64,8 @@ await db.insert(users)
   .onConflictDoNothing({ target: users.id });
 ```
 
-{/* This is how you upsert with `onConflictDoUpdate` */}
-### On conflict do update
+This is how you upsert with `onConflictDoUpdate`, you can specify `set` and `where` clauses.
+
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 
 `onConflictDoUpdate` will update the row if there's a conflict:
@@ -79,8 +75,7 @@ await db.insert(users)
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
 
-{/* Upsert with where statement */}
-You can also specify a `where` clause for `onConflictDoUpdate`:
+Upsert with `where` clause for `onConflictDoUpdate`:
 ```typescript
 await db.insert(users)
   .values({ id: 1, name: 'John' })

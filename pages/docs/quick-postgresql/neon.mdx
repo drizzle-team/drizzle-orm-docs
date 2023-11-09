@@ -1,11 +1,11 @@
 import { Tab, Tabs } from "nextra-theme-docs";
 
 # Neon 
-According to their [official website](https://neon.tech), Neon database is a multi-cloud fully managed Postgres. 
+According to their **[official website](https://neon.tech)**, Neon database is a multi-cloud fully managed Postgres. 
   
-Drizzle ORM natively supports both [Neon Serverless](https://github.com/neondatabase/serverless) 
-driver with `drizzle-orm/neon-serverless` package and [`postgres`](./postgresjs) or [`pg`](./node-postgres) 
-drivers to access Neon database, as of their [official nodejs docs](https://neon.tech/docs/guides/node)
+Drizzle ORM natively supports both **[Neon Serverless](https://github.com/neondatabase/serverless)** 
+driver with `drizzle-orm/neon-serverless` package and **[`postgres`](./postgresjs)** or **[`pg`](./node-postgres)** 
+drivers to access Neon database, as per the **[Neon nodejs docs.](https://neon.tech/docs/guides/node)**
 <Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
   <Tab>
     ```bash copy
@@ -32,8 +32,8 @@ drivers to access Neon database, as of their [official nodejs docs](https://neon
     ```
   </Tab>
 </Tabs>
-With Neon Serverless package [[github](https://github.com/neondatabase/serverless), [blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/)] 
-you can access Neon database from serverless environments with no TCP available, like Cloudflare Workers, through websockets.
+With Neon Serverless package [**[github](https://github.com/neondatabase/serverless)**, **[blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/)**] 
+you can access Neon database from serverless environments with no TCP available — like Cloudflare Workers — through websockets.
 
 <Tabs items={['HTTP', 'WebSockets']}>
 <Tab>
@@ -50,7 +50,7 @@ const result = await db.select().from(...);
 ```
 </Tab>
 <Tab>
-Below is the example of using Drizzle ORM with Neon Serverless driver in Cloudflare Worker, for extensive example - [see here](http://driz.li/neon-cf-ex)
+Below is the example of using Drizzle ORM with Neon Serverless driver in Cloudflare Worker, for extensive example — **[see here.](http://driz.li/neon-cf-ex)**
 ```typescript copy filename="index.ts"
 import { Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
@@ -68,5 +68,5 @@ export default {
 </Tab>
 </Tabs>
 
-If you're about to use Neon from a serverfull environments, according to their [official nodejs docs](https://neon.tech/docs/guides/node) 
-you should just use PostgresJS driver - see [docs](./postgresjs).
+If you're unsure how to use Neon from a serverfull environments, you should just use PostgresJS driver 
+according to their **[official nodejs docs](https://neon.tech/docs/guides/node)** — see **[docs](./postgresjs)**.
