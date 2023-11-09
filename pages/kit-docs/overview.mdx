@@ -167,15 +167,17 @@ You can have autocomplete experience and a very convenient environment variables
 <CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
 <CodeTab>
 ```ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from 'drizzle-kit/utils'
 
-export default {
-  schema: "./schema.ts",
+export default defineConfig({
+ schema: "./schema.ts",
   driver: 'pg',
   dbCredentials: {
     connectionString: process.env.DB_URL,
-  }
-} satisfies Config;
+  },
+  verbose: true,
+  strict: true,
+})
 ```
 </CodeTab>
 <CodeTab>
