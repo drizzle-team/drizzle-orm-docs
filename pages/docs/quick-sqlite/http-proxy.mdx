@@ -4,11 +4,11 @@ import { Tab, Tabs } from 'nextra-theme-docs';
 
 Drizzle ORM also supports simply using asynchronous callback function for executing SQL.
 
-- `sql` is a query string with praceholders.
+- `sql` is a query string with placeholders.
 - `params` is an array of parameters.
 - One of the following values will set for `method` depending on the SQL statement - `run`, `all`, `values` or `get`.
 
-Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the retuen value.
+Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the return value.
 
 - When the `method` is `get`, you should return a value as `{rows: string[]}`.
 - Otherwise, you should return `{rows: string[][]}`.
