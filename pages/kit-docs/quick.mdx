@@ -124,6 +124,8 @@ const sql = postgres(connectionString, { max: 1 })
 const db = drizzle(sql);
 
 await migrate(db, { migrationsFolder: "drizzle" });
+
+await sql.end();
 ```
 
 That's it, folks!  
