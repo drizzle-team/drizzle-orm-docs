@@ -79,6 +79,18 @@ export const pgDatabases: ICards = {
     description: 'Data API for AWS Aurora Serverless',
     href: '/docs/quick-postgresql//aws-data-api',
   },
+  http: {
+    title: 'PostgreSQL HTTP proxy',
+    image: 'server',
+    lightIcon: {
+      width: 24,
+    },
+    darkIcon: {
+      width: 24,
+    },
+    description: 'PostgreSQL HTTP proxy implementation',
+    href: '/docs/quick-postgresql/http-proxy',
+  },
 };
 
 export const mysql: ICards = {
@@ -106,6 +118,18 @@ export const mysql: ICards = {
     },
     description: 'MySQL client for Node.js with focus on performance',
     href: '/docs/quick-mysql/mysql2',
+  },
+  http: {
+    title: 'MySQL HTTP proxy',
+    image: 'server',
+    lightIcon: {
+      width: 24,
+    },
+    darkIcon: {
+      width: 24,
+    },
+    description: 'MySQL HTTP proxy implementation',
+    href: '/docs/quick-mysql/http-proxy',
   },
 };
 

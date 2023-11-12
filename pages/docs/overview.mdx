@@ -1,48 +1,51 @@
 import Section from "../../components/Section/Section";
 import {CodeTab, CodeTabs} from "../../components/CodeTabs/CodeTabs";
+import { Callout } from 'nextra-theme-docs';
 import Image from 'next/image'
 
 # Drizzle ORM  
-Drizzle ORM is a headless TypeScript ORM with a head.  
-It looks and feels simple, performs on day 1000 of your project, 
-lets you do things your way and helps when you need help.  
+> Drizzle is a good friend who's there for you when necessary and doesn't bother when you need some space.
 
-> Drizzle is a good friend who's there for you when necessary and doesn't bother when you need some space
+Drizzle ORM is a headless TypeScript ORM with a head 🐲
 
-It is the only ORM with both [relational](/docs/rqb) and [SQL-like](/docs/select) query APIs 
+It looks and feels simple, performs on day _1000_ of your project, 
+lets you do things your way, and is there when you need it.  
+
+**It's the only ORM with both [relational](/docs/rqb) and [SQL-like](/docs/select) query APIs**, 
 providing you best of both worlds when it comes to accessing your relational data. 
-Drizzle is lightweight, performant, typesafe, non lactose, gluten-free, flexible and serverless-ready **by design**.  
+Drizzle is lightweight, performant, typesafe, non lactose, gluten-free, sober, flexible and **serverless-ready by design**.
+Drizzle is not just a library, it's an experience 🤩
 
-  
 [![Drizzle bestofjs](/images/bestofjs.jpg)](https://bestofjs.org/projects/drizzle-orm)
 
 ## Headless ORM? 
-First and foremost Drizzle is a library and a set of complementary opt-in tools. 
-ORM stands for object relational mapping and developers tend to call Django-like or Spring-like tools an ORM. 
-We trully believe it's a misconception based on legacy and we call them Data Frameworks.
+First and foremost, Drizzle is a library and a collection of complementary opt-in tools. 
 
-With data frameworks you have to build projects **around them** and not **with them**.  
-Drizzle lets you build your project the way you want or need, lets you be productive and does not interfere. 
-It lets you solve SQL problems with SQL toolkit and provide you a variety of opt in tools 
-to take your developer experience through the roof.  
+**ORM** stands for _object relational mapping_, and developers tend to call Django-like or Spring-like tools an ORM. 
+We trully believe it's a misconception based on legacy nomenclature and we call them **data frameworks**.
 
-Drizzle lets you define and manage database schema in typescript, lets you access your data in SQL-like 
-or relational way, has a massive variety of opt-in tools which makes Drizzle an ultimate tool for managing
-and accessing your SQL data.  
+<Callout type="error" emoji="️💔">
+  With data frameworks you have to build projects **around them** and not **with them**.
+</Callout>
+
+**Drizzle** lets you build your project the way you want, withour interfering with your project or structure. 
+
+Using Drizzle you can define & manage database schemas in typescript, access your data in a SQL-like 
+or relational way, and take advantage of opt in tools 
+to push your developer experience _through the roof_ 🤯 
 
 ## Why SQL-like?
-**If you know SQL - you know Drizzle**.
-> SQL has been here for 49 years, it aint going anywhere and only gets better
+**If you know SQL — you know Drizzle**.
   
 Other ORMs and data frameworks tend to deviate/abstract you away from SQL which 
-leads to a double learning curve - you will need to know both SQL and the framework API.  
+leads to a double learning curve — needing to know both SQL and the framework's API.  
   
 Drizzle is the opposite. 
-We embrace SQL and built Drizzle to be SQL-like by default at its core, so you can have zero to none 
+We embrace SQL and built Drizzle to be SQL-like at its core, so you can have zero to none 
 learning curve and access to the full power of SQL.  
   
-All the familiar [SQL schema](/docs/sql-schema-declaration), [queries](/docs/select), 
-[automatic migrations](/docs/migrations) and [one more thing](/docs/rqb).
+We bring all the familiar **[SQL schema](/docs/sql-schema-declaration)**, **[queries](/docs/select)**, 
+**[automatic migrations](/docs/migrations)** and **[one more thing](/docs/rqb)** ✨
 
 <CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
 ```typescript copy
@@ -84,46 +87,51 @@ ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN 
 </CodeTabs>
 
 ## Why not SQL-like?
-At Drizzle we're never settled and striving for a perfectly balanced solution and while SQL-like does cover 100% of the needs, 
-there're certain common scenarious when you can query data in a better way.  
+We're always striving for a perfectly balanced solution, and while SQL-like does cover 100% of the needs, 
+there're certain common scenarios where you can query data in a better way.  
   
-We've build [Queries API](/docs/rqb) for you, so you can fetch relational nested data from database 
-in the most convenient and performant way and never think about joins and data mapping.  
+We've built **[Queries API](/docs/rqb)** for you, so you can fetch relational nested data from the database 
+in the most convenient and performant way, and never think about joins and data mapping.  
   
-It always generates exactly 1 SQL, feel free to use it with serverless databases and never worry about performance 
+**Drizzle always outputs exactly 1 SQL query** — feel free to use it with serverless databases and never worry about performance or roundtrip costs!
 
 ```ts
 const result = await db.query.users.findMany({
 	with: {
-		posts: true			
+		posts: true
 	},
 });
 ```
 
 ## Serverless?
-> Best part is no part - Drizzle has exactly **0 dependencies**
+<Callout type="info" emoji="🥳">
+  Best part is no part — **Drizzle has exactly 0 dependencies!**
+</Callout>
 
 ![Drizzle is slim an Serverless ready](/images/drizzle31kb.jpg)
   
 Drizzle ORM is dialect specific, slim, performant and serverless ready **by design**.  
   
-We've spent a lot of time to make sure you have best in class SQL dialects support, 
-so you can have Postgres or MySQL or other dialect-specific stuff support.  
+We've spent a lot of time to make sure you have best in class SQL dialects support — Postgres, MySQL, or any other dialect-specific stuff.  
   
-Drizzle is operating natively through industry standard database drivers.  
-We support all major [PostgreSQL](/docs/quick-postgresql), 
-[MySQL](/docs/quick-mysql) or [SQLite](/docs/quick-sqlite) drivers out there 
-and we're adding new ones [really fast](https://twitter.com/DrizzleORM/status/1653082492742647811?s=20).  
+Drizzle is operating natively through industry standard database drivers. We support all major **[PostgreSQL](/docs/quick-postgresql)**, **[MySQL](/docs/quick-mysql)** or **[SQLite](/docs/quick-sqlite)** drivers out there and we're adding new ones **[really fast](https://twitter.com/DrizzleORM/status/1653082492742647811?s=20)**.  
 
 
-## Welcome on board
+## Welcome on board!
+More and more companies adopt Drizzle into production, experiencing immense benefits in both DX and performance.
 
-Drizzle is not just a library, it's an experience.  
+**We're always there to help, so don't hesitate to reach out — we'll gladly assist you in your Drizzle journey!**
+
+We have an outstanding **[Discord community](https://driz.li/discord)** and welcome all builders to our **[Twitter](https://twitter.com/drizzleorm)**.
   
-More and more companies adopt Drizzle into their production projects experiencing immense benefits 
-in both DX and performance and we're always there to help!  
-  
-Don't hesitate to reach us out - we'll gladly assist you in your Drizzle journey!  
-We have an outstanding [Discord community](https://driz.li/discord) and welcome to our [Twitter](https://twitter.com/drizzleorm)  
-  
-Now go build something awesome with Drizzle and your [PostgreSQL](/docs/quick-postgresql), [MySQL](/docs/quick-mysql) or [SQLite](/docs/quick-sqlite)!
+Now go build something awesome with Drizzle and your **[PostgreSQL](/docs/quick-postgresql)**, **[MySQL](/docs/quick-mysql)** or **[SQLite](/docs/quick-sqlite)** 🚀
+
+## Video Showcase
+
+#### Theo
+
+<iframe width="700" height="400" src="https://www.youtube-nocookie.com/embed/_SLxGYzv6jo?si=s9S4SLqzQVIbd5e6&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+#### Marius Espejo
+
+<iframe width="700" height="400" src="https://www.youtube-nocookie.com/embed/Qo-RXkSwOtc?si=cHMKzZnB1NFYSsqL&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
