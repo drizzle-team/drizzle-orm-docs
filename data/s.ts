@@ -102,6 +102,29 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
   },
+  {
+    tier: {
+      name: '$1000 a month',
+      isOneTime: true,
+    },
+    sponsorEntity: {
+      __typename: 'Organization',
+      login: 'neon.tech',
+      name: 'Neon',
+      avatarUrl: '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: '2023-11-16T13:32:16Z',
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      background: 'url("/svg/neon-dark.svg") 0% 0% / cover no-repeat content-box',
+      padding: '10px',
+    },
+    lightStyle: {
+      background: 'url("/svg/neon-light.svg") 0% 0% / cover no-repeat content-box',
+      padding: '10px',
+    },
+  },
 ];
 
 export default sponsorsData;
