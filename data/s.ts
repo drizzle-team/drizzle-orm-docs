@@ -109,7 +109,7 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: 'Organization',
-      login: 'neon.tech',
+      login: 'driz.li/neon',
       name: 'Neon',
       avatarUrl: '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
