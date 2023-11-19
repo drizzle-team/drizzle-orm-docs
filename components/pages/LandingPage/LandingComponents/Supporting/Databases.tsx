@@ -12,6 +12,7 @@ const Databases: {
     darkStyles: {
       width: 24,
     },
+    sponsorUrl: 'https://driz.li/neon',
   },
   PlanetScale: {
     src: 'planetscale.svg',
