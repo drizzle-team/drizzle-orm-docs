@@ -15,7 +15,7 @@ import SponsorsLine from './LandingComponents/SponsorsLine/SponsorsLine';
 
 const LandingPage = () => {
   const runtimes: string[] = ['Cloudflare Workers', 'Supabase functions', 'Vercel functions', 'Deno deploy', 'Bun', 'Lagon', 'Fly.io', 'ElectronJS', 'Browser'];
-  const databases: string[] = ['Neon', 'PlanetScale', 'Vercel Postgres', 'Turso', 'Supabase', 'Xata', 'PostgreSQL', 'MySQL', 'LiteFS', 'SQLite', 'Web SQLite'];
+  const databases: string[] = ['PlanetScale', 'Neon', 'Vercel Postgres', 'Turso', 'Supabase', 'Xata', 'PostgreSQL', 'MySQL', 'LiteFS', 'SQLite', 'Web SQLite'];
   return (
     <div className={styles.wrap}>
       <Header />

@@ -416,7 +416,7 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
     <Section>
-      ```typescript copy {18}
+      ```typescript copy {18, 19}
       import { serial, text, integer, primaryKey, pgTable } from "drizzle-orm/pg-core";
 
       export const user = pgTable("user", {
@@ -434,26 +434,29 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
         bookId: integer("book_id"),
       }, (table) => {
         return {
-          pk: primaryKey(table.bookId, table.authorId),
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
         };
       });
       ```
 
-      ```sql {6}
+      ```sql {6, 9}
       ...
 
       CREATE TABLE IF NOT EXISTS "books_to_authors" (
         "author_id" integer,
         "book_id" integer,
-        PRIMARY KEY("book_id","author_id")
+        PRIMARY KEY("book_id","author_id"),
       );
+
+      ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");
       ```
     </Section>
 
   </Tab> 
   <Tab>
     <Section>
-      ```typescript {18}
+      ```typescript {18, 19}
       import { int, text, primaryKey, mysqlTable } from "drizzle-orm/mysql-core";
 
       export const user = mysqlTable("user", {
@@ -471,7 +474,8 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
         bookId: int("book_id"),
       }, (table) => {
         return {
-          pk: primaryKey(table.bookId, table.authorId),
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
         };
       });
       ```
@@ -484,14 +488,13 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
         `book_id` int,
         PRIMARY KEY(`book_id`,`author_id`)
       );
-
       ```
     </Section>
 
   </Tab>
   <Tab>
    <Section>
-      ```typescript copy {18}
+      ```typescript copy {18, 19}
       import { integer, text, primaryKey, sqliteTable} from "drizzle-orm/sqlite-core";
 
       export const user = sqliteTable("user", {
@@ -509,7 +512,8 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
         bookId: integer("book_id"),
       }, (table) => {
         return {
-          pk: primaryKey(table.bookId, table.authorId),
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
         };
       });
       ```
@@ -614,6 +618,7 @@ set return type for reference callback or user a standalone `foreignKey` operato
         parentReference: foreignKey({
           columns: [table.parentId],
           foreignColumns: [table.id],
+          name: "custom_fk"
         }),
       };
     });
@@ -640,6 +645,7 @@ set return type for reference callback or user a standalone `foreignKey` operato
         parentReference: foreignKey({
           columns: [table.parentId],
           foreignColumns: [table.id],
+          name: "custom_fk"
         }),
       };
     });
@@ -666,6 +672,7 @@ set return type for reference callback or user a standalone `foreignKey` operato
         parentReference: foreignKey(() => ({
           columns: [table.parentId],
           foreignColumns: [table.id],
+          name: "custom_fk"
         })),
       };
     });
@@ -684,7 +691,7 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       lastName: text("lastName"),
     }, (table) => {
       return {
-        pk: primaryKey(table.firstName, table.lastName),
+        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
       };
     });
 
@@ -697,6 +704,7 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
         userReference: foreignKey({
           columns: [table.userFirstName, table.userLastName],
           foreignColumns: [user.firstName, user.lastName]
+          name: "custom_fk"
         })
       }
     })
@@ -712,7 +720,7 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       lastName: text("lastName"),
     }, (table) => {
       return {
-        pk: primaryKey(table.firstName, table.lastName),
+        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
       };
     });
 
@@ -724,7 +732,8 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       return {
         userReference: foreignKey({
           columns: [table.userFirstName, table.userLastName],
-          foreignColumns: [user.firstName, user.lastName]
+          foreignColumns: [user.firstName, user.lastName],
+          name: "custom_name"
         })
       }
     });
@@ -740,7 +749,7 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       lastName: text("lastName"),
     }, (table) => {
       return {
-        pk: primaryKey(table.firstName, table.lastName),
+        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
       };
     });
 
@@ -752,7 +761,8 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       return {
         userReference: foreignKey(() => ({
           columns: [table.userFirstName, table.userLastName],
-          foreignColumns: [user.firstName, user.lastName]
+          foreignColumns: [user.firstName, user.lastName],
+          name: "custom_name"
         }))
       }
     });

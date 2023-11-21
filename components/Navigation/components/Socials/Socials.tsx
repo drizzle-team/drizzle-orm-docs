@@ -18,7 +18,7 @@ const Socials = () => (
     </a>
     <a
       target="_blank"
-      href="https://mobile.twitter.com/DrizzleOrm"
+      href="https://mobile.twitter.com/DrizzleORM"
       aria-label="Drizzle twitter"
       rel="nofollow noreferrer"
       className={styles['socials-item']}

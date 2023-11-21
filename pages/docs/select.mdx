@@ -4,59 +4,134 @@ import { Callout } from 'nextra-theme-docs'
 import IsSupportedChipGroup from '../../components/IsSupportedChip/IsSupportedChipGroup';
 
 # SQL Select
-Drizzle ORM provide you the most SQL-like way to query your relational database.  
+Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
+It natively supports mostly every query feature and capability of every dialect,
+and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
 
-We natively support mostly every query feature capability of every dialect 
-and whatever we do not yet support can be done with our powerful **[`sql`](/docs/sql)** operator.
+For the following examples, let's assume you have a `users` table defined like this:
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tab>
+```typescript
+import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core';
+
+export const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age'),
+});
+```
+</Tab>
+</Tabs>
 
 ## Basic and partial select
-Getting a list of all users and you will have a typed result set:
+
+### Select with all columns
+Select all rows from a table including all columns:
 
 <Section>
 ```typescript
-const result: User[] = await db.select().from(users);
-
-result[0].id;
-result[0].name;
+const result = await db.select().from(users);
+/*
+  {
+    id: number;
+    name: string;
+    age: number | null;
+  }[]
+*/
 ```
 ```sql
-select * from 'users';
+select "id", "name", "age" from "users";
 ```
 </Section>
 
-Whenever you have SQL table with many columns you might not wanna select all of them for either performance or security reasons. 
+Notice that the result type is inferred automatically based on the table definition, including columns nullability.
 
-You can omit them by using our partial query syntax which will generate partial SQL select and automatically map results.
-See this example below:
+<Callout type="info">
+Drizzle always explicitly lists columns in the `select` clause instead of using `select *`.<br />
+This is required internally to guarantee the fields order in the query result, and is also generally considered a good practice.
+</Callout>
+
+### Partial select
+In some cases, you might want to select only a subset of columns from a table.
+You can do that by providing a selection object to the `.select()` method:
 <Section>
 ```typescript copy
 const result = await db.select({
-    field1: users.id,
-    field2: users.name,
-  }).from(users);
+  field1: users.id,
+  field2: users.name,
+}).from(users);
 
 const { field1, field2 } = result[0];
 ```
 ```sql
-select "users"."id" as "field1", "users"."name" as "field2" from "users";
+select "id", "name" from "users";
 ```
 </Section>
 
-With partial select you can apply sql transformations with `sql` operator:
+Like in SQL, you can use arbitrary expressions as selection fields, not just table columns:
 
 <Section>
 ```typescript
 const result = await db.select({
-    id: users.id,
-    lowerName: sql`lower(${users.name})`,
-  }).from(users);
+  id: users.id,
+  lowerName: sql<string>`lower(${users.name})`,
+}).from(users);
 ```
 ```sql
-select "users"."id", lower("users"."name") as "lowerName" from "users";
+select "id", lower("name") from "users";
 ```
 </Section>
 
-You can also select fields conditionally:
+<Callout type="warning">
+By specifying `sql<string>`, you are telling Drizzle that the **expected** type of the field is `string`.<br />
+If you specify it incorrectly (e.g. use `sql<number>` for a field that will be returned as a string), the runtime value won't match the expected type.
+Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
+
+If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
+</Callout>
+
+If you have an expression you use frequently, you can extract it into a function:
+
+```typescript
+import type { Column } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
+
+function lower(col: Column) {
+  return sql<string>`lower(${col})`;
+}
+
+const result = await db.select({
+  id: users.id,
+  lowerName: lower(users.name),
+}).from(users);
+```
+
+### Conditional select
+
+You can have a dynamic selection object based on some condition:
+
 ```typescript
 async function selectUsers(withName: boolean) {
   return db
@@ -70,11 +145,13 @@ async function selectUsers(withName: boolean) {
 const users = await selectUsers(true);
 ```
 
-## Where | Select Filters
-You can filter SQL results with our list of **[filter operators](/docs/operators)**:
+## Filtering
+
+You can filter the query results using the [filter operators](/docs/operators) in the `.where()` method:
+
 <Section>
 ```typescript copy
-import { eq, lt, gte, ne } from "drizzle-orm";
+import { eq, lt, gte, ne } from 'drizzle-orm';
 
 await db.select().from(users).where(eq(users.id, 42));
 await db.select().from(users).where(lt(users.id, 42));
@@ -83,74 +160,96 @@ await db.select().from(users).where(ne(users.id, 42));
 ...
 ```
 ```sql
-select * from 'users' where 'id' = 42;
-select * from 'users' where 'id' < 42;
-select * from 'users' where 'id' >= 42;
-select * from 'users' where 'id' <> 42;
+select "id", "name", "age" from "users" where "id" = 42;
+select "id", "name", "age" from "users" where "id" < 42;
+select "id", "name", "age" from "users" where "id" >= 42;
+select "id", "name", "age" from "users" where "id" <> 42;
 ```
 </Section>
 
-Any filter operator is a `sql` operator under the hood, for full SQL potential 
-you can utilise it directly and build type safe and future safe queries.
-
-You can safely alter schema, rename tables and columns and it will automatically reflect in queries, 
-as opposed to having regular string raw SQL queries.
+All filter operators are implemented using the [`sql`](/docs/sql) function.
+You can use it yourself to write arbitrary SQL filters, or build your own operators.
+For inspiration, you can check how the operators provided by Drizzle are [implemented](https://github.com/drizzle-team/drizzle-orm/blob/main/drizzle-orm/src/sql/expressions/conditions.ts).
 <Section>
 ```typescript copy
-import { sql } from "drizzle-orm";
+import { sql } from 'drizzle-orm';
+
+function equals42(col: Column) {
+  return sql`${col} = 42`;
+}
 
 await db.select().from(users).where(sql`${users.id} < 42`);
 await db.select().from(users).where(sql`${users.id} = 42`);
+await db.select().from(users).where(equals42(users.id));
 await db.select().from(users).where(sql`${users.id} >= 42`);
 await db.select().from(users).where(sql`${users.id} <> 42`);
-await db.select().from(users).where(sql`lower(${users.name}) = "aaron"`);
+await db.select().from(users).where(sql`lower(${users.name}) = 'aaron'`);
 ```
 ```sql
-select * from 'users' where 'id' = 42;
-select * from 'users' where 'id' < 42;
-select * from 'users' where 'id' <> 42;
-select * from 'users' where 'id' >= 42;
-select * from 'users' where lower('name') = "aaron";
+select "id", "name", "age" from "users" where 'id' < 42;
+select "id", "name", "age" from "users" where 'id' = 42;
+select "id", "name", "age" from "users" where 'id' = 42;
+select "id", "name", "age" from "users" where 'id' >= 42;
+select "id", "name", "age" from "users" where 'id' <> 42;
+select "id", "name", "age" from "users" where lower("name") = 'aaron';
 ```
 </Section>
+
+<Callout type='info'>
+All the values provided to filter operators and to the `sql` function are parameterized automatically.
+For example, this query:
+```ts
+await db.select().from(users).where(eq(users.id, 42));
+```
+will be translated to:
+```sql
+select "id", "name", "age" from "users" where "id" = $1; -- params: [42]
+```
+</Callout>
 
 Inverting condition with a `not` operator:
 <Section>
 ```typescript copy
-import { eq, not, sql } from "drizzle-orm";
+import { eq, not, sql } from 'drizzle-orm';
 
 await db.select().from(users).where(not(eq(users.id, 42)));
 await db.select().from(users).where(sql`not ${users.id} = 42`);
 ```
 ```sql
-select * from 'users' where not 'id' = 42;
-select * from 'users' where not 'id' = 42;
+select "id", "name", "age" from "users" where not ("id" = 42);
+select "id", "name", "age" from "users" where not ("id" = 42);
 ```
 </Section>
 
+<Callout type="info">
+You can safely alter schema, rename tables and columns
+and it will be automatically reflected in your queries because of template interpolation,
+as opposed to hardcoding column or table names when writing raw SQL.
+</Callout>
+
 ## Combining filters
-You can logically combine filter operators with conditional `and` and `or` operators, like this:
+You can logically combine filter operators with `and()` and `or()` operators:
 <Section>
 ```typescript copy
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql } from 'drizzle-orm';
 
 await db.select().from(users).where(
   and(
-    eq(users.id, 42), 
+    eq(users.id, 42),
     eq(users.name, 'Dan')
   )
 );
-await db.select().from(users).where(sql`${users.id} = 42 and ${users.name} = "Dan"`);
+await db.select().from(users).where(sql`${users.id} = 42 and ${users.name} = 'Dan'`);
 ```
 ```sql
-select * from 'users' where 'id' = 42 and 'name' = "Dan";
-select * from 'users' where 'id' = 42 and 'name' = "Dan";
+select "id", "name", "age" from "users" where "id" = 42 and "name" = 'Dan';
+select "id", "name", "age" from "users" where "id" = 42 and "name" = 'Dan';
 ```
 </Section>
 
 <Section>
 ```typescript copy
-import { eq, or, sql } from "drizzle-orm";
+import { eq, or, sql } from 'drizzle-orm';
 
 await db.select().from(users).where(
   or(
@@ -158,18 +257,17 @@ await db.select().from(users).where(
     eq(users.name, 'Dan')
   )
 );
-await db.select().from(users).where(sql`${users.id} = 42 or ${users.name} = "Dan"`);
+await db.select().from(users).where(sql`${users.id} = 42 or ${users.name} = 'Dan'`);
 ```
 ```sql
-select * from 'users' where 'id' = 42 or 'name' = "Dan";
-select * from 'users' where 'id' = 42 or 'name' = "Dan";
+select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
+select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
 ```
 </Section>
 
 ## Distinct
 
-You can use the `distinct` keyword to retrieve unique or distinct values from a column 
-or set of columns in a query result. It eliminates duplicate rows, returning only the unique values.
+You can use `.selectDistinct()` instead of `.select()` to retrieve only unique rows from a dataset:
 <Section>
 ```ts
 await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
@@ -177,72 +275,67 @@ await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
 await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
 ```
 ```sql
-select distinct "id", "name" from "users" order by "users"."id", "users"."name";
+select distinct "id", "name" from "users" order by "id", "name";
 
-select distinct "id" from "users" order by "users"."id";
+select distinct "id" from "users" order by "id";
 ```
 </Section>
 
-Drizzle ORM supports `DISTINCT ON` PostgreSQL operator too.
-<Callout>
-    `DISTINCT ON` is only available in PostgreSQL.
-</Callout>
+In PostgreSQL, you can also use the `distinct on` clause to specify how the unique rows are determined:
 
 <Section>
 ```ts
-await db.selectDistinctOn([users.id])
-        .from(users)
-        .orderBy(users.id);
-
-await db.selectDistinctOn([users.name], { name: users.name })
-        .from(users)
-        .orderBy(users.name);
+await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
+await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
 ```
 ```sql
-select distinct on ("users"."id") "id", "name" from "users" order by "users"."id";
-
-select distinct on ("users"."name") "name" from "users" order by "users"."name";
+select distinct on ("id") "id", "name" from "users" order by "id";
+select distinct on ("name") "name" from "users" order by "name";
 ```
 </Section>
 
+<Callout>
+`distinct on` clause is only supported in PostgreSQL.
+</Callout>
 
-## Limit & Offset
-You can apply `limit` and `offset` to the query:
+
+## Limit & offset
+Use `.limit()` and `.offset()` to add `limit` and `offset` clauses to the query - for example, to implement pagination:
 <Section>
 ```typescript
 await db.select().from(users).limit(10);
 await db.select().from(users).limit(10).offset(10);
 ```
 ```sql
-select * from "users" limit 10;
-select * from "users" limit 10 offset 10;
+select "id", "name", "age" from "users" limit 10;
+select "id", "name", "age" from "users" limit 10 offset 10;
 ```
 </Section>
 
 ## Order By
-You can sort results with `orderBy` operator:
+Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
 <Section>
 ```typescript
-import { asc, desc } from "drizzle-orm";
+import { asc, desc } from 'drizzle-orm';
 
 await db.select().from(users).orderBy(users.name);
 await db.select().from(users).orderBy(desc(users.name));
 
-// you can pass multiple order args
+// order by multiple fields
 await db.select().from(users).orderBy(users.name, users.name2);
 await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
 ```
 ```sql
-select * from "users" order by "name";
-select * from "users" order by "name" desc;
+select "id", "name", "age" from "users" order by "name";
+select "id", "name", "age" from "users" order by "name" desc;
 
-select * from "users" order by "name" "name2";
-select * from "users" order by "name" asc "name2" desc;
+select "id", "name", "age" from "users" order by "name", "name2";
+select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 ```
 </Section>
 
 ## WITH clause
-SQL `with` clause is a statement scoped view, helpful to organise complex queries like such:
+Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
 <Section>
 ```typescript copy
 const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
@@ -250,204 +343,92 @@ const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
 const result = await db.with(sq).select().from(sq);
 ```
 ```sql
-with sq as (select * from "users" where "users"."id" = 42)
-select * from sq;
+with sq as (select "id", "name", "age" from "users" where "id" = 42)
+select "id", "name", "age" from sq;
 ```
 </Section>
 
-To select raw `sql` in a WITH subquery and reference that field in other queries, 
-you must add an alias to it:
+To select arbitrary SQL values as fields in a CTE and reference them in other CTEs or in the main query,
+you need to add aliases to them:
 ```typescript copy
 
 const sq = db.$with('sq').as(db.select({ 
-    name: sql<string>`upper(${users.name})`.as('name') 
-  })
-  .from(users));
+  name: sql<string>`upper(${users.name})`.as('name'),
+})
+.from(users));
 
 const result = await db.with(sq).select({ name: sq.name }).from(sq);
 ```
-If you don't provide an alias, the field `type` will become `DrizzleTypeError` and you won't be able to reference it in other queries. 
-If you ignore the type error and still try to reference the field, 
+If you don't provide an alias, the field type will become `DrizzleTypeError` and you won't be able to reference it in other queries.
+If you ignore the type error and still try to use the field,
 you will get a runtime error, since there's no way to reference that field without an alias.
 
 ## Select from subquery
-Just like in SQL, you can embed SQL queries into other SQL queries by using `subquery` API.
+Just like in SQL, you can embed queries into other queries by using the subquery API:
 <Section>
 ```typescript copy
 const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
 ```sql
-select * from (select * from "user" where "user"."id" = 42) "sq";
+select "id", "name", "age" from (select "id", "name", "age" from "users" where "id" = 42) "sq";
 ```
 </Section>
 
-You can also use subqueries in joins:
+Subqueries can be used in any place where a table can be used, for example in joins:
+<Section>
 ```typescript copy
+const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
+```sql
+select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"."age" from "users"
+  left join (select "id", "name", "age" from "users" where "id" = 42) "sq"
+    on "users"."id" = "sq"."id";
+```
+</Section>
 ## Aggregations
-With Drizzle ORM you can do aggregations with functions like `sum`, `count`, `avg`, etc. by 
-grouping and filtering with `groupBy` and `having` respectfully, just like you do in SQL.  
-  
-With our powerful `sql` operator you can infer aggregations functions return types using `sql<number>` syntax:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-    ```typescript copy {10,13}
-    import { pgTable, serial, text, doublePrecision } from 'drizzle-orm/pg-core';
-    import { gte } from 'drizzle-orm';
+With Drizzle, you can do aggregations using functions like `sum`, `count`, `avg`, etc. by
+grouping and filtering with `.groupBy()` and `.having()` respectfully, same as you would do in raw SQL:
 
-    export const product = pgTable('product', {
-      id: serial('id').primaryKey(),
-      name: text('name'),
-      unitPrice: doublePrecision("unit_price")
-    });
+<Section>
+```typescript
+import { gt } from 'drizzle-orm';
 
-    const result = await db.select({ count: sql<number>`count(*)` }).from(product);
-    result[0].count // will be number type
+await db.select({
+  age: users.age,
+  count: sql<number>`cast(count(${users.id}) as int)`,
+})
+  .from(users)
+  .groupBy(users.age);
 
-    await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
+await db.select({
+  age: users.age,
+  count: sql<number>`cast(count(${users.id}) as int)`,
+})
+  .from(users)
+  .groupBy(users.age)
+  .having(({ count }) => gt(count, 1));
+```
+```sql
+select "age", cast(count("id") as int)
+  from "users"
+  group by "age";
 
-    ```
-    ```sql
-    select count(*) from "product";
-    select count(*) from "product" where "unit_price" >= 4;
-    ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```typescript copy {10,13}
-      import { mysqlTable, bigint, text, double } from 'drizzle-orm/mysql-core';
-      import { gte } from 'drizzle-orm';
+select "age", cast(count("id") as int)
+  from "users"
+  group by "age"
+  having cast(count("id") as int) > 1;
+```
+</Section>
 
-      export const product = mysqlTable('product', {
-        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-        name: text('name'),
-        unitPrice: double("unit_price")
-      });
+<Callout type="info">
+`cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
+Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
+</Callout>
 
-      const result = await db.select({ count: sql<number>`count(*)` }).from(product);
-      result[0].count // will be number type
+A more advanced example:
 
-      await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
-      ```
-      ```sql
-      select count(*) from "product";
-      select count(*) from "product" where "unit_price" >= 4;
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-      <Section>
-      ```typescript copy {10,13}
-      import { sqliteTable, serial, text, real } from 'drizzle-orm/sqlite-core';
-      import { gte } from 'drizzle-orm';
-
-      export const product = sqliteTable('product', {
-        id: integer("id").primaryKey({ autoIncrement: true }),
-        name: text('name'),
-        unitPrice: real("unit_price")
-      });
-
-      const result = await db.select({ count: sql<number>`count(*)` }).from(product);
-      result[0].count // will be number type
-
-      await db.select({ count: sql<number>`count(*)` }).from(product).where(gte(product.unitPrice, 4));
-      ```
-      ```sql
-      select count(*) from "product";
-      select count(*) from "product" where "unit_price" >= 4;
-      ```
-    </Section>
-  </Tab>
-</Tabs>
-
-Lets have a quick look on how to group and filter grouped using a `having`:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
-  <Tab>
-    <Section>
-    ```typescript copy {9-11,13-17}
-    import { pgTable, serial, text } from 'drizzle-orm/pg-core';
-
-    export const user = pgTable('user', {
-      id: serial('id').primaryKey(),
-      name: text('name'),
-      city: text("city"),
-    });
-
-    await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
-      .from(user)
-      .groupBy(({ city }) => city)
-    
-    await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
-      .from(user)
-      .groupBy(({ city }) => city)
-      .having(({ count }) => count)
-    ```
-    ```sql
-    select count("id"), "city" from "user" group by "user"."city";
-    select count("id"), "city" from "user" group by "user"."city" having count("user"."id");
-    ```
-    </Section>
-  </Tab>
-  <Tab>
-    <Section>
-      ```typescript copy {9-11,13-17}
-      import { mysqlTable, bigint, text } from 'drizzle-orm/mysql-core';
-
-      export const user = mysqlTable('user', {
-        id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-        name: text('name'),
-        city: text("city"),
-      });
-
-      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
-        .from(user)
-        .groupBy(({ city }) => city)
-      
-      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
-        .from(user)
-        .groupBy(({ city }) => city)
-        .having(({ count }) => count)
-      ```
-      ```sql
-      select count("id"), "city" from "user" group by "user"."city";
-      select count("id"), "city" from "user" group by "user"."city" having count("user"."id");
-      ```
-    </Section>
-  </Tab>
-  <Tab>
-      <Section>
-      ```typescript copy {9-11,13-17}
-      import { sqliteTable, serial, text } from 'drizzle-orm/sqlite-core';
-
-      export const user = sqliteTable('user', {
-        id: integer("id").primaryKey({ autoIncrement: true }),
-        name: text('name'),
-        city: text("city"),
-      });
-
-      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
-        .from(user)
-        .groupBy(({ city }) => city)
-      
-      await db.select({ count: sql<number>`count(${user.id})`, city: user.city })
-        .from(user)
-        .groupBy(({ city }) => city)
-        .having(({ count }) => count)
-      ```
-      ```sql
-      select count("id"), "city" from "user" group by "user"."city";
-      select count("id"), "city" from "user" group by "user"."city" having count("user"."id");
-      ```
-    </Section>
-  </Tab>
-</Tabs>
-
-Here's a more advanced example. This query will return a list of orders with their details,
-and will calculate total price, total quantity and total products count for each order.
 ```typescript copy
 const orders = sqliteTable('order', {
   id: integer('id').primaryKey(),
@@ -481,7 +462,7 @@ db
     shipName: orders.shipName,
     shipCity: orders.shipCity,
     shipCountry: orders.shipCountry,
-    productsCount: sql<number>`count(${details.productId})`,
+    productsCount: sql<number>`cast(count(${details.productId}) as int)`,
     quantitySum: sql<number>`sum(${details.quantity})`,
     totalPrice: sql<number>`sum(${details.quantity} * ${details.unitPrice})`,
   })
