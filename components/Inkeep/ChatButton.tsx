@@ -14,6 +14,7 @@ const InkeepChatButton: any = dynamic(
 function ChatButton() {
   const { theme } = useTheme();
   const inkeepChatButtonProps: InkeepChatButtonProps = {
+    chatButtonType: 'ICON_TEXT',
     baseSettings: {
       apiKey: process.env.NEXT_PUBLIC_INKEEP_API_KEY || '',
       organizationId: process.env.NEXT_PUBLIC_INKEEP_ORGANIZATION_ID || '',
@@ -38,26 +39,21 @@ function ChatButton() {
       ],
       getHelpCallToActions: [
         {
-          icon: { builtIn: 'FaGithub' },
-          name: 'GitHub',
-          url: 'https://github.com/drizzle-team/drizzle-orm/discussions',
-        },
-        {
           icon: { builtIn: 'FaDiscord' },
           name: 'Discord',
           url: 'https://discord.gg/tCe773yFeZ',
         },
+        {
+          icon: { builtIn: 'FaGithub' },
+          name: 'GitHub',
+          url: 'https://github.com/drizzle-team/drizzle-orm/discussions',
+        },
       ],
     },
     modalSettings: {
-      isModeSwitchingEnabled: true,
       defaultView: 'AI_CHAT',
-      closeOnBlur: true,
-      isAlignedToTop: true,
-      isAlignedToRight: false,
       areOpenHotKeysDisabled: true,
     },
-    chatButtonType: 'ICON_TEXT',
   };
 
   return (
