@@ -178,7 +178,7 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
     <Tab>
     ```ts
     const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
-    const res: postgres.RowList<Record<string, unknown>[]> = await db.execute(sql``)
+    const res: postgres.RowList<Record<string, unknown>[]> = await db.execute(statement)
     ```
     </Tab>
     <Tab>
