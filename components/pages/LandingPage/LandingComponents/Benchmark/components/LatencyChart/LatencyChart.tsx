@@ -225,7 +225,7 @@ const LatencyChart: FC<IProps> = ({
               x
               {fixedHelper(+averageLatencyCompare.toFixed() / +averageLatency.toFixed(), 1)}
             </div>
-            |
+            <span> | </span>
             <div className={(isCompleted && showTooltip) ? styles['tooltip-wrap-underline'] : styles['tooltip-wrap']}>
               <div className={styles.tooltip}>
                 Drizzle has x
