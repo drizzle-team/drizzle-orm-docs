@@ -24,7 +24,7 @@ const Benchmark = () => (
           <div>
             |
           </div>
-          <a href="https://google.com" target="_blank" rel="nofollow noreferrer" className={styles.github}>
+          <a href="https://github.com/drizzle-team/drizzle-benchmarks" target="_blank" rel="nofollow noreferrer" className={styles.github}>
             Open on Github ↗︎
           </a>
         </div>
