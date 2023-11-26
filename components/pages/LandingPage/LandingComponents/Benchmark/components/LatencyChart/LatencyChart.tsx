@@ -16,8 +16,10 @@ interface IProps {
   pathArray: IData[];
   maxDataLength: number;
   max: number;
-  average: number;
-  averageCompare: number;
+  averageLatency: number;
+  averageLatencyCompare: number;
+  averageP99: number;
+  averageP99Compare: number;
   isCompleted: boolean;
   showTooltip?: boolean;
 }
@@ -28,9 +30,11 @@ const LatencyChart: FC<IProps> = ({
   pathArray,
   max,
   maxDataLength,
-  average,
   isCompleted,
-  averageCompare,
+  averageLatency,
+  averageLatencyCompare,
+  averageP99,
+  averageP99Compare,
   showTooltip,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
@@ -204,22 +208,35 @@ const LatencyChart: FC<IProps> = ({
         <div className={styles.label}>
           avg latency:
           {' '}
-          {formatMs(average)}
+          {formatMs(averageLatency)}
         </div>
         {pathArray.length > 0 && isCompleted && showTooltip && (
-        <div className={(isCompleted && showTooltip) ? styles['tooltip-wrap-underline'] : styles['tooltip-wrap']}>
-          <div className={styles.tooltip}>
-            Drizzle has x
-            {fixedHelper(+averageCompare.toFixed() / +average.toFixed(), 1)}
-            {' '}
-            times better latency
+          <div className={styles['success-values']}>
+            <div className={(isCompleted && showTooltip) ? styles['tooltip-wrap-underline'] : styles['tooltip-wrap']}>
+              <div className={styles.tooltip}>
+                Drizzle has x
+                {fixedHelper(+averageLatencyCompare.toFixed() / +averageLatency.toFixed(), 1)}
+                {' '}
+                times better average latency
+              </div>
+              <div className={styles['success-icon-wrap']}>
+                <CheckIcon />
+              </div>
+              x
+              {fixedHelper(+averageLatencyCompare.toFixed() / +averageLatency.toFixed(), 1)}
+            </div>
+            |
+            <div className={(isCompleted && showTooltip) ? styles['tooltip-wrap-underline'] : styles['tooltip-wrap']}>
+              <div className={styles.tooltip}>
+                Drizzle has x
+                {fixedHelper(+averageP99Compare.toFixed() / +averageP99.toFixed(), 1)}
+                {' '}
+                times better p99 latency
+              </div>
+              x
+              {fixedHelper(+averageP99Compare.toFixed() / +averageP99.toFixed(), 1)}
+            </div>
           </div>
-          <div className={styles['success-icon-wrap']}>
-            <CheckIcon />
-          </div>
-          x
-          {fixedHelper(+averageCompare.toFixed() / +average.toFixed(), 1)}
-        </div>
         )}
       </div>
       <div className={styles['chart-wrap']}>

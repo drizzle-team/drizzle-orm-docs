@@ -16,6 +16,7 @@ export interface IData {
   reqs: number;
   totalReqs: number;
   avg: {
+    p99: number;
     cpus: number;
     latency: number;
     reqs: number;

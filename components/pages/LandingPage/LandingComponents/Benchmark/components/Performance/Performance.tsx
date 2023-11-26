@@ -141,8 +141,10 @@ const Performance: FC<Props> = ({
           pathArray={concatedDataDrizzle}
           max={max}
           maxDataLength={maxElements}
-          average={data ? data[index].avg.latency : 0}
-          averageCompare={compareData ? compareData[index].avg.latency : 0}
+          averageLatency={data ? data[index].avg.latency : 0}
+          averageLatencyCompare={compareData ? compareData[index].avg.latency : 0}
+          averageP99={data ? data[index].avg.p99 : 0}
+          averageP99Compare={compareData ? compareData[index].avg.p99 : 0}
           showTooltip
           isCompleted={index === maxDataLength}
         />
@@ -154,8 +156,10 @@ const Performance: FC<Props> = ({
           pathArray={concatedDataCompare}
           max={max}
           maxDataLength={maxElements}
-          average={compareData ? compareData[index].avg.latency : 0}
-          averageCompare={data ? data[index].avg.latency : 0}
+          averageLatency={compareData ? compareData[index].avg.latency : 0}
+          averageLatencyCompare={data ? data[index].avg.latency : 0}
+          averageP99={compareData ? compareData[index].avg.p99 : 0}
+          averageP99Compare={data ? data[index].avg.p99 : 0}
           isCompleted={index === maxDataLength}
         />
       </div>
