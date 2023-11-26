@@ -59,8 +59,12 @@ const configurationData: {
         value: 'Huge',
         disabled: true,
       },
-      Extreme: {
+      extreme: {
         value: 'Extreme',
+        disabled: true,
+      },
+      blackFriday: {
+        value: 'Black Friday',
         disabled: true,
       },
     },
