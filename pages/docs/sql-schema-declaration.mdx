@@ -1,18 +1,24 @@
-import { Tab, Tabs } from 'nextra-theme-docs';
+import { Tab, Tabs, FileTree, Callout, Cards, Card } from 'nextra-theme-docs';
 
 # SQL schema declaration
 
-You declare SQL schema in TypeScript in either one `schema.ts` file 
-or you can group them logically in multiple logically grouped files, whichever you prefer, all the freedom!
+You can declare your SQL schema directly in TypeScript either in a single `schema.ts` file,
+or you can spread them around — whichever you prefer, all the freedom!
 
-```plaintext
+
+<Tabs items={['1 File', 'Separate Files', 'Separate Folders']}>
+  <Tab>
+    Everything in 1 file:
+    ```plaintext
 📦 <project root>
  └ 📂 src
     └ 📂 db
        └ 📜 schema.ts
-```
-
-```plaintext
+    ```
+  </Tab>
+   <Tab>
+    Scattered across multiple files:
+    ```plaintext
 📦 <project root>
  └ 📂 src
     └ 📂 db
@@ -24,8 +30,11 @@ or you can group them logically in multiple logically grouped files, whichever y
           ├ 📜 clients.ts
           ├ 📜 enums.ts
           └ 📜 etc.ts
-```
-```plaintext
+    ```
+  </Tab>
+   <Tab>
+    In separate/domain-specific folders:
+   ```plaintext
 📦 <project root>
  └ 📂 src
     ├ 📂 get-user
@@ -35,10 +44,16 @@ or you can group them logically in multiple logically grouped files, whichever y
     │  ├ 📜 city.ts
     │  └ 📜 handler.ts    
     ├  ...
-```
+    ```
+  </Tab>
+</Tabs>
 
-You can declare tables, indexes and constraints, foreign keys and enums.  
-Please pay attention to `export` keyword, they are mandatory if you'll be using [drizzle-kit SQL migrations generator](/docs/migrations)
+You can declare `tables`, `indexes` and `constraints`, `foreign keys` and `enums`.  
+
+<Callout type="warning" emoji="⚠️">
+  Pay attention to the mandatory `export` keyword, if you're using **[drizzle-kit SQL migrations generator.](/docs/migrations)**
+</Callout>
+
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
   ```typescript copy
@@ -67,7 +82,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   Database and table explicit entity types:
   ```typescript copy
   import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
-  import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
+  import { drizzle } from 'drizzle-orm/node-postgres';
 
   export const users = pgTable('users', {
     id: serial('id').primaryKey(),
@@ -79,7 +94,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   export type NewUser = typeof users.$inferInsert; // insert type
   ...
 
-  const db: NodePgDatabase = drizzle(...);
+  const db = drizzle(...);
 
   const result: User[] = await db.select().from(users);
 
@@ -87,6 +102,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     return db.insert(users).values(user).returning();
   }
   ```
+
+  Check out all supported PostgreSQL column types **[here.](/docs/column-types/pg)**
   </Tab>
   <Tab>
   ```typescript copy
@@ -110,7 +127,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
 
   Database and table explicit entity types:  
   ```typescript copy
-  import { MySqlDatabase, MySqlRawQueryResult, mysqlTable, bigint, text, varchar } from 'drizzle-orm/mysql-core';
+  import { MySqlRawQueryResult, mysqlTable, bigint, text, varchar } from 'drizzle-orm/mysql-core';
   import mysql from 'mysql2/promise';
   import { drizzle } from 'drizzle-orm/mysql2';
 
@@ -131,7 +148,7 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
       database: 'test'
   });
 
-  export const db: MySqlDatabase = drizzle(poolConnection);
+  export const db = drizzle(poolConnection);
 
   const result: User[] = await db.select().from(users);
 
@@ -139,6 +156,8 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     return db.insert(users).values(user);
   }
   ```
+
+    Check out all supported MySQL column types **[here.](/docs/column-types/mysql)**
   </Tab>
   <Tab>
   ```typescript copy
@@ -173,11 +192,11 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
   export type User = typeof users.$inferSelect // return type when queried
   export type InsertUser = typeof users.$inferInsert // insert type
   ...
-  import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+  import { drizzle } from 'drizzle-orm/better-sqlite3';
   import Database from 'better-sqlite3';
 
   const sqlite = new Database('sqlite.db');
-  const db: BetterSQLite3Database = drizzle(sqlite);
+  const db = drizzle(sqlite);
 
   const result: User[] = db.select().from(users).all();
 
@@ -185,6 +204,13 @@ Please pay attention to `export` keyword, they are mandatory if you'll be using 
     return db.insert(users).values(user).run()
   }
   ```
+
+    Check out all supported SQLite column types **[here.](/docs/column-types/sqlite)**
   </Tab>
 </Tabs>
 
+<Cards>
+  <Card title="PostgreSQL column types" href="/docs/column-types/pg" />
+  <Card title="MySQL column types" href="/docs/column-types/mysql" />
+  <Card title="SQLite column types" href="/docs/column-types/sqlite" />
+</Cards>

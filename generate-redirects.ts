@@ -7,7 +7,7 @@ const filtered = items
   .map((it) => {
     return {
       source: it[0].replace("*", ":path*"),
-      destination: it[1].replace("*",":path*"),
+      destination: it[1].replace("*",":path*").replace(":splat", ":path*"),
       statusCode: Number(it[2]),
     };
   });

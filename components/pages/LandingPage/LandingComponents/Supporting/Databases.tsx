@@ -12,6 +12,7 @@ const Databases: {
     darkStyles: {
       width: 24,
     },
+    sponsorUrl: 'https://driz.li/neon',
   },
   PlanetScale: {
     src: 'planetscale.svg',
@@ -42,7 +43,7 @@ const Databases: {
     darkStyles: {
       width: 28,
     },
-    sponsorUrl: 'https://turso.tech/drizzle',
+    sponsorUrl: 'https://driz.li/turso',
   },
   Xata: {
     src: 'xata.svg',
@@ -52,7 +53,7 @@ const Databases: {
     darkStyles: {
       width: 32,
     },
-    sponsorUrl: 'https://xata.io/',
+    sponsorUrl: 'https://driz.li/xataio',
   },
   Supabase: {
     src: 'supabase.svg',

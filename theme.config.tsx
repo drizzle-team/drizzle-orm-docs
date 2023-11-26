@@ -9,8 +9,8 @@ const config: DocsThemeConfig = {
   banner: {
     key: 'rqb',
     text: (
-      <a href="https://driz.li/821days" target="_blank" rel="nofollow noreferrer">
-        🎉 Drizzle got FASTER! Read more →
+      <a href="https://driz.li/wdmm" target="_blank" rel="nofollow noreferrer">
+        🎉 Drizzle is giving away 1000$ for your HEX colors! Read more →
       </a>
     ),
   },
@@ -18,13 +18,13 @@ const config: DocsThemeConfig = {
     const { asPath } = useRouter();
     if (asPath !== '/') {
       return {
-        titleTemplate: '%s - DrizzleORM',
-        description: 'Drizzle ORM | %s',
+        titleTemplate: '%s - Drizzle ORM',
+        description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.',
       };
     }
     return {
-      titleTemplate: 'DrizzleORM - next gen TypeScript ORM',
-      description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind',
+      titleTemplate: 'Drizzle ORM - next gen TypeScript ORM',
+      description: 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.',
     };
   },
   logo: <Logo />,

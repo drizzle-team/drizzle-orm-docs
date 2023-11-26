@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { StaticImageData } from 'next/image';
 import { useTheme } from 'next-themes';
 import styles from './Supporting.module.css';
-import LiveOnTheEdge from './Images/LiveOnTheEdge.png';
-import LiveOnTheEdgeDark from './Images/LiveOnTheEdgeDark.png';
-import ConnectEverywhere from './Images/ConnectEverywhere.png';
-import ConnectEverywhereDark from './Images/ConnectEverywhereDark.png';
+import LiveOnTheEdge from './Images/LiveOnTheEdge.webp';
+import LiveOnTheEdgeDark from './Images/LiveOnTheEdgeDark.webp';
+import ConnectEverywhere from './Images/ConnectEverywhere.webp';
+import ConnectEverywhereDark from './Images/ConnectEverywhereDark.webp';
 import { ISupportingElement } from '@/@types/Supporting';
 import SupportingElement from './SupportingElement/SupportingElement';
 

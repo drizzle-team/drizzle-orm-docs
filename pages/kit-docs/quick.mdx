@@ -4,8 +4,9 @@ import { Tab, Tabs, Callout } from 'nextra-theme-docs';
 
 
 # Quick start
-Lets build a quick start app with `PostgreSQL` + `postgresjs` and run our first migration
+Lets build a quick start app with `PostgreSQL` + `postgresjs` and run our first migration.
 
+The first thing we need to do is to install `drizzle-orm` and `drizzle-kit`:
 <Tabs items={["npm", "yarn", "pnpm", "bun"]}>
 <Tab>
 ```shell copy
@@ -33,7 +34,7 @@ bun add -D drizzle-kit
 </Tab>
 </Tabs>
 
-Lets declare our `schema.ts`
+Lets declare our `schema.ts`:
 
 ```plaintext {4}
 📦 <project root>
@@ -56,7 +57,7 @@ export const user = pgTable("user", {
 });
 ```
 
-Now lets add drizzle configuration file
+Now lets add drizzle configuration file:
 ```plaintext {4}
 📦 <project root>
  ├ ...
@@ -73,14 +74,14 @@ export default {
 } satisfies Config;
 ```
 
-Add generate command to `package.json` and run our first migrations generation
+Add generate command to `package.json` and run our first migrations generation:
 
 ```json filename="package.json" {5}
 {
   "name": "first time?",
   "version": "0.0.1",
   "scripts": {
-    "generate": "drizzle-kit generate:pg",
+    "generate": "drizzle-kit generate:pg"
   }, 
 }
 ```
@@ -91,7 +92,7 @@ $ npm run generate
 [✓] Your SQL migration file ➜ drizzle/0000_pale_mister_fear.sql 🚀
 ```
 
-Done! We now have our first SQL migration file
+Done! We now have our first SQL migration file 🥳
 ```plaintext {4}
 📦 <project root>
  ├ 📂 drizzle
@@ -101,7 +102,7 @@ Done! We now have our first SQL migration file
  ├ 📜 drizzle.config.ts
  └ 📜 package.json
 ```
-Now lets run our first migration to the database
+Now lets run our first migration to the database:
 
 ```plaintext {5}
 📦 <project root>
@@ -126,4 +127,5 @@ await migrate(db, { migrationsFolder: "drizzle" });
 ```
 
 That's it, folks!  
-My personal congratulations 🎉
+
+**My personal congratulations 🎉**
