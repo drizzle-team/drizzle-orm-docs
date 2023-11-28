@@ -8,6 +8,7 @@ import SearchBar from './components/SearchBar/SearchBar';
 import BurgerIcon from '../Icons/BurgerIcon';
 import MobileNav from './components/MobileNav/MobileNav';
 import Socials from './components/Socials/Socials';
+import ChatButton from '../common/ChatButton/ChatButton';
 
 const Navigation = () => {
   const router = useRouter();
@@ -59,6 +60,7 @@ const Navigation = () => {
       <div className={styles.nav_mobile}>
         <MobileNav isOpened={isOpened} setIsOpened={setIsOpened} />
       </div>
+      <ChatButton />
     </>
   );
 };
