@@ -13,7 +13,7 @@ See [detailed docs](/kit-docs) for extended examples and walk-throughs.
 ### Declare your schema
 
 ```typescript copy filename="src/schema.ts"
-import { index, integer, mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
+import { index, int, mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
   id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
