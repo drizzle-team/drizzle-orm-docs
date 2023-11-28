@@ -30,6 +30,9 @@ const inkeepChatButtonProps: InkeepChatButtonProps = {
   modalSettings: {
     areOpenHotKeysDisabled: true,
   },
+  aiChatSettings: {
+    botAvatarSrcUrl: '/svg/drizzle.svg',
+  },
 };
 
 const ChatButton = () => <InkeepChatButton {...inkeepChatButtonProps} />;
