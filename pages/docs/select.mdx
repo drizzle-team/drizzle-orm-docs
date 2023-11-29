@@ -427,6 +427,184 @@ select "age", cast(count("id") as int)
 Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
 </Callout>
 
+## Aggregations helpers
+
+Drizzle has a set of wrapped `sql` functions, so you don't need to write
+`sql` templates for common cases in your app
+
+<Callout type="info">
+ Remember, aggregation functions are often used with the GROUP BY clause of the SELECT statement. 
+ So if you are selecting using aggregating functions and other columns in one query, 
+ be sure to use the `.groupBy` clause
+</Callout>
+
+
+**count**
+
+Returns the number of values in `expression`.
+<Section>
+```ts
+import { count } from 'drizzle-orm'
+
+await db.select({ value: count() }).from(users);
+await db.select({ value: count(users.id) }).from(users);
+```
+```sql
+select count("*") from "users";
+select count("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`count('*'))`.mapWith(Number) 
+}).from(users);
+
+await db.select({ 
+  value: sql`count(${users.id})`.mapWith(Number) 
+}).from(users);
+```
+</Section>
+
+**countDistinct**
+
+Returns the number of non-duplicate values in `expression`.
+<Section>
+```ts
+import { countDistinct } from 'drizzle-orm'
+
+await db.select({ value: countDistinct(users.id) }).from(users);
+```
+```sql
+select count(distinct "id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`count(${users.id})`.mapWith(Number) 
+}).from(users);
+```
+</Section>
+
+**avg**
+
+Returns the average (arithmetic mean) of all non-null values in `expression`.
+<Section>
+```ts
+import { avg } from 'drizzle-orm'
+
+await db.select({ value: avg(users.id) }).from(users);
+```
+```sql
+select avg("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`avg(${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**avgDistinct**
+
+Returns the average (arithmetic mean) of all non-null values in `expression`.
+<Section>
+```ts
+import { avgDistinct } from 'drizzle-orm'
+
+await db.select({ value: avgDistinct(users.id) }).from(users);
+```
+```sql
+select avg(distinct "id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`avg(distinct ${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**sum**
+
+Returns the sum of all non-null values in `expression`.
+<Section>
+```ts
+import { sum } from 'drizzle-orm'
+
+await db.select({ value: sum(users.id) }).from(users);
+```
+```sql
+select sum("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`sum(${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**sumDistinct**
+
+Returns the sum of all non-null and non-duplicate values in `expression`.
+<Section>
+```ts
+import { sumDistinct } from 'drizzle-orm'
+
+await db.select({ value: sumDistinct(users.id) }).from(users);
+```
+```sql
+select sum(distinct "id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`sum(distinct ${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**max**
+
+Returns the maximum value in `expression`.
+<Section>
+```ts
+import { max } from 'drizzle-orm'
+
+await db.select({ value: max(users.id) }).from(users);
+```
+```sql
+select max("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`max(${expression})`.mapWith(users.id) 
+}).from(users);
+```
+</Section>
+
+**min**
+
+Returns the minimum value in `expression`.
+<Section>
+```ts
+import { min } from 'drizzle-orm'
+
+await db.select({ value: min(users.id) }).from(users);
+```
+```sql
+select min("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`min(${users.id})`.mapWith(users.id) 
+}).from(users);
+```
+</Section>
+
 A more advanced example:
 
 ```typescript copy
