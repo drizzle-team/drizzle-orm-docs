@@ -59,13 +59,13 @@ $ drizzle-kit generate:pg --custom
 
 `drizzle-kit introspect:{dialect}` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
 
-Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are mandatory.
+Either **[`uri`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are mandatory.
 
 | param                                 | required | description                                   |
 | :-----------------------------------  | :------- | :-------------------------------------------- |
 | driver                                | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
 | **[`out`](./conf#migrations-folder)**     | no       | migrations folder, default=`./drizzle`        |
-| `connectionString`                    | no       | database connection string                    |
+| `uri`                                 | no       | database connection string                    |
 | `user`                                | no       | database user                                 |
 | `password`                            | no       | database password                             |
 | `host`                                | no       | host                                          |
@@ -102,7 +102,7 @@ export default {
   out: "./drizzle",
   driver: 'pg',
   dbCredentials: {
-    connectionString: "postgresql://postgres:password@host:port/db",
+    uri: "postgresql://postgres:password@host:port/db",
   }
 } satisfies Config;
 ```
@@ -136,7 +136,7 @@ $ drizzle-kit introspect:pg --config=custom.config.ts
 If you want to have all params as CLI options
 
 ```shell
-$ drizzle-kit introspect:pg --out=migrations/ --connectionString=postgresql://user:pass@host:port/db_name
+$ drizzle-kit introspect:pg --out=migrations/ --uri=postgresql://user:pass@host:port/db_name
 $ drizzle-kit introspect:pg --out=migrations/ --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
 ```
 
@@ -154,7 +154,7 @@ This has proven to be very useful for rapid local development(prototyping) and w
   Extended article on Turso and drizzle-kit push — **[read here.](https://driz.li/sqlite-push)**
 </Callout>
 
-Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are **required**.
+Either **[`uri`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are **required**.
 
 | param                                         | required | description                                                         |
 | :-------------------------------------------- | :------- | :------------------------------------------------------------------ |
@@ -162,7 +162,7 @@ Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:
 | driver                                        | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
 | **[`tablesFilter`](./conf#multi-project-schema)** | no       | table name filter                                                   |
 | **[`schemaFilter`](./config-reference#schemaFilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
-| `connectionString`                            | no       | database connection string                                          |
+| `uri`                                         | no       | database connection string                                          |
 | `user`                                        | no       | database user                                                       |
 | `password`                                    | no       | database password                                                   |
 | `host`                                        | no       | host                                                                |
