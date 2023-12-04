@@ -15,7 +15,12 @@ interface metaItems {
       };
 }
 
-const getContentTree = async (headings?: IHeading[]) => {
+interface Props {
+  headings?: IHeading[];
+  slug?: string;
+}
+
+const getContentTree = async (props: Props) => {
   const metaFiles: Record<string, () => Promise<{ default: any }>> =
     await import.meta.glob("../content/**/*.json");
   const mdxFiles: Record<string, () => Promise<{ default: any }>> =
@@ -67,7 +72,7 @@ const getContentTree = async (headings?: IHeading[]) => {
 
   const dialectNames = ["sqlite", "pg", "mysql"];
 
-  function buildTree(items: SidebarItem[]): TreeNode[] {
+  const buildTree = (items: SidebarItem[]): TreeNode[] => {
     const tree: TreeNode[] = [];
     for (const item of items) {
       const parts = item.path.split("/");
@@ -105,17 +110,52 @@ const getContentTree = async (headings?: IHeading[]) => {
     tree.forEach((node) => findDialects(node));
 
     return tree;
-  }
+  };
 
   const tree = buildTree(navItems);
 
   const filteredHeadings =
-    headings?.filter((heading) => heading.depth === 2 || heading.depth === 3) ??
-    [];
+    props.headings?.filter(
+      (heading) => heading.depth === 2 || heading.depth === 3,
+    ) ?? [];
+
+  const findTitleBySlug = (
+    tree: TreeNode[],
+    slug: string,
+  ): string | undefined => {
+    const traverse = (
+      node: TreeNode,
+      currentSlug: string,
+    ): string | undefined => {
+      const currentPath = currentSlug
+        ? `${currentSlug}/${node.name}`
+        : node.name;
+      if (currentPath === slug) {
+        return node.title;
+      }
+      for (const child of node.children) {
+        const result = traverse(child, currentPath);
+        if (result !== undefined) {
+          return result;
+        }
+      }
+      return undefined;
+    };
+    for (const node of tree) {
+      const result = traverse(node, "");
+      if (result !== undefined) {
+        return result;
+      }
+    }
+    return undefined;
+  };
+
+  const title = findTitleBySlug(tree, props.slug ?? "");
 
   return {
     tree,
     filteredHeadings,
+    title,
   };
 };
 

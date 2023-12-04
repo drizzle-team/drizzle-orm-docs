@@ -7,7 +7,9 @@ import getContentTree from "@/utils/getContentTree";
 const { headings } = Astro.props;
 const { slug } = Astro.params;
 const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!);
-const { tree, filteredHeadings } = await getContentTree(headings);
+const { tree, filteredHeadings } = await getContentTree({
+  headings
+});
 
 ---
 <div class="header__wrap">

@@ -113,7 +113,7 @@ const currentItem = currentItems[current as keyof typeof currentItems];
 
   window.addEventListener('click', (e) => {
     if (!(e.target as HTMLElement).className.includes('type-selector__button')) {
-      if (typeSelectorItems.classList.contains('d-flex')) {
+      if (typeSelectorItems && typeSelectorItems.classList.contains('d-flex')) {
         typeSelectorItems.classList.remove('d-flex');
       }
     }
