@@ -1,7 +1,7 @@
 const TwitterLink = () => (
   <a
     target="_blank"
-    href="https://mobile.twitter.com/DrizzleOrm"
+    href="https://mobile.twitter.com/DrizzleORM"
     className="nx-p-2 nx-text-current"
     aria-label="Drizzle twitter"
     rel="nofollow noreferrer"
