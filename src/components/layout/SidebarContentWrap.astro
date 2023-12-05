@@ -35,6 +35,10 @@ const { slug, tree, filteredHeadings } = Astro.props;
     border-left: 1px solid rgb(243, 244, 246);
   }
 
+  body[class~=banner-shown] .aside-content {
+			max-height: calc(100vh - 104px);
+		}
+
   .aside-content {
     flex-grow: 1;
     overflow-y: auto;
@@ -144,9 +148,10 @@ const { slug, tree, filteredHeadings } = Astro.props;
       display: none;
     }
 
-    .aside-content {
+    .aside-content, body[class~=banner-shown] .aside-content {
       height: inherit;
       overflow: visible;
+      max-height: inherit;
     }
   }
 </style>

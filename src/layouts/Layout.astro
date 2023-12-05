@@ -28,7 +28,7 @@ const { title } = Astro.props;
 		<meta property="og:description" content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.">
     <script type="module" src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js" defer></script>
 	</head>
-	<body>
+	<body class="banner-shown">
 		<GlobalStyles />
 		<Banner />
 		<NavigationAstro />
@@ -41,6 +41,9 @@ const { title } = Astro.props;
 		</main>
 	</body>
 	<style is:inline>
+		body[class~=banner-shown] .landing-wrap {
+			max-height: calc(100vh - 104px);
+		}
 		.landing-wrap {
 			max-height: calc(100vh - 64px);
 			width: 100%;

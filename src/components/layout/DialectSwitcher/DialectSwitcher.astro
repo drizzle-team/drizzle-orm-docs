@@ -118,7 +118,8 @@ const getLinkWithDialect = (dialect: string) => {
   }
 
   window.addEventListener('click', (e) => {
-    if (!(e.target as HTMLElement).className.includes('dialect-selector__button')) {
+    const clickedElement = e.target as HTMLElement;
+    if (!clickedElement.matches('.dialect-selector__button')) {
       if (typeSelectorItems && typeSelectorItems.classList.contains('d-flex')) {
         typeSelectorItems.classList.remove('d-flex');
       }

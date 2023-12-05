@@ -34,7 +34,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
 		<meta property="og:description" content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.">
     <script type="module" src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js" defer></script>
   </head>
-  <body>
+  <body class="banner-shown">
     <GlobalStyles />
     <MDXStyles />
     <Banner />
@@ -85,9 +85,12 @@ const { tree, filteredHeadings, title } = await getContentTree({
       margin: 0 auto;
     }
 
+    body[class~=banner-shown] .documentation-container {
+			max-height: calc(100vh - 104px);
+		}
+
     .documentation-content {
       overflow: auto;
-      height: calc(100vh - 64px);
       padding-left: 3rem;
       padding-right: 3rem;
       padding-top: 1rem;
