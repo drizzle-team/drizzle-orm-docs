@@ -77,6 +77,7 @@ import MobileNav from './MobileNav.astro';
 <div class="nav_mobile">
   <MobileNav />
 </div>
+<span class="inkeep-container" id="inkeep-container"></span>
 
 <style>
   .nav_container {
@@ -188,6 +189,13 @@ import MobileNav from './MobileNav.astro';
   transition: transform .2s cubic-bezier(.25,1,.5,1) .2s,opacity .2s .2s;
 }
 
+.inkeep-container {
+  display: block;
+  position: absolute;
+  height: 0;
+  z-index: 11;
+}
+
 @media screen and (max-width: 768px) {
   .nav_container {
     top: 0px;
@@ -242,4 +250,33 @@ import MobileNav from './MobileNav.astro';
       const theme = getColorPreference();
       setPreference(theme);
   })();
-  </script>
+</script>
+
+<script type="module" defer>
+  //@ts-ignore
+  Inkeep().embed({
+    componentType: "ChatButton",
+    targetElement: document.getElementById("inkeep-container"),
+    properties: {
+      chatButtonType: 'ICON_TEXT',
+      baseSettings: {
+        apiKey: import.meta.env.PUBLIC_INKEEP_API_KEY,
+        integrationId: import.meta.env.PUBLIC_INKEEP_INTEGRATION_ID,
+        organizationId: import.meta.env.PUBLIC_INKEEP_ORG_ID,
+        organizationDisplayName: 'Drizzle ORM',
+        primaryBrandColor: '#FFFFFF',
+        theme: {
+          colorMode: {
+            forcedColorMode: 'dark',
+          },
+        },
+      },
+      modalSettings: {
+        areOpenHotKeysDisabled: true,
+      },
+      aiChatSettings: {
+        botAvatarSrcUrl: '/svg/drizzle.svg',
+      }
+    },
+  });
+</script>
