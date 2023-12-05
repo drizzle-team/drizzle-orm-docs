@@ -12,11 +12,11 @@ import Button from '@components/markdown/Button.astro';
 
 | param                                   | required | description                                                         |
 | :-------------------------------------- | :------- | :------------------------------------------------------------------ |
-| **[`schema`](./conf#schema-file-paths)**    | yes      | path to typescript schema file or folder with multiple schema files |
-| **[`out`](./conf#migrations-folder)**       | no       | migrations folder, default=`./drizzle`                              |
+| **[`schema`](/kit-docs/conf#schema-files-paths)**    | yes      | path to typescript schema file or folder with multiple schema files |
+| **[`out`](/kit-docs/conf#migrations-folder)**       | no       | migrations folder, default=`./drizzle`                              |
 | `config`                                | no       | config file path, default=`drizzle.config.ts`                       |
 | `custom`                                | no       | generate empty SQL for custom migration                             |
-| **[`breakpoints`](./conf#sql-breakpoints)** | no       | SQL statements breakpoints, default=`true`                          |
+| **[`breakpoints`](/kit-docs/conf#sql-breakpoints)** | no       | SQL statements breakpoints, default=`true`                          |
 
 <Section>
 ```shell
@@ -61,12 +61,12 @@ $ drizzle-kit generate:pg --custom
 
 `drizzle-kit introspect:{dialect}` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
 
-Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are mandatory.
+Either **[`connectionString`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are mandatory.
 
 | param                                 | required | description                                   |
 | :-----------------------------------  | :------- | :-------------------------------------------- |
 | driver                                | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
-| **[`out`](./conf#migrations-folder)**     | no       | migrations folder, default=`./drizzle`        |
+| **[`out`](/kit-docs/conf#migrations-folder)**     | no       | migrations folder, default=`./drizzle`        |
 | `connectionString`                    | no       | database connection string                    |
 | `user`                                | no       | database user                                 |
 | `password`                            | no       | database password                             |
@@ -75,7 +75,7 @@ Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:
 | `database`                            | no       | database name                                 |
 | `config`                              | no       | config file path, default=`drizzle.config.ts` |
 | `introspect-casing`                   | no       | strategy for JS keys creation in columns, tables, etc. (`preserve`, `camel`) |
-| **[`schemaFilter`](./config-reference#schemaFilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
+| **[`schemaFilter`](/kit-docs/config-reference#schemaFilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
 
 
 <Section>
@@ -156,14 +156,14 @@ This has proven to be very useful for rapid local development(prototyping) and w
   Extended article on Turso and drizzle-kit push — **[read here.](https://driz.li/sqlite-push)**
 </Callout>
 
-Either **[`connectionString`](./conf#push-and-pull)** or **[`user:password@host:port/db`](./conf#push-and-pull)** params are **required**.
+Either **[`connectionString`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are **required**.
 
 | param                                         | required | description                                                         |
 | :-------------------------------------------- | :------- | :------------------------------------------------------------------ |
-| **[`schema`](./conf#schema-file-paths)**          | yes      | path to typescript schema file or folder with multiple schema files |
+| **[`schema`](/kit-docs/conf#schema-files-paths)**          | yes      | path to typescript schema file or folder with multiple schema files |
 | driver                                        | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
-| **[`tablesFilter`](./conf#multi-project-schema)** | no       | table name filter                                                   |
-| **[`schemaFilter`](./config-reference#schemaFilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
+| **[`tablesFilter`](/kit-docs/conf#multi-project-schema)** | no       | table name filter                                                   |
+| **[`schemaFilter`](/kit-docs/config-reference#schemafilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
 | `connectionString`                            | no       | database connection string                                          |
 | `user`                                        | no       | database user                                                       |
 | `password`                                    | no       | database password                                                   |
@@ -214,7 +214,7 @@ $ drizzle-kit push:mysql --schema=src/schema.ts --host=0.0.0.0 --port=5432 --use
 
 | param                             | required | description                                   |
 | :-------------------------------- | :------- | :-------------------------------------------- |
-| **[`out`](./conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
+| **[`out`](/kit-docs/conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
 | `config`                          | no       | config file path, default=`drizzle.config.ts` |
 
 ```shell
@@ -242,7 +242,7 @@ We're rapidly evolving Drizzle Kit APIs and from time to time there's a need to 
 
 | param                             | required | description                                   |
 | :-------------------------------- | :------- | :-------------------------------------------- |
-| **[`out`](./conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
+| **[`out`](/kit-docs/conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
 | `config`                          | no       | config file path, default=`drizzle.config.ts` |
 
 <Section>
@@ -279,7 +279,7 @@ Drizzle Kit will check for all collisions and inconsistencies.
 
 | param                             | required | description                                   |
 | :-------------------------------- | :------- | :-------------------------------------------- |
-| **[`out`](./conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
+| **[`out`](/kit-docs/conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
 | `config`                          | no       | config file path, default=`drizzle.config.ts` |
 
 <Section>
