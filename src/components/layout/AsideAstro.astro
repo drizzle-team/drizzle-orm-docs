@@ -111,6 +111,7 @@ const isActive = (path: string) => {
       } 
     </div>
 <script>
+  import throttle from 'lodash.throttle';
   import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
   import updateDialectLinks from "@/utils/updateDialectLinks";
 
@@ -137,7 +138,7 @@ const isActive = (path: string) => {
   }
 
   if(container && links) {
-    container.addEventListener('scroll', updateLinks);
+    container.addEventListener('scroll', throttle(updateLinks, 80));
     updateLinks();
   }
 
