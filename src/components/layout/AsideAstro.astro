@@ -110,34 +110,36 @@ const isActive = (path: string) => {
         )
       } 
     </div>
-<script>import updateDialectLinks from "@/utils/updateDialectLinks";
+<script>
+  import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
+  import updateDialectLinks from "@/utils/updateDialectLinks";
 
-const allHeadingTocElements = document.querySelectorAll('[data-slug]');
-const headingElements = document.querySelectorAll("h2, h3");
+  const container = document.querySelector(".documentation-content")!;
+  const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
+  const links = document.querySelectorAll<HTMLElement>('[data-slug]');
 
-  const activeAnchors: {
-    [key: string]: boolean;
-  } = {}
-
-  const handleObserver = (entries: IntersectionObserverEntry[]) => {
-    entries.forEach(entry => {
-      const { isIntersecting } = entry;
-      activeAnchors[entry.target.id] = isIntersecting;
+  const updateLinks = () => {
+    const activeAnchors = handleAnchorHighlighting({
+      viewportHeight: window.innerHeight,
+      anchors: [...anchors].map((anchor) => ({
+        id: anchor.id,
+        offsetTop: anchor.offsetTop,
+      })),
+      scrollTop: container.scrollTop,
     });
-    allHeadingTocElements.forEach((elem) => {
-      const slug = (elem as HTMLAnchorElement).dataset.slug;
+
+    links.forEach((link) => {
+      const slug = link.dataset.slug;
       if(!slug) return;
-      elem.classList.toggle("nav-toc-item--active", activeAnchors[slug]);
-      elem.classList.toggle("nav-toc-item", !activeAnchors[slug]);
+      link.classList.toggle("nav-toc-item--active", activeAnchors.includes(slug));
+      link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
     });
   }
 
-  const observer = new IntersectionObserver(handleObserver, {
-    rootMargin: "0px 0px",
-    threshold: [0, 1],
-  });
-
-  headingElements.forEach((elem) => observer.observe(elem));
+  if(container && links) {
+    container.addEventListener('scroll', updateLinks);
+    updateLinks();
+  }
 
   updateDialectLinks();
 
