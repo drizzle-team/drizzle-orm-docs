@@ -12,7 +12,7 @@ export const dialects: ICards = {
       fill: "#f0f0f0",
     },
     description: "Fastest full featured PostgreSQL client for Node.js and Deno",
-    href: "./mysql",
+    href: "/mysql",
   },
   sqlite: {
     title: "SQLite",
@@ -24,7 +24,7 @@ export const dialects: ICards = {
       width: 24,
     },
     description: "Collection of nodejs modules to interact with PostgreSQL",
-    href: "./sqlite",
+    href: "/sqlite",
   },
   pg: {
     title: "PostgreSQL",
@@ -36,6 +36,6 @@ export const dialects: ICards = {
       width: 24,
     },
     description: "Serverless multi-cloud fully managed Postgres",
-    href: "./pg",
+    href: "/pg",
   },
 };

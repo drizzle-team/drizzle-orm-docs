@@ -18,6 +18,12 @@ const current = Object.keys(dialects).find((key) => {
   return item === slugDialect;
 });
 const currentItem = dialects[current as keyof typeof dialects];
+
+const getLinkWithDialect = (dialect: string) => {
+  const slugDialect = slug.split('/').at(-1);
+  const slugWithoutDialect = slug.replace(`/${slugDialect}`, '');
+  return `/${slugWithoutDialect}${dialect}`;
+};
 ---
 <div class="dialect-selector">
   <div data-dialect-selector-btn class="dialect-selector__button" data-dialect={current}>
@@ -25,7 +31,7 @@ const currentItem = dialects[current as keyof typeof dialects];
   </div>
   <div id="dialect-selector" class="dialect-selector__items">
     {Object.keys(dialects).map((name) => 
-    (<a class="dialect-link" href={dialects[name].href}>
+    (<a class="dialect-link" href={getLinkWithDialect(dialects[name].href)}>
       <DialectSwitcherItem card={dialects[name]}  svgs={svgs}/>
       </a>)
     )}
