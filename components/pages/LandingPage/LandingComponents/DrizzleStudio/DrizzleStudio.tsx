@@ -31,7 +31,7 @@ const DrizzleStudio = () => {
         <a className={styles.button} href="/drizzle-studio/overview">
           Documentation
         </a>
-        <a className={styles.button_accent} href="https://demo.drizzle.team/">
+        <a className={styles.button_accent} href="https://demo.drizzle.studio/">
           Live demo
         </a>
       </div>

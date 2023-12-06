@@ -1,11 +1,6 @@
-import { Callout } from "nextra-theme-docs";
+import { Callout, Tab, Tabs } from "nextra-theme-docs";
 
 # Batch API
-
-<Callout>
-	Note: The Batch API is only supported in the **[`libsql`](./installation-and-db-connection/sqlite/turso)**
-	driver and will soon be supported in **[`D1`](./docs/installation-and-db-connection/sqlite/d1)**
-</Callout>
 
 **LibSQL Batch API explanation**:
 _[source](https://docs.turso.tech/reference/client-access#batches)_
@@ -35,6 +30,8 @@ const batchResponse: BatchResponse = await db.batch([
 ]);
 ```
 Type for `batchResponse` in this example would be:
+<Tabs items={["libSQL", "D1"]}>
+<Tab>
 ```ts
 type BatchResponse = [
 	{
@@ -59,6 +56,35 @@ type BatchResponse = [
 	}[],
 ]
 ```
+</Tab>
+<Tab>
+```ts
+type BatchResponse = [
+  {
+    id: number;
+  }[],
+  D1Result,
+  {
+    id: number;
+    name: string;
+    verified: number;
+    invitedBy: number | null;
+  }[],
+  {
+    id: number;
+    name: string;
+    verified: number;
+    invitedBy: number | null;
+  }[],
+  {
+    id: number;
+    invitedBy: number | null;
+  }[],
+];
+```
+</Tab>
+</Tabs>
+
 All possible builders that can be used inside `db.batch`:
 ```ts
 db.all(),

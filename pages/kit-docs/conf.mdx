@@ -193,8 +193,6 @@ We mirror connection params of database drivers.
 <Tab>
 ```ts {6}
 import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 export default {
   schema: "./src/schema/*",
@@ -259,7 +257,7 @@ export default {
   out: "./drizzle",
   driver: "mysql2",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL,
+    uri: process.env.DATABASE_URL,
   }
   tablesFilter: ["project1_*"],
 } satisfies Config;

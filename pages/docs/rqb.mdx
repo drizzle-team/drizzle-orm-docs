@@ -132,10 +132,7 @@ export const users = pgTable('users', {
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
-	profileInfo: one(profileInfo, {
-		fields: [users.id],
-		references: [profileInfo.userId],
-	}),
+	profileInfo: one(profileInfo),
 }));
 
 export const profileInfo = pgTable('profile_info', {
@@ -526,7 +523,7 @@ const post = await db.query.posts.findFirst({
 ```
 
 You can chain nested with statements as much as necessary.  
-For any nested `with` queries Drizzle will infer types using [Core Type API](./goodies#type-api).
+For any nested `with` queries Drizzle will infer types using [Core Type API](/docs/goodies#type-api).
   
 **Get all users with posts. Each post should contain a list of comments:**
 ```typescript copy
@@ -636,7 +633,7 @@ const posts = await db.query.posts.findMany({
 });
 ```
 
-### Select filters
+### Where | Filters
 Just like in our SQL-like query builder, 
 relational queries API lets you define filters and conditions with the list of our **[`operators`](/docs/operators)**.  
 

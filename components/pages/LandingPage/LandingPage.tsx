@@ -12,14 +12,18 @@ import Pricing from './LandingComponents/Pricing/Pricing';
 import PricingTag from './LandingComponents/Pricing/PricingTag';
 import DrizzleStudio from './LandingComponents/DrizzleStudio/DrizzleStudio';
 import SponsorsLine from './LandingComponents/SponsorsLine/SponsorsLine';
+import Benchmark from './LandingComponents/Benchmark/Benchmark';
+import BenchmarkAnchor from './LandingComponents/Benchmark/BenchmarkAnchor';
 
 const LandingPage = () => {
   const runtimes: string[] = ['Cloudflare Workers', 'Supabase functions', 'Vercel functions', 'Deno deploy', 'Bun', 'Lagon', 'Fly.io', 'ElectronJS', 'Browser'];
-  const databases: string[] = ['Neon', 'PlanetScale', 'Vercel Postgres', 'Turso', 'Supabase', 'Xata', 'PostgreSQL', 'MySQL', 'LiteFS', 'SQLite', 'Web SQLite'];
+  const databases: string[] = ['PlanetScale', 'Neon', 'Vercel Postgres', 'Turso', 'Supabase', 'Xata', 'PostgreSQL', 'MySQL', 'LiteFS', 'SQLite', 'Web SQLite'];
   return (
     <div className={styles.wrap}>
       <Header />
       <Advantages />
+      <BenchmarkAnchor />
+      <Benchmark />
       <Supporting rowsNum={4} imageType="liveontheedge" title="Live on the edge" description="We support every major serverful and serverless runtime" items={runtimes} data={Runtimes} />
       <Supporting rowsNum={3} imageType="connecteverywhere" title="Connect to any database" description="We support all platform-specific, tcp, http and websocket based drivers" items={databases} data={Databases} />
       <DrizzleStudio />
