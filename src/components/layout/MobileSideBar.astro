@@ -35,7 +35,7 @@ interface Props {
   }
 
   for(const meta in metaFiles) {
-    const {default: parsed} = await metaFiles[meta]();
+    const {default: parsed} = await metaFiles[meta]() as any;
     const metaSlug = meta.match(regex);
     if(metaSlug) {
       const extractedText = metaSlug[1];
