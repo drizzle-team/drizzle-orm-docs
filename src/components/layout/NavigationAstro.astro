@@ -104,36 +104,10 @@ const setPreference = (themeName) => {
     themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
   );
   updateIcon();
-  const properties = {
-    stylesheetUrls: ["/inkeep-styles.css"],
-    chatButtonType: "ICON_TEXT",
-    isPositionFixed: false,
-    baseSettings: {
-      apiKey: "4f4da4a5733032ef8ff23e3b7906954877fd0ee54d58d1e0",
-      integrationId: "clpbm8p9y002ns601vbbswj5i",
-      organizationId: "clog94xy50001s601yapu7swn",
-      organizationDisplayName: "Drizzle ORM",
-      theme: {
-        colorMode: {
-          forcedColorMode: "dark",
-        },
-      },
-    },
-    modalSettings: {
-      areOpenHotKeysDisabled: true,
-    },
-    aiChatSettings: {
-      botAvatarSrcUrl: "/svg/drizzle-dark.svg",
-      botAvatarDarkSrcUrl: "/svg/drizzle.svg",
-    },
-  };
   if (window.inkeepWidget) {
     window.inkeepWidget.render({
-      ...properties,
       baseSettings: {
-        ...properties.baseSettings,
         theme: {
-          ...properties.baseSettings.theme,
           colorMode: {
             forcedColorMode: themeName,
           },
