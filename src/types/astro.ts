@@ -10,3 +10,11 @@ export interface TreeNode {
   title: string;
   children: TreeNode[];
 }
+
+declare global {
+  interface Window {
+    inkeepWidget: {
+      render: () => void;
+    };
+  }
+}

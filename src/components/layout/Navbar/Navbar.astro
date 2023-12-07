@@ -1,10 +1,8 @@
 ---
-import Logo from './Logo.astro';
-import NavItem from './NavItem.astro';
-import SearchBar from './SearchBar.astro';
-import Socials from './Socials.astro';
-import MobileNav from './MobileNav.astro';
-import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
+import ThemeSelector from '../ThemeSelector/ThemeSelector.astro';
+import Logo from '../Logo.astro';
+import MobileNav from '../MobileNav.astro';
+import CenteredSearchWithAI from '../CenteredSearchWithAI.astro';
 ---
 <div id="nav_container" class="nav_container">
   <div class="nav_container_blur" />
@@ -15,23 +13,9 @@ import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
         </div>
       </a>
       <div class="nav_desktop">
-        <NavItem
-          value="Pricing"
-          href="/#pricing"
-          activeKeywords={["/#pricing"]}
-        />
-        <NavItem
-          value="Studio"
-          href="/drizzle-studio/overview"
-          activeKeywords={["/drizzle-studio"]}
-        />
-        <NavItem
-          value="Documentation"
-          href="/docs/overview"
-          activeKeywords={["/kit-docs", "/docs"]}
-        />
-        <SearchBar />
-        <Socials />
+        <CenteredSearchWithAI />
+      </div>
+      <div class="nav_theme-wrap">
         <ThemeSelector />
       </div>
       <div class="nav_mobile">
@@ -106,10 +90,18 @@ import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
   height: 64px;
   max-width: 1440px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 8px;
   padding-left: max(env(safe-area-inset-left),24px);
   padding-right: max(env(safe-area-inset-right),24px);
+}
+
+.nav_theme-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  max-width: 137px;
+  width: 100%;
 }
 
 .nav_logo {
@@ -118,7 +110,6 @@ import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
   border-radius: 4px;
   display: flex;
   align-items: center;
-  margin-right: auto;
 }
 
 .nav_logo:hover {
@@ -185,6 +176,13 @@ import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
   transition: transform .2s cubic-bezier(.25,1,.5,1) .2s,opacity .2s .2s;
 }
 
+.inkeep-container {
+  display: block;
+  position: absolute;
+  height: 0;
+  z-index: 11;
+}
+
 @media screen and (max-width: 768px) {
   .nav_container {
     top: 0px;
@@ -198,6 +196,23 @@ import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
   .nav_mobile {
     display: contents;
   }
+
+  .nav_theme-wrap {
+    margin-left: auto;
+  }
 }
 </style>
+<script is:inline>
+  const burgerBtn = document.querySelector('[data-nav-burger-btn]');
+  const navContainer = document.getElementById('nav_container');
+  const navMobile = document.getElementById('nav_mobile');
+
+  if(burgerBtn && navContainer && navMobile) {
+    burgerBtn.addEventListener('click', () => {
+      navContainer.classList.toggle('nav_container_open');
+      navMobile.classList.toggle('invisible');
+      document.body.style.overflow = navContainer.classList.contains('nav_container_open') ? 'hidden' : 'auto';
+    })
+  }
+</script>
 <script is:inline src="/theme-selector.js"></script>

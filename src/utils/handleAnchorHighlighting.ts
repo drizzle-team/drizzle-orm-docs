@@ -40,7 +40,7 @@ const handleAnchorHighlighting = (props: Props) => {
   }
 
   if (!closestAnchor) {
-    activeAnchors.push(anchors[anchors.length - 1].id);
+    activeAnchors.push(anchors[anchors.length - 1]?.id);
   }
 
   return activeAnchors;

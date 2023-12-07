@@ -1,13 +1,16 @@
-<!-- <template id="banner-template"> -->
-  <div id="banner" class="banner">
-    <div class="banner__content">
-      <a href="https://driz.li/wdmm" target="_blank" rel="nofollow noreferrer">🎉 Drizzle is giving away 1000$ for your HEX colors! Read more →</a>
-    </div>
+<div id="banner" class="banner">
+  <div class="banner__content">
+    <a href="https://driz.li/wdmm" target="_blank" rel="nofollow noreferrer">🎉 Drizzle is giving away 1000$ for your HEX colors! Read more →</a>
   </div>
-  </div>
-<!-- </template> -->
+</div>  
 
 <style is:inline>
+  html[class~=dark] .banner {
+    border-bottom: 1px solid rgb(48, 48, 48);
+    background-color: #121212;
+    color: #ffffff;
+  }
+
   .banner {
     position: relative;
     top: 0;
@@ -15,11 +18,11 @@
     display: flex;
     height: 40px;
     align-items: center;
-    background-color: rgba(23,23,23,1);
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #efefef;
     padding-right: 8px;
     padding-left: 8px;
-    background-image: linear-gradient(1deg,#383838,#212121);
-    color: rgba(255,255,255,1);
+    color: #000000;
   }
   .banner__content {
     width: 100%;
@@ -32,23 +35,6 @@
     font-size: .875rem;
     font-weight: 500;
   }
-  .banner__button {
-    cursor: pointer;
-    outline-offset: 2px;
-    outline: 2px solid transparent;
-    -webkit-appearance: button;
-    background-color: transparent;
-    background-image: none;
-    height: 2rem;
-    width: 2rem;
-    opacity: .8;
-  }
-  .banner__button svg {
-    margin-left: auto;
-    margin-right: auto;
-    height: 1rem;
-    width: 1rem;
-  }
 
   @media screen and (max-width:768px) {
     .banner {
@@ -56,33 +42,3 @@
     }
   }
 </style>
-<script>
-  const removeBanner = () => {
-    const banner = document.getElementById('banner');
-    const bannerTemplate = document.getElementById('banner-template') as HTMLTemplateElement;
-    if(banner && bannerTemplate) {
-      banner.remove();
-      document.body.classList.remove('banner-shown');
-      localStorage.setItem('banner-hidden', 'true');
-    }
-  }
-
-
-  const addBannerToBody = () => {
-    const bannerTemplate = document.getElementById('banner-template') as HTMLTemplateElement;
-    if(!bannerTemplate) return;
-    document.body.insertBefore(bannerTemplate.content.cloneNode(true), document.body.firstChild);
-    document.body.classList.add('banner-shown');
-    const banner = document.querySelector('[data-close-banner]');
-    if(banner) {
-      banner.addEventListener('click', removeBanner);
-    }
-  }
-
-  const isBunnerHidden = localStorage.getItem('banner-hidden');
-  if (!isBunnerHidden) {
-    // addBannerToBody();
-  } else {
-    // removeBanner();
-  }
-</script>

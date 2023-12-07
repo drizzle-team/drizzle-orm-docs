@@ -2,12 +2,12 @@
 import EndOfContent from '@components/layout/EndOfContent.astro';
 import GlobalStyles from '@components/layout/GlobalStyles.astro';
 import MDXStyles from '@components/layout/MDXStyles.astro';
-import NavigationAstro from '@components/layout/NavigationAstro.astro';
 import type { IHeading } from '../types/astro';
 import Banner from '@components/layout/Banner.astro';
 import SidebarWrap from '@components/layout/SidebarWrap.astro';
 import Footer from '@components/layout/Footer.astro';
 import getContentTree from '@/utils/getContentTree';
+import Navbar from '@components/layout/Navbar/Navbar.astro';
 
 interface Props {
   title: string;
@@ -32,13 +32,16 @@ const { tree, filteredHeadings, title } = await getContentTree({
     <meta name="description" content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.">
 		<meta property="og:title" content="Drizzle ORM - next gen TypeScript ORM">
 		<meta property="og:description" content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.">
-    <script type="module" src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js" defer></script>
+		<link rel="preconnect" href="https://MXZNUT59HV-dsn.algolia.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
+    <script is:inline src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+    <script is:inline type="module" src="https://unpkg.com/@inkeep/widgets-embed@0.2.238/dist/embed.js"></script>
   </head>
   <body class="banner-shown">
     <GlobalStyles />
     <MDXStyles />
     <Banner />
-    <NavigationAstro />
+    <Navbar />
     <main class="documentation-container">
       <SidebarWrap filteredHeadings={filteredHeadings} tree={tree}/> 
       <div class="documentation-content scrollbar">
@@ -94,7 +97,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
       padding-left: 3rem;
       padding-right: 3rem;
       padding-top: 1rem;
-      max-width: 928px;
+      max-width: 816px;
       width: 100%;
     }
 
