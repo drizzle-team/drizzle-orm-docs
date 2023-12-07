@@ -13,6 +13,7 @@ import {
 export default defineConfig({
   prefetch: {
     prefetchAll: true,
+    defaultStrategy: "viewport",
   },
   integrations: [
     AutoImport({
