@@ -23,7 +23,7 @@ export const sponsorsData: ISponsor[] = [
         'url("/svg/turso-light.svg") 0% 0% / cover no-repeat content-box',
     },
     darkStyle: {
-      filter: "grayscale(1) brightness(0.5)",
+      filter: "grayscale(1) brightness(0.35)",
       padding: "4px",
       background: 'url("/svg/turso.svg") 0% 0% / cover no-repeat content-box',
     },
@@ -44,7 +44,7 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      filter: "brightness(0.4)",
+      filter: "brightness(0.3)",
       background:
         'url("/svg/payload-dark.svg") 0% 0% / cover no-repeat content-box',
     },
@@ -91,7 +91,7 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      filter: "brightness(0.4) grayscale(1)",
+      filter: "brightness(0.3) grayscale(1)",
       background:
         'url("/svg/neon-dark.svg") 0% 0% / cover no-repeat content-box',
       padding: "6px",
