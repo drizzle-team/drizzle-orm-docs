@@ -38,24 +38,6 @@ const { tree, filteredHeadings, title } = await getContentTree({
     <link rel="stylesheet" href="/preferred.css" />
     <script is:inline src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
     <script is:inline type="module" src="https://unpkg.com/@inkeep/widgets-embed@0.2.238/dist/embed.js"></script>
-    <script is:inline>
-      const getColorPreference = () => {
-        let preference = localStorage.getItem("theme");
-        if (preference === "system") {
-          return preference;
-        }
-        if (!preference) {
-          preference = window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-        }
-        return preference;
-      };
-			const theme = getColorPreference();
-			document.documentElement.setAttribute("data-theme", theme);
-      document.documentElement.classList.toggle("dark", theme === "dark");
-  		document.documentElement.classList.toggle("light", theme !== "dark");
-    </script>
   </head>
   <body class="banner-shown">
     <GlobalStyles />

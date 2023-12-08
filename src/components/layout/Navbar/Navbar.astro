@@ -93,6 +93,21 @@ const lightIconTemplate = document.querySelector("#theme-light-icon");
 const darkIconTemplate = document.querySelector("#theme-dark-icon");
 const themeSelect = document.getElementById('theme__select');
 
+const getColorPreference = () => {
+  let preference = localStorage.getItem("theme");
+  if (preference === "system") {
+    return preference;
+  }
+
+  if (!preference) {
+    preference = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return preference;
+};
+
+const theme = getColorPreference();
 setPreference(theme);
 
 function updateIcon () {

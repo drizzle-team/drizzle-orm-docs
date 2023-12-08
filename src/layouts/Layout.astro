@@ -54,25 +54,6 @@ const { title } = Astro.props;
       href="https://MXZNUT59HV-dsn.algolia.net"
       crossorigin
     />
-    <script is:inline>
-      const getColorPreference = () => {
-        let preference = localStorage.getItem("theme");
-        if (preference === "system") {
-          return preference;
-        }
-
-        if (!preference) {
-          preference = window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-        }
-        return preference;
-      };
-			const theme = getColorPreference();
-			document.documentElement.setAttribute("data-theme", theme);
-			document.documentElement.classList.toggle("dark", theme === "dark");
-  		document.documentElement.classList.toggle("light", theme !== "dark");
-    </script>
   </head>
   <body class="banner-shown">
     <GlobalStyles />
