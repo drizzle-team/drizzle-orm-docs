@@ -35,6 +35,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
 		<meta property="og:description" content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.">
 		<link rel="preconnect" href="https://MXZNUT59HV-dsn.algolia.net" crossorigin />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
+    <link rel="stylesheet" href="/preferred.css" />
     <script is:inline src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
     <script is:inline type="module" src="https://unpkg.com/@inkeep/widgets-embed@0.2.238/dist/embed.js"></script>
     <script is:inline>
@@ -43,7 +44,6 @@ const { tree, filteredHeadings, title } = await getContentTree({
         if (preference === "system") {
           return preference;
         }
-
         if (!preference) {
           preference = window.matchMedia("(prefers-color-scheme: dark)").matches
             ? "dark"
