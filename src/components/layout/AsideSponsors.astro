@@ -7,9 +7,6 @@ const getStyleString = (style: CSSProperties) => {
     return acc + `${key}: ${style[key as keyof CSSProperties]};`;
   }, "");
 };
-const getImgLink = (link: string) => {
-  return link.split("?")[0] + "?size=" + 72 * 2;
-};
 
 const slicedSponsors = [];
 
@@ -19,6 +16,23 @@ for (let i = 0; i < s.length; i += 2) {
 }
 ---
 
+<div class="aside-sponsors__header">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    ><path
+      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+    ></path></svg
+  >
+  our gold sponsors
+</div>
 <div class="aside-sponsors__wrap">
   {
     slicedSponsors.map((slice) => (
@@ -61,7 +75,31 @@ for (let i = 0; i < s.length; i += 2) {
   }
 </div>
 
-<style is:global>
+<style>
+  html.dark .aside-sponsors__header {
+    color: #a8a8a8;
+  }
+
+  .aside-sponsors__header {
+    align-items: center;
+    border-radius: 2px;
+    display: flex;
+    margin-right: auto;
+    margin-bottom: 4px;
+    font-size: 10px;
+    gap: 4px;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .aside-sponsors__header svg {
+    fill: #fd7776;
+    color: #fd7776;
+    height: 10px;
+    width: 10px;
+  }
+
+
   html.dark .aside-sponsors__dark-img {
     display: block;
   }
@@ -84,6 +122,7 @@ for (let i = 0; i < s.length; i += 2) {
     flex-direction: column;
     gap: 4px;
     user-select: none;
+    min-width: 210px;
   }
 
   .aside-sponsors__row {
@@ -133,7 +172,7 @@ for (let i = 0; i < s.length; i += 2) {
   }
 
   html.dark .aside-sponsors__sponsor {
-    background-color: #1C1C1C;
+    background-color: #1c1c1c;
   }
 
   .aside-sponsors__sponsor:hover {
@@ -149,7 +188,12 @@ for (let i = 0; i < s.length; i += 2) {
     transition: background-color 0.2s;
   }
 
-  .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image .aside-sponsors__light-img,   .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image .aside-sponsors__dark-img {
+  .aside-sponsors__sponsor:hover
+    .aside-sponsors__sponsor-image
+    .aside-sponsors__light-img,
+  .aside-sponsors__sponsor:hover
+    .aside-sponsors__sponsor-image
+    .aside-sponsors__dark-img {
     filter: none !important;
   }
 
