@@ -83,6 +83,7 @@ for (let i = 0; i < s.length; i += 2) {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    user-select: none;
   }
 
   .aside-sponsors__row {
@@ -91,35 +92,34 @@ for (let i = 0; i < s.length; i += 2) {
   }
 
   .aside-sponsors__row:first-child > .aside-sponsors__sponsor:only-child {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
   }
 
   .aside-sponsors__row:first-child > .aside-sponsors__sponsor:first-child {
-    border-top-left-radius: 12px;
+    border-top-left-radius: 4px;
   }
   .aside-sponsors__row:first-child > .aside-sponsors__sponsor:last-child {
-    border-top-right-radius: 12px;
+    border-top-right-radius: 4px;
   }
 
   .aside-sponsors__row:last-child > .aside-sponsors__sponsor:only-child {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
 
   .aside-sponsors__row:last-child > .aside-sponsors__sponsor:first-child {
-    border-bottom-left-radius: 12px;
+    border-bottom-left-radius: 4px;
   }
   .aside-sponsors__row:last-child > .aside-sponsors__sponsor:last-child {
-    border-bottom-right-radius: 12px;
+    border-bottom-right-radius: 4px;
   }
 
   .aside-sponsors__row > .aside-sponsors__sponsor {
-    height: 64px;
+    height: 72px;
   }
 
   .aside-sponsors__row > .aside-sponsors__sponsor:only-child {
-    height: 72px;
   }
 
   .aside-sponsors__row
@@ -149,12 +149,11 @@ for (let i = 0; i < s.length; i += 2) {
     transition: background-color 0.2s;
   }
 
-  .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image {
-    filter: grayscale(0);
+  .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image .aside-sponsors__light-img,   .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image .aside-sponsors__dark-img {
+    filter: none !important;
   }
 
   .aside-sponsors__sponsor-image {
-    filter: grayscale(1);
     transition: filter 0.2s;
     display: flex;
     align-items: center;
@@ -165,5 +164,6 @@ for (let i = 0; i < s.length; i += 2) {
 
   .aside-sponsors__sponsor-image img {
     width: 100%;
+    transition: filter 0.2s;
   }
 </style>

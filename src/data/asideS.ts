@@ -11,13 +11,21 @@ export const sponsorsData: ISponsor[] = [
       login: "driz.link/turso",
       name: "Turso",
       avatarUrl:
-        '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M34.2734 6.00408L33.5708 5.4785L32.1823 6.96493L31.0691 5.35689L30.4286 5.65094L31.3098 7.89882L30.9018 8.33563L27.7391 5L27.0222 5.35519L29.8348 11.4003L27.1994 12.3268H27.1366L25.7079 10.6278L24.2781 12.3282H15.9952L14.5653 10.6278L13.1326 12.3317H13.0883L10.4384 11.4001L13.2512 5.35519L12.5343 5L9.37147 8.33554L8.96345 7.89874L9.84473 5.65086L9.20435 5.35681L8.09111 6.96484L6.70257 5.4785L6 6.00408L8.16164 9.6115L7.04918 10.7847L7.43812 13.754L10.0146 14.738L10.0095 16.0219H7.56972V16.576L8.51412 17.9232L10.0095 18.4645V27.179L13.8316 32.8674L14.7075 35L16.0841 32.9925L17.5108 35L18.76 32.9925L20.1366 35L21.5132 32.9925L22.7624 35L24.1891 32.9925L25.5656 35L26.4416 32.8674L30.2637 27.179V18.4645L31.759 17.9232L32.7034 16.576V16.0219H30.2637L30.2674 14.7347L32.8351 13.754L33.224 10.7848L32.1115 9.61158L34.2734 6.00408ZM23.1118 29.401H15.1782L16.1699 27.3822L17.1616 29.401L18.1532 28.048L19.1449 29.401L20.1366 28.0479L21.1283 29.401L22.12 28.048L23.1118 29.401L24.1034 27.3822L25.0951 29.401H23.1118ZM27.9686 20.1632L23.8433 21.5192L23.6656 25.3456L20.1322 26.1286L16.5989 25.3456L16.4212 21.5192L12.2958 20.1632V18.1206L17.6289 19.6318L17.5639 24.7906H22.7005L22.6355 19.6318L27.9686 18.1206V20.1632Z" fill="#88FFE4"/></svg>',
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
     createdAt: "2023-12-21T15:51:27Z",
     isActive: false,
     imageType: ImageType.SVG,
     lightStyle: {
-      filter: "brightness(0.3)",
+      filter: "grayscale(1) invert(0.5)",
+      padding: "4px",
+      background:
+        'url("/svg/turso-light.svg") 0% 0% / cover no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "grayscale(1) brightness(0.5)",
+      padding: "4px",
+      background: 'url("/svg/turso.svg") 0% 0% / cover no-repeat content-box',
     },
   },
   {
@@ -30,13 +38,19 @@ export const sponsorsData: ISponsor[] = [
       login: "driz.link/payload",
       name: "Payload",
       avatarUrl:
-        '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5293 4L26 10.901V23.9978L17.3608 29V15.9032L5.88452 9.00777L14.5293 4Z" fill="black"/><path d="M13.6559 28.2727V18.0518L5 23.0651L13.6559 28.2727Z" fill="black"/></svg>',
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
     createdAt: "2023-06-11T13:32:16Z",
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      filter: "invert(1)",
+      filter: "brightness(0.4)",
+      background:
+        'url("/svg/payload-dark.svg") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      filter: "invert(0.5)",
+      background: 'url("/svg/payload.svg") 0% 0% / cover no-repeat content-box',
     },
   },
   {
@@ -54,6 +68,12 @@ export const sponsorsData: ISponsor[] = [
     createdAt: "2023-06-11T13:32:16Z",
     isActive: true,
     imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "brightness(0.5) grayscale(1)",
+    },
+    lightStyle: {
+      filter: "grayscale(1)",
+    },
   },
   {
     tier: {
@@ -71,14 +91,16 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
+      filter: "brightness(0.4) grayscale(1)",
       background:
         'url("/svg/neon-dark.svg") 0% 0% / cover no-repeat content-box',
-      padding: "5px",
+      padding: "6px",
     },
     lightStyle: {
+      filter: "brightness(0.7) grayscale(1)",
       background:
         'url("/svg/neon-light.svg") 0% 0% / cover no-repeat content-box',
-      padding: "5px",
+      padding: "6px",
     },
   },
 ];
