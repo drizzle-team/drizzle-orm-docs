@@ -97,11 +97,18 @@ const { tree, filteredHeadings, title } = await getContentTree({
 
     .documentation-content {
       overflow: auto;
-      padding-left: 3rem;
-      padding-right: 3rem;
+      padding-left: 48px;
+      padding-right: 40px;
       padding-top: 1rem;
       max-width: 816px;
       width: 100%;
+    }
+
+    @media screen and (max-width: 1279px) {
+      .documentation-content {
+        padding-left: 24px;
+        padding-right: 18px;
+      }
     }
 
 
