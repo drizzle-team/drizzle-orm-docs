@@ -1,0 +1,37 @@
+---
+import AsideSponsors from "./AsideSponsors.astro";
+import CarbonCard from "./CarbonCard.astro";
+---
+
+<div class="aside-right">
+  <div class="aside-right__content">
+    <AsideSponsors />
+  </div>
+  <CarbonCard />
+</div>
+<style>
+  .aside-right {
+    flex: 1;
+    padding: 22px 24px;
+    width: 100%;
+    display: flex;
+    max-width: 369px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .aside-right__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  @media screen and (max-width: 1279px) {
+    .aside-right {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,56 @@
+---
+interface YoutubeCard {
+  title: string;
+  description: string;
+  videoId: string;
+}
+
+interface Props {
+  cards: YoutubeCard[];
+}
+
+const { cards } = Astro.props;
+const getPreviewImage = (videoId: string) =>
+  `https://i3.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+const getYoutubeLink = (videoId: string) =>
+  `https://www.youtube.com/watch?v=${videoId}`;
+---
+
+<div class="youtube-cards__wrap">
+  {
+    cards.map((card) => (
+      <div>
+        <a
+          href={getYoutubeLink(card.videoId)}
+          target="_blank"
+          rel="nofollow noreferrer"
+        >
+          <img src={getPreviewImage(card.videoId)} alt={card.title} />
+          <h3>{card.title}</h3>
+          <p>{card.description}</p>
+        </a>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .youtube-cards__wrap {
+    margin-left: -15px;
+    margin-right: -15px;
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    align-items: normal;
+    justify-content: flex-start;
+    flex-flow: wrap;
+  }
+
+  .youtube-cards__card__wrap {
+
+  }
+
+  .youtube-cards__card__link {
+    
+  }
+</style>

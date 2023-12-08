@@ -8,6 +8,7 @@ import SidebarWrap from '@components/layout/SidebarWrap.astro';
 import Footer from '@components/layout/Footer.astro';
 import getContentTree from '@/utils/getContentTree';
 import Navbar from '@components/layout/Navbar/Navbar.astro';
+import RightAside from '@components/layout/RightAside.astro';
 
 interface Props {
   title: string;
@@ -49,6 +50,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
           <EndOfContent />
 		      <Footer />
       </div>
+      <RightAside />
     </main>
   </body>
 <style is:global>

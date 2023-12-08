@@ -1,0 +1,109 @@
+---
+import { type IAsideSponsor, asideSponsors } from "@/data/asideSponsors";
+---
+
+<div class="aside-sponsors__wrap">
+  {
+    asideSponsors.map((sponsorsRow) => (
+      <div class="aside-sponsors__row">
+        {sponsorsRow.map((sponsor) => (
+          <a
+            class="aside-sponsors__sponsor"
+            href={sponsor.href}
+            target="_blank"
+          >
+            <img class="aside-sponsors__sponsor-image" src={sponsor.imgSrc} alt={sponsor.name} />
+          </a>
+        ))}
+      </div>
+    ))
+  }
+</div>
+<style>
+  .aside-sponsors__wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .aside-sponsors__row {
+    display: flex;
+    gap: 4px;
+  }
+
+  .aside-sponsors__row:first-child > .aside-sponsors__sponsor:only-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  .aside-sponsors__row:first-child > .aside-sponsors__sponsor:first-child {
+    border-top-left-radius: 12px;
+  }
+  .aside-sponsors__row:first-child > .aside-sponsors__sponsor:last-child {
+    border-top-right-radius: 12px;
+  }
+
+  .aside-sponsors__row:last-child > .aside-sponsors__sponsor:only-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .aside-sponsors__row:last-child > .aside-sponsors__sponsor:first-child {
+    border-bottom-left-radius: 12px;
+  }
+  .aside-sponsors__row:last-child > .aside-sponsors__sponsor:last-child {
+    border-bottom-right-radius: 12px;
+  }
+
+  .aside-sponsors__row > .aside-sponsors__sponsor {
+    height: 64px;
+  }
+
+  .aside-sponsors__row > .aside-sponsors__sponsor:only-child {
+    height: 72px;
+  }
+
+  .aside-sponsors__row > .aside-sponsors__sponsor:only-child > .aside-sponsors__sponsor-image {
+    max-width: 124px;
+  }
+
+  html.dark .aside-sponsors__sponsor:hover {
+    background-color: #ffffff;
+  }
+
+  html.dark .aside-sponsors__sponsor {
+    background-color: #171717;
+  }
+
+  .aside-sponsors__sponsor:hover {
+    background-color: rgba(142, 150, 170, .14);
+  }
+
+  .aside-sponsors__sponsor {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: #f6f6f7;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+
+  html.dark .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image {
+    filter: grayscale(0) invert(0);
+  }
+
+  html.dark .aside-sponsors__sponsor .aside-sponsors__sponsor-image {
+    filter: grayscale(1) invert(1);
+  }
+
+  .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image {
+    filter: grayscale(0);
+  }
+
+  .aside-sponsors__sponsor-image {
+    filter: grayscale(1);
+    max-width: 64px;
+    transition: filter 0.2s;
+  }
+</style>
