@@ -1,9 +1,6 @@
----
----
-
-<div class="aside-posts__wrap">
+<a href="https://driz.link/drizzle-stories" rel="nofollow noreferrer" target="_blank" class="aside-posts__wrap">
   <div class="aside-posts__image">
-    <svg fill="#8e8e8e" viewBox="0 0 1043.63 592.71"
+    <svg fill="currentColor" viewBox="0 0 1043.63 592.71"
       ><g data-name="Layer 2"
         ><g data-name="Layer 1"
           ><path
@@ -14,8 +11,24 @@
     >
   </div>
   <div class="aside-posts__text">Drizzle Stories</div>
-</div>
+</a>
 <style>
+  html.dark .aside-posts__wrap {
+    background-color: #1c1c1c;
+  }
+
+  html.dark .aside-posts__wrap:hover {
+    background-color: #282828;
+  }
+
+  html.dark .aside-posts__wrap:hover .aside-posts__text {
+    color: #fff;
+  }
+
+  html.dark .aside-posts__wrap:hover .aside-posts__image svg {
+    color: #fff;
+  }
+
   .aside-posts__wrap {
     height: 56px;
     width: 100%;
@@ -24,6 +37,19 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .aside-posts__wrap:hover {
+    background-color: #eff0f3;
+  }
+
+  .aside-posts__wrap:hover .aside-posts__text {
+    color: #000;
+  }
+
+  .aside-posts__wrap:hover .aside-posts__image svg {
+    color: #000;
   }
 
   .aside-posts__image {
@@ -37,14 +63,22 @@
     height: 32px;
     margin: 12px 8px 12px 12px;
   }
+
+  html.dark .aside-posts__image svg {
+    color: #4d4d4d;
+  }
+
   .aside-posts__image svg {
     height: 100%;
     width: 100%;
+    color: #8e8e8e;
+    transition: color 0.2s ease-in-out;
   }
 
   .aside-posts__text {
     font-size: 14px;
     color: #909090;
     font-weight: 600;
+    transition: color 0.2s ease-in-out;
   }
 </style>
