@@ -1,4 +1,9 @@
-<a href="https://driz.link/drizzle-stories" rel="nofollow noreferrer" target="_blank" class="aside-posts__wrap">
+<a
+  href="https://driz.link/drizzle-stories"
+  rel="nofollow noreferrer"
+  target="_blank"
+  class="aside-posts__wrap"
+>
   <div class="aside-posts__image">
     <svg fill="currentColor" viewBox="0 0 1043.63 592.71"
       ><g data-name="Layer 2"
@@ -11,6 +16,22 @@
     >
   </div>
   <div class="aside-posts__text">Drizzle Stories</div>
+  <div class="aside-posts__arrow-right">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="feather feather-arrow-right"
+      ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
+        points="12 5 19 12 12 19"></polyline></svg
+    >
+  </div>
 </a>
 <style>
   html.dark .aside-posts__wrap {
@@ -33,7 +54,7 @@
     height: 56px;
     width: 100%;
     background-color: #f6f6f7;
-    margin-bottom: 4px;
+    margin-bottom: 12px;
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -42,6 +63,11 @@
 
   .aside-posts__wrap:hover {
     background-color: #eff0f3;
+  }
+
+  .aside-posts__wrap:hover .aside-posts__arrow-right {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .aside-posts__wrap:hover .aside-posts__text {
@@ -80,5 +106,28 @@
     color: #909090;
     font-weight: 600;
     transition: color 0.2s ease-in-out;
+  }
+
+  .aside-posts__arrow-right {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: 8px;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease-in-out;
+  }
+
+  html.dark .aside-posts__arrow-right svg {
+    color: #fff;
+  }
+
+  .aside-posts__arrow-right svg {
+    height: 16px;
+    width: 16px;
+    color: #000;
   }
 </style>
