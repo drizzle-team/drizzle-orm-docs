@@ -1,199 +1,214 @@
 ---
-import Logo from './Logo.astro';
-import NavItem from './NavItem.astro';
-import SearchBar from './SearchBar.astro';
-import Socials from './Socials.astro';
-import MobileNav from './MobileNav.astro';
-import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
+import Logo from "./Logo.astro";
+import NavItem from "./NavItem.astro";
+import SearchBar from "./SearchBar.astro";
+import Socials from "./Socials.astro";
+import MobileNav from "./MobileNav.astro";
+import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
 ---
+
 <div id="nav_container" class="nav_container">
-  <div class="nav_container_blur" />
-    <div class="nav_content_wrap">
-      <a class="nav_logo" href={'/'}>
-        <div>
-          <Logo />
-        </div>
-      </a>
-      <div class="nav_desktop">
-        <NavItem
-          value="Pricing"
-          href="/#pricing"
-          activeKeywords={["/#pricing"]}
-        />
-        <NavItem
-          value="Studio"
-          href="/drizzle-studio/overview"
-          activeKeywords={["/drizzle-studio"]}
-        />
-        <NavItem
-          value="Documentation"
-          href="/docs/overview"
-          activeKeywords={["/kit-docs", "/docs"]}
-        />
-        <SearchBar />
-        <Socials />
-        <ThemeSelector />
+  <div class="nav_container_blur"></div>
+  <div class="nav_content_wrap">
+    <a class="nav_logo" href={"/"}>
+      <div>
+        <Logo />
       </div>
-      <div class="nav_mobile">
-        <div class="burger" data-nav-burger-btn>
-          <svg
-            fill="none"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            >
-            <g>
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16"
-              />
-            </g>
+    </a>
+    <div class="nav_desktop">
+      <NavItem
+        value="Pricing"
+        href="/#pricing"
+        activeKeywords={["/#pricing"]}
+      />
+      <NavItem
+        value="Studio"
+        href="/drizzle-studio/overview"
+        activeKeywords={["/drizzle-studio"]}
+      />
+      <NavItem
+        value="Documentation"
+        href="/docs/overview"
+        activeKeywords={["/kit-docs", "/docs"]}
+      />
+      <SearchBar />
+      <Socials />
+      <ThemeSelector />
+    </div>
+    <div class="nav_mobile">
+      <div class="burger" data-nav-burger-btn>
+        <svg
+          fill="none"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <g>
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M4 12h16"
-            />
-            <g>
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 18h16"
-              />
-            </g>
-          </svg>
-        </div>
+              d="M4 6h16"></path>
+          </g>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 12h16"></path>
+          <g>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 18h16"></path>
+          </g>
+        </svg>
       </div>
     </div>
   </div>
 </div>
+
 <div class="nav_mobile">
   <MobileNav />
 </div>
 <script is:inline>
-
-const setPreference = (themeName) => {
-  localStorage.setItem("theme", themeName);
-  if (!document.firstElementChild) return;
-  if (themeName === "system") {
-    themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-  document.firstElementChild.classList.toggle("dark", themeName === "dark");
-  document.firstElementChild.classList.toggle("light", themeName !== "dark");
-  document.firstElementChild.setAttribute(
-    "style",
-    themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
-  );
-  updateIcon();
-  if (window.inkeepWidget) {
-    window.inkeepWidget.render({
-      baseSettings: {
-        theme: {
-          colorMode: {
-            forcedColorMode: themeName,
+  const setPreference = (themeName) => {
+    localStorage.setItem("theme", themeName);
+    if (!document.firstElementChild) return;
+    if (themeName === "system") {
+      themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    document.firstElementChild.classList.toggle("dark", themeName === "dark");
+    document.firstElementChild.classList.toggle("light", themeName !== "dark");
+    document.firstElementChild.setAttribute(
+      "style",
+      themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
+    );
+    updateIcon();
+    if (window.inkeepWidget) {
+      window.inkeepWidget.render({
+        baseSettings: {
+          theme: {
+            colorMode: {
+              forcedColorMode: themeName,
+            },
           },
         },
-      },
+      });
+    }
+  };
+
+  const currentThemeIcons = document.querySelectorAll(
+    "[data-current-theme-icon]",
+  );
+  const systemIconTemplate = document.querySelector("#theme-system-icon");
+  const lightIconTemplate = document.querySelector("#theme-light-icon");
+  const darkIconTemplate = document.querySelector("#theme-dark-icon");
+  const themeSelect = document.getElementById("theme__select");
+
+  const getColorPreference = () => {
+    let preference = localStorage.getItem("theme");
+    if (preference === "system") {
+      return preference;
+    }
+
+    if (!preference) {
+      preference = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    return preference;
+  };
+
+  const theme = getColorPreference();
+  setPreference(theme);
+
+  function updateIcon() {
+    const theme = localStorage.getItem("theme");
+    if (
+      !theme ||
+      !currentThemeIcons ||
+      !systemIconTemplate ||
+      !lightIconTemplate ||
+      !darkIconTemplate
+    )
+      return;
+    currentThemeIcons.forEach((currentThemeIcon) => {
+      if (theme === "system") {
+        currentThemeIcon.innerHTML = "";
+        currentThemeIcon.appendChild(
+          systemIconTemplate.content.cloneNode(true),
+        );
+      } else if (theme === "light") {
+        currentThemeIcon.innerHTML = "";
+        currentThemeIcon.appendChild(lightIconTemplate.content.cloneNode(true));
+      } else if (theme === "dark") {
+        currentThemeIcon.innerHTML = "";
+        currentThemeIcon.appendChild(darkIconTemplate.content.cloneNode(true));
+      }
+      themeSelect.value = theme;
     });
   }
-};
 
-const currentThemeIcons = document.querySelectorAll(
-  "[data-current-theme-icon]",
-);
-const systemIconTemplate = document.querySelector("#theme-system-icon");
-const lightIconTemplate = document.querySelector("#theme-light-icon");
-const darkIconTemplate = document.querySelector("#theme-dark-icon");
-const themeSelect = document.getElementById('theme__select');
+  const dropdownItems = document.getElementById("theme-dropdown-items");
+  const themeItems = document.querySelectorAll("[data-theme-value]");
 
-const getColorPreference = () => {
-  let preference = localStorage.getItem("theme");
-  if (preference === "system") {
-    return preference;
+  const themeCurrentBtn = document.querySelector(".theme__current-btn");
+  if (themeCurrentBtn) {
+    themeCurrentBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (dropdownItems) {
+        dropdownItems.classList.toggle("d-flex");
+      }
+    });
   }
 
-  if (!preference) {
-    preference = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-  return preference;
-};
-
-const theme = getColorPreference();
-setPreference(theme);
-
-function updateIcon () {
-  const theme = localStorage.getItem("theme");
-  if (
-    !theme ||
-    !currentThemeIcons ||
-    !systemIconTemplate ||
-    !lightIconTemplate ||
-    !darkIconTemplate
-  )
-    return;
-  currentThemeIcons.forEach((currentThemeIcon) => {
-    if (theme === "system") {
-      currentThemeIcon.innerHTML = "";
-      currentThemeIcon.appendChild(systemIconTemplate.content.cloneNode(true));
-    } else if (theme === "light") {
-      currentThemeIcon.innerHTML = "";
-      currentThemeIcon.appendChild(lightIconTemplate.content.cloneNode(true));
-    } else if (theme === "dark") {
-      currentThemeIcon.innerHTML = "";
-      currentThemeIcon.appendChild(darkIconTemplate.content.cloneNode(true));
-    }
-    themeSelect.value = theme;
-  });
-};
-
-const dropdownItems = document.getElementById("theme-dropdown-items");
-const themeItems = document.querySelectorAll("[data-theme-value]");
-
-const themeCurrentBtn = document.querySelector(".theme__current-btn");
-if (themeCurrentBtn) {
-  themeCurrentBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (dropdownItems) {
-      dropdownItems.classList.toggle("d-flex");
+  window.addEventListener("click", (e) => {
+    const clickedElement = e.target;
+    if (!clickedElement.matches(".dialect-selector__button")) {
+      if (dropdownItems && dropdownItems.classList.contains("d-flex")) {
+        dropdownItems.classList.remove("d-flex");
+      }
     }
   });
-}
 
-window.addEventListener("click", (e) => {
-  const clickedElement = e.target;
-  if (!clickedElement.matches(".dialect-selector__button")) {
-    if (dropdownItems && dropdownItems.classList.contains("d-flex")) {
-      dropdownItems.classList.remove("d-flex");
-    }
+  if (themeItems) {
+    themeItems.forEach((element) => {
+      element.addEventListener("click", () => {
+        const theme = element.dataset.themeValue;
+        if (!theme) return;
+        setPreference(theme);
+        dropdownItems.classList.remove("d-flex");
+      });
+    });
   }
-});
 
-if (themeItems) {
-  themeItems.forEach((element) => {
-    element.addEventListener("click", () => {
-      const theme = element.dataset.themeValue;
+  if (themeSelect) {
+    themeSelect.addEventListener("change", (e) => {
+      const theme = e.target.value;
       if (!theme) return;
       setPreference(theme);
-      dropdownItems.classList.remove("d-flex");
     });
-  });
-}
+  }
 
-if (themeSelect) {
-  themeSelect.addEventListener("change", (e) => {
-    const theme = e.target.value;
-    if (!theme) return;
-    setPreference(theme);
-  });
-}
+  const burgerBtn = document.querySelector("[data-nav-burger-btn]");
+  const navContainer = document.getElementById("nav_container");
+  const navMobile = document.getElementById("nav_mobile");
+
+  if (burgerBtn && navContainer && navMobile) {
+    burgerBtn.addEventListener("click", () => {
+      navContainer.classList.toggle("nav_container_open");
+      navMobile.classList.toggle("invisible");
+      document.body.style.overflow = navContainer.classList.contains(
+        "nav_container_open",
+      )
+        ? "hidden"
+        : "auto";
+    });
+  }
 </script>
 
 <style>
@@ -204,56 +219,63 @@ if (themeSelect) {
     width: 100%;
   }
 
-  html[class~=dark] .nav_container_blur {
-  background-color: rgba(18, 18, 18, 0.8);
-  box-shadow: 0 0 transparent,0 0 transparent,0 -1px 0 hsla(0,0%,100%,.1) inset;
-}
+  html[class~="dark"] .nav_container_blur {
+    background-color: rgba(18, 18, 18, 0.8);
+    box-shadow:
+      0 0 transparent,
+      0 0 transparent,
+      0 -1px 0 hsla(0, 0%, 100%, 0.1) inset;
+  }
 
-.nav_container_blur {
-  backdrop-filter: blur(12px);
-  pointer-events: none;
-  position: absolute;
-  z-index: -1;
-  height: 100%;
-  width: 100%;
-  background-color: hsla(0,0%,100%,.85);
-  box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.02) 0px 2px 4px 0px, rgba(0, 0, 0, 0.06) 0px 1px 0px 0px;
-}
+  .nav_container_blur {
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+    position: absolute;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    background-color: hsla(0, 0%, 100%, 0.85);
+    box-shadow:
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0.02) 0px 2px 4px 0px,
+      rgba(0, 0, 0, 0.06) 0px 1px 0px 0px;
+  }
 
-.nav_content_wrap {
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  height: 64px;
-  max-width: 1440px;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  padding-left: max(env(safe-area-inset-left),24px);
-  padding-right: max(env(safe-area-inset-right),24px);
-}
+  .nav_content_wrap {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    height: 64px;
+    max-width: 1440px;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-left: max(env(safe-area-inset-left), 24px);
+    padding-right: max(env(safe-area-inset-right), 24px);
+  }
 
-.nav_logo {
-  outline-offset: 2px;
-  outline: 2px solid transparent;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  margin-right: auto;
-}
+  .nav_logo {
+    outline-offset: 2px;
+    outline: 2px solid transparent;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    margin-right: auto;
+  }
 
-.nav_desktop {
-  display: contents;
-}
+  .nav_desktop {
+    display: contents;
+  }
 
-.nav_mobile {
-  display: none;
-}
+  .nav_mobile {
+    display: none;
+  }
 
-.nav_container_open .burger svg g {
-  transition: transform .2s cubic-bezier(.25,1,.5,1) .2s;
-  transform-origin: 50%;
-}
+  .nav_container_open .burger svg g {
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s;
+    transform-origin: 50%;
+  }
 
   .nav_container_open .burger svg g:first-of-type {
     transform: rotate(45deg);
@@ -266,7 +288,9 @@ if (themeSelect) {
 
   .nav_container_open .burger svg path {
     opacity: 0;
-    transition: transform .2s cubic-bezier(.25,1,.5,1),opacity 0s .2s;
+    transition:
+      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+      opacity 0s 0.2s;
   }
 
   .nav_container_open .burger svg g:nth-of-type(2) {
@@ -277,43 +301,45 @@ if (themeSelect) {
     transform: translateY(-6px);
   }
 
-.burger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  margin-right: -8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.burger:active {
-  background-color: rgba(156, 163, 175, 0.2);
-}
-
-.burger g {
-  transform-origin: 50%;
-  transition: transform .2s cubic-bezier(.25,1,.5,1);
-}
-
-.burger path {
-  opacity: 1;
-  transition: transform .2s cubic-bezier(.25,1,.5,1) .2s,opacity .2s .2s;
-}
-
-@media screen and (max-width: 768px) {
-  .nav_container {
-    top: 0px;
+  .burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-right: -8px;
+    border-radius: 4px;
+    cursor: pointer;
   }
-  body[class~=banner-shown] .nav_container {
-    top: 40px;
+
+  .burger:active {
+    background-color: rgba(156, 163, 175, 0.2);
   }
-  .nav_desktop {
-    display: none;
+
+  .burger g {
+    transform-origin: 50%;
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   }
-  .nav_mobile {
-    display: contents;
+
+  .burger path {
+    opacity: 1;
+    transition:
+      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s,
+      opacity 0.2s 0.2s;
   }
-}
+
+  @media screen and (max-width: 768px) {
+    .nav_container {
+      top: 0px;
+    }
+    body[class~="banner-shown"] .nav_container {
+      top: 40px;
+    }
+    .nav_desktop {
+      display: none;
+    }
+    .nav_mobile {
+      display: contents;
+    }
+  }
 </style>
