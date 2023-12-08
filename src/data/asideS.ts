@@ -17,7 +17,7 @@ export const sponsorsData: ISponsor[] = [
     isActive: false,
     imageType: ImageType.SVG,
     lightStyle: {
-      filter: "grayscale(1) invert(0.5)",
+      filter: "grayscale(1) invert(0.6)",
       padding: "4px",
       background:
         'url("/svg/turso-light.svg") 0% 0% / cover no-repeat content-box',
@@ -49,7 +49,7 @@ export const sponsorsData: ISponsor[] = [
         'url("/svg/payload-dark.svg") 0% 0% / cover no-repeat content-box',
     },
     lightStyle: {
-      filter: "invert(0.5)",
+      filter: "invert(0.6)",
       background: 'url("/svg/payload.svg") 0% 0% / cover no-repeat content-box',
     },
   },
@@ -72,7 +72,7 @@ export const sponsorsData: ISponsor[] = [
       filter: "brightness(0.5) grayscale(1)",
     },
     lightStyle: {
-      filter: "grayscale(1)",
+      filter: "grayscale(1) brightness(1.2)",
     },
   },
   {
@@ -97,7 +97,7 @@ export const sponsorsData: ISponsor[] = [
       padding: "6px",
     },
     lightStyle: {
-      filter: "brightness(0.7) grayscale(1)",
+      filter: "brightness(0.8) grayscale(1)",
       background:
         'url("/svg/neon-light.svg") 0% 0% / cover no-repeat content-box',
       padding: "6px",
