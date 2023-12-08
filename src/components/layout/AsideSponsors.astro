@@ -1,25 +1,83 @@
 ---
-import { type IAsideSponsor, asideSponsors } from "@/data/asideSponsors";
+import type { CSSProperties } from "react";
+import s from "@/data/asideS";
+
+const getStyleString = (style: CSSProperties) => {
+  return Object.keys(style).reduce((acc, key) => {
+    return acc + `${key}: ${style[key as keyof CSSProperties]};`;
+  }, "");
+};
+const getImgLink = (link: string) => {
+  return link.split("?")[0] + "?size=" + 72 * 2;
+};
+
+const slicedSponsors = [];
+
+for (let i = 0; i < s.length; i += 2) {
+  let items = s.slice(i, i + 2);
+  slicedSponsors.push(items);
+}
 ---
 
 <div class="aside-sponsors__wrap">
   {
-    asideSponsors.map((sponsorsRow) => (
+    slicedSponsors.map((slice) => (
       <div class="aside-sponsors__row">
-        {sponsorsRow.map((sponsor) => (
+        {slice.map((sponsor) => (
           <a
             class="aside-sponsors__sponsor"
-            href={sponsor.href}
+            href={`https://${sponsor.sponsorEntity.login}`}
             target="_blank"
+            rel="nofollow"
           >
-            <img class="aside-sponsors__sponsor-image" src={sponsor.imgSrc} alt={sponsor.name} />
+            <div
+              class="aside-sponsors__sponsor-image"
+              id="aside-sponsors-img-wrapper"
+            >
+              <img
+                class="aside-sponsors__light-img"
+                loading="lazy"
+                src={
+                  "data:image/svg+xml;base64," +
+                  btoa(sponsor.sponsorEntity.avatarUrl)
+                }
+                style={getStyleString(sponsor.lightStyle || {})}
+              />
+              <img
+                class="aside-sponsors__dark-img"
+                loading="lazy"
+                src={
+                  "data:image/svg+xml;base64," +
+                  btoa(sponsor.sponsorEntity.avatarUrl)
+                }
+                alt={sponsor.sponsorEntity.name || sponsor.sponsorEntity.login}
+                style={getStyleString(sponsor.darkStyle || {})}
+              />
+            </div>
           </a>
         ))}
       </div>
     ))
   }
 </div>
-<style>
+
+<style is:global>
+  html.dark .aside-sponsors__dark-img {
+    display: block;
+  }
+
+  html.dark .aside-sponsors__light-img {
+    display: none;
+  }
+
+  .aside-sponsors__dark-img {
+    display: none;
+  }
+
+  .aside-sponsors__light-img {
+    display: block;
+  }
+
   .aside-sponsors__wrap {
     width: 100%;
     display: flex;
@@ -64,20 +122,22 @@ import { type IAsideSponsor, asideSponsors } from "@/data/asideSponsors";
     height: 72px;
   }
 
-  .aside-sponsors__row > .aside-sponsors__sponsor:only-child > .aside-sponsors__sponsor-image {
+  .aside-sponsors__row
+    > .aside-sponsors__sponsor:only-child
+    > .aside-sponsors__sponsor-image {
     max-width: 124px;
   }
 
   html.dark .aside-sponsors__sponsor:hover {
-    background-color: #ffffff;
+    background-color: #282828;
   }
 
   html.dark .aside-sponsors__sponsor {
-    background-color: #171717;
+    background-color: #1C1C1C;
   }
 
   .aside-sponsors__sponsor:hover {
-    background-color: rgba(142, 150, 170, .14);
+    background-color: rgba(142, 150, 170, 0.14);
   }
 
   .aside-sponsors__sponsor {
@@ -89,21 +149,21 @@ import { type IAsideSponsor, asideSponsors } from "@/data/asideSponsors";
     transition: background-color 0.2s;
   }
 
-  html.dark .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image {
-    filter: grayscale(0) invert(0);
-  }
-
-  html.dark .aside-sponsors__sponsor .aside-sponsors__sponsor-image {
-    filter: grayscale(1) invert(1);
-  }
-
   .aside-sponsors__sponsor:hover .aside-sponsors__sponsor-image {
     filter: grayscale(0);
   }
 
   .aside-sponsors__sponsor-image {
     filter: grayscale(1);
-    max-width: 64px;
     transition: filter 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: 48px;
+  }
+
+  .aside-sponsors__sponsor-image img {
+    width: 100%;
   }
 </style>

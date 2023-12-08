@@ -38,19 +38,6 @@ export interface StorageItem {
   status: string;
 }
 
-// export interface ICards {
-//   [key: string]: ICard;
-// }
-
-// export interface ICard {
-//   title: string;
-//   image: string;
-//   lightIcon: SVGProps;
-//   darkIcon: SVGProps;
-//   description: string;
-//   href: string;
-// }
-
 type ImageSrc =
   | string
   | {

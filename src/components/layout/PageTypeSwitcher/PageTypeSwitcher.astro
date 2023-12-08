@@ -15,7 +15,7 @@ const items = {
   'quick-postgresql': pg,
 };
 
-const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
+const svgs = import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
 
 const { slug = '', tree } = Astro.props;
 
