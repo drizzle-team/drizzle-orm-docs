@@ -75,19 +75,6 @@ import ThemeSelector from './ThemeSelector/ThemeSelector.astro';
   <MobileNav />
 </div>
 <script is:inline>
-  const getColorPreference = () => {
-  let preference = localStorage.getItem("theme");
-  if (preference === "system") {
-    return preference;
-  }
-
-  if (!preference) {
-    preference = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-  return preference;
-};
 
 const setPreference = (themeName) => {
   localStorage.setItem("theme", themeName);
@@ -125,8 +112,6 @@ const lightIconTemplate = document.querySelector("#theme-light-icon");
 const darkIconTemplate = document.querySelector("#theme-dark-icon");
 const themeSelect = document.getElementById('theme__select');
 
-
-const theme = getColorPreference();
 setPreference(theme);
 
 function updateIcon () {
