@@ -53,6 +53,8 @@ const { tree, filteredHeadings, title } = await getContentTree({
       };
 			const theme = getColorPreference();
 			document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.classList.toggle("dark", theme === "dark");
+  		document.documentElement.classList.toggle("light", theme !== "dark");
     </script>
   </head>
   <body class="banner-shown">
