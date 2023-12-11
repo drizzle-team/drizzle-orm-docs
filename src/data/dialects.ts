@@ -1,6 +1,18 @@
 import type { ICards } from "@/types/SVGTypes";
 
 export const dialects: ICards = {
+  pg: {
+    title: "PostgreSQL",
+    imageSrc: "/public/svg/postgresql.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    description: "Serverless multi-cloud fully managed Postgres",
+    href: "/pg",
+  },
   mysql: {
     title: "MySQL",
     imageSrc: "/public/svg/mysql.svg",
@@ -25,17 +37,5 @@ export const dialects: ICards = {
     },
     description: "Collection of nodejs modules to interact with PostgreSQL",
     href: "/sqlite",
-  },
-  pg: {
-    title: "PostgreSQL",
-    imageSrc: "/public/svg/postgresql.svg",
-    lightStyle: {
-      width: 24,
-    },
-    darkStyle: {
-      width: 24,
-    },
-    description: "Serverless multi-cloud fully managed Postgres",
-    href: "/pg",
   },
 };

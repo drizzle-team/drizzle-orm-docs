@@ -67,6 +67,32 @@ const db = drizzle(pool);
 </Tab>
 </Tabs>
 
+### Usage with Cloudflare Workers
+
+Now that Cloudflare Workers supports TCP connections, [you can use](https://developers.cloudflare.com/workers/databases/connect-to-postgres/) `node-postgres` to connect to connection poolers, e.g. pgBouncer.
+
+```typescript copy filename="worker.ts"
+import { Client } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+
+export default {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<Response> {
+    const client = new Client({ connectionString: env.DATABASE_URL });
+    await client.connect();
+    const db = drizzle(client);
+    const result = await db.select().from(...);
+
+    // Clean up the client, ensuring we don't kill the worker before that is completed.
+    ctx.waitUntil(client.end());
+    return new Response(now);
+  }
+}
+```
+
 <Callout type="warning" emoji="⚙️">
   For the built in `migrate` function with DDL migrations we strongly encourage you to use `max: 1` connection configuration. 
 

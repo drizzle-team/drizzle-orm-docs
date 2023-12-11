@@ -26,7 +26,20 @@ export default defineConfig({
     }),
   ],
   markdown: {
-    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "append",
+          properties: {
+            class: "autolink-header",
+            ariaHidden: true,
+            tabIndex: -1,
+          },
+        },
+      ],
+    ],
     shikiConfig: {
       theme: "css-variables",
     },

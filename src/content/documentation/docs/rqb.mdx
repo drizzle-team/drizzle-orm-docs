@@ -101,9 +101,9 @@ const db = drizzle(connection, { schema, mode: 'planetscale' });
 ## Declaring relations
 
 ### One-to-one
-Drizzle ORM provides you an API to define `one-to-one` relations between tables with `relations` operator.  
+Drizzle ORM provides you an API to define `one-to-one` relations between tables with the `relations` operator.
 
-Example of `one-to-one` relation between users and users who invited them to the service, self reference:
+An example of a `one-to-one` relation between users and users, where a user can invite another (this example uses a self reference):
 
 ```typescript copy {10-15}
 import { pgTable, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
@@ -123,8 +123,9 @@ export const usersRelations = relations(users, ({ one }) => ({
 }));
 ```
 
-Another example would be a user having a profile information stored in separate table:
-```typescript copy {9-14}
+Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
+
+```typescript copy {9-17}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -139,9 +140,12 @@ export const usersRelations = relations(users, ({ one }) => ({
 
 export const profileInfo = pgTable('profile_info', {
 	id: serial('id').primaryKey(),
-	userId: integer("user_id").references(() => users.id),
-	metadata: jsonb("metadata"),
+	userId: integer('user_id').references(() => users.id),
+	metadata: jsonb('metadata'),
 });
+
+const user = await queryUserWithProfileInfo();
+//____^? type { id: number, profileInfo: { ... } | null  }
 ```
 
 ### One-to-many
@@ -315,6 +319,57 @@ export const profileInfo = pgTable('profile_info', {
 ```
 </CodeTab>
 </CodeTabs>
+
+### Foreign key actions
+
+for more information check [posrgres foreign keys docs](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)
+
+You can specify actions that should occur when the referenced data in the parent table is modified. These actions are known as "foreign key actions." PostgreSQL provides several options for these actions.
+
+On Delete/ Update Actions
+
+- `CASCADE`: When a row in the parent table is deleted, all corresponding rows in the child table will also be deleted. This ensures that no orphaned rows exist in the child table.
+
+- `NO ACTION`: This is the default action. It prevents the deletion of a row in the parent table if there are related rows in the child table. The DELETE operation in the parent table will fail.
+
+- `RESTRICT`: Similar to NO ACTION, it prevents the deletion of a parent row if there are dependent rows in the child table. It is essentially the same as NO ACTION and included for compatibility reasons.
+
+- `SET DEFAULT`: If a row in the parent table is deleted, the foreign key column in the child table will be set to its default value if it has one. If it doesn't have a default value, the DELETE operation will fail.
+
+- `SET NULL`: When a row in the parent table is deleted, the foreign key column in the child table will be set to NULL. This action assumes that the foreign key column in the child table allows NULL values.
+
+> Analogous to ON DELETE there is also ON UPDATE which is invoked when a referenced column is changed (updated). The possible actions are the same, except that column lists cannot be specified for SET NULL and SET DEFAULT. In this case, CASCADE means that the updated values of the referenced column(s) should be copied into the referencing row(s).
+in drizzle you can add foreign key action using `references()` second argument.
+
+type of the actions
+
+```typescript
+export type UpdateDeleteAction = 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
+
+// secone argument of references interface
+actions?: {
+		onUpdate?: UpdateDeleteAction;
+		onDelete?: UpdateDeleteAction;
+	} | undefined
+```
+
+In the following example, adding `onDelete: 'cascade'` to the author field on the `posts` schema means that deleting the `user` will also delete all related Post records.
+
+
+```typescript {11}
+import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+	id: serial('id').primaryKey(),
+	name: text('name'),
+});
+
+export const posts = pgTable('posts', {
+	id: serial('id').primaryKey(),
+	name: text('name'),
+	author: integer('author').references(() => users.id, {onDelete: 'cascade'}).notNull(),
+});
+```
 
 ### Disambiguating relations
 

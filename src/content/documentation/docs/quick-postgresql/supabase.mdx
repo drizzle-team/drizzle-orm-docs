@@ -37,7 +37,26 @@ import postgres from 'postgres'
 import { users } from './schema'
 
 const connectionString = process.env.DATABASE_URL
+
 const client = postgres(connectionString)
+const db = drizzle(client);
+
+const allUsers = await db.select().from(users);
+```
+
+### Connection pooling (optional)
+
+If you decide to use connection pooling via Supabase (described [here](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)), and have "Transaction" pool mode enabled, the ensure to turn of prepare as prepared statements are not supported. 
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+import { users } from './schema'
+
+const connectionString = process.env.DATABASE_URL
+
+// Disable prefetch as it is not supported for "Transaction" pool mode 
+const client = postgres(connectionString, { prepare: false })
 const db = drizzle(client);
 
 const allUsers = await db.select().from(users);
@@ -46,22 +65,3 @@ const allUsers = await db.select().from(users);
 </Steps>
 
 Connect to your database using the Connection Pooler for **serverless environments**, and the Direct Connection for **long-running servers**.
-
-### Usage with Cloudflare Workers
-
-Now that Cloudflare Workers supports TCP connections, you can use **[`node-postgres`](/docs/quick-postgresql/node-postgres)** to connect to Supabase's connection pooler.
-
-```typescript copy filename="worker.ts"
-import { Pool } from "pg";
-import { drizzle } from "drizzle-orm/node-postgres";
- 
-export default {
-  async fetch(req, env, ctx) {
-    const pool = new Pool({ connectionString: env.DATABASE_URL });
-    const db = drizzle(pool)
-    const result = await db.select().from(...);
-    ctx.waitUntil(pool.end());
-    return new Response(now);
-  }
-}
-```

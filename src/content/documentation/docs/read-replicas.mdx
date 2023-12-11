@@ -75,6 +75,7 @@ const db = withReplicas(primaryDb, [read1, read2]);
 ```ts copy
 import { sql } from 'drizzle-orm';
 import { sqliteTable, int, text, withReplicas } from 'drizzle-orm/sqlite-core';
+import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 
 const usersTable = sqliteTable('users', {

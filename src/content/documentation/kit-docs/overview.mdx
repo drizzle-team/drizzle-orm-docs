@@ -115,6 +115,8 @@ const sql = postgres("...", { max: 1 })
 const db = drizzle(sql);
 
 await migrate(db, { migrationsFolder: "drizzle" });
+
+await sql.end();
 ```
 </Tab>
 <Tab>
@@ -127,6 +129,8 @@ const connection = createConnection("...")
 const db = drizzle(connection);
 
 await migrate(db, { migrationsFolder: "drizzle" });
+
+await connection.end();
 ```
 </Tab>
 <Tab>
@@ -139,6 +143,8 @@ const betterSqlite = new Database(":memory:");
 const db = drizzle(betterSqlite);
 
 migrate(db, { migrationsFolder: "drizzle" });
+
+betterSqlite.close()
 ```
 </Tab>
 </Tabs>
@@ -151,7 +157,7 @@ You can have autocomplete experience and a very convenient environment variables
 <CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
 <CodeTab>
 ```ts
-import { defineConfig } from 'drizzle-kit/utils'
+import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
  schema: "./schema.ts",

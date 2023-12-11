@@ -52,7 +52,7 @@ export default {
   async fetch(request: Request, env: Env) {
     const db = drizzle(env.<BINDING_NAME>);
     const result = await db.select().from(users).all()
-    return Response.json(results);
+    return Response.json(result);
   },
 };
 ```

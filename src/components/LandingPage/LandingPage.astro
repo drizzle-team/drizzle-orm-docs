@@ -1,14 +1,14 @@
 ---
-import Header from './Header/Header.astro';
-import Advantages from './Advantages/Advantages.astro';
-import Supporting from './Supporting/Supporting.astro';
+import Header from "./Header/Header.astro";
+import Advantages from "./Advantages/Advantages.astro";
+import Supporting from "./Supporting/Supporting.astro";
 import Runtimes from "./Supporting/Runtimes";
 import Databases from "./Supporting/Databases";
-import DrizzleStudio from './DrizzleStudio/DrizzleStudio.astro';
-import Pricing from './Pricing/Pricing.astro';
-import Twits from './Twits/Twits.astro';
-import SponsorsLine from './SponsorsLine/SponsorsLine.astro';
-import Benchmark from './Benchmark/Benchmark';
+import DrizzleStudio from "./DrizzleStudio/DrizzleStudio.astro";
+import Pricing from "./Pricing/Pricing.astro";
+import Twits from "./Twits/Twits.astro";
+import SponsorsLine from "./SponsorsLine/SponsorsLine.astro";
+import Benchmark from "./Benchmark/Benchmark";
 
 const runtimes: string[] = [
   "Cloudflare Workers",
@@ -38,7 +38,7 @@ const databases: string[] = [
 <div class="wrap">
   <Header />
   <Advantages />
-  <div id="performance" />
+  <div id="performance"></div>
   <Benchmark client:load />
   <Supporting
     rowsNum={4}
@@ -58,11 +58,11 @@ const databases: string[] = [
   />
   <DrizzleStudio />
   <SponsorsLine />
-  <div id="pricing"/>
+  <div id="pricing"></div>
   <Pricing />
   <Twits />
 </div>
-  
+
 <style>
   .wrap {
     max-width: 1080px;
@@ -74,8 +74,8 @@ const databases: string[] = [
     color: #222;
   }
 
-  html[class~=dark] .wrap {
-    color: rgb(226,232,240);
+  html[class~="dark"] .wrap {
+    color: rgb(226, 232, 240);
   }
 
   @media (max-width: 599px) {
@@ -84,3 +84,8 @@ const databases: string[] = [
     }
   }
 </style>
+<script>
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem("sidebar-scroll", "0");
+  });
+</script>
