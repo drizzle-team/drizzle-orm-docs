@@ -77,6 +77,31 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 </CodeTabs>
 
+⚠️ If you have SQL schema declared in multiple files you can do it like that
+<CodeTabs items={["index.ts", "schema1.ts", "schema2.ts"]}>
+	```typescript copy /schema/3
+	import * as schema1 from './schema1';
+	import * as schema2 from './schema2';
+	import { drizzle } from 'drizzle-orm/...';
+
+	const db = drizzle(client, { schema: { ...schema1, ...schema2 } });
+
+	const result = await db.query.users.findMany({
+		with: {
+			posts: true			
+		},
+	});
+	```
+	
+	```ts
+	// schema declaration in the first file
+	```
+	```ts
+	// schema declaration in the second file
+	```
+</CodeTabs>
+
+
 ## Modes
 Drizzle relational queries always generate exactly one SQL statement to run on the database and it has certain caveats. 
 To have best in class support for every database out there we've introduced **`modes`**.  
