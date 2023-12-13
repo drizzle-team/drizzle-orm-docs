@@ -1,44 +1,29 @@
 ---
-import CloudRainIcon from '@components/Icons/CloudRainIcon.astro';
-import CloudRainActiveIcon from '@components/Icons/CloudRainActiveIcon.astro';
-import TerminalActiveIcon from '@components/Icons/TerminalActiveIcon.astro';
-import TerminalIcon from '@components/Icons/TerminalIcon.astro';
-import LayoutActiveIcon from '@components/Icons/LayoutActiveIcon.astro';
-import LayoutIcon from '@components/Icons/LayoutIcon.astro';
-
-
+import CloudRainIcon from "@components/Icons/CloudRainIcon.astro";
+import CodeIcon from "@components/Icons/CodeIcon.astro";
+import LayersIcon from "@components/Icons/LayersIcon.astro";
+import WindowFrameIcon from "@components/Icons/WindowFrameIcon.astro";
 
 interface Props {
   slug: string;
 }
 
-const { slug = '' } = Astro.props;
+const { slug = "" } = Astro.props;
 ---
+
 <div class="wrap">
   <a href="/docs/overview">
-    <div
-      class:list={["button", slug.startsWith("docs") && "selected"]}
-    >
+    <div class:list={["button", slug.startsWith("docs") && "selected"]}>
       <div class="icon">
-        {slug.startsWith("docs") ? (
-          <CloudRainActiveIcon />
-        ) : (
-          <CloudRainIcon />
-        )}
+        <CloudRainIcon />
       </div>
       <div class="text">Drizzle ORM</div>
     </div>
   </a>
   <a href="/kit-docs/overview">
-    <div
-      class:list={["button", slug.startsWith("kit-docs") && "selected"]}
-    >
+    <div class:list={["button", slug.startsWith("kit-docs") && "selected"]}>
       <div class="icon">
-        {slug.startsWith("kit-docs") ? (
-          <TerminalActiveIcon />
-        ) : (
-          <TerminalIcon />
-        )}
+        <LayersIcon />
       </div>
       <div class="text">Drizzle Kit</div>
     </div>
@@ -47,12 +32,8 @@ const { slug = '' } = Astro.props;
     <div
       class:list={["button", slug.startsWith("drizzle-studio") && "selected"]}
     >
-      <div class="icon">
-        {slug.startsWith("drizzle-studio") ? (
-          <LayoutActiveIcon />
-        ) : (
-          <LayoutIcon />
-        )}
+      <div class="icon frame">
+        <WindowFrameIcon />
       </div>
       <div class="text">Drizzle Studio</div>
     </div>
@@ -61,7 +42,7 @@ const { slug = '' } = Astro.props;
 </div>
 
 <style>
-  html[class~=dark] .wrap {
+  html[class~="dark"] .wrap {
     background-color: #111111;
   }
 
@@ -70,7 +51,7 @@ const { slug = '' } = Astro.props;
     top: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
     padding: 22px 16px 16px 24px;
     background-color: #ffffff;
   }
@@ -82,69 +63,83 @@ const { slug = '' } = Astro.props;
     gap: 8px;
   }
 
-  html[class~=dark] .selected .text {
+  html[class~="dark"] .selected .text {
     color: rgb(0, 138, 230);
   }
 
-  html[class~=dark] .selected .layout {
-    fill: none;
+  html[class~="dark"] .selected .icon {
+    background-color: #102a4c;
+    color: #96c7f2;
+    fill: #008AE6;
   }
 
-  html[class~=dark] .text {
-    color: rgb(115,115,115);
+  html[class~="dark"] .text {
+    color: #737373;
   }
 
-  html[class~=dark] .icon {
-    color: rgb(115,115,115);
-    fill: rgba(255,255,255,0.2);
+  html[class~="dark"] .icon {
+    color: #737373;
+    fill: #565656;
   }
 
-
-  html[class~=dark] .button:not(.selected):hover .text { 
-    color: rgb(249,250,251);
+  html[class~="dark"] .button:not(.selected):hover .text {
+    color: rgb(249, 250, 251);
   }
 
-  html[class~=dark] .button:not(.selected):hover .icon {
-    fill: rgb(249,250,251);
-
-  } 
+  html[class~="dark"] .button:not(.selected):hover .icon {
+    color: #f9fafb;
+    fill: #b3b4b5;
+  }
 
   .selected .text {
     color: rgb(0, 98, 163);
   }
 
-  .selected .layout {
-    fill: #E0EEFE;
+  .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #737373;
+    fill: #b9b9b9;
   }
 
-  .icon {
-    transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
-    transition-duration: .15s;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
-    fill: rgb(107,114,128);
-    color: rgb(107,114,128);
+  .icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .selected .icon {
+    color: #006adc;
+    fill: #71aded;
+    background-color: #e1f0ff;
   }
 
   .text {
     font-weight: 600;
-    color: rgb(107,114,128);
-    transition-property: color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke;
-    transition-duration: .15s;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    color: rgb(107, 114, 128);
+    transition-property:
+      color,
+      background-color,
+      border-color,
+      -webkit-text-decoration-color,
+      text-decoration-color,
+      fill,
+      stroke;
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-
-
-  /* HOVER */
-
-  .button:not(.selected):hover .text { 
-    color: rgba(17,24,39);
+  .button:not(.selected):hover .text {
+    color: rgba(17, 24, 39);
   }
 
-  html[class~=dark] .fadeout {
+  html[class~="dark"] .fadeout {
     background: linear-gradient(to bottom, #111111 0%, transparent 100%);
   }
-  
+
   .fadeout {
     position: absolute;
     bottom: 0;
@@ -152,8 +147,70 @@ const { slug = '' } = Astro.props;
     z-index: 12312312;
     height: 20px;
     width: 100%;
-    background: linear-gradient(to bottom, #FFFFFF 0%, transparent 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, transparent 100%);
     left: 0;
     pointer-events: none;
+  }
+</style>
+
+<style is:global>
+  html[class~="dark"] .selected .togglelib-icon-primary {
+    fill: #094A94;
+  }
+
+  html[class~="dark"] .selected .togglelib-icon-secondary {
+    fill: #0657B1;
+  }
+
+  html[class~="dark"] .selected .togglelib-icon-tertiary {
+    fill: #96C7F2;
+  }
+
+  html[class~="dark"] .togglelib-icon-primary {
+    fill: #424242;
+  }
+
+  html[class~="dark"] .togglelib-icon-secondary {
+    fill: #565656;
+  }
+
+  html[class~="dark"] .togglelib-icon-tertiary {
+    fill: #737373;
+  }
+
+  html[class~="dark"] .button:not(.selected):hover .togglelib-icon-primary {
+    fill: #858586;
+  }
+
+  html[class~="dark"] .button:not(.selected):hover .togglelib-icon-secondary {
+    fill: #b3b4b5;
+  }
+
+  html[class~="dark"] .button:not(.selected):hover .togglelib-icon-tertiary {
+    fill: #f9fafb;
+  }
+
+  .selected .togglelib-icon-primary {
+    fill: #006ADC;
+  }
+
+  .selected .togglelib-icon-secondary {
+    fill: #4593E6;
+  }
+
+  .selected .togglelib-icon-tertiary {
+    fill: #71ADED;
+  }
+
+  .togglelib-icon-primary {
+    fill: #737373;
+  }
+
+  .togglelib-icon-secondary {
+    fill: #9d9d9d;
+  }
+
+  .togglelib-icon-tertiary {
+    fill: #b9b9b9;
   }
 </style>

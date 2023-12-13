@@ -74,11 +74,11 @@ const Runtimes: {
   "Vercel functions": {
     imageSrc: "/public/svg/vercel.svg",
     lightStyle: {
-      width: 32,
+      width: 24,
     },
     darkStyle: {
       fill: "#000000",
-      width: 32,
+      width: 24,
     },
   },
   "Fly.io": {
