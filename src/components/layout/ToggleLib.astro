@@ -11,15 +11,15 @@ const { slug = "" } = Astro.props;
 ---
 
 <div class="wrap">
-  <a href="/docs/overview">
+  <a href="/docs/overview/">
     <div class:list={["button", slug.startsWith("docs") && "selected"]}>
-      <div class="icon">
+      <div class="icon brackets">
         <BracketsIcon />
       </div>
       <div class="text">Drizzle ORM</div>
     </div>
   </a>
-  <a href="/kit-docs/overview">
+  <a href="/kit-docs/overview/">
     <div class:list={["button", slug.startsWith("kit-docs") && "selected"]}>
       <div class="icon">
         <LayersIcon />
@@ -27,7 +27,7 @@ const { slug = "" } = Astro.props;
       <div class="text">Drizzle Kit</div>
     </div>
   </a>
-  <a href="/drizzle-studio/overview">
+  <a href="/drizzle-studio/overview/">
     <div
       class:list={["button", slug.startsWith("drizzle-studio") && "selected"]}
     >
@@ -69,7 +69,7 @@ const { slug = "" } = Astro.props;
   html[class~="dark"] .selected .icon {
     background-color: #102a4c;
     color: #96c7f2;
-    fill: #006ADC;
+    fill: #006adc;
   }
 
   html[class~="dark"] .text {
@@ -103,6 +103,14 @@ const { slug = "" } = Astro.props;
     justify-content: center;
     color: #737373;
     fill: #b9b9b9;
+    transition-property: color, background-color, border-color, fill;
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .brackets {
+    fill: #737373;
+    color: #b9b9b9;
   }
 
   .icon svg {
@@ -112,21 +120,14 @@ const { slug = "" } = Astro.props;
 
   .selected .icon {
     color: #006adc;
-    fill: #A1C6EE;
+    fill: #a1c6ee;
     background-color: #e1f0ff;
   }
 
   .text {
     font-weight: 600;
     color: rgb(107, 114, 128);
-    transition-property:
-      color,
-      background-color,
-      border-color,
-      -webkit-text-decoration-color,
-      text-decoration-color,
-      fill,
-      stroke;
+    transition-property: color;
     transition-duration: 0.15s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -154,15 +155,15 @@ const { slug = "" } = Astro.props;
 
 <style is:global>
   html[class~="dark"] .selected .togglelib-icon-primary {
-    fill: #094A94;
+    fill: #47698f;
   }
 
   html[class~="dark"] .selected .togglelib-icon-secondary {
-    fill: #0657B1;
+    fill: #6e98c1;
   }
 
   html[class~="dark"] .selected .togglelib-icon-tertiary {
-    fill: #96C7F2;
+    fill: #96c7f2;
   }
 
   html[class~="dark"] .togglelib-icon-primary {
@@ -190,15 +191,15 @@ const { slug = "" } = Astro.props;
   }
 
   .selected .togglelib-icon-primary {
-    fill: #006ADC;
+    fill: #006adc;
   }
 
   .selected .togglelib-icon-secondary {
-    fill: #4593E6;
+    fill: #4593e6;
   }
 
   .selected .togglelib-icon-tertiary {
-    fill: #71ADED;
+    fill: #71aded;
   }
 
   .togglelib-icon-primary {
