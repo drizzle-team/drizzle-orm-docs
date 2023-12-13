@@ -1,6 +1,5 @@
 ---
-import CloudRainIcon from "@components/Icons/CloudRainIcon.astro";
-import CodeIcon from "@components/Icons/CodeIcon.astro";
+import BracketsIcon from "@components/Icons/BracketsIcon.astro";
 import LayersIcon from "@components/Icons/LayersIcon.astro";
 import WindowFrameIcon from "@components/Icons/WindowFrameIcon.astro";
 
@@ -15,7 +14,7 @@ const { slug = "" } = Astro.props;
   <a href="/docs/overview">
     <div class:list={["button", slug.startsWith("docs") && "selected"]}>
       <div class="icon">
-        <CloudRainIcon />
+        <BracketsIcon />
       </div>
       <div class="text">Drizzle ORM</div>
     </div>
@@ -70,7 +69,7 @@ const { slug = "" } = Astro.props;
   html[class~="dark"] .selected .icon {
     background-color: #102a4c;
     color: #96c7f2;
-    fill: #008AE6;
+    fill: #006ADC;
   }
 
   html[class~="dark"] .text {
