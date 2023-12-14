@@ -1,12 +1,11 @@
 <style is:global lang="scss">
   .documentation-content {
     color: #334155;
-    position: relative;
     h1 {
-      margin-top: .5rem;
+      margin-top: 0.5rem;
       font-size: 32px;
       font-weight: 700;
-      letter-spacing: -.015em;
+      letter-spacing: -0.015em;
       color: #0f172a;
     }
 
@@ -17,7 +16,7 @@
       padding-left: 1.5rem;
       border-left: 2px solid #d1d5db;
     }
-    
+
     p {
       margin-top: 1.5rem;
       line-height: 1.75rem;
@@ -31,7 +30,7 @@
       text-decoration: inherit;
       outline-offset: 2px;
       outline: 2px solid transparent;
-      border-radius: .25rem;
+      border-radius: 0.25rem;
       color: #006be6;
       text-decoration-line: underline;
       text-decoration-thickness: from-font;
@@ -40,26 +39,26 @@
 
     h2 {
       margin-top: 2.5rem;
-      padding-bottom: .25rem;
+      padding-bottom: 0.25rem;
       font-size: 1.875rem;
       font-weight: 600;
-      letter-spacing: -.015em;
+      letter-spacing: -0.015em;
       color: #0f172a;
       border-bottom: 1px solid rgba(230, 230, 230, 0.7);
     }
-    
+
     h3 {
       margin-top: 2rem;
       font-size: 1.5rem;
       font-weight: 600;
-      letter-spacing: -.015em;
+      letter-spacing: -0.015em;
     }
 
     h4 {
       margin-top: 2rem;
       font-size: 1.25rem;
       font-weight: 600;
-      letter-spacing: -.015em;
+      letter-spacing: -0.015em;
       color: #0f172a;
     }
 
@@ -67,7 +66,7 @@
       margin-top: 2rem;
       font-size: 1.125rem;
       font-weight: 600;
-      letter-spacing: -.015em;
+      letter-spacing: -0.015em;
       color: #0f172a;
     }
 
@@ -75,7 +74,7 @@
       margin-top: 2rem;
       font-size: 1rem;
       font-weight: 600;
-      letter-spacing: -.015em;
+      letter-spacing: -0.015em;
       color: #0f172a;
     }
 
@@ -106,17 +105,17 @@
 
     code {
       overflow-wrap: break-word;
-      border-radius: .375rem;
-      border: 1px solid rgba(0,0,0,.04);
-      background-color: rgba(0,0,0,.03);
-      padding-top: .125rem;
-      padding-bottom: .125rem;
-      padding-left: .25em;
-      padding-right: .25em;
-      font-size: .9em;
+      border-radius: 0.375rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      background-color: rgba(0, 0, 0, 0.03);
+      padding-top: 0.125rem;
+      padding-bottom: 0.125rem;
+      padding-left: 0.25em;
+      padding-right: 0.25em;
+      font-size: 0.9em;
     }
 
-    table { 
+    table {
       text-indent: 0;
       border-color: inherit;
       border-collapse: collapse;
@@ -132,11 +131,11 @@
     }
 
     table::-webkit-scrollbar-thumb {
-        border-radius: 10px;
+      border-radius: 10px;
     }
 
     table::-webkit-scrollbar-track {
-        background-color: transparent;
+      background-color: transparent;
     }
 
     iframe {
@@ -145,15 +144,16 @@
       aspect-ratio: 16/9;
     }
 
-    @supports (color:lab(0% 0 0)) {
+    @supports (color: lab(0% 0 0)) {
       table {
-        scrollbar-color: lab(48.438% 0 0/.4) transparent;
+        scrollbar-color: lab(48.438% 0 0/0.4) transparent;
       }
     }
 
-    @supports (color:color(display-p3 0 0 0)) {
+    @supports (color: color(display-p3 0 0 0)) {
       table {
-          scrollbar-color: color(display-p3 .45095 .45095 .45095/.4) transparent;
+        scrollbar-color: color(display-p3 0.45095 0.45095 0.45095/.4)
+          transparent;
       }
     }
     thead tr {
@@ -163,23 +163,48 @@
       border-top: 1px solid rgb(209, 213, 219);
     }
     thead tr th {
-      border: 1px solid rgb(209,213,219);
-      padding-top: .5rem;
-      padding-bottom: .5rem;
+      border: 1px solid rgb(209, 213, 219);
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
       padding-left: 1rem;
       padding-right: 1rem;
       font-weight: 600;
     }
     tbody tr:nth-child(2n) {
-      background-color: rgb(243,244,246);
+      background-color: rgb(243, 244, 246);
     }
 
     tbody tr td {
-      border: 1px solid rgb(209,213,219);
-      padding-top: .5rem;
-      padding-bottom: .5rem;
+      border: 1px solid rgb(209, 213, 219);
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
       padding-left: 1rem;
       padding-right: 1rem;
+    }
+
+    h1 .autolink-header,
+    h4 .autolink-header,
+    h5 .autolink-header {
+      display: none;
+    }
+
+    h2:hover .autolink-header,
+    h3:hover .autolink-header {
+      opacity: 1;
+    }
+
+    .autolink-header {
+      opacity: 0;
+      transition: opacity 0.1s ease-in-out;
+      margin-left: 4px;
+      text-decoration: none;
+    }
+
+    .autolink-header::after {
+      content: "#";
+      color: rgba(209, 213, 219, 1);
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
     }
   }
 
@@ -190,8 +215,8 @@
       border-left: 2px solid rgb(55, 65, 81);
     }
     code {
-      background-color: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.1);
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     h2 {
@@ -199,24 +224,32 @@
       border-bottom: 1px solid rgba(224, 243, 255, 0.1);
     }
 
-    h1, h3, h4, h5, h6 {
+    h1,
+    h3,
+    h4,
+    h5,
+    h6 {
       color: #f1f5f9;
     }
 
     thead tr th {
-      border: 1px solid rgb(75,85,99);
+      border: 1px solid rgb(75, 85, 99);
     }
     tbody tr:nth-child(2n) {
-      background-color: rgba(75,85,99,.2);
+      background-color: rgba(75, 85, 99, 0.2);
     }
 
     tbody tr td {
-      border: 1px solid rgb(75,85,99);
-      padding-top: .5rem;
-      padding-bottom: .5rem;
+      border: 1px solid rgb(75, 85, 99);
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
       padding-left: 1rem;
       padding-right: 1rem;
     }
+  }
+
+  html[class~="dark"] .autolink-header::after {
+    color: rgb(64, 64, 64);
   }
 
   @media screen and (max-width: 768px) {
