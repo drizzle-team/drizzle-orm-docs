@@ -38,11 +38,12 @@ const getYoutubeLink = (id: string) => {
             href={getYoutubeLink(card.id)}
           >
             <div class="youtube-card__image">
+              <div class="youtube-card__inner-border"></div>
               <Image
                 src={card.imageUrl ? card.imageUrl : getYoutubeImage(card)}
                 alt={card.title}
-                width="280"
-                height="156"
+                width="560"
+                height="314"
               />
               <div class="youtube-card__play-button">
                 <svg
@@ -85,7 +86,6 @@ const getYoutubeLink = (id: string) => {
   }
 
   html.dark .youtube-card {
-    border: 1px solid #404040;
     background-color: #111111;
   }
 
@@ -100,9 +100,8 @@ const getYoutubeLink = (id: string) => {
   .youtube-card {
     display: flex;
     flex-direction: column;
-    border: 1px solid #e4e4e5;
     min-height: 200px;
-    border-radius: 2px;
+    border-radius: 4px;
     flex: 1 1 240px;
     max-width: 280px;
     min-width: 240px;
@@ -112,15 +111,21 @@ const getYoutubeLink = (id: string) => {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.1s;
-    opacity: 1;
-    border-radius: 2px;
+    filter: brightness(1);
+    border-radius: 4px;
   }
 
   .youtube-card__link:hover {
     box-shadow:
       0 3px 6px rgba(0, 0, 0, 0.08),
       0 2px 4px rgba(0, 0, 0, 0.07);
-    opacity: 0.8;
+    filter: brightness(0.8);
+  }
+
+  html.dark .youtube-card__content {
+    border-left: 1px solid #404040;
+    border-bottom: 1px solid #404040;
+    border-right: 1px solid #404040;
   }
 
   .youtube-card__content {
@@ -128,6 +133,27 @@ const getYoutubeLink = (id: string) => {
     align-items: center;
     padding: 12px 16px;
     gap: 4px;
+    border-left: 1px solid #e4e4e5;
+    border-bottom: 1px solid #e4e4e5;
+    border-right: 1px solid #e4e4e5;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  html.dark .youtube-card__inner-border {
+    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.15);
+  }
+
+  .youtube-card__inner-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    z-index: 2;
+    box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.5);
   }
 
   .youtube-card__image {
@@ -135,13 +161,12 @@ const getYoutubeLink = (id: string) => {
   }
 
   html.dark .youtube-card__image img {
-    border-bottom: 1px solid #3a3f42;
   }
 
   .youtube-card__image img {
-    border-top-right-radius: 1px;
-    border-top-left-radius: 1px;
-    border-bottom: 1px solid #d7dbdf;
+    position: relative;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
     aspect-ratio: 16/9;
     object-fit: cover;
   }
