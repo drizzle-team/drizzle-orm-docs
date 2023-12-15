@@ -111,15 +111,16 @@ const getYoutubeLink = (id: string) => {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.1s;
-    filter: brightness(1);
     border-radius: 4px;
   }
 
+  .youtube-card__link:hover .youtube-card__image {
+    filter: brightness(0.8);
+  }
   .youtube-card__link:hover {
     box-shadow:
       0 3px 6px rgba(0, 0, 0, 0.08),
       0 2px 4px rgba(0, 0, 0, 0.07);
-    filter: brightness(0.8);
   }
 
   html.dark .youtube-card__content {
@@ -158,6 +159,8 @@ const getYoutubeLink = (id: string) => {
 
   .youtube-card__image {
     position: relative;
+    transition: all 0.1s;
+    filter: brightness(1);
   }
 
   html.dark .youtube-card__image img {
