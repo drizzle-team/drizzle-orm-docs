@@ -1,65 +1,45 @@
 ---
 import { Image } from "astro:assets";
 
-interface IYoutubeCard {
-  id: string;
-  imageUrl?: string;
+interface IBlogCard {
+  href: string;
+  imageUrl: string;
   title: string;
   description: string;
-}
+};
 
 interface Props {
-  cards: IYoutubeCard[];
+  cards: IBlogCard[];
 }
 
 const { cards } = Astro.props;
 
-const getYoutubeImage = (card: IYoutubeCard) => {
-  if (card.imageUrl) {
-    return card.imageUrl;
-  }
-  return `https://img.youtube.com/vi/${card.id}/maxresdefault.jpg`;
-};
-
-const getYoutubeLink = (id: string) => {
-  return `https://www.youtube.com/watch?v=${id}`;
-};
 ---
 
-<div class="youtube-cards_wrap">
+<div class="blog-cards_wrap">
   {
     cards.map((card) => (
-      <div class="youtube-card">
+      <div class="blog-card">
         <a
-          class="youtube-card__link"
+          class="blog-card__link"
           target="_blank"
           rel="nofollow noreferrer"
-          href={getYoutubeLink(card.id)}
+          href={card.href}
         >
-          <div class="youtube-card__image">
+          <div class="blog-card__image">
             <Image
-              src={card.imageUrl ? card.imageUrl : getYoutubeImage(card)}
+              src={card.imageUrl}
               alt={card.title}
               width="280"
               height="156"
             />
-            <div class="youtube-card__play-button">
-              <svg height="100%" version="1.1" viewBox="0 0 68 48" width="100%">
-                <path
-                  class="ytp-large-play-button-bg"
-                  d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z"
-                  fill="#f00"
-                />
-                <path d="M 45,24 27,14 27,34" fill="#fff" />
-              </svg>
-            </div>
           </div>
-          <div class="youtube-card__content">
-            <div class="youtube-card__text">
-              <div class="youtube-card__title">
+          <div class="blog-card__content">
+            <div class="blog-card__text">
+              <div class="blog-card__title">
                 <Fragment set:html={card.title} />
               </div>
-              <p class="youtube-card__description">
+              <p class="blog-card__description">
                 <Fragment set:html={card.description} />
               </p>
             </div>
@@ -70,11 +50,11 @@ const getYoutubeLink = (id: string) => {
   }
 </div>
 <style>
-  html.dark .youtube-card {
+  html.dark .blog-card {
     border: 1px solid #404040;
     background-color: #111111;
   }
-  .youtube-cards_wrap {
+  .blog-cards_wrap {
     margin-top: 32px;
     display: flex;
     flex-wrap: wrap;
@@ -83,7 +63,7 @@ const getYoutubeLink = (id: string) => {
     max-width: 896px;
   }
 
-  .youtube-card {
+  .blog-card {
     display: flex;
     flex-direction: column;
     border: 1px solid #e4e4e5;
@@ -94,7 +74,7 @@ const getYoutubeLink = (id: string) => {
     min-width: 240px;
   }
 
-  .youtube-card__link {
+  .blog-card__link {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.1s;
@@ -102,37 +82,38 @@ const getYoutubeLink = (id: string) => {
     border-radius: 7px;
   }
 
-  .youtube-card__link:hover {
+  .blog-card__link:hover {
     box-shadow:
       0 3px 6px rgba(0, 0, 0, 0.08),
       0 2px 4px rgba(0, 0, 0, 0.07);
     opacity: 0.8;
   }
 
-  .youtube-card__content {
+  .blog-card__content {
     display: flex;
     align-items: center;
     padding: 12px 16px;
     gap: 4px;
   }
 
-  .youtube-card__image {
+  .blog-card__image {
     position: relative;
   }
 
-  html.dark .youtube-card__image img {
+  html.dark .blog-card__image img {
     border-bottom: 1px solid #3a3f42;
   }
 
-  .youtube-card__image img {
+  .blog-card__image img {
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
     border-bottom: 1px solid #d7dbdf;
+    max-height: 156px;
     aspect-ratio: 16/9;
     object-fit: cover;
   }
 
-  .youtube-card__play-button {
+  .blog-card__play-button {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -144,11 +125,11 @@ const getYoutubeLink = (id: string) => {
     width: 48px;
   }
 
-  html.dark .youtube-card__title {
+  html.dark .blog-card__title {
     color: #ecedee;
   }
 
-  .youtube-card__title {
+  .blog-card__title {
     margin-top: 0;
     font-size: 15px;
     font-weight: 500;
@@ -167,11 +148,11 @@ const getYoutubeLink = (id: string) => {
     box-orient: vertical;
   }
 
-  html.dark .youtube-card__description {
+  html.dark .blog-card__description {
     color: #9ba1a6;
   }
 
-  .youtube-card__description {
+  .blog-card__description {
     font-weight: 400;
     font-size: 14px;
     line-height: 22px;
