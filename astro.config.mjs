@@ -11,6 +11,9 @@ import {
 
 // https://astro.build/config
 export default defineConfig({
+  image: {
+    domains: ["img.youtube.com"],
+  },
   prefetch: {
     prefetchAll: true,
     defaultStrategy: "viewport",
