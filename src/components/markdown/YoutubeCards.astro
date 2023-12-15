@@ -6,6 +6,7 @@ interface IYoutubeCard {
   imageUrl?: string;
   title: string;
   description?: string;
+  time: string;
 }
 
 interface Props {
@@ -22,7 +23,7 @@ const getYoutubeImage = (card: IYoutubeCard) => {
 };
 
 const getYoutubeLink = (id: string) => {
-  return `https://www.youtube.com/watch?v=${id}`;
+  return `https://driz.link/yt/${id}`;
 };
 ---
 
@@ -38,40 +39,24 @@ const getYoutubeLink = (id: string) => {
             href={getYoutubeLink(card.id)}
           >
             <div class="youtube-card__image">
-              <div class="youtube-card__inner-border"></div>
+              <div class="youtube-card__inner-border" />
+              <div class="youtube-card__time">{card.time}</div>
               <Image
                 src={card.imageUrl ? card.imageUrl : getYoutubeImage(card)}
                 alt={card.title}
                 width="560"
                 height="314"
               />
-              <div class="youtube-card__play-button">
-                <svg
-                  height="100%"
-                  version="1.1"
-                  viewBox="0 0 68 48"
-                  width="100%"
-                >
-                  <path
-                    class="ytp-large-play-button-bg"
-                    d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z"
-                    fill="#f00"
-                  />
-                  <path d="M 45,24 27,14 27,34" fill="#fff" />
-                </svg>
-              </div>
             </div>
             <div class="youtube-card__content">
-              <div class="youtube-card__text">
-                <div class="youtube-card__title">
-                  <Fragment set:html={card.title} />
-                </div>
-                {card.description && (
-                  <p class="youtube-card__description">
-                    <Fragment set:html={card.description} />
-                  </p>
-                )}
+              <div class="youtube-card__title">
+                <Fragment set:html={card.title} />
               </div>
+              {card.description && (
+                <p class="youtube-card__description">
+                  <Fragment set:html={card.description} />
+                </p>
+              )}
             </div>
           </a>
         </div>
@@ -90,11 +75,11 @@ const getYoutubeLink = (id: string) => {
   }
 
   .youtube-cards__wrap {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: 16px;
     align-items: flex-start;
     max-width: 896px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, max-content));
   }
 
   .youtube-card {
@@ -105,18 +90,19 @@ const getYoutubeLink = (id: string) => {
     flex: 1 1 240px;
     max-width: 280px;
     min-width: 240px;
+    height: 100%;
   }
 
   .youtube-card__link {
+    display: flex;
+    flex-direction: column;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.1s;
     border-radius: 4px;
+    height: 100%;
   }
 
-  .youtube-card__link:hover .youtube-card__image {
-    filter: brightness(0.8);
-  }
   .youtube-card__link:hover {
     box-shadow:
       0 3px 6px rgba(0, 0, 0, 0.08),
@@ -131,14 +117,16 @@ const getYoutubeLink = (id: string) => {
 
   .youtube-card__content {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
     padding: 12px 16px;
-    gap: 4px;
     border-left: 1px solid #e4e4e5;
     border-bottom: 1px solid #e4e4e5;
     border-right: 1px solid #e4e4e5;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+    height: 100%;
   }
 
   html.dark .youtube-card__inner-border {
@@ -157,13 +145,23 @@ const getYoutubeLink = (id: string) => {
     box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.5);
   }
 
+  .youtube-card__time {
+    position: absolute;
+    z-index: 2;
+    bottom: 4px;
+    right: 4px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 3px 4px;
+    font-size: 12px;
+    line-height: 12px;
+    border-radius: 4px;
+    color: rgb(255, 255, 255);
+    font-weight: 500;
+  }
+
   .youtube-card__image {
     position: relative;
     transition: all 0.1s;
-    filter: brightness(1);
-  }
-
-  html.dark .youtube-card__image img {
   }
 
   .youtube-card__image img {
@@ -172,18 +170,6 @@ const getYoutubeLink = (id: string) => {
     border-top-left-radius: 4px;
     aspect-ratio: 16/9;
     object-fit: cover;
-  }
-
-  .youtube-card__play-button {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
   }
 
   html.dark .youtube-card__title {
@@ -226,6 +212,16 @@ const getYoutubeLink = (id: string) => {
     -webkit-box-orient: vertical;
     line-clamp: 3;
     box-orient: vertical;
+  }
+
+  @media screen and (min-width: 769px) {
+    .youtube-card__link:hover .youtube-card__image {
+      filter: grayscale(0);
+    }
+
+    .youtube-card__image {
+      filter: grayscale(0.7);
+    }
   }
 
   @media screen and (max-width: 768px) {
