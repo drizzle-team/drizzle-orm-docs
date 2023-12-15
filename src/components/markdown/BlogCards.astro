@@ -5,57 +5,65 @@ interface IBlogCard {
   href: string;
   imageUrl: string;
   title: string;
-  description: string;
-};
+  description?: string;
+}
 
 interface Props {
   cards: IBlogCard[];
 }
 
 const { cards } = Astro.props;
-
 ---
 
-<div class="blog-cards_wrap">
-  {
-    cards.map((card) => (
-      <div class="blog-card">
-        <a
-          class="blog-card__link"
-          target="_blank"
-          rel="nofollow noreferrer"
-          href={card.href}
-        >
-          <div class="blog-card__image">
-            <Image
-              src={card.imageUrl}
-              alt={card.title}
-              width="280"
-              height="156"
-            />
-          </div>
-          <div class="blog-card__content">
-            <div class="blog-card__text">
-              <div class="blog-card__title">
-                <Fragment set:html={card.title} />
-              </div>
-              <p class="blog-card__description">
-                <Fragment set:html={card.description} />
-              </p>
+<div class="blog-cards__scroll">
+  <div class="blog-cards_wrap">
+    {
+      cards.map((card) => (
+        <div class="blog-card">
+          <a
+            class="blog-card__link"
+            target="_blank"
+            rel="nofollow noreferrer"
+            href={card.href}
+          >
+            <div class="blog-card__image">
+              <Image
+                src={card.imageUrl}
+                alt={card.title}
+                width="280"
+                height="156"
+              />
             </div>
-          </div>
-        </a>
-      </div>
-    ))
-  }
+            <div class="blog-card__content">
+              <div class="blog-card__text">
+                <div class="blog-card__title">
+                  <Fragment set:html={card.title} />
+                </div>
+                {card.description && (
+                  <p class="blog-card__description">
+                    <Fragment set:html={card.description} />
+                  </p>
+                )}
+              </div>
+            </div>
+          </a>
+        </div>
+      ))
+    }
+  </div>
 </div>
+
 <style>
+  .blog-cards__scroll {
+    margin-top: 32px;
+  }
+
   html.dark .blog-card {
     border: 1px solid #404040;
     background-color: #111111;
   }
-  .blog-cards_wrap {
-    margin-top: 32px;
+
+  .blog-cards__wrap {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
@@ -68,8 +76,8 @@ const { cards } = Astro.props;
     flex-direction: column;
     border: 1px solid #e4e4e5;
     min-height: 200px;
-    border-radius: 8px;
-    flex: 1 1 240px; /* or 1 0 100px, and no more need in min-width at all */
+    border-radius: 2px;
+    flex: 1 1 240px;
     max-width: 280px;
     min-width: 240px;
   }
@@ -79,7 +87,7 @@ const { cards } = Astro.props;
     text-decoration: none;
     transition: all 0.1s;
     opacity: 1;
-    border-radius: 7px;
+    border-radius: 2px;
   }
 
   .blog-card__link:hover {
@@ -105,8 +113,8 @@ const { cards } = Astro.props;
   }
 
   .blog-card__image img {
-    border-top-left-radius: 7px;
-    border-top-right-radius: 7px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
     border-bottom: 1px solid #d7dbdf;
     max-height: 156px;
     aspect-ratio: 16/9;
@@ -167,5 +175,48 @@ const { cards } = Astro.props;
     -webkit-box-orient: vertical;
     line-clamp: 3;
     box-orient: vertical;
+  }
+
+  @media screen and (max-width: 768px) {
+    .blog-cards__scroll {
+      display: flex;
+      margin-left: -16px;
+      margin-right: -16px;
+      overflow-x: auto;
+    }
+
+    .blog-cards__wrap {
+      margin: 0 16px;
+      gap: 12px;
+      display: grid;
+      grid-template-rows: repeat(2, auto);
+      grid-auto-flow: column;
+    }
+
+    .blog-cards__scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .blog-cards__scroll {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .blog-card {
+      max-width: 240px;
+    }
+
+    .blog-card__title {
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    .blog-card__description {
+      font-size: 14px;
+    }
+
+    .blog-card__content {
+      padding: 8px 16px;
+    }
   }
 </style>

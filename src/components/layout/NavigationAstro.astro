@@ -33,6 +33,8 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
       />
       <SearchBar />
       <Socials />
+    </div>
+    <div class="nav_theme-wrap">
       <ThemeSelector />
     </div>
     <div class="nav_mobile">
@@ -329,6 +331,11 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
   }
 
   @media screen and (max-width: 768px) {
+    .nav_content_wrap {
+      padding-left: max(env(safe-area-inset-left), 16px);
+      padding-right: max(env(safe-area-inset-right), 16px);
+    }
+
     .nav_container {
       top: 0px;
     }

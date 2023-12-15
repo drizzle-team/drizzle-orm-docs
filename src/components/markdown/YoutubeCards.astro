@@ -5,7 +5,7 @@ interface IYoutubeCard {
   id: string;
   imageUrl?: string;
   title: string;
-  description: string;
+  description?: string;
 }
 
 interface Props {
@@ -26,59 +26,73 @@ const getYoutubeLink = (id: string) => {
 };
 ---
 
-<div class="youtube-cards_wrap">
-  {
-    cards.map((card) => (
-      <div class="youtube-card">
-        <a
-          class="youtube-card__link"
-          target="_blank"
-          rel="nofollow noreferrer"
-          href={getYoutubeLink(card.id)}
-        >
-          <div class="youtube-card__image">
-            <Image
-              src={card.imageUrl ? card.imageUrl : getYoutubeImage(card)}
-              alt={card.title}
-              width="280"
-              height="156"
-            />
-            <div class="youtube-card__play-button">
-              <svg height="100%" version="1.1" viewBox="0 0 68 48" width="100%">
-                <path
-                  class="ytp-large-play-button-bg"
-                  d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z"
-                  fill="#f00"
-                />
-                <path d="M 45,24 27,14 27,34" fill="#fff" />
-              </svg>
-            </div>
-          </div>
-          <div class="youtube-card__content">
-            <div class="youtube-card__text">
-              <div class="youtube-card__title">
-                <Fragment set:html={card.title} />
+<div class="youtube-cards__scroll">
+  <div class="youtube-cards__wrap">
+    {
+      cards.map((card) => (
+        <div class="youtube-card">
+          <a
+            class="youtube-card__link"
+            target="_blank"
+            rel="nofollow noreferrer"
+            href={getYoutubeLink(card.id)}
+          >
+            <div class="youtube-card__image">
+              <Image
+                src={card.imageUrl ? card.imageUrl : getYoutubeImage(card)}
+                alt={card.title}
+                width="280"
+                height="156"
+              />
+              <div class="youtube-card__play-button">
+                <svg
+                  height="100%"
+                  version="1.1"
+                  viewBox="0 0 68 48"
+                  width="100%"
+                >
+                  <path
+                    class="ytp-large-play-button-bg"
+                    d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z"
+                    fill="#f00"
+                  />
+                  <path d="M 45,24 27,14 27,34" fill="#fff" />
+                </svg>
               </div>
-              <p class="youtube-card__description">
-                <Fragment set:html={card.description} />
-              </p>
             </div>
-          </div>
-        </a>
-      </div>
-    ))
-  }
+            <div class="youtube-card__content">
+              <div class="youtube-card__text">
+                <div class="youtube-card__title">
+                  <Fragment set:html={card.title} />
+                </div>
+                {card.description && (
+                  <p class="youtube-card__description">
+                    <Fragment set:html={card.description} />
+                  </p>
+                )}
+              </div>
+            </div>
+          </a>
+        </div>
+      ))
+    }
+  </div>
 </div>
+
 <style>
+  .youtube-cards__scroll {
+    margin-top: 32px;
+  }
+
   html.dark .youtube-card {
     border: 1px solid #404040;
     background-color: #111111;
   }
-  .youtube-cards_wrap {
-    margin-top: 32px;
+
+  .youtube-cards__wrap {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    gap: 16px;
     align-items: flex-start;
     max-width: 896px;
   }
@@ -88,8 +102,8 @@ const getYoutubeLink = (id: string) => {
     flex-direction: column;
     border: 1px solid #e4e4e5;
     min-height: 200px;
-    border-radius: 8px;
-    flex: 1 1 240px; /* or 1 0 100px, and no more need in min-width at all */
+    border-radius: 2px;
+    flex: 1 1 240px;
     max-width: 280px;
     min-width: 240px;
   }
@@ -99,7 +113,7 @@ const getYoutubeLink = (id: string) => {
     text-decoration: none;
     transition: all 0.1s;
     opacity: 1;
-    border-radius: 7px;
+    border-radius: 2px;
   }
 
   .youtube-card__link:hover {
@@ -125,8 +139,8 @@ const getYoutubeLink = (id: string) => {
   }
 
   .youtube-card__image img {
-    border-top-left-radius: 7px;
-    border-top-right-radius: 7px;
+    border-top-right-radius: 1px;
+    border-top-left-radius: 1px;
     border-bottom: 1px solid #d7dbdf;
     aspect-ratio: 16/9;
     object-fit: cover;
@@ -152,7 +166,6 @@ const getYoutubeLink = (id: string) => {
     margin-top: 0;
     font-size: 15px;
     font-weight: 500;
-    line-height: 22.5px;
     margin-bottom: 4px;
     color: rgb(17, 24, 28);
 
@@ -174,7 +187,6 @@ const getYoutubeLink = (id: string) => {
   .youtube-card__description {
     font-weight: 400;
     font-size: 14px;
-    line-height: 22px;
     color: rgb(104, 112, 118);
     margin-top: 0;
     overflow: hidden;
@@ -186,5 +198,48 @@ const getYoutubeLink = (id: string) => {
     -webkit-box-orient: vertical;
     line-clamp: 3;
     box-orient: vertical;
+  }
+
+  @media screen and (max-width: 768px) {
+    .youtube-cards__scroll {
+      display: flex;
+      margin-left: -16px;
+      margin-right: -16px;
+      overflow-x: auto;
+    }
+
+    .youtube-cards__wrap {
+      margin: 0 16px;
+      gap: 12px;
+      display: grid;
+      grid-template-rows: repeat(2, auto);
+      grid-auto-flow: column;
+    }
+
+    .youtube-cards__scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .youtube-cards__scroll {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .youtube-card {
+      max-width: 240px;
+    }
+
+    .youtube-card__title {
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    .youtube-card__description {
+      font-size: 14px;
+    }
+
+    .youtube-card__content {
+      padding: 8px 16px;
+    }
   }
 </style>

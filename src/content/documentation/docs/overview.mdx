@@ -1,5 +1,6 @@
 import Callout from '@components/markdown/Callout.astro';
 import CodeTabs from '@components/markdown/CodeTabs.astro';
+import YoutubeCards from '@components/markdown/YoutubeCards.astro';
 
 # Drizzle ORM  
 > Drizzle is a good friend who's there for you when necessary and doesn't bother when you need some space.
@@ -126,10 +127,15 @@ Now go build something awesome with Drizzle and your **[PostgreSQL](/docs/quick-
 
 ## Video Showcase
 
-#### Theo
-
-<iframe width="700" height="400" src="https://www.youtube-nocookie.com/embed/_SLxGYzv6jo?si=s9S4SLqzQVIbd5e6&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
-#### Marius Espejo
-
-<iframe width="700" height="400" src="https://www.youtube-nocookie.com/embed/Qo-RXkSwOtc?si=cHMKzZnB1NFYSsqL&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<YoutubeCards cards={[
+	{
+	id: "_SLxGYzv6jo",
+	title: "I Have A New Favorite Database&nbsp;Tool",
+	description: "Theo - t3.gg",
+	}, 
+	{
+		id: "Qo-RXkSwOtc",
+		title: "Drizzle ORM First impressions - migrations, relations, queries!",
+		description: "Marius Espejo",
+	},
+]} />
