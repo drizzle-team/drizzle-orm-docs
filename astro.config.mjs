@@ -8,9 +8,11 @@ import {
   astroCodeSnippets,
   codeSnippetAutoImport,
 } from "./integration/astro-code-snippets";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://orm.drizzle.team",
   build: {
     format: "file", // mandatory due to CloudFlare Pages trailing slash problem
   },
@@ -30,6 +32,7 @@ export default defineConfig({
     react({
       experimentalReactChildren: true,
     }),
+    sitemap(),
   ],
   markdown: {
     rehypePlugins: [
