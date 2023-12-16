@@ -11,6 +11,9 @@ import {
 
 // https://astro.build/config
 export default defineConfig({
+  build: {
+    format: "file", // mandatory due to CloudFlare Pages trailing slash problem
+  },
   image: {
     domains: ["img.youtube.com"],
   },
