@@ -41,6 +41,45 @@ const { tree, filteredHeadings, title } = await getContentTree({
       property="og:description"
       content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind."
     />
+    <script is:inline>
+      const setPreference = (themeName) => {
+        localStorage.setItem("theme", themeName);
+        if (!document.firstElementChild) return;
+        if (themeName === "system") {
+          themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.firstElementChild.classList.toggle(
+          "dark",
+          themeName === "dark",
+        );
+        document.firstElementChild.classList.toggle(
+          "light",
+          themeName !== "dark",
+        );
+        document.firstElementChild.setAttribute(
+          "style",
+          themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
+        );
+      };
+
+      const getColorPreference = () => {
+        let preference = localStorage.getItem("theme");
+        if (preference === "system") {
+          return preference;
+        }
+
+        if (!preference) {
+          preference = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        return preference;
+      };
+
+      setPreference(getColorPreference());
+    </script>
     <link
       rel="preconnect"
       href="https://MXZNUT59HV-dsn.algolia.net"

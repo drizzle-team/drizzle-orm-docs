@@ -75,34 +75,6 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
   <MobileNav />
 </div>
 <script is:inline>
-  const setPreference = (themeName) => {
-    localStorage.setItem("theme", themeName);
-    if (!document.firstElementChild) return;
-    if (themeName === "system") {
-      themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    document.firstElementChild.classList.toggle("dark", themeName === "dark");
-    document.firstElementChild.classList.toggle("light", themeName !== "dark");
-    document.firstElementChild.setAttribute(
-      "style",
-      themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
-    );
-    updateIcon();
-    if (window.inkeepWidget) {
-      window.inkeepWidget.render({
-        baseSettings: {
-          theme: {
-            colorMode: {
-              forcedColorMode: themeName,
-            },
-          },
-        },
-      });
-    }
-  };
-
   const currentThemeIcons = document.querySelectorAll(
     "[data-current-theme-icon]",
   );
@@ -111,24 +83,7 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
   const darkIconTemplate = document.querySelector("#theme-dark-icon");
   const themeSelect = document.getElementById("theme__select");
 
-  const getColorPreference = () => {
-    let preference = localStorage.getItem("theme");
-    if (preference === "system") {
-      return preference;
-    }
-
-    if (!preference) {
-      preference = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    return preference;
-  };
-
-  const theme = getColorPreference();
-  setPreference(theme);
-
-  function updateIcon() {
+  const updateIcon = () => {
     const theme = localStorage.getItem("theme");
     if (
       !theme ||
@@ -153,7 +108,28 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
       }
       themeSelect.value = theme;
     });
-  }
+
+    let themeName = "";
+
+    if (theme === "system") {
+      themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    } else {
+      themeName = theme;
+    }
+    if (window.inkeepWidget) {
+      window.inkeepWidget.render({
+        baseSettings: {
+          theme: {
+            colorMode: {
+              forcedColorMode: themeName,
+            },
+          },
+        },
+      });
+    }
+  };
 
   const dropdownItems = document.getElementById("theme-dropdown-items");
   const themeItems = document.querySelectorAll("[data-theme-value]");
@@ -183,6 +159,7 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
         const theme = element.dataset.themeValue;
         if (!theme) return;
         setPreference(theme);
+        updateIcon();
         dropdownItems.classList.remove("d-flex");
       });
     });
@@ -193,6 +170,7 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
       const theme = e.target.value;
       if (!theme) return;
       setPreference(theme);
+      updateIcon();
     });
   }
 
@@ -211,6 +189,8 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
         : "auto";
     });
   }
+
+  updateIcon();
 </script>
 
 <style>

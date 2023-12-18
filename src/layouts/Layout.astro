@@ -12,7 +12,7 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" >
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="robots" content="index,follow" />
@@ -37,6 +37,45 @@ const { title } = Astro.props;
       property="og:description"
       content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind."
     />
+    <script is:inline>
+      const setPreference = (themeName) => {
+        localStorage.setItem("theme", themeName);
+        if (!document.firstElementChild) return;
+        if (themeName === "system") {
+          themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.firstElementChild.classList.toggle(
+          "dark",
+          themeName === "dark",
+        );
+        document.firstElementChild.classList.toggle(
+          "light",
+          themeName !== "dark",
+        );
+        document.firstElementChild.setAttribute(
+          "style",
+          themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
+        );
+      };
+
+      const getColorPreference = () => {
+        let preference = localStorage.getItem("theme");
+        if (preference === "system") {
+          return preference;
+        }
+
+        if (!preference) {
+          preference = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        return preference;
+      };
+
+      setPreference(getColorPreference());
+    </script>
     <script
       type="module"
       src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js"
@@ -47,7 +86,7 @@ const { title } = Astro.props;
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"
     />
-		<link rel="stylesheet" href="/preferred.css" />
+    <link rel="stylesheet" href="/preferred.css" />
     <link
       rel="preconnect"
       href="https://MXZNUT59HV-dsn.algolia.net"
