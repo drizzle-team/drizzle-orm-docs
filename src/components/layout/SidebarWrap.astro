@@ -32,17 +32,15 @@ const { tree, filteredHeadings } = Astro.props;
   });
 
   if (activeNavItem) {
-    itemIndex = activeNavItem.getAttribute("data-nav-index");
+    itemIndex = +(activeNavItem.getAttribute("data-nav-index") || 0);
   }
-
   navItems.forEach((item) => {
     item.addEventListener("click", () => {
       const nextIndex = item.getAttribute("data-nav-index");
-      localStorage.setItem(
-        "sidebar-scroll",
+      const scrollTop =
         leftSidebar.scrollTop -
-          (nextIndex > itemIndex ? headingsContainerHeight : 0),
-      );
+        (nextIndex > itemIndex ? headingsContainerHeight : 0);
+      localStorage.setItem("sidebar-scroll", scrollTop.toString());
     });
   });
 
