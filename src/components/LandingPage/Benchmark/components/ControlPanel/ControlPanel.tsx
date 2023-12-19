@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FC } from "react";
 
 import styles from "./ControlPanel.module.css";
 import type { IData, IInputData, IParams } from "../../types";
@@ -13,7 +13,11 @@ import BenchmarkConifg from "../BenchmarkConfig/BenchmarkConfig";
 import getBenchmarkPaths from "../../utils/getBenchmarkPaths";
 import ArrowRight from "@/components/Icons/ArrowRight";
 
-function ControlPanel() {
+interface Props {
+  minWidth?: number;
+}
+
+const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   const { setIsTimerActive, isTimerActive, time, setTime, intervalId } =
     useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
@@ -82,7 +86,7 @@ function ControlPanel() {
   };
 
   const start = () => {
-    if (window.innerWidth < 940 && !isShaking) {
+    if (window.innerWidth < minWidth && !isShaking) {
       setIsShaking(true);
       setTimeout(() => {
         setIsShaking(false);
@@ -97,12 +101,14 @@ function ControlPanel() {
   };
 
   useEffect(() => {
-    getFile().then((data) => {
-      if (!data.drizzleData || !data.compareData) return;
-      setDrizzleData(data.drizzleData);
-      setCompareData(data.compareData);
-      rerun();
-    });
+    getFile()
+      .then((data) => {
+        if (!data.drizzleData || !data.compareData) return;
+        setDrizzleData(data.drizzleData);
+        setCompareData(data.compareData);
+        rerun();
+      })
+      .catch(() => {});
     return () => {
       setDrizzleData(null);
       setCompareData(null);
@@ -116,100 +122,98 @@ function ControlPanel() {
   }, [drizzleData, compareData]);
 
   return (
-    <div className={styles.wrap}>
-      <div className={styles.content}>
-        <div className={styles.control}>
-          <div className={styles.time}>
-            <Timer time={time} />
-            <SpeedSelector speed={speed} setSpeed={setSpeed} />
-            <div className={styles.divider} />
-            {isTimerActive && !isConfigOpen && (
-              <button
-                type="button"
-                className={styles["play-wrap"]}
-                onClick={skipToResults}
-              >
-                Skip to results
-              </button>
-            )}
-            {!isTimerActive && !isConfigOpen && (
-              <button
-                type="button"
-                className={styles["play-wrap"]}
-                onClick={rerun}
-              >
-                Rerun
-              </button>
-            )}
-          </div>
-          <div className={styles.config}>
-            <div className={styles["config-wrap"]}>
-              <div className={styles["config-popup"]}>
-                <BenchmarkConifg selectedItems={selectedItems} />
-              </div>
-              <div className={styles["config-info"]}>Benchmark Config</div>
-            </div>
-            <div className={styles["arrow-wrap"]}>
-              <ArrowRight />
-            </div>
+    <div className={styles.content}>
+      <div className={styles.control}>
+        <div className={styles.time}>
+          <Timer time={time} />
+          <SpeedSelector speed={speed} setSpeed={setSpeed} />
+          <div className={styles.divider} />
+          {isTimerActive && !isConfigOpen && (
             <button
               type="button"
-              className={styles["config-button"]}
-              onClick={openConfigModal}
+              className={styles["play-wrap"]}
+              onClick={skipToResults}
             >
-              <OptionsIcon />
+              Skip to results
             </button>
-          </div>
+          )}
+          {!isTimerActive && !isConfigOpen && (
+            <button
+              type="button"
+              className={styles["play-wrap"]}
+              onClick={rerun}
+            >
+              Rerun
+            </button>
+          )}
         </div>
-        <div className={styles.container}>
-          <div className={isBlurred ? styles.blurred : styles["hide-blur"]}>
-            {drizzleData && compareData && (
-              <div className={styles["blur-content"]}>
-                {isShaking && (
-                  <div className={styles["only-desktop"]}>
-                    Only available on Desktop 🖥️
-                  </div>
-                )}
-                <button
-                  onClick={start}
-                  type="button"
-                  className={isShaking ? styles["start-shaked"] : styles.start}
-                >
-                  Launch your DevOps experience 🚀
-                </button>
-              </div>
-            )}
+        <div className={styles.config}>
+          <div className={styles["config-wrap"]}>
+            <div className={styles["config-popup"]}>
+              <BenchmarkConifg selectedItems={selectedItems} />
+            </div>
+            <div className={styles["config-info"]}>Benchmark Config</div>
           </div>
-          <Performance
-            selectedItems={selectedItems}
-            isConfigOpen={isConfigOpen}
-            speed={speed}
-            data={drizzleData}
-            compareData={compareData}
-            maxElements={81}
-            maxDataLength={maxDataLength}
-          />
-          <Configuration
-            isOpened={isConfigOpen}
-            selectedItems={selectedItems}
-            setSelectedItems={setSelectedItems}
-          />
-          {!isConfigOpen && selectedItems.traffic === "your_startup" && (
-            <div className={styles["sticker-wrap"]}>
-              <div className={styles.congrats}>
-                <div className={styles["congrats-text"]}>
-                  At least you have great Lighthouse score!
+          <div className={styles["arrow-wrap"]}>
+            <ArrowRight />
+          </div>
+          <button
+            type="button"
+            className={styles["config-button"]}
+            onClick={openConfigModal}
+          >
+            <OptionsIcon />
+          </button>
+        </div>
+      </div>
+      <div className={styles.container}>
+        <div className={isBlurred ? styles.blurred : styles["hide-blur"]}>
+          {drizzleData && compareData && (
+            <div className={styles["blur-content"]}>
+              {isShaking && (
+                <div className={styles["only-desktop"]}>
+                  Only available on Desktop 🖥️
                 </div>
-              </div>
-              <div className={styles.sticker}>
-                <img src="/images/sticker.webp" alt="sticker" />
-              </div>
+              )}
+              <button
+                onClick={start}
+                type="button"
+                className={isShaking ? styles["start-shaked"] : styles.start}
+              >
+                Launch your DevOps experience 🚀
+              </button>
             </div>
           )}
         </div>
+        <Performance
+          selectedItems={selectedItems}
+          isConfigOpen={isConfigOpen}
+          speed={speed}
+          data={drizzleData}
+          compareData={compareData}
+          maxElements={81}
+          maxDataLength={maxDataLength}
+        />
+        <Configuration
+          isOpened={isConfigOpen}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+        />
+        {!isConfigOpen && selectedItems.traffic === "your_startup" && (
+          <div className={styles["sticker-wrap"]}>
+            <div className={styles.congrats}>
+              <div className={styles["congrats-text"]}>
+                At least you have great Lighthouse score!
+              </div>
+            </div>
+            <div className={styles.sticker}>
+              <img src="/images/sticker.webp" alt="sticker" />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default ControlPanel;

@@ -19,12 +19,7 @@ const Benchmark = () => (
       <div className={styles.charts}>
         <ControlPanel />
         <div className={styles.bottom}>
-          <a
-            href="https://github.com/drizzle-team/drizzle-benchmarks"
-            target="_blank"
-            rel="nofollow noreferrer"
-            className={styles["how-it-works"]}
-          >
+          <a href="/benchmarks" className={styles["how-it-works"]}>
             How it works?
           </a>
           <div>|</div>

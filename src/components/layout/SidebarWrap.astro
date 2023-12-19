@@ -19,6 +19,11 @@ import SidebarContentWrap from './SidebarContentWrap.astro';
 <script is:inline>
   const leftSidebar = document.querySelector('.aside-scroll');
   const leftSidebarScroll = localStorage.getItem('sidebar-scroll');
+  const navContainer = document.querySelectorAll('.nav-items');
+  const navItems = navContainer[1].querySelectorAll('[data-nav-item]');
+  const slugItems  = document.querySelectorAll('[data-slug]');
+
+
   if (leftSidebarScroll !== null) {
     leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
   }

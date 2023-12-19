@@ -1,26 +1,24 @@
 ---
+import BoltIcon from "@components/Icons/BoltIcon.astro";
 import BracketsIcon from "@components/Icons/BracketsIcon.astro";
 import LayersIcon from "@components/Icons/LayersIcon.astro";
 import WindowFrameIcon from "@components/Icons/WindowFrameIcon.astro";
 
-interface Props {
-  slug: string;
-}
+const slug = Astro.url.pathname || "";
 
-const { slug = "" } = Astro.props;
 ---
 
 <div class="wrap">
   <a href="/docs/overview">
-    <div class:list={["button", slug.startsWith("docs") && "selected"]}>
+    <div class:list={["button", slug.startsWith("/docs") && "selected"]}>
       <div class="icon brackets">
         <BracketsIcon />
       </div>
       <div class="text">Drizzle ORM</div>
     </div>
   </a>
-  <a href="/kit-docs/overview/">
-    <div class:list={["button", slug.startsWith("kit-docs") && "selected"]}>
+  <a href="/kit-docs/overview">
+    <div class:list={["button", slug.startsWith("/kit-docs") && "selected"]}>
       <div class="icon">
         <LayersIcon />
       </div>
@@ -29,12 +27,20 @@ const { slug = "" } = Astro.props;
   </a>
   <a href="/drizzle-studio/overview">
     <div
-      class:list={["button", slug.startsWith("drizzle-studio") && "selected"]}
+      class:list={["button", slug.startsWith("/drizzle-studio") && "selected"]}
     >
       <div class="icon frame">
         <WindowFrameIcon />
       </div>
       <div class="text">Drizzle Studio</div>
+    </div>
+  </a>
+  <a href="/benchmarks">
+    <div class:list={["button", slug.startsWith("/benchmarks") && "selected"]}>
+      <div class="icon frame">
+        <BoltIcon />
+      </div>
+      <div class="text">Benchmarks</div>
     </div>
   </a>
   <div class="fadeout"></div>
@@ -150,6 +156,13 @@ const { slug = "" } = Astro.props;
     background: linear-gradient(to bottom, #ffffff 0%, transparent 100%);
     left: 0;
     pointer-events: none;
+  }
+
+
+  @media screen and (max-width: 768px) {
+    .wrap {
+      padding: 22px 16px 16px 16px;
+    } 
   }
 </style>
 

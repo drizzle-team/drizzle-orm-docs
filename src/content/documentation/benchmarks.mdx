@@ -1,0 +1,69 @@
+import MdxBenchmark from "@components/LandingPage/Benchmark/MdxBenchmark";
+
+<MdxBenchmark client:load />
+
+## How it works
+
+Drizzle has been originally designed to be a thin layer on top of SQL and introduce minimal runtime overhead and by introducing Prepared Statements and Relational Queries — we've [smashed it](https://medium.com/drizzle-stories/weve-built-typescript-orm-for-821-days-then-this-happened-71282a8b0206). It's now both fast and has exceptional DX and no n+1 problem for relational queries.
+
+But how fast is it? Is it Drizzle or is it SQL who’s fast? What to measure?
+
+What is a meaningful benchmark?
+We’ve spent quite some time doing synthetic benchmarks with mitata, tested everything in one runtime and then in separate containerised so there’s no GC cross-influence, community made their own benchmarks and helped us allocate Relational Queries performance and row reads bottlenecks and make them really fast and efficient.
+
+We’ve tested different SQL dialects across all the competitors, and while we were crazy fast, in some cases 100+ times faster than Prisma with SQLite, we only wanted to share benchmarks that were meaningful for businesses and developers.
+
+From business perspective— request roundtrip is the most important metric when it comes down to the server-side performance. While you can influence network latency with services like Cloudflare Argo, on the server side it usually comes down to the database queries.
+
+We’ve composed a test case with a ~370k records in a PostgreSQL database and generated production-like E-commerce traffic benchmarks on 1GB ethernet to eliminate any discrepancies. On Lenovo M720q Drizzle can handle 4.6k reqs/s while maintaining a ~100ms p95 latency.
+
+![](@/assets/images/benchmark-result.webp)
+
+We ran our benchmarks on 2 separate machines, so that observer does not influence results. For database we're using PostgreSQL instance with 42MB of E-commerce data(~370k records).  
+K6 benchmarking instance lives on MacBook Air and makes [1M prepared requests](https://github.com/drizzle-team/drizzle-benchmarks/blob/main/data/requests.json) through 1GB ethernet to Lenovo M720q with Intel Core i3-9100T and 32GB of RAM.
+
+![image](@/assets/images/how-it-works.png)
+
+
+To run your own tests - follow instructions below!
+
+## Prepare test machine
+1. Spin up a docker container with PostgreSQL using `pnpm start:docker` command. You can configure a desired database port in `./src/docker.ts` file:
+```ts
+...
+}
+
+const desiredPostgresPort = 5432; // change here
+main();
+```
+2. Update `DATABASE_URL` with allocated database port in .env file:
+```ts
+DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres"
+```
+3. Seed your database with test data using `pnpm start:seed` command, you can change the size of the database in `./src/seed.ts` file:
+```ts
+...
+}
+
+main("micro"); // nano | micro
+```
+4. Make sure you have Node version 18 installed or above. You can use [`nvm use 18`](https://github.com/nvm-sh/nvm) command
+5. Start Drizzle/Prisma server:
+```bash
+## Drizzle
+pnpm start:drizzle
+
+## Prisma
+pnpm prepare:prisma
+pnpm start:prisma
+```
+
+## Prepare testing machine
+1. Generate a list of http requests with `pnpm start:generate`. It will output a list of http requests to be run on the tested server | `./data/requests.json`
+2. Install [k6 load tester](https://k6.io/)
+3. Configure tested server url in `./k6.js` file
+```js
+// const host = `http://192.168.31.144:3000`; // drizzle
+const host = `http://192.168.31.144:3001`; // prisma
+```
+4. Run tests with `k6 run bench.js` 🚀
