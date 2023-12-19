@@ -7,117 +7,116 @@ interface Props {
   slug: string;
 }
 
-const {headings, slug = "", tree} = Astro.props;
+const { headings, slug = "", tree } = Astro.props;
 const isActive = (path: string) => {
   const pathArray = path.split("/");
   const slugArray = slug.split("/");
   return pathArray.every((element, index) => element === slugArray[index]);
-}
+};
 ---
 
-<div class="nav-items">{
-  tree
-  .filter((t) => isActive(t.name))
-  .map(
-    (t) =>
-      t.children?.map((n) => (
-        <Fragment key={n.name}> 
-          {
-            n.type === "separator" && ( <div class="nav-separator"> 
-              {n.title}
-              </div>
-            )
-          } 
-          {
-            n.type === "mdx" && ( 
-              <a 
-              class:list={
-                [isActive(`${t.name}/${n.name}`) ? "nav-item--active" : "nav-item", "nav-item-1"]
-              }
-                href={
-                `/${t.name}/${n.name}`
-              }>
+<div class="nav-items">
+  {
+    tree
+      .filter((t) => isActive(t.name))
+      .map((t) =>
+        t.children?.map((n, index) => (
+          <Fragment key={n.name}>
+            {n.type === "separator" && (
+              <div class="nav-separator">{n.title}</div>
+            )}
+            {n.type === "mdx" && (
+              <a
+                data-nav-index={index}
+                class:list={[
+                  isActive(`${t.name}/${n.name}`)
+                    ? "nav-item--active"
+                    : "nav-item",
+                  "nav-item-1",
+                ]}
+                href={`/${t.name}/${n.name}`}
+              >
                 {n.title}
-              </a>)
-          }   
-          {
-            n.type === "subDir" &&
-            (
-              <a 
-                class:list={
-                [isActive(`${t.name}/${n.name}`) ? "nav-item--active" : "nav-item", 'nav-item-1']}
+              </a>
+            )}
+            {n.type === "subDir" && (
+              <a
+                data-nav-index={index}
+                class:list={[
+                  isActive(`${t.name}/${n.name}`)
+                    ? "nav-item--active"
+                    : "nav-item",
+                  "nav-item-1",
+                ]}
                 href={`/${t.name}/${n.name}/${n.children?.[0].name}`}
-                >
-                  {n.title}
-              </a>)
-          } 
-          {
-            n.type === "withDialects" &&
-            (
-              <a 
+              >
+                {n.title}
+              </a>
+            )}
+            {n.type === "withDialects" && (
+              <a
+                data-nav-index={index}
                 data-href={`/${t.name}/${n.name}`}
-                class:list={
-                [isActive(`${t.name}/${n.name}`) ? "nav-item--active" : "nav-item", 'nav-item-1']}
-                >
-                  {n.title}
-              </a>)
-          }
-          {
-            headings &&
-            slug &&
-            slug.split("/")[1] === n.name &&
-            slug === `${t.name}/${n.name}` &&
-            (<div> {
-                headings.map((heading) => (<a 
-                  data-slug={heading.slug}
-                  class:list={
-                    [
-                      "nav-toc-item",
-                      'heading-2'
-                    ]
-                  }
-                  href={`#${heading.slug}`}> 
-                    {heading.text}
-                  </a>
-                ))
-              }</div>
-            )
-          } 
-          {
-            n.children?.map((c) => ( 
-              <Fragment> 
-              {
-                headings &&
-                slug &&
-                slug.split("/")[2] === c.name &&
-                slug === `${t.name}/${n.name}/${c.name}` &&
-                ( <div> {
-                    headings.map((heading) => (<a 
+                class:list={[
+                  isActive(`${t.name}/${n.name}`)
+                    ? "nav-item--active"
+                    : "nav-item",
+                  "nav-item-1",
+                ]}
+              >
+                {n.title}
+              </a>
+            )}
+            {headings &&
+              slug &&
+              slug.split("/")[1] === n.name &&
+              slug === `${t.name}/${n.name}` && (
+                <div data-headings>
+                  {headings.map((heading) => (
+                    <a
                       data-slug={heading.slug}
-                      class:list={
-                        ["nav-toc-item", 'heading-2']
-                      }
-                      href={`#${heading.slug}`}>{heading.text}</a>
-                    ))
-                  }</div>
-                )
-              }
+                      class:list={["nav-toc-item", "heading-2"]}
+                      href={`#${heading.slug}`}
+                    >
+                      {heading.text}
+                    </a>
+                  ))}
+                </div>
+              )}
+            {n.children?.map((c) => (
+              <Fragment>
+                {headings &&
+                  slug &&
+                  slug.split("/")[2] === c.name &&
+                  slug === `${t.name}/${n.name}/${c.name}` && (
+                    <div>
+                      {" "}
+                      {headings.map((heading) => (
+                        <a
+                          data-slug={heading.slug}
+                          class:list={["nav-toc-item", "heading-2"]}
+                          href={`#${heading.slug}`}
+                        >
+                          {heading.text}
+                        </a>
+                      ))}
+                    </div>
+                  )}
               </Fragment>
-                  ))
-                } 
-            </Fragment>
-          )),
-        )
-      } 
-    </div>
+            ))}
+          </Fragment>
+        )),
+      )
+  }
+</div>
 <script>
-  import throttle from 'lodash.throttle';
+  import throttle from "lodash.throttle";
   import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
   import updateDialectLinks from "@/utils/updateDialectLinks";
 
   const container = document.querySelector(".documentation-content-wrap")!;
   const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
-  const links = document.querySelectorAll<HTMLElement>('[data-slug]');
+  const links = document.querySelectorAll<HTMLElement>("[data-slug]");
 
   const updateLinks = () => {
     const activeAnchors = handleAnchorHighlighting({
@@ -131,17 +130,19 @@ const isActive = (path: string) => {
 
     links.forEach((link) => {
       const slug = link.dataset.slug;
-      if(!slug) return;
-      link.classList.toggle("nav-toc-item--active", activeAnchors.includes(slug));
+      if (!slug) return;
+      link.classList.toggle(
+        "nav-toc-item--active",
+        activeAnchors.includes(slug),
+      );
       link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
     });
-  }
+  };
 
-  if(container && links) {
-    container.addEventListener('scroll', throttle(updateLinks, 80));
+  if (container && links) {
+    container.addEventListener("scroll", throttle(updateLinks, 80));
     updateLinks();
   }
 
   updateDialectLinks();
-
 </script>

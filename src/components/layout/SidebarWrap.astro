@@ -1,39 +1,58 @@
 ---
-import type { IHeading, TreeNode } from '@/types/astro';
-import SidebarContentWrap from './SidebarContentWrap.astro';
+import type { IHeading, TreeNode } from "@/types/astro";
+import SidebarContentWrap from "./SidebarContentWrap.astro";
 
-  interface Props {
-    tree: TreeNode[];
-    filteredHeadings: IHeading[];
-  }
-  const { slug } = Astro.params;
-  const { tree, filteredHeadings } = Astro.props;
+interface Props {
+  tree: TreeNode[];
+  filteredHeadings: IHeading[];
+}
+const { slug } = Astro.params;
+const { tree, filteredHeadings } = Astro.props;
 ---
+
 <div class="aside">
   <div class="aside-content aside-scroll scrollbar">
-    <SidebarContentWrap filteredHeadings={filteredHeadings}
-      slug={slug} tree={tree}
+    <SidebarContentWrap
+      filteredHeadings={filteredHeadings}
+      slug={slug}
+      tree={tree}
     />
   </div>
 </div>
 <script is:inline>
-  const leftSidebar = document.querySelector('.aside-scroll');
-  const leftSidebarScroll = localStorage.getItem('sidebar-scroll');
-  const navContainer = document.querySelectorAll('.nav-items');
-  const navItems = navContainer[1].querySelectorAll('[data-nav-item]');
-  const slugItems  = document.querySelectorAll('[data-slug]');
+  const leftSidebar = document.querySelector(".aside-scroll");
+  const navItems = document.querySelectorAll("[data-nav-index]");
+  const headingsContainer = document.querySelector("[data-headings]");
+  const headingsContainerHeight = headingsContainer.clientHeight;
 
+  let itemIndex = 0;
 
+  const activeNavItem = Array.from(navItems).find((item) => {
+    return item.classList.contains("nav-item--active");
+  });
+
+  if (activeNavItem) {
+    itemIndex = activeNavItem.getAttribute("data-nav-index");
+  }
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const nextIndex = item.getAttribute("data-nav-index");
+      localStorage.setItem(
+        "sidebar-scroll",
+        leftSidebar.scrollTop -
+          (nextIndex > itemIndex ? headingsContainerHeight : 0),
+      );
+    });
+  });
+
+  const leftSidebarScroll = localStorage.getItem("sidebar-scroll");
   if (leftSidebarScroll !== null) {
     leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
   }
-  window.addEventListener('beforeunload', () => {
-    localStorage.setItem('sidebar-scroll', leftSidebar.scrollTop);
-  });
 </script>
 <style is:global>
-
-  html[class~=dark] .aside {
+  html[class~="dark"] .aside {
     border-right: 1px solid #303030;
   }
 
@@ -42,15 +61,24 @@ import SidebarContentWrap from './SidebarContentWrap.astro';
     display: flex;
     flex-direction: column;
     transition-property: all;
-    transition-duration: .15s;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     position: sticky;
     top: 4rem;
     width: 16rem;
     flex-shrink: 0;
     align-self: flex-start;
-    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.02) 0px 2px 4px 0px, rgba(0, 0, 0, 0.06) 1px 0px 0px 0px;
-    mask-image: linear-gradient(to bottom, #000, #000 calc(100% - 20px), transparent);
+    box-shadow:
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0.02) 0px 2px 4px 0px,
+      rgba(0, 0, 0, 0.06) 1px 0px 0px 0px;
+    mask-image: linear-gradient(
+      to bottom,
+      #000,
+      #000 calc(100% - 20px),
+      transparent
+    );
   }
 
   .aside-scroll {
