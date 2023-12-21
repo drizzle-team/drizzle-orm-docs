@@ -1,0 +1,169 @@
+import Npm from '@components/markdown/Npm.astro';
+import Callout from '@components/markdown/Callout.astro';
+import Tabs from '@components/markdown/Tabs.astro';
+import Tab from '@components/markdown/Tab.astro';
+import AnchorCards from '@components/markdown/AnchorCards.astro';
+
+<AnchorCards cards={{
+  "Planetscale": "#planetscale",
+  "MySQL 2": "#mysql-2",
+  "HTTP proxy": "#http-proxy"
+}} />
+
+## PlanetScale
+
+According to the **[official website](https://planetscale.com/)**, 
+PlanetScale is the world's most advanced serverless MySQL platform.
+
+With Drizzle ORM you can access PlanetScale over http
+through their official **[`database-js`](https://github.com/planetscale/database-js)**
+driver from serverless and serverfull environments with our `drizzle-orm/planetscale-serverless` package.
+
+You can also access PlanetScale through TCP with `mysql2` driver — **[see here.](/docs/get-started-mysql#mysql-2)**
+
+<Npm>
+drizzle-orm @planetscale/database
+-D drizzle-kit
+</Npm>
+
+```typescript copy filename="index.ts"
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { connect } from "@planetscale/database";
+
+// create the connection
+const connection = connect({
+  host: process.env["DATABASE_HOST"],
+  username: process.env["DATABASE_USERNAME"],
+  password: process.env["DATABASE_PASSWORD"],
+});
+
+const db = drizzle(connection);
+```
+
+Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
+we think they're outstanding 🙌
+
+## MySQL 2
+
+According to the **[official website](https://github.com/sidorares/node-mysql2)**, 
+`mysql2` is a MySQL client for Node.js with focus on performance.  
+
+Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
+
+<Npm>
+drizzle-orm mysql2
+-D drizzle-kit
+</Npm>
+
+There're two ways you can connect to the MySQL with `mysql2` driver, either single `client` connection or a `pool`.
+
+<Tabs items={['Client connection', 'Pool connection']}>
+  <Tab>
+  ```typescript copy filename="index.ts"
+  import { drizzle } from "drizzle-orm/mysql2";
+  import mysql from "mysql2/promise";
+
+  const connection = await mysql.createConnection({
+    host: "host",
+    user: "user",
+    database: "database",
+    ...
+  });
+
+  const db = drizzle(connection);
+  ```
+  </Tab>
+
+  <Tab>
+  ```typescript copy filename="index.ts"
+  import { drizzle } from "drizzle-orm/mysql2";
+  import mysql from "mysql2/promise";
+
+  const poolConnection = mysql.createPool({
+    host: "host",
+    user: "user",
+    database: "database",
+    ...
+  });
+
+  const db = drizzle(poolConnection);
+  ```
+  </Tab>
+</Tabs>
+
+<Callout type="warning" emoji="⚙️">
+  For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.  
+
+  For querying purposes feel free to use either `client` or `pool` based on your business demands.
+</Callout>
+
+## HTTP proxy
+
+Example of driver implementation
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/mysql-proxy';
+
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from mysql proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```
+
+Example of server implementation
+
+```ts
+import * as mysql from 'mysql2/promise';
+import express from 'express';
+
+const app = express();
+
+app.use(express.json());
+const port = 3000;
+
+const main = async () => {
+    const connection = await mysql.createConnection('mysql://root:mysql@127.0.0.1:5432/drizzle');
+
+    app.post('/query', async (req, res) => {
+    	const { sql, params, method } = req.body;
+
+      // prevent multiple queries
+    	const sqlBody = sql.replace(/;/g, '');
+
+      try {
+            const result = await connection.query({
+                sql: sqlBody,
+                values: params,
+                rowsAsArray: method === 'all',
+                typeCast: function(field: any, next: any) {
+                    if (field.type === 'TIMESTAMP' || field.type === 'DATETIME' || field.type === 'DATE') {
+                        return field.string();
+                    }
+                    return next();
+                },
+            });
+    	} catch (e: any) {
+    		res.status(500).json({ error: e });
+    	}
+
+    	if (method === 'all') {
+    		res.send(result[0]);
+    	} else if (method === 'execute') {
+    		res.send(result);
+    	}
+    	res.status(500).json({ error: 'Unknown method value' });
+    });
+
+    app.listen(port, () => {
+    	console.log(`Example app listening on port ${port}`);
+    });
+}
+
+main();
+```

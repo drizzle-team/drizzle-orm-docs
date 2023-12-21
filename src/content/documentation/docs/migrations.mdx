@@ -11,7 +11,7 @@ See [detailed docs](/kit-docs) for extended examples and walk-throughs.
 ## Quick start
 
 <Steps>
-### Declare your schema
+#### Declare your schema
 
 ```typescript copy filename="src/schema.ts"
 import { index, int, mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
@@ -38,7 +38,7 @@ Otherwise, that logic will be executed whenever you run any drizzle-kit commands
 Schema-related type definitions, on the other hand, are allowed and even encouraged, as they are not executed at runtime.
 </Callout>
 
-### Create the config
+#### Create the config
 
 Create a `drizzle.config.ts` file in your project root:
 
@@ -59,7 +59,7 @@ export default {
 } satisfies Config;
 ```
 
-### Generate the migration
+#### Generate the migration
 
 ```bash
 pnpm drizzle-kit generate:mysql
@@ -83,7 +83,7 @@ ALTER TABLE auth_otp ADD CONSTRAINT auth_otp_user_id_users_id_fk FOREIGN KEY (`u
 CREATE INDEX name_idx ON users (`full_name`);
 ```
 
-### Run the migrations
+#### Run the migrations
 
 Drizzle ORM is designed to be an opt-in solution at any point of your development flow.
 You can either run the generated migrations via Drizzle, or treat them as generic SQL migrations and run them with any other tool.

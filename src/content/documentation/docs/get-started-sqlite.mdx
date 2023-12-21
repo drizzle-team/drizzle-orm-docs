@@ -1,0 +1,268 @@
+import Npm from "@components/markdown/Npm.astro";
+import Callout from '@components/markdown/Callout.astro';
+import AnchorCards from '@components/markdown/AnchorCards.astro';
+
+<AnchorCards cards={{
+  "Turso": "#turso",
+  "Cloudflare D1": "#cloudflare-d1",
+  "Bun SQLite": "#bun-sqlite",
+  "better-sqlite3" : "#better-sqlite3",
+  "HTTP proxy": "#http-proxy"
+}}/>
+
+## Turso
+
+According to the **[official website](https://turso.tech/drizzle)**, 
+Turso is a **[libSQL](https://github.com/libsql/libsql)** powered edge SQLite database as a service.
+  
+Drizzle ORM natively supports libSQL driver, 
+we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax. 
+
+<Npm>
+drizzle-orm @libsql/client
+-D drizzle-kit
+</Npm>
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
+
+const client = createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' });
+
+const db = drizzle(client);
+
+const result = await db.select().from(users).all()
+```
+
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
+
+## Cloudflare D1
+
+According to the **[official website](https://developers.cloudflare.com/d1/)**, 
+D1 is Cloudflare's first queryable relational database.  
+  
+Drizzle ORM fully supports the Cloudflare D1 database and Cloudflare Workers environment.
+We embrace SQL dialects and dialect specific drivers and syntax and mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+To setup project for your Cloudflare D1 please refer to **[official docs.](https://developers.cloudflare.com/d1/)**
+
+```toml
+### your wrangler.toml will look something like this:
+
+name = "YOUR PROJECT NAME"
+main = "src/index.ts"
+compatibility_date = "2022-11-07"
+node_compat = true
+
+[[ d1_databases ]]
+binding = "DB"
+database_name = "YOUR DB NAME"
+database_id = "YOUR DB ID"
+```
+
+Initialize local database and run server locally:
+```bash
+wrangler d1 execute <DATABASE_NAME> --local --file=./drizzle/0000_short_lockheed.sql
+wrangler dev ## on wrangler versions below 3.0.0, add the --local and --persist flags
+```
+
+Install Drizzle ORM:
+
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
+
+Make your first D1 query:
+```typescript copy
+import { drizzle } from 'drizzle-orm/d1';
+
+export interface Env {
+  <BINDING_NAME>: D1Database;
+}
+
+export default {
+  async fetch(request: Request, env: Env) {
+    const db = drizzle(env.<BINDING_NAME>);
+    const result = await db.select().from(users).all()
+    return Response.json(result);
+  },
+};
+```
+
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
+
+## Bun SQLite
+
+According to the **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
+
+Drizzle ORM natively supports **[`bun:sqlite`](https://bun.sh/docs/api/sqlite)** module and it's crazy fast 🚀  
+
+We embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
+for synchronous drivers like `bun:sqlite` we have both **async** and **sync** APIs and we mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
+
+const sqlite = new Database('sqlite.db');
+const db = drizzle(sqlite);
+
+const result = await db.select().from(users);
+```
+
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
+
+If you want to use **sync** APIs:
+```typescript copy
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
+
+const sqlite = new Database('sqlite.db');
+const db = drizzle(sqlite);
+
+const result = db.select().from(users).all();
+const result = db.select().from(users).get();
+const result = db.select().from(users).values();
+const result = db.select().from(users).run();
+```
+More on **sync** and **async** APIs for sqlite - read here.
+
+## better-sqlite3
+
+According to the **[official docs](https://github.com/WiseLibs/better-sqlite3)**, 
+BetterSqlite3 is the fastest and simplest library for SQLite3 in Node.js.
+
+Drizzle ORM embraces SQL dialects and dialect specific drivers and syntax and unlike any other ORM, 
+for synchronous drivers like `better-sqlite3` both **async** and **sync** APIs and we mirror most popular 
+SQLite-like `all`, `get`, `values` and `run` query methods syntax.  
+
+<Npm>
+drizzle-orm better-sqlite3
+-D drizzle-kit 
+</Npm>
+
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+const sqlite = new Database('sqlite.db');
+const db = drizzle(sqlite);
+
+const result = await db.select().from(users);
+```
+
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
+
+<Callout type="info" emoji="ℹ️">
+  If your `db.insert()` returns data, append `all()` to your query, otherwise append `run()`
+</Callout>
+
+If you want to use **sync** APIs:
+```typescript copy
+import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+const sqlite = new Database('sqlite.db');
+const db: BetterSQLite3Database = drizzle(sqlite);
+
+const result = db.select().from(users).all();
+const result = db.select().from(users).get();
+const result = db.select().from(users).values();
+const result = db.select().from(users).run();
+```
+More on **sync** and **async** APIs for sqlite - read here.
+
+## HTTP proxy
+
+
+Drizzle ORM also supports simply using asynchronous callback function for executing SQL.
+
+- `sql` is a query string with placeholders.
+- `params` is an array of parameters.
+- One of the following values will set for `method` depending on the SQL statement - `run`, `all`, `values` or `get`.
+
+Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the return value.
+
+- When the `method` is `get`, you should return a value as `{rows: string[]}`.
+- Otherwise, you should return `{rows: string[][]}`.
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/sqlite-proxy';
+
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from sqlite proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**

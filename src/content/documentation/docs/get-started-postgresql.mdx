@@ -1,0 +1,390 @@
+import Tab from '@components/markdown/Tab.astro';
+import Tabs from '@components/markdown/Tabs.astro';
+import Npm from "@components/markdown/Npm.astro";
+import Callout from '@components/markdown/Callout.astro';
+import Steps from '@components/markdown/Steps.astro';
+import AnchorCards from '@components/markdown/AnchorCards.astro';
+
+<AnchorCards cards={{
+  "Neon": "#neon",
+  "Postgres.JS": "#postgresjs",
+  "node-postgres": "#node-postgres",
+  "Vercel Postgres" : "#vercel-postgres",
+  "Supabase": "#supabase",
+  "AWS Data API": "#aws-data-api",
+  "HTTP proxy": "#http-proxy"
+}}/>
+
+## Neon
+
+According to their **[official website](https://neon.tech)**, Neon database is a multi-cloud fully managed Postgres. 
+
+Drizzle ORM natively supports both **[Neon Serverless](https://github.com/neondatabase/serverless)** 
+driver with `drizzle-orm/neon-serverless` package and **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)** 
+drivers to access Neon database, as per the **[Neon nodejs docs.](https://neon.tech/docs/guides/node)**
+
+<Npm>
+drizzle-orm @neondatabase/serverless
+-D drizzle-kit
+</Npm>
+
+With Neon Serverless package [**[github](https://github.com/neondatabase/serverless)**, **[blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/)**] 
+you can access Neon database from serverless environments with no TCP available — like Cloudflare Workers — through websockets.
+
+<Tabs items={['HTTP', 'WebSockets']}>
+<Tab>
+```typescript copy filename="index.ts"
+import { neon, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+
+neonConfig.fetchConnectionCache = true;
+
+const sql = neon(process.env.DRIZZLE_DATABASE_URL!);
+const db = drizzle(sql);
+
+const result = await db.select().from(...);
+```
+</Tab>
+<Tab>
+Below is the example of using Drizzle ORM with Neon Serverless driver in Cloudflare Worker, for extensive example — **[see here.](http://driz.link/neon-cf-ex)**
+```typescript copy filename="index.ts"
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+
+export default {
+  async fetch(req, env, ctx) {
+    const pool = new Pool({ connectionString: env.DATABASE_URL });
+    const db = drizzle(pool)
+    const result = await db.select().from(...);
+    ctx.waitUntil(pool.end());
+    return new Response(now);
+  }
+}
+```
+</Tab>
+</Tabs>
+
+If you're unsure how to use Neon from a serverfull environments, you should just use PostgresJS driver 
+according to their **[official nodejs docs](https://neon.tech/docs/guides/node)** — see **[docs](#postgresjs)**.
+
+## Postgres.JS
+
+According to the **[official website](https://github.com/porsager/postgres)**, PostgresJS is the fastest fully featured PostgreSQL client for Node.js and Deno.  
+
+Drizzle ORM natively supports `postgresjs` driver with `drizzle-orm/postgres-js` package.
+
+
+<Npm>
+drizzle-orm postgres
+-D drizzle-kit
+</Npm>
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import postgres from 'postgres';
+
+// for migrations
+const migrationClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db", { max: 1 });
+migrate(drizzle(migrationClient), ...)
+
+// for query purposes
+const queryClient = postgres("postgres://postgres:adminadmin@0.0.0.0:5432/db");
+const db = drizzle(queryClient);
+await db.select().from(...)...
+```
+
+<Callout type="warning" emoji="⚙️">
+  For the built in `migrate` function with DDL migrations we strongly encourage you to use `max: 1` connection configuration. 
+
+  For querying purposes feel free to use pool size of your choice based on your business demands.
+</Callout>
+
+## node-postgres
+
+According to the **[official website](https://node-postgres.com/)**, node-postgres is a collection 
+of Node.js modules for interfacing with your PostgreSQL database.
+
+Drizzle ORM natively supports `pg` with `drizzle-orm/pg` package.
+
+<Npm>
+drizzle-orm pg
+-D drizzle-kit @types/pg
+</Npm>
+
+
+You can connect to a PostgreSQL database either using a single `client` connection or a `pool`.
+<Tabs items={['Client connection', 'Pool connection']}>
+  <Tab>
+```typescript copy filename="index.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Client } from "pg";
+
+const client = new Client({
+  connectionString: "postgres://user:password@host:port/db",
+});
+
+// or
+const client = new Client({
+  host: "127.0.0.1",
+  port: 5432,
+  user: "postgres",
+  password: "password",
+  database: "db_name",
+});
+
+await client.connect();
+const db = drizzle(client);
+```
+</Tab>
+<Tab>
+```typescript copy filename="index.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+const pool = new Pool({
+  connectionString: "postgres://user:password@host:port/db",
+});
+
+// or
+const pool = new Pool({
+  host: "127.0.0.1",
+  port: 5432,
+  user: "postgres",
+  password: "password",
+  database: "db_name",
+});
+
+const db = drizzle(pool);
+```
+</Tab>
+</Tabs>
+
+### Usage with Cloudflare Workers
+
+Now that Cloudflare Workers supports TCP connections, [you can use](https://developers.cloudflare.com/workers/databases/connect-to-postgres/) `node-postgres` to connect to connection poolers, e.g. pgBouncer.
+
+```typescript copy filename="worker.ts"
+import { Client } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+
+export default {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<Response> {
+    const client = new Client({ connectionString: env.DATABASE_URL });
+    await client.connect();
+    const db = drizzle(client);
+    const result = await db.select().from(...);
+
+    // Clean up the client, ensuring we don't kill the worker before that is completed.
+    ctx.waitUntil(client.end());
+    return new Response(now);
+  }
+}
+```
+
+<Callout type="warning" emoji="⚙️">
+  For the built in `migrate` function with DDL migrations we strongly encourage you to use `max: 1` connection configuration. 
+
+  For querying purposes feel free to use pool size of your choice based on your business demands.
+</Callout>
+
+## Vercel Postgres
+
+According to their **[official website](https://vercel.com/docs/storage/vercel-postgres)**,
+Vercel Postgres is a serverless SQL database designed to integrate with Vercel Functions.
+
+Drizzle ORM natively supports both **[@vercel/postgres](https://vercel.com/docs/storage/vercel-postgres)** serverless
+driver with `drizzle-orm/vercel-postgres` package and **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)**
+drivers to access Vercel Postgres through `postgesql://`
+
+Check out the official **[Vercel Postgres + Drizzle](https://vercel.com/docs/storage/vercel-postgres/using-an-orm#drizzle)** docs.
+
+<Steps>
+
+#### Install dependencies
+
+<Npm>
+drizzle-orm @vercel/postgres
+-D drizzle-kit
+</Npm>
+
+#### Prepare Vercel Postgres
+
+Setup a project according to the **[official docs.](https://vercel.com/docs/storage/vercel-postgres/quickstart)** 
+
+#### Make your first query
+
+```typescript copy filename="index.ts"
+import { sql } from '@vercel/postgres';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
+
+const db = drizzle(sql)
+const result = await db.select().from(...);
+```
+</Steps>
+
+With **[@vercel/postgres](https://vercel.com/docs/storage/vercel-postgres)** severless package
+you can access Vercel Postgres from either serverful or serverless environments with no TCP available,
+like Cloudflare Workers, through websockets.  
+  
+If you're about to use Vercel Postgres from a _serverfull_ environment, you can do it
+either with `@vercel/postgres` or directly access the DB through `postgesql://` with 
+either **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)**.
+
+
+## Supabase
+
+According to the **[official website](https://supabase.com/docs)**, Supabase is an open source Firebase alternative for building secure and performant Postgres backends with minimal configuration.
+
+Checkout official **[Supabase + Drizzle](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle)** docs.
+
+<Steps>
+
+#### Install dependencies
+
+<Npm>
+drizzle-orm postgres
+-D drizzle-kit
+</Npm>
+
+#### Create your models
+
+```typescript copy filename="schema.ts"
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name'),
+  phone: varchar('phone', { length: 256 }),
+});
+```
+
+#### Make your first query
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+import { users } from './schema'
+
+const connectionString = process.env.DATABASE_URL
+
+const client = postgres(connectionString)
+const db = drizzle(client);
+
+const allUsers = await db.select().from(users);
+```
+
+#### Connection pooling (optional)
+
+If you decide to use connection pooling via Supabase (described [here](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)), and have "Transaction" pool mode enabled, the ensure to turn of prepare as prepared statements are not supported. 
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+import { users } from './schema'
+
+const connectionString = process.env.DATABASE_URL
+
+// Disable prefetch as it is not supported for "Transaction" pool mode 
+const client = postgres(connectionString, { prepare: false })
+const db = drizzle(client);
+
+const allUsers = await db.select().from(users);
+```
+
+</Steps>
+
+Connect to your database using the Connection Pooler for **serverless environments**, and the Direct Connection for **long-running servers**.
+
+
+## AWS Data API
+
+Drizzle ORM natively supports `aws-sdk` driver with `drizzle-orm/aws-data-api` package.
+
+<Npm>
+drizzle-orm @aws-sdk/client-rds-data @aws-sdk/credential-providers
+-D drizzle-kit
+</Npm>
+
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/aws-data-api/pg';
+import { RDSDataClient } from '@aws-sdk/client-rds-data';
+import { fromIni } from '@aws-sdk/credential-providers';
+
+const rdsClient = new RDSDataClient({
+  	credentials: fromIni({ profile: process.env['PROFILE'] }),
+		region: 'us-east-1',
+});
+
+const db = drizzle(rdsClient, {
+  database: process.env['DATABASE']!,
+  secretArn: process.env['SECRET_ARN']!,
+  resourceArn: process.env['RESOURCE_ARN']!,
+});
+
+await db.select().from(...)...;
+```
+
+## HTTP proxy
+
+Example of driver implementation
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/pg-proxy';
+
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from pg proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```
+
+Example of server implementation
+
+```ts
+import { Client } from 'pg';
+import express from 'express';
+
+const app = express();
+
+app.use(express.json());
+const port = 3000;
+
+const client = new Client('postgres://postgres:postgres@localhost:5432/postgres');
+
+app.post('/query', async (req, res) => {
+	const { sql, params, method } = req.body;
+
+	// prevent multiple queries
+	const sqlBody = sql.replace(/;/g, '');
+
+    try {
+        const result = await client.query({
+            text: sqlBody,
+            values: params,
+            rowMode: method === 'all' ? 'array': undefined,
+        });
+		res.send(result.rows);
+	} catch (e: any) {
+		res.status(500).json({ error: e });
+	}
+
+	res.status(500).json({ error: 'Unknown method value' });
+});
+
+app.listen(port, () => {
+	console.log(`Example app listening on port ${port}`);
+});
+```

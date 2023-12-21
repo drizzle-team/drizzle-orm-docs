@@ -15,7 +15,7 @@ delete and update everything based on your existing drizzle sql schema. It suppo
 ## Quick start
 <Steps>
 
-### Install dependencies
+#### Install dependencies
 Check out extended docs for **[SQL dialect and drivers.](/docs/installation-and-db-connection)**
 
 <Npm>
@@ -23,7 +23,7 @@ drizzle-orm
 -D drizzle-kit
 </Npm>
 
-### Prepare your database schema
+#### Prepare your database schema
 Check out extended schema declaration **[docs.](/docs/sql-schema-declaration)**
 ```typescript copy filename="schema.ts"
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
@@ -35,7 +35,7 @@ export const users = pgTable('users', {
 });
 ```
 
-### Prepare config file
+#### Prepare config file
 Check out extended config file **[docs.](/kit-docs/conf)**
 ```typescript copy filename="drizzle.config.ts"
 import type { Config } from "drizzle-kit";
@@ -51,7 +51,7 @@ export default {
   }
 } satisfies Config;
 ```
-### Launch Drizzle Studio
+#### Launch Drizzle Studio
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab>
 ```bash copy
