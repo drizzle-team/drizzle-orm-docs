@@ -84,6 +84,17 @@ await db.insert(users)
   });
 ```
 
+Upsert with composite indexes, or composite primary keys for `onConflictDoUpdate`:
+
+```typescript
+await db.insert(users)
+  .values({ firstName: 'John', lastName: 'Doe' })
+  .onConflictDoUpdate({
+    target: [users.firstName, users.lastName],
+    set: { firstName: 'John1' }
+  });
+```
+
 ### On duplicate key update
 <IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true }} />
 
