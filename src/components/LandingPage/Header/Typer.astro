@@ -11,18 +11,15 @@
     let canAnimate = false;
     let reverse = true;
     const words = [
-      "lets you be productive",
-      "is a query builder on steroids",
-      "performs and lasts",
+      "is production ready",
+      "dropped out of college",
+      "feels like SPA with SSR",
+      "is a library, like React",
       "developers love",
       "is not as good as Django",
-      "is production ready",
-      "lets you make friends with SQL",
-      "Dax should definitely try",
-      "is not as good as Laravel",
-      "is not VC backed yet",
+      "made friends with SQL",
       "is familiar, but different",
-      "is JavaScript ORM too",
+      "is a JavaScript ORM too",
       "will be here for a while",
     ];
 
@@ -35,20 +32,20 @@
       const wordLength = words[indexWord].length;
       if (sentenceLength < wordLength) {
         timeOut = setTimeout(() => {
-            sentence = sentence + words[indexWord][index];
-            ++index;
-            animateText();
-          }, 32);
+          sentence = sentence + words[indexWord][index];
+          ++index;
+          animateText();
+        }, 32);
       } else {
-          clearTimeout(timeOut);
-          reverse = true;
-          if (indexWord === words.length - 1) {
-            indexWord = 0;
-          } else {
-            ++indexWord;
-          }
-          setTimeout(reduceText, 3000);
+        clearTimeout(timeOut);
+        reverse = true;
+        if (indexWord === words.length - 1) {
+          indexWord = 0;
+        } else {
+          ++indexWord;
         }
+        setTimeout(reduceText, 3000);
+      }
     };
 
     const reduceText = () => {
@@ -60,12 +57,12 @@
         animateText();
       }, 32);
 
-      if(sentenceLength === 0) {
+      if (sentenceLength === 0) {
         clearTimeout(timeOut);
         reverse = false;
         increaseText();
       }
-    }
+    };
 
     const animateText = () => {
       if (canAnimate) {
@@ -75,7 +72,7 @@
           increaseText();
         }
       }
-    }
+    };
 
     setTimeout(() => {
       reduceText();
@@ -90,35 +87,34 @@
   }
 
   @keyframes blank {
-      0% {
-        opacity: 0;
-      }
+    0% {
+      opacity: 0;
+    }
 
-      25% {
-        opacity: 1;
-      }
+    25% {
+      opacity: 1;
+    }
 
-      75% {
-        opacity: 1;
-      }
+    75% {
+      opacity: 1;
+    }
 
-      100% {
-        opacity: 0;
-      }
+    100% {
+      opacity: 0;
+    }
   }
 
-
-  html[class~=dark] .typer__cursor {
-    background-color: rgb(241,245,249);
-    color: rgb(241,245,249);
+  html[class~="dark"] .typer__cursor {
+    background-color: rgb(241, 245, 249);
+    color: rgb(241, 245, 249);
   }
 
   .typer__cursor {
     display: inline-block;
     position: relative;
     width: 2px;
-    color: rgb(15,23,42);
-    background-color: rgb(15,23,42);
+    color: rgb(15, 23, 42);
+    background-color: rgb(15, 23, 42);
     line-height: 1;
     left: -2px;
     animation-name: blank;
@@ -131,8 +127,7 @@
     text-decoration: underline #4bb74a;
   }
 
-  html[class~=dark] .typer__underline {
+  html[class~="dark"] .typer__underline {
     text-decoration: underline #4bb74a;
   }
-
 </style>
