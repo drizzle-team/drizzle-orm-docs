@@ -21,10 +21,12 @@ interface Props {
 }
 
 const getContentTree = async (props: Props) => {
-  const metaFiles: Record<string, () => Promise<{ default: any }>> =
-    await import.meta.glob("../content/**/*.json");
-  const mdxFiles: Record<string, () => Promise<{ default: any }>> =
-    await import.meta.glob("../content/**/*.mdx");
+  const metaFiles = import.meta.glob<Record<string, Record<string, string>>>(
+    "../content/**/*.json",
+  );
+  const mdxFiles = import.meta.glob<Record<string, Record<string, string>>>(
+    "../content/**/*.mdx",
+  );
   const mdxPaths = Object.keys(mdxFiles);
 
   const regex = /\.\.\/content\/documentation\/(.*?)\/_meta\.json/;

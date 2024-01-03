@@ -12,14 +12,18 @@ import RightAside from "@components/layout/RightAside.astro";
 
 interface Props {
   title: string;
+  description?: string;
   headings: IHeading[];
 }
-const { headings } = Astro.props;
+const { headings, description } = Astro.props;
 const { slug } = Astro.params;
 const { tree, filteredHeadings, title } = await getContentTree({
   headings,
   slug,
 });
+
+const defaultDescription =
+  "Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.";
 ---
 
 <!doctype html>
@@ -33,14 +37,12 @@ const { tree, filteredHeadings, title } = await getContentTree({
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <title>Drizzle ORM - {title}</title>
-    <meta
-      name="description"
-      content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind."
-    />
-    <meta property="og:title" content="Drizzle ORM - next gen TypeScript ORM" />
+    <meta name="description" content={description || defaultDescription} />
+
+    <meta property="og:title" content={`Drizzle ORM - ${title}`} />
     <meta
       property="og:description"
-      content="Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind."
+      content={description || defaultDescription}
     />
     <script is:inline>
       const setPreference = (themeName) => {

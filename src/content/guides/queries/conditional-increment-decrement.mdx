@@ -1,0 +1,30 @@
+---
+title: Conditional increment/decrement of user logins
+---
+
+## Schema
+
+```ts
+import { pgTable, serial, text, integer } from 'drizzle-orm';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  logins: integer('logins').notNull().default(0),
+});
+```
+
+To increment or decrement the number of logins (**`logins`**) for a user, use the update (**`update`**) query with your own `isIncrease` variable and conditional operator.
+
+```ts
+const isIncrease = false;
+const credit = 1;
+const id = 1
+
+await db
+  .update(users)
+  .set({
+    logins: sql`${users.logins} + ${isIncrease ? credit : -credit}`,
+  })
+  .where(eq(users.id, id));
+```

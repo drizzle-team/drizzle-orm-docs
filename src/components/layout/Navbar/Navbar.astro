@@ -8,9 +8,7 @@ import LogoDocs from "../LogoDocs.astro";
 <div id="nav_container" class="nav_container">
   <div class="nav_container_blur"></div>
   <div class="nav_content_wrap">
-    <div>
-      <LogoDocs />
-    </div>
+    <LogoDocs />
     <div class="nav_desktop">
       <CenteredSearchWithAI />
     </div>
@@ -104,7 +102,7 @@ import LogoDocs from "../LogoDocs.astro";
         },
       });
     }
-  }
+  };
 
   const dropdownItems = document.getElementById("theme-dropdown-items");
   const themeItems = document.querySelectorAll("[data-theme-value]");
@@ -200,8 +198,8 @@ import LogoDocs from "../LogoDocs.astro";
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    max-width: 165px;
     width: 100%;
+    flex: 1;
   }
 
   .nav_desktop {

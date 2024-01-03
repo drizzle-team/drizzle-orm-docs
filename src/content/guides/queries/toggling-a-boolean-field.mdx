@@ -1,0 +1,27 @@
+---
+title: Toggling a boolean field
+---
+
+This query demonstrates how to toggle a boolean field.
+
+## Schema
+
+```ts
+import { boolean, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const tasks = pgTable('tasks', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  done: boolean('done').notNull().default(false),
+});
+```
+
+The query invert the value of the **`done`** column, which is a boolean.
+
+## Query
+
+```ts
+await db.update(tasks).set({
+  done: sql`NOT ${tasks.done}`,
+});
+```

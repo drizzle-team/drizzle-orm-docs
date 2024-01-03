@@ -1,0 +1,28 @@
+---
+title: Decrementing a Value
+---
+
+## Schema
+
+```ts
+import { pgTable, serial, text, integer } from 'drizzle-orm';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  logins: integer('logins').notNull().default(0),
+});
+```
+
+To decrement the number of logins (**`logins`**) for a user, use the update (**`update`**) query. In this example, we decrement the **`logins`** value by 1 for the user with **`id = 1`**.
+
+```ts
+const id = 1
+
+await db
+    .update(users)
+    .set({
+      logins: sql`${users.logins} - 1`,
+    })
+    .where(eq(users.id, id));
+```

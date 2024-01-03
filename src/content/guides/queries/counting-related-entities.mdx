@@ -1,0 +1,44 @@
+---
+title: Counting Related Entities
+---
+
+## Schema
+
+```ts
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+export const posts = pgTable('posts', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+});
+```
+
+`cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
+
+## Count query
+
+```ts
+const id = 1;
+
+const response = await db
+  .select({
+    postsCount: sql<number>`cast(${count(posts.id)} as int)`,
+  })
+  .from(users)
+  .where(eq(users.id, id))
+  .leftJoin(posts, eq(users.id, posts.userId));
+
+// response type
+const response: {
+  postsCount: number;
+}[]
+```
