@@ -271,7 +271,7 @@ You can define `relations` without using foreign keys (and vice versa), which al
 The following two examples will work exactly the same in terms of querying the data using Drizzle relational queries.
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
-```ts {15}
+```ts {6-11}
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
 	name: text('name'),
@@ -292,18 +292,11 @@ export const profileInfo = pgTable('profile_info', {
 ```
 </CodeTab>
 <CodeTab>
-```ts {15}
+```ts {8}
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
 	name: text('name'),
 });
-
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
-	}),
-}));
 
 export const profileInfo = pgTable('profile_info', {
 	id: serial('id').primaryKey(),
