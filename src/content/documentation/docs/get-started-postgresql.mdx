@@ -28,7 +28,11 @@ drizzle-orm @neondatabase/serverless
 </Npm>
 
 With the Neon serverless driver [**[github](https://github.com/neondatabase/serverless)**, **[blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/)**, **[Neon docs](https://neon.tech/docs/serverless/serverless-driver)**],  
-you can access a Neon database from serverless environments — like Cloudflare Workers or Vercel Edge Functions — over HTTP or WebSockets instead of TCP.
+you can access a Neon database from serverless environments — like Cloudflare Workers or Vercel Edge Functions — over HTTP or WebSockets instead of TCP. 
+
+<Callout type="info" emoji="ℹ️">
+The Neon serverless driver is not supported with [Drizzle Kit](/kit-docs/overview). For Drizzle Kit, use a standard Postgres driver like **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)**.
+</Callout>
 
 Querying over HTTP is faster for single, non-interactive transactions. If you require session or interactive transaction support or a fully-compatible drop-in replacement for the `pg` driver, use WebSockets.
 
