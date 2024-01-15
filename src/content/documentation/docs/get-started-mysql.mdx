@@ -39,11 +39,8 @@ const client = new Client({
 
 ...
 
-// Inside of your request handler, create a database instance
-const db = drizzle(client.connection());
+const db = drizzle(client);
 ```
-
-**NOTE**: You must create a fresh connection for each web request handler / transaction, as the database is executing requests over HTTP and is not meant to be shared globally.
 
 Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
 we think they're outstanding 🙌
