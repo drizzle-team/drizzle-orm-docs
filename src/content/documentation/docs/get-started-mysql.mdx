@@ -28,17 +28,22 @@ drizzle-orm @planetscale/database
 
 ```typescript copy filename="index.ts"
 import { drizzle } from "drizzle-orm/planetscale-serverless";
-import { connect } from "@planetscale/database";
+import { Client } from "@planetscale/database";
 
 // create the connection
-const connection = connect({
+const client = new Client({
   host: process.env["DATABASE_HOST"],
   username: process.env["DATABASE_USERNAME"],
   password: process.env["DATABASE_PASSWORD"],
 });
 
-const db = drizzle(connection);
+...
+
+// Inside of your request handler, create a database instance
+const db = drizzle(client.connection());
 ```
+
+**NOTE**: You must create a fresh connection for each web request handler / transaction, as the database is executing requests over HTTP and is not meant to be shared globally.
 
 Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
 we think they're outstanding 🙌
