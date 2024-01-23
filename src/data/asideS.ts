@@ -4,7 +4,7 @@ export const sponsorsData: ISponsor[] = [
   {
     tier: {
       name: "$1,000 one time",
-      isOneTime: true,
+      isOneTime: false,
     },
     sponsorEntity: {
       __typename: "Organization",
@@ -31,7 +31,7 @@ export const sponsorsData: ISponsor[] = [
   {
     tier: {
       name: "$1000 a month",
-      isOneTime: true,
+      isOneTime: false,
     },
     sponsorEntity: {
       __typename: "Organization",
@@ -56,7 +56,7 @@ export const sponsorsData: ISponsor[] = [
   {
     tier: {
       name: "$1000 a month",
-      isOneTime: true,
+      isOneTime: false,
     },
     sponsorEntity: {
       __typename: "Organization",
@@ -78,7 +78,7 @@ export const sponsorsData: ISponsor[] = [
   {
     tier: {
       name: "$1000 a month",
-      isOneTime: true,
+      isOneTime: false,
     },
     sponsorEntity: {
       __typename: "Organization",
