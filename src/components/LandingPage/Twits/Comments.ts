@@ -39,7 +39,9 @@ const Comments: IComment[] = [
     avatar: adamdotdev,
     name: "Adam",
     login: "adamdotdev",
-    text: "i know this won't get me on the homepage, but @DrizzleORM is so good",
+    text: `i know this won't get me on the homepage, but 
+    
+@DrizzleORM is so good`,
   },
   {
     avatar: t3dotgg,
