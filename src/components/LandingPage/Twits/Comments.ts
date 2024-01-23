@@ -7,6 +7,7 @@ import t3dotgg from "@/assets/images/twits/t3dotgg.jpg";
 import thdxr from "@/assets/images/twits/thdxr.jpg";
 import tslamoon1 from "@/assets/images/twits/tslamoon1.jpg";
 import lightgrey from "@/assets/images/twits/lightgrey.svg";
+import adamdotdev from "@/assets/images/twits/adamdotdev.jpeg";
 
 export interface IComment {
   avatar: ImageMetadata;
@@ -35,10 +36,10 @@ const Comments: IComment[] = [
     text: "I hate @DrizzleOrm so much that I wrote the Auth.js adapter for it.",
   },
   {
-    avatar: lightgrey,
-    name: "Regular Twitter Comment",
-    login: "dont_know",
-    text: "It's not yet production ready",
+    avatar: adamdotdev,
+    name: "Adam",
+    login: "adamdotdev",
+    text: "i know this won't get me on the homepage, but @DrizzleORM is so good",
   },
   {
     avatar: t3dotgg,
@@ -59,10 +60,10 @@ const Comments: IComment[] = [
     text: "Y'all should just copy everything Eloquent has",
   },
   {
-    avatar: lightgrey,
-    name: "Some Body",
-    login: "dont_know",
-    text: "Django had it in 2008",
+    avatar: imfelquis,
+    name: "Ofelquis Gimenes",
+    login: "imfelquis",
+    text: "unpredictable results is what feeds the human race, ban Drizzle now and all this typing gibberish all together",
   },
   {
     avatar: tslamoon1,
@@ -77,10 +78,16 @@ const Comments: IComment[] = [
     text: "What I notice is also an understandable API, text is a text, a primary value is primaryKey and so on",
   },
   {
-    avatar: imfelquis,
-    name: "Ofelquis Gimenes",
-    login: "imfelquis",
-    text: "unpredictable results is what feeds the human race, ban Drizzle now and all this typing gibberish all together",
+    avatar: lightgrey,
+    name: "Some Body",
+    login: "dont_know",
+    text: "Django had it in 2008",
+  },
+  {
+    avatar: lightgrey,
+    name: "Regular Twitter Comment",
+    login: "dont_know",
+    text: "It's not yet production ready",
   },
 ];
 
