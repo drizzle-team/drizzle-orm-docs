@@ -2,13 +2,8 @@ import sponsorsData from "@/data/s";
 import { type ISponsor } from "@/types/Sponsors";
 
 const sponsorsHandler = async () => {
-  const response = await fetch("https://api.drizzle.team/github/sponsors", {
-    headers: {
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-    },
-  });
-  const { data } = await response.json();
-  const sponsors = data.data.organization.sponsorshipsAsMaintainer.nodes;
+  const response = await fetch("https://api.drizzle.team/v2/sponsors");
+  const { sponsors } = await response.json();
 
   const allSponsors = [...sponsors, ...sponsorsData];
   let pastSponsors: ISponsor[] = [];
