@@ -90,6 +90,24 @@ const Runtimes: {
       width: 28,
     },
   },
+  "React Native": {
+    imageSrc: "/public/svg/react-native.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+  },
+  Expo: {
+    imageSrc: "/public/svg/expo.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+  },
 };
 
 export default Runtimes;
