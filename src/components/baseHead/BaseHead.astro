@@ -1,0 +1,84 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.'
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="index,follow" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  <link
+    rel="preconnect"
+    href="https://MXZNUT59HV-dsn.algolia.net"
+    crossorigin
+  />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title}</title>
+  <meta
+    name="description"
+    content={defaultDescription || description}
+  />
+  <meta property="og:title" content={title} />
+  <meta
+    property="og:description"
+    content={defaultDescription || description}
+  />
+  <script is:inline>
+    const setPreference = (themeName) => {
+      localStorage.setItem("theme", themeName);
+      if (!document.firstElementChild) return;
+      if (themeName === "system") {
+        themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+      document.firstElementChild.classList.toggle("dark", themeName === "dark");
+      document.firstElementChild.classList.toggle(
+        "light",
+        themeName !== "dark",
+      );
+      document.firstElementChild.setAttribute(
+        "style",
+        themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
+      );
+    };
+
+    const getColorPreference = () => {
+      let preference = localStorage.getItem("theme");
+      if (preference === "system") {
+        return preference;
+      }
+
+      if (!preference) {
+        preference = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+      return preference;
+    };
+
+    setPreference(getColorPreference());
+  </script>
+  <script
+    type="module"
+    src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js"
+    defer></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
+  <link rel="stylesheet" href="/preferred.css" />
+  <link
+    rel="preconnect"
+    href="https://MXZNUT59HV-dsn.algolia.net"
+    crossorigin
+  />
+</head>
