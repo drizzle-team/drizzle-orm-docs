@@ -5,6 +5,9 @@ svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="h
 import Steps from "@mdx/Steps.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import CodeTab from "@mdx/CodeTab.astro";
+import Section from "@mdx/Section.astro";
+import Tabs from "@mdx/Tabs.astro";
+import Tab from "@mdx/Tab.astro";
 
 
 ## Backend
@@ -78,89 +81,105 @@ npx drizzle-kit push:pg
 **Now, we're ready to write queries** using Drizzle ORM.
 </Steps>
 
-### Add todo
 
-The **`addTodo`** function inserts a new record into the **`todo`** table.
+### Functions
 
-```tsx
-import db from "@/db/drizzle";
-import { todo } from "@/db/schema";
+1. **`Add todo`:**
+    The `addTodo` function inserts a new record into the `todo` table.
+2. **`Get todos`:**
+    Here, we fetch all todos, sorted by their identifier.
+3. **`Edit todo`:**
+    The `editTodo` function updates the text of a todo by its identifier.
+4. **`Toggle todo`:**
+    This method toggles the status of a todo to its opposite state.
+5. **`Delete todo`:**
+    The `deleteTodo` function removes a todo by its identifier.
 
-export const addTodo = async (id: number, text: string) => {
-  await db.insert(todo).values({
-    id: id,
-    text: text,
-  });
-};
-```
 
-### Get todos
+<Tabs items={['Add todo', 'Get todos', 'Edit todo', 'Toggle todo', 'Delete todo']}>
+  <Tab>
+    <Section>
+    ```tsx
+    import db from "@/db/drizzle";
+    import { todo } from "@/db/schema";
 
-Here, we fetch all todos, sorted by their identifier.
+    export const addTodo = async (id: number, text: string) => {
+      await db.insert(todo).values({
+        id: id,
+        text: text,
+      });
+    };
+    ```
+    </Section>
 
-```tsx
-import db from "@/db/drizzle";
-import { todo } from "@/db/schema";
-import { asc } from 'drizzle-orm';
+  </Tab> 
+  <Tab>
+    <Section>
+    ```tsx
+    import db from "@/db/drizzle";
+    import { todo } from "@/db/schema";
+    import { asc } from 'drizzle-orm';
 
-export const getData = async () => {
-  const data = await db.select().from(todo).orderBy(asc(todo.id));
+    export const getData = async () => {
+      const data = await db.select().from(todo).orderBy(asc(todo.id));
 
-  return data;
-};
-```
+      return data;
+    };
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+    ```tsx
+    import db from "@/db/drizzle";
+    import { todo } from "@/db/schema";
+    import { eq } from 'drizzle-orm';
 
-### Edit todo
+    export const editTodo = async (id: number, text: string) => {
+      await db
+        .update(todo)
+        .set({
+          text: text,
+        })
+        .where(eq(todo.id, id));
+    };
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+    ```tsx
+    import db from "@/db/drizzle";
+    import { todo } from "@/db/schema";
+    import { eq, not } from 'drizzle-orm';
 
-The **`editTodo`** function updates the text of a todo by its identifier.
+    export const toggleTodo = async (id: number) => {
+      await db
+        .update(todo)
+        .set({
+          done: not(todo.done),
+        })
+        .where(eq(todo.id, id));
+    };
+    ```
+    </Section>
+  </Tab>
+    <Tab>
+    <Section>
+    ```tsx
+    import db from "@/db/drizzle";
+    import { todo } from "@/db/schema";
+    import { eq } from 'drizzle-orm';
 
-```tsx
-import db from "@/db/drizzle";
-import { todo } from "@/db/schema";
-import { eq } from 'drizzle-orm';
+    export const deleteTodo = async (id: number) => {
+      await db.delete(todo).where(eq(todo.id, id));
+    };
+    ```
+    </Section>
+  </Tab>
+</Tabs>
 
-export const editTodo = async (id: number, text: string) => {
-  await db
-    .update(todo)
-    .set({
-      text: text,
-    })
-    .where(eq(todo.id, id));
-};
-```
 
-### Toogle todo
-
-This method toggles the status of a todo to its opposite state.
-
-```tsx
-import db from "@/db/drizzle";
-import { todo } from "@/db/schema";
-import { eq, not } from 'drizzle-orm';
-
-export const toggleTodo = async (id: number) => {
-  await db
-    .update(todo)
-    .set({
-      done: not(todo.done),
-    })
-    .where(eq(todo.id, id));
-};
-```
-
-### Delete todo
-
-The **`deleteTodo`** function removes a todo by its identifier.
-
-```tsx
-import db from "@/db/drizzle";
-import { todo } from "@/db/schema";
-import { eq } from 'drizzle-orm';
-
-export const deleteTodo = async (id: number) => {
-  await db.delete(todo).where(eq(todo.id, id));
-};
-```
 This guide uses the following file structure for Backend part:
 ```text
 📦 <project root>
