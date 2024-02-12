@@ -25,7 +25,7 @@ These steps are applicable whether you're developing a REST API (for example, wi
 
 For this guide, we'll use a REST API built with `Express` as a sample project to migrate to **Drizzle ORM**. It has four entities:
 
-```typescript copy filename="src/entities/supplier.entity.ts"
+```typescript collapsable copy filename="src/entities/supplier.entity.ts"
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Product } from './product.entity';
 
@@ -48,7 +48,7 @@ export class Supplier {
 }
 ```
 
-```typescript copy filename="src/entities/product.entity.ts"
+```typescript collapsable copy filename="src/entities/product.entity.ts"
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderDetail } from './order-detail.entity';
 import { Supplier } from './supplier.entity';
@@ -79,7 +79,7 @@ export class Product {
 }
 ```
 
-```typescript copy filename="src/entities/order.entity.ts"
+```typescript collapsable copy filename="src/entities/order.entity.ts"
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderDetail } from './order-detail.entity';
 
@@ -108,7 +108,7 @@ export class Order {
 }
 ```
 
-```typescript copy filename="src/entities/order-detail.entity.ts"
+```typescript collapsable copy filename="src/entities/order-detail.entity.ts"
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from './product.entity';
@@ -248,7 +248,7 @@ npx drizzle-kit introspect:pg
 
 This command will generate a schema.ts file, along with snapshots and migrations in the src/drizzle folder.
 
-```typescript copy filename="src/drizzle/schema.ts"
+```typescript collapsable copy filename="src/drizzle/schema.ts" 
 import {
   pgTable,
   serial,
@@ -318,7 +318,7 @@ export const orderDetails = pgTable(
 );
 ```
 
-```sql copy filename="src/drizzle/0000_lush_lenny_balinger.sql"
+```sql collapsable copy filename="src/drizzle/0000_lush_lenny_balinger.sql"
 -- Current sql file was generated after introspecting the database
 
 CREATE TABLE IF NOT EXISTS "migrations" (
@@ -691,7 +691,7 @@ const response = await repostitory.findAndCount({
 
 In **Drizzle ORM**, the query is implemented as follows:
 
-```typescript copy filename="src/controllers/product.controller.ts"
+```typescript collapsable copy filename="src/controllers/product.controller.ts"
 import { ilike, sql } from 'drizzle-orm';
 import { db } from '../drizzle/db';
 import { products } from '../drizzle/schema';

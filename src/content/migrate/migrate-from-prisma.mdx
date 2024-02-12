@@ -224,7 +224,7 @@ npx drizzle-kit introspect:pg
 
 This command will generate a schema.ts file, along with snapshots and migrations in the src/drizzle folder.
 
-```typescript copy filename="src/drizzle/schema.ts"
+```typescript collapsable copy filename="src/drizzle/schema.ts"
 import {
   pgTable,
   varchar,
@@ -295,7 +295,7 @@ export const orderDetails = pgTable(
 );
 ```
 
-```sql copy filename="src/drizzle/0000_cool_puff_adder.sql"
+```sql collapsable copy filename="src/drizzle/0000_cool_puff_adder.sql"
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
 	"id" varchar(36) PRIMARY KEY NOT NULL,
 	"checksum" varchar(64) NOT NULL,
@@ -659,7 +659,7 @@ const [response, count] = await Promise.all([
 
 In **Drizzle ORM**, the query is implemented as follows:
 
-```typescript copy filename="src/controllers/product.controller.ts"
+```typescript collapsable copy filename="src/controllers/product.controller.ts"
 import { ilike, sql } from 'drizzle-orm';
 import { db } from '../drizzle/db';
 import { products } from '../drizzle/schema';

@@ -25,7 +25,7 @@ These steps are applicable whether you're developing a REST API (for example, wi
 
 For this guide, we'll use a REST API built with `Express` as a sample project to migrate to **Drizzle ORM**. It has four entities:
 
-```typescript copy filename="src/db/models/supplier.ts"
+```typescript collapsable copy filename="src/db/models/supplier.ts"
 import { DataTypes, Model } from 'sequelize';
 import { Product } from './product';
 import { sequelize } from '../db';
@@ -70,7 +70,7 @@ Product.belongsTo(Supplier, {
 });
 ```
 
-```typescript copy filename="src/db/models/product.ts"
+```typescript collapsable copy filename="src/db/models/product.ts"
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db';
 
@@ -114,7 +114,7 @@ Product.init(
 );
 ```
 
-```typescript copy filename="src/db/models/order.ts"
+```typescript collapsable copy filename="src/db/models/order.ts"
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db';
 
@@ -157,7 +157,7 @@ Order.init(
 );
 ```
 
-```typescript copy filename="src/db/models/order-detail.ts"
+```typescript collapsable copy filename="src/db/models/order-detail.ts"
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db';
 import { Order } from './order';
@@ -227,7 +227,7 @@ For `many-to-many` relation we will create a join table `order_details`, so `Ord
 
 The corresponding tables have been created using Sequelize migration. Sequelize doesn't support auto generation of migrations, so you have to write them manually.
 
-```javascript copy filename="src/db/migrations/20231220152726-init.js"
+```javascript collapsable copy filename="src/db/migrations/20231220152726-init.js"
 'use strict';
 
 module.exports = {
@@ -425,7 +425,7 @@ npx drizzle-kit introspect:pg
 
 This command will generate a schema.ts file, along with snapshots and migrations in the src/drizzle folder.
 
-```typescript copy filename="src/drizzle/schema.ts"
+```typescript collapsable copy filename="src/drizzle/schema.ts"
 import {
   pgTable,
   varchar,
@@ -488,7 +488,7 @@ export const orderDetails = pgTable(
 );
 ```
 
-```sql copy filename="src/drizzle/0000_high_rhodey.sql"
+```sql collapsable copy filename="src/drizzle/0000_high_rhodey.sql"
 -- Current sql file was generated after introspecting the database
 
 CREATE TABLE IF NOT EXISTS "SequelizeMeta" (
@@ -845,7 +845,7 @@ const { rows, count } = await Product.findAndCountAll({
 
 In **Drizzle ORM**, the query is implemented as follows:
 
-```typescript copy filename="src/controllers/product.controller.ts"
+```typescript collapsable copy filename="src/controllers/product.controller.ts"
 import { ilike, sql } from 'drizzle-orm';
 import { db } from '../drizzle/db';
 import { products } from '../drizzle/schema';

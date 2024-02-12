@@ -23,12 +23,15 @@ const { filteredHeadings, title } = await getContentTree({
   headings,
   slug,
 });
-
+const defaultTitle = "Learn";
 ---
 
 <!doctype html>
 <html lang="en">
-  <BaseHead title={`Drizzle ORM - ${title}`} description={description} />
+  <BaseHead
+    title={`Drizzle ORM - ${title || defaultTitle}`}
+    description={description}
+  />
   <body class="banner-shown">
     <GlobalStyles />
     <MDXStyles />

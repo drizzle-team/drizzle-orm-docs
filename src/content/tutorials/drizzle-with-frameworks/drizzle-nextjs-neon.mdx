@@ -2,9 +2,12 @@
 title: "Todo App with Drizzle ORM, Next.js and Neon"
 svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', '<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_84_2)"><path d="M128 256C198.692 256 256 198.692 256 128C256 57.3075 198.692 0 128 0C57.3075 0 0 57.3075 0 128C0 198.692 57.3075 256 128 256Z" fill="black"/><path d="M212.63 224.03L98.34 76.8H76.8V179.16H94.03V98.68L199.11 234.45C203.85 231.27 208.37 227.79 212.63 224.03Z" fill="url(#paint0_linear_84_2)"/><path d="M180.63 76.8H163.56V179.2H180.63V76.8Z" fill="url(#paint1_linear_84_2)"/></g><defs><linearGradient id="paint0_linear_84_2" x1="132.707" y1="181.561" x2="178.076" y2="237.79" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient><linearGradient id="paint1_linear_84_2" x1="172.083" y1="76.7712" x2="171.776" y2="151.973" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient><clipPath id="clip0_84_2"><rect width="256" height="256" fill="white"/></clipPath></defs></svg>', '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 6.27586C2 4.46665 3.54385 3 5.44828 3H18.5517C20.4562 3 22 4.46665 22 6.27586V16.8631C22 18.7349 19.5068 19.5471 18.2976 18.0694L14.5173 13.4496V19.0517C14.5173 20.68 13.1278 22 11.4138 22H5.44828C3.54385 22 2 20.5333 2 18.7241V6.27586ZM5.44828 5.62069C5.06739 5.62069 4.75863 5.91402 4.75863 6.27586V18.7241C4.75863 19.086 5.06739 19.3793 5.44828 19.3793H11.5172C11.7077 19.3793 11.7586 19.2327 11.7586 19.0517V11.5393C11.7586 9.66758 14.2518 8.8552 15.461 10.333L19.2414 14.9528V6.27586C19.2414 5.91402 19.2774 5.62069 18.8966 5.62069H5.44828Z" fill="currentColor"/></svg>']
 ---
+import Steps from "@mdx/Steps.astro";
+
 
 ## Backend
-
+<Steps>
+#### Install Drizzle Kit and Drizzle ORM
 The first step is to install **Drizzle Kit** and **Drizzle ORM** in your project.
 
 ```bash
@@ -14,7 +17,7 @@ npm i -D drizzle-kit
 
 Here, we're installing the necessary packages: **`drizzle-orm`** for database interactions and **`@neondatabase/serverless`** for working with the Neon database. The **`drizzle-kit`** package is used as a dev-dependency for handling configuration and migrations.
 
-**Next**, connect Drizzle ORM to the Neon database.
+#### Connect Drizzle ORM to the Neon database
 
 ```tsx
 import { neon } from '@neondatabase/serverless';
@@ -28,6 +31,9 @@ export default db;
 ```
 
 In this snippet, we import functionality from **`@neondatabase/serverless`** and **`drizzle-orm`**, establish a connection to the Neon database, and initialize Drizzle.
+
+#### Setup Drizzle config file
+
 
 **Then, set up** the Drizzle configuration. **Drizzle config** is a configuration file used by **Drizzle Kit**. It contains all the information about your database connection, migration folder, and schema files.
 
@@ -47,7 +53,7 @@ export default {
 
 This configuration file specifies the database schema location, path for generating migrations, and database connection through the connection string.
 
-**Next, declare** the **`todos`** schema.
+#### Declare todos schema
 
 ```tsx
 import { integer, text, boolean, pgTable } from "drizzle-orm/pg-core";
@@ -67,6 +73,7 @@ Push your schema changes directly to the database without generating any migrati
 npx drizzle-kit push:pg
 ```
 
+</Steps>
 **Now, we're ready to write queries** using Drizzle ORM.
 
 ### Add todo
@@ -152,16 +159,36 @@ export const deleteTodo = async (id: number) => {
   await db.delete(todo).where(eq(todo.id, id));
 };
 ```
-
+This guide uses the following file structure for Backend part:
+```text
+📦 <project root>
+ ├ 📂 drizzle
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json  
+ │  │  └  📜 0000_snapshot.json
+ │  └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📂 actions
+ │  └ 📜 todoActions.ts
+ ├ 📂 db
+ │  ├ 📜 drizzle.ts
+ │  └ 📜 schema.ts
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
 ## Frontend
-
+<Steps>
+#### Initiate Next.js app with Tailwind CSS
 Initiate a new Next.js application with Tailwind CSS support using the **`npx create-next-app@latest`** command. Name your project when prompted, navigate to the project directory, and start the development server with **`npm run dev`**. Your Next.js app is now set up for customization and styling with Tailwind CSS.
 
+```bash
 npx create-next-app@latest
+```
+#### Define a TypeScript type
 
 Define a TypeScript type for a todo item with three properties: **`id`** of type **`number`**, **`text`** of type **`string`**, and **`done`** of type **`boolean`**. This type, named **`todoType`**, represents the structure of a typical todo item within your application.
 
-```
+```ts
 export type todoType = {
   id: number;
   text: string;
@@ -169,7 +196,7 @@ export type todoType = {
 };
 ```
 
-Create a home page for a to-do application.
+#### Create a home page for a to-do application
 
 ```tsx
 import {getData} from "@/actions/todoActions";
@@ -184,7 +211,7 @@ export default async function Home() {
 
 Create Todos components that represents the main interface of a Todo app. It manages the state of todo items, provides functions for creating, editing, toggling, and deleting todos, and renders the individual todo items using the **`Todo`** component.
 
-```tsx
+```tsx collapsable
 "use client";
 import { FC, useState } from "react";
 import { todoType } from "@/types/todoType";
@@ -256,7 +283,7 @@ export default Todos;
 
 Create a `Todo` component that represents a single todo item. It includes features for displaying and editing the todo text, marking it as done with a checkbox, and providing actions for editing, saving, canceling, and deleting the todo.
 
-```tsx
+```tsx collapsable
 "use client";
 import { ChangeEvent, FC, useState } from "react";
 import { todoType } from "@/types/todoType";
@@ -380,7 +407,7 @@ export default Todo;
 
 The **`AddTodo`** component provides a simple form for adding new todo items to the Todo app. It includes an input field for entering the todo text and a button for triggering the addition of the new todo.
 
-```tsx
+```tsx collapsable
 "use client";
 import { ChangeEvent, FC, useState } from "react";
 
@@ -425,4 +452,97 @@ const AddTodo: FC<Props> = ({ createTodo }) => {
 };
 
 export default AddTodo;
+```
+#### Establish server-side functions
+In this step, we establish server-side functions in the **`todoActions`** file to handle crucial operations on todo items:
+
+1. **`getData`:**
+    - Fetches all existing todo items from the database.
+2. **`addTodo`:**
+    - Adds a new todo item to the database with the provided text.
+    - Initiates revalidation of the home page using **`revalidatePath("/")`**.
+3. **`deleteTodo`:**
+    - Removes a todo item from the database based on its unique ID.
+    - Triggers a revalidation of the home page.
+4. **`toggleTodo`:**
+    - Toggles the completion status of a todo item, updating the database accordingly.
+    - Revalidates the home page after the operation.
+5. **`editTodo`:**
+    - Modifies the text of a todo item identified by its ID in the database.
+    - Initiates a revalidation of the home page.
+
+
+```tsx collapsable
+"use server";
+import {eq} from "drizzle-orm";
+import {revalidatePath} from "next/cache";
+
+import db from "@/db/drizzle";
+import {todo} from "@/db/schema";
+
+export const getData = async () => {
+  const data = await db.select().from(todo);
+  return data;
+};
+
+export const addTodo = async (text: string) => {
+  await db.insert(todo).values({
+    text: text,
+  });
+  revalidatePath("/");
+};
+
+export const deleteTodo = async (id: number) => {
+  await db.delete(todo).where(eq(todo.id, id));
+
+  revalidatePath("/");
+};
+
+export const toggleTodo = async (id: number, done: boolean) => {
+  await db
+    .update(todo)
+    .set({
+      done: done,
+    })
+    .where(eq(todo.id, id));
+
+  revalidatePath("/");
+};
+
+export const editTodo = async (id: number, text: string) => {
+  await db
+    .update(todo)
+    .set({
+      text: text,
+    })
+    .where(eq(todo.id, id));
+
+  revalidatePath("/");
+};
+```
+</Steps>
+This guide uses the following file structure for Frontend part:
+```text
+📦 <project root>
+ ├ 📂 actions
+ │  └ 📜 todoActions.ts
+ ├ 📂 app
+ │  ├ 📜 favicon.ico
+ │  ├ 📜 globals.css
+ │  ├ 📜 layout.tsx
+ │  └ 📜 page.tsx
+ ├ 📂 components
+ │  ├ 📜 AddTodo.tsx
+ │  ├ 📜 Todo.tsx
+ │  └ 📜 Todos.tsx
+ ├ 📂 components
+ │  ├ 📜 next.svg
+ │  └ 📜 vercel.svg
+ ├ 📂 types
+ │  └ 📜 todoType.ts
+ ├ 📜 next.config.ts
+ ├ 📜 package.json
+ ├ 📜 postcss.config.ts
+ ├ 📜 tailwind.config.ts
+ └ 📜 tsconfig.json
 ```

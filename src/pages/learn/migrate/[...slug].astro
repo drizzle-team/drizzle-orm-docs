@@ -23,9 +23,7 @@ const { Content, headings } = await entry.render();
   description={entry.data.description}
   headings={headings}
 >
-  <Breadcrumbs crumbs={{Learn: "/learn", Migrate: "/learn"}} />
+  <Breadcrumbs crumbs={{ Learn: "/learn", Migrate: "/learn" }} />
   {entry.data?.title && <CustomHeader>{entry.data.title}</CustomHeader>}
   <Content components={{ a: Link }} />
 </MigrateLayout>
-
-
