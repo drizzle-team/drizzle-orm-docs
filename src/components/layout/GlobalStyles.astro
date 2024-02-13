@@ -883,15 +883,31 @@
       top: 16px;
     }
 
+    .expand-icon  {
+      display: none;
+    }
+
+    .collapse-icon {
+      display: block;
+    }
+
     &.collapsable {
       height: 300px;
       overflow: hidden;
+
+      .expand-icon  {
+        display: block;
+      }
+
+      .collapse-icon {
+        display: none;
+      }
 
       .expand-button {
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(to top, #111, transparent);
+        background: linear-gradient(to top, #f4f7fc, transparent);
         position: absolute;
         bottom: 1px;
         left: 1px;
@@ -940,8 +956,12 @@
     .code-snippet pre {
       background-color: #202830 !important;
     }
-
     .code-snippet {
+      &.collapsable {
+        .expand-button {
+          background: linear-gradient(to top, #111, transparent);
+        }
+    }
       &.has-title {
         .header {
           border-bottom: 1px solid #2e3e49;
