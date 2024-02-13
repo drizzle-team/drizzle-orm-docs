@@ -17,30 +17,29 @@ const { forTitle } = Astro.props;
     width="24"
     height="24"
     viewBox="0 0 24 24"
-    fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M8.67383 5.36887L12.0427 2L15.4116 5.36887"
-      stroke="black"
+      stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"></path>
     <path
       d="M15.4116 18.8443L12.0427 22.2132L8.67383 18.8443"
-      stroke="black"
+      stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"></path>
     <path
       d="M12.0426 2.00003V10.0853"
-      stroke="black"
+      stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"></path>
     <path
       d="M12.0426 22.2132V14.1279"
-      stroke="black"
+      stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"></path>
@@ -55,7 +54,6 @@ const { forTitle } = Astro.props;
     background-color: rgba(138, 208, 255, 0.1);
     color: #9ca3af;
   }
-
   .button-wrap:hover {
     color: #111827;
   }
@@ -81,12 +79,7 @@ const { forTitle } = Astro.props;
     padding: 0.375rem;
     background-color: #ebf0f9;
     color: rgba(75, 85, 99, 0.6);
-    position: absolute;
-    top: 0;
-    right: 46px;
     z-index: 99;
-    margin: 11px;
-    margin-left: auto;
     opacity: 0;
   }
 
@@ -107,8 +100,9 @@ const { forTitle } = Astro.props;
     "[data-collapse-btn]",
   ) as NodeListOf<HTMLElement>;
   collapseButton.forEach((n) => {
+    const isForTitle = n.dataset.forTitle === "true";
     n.addEventListener("click", () => {
-      const parent = n.parentElement?.parentElement;
+      const parent = n.closest(".code-snippet");
       if (parent) {
         parent.classList.toggle("collapsable");
       }
@@ -118,8 +112,9 @@ const { forTitle } = Astro.props;
     "[data-expand-button]",
   ) as NodeListOf<HTMLElement>;
   expandButton.forEach((n) => {
+    const isForTitle = n.dataset.forTitle === "true";
     n.addEventListener("click", () => {
-      const parent = n.parentElement;
+      const parent = n.closest(".code-snippet");
       if (parent) {
         parent.classList.toggle("collapsable");
       }

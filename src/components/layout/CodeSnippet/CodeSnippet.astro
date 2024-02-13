@@ -161,15 +161,14 @@ function parseMarkingDefinition(
     {titleHtml && collapsable && <CollapseToggleButton forTitle={true} />}
     {titleHtml && copy && <CopyButton forTitle={true} />}
   </figcaption>
-  {!titleHtml && collapsable && <CollapseToggleButton />}
-  {!titleHtml && copy && <CopyButton />}
+  <div class="btn-container">
+    {!titleHtml && collapsable && <CollapseToggleButton />}
+    {!titleHtml && copy && <CopyButton />}
+  </div>
   <Fragment set:html={codeSnippetHtml} />
   {
     collapsable && (
-      <div
-        data-expand-button
-        class="expand-button"
-      >
+      <div data-expand-button class="expand-button">
         Expand
       </div>
     )

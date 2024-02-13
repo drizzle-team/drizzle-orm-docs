@@ -236,6 +236,7 @@ export default async function Home() {
 3. **`AddTodo`:**
     The `AddTodo` component provides a simple form for adding new todo items to the Todo app. It includes an input field for entering the todo text and a button for triggering the addition of the new todo.
 
+
 <CodeTabs items={["Todos.tsx", "Todo.tsx", "AddTodo.tsx"]}>
 	<CodeTab>
 ```tsx collapsable copy
@@ -499,7 +500,7 @@ In this step, we establish server-side functions in the **`todoActions`** file t
     - Initiates a revalidation of the home page.
 
 
-```tsx collapsable
+```tsx collapsable copy
 "use server";
 import {eq} from "drizzle-orm";
 import {revalidatePath} from "next/cache";
