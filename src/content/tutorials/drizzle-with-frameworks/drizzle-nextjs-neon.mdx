@@ -180,23 +180,7 @@ npx drizzle-kit push:pg
 </Tabs>
 
 
-This guide uses the following file structure for Backend part:
-```text
-📦 <project root>
- ├ 📂 drizzle
- │  ├ 📂 meta
- │  │  ├ 📜 _journal.json  
- │  │  └  📜 0000_snapshot.json
- │  └ 📜 0000_watery_spencer_smythe.sql
- ├ 📂 actions
- │  └ 📜 todoActions.ts
- ├ 📂 db
- │  ├ 📜 drizzle.ts
- │  └ 📜 schema.ts
- ├ 📜 drizzle.config.ts
- ├ 📜 package.json
- └ 📜 tsconfig.json
-```
+
 ## Frontend
 <Steps>
 #### Initiate Next.js app with Tailwind CSS
@@ -549,13 +533,20 @@ export const editTodo = async (id: number, text: string) => {
 };
 ```
 </Steps>
-This guide uses the following file structure for Frontend part:
+
+
+## Project file structure
+This guide uses the following file structure:
+
+
+<Tabs items={['Frontend', 'Backend', 'FullStack']}>
+  <Tab>
+    <Section>
 ```text
 📦 <project root>
  ├ 📂 actions
  │  └ 📜 todoActions.ts
  ├ 📂 app
- │  ├ 📜 favicon.ico
  │  ├ 📜 globals.css
  │  ├ 📜 layout.tsx
  │  └ 📜 page.tsx
@@ -563,9 +554,6 @@ This guide uses the following file structure for Frontend part:
  │  ├ 📜 AddTodo.tsx
  │  ├ 📜 Todo.tsx
  │  └ 📜 Todos.tsx
- ├ 📂 components
- │  ├ 📜 next.svg
- │  └ 📜 vercel.svg
  ├ 📂 types
  │  └ 📜 todoType.ts
  ├ 📜 next.config.ts
@@ -574,3 +562,61 @@ This guide uses the following file structure for Frontend part:
  ├ 📜 tailwind.config.ts
  └ 📜 tsconfig.json
 ```
+    </Section>
+  </Tab> 
+  <Tab>
+    <Section>
+```text
+📦 <project root>
+ ├ 📂 drizzle
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json  
+ │  │  └  📜 0000_snapshot.json
+ │  └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📂 actions
+ │  └ 📜 todoActions.ts
+ ├ 📂 db
+ │  ├ 📜 drizzle.ts
+ │  └ 📜 schema.ts
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+    </Section>
+  </Tab>
+    <Tab>
+    <Section>
+```text /schema/3
+📦 <+project root>
+ ├ 📂 actions
+ │  └ 📜 todoActions.ts
+ ├ 📂 drizzle
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json  
+ │  │  └  📜 0000_snapshot.json
+ │  └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📂 app
+ │  ├ 📜 globals.css
+ │  ├ 📜 layout.tsx
+ │  └ 📜 page.tsx
+ ├ 📂 components
+ │  ├ 📜 AddTodo.tsx
+ │  ├ 📜 Todo.tsx
+ │  └ 📜 Todos.tsx
+ ├ 📂 db
+ │  ├ 📜 drizzle.ts
+ │  └ 📜 schema.ts
+ ├ 📂 types
+ │  └ 📜 todoType.ts
+ ├ 📜 next.config.ts
+ ├ 📜 package.json
+ ├ 📜 drizzle.config.ts
+ ├ 📜 postcss.config.ts
+ ├ 📜 tailwind.config.ts
+ └ 📜 tsconfig.json
+```
+
+    </Section>
+  </Tab>
+
+</Tabs>
