@@ -1,0 +1,54 @@
+---
+title: Conditional filters in query
+---
+
+This example demonstrates how to implement conditional filtering.
+
+### Schema
+
+```ts
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const orders = pgTable('orders', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  price: integer('price').notNull(),
+  status: text('status', { enum: ['done', 'pending'] }).notNull(),
+});
+```
+
+1. **`searchFilter`**: Filters orders by partial match in the title using **`ilike`**.
+2. **`priceFilter`**: Filters orders with a price greater than or equal to 1000.
+3. **`statusFilter`**: Filters orders by the status “pending”.
+
+### Query
+
+```ts
+import { SQLWrapper, and, eq, gte, ilike } from 'drizzle-orm';
+
+const filters: SQLWrapper[] = [];
+const searchFilter = true;
+const priceFilter = true;
+const statusFilter = true;
+
+if (searchFilter) filters.push(ilike(orders.title, 'my-order'));
+if (priceFilter) filters.push(gte(orders.price, 1000));
+if (statusFilter) filters.push(eq(orders.status, 'pending'));
+
+const result = await db
+  .select()
+  .from(orders)
+  .where(and(...filters));
+```
+
+Selects rows from the **`orders`** table where the `title` is similar to 'my-order', the `price` is at least 1000, and the `status` is “pending”.
+
+### Generated SQL
+
+```bash
+{
+  sql: 'select "id", "title", "description", "price", "status" from "orders" where ("orders"."title" ilike $1 and "orders"."price" >= $2 and "orders"."status" = $3)',
+  params: [ 'my-order', 1000, 'pending' ]
+}
+```

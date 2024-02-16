@@ -1,0 +1,33 @@
+---
+title: Filtering records by a list of values
+---
+
+This example demonstrates how to implement filtering by list of values.
+
+### Schema
+
+```ts
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const orders = pgTable('orders', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  price: integer('price').notNull(),
+  status: text('status', { enum: ['done', 'pending'] }).notNull(),
+});
+```
+
+**`inArray`** function corresponds to the SQL `IN` operator. It filters the rows in the **`orders`** table to return only those where the **`id`** column matches any of the values in the **`orderIds`** array.
+
+`Warning:` If you pass an array of 0 elements to the `IN` operator that will result in a failed query, so a check of array length > 0 is required.
+
+### Query
+
+```ts
+import { inArray } from 'drizzle-orm';
+
+const orderIds = [1, 3];
+
+const result = await db.select().from(orders).where(inArray(orders.id, orderIds));
+```

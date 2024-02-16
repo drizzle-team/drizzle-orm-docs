@@ -1,0 +1,70 @@
+---
+import type { IHeading, TreeNode } from "../../types/astro";
+
+interface Props {
+  headings?: IHeading[];
+}
+const { slug } = Astro.params;
+
+const { headings } = Astro.props;
+const isActive = (path: string) => {
+  const pathArray = path.split("/");
+  const slugArray = slug!.split("/");
+  return pathArray.every((element, index) => element === slugArray[index]);
+};
+---
+
+<div class="nav-items">
+  {
+    headings && slug && (
+      <div data-headings>
+        {headings.map((heading) => (
+          <a
+            data-slug={heading.slug}
+            class:list={["nav-toc-item", "heading-2"]}
+            href={`#${heading.slug}`}
+          >
+            {heading.text}
+          </a>
+        ))}
+      </div>
+    )
+  }
+</div>
+<script>
+  import throttle from "lodash.throttle";
+  import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
+  import updateDialectLinks from "@/utils/updateDialectLinks";
+
+  const container = document.querySelector(".documentation-content-wrap")!;
+  const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
+  const links = document.querySelectorAll<HTMLElement>("[data-slug]");
+
+  const updateLinks = () => {
+    const activeAnchors = handleAnchorHighlighting({
+      viewportHeight: window.innerHeight,
+      anchors: [...anchors].map((anchor) => ({
+        id: anchor.id,
+        offsetTop: anchor.offsetTop,
+      })),
+      scrollTop: container.scrollTop,
+    });
+
+    links.forEach((link) => {
+      const slug = link.dataset.slug;
+      if (!slug) return;
+      link.classList.toggle(
+        "nav-toc-item--active",
+        activeAnchors.includes(slug),
+      );
+      link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
+    });
+  };
+
+  if (container && links) {
+    container.addEventListener("scroll", throttle(updateLinks, 80));
+    updateLinks();
+  }
+
+  updateDialectLinks();
+</script>

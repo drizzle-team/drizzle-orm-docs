@@ -1,0 +1,292 @@
+---
+title: "Drizzle with Turso"
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.1333 5.06667L34.4222 4.53333L32.9111 6.13333L31.7556 4.35556L31.0444 4.71111L31.9333 7.11111L31.4889 7.55556L28.2 4L27.4 4.35556L30.4222 10.8444L27.4889 11.8222L25.9778 10.0444L24.3778 11.8222H15.6667L14.1556 10.0444L12.6444 11.8222H12.5556L9.71111 10.8444L12.7333 4.35556L11.9333 4L8.55556 7.55556L8.2 7.11111L9.08889 4.71111L8.37778 4.35556L7.22222 6.13333L5.71111 4.53333L5 5.06667L7.31111 8.88889L6.15556 10.1333L6.51111 13.3333L9.26667 14.4V15.7333H6.68889V16.3556L7.66667 17.7778L9.26667 18.4V27.6444L13.3556 33.6889L14.2444 36L15.7556 33.8667L17.2667 36L18.6 33.8667L20.1111 36L21.5333 33.8667L22.8667 36L24.3778 33.8667L25.8889 36L26.7778 33.6889L30.8667 27.6444V18.4L32.3778 17.7778L33.3556 16.3556V15.7333H30.8667V14.4L33.6222 13.3333L34.0667 10.1333L32.7333 8.88889L35.1333 5.06667ZM23.2222 30.0444H14.7778L15.8444 27.9111L16.9111 30.0444L17.9778 28.6222L19.0444 30.0444L20.1111 28.6222L21.1778 30.0444L22.1556 28.6222L23.2222 30.0444L24.2889 27.9111L25.2667 30.0444H23.2222ZM28.3778 20.1778L23.9333 21.6L23.8444 25.6889L20.1111 26.5778L16.2889 25.6889L16.1111 21.6L11.7556 20.1778V17.9556L17.4444 19.6444L17.3556 25.0667H22.7778V19.6444L28.3778 17.9556V20.1778Z" fill="currentColor"/></svg>']
+---
+import Steps from '@mdx/Steps.astro';
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+This guide provides a step-by-step walkthrough on how to integrate Drizzle ORM with [Turso](https://docs.turso.tech/introduction) database. 
+
+[Turso](https://docs.turso.tech/concepts) is a SQLite-compatible database built on **[libSQL](https://docs.turso.tech/libsql)**, the Open Contribution fork of SQLite. It enables scaling to hundreds of thousands of databases per organization and supports replication to any location, including your own servers, for microsecond-latency access. You can read more about Turso’s concepts [here](https://docs.turso.tech/concepts).
+
+Drizzle ORM natively supports libSQL driver, we embrace SQL dialects and dialect specific drivers and syntax and mirror most popular SQLite-like `all`, `get`, `values` and `run` query methods syntax.
+
+The first step involves signing up for Turso and setting up a new database. Turso's [official docs](https://docs.turso.tech/quickstart) are excellent resources for newcomers. Begin by installing the Turso CLI tool, which is essential for managing Turso services directly from your terminal. Once the CLI is installed, you can sign up for Turso.
+
+<Steps>
+#### Signup to Turso
+
+```bash
+turso auth signup
+```
+
+#### Create new database
+
+```bash
+turso db create drizzle-turso-db
+```
+
+To see information about the database
+
+```bash
+turso db show drizzle-turso-db
+```
+
+#### Get an authentication token
+
+```bash
+turso db tokens create drizzle-turso-db
+```
+
+#### Update .env
+
+Update your `.env` file with connection url and authentication token.
+
+```
+TURSO_CONNECTION_URL=
+TURSO_AUTH_TOKEN=
+```
+
+With the database set up, the next phase involves integrating Drizzle ORM into your project. This begins by installing necessary dependencies:
+
+<Npm>
+drizzle-orm @libsql/client
+-D drizzle-kit
+</Npm>
+
+To connect Drizzle ORM with your Turso database, you'll need to create a client using the **`@libsql/client`** package, configuring it with the connection URL and authentication token from your **`.env`** file. This client is then passed to Drizzle to establish the connection.
+
+```tsx
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
+
+const client = createClient({
+  url: process.env.TURSO_CONNECTION_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN!,
+});
+
+export const db = drizzle(client);
+```
+
+**Then, set up** the Drizzle configuration. **Drizzle config** is a configuration file used by **Drizzle Kit**. It contains all the information about your database connection, migration folder, and schema files.
+
+```tsx
+import 'dotenv/config';
+import type { Config } from 'drizzle-kit';
+
+export default {
+  schema: './src/db/schema.ts',
+  out: './migrations',
+  driver: 'turso',
+  dbCredentials: {
+    url: process.env.TURSO_CONNECTION_URL!,
+    authToken: process.env.TURSO_AUTH_TOKEN!,
+  },
+} satisfies Config;
+```
+
+This configuration file specifies the database schema location, path for generating migrations, and database connection through the connection string.
+
+Finally, you'll define the schemas for your database tables. In this guide, two schemas are created: **`users`** and **`posts`**.
+
+```tsx
+import { sql } from 'drizzle-orm';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').unique().notNull(),
+});
+
+export const posts = sqliteTable('posts', {
+  id: integer('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: text('created_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export type InsertUser = typeof users.$inferInsert;
+export type SelectUser = typeof users.$inferSelect;
+
+export type InsertPost = typeof posts.$inferInsert;
+export type SelectPost = typeof posts.$inferSelect;
+```
+
+</Steps>
+
+### Applying changes to the database
+
+To apply changes to the database, we will generate migrations and then run them using the **`migrate`** function.
+
+Command for generating migrations:
+
+```bash
+npx drizzle-kit generate:sqlite
+```
+
+These migrations are stored in the `**migrations**`  directory, as specified in your **`drizzle.config.ts`**. This directory will contain the SQL files necessary to update your database schema and a **`meta`** folder for storing snapshots of the schema at different migration stages.
+
+Example of a generated migration:
+
+```sql
+CREATE TABLE `posts` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`title` text NOT NULL,
+	`content` text NOT NULL,
+	`user_id` integer NOT NULL,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`email` text NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
+```
+
+To run migrations, use the **`migrate`** function. This function takes your database connection and the path to your migrations directory as arguments. In the provided example, we call it in **`index.ts`**, applying all pending migrations to the database.
+
+```tsx
+import 'dotenv/config';
+import { resolve } from 'node:path';
+import { db } from './db/db';
+import { migrate } from 'drizzle-orm/libsql/migrator';
+
+(async () => {
+  await migrate(db, { migrationsFolder: resolve(__dirname, '../migrations') });
+})();
+```
+
+### Basic file structure
+
+The basic file structure outlines how the project is organized, with the **`src`** directory containing your database and schema definitions (**`db.ts`** and **`schema.ts`**) and the entry point to your application (**`index.ts`**). The `**migrations**`  directory holds your migrations and their metadata.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │   ├ 📂 db
+ │   │  ├ 📜 db.ts
+ │   │  └ 📜 schema.ts
+ │   └ 📜 index.ts
+ ├ 📂 migrations
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json
+ │  │  └ 📜 0000_snapshot.json
+ │  └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+As an alternative to generating migration files, you can apply your schema changes directly to the database without generating any migrations files using `drizzle-kit push:sqlite` command:
+
+```bash
+npx drizzle-kit push:sqlite
+```
+
+
+<Callout type="warning">It is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+
+### CRUD
+
+**Now, we're ready to write queries** using Drizzle ORM. This section covers the practical aspects of interacting with your database using Drizzle ORM. It includes creating functions for basic CRUD (Create, Read, Update, Delete) operations for users and their posts.
+
+For instance, we will create `user.ts`  and `post.ts`  files in `src/functions` folder for our queries.
+
+#### Inserting data
+
+The functions **`insertUser`** and **`insertPost`** are straightforward examples of how to insert data into the **`users`** and **`posts`** tables.
+
+```tsx
+import { db } from '../db/db';
+import { InsertUser, users } from '../db/schema';
+
+export async function insertUser(data: InsertUser): Promise<void> {
+  await db.insert(users).values(data);
+}
+```
+
+```tsx
+import { db } from '../db/db';
+import { InsertPost, posts } from '../db/schema';
+
+export async function insertPost(data: InsertPost): Promise<void> {
+  await db.insert(posts).values(data);
+}
+```
+
+#### Retrieving data
+
+The function **`getUserWithPosts`** is straightforward example of how to retrieve data with relation:
+
+```tsx
+import { eq } from 'drizzle-orm';
+import { db } from '../db/db';
+import { SelectPost, SelectUser, users, posts } from '../db/schema';
+
+export async function getUserWithPosts(
+  id: SelectUser['id'],
+): Promise<Array<{ users: SelectUser; posts: SelectPost | null }>> {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, id))
+    .leftJoin(posts, eq(posts.userId, users.id));
+
+  return user;
+}
+```
+
+Alternatively, you can use [relational queries](https://orm.drizzle.team/docs/rqb).
+
+#### Updating data
+
+The **`patchPost`** function illustrates how to update existing records. It highlights the use of the **`returning()`** function to fetch the updated records after the operation.
+
+```tsx
+import { eq } from 'drizzle-orm';
+import { db } from '../db/db';
+import { posts, SelectPost } from '../db/schema';
+
+export async function patchPost(
+  id: SelectPost['id'],
+  data: Partial<Omit<SelectPost, 'id'>>,
+): Promise<SelectPost[]> {
+  const updatedPost = await db.update(posts).set(data).where(eq(posts.id, id)).returning();
+
+  return updatedPost;
+}
+```
+
+#### Deleting data
+
+Finally, the **`deleteUser`** function shows how to remove a user from the database. Due to the relational integrity constraints defined in your schema (e.g., cascade delete), deleting a user will also remove all their associated posts.
+
+```tsx
+import { eq } from 'drizzle-orm';
+import { db } from '../db/db';
+import { SelectUser, users } from '../db/schema';
+
+export async function deleteUser(id: SelectUser['id']): Promise<void> {
+  await db.delete(users).where(eq(users.id, id));
+}
+```
+
+That's it! By implementing these functions, you can perform a full spectrum of CRUD operations in your application, effectively managing your database records with Drizzle ORM.
+
+### Conclusion
+
+In this guide, we walked through the steps of building a compact application, using Drizzle and Turso to set up a flexible and powerful database environment.
+
+Turso offers a variety of advanced database functionalities, such as replication, among others. For further insights into how Turso can support your database needs, it's recommended to consult their **[documentation](https://docs.turso.tech/)**.

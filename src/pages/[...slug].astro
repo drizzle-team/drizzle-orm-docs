@@ -39,7 +39,7 @@ const { Content, headings } = await entry.render();
 
 
 ---
-<MDXLayout title={entry.data.title} headings={headings}>
+<MDXLayout title={entry.data.title} description={frontmatter.description} headings={headings}>
   {frontmatter?.title && <CustomHeader>{frontmatter.title}</CustomHeader>}
   <Content components={{ a: Link }} />
 </MDXLayout>

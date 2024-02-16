@@ -1,0 +1,211 @@
+---
+title: Hanji v0.0.1
+pubDate: 2022-08-29
+description: I've been building CLI tools for 2 of my open-source projects for over a year now. I've started with Ink since I have React developers on team and we were under impression that's gonna let us rapidly build stuff and that turned out to be misleading to say the list.
+---
+
+I've been building CLI tools for 2 of my open-source projects for over a year now. I've started with Ink since I have React developers on team and we were under impression that's gonna let us rapidly build stuff and that turned out to be misleading to say the list.
+
+We've tried Inquirer, Enquirer, Prompts and Ink and for some reason there's not a single library to let you customise stuff. Every library is hardly focused on a particular scenario without any room for you to move around.
+
+I've spent some time digging around libraries internals and found out that core of the library is pretty simple.
+
+![Image description](https://res.cloudinary.com/practicaldev/image/fetch/s--nNk0ript--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qmwcemzabutcwbpqp69g.png)
+
+As a library developer - I can handle 95% of behind the scenes stuff and let user render text the way he wants leaving room for boundless CLI design.
+
+This is how you obtain `stdin`, `stdout` and `readline`
+
+```
+const stdin = process.stdin;
+const stdout = process.stdout;
+
+const readline = require("readline");
+const rl = readline.createInterface({
+  input: stdin,
+  escapeCodeTimeout: 50,
+});
+
+readline.emitKeypressEvents(stdin, rl);
+```
+
+now we can listen to all the keypress events
+
+```
+// keystrokes are typed
+type Key = {
+  sequence: string;
+  name: string | undefined;
+  ctrl: boolean;
+  meta: boolean;
+  shift: boolean;
+};
+
+const keypress = (str: string | undefined, key: Key) => {
+  // handle keypresses
+}
+
+stdin.on("keypress", keypress);
+
+// whenever you're done, you just close readline
+readline.close()
+```
+
+now to render text we just output it to stdout
+
+```
+let previousText = "";
+stdout.write(clear(previousText, stdout.columns));
+
+stdout.write(string);
+previousText = string;
+
+// here's how you clear cli
+const strip = (str: string) => {
+  const pattern = [
+    "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))",
+  ].join("|");
+
+  const RGX = new RegExp(pattern, "g");
+  return typeof str === "string" ? str.replace(RGX, "") : str;
+};
+
+const stringWidth = (str: string) => [...strip(str)].length;
+
+export const clear = function (prompt: string, perLine: number) {
+  if (!perLine) return erase.line + cursor.to(0);
+
+  let rows = 0;
+  const lines = prompt.split(/\r?\n/);
+  for (let line of lines) {
+    rows += 1 + Math.floor(Math.max(stringWidth(line) - 1, 0) / perLine);
+  }
+
+  return erase.lines(rows);
+};
+```
+
+While building a design-less toolkit I'm still keen to provide user as much utility as possible, so I decided to implement StateWrappers for domain specific kind of Inputs like `select`
+
+![Image description](https://res.cloudinary.com/practicaldev/image/fetch/s--vKQehVPq--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/g4bofwqj21nivi8e4fhj.png)
+
+this is how a `select state wrapper` would look like. The one below is for simple strings array, it handles `up` and `down` keypresses and keeps track of selected index and loops it whenever it's out of bound:
+
+```
+export class SelectState {
+  public selectedIdx = 0;
+  constructor(public readonly items: string[]) {}
+
+  consume(str: string | undefined, key: AnyKey): boolean {
+    if (!key) return false;
+
+    if (key.name === "down") {
+      this.selectedIdx = (this.selectedIdx + 1) % this.items.length;
+      return true;
+    }
+
+    if (key.name === "up") {
+      this.selectedIdx -= 1;
+      this.selectedIdx =
+        this.selectedIdx < 0 ? this.items.length - 1 : this.selectedIdx;
+      return true;
+    }
+
+    return false;
+  }
+}
+```
+
+This is library defined Prompt API
+
+```
+export abstract class Prompt<RESULT> {
+  protected terminal: ITerminal | undefined;
+
+  protected requestLayout() {
+    this.terminal!.requestLayout();
+  }
+
+  attach(terminal: ITerminal) {
+    this.terminal = terminal;
+    this.onAttach(terminal);
+  }
+
+  detach(terminal: ITerminal) {
+    this.onDetach(terminal);
+    this.terminal = undefined;
+  }
+
+  onInput(str: string | undefined, key: AnyKey) {}
+
+  abstract result(): RESULT;
+  abstract onAttach(terminal: ITerminal): void;
+  abstract onDetach(terminal: ITerminal): void;
+  abstract render(status: "idle" | "submitted" | "aborted"): string;
+}
+```
+
+Now all you as a developer have to do is to define how to render `select` element and not worry about state and keypress managements, you just leave it to the library and replace it with custom implementations whenever needed.
+
+```
+export class Select extends Prompt<{ index: number; value: string }> {
+  private readonly data: SelectState;
+
+  constructor(items: string[]) {
+    super();
+    this.data = new SelectState(items);
+  }
+
+  onAttach(terminal: ITerminal) {
+    terminal.toggleCursor("hide");
+  }
+
+  onDetach(terminal: ITerminal) {
+    terminal.toggleCursor("show");
+  }
+
+  override onInput(str: string | undefined, key: any) {
+    super.onInput(str, key);
+    const invlidate = this.data.consume(str, key);
+    if (invlidate) {
+      this.requestLayout();
+      return;
+    }
+  }
+
+  render(status: "idle" | "submitted" | "aborted"): string {
+    if (status === "submitted" || status === "aborted") {
+      return "";
+    }
+
+    let text = "";
+    this.data.items.forEach((it, idx) => {
+      text +=
+        idx === this.data.selectedIdx ? `${color.green("❯ " + it)}` : `  ${it}`;
+      text += idx != this.data.items.length - 1 ? "\n" : "";
+    });
+    return text;
+  }
+
+  result() {
+    return {
+      index: this.data.selectedIdx,
+      value: this.data.items[this.data.selectedIdx]!,
+    };
+  }
+}
+```
+
+Now we just render and wait for user input
+
+```
+const result = await render(new Select(["user1", "user2" ...]))
+```
+
+I've spent some time over the weekend and published a v0.0.1
+you can give it a try - https://www.npmjs.com/package/hanji
+
+I'm going to drop v0.0.2 soon with proper CTRL+C support and API simplifications.
+
+you can stay tuned on twitter - https://twitter.com/_alexblokh

@@ -1,0 +1,88 @@
+---
+interface IProps {
+  crumbs: {
+    [key: string]: string;
+  };
+}
+
+const { crumbs } = Astro.props;
+
+const crumbsKeys = Object.keys(crumbs);
+---
+
+<div class="bread_crumbs__container">
+  {
+    crumbsKeys.map((key, index) => (
+      <div class="bread_crumb__wrap">
+        <a class="bread_crumb" href={crumbs[key]}>
+          {key}
+        </a>{" "}
+        {index !== crumbsKeys.length - 1 && (
+          <div class="bread_crumb__icon">•</div>
+        )}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .bread_crumbs__container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 56px;
+  }
+
+  .bread_crumb__wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .bread_crumb {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-decoration: none;
+    margin: 0;
+    font-weight: 400;
+    font-size: 16px;
+    color: #6b7280;
+  }
+
+  .bread_crumb:hover {
+    text-decoration: underline;
+  }
+
+  .bread_crumb__icon {
+    display: flex;
+    user-select: none;
+    margin-left: 8px;
+    margin-right: 8px;
+    color: #6b7280;
+  }
+  @media (max-width: 767px) {
+    .bread_crumbs__container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      margin-top: 36px;
+    }
+    .bread_crumb {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      text-decoration: none;
+      margin: 0;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 18px;
+      color: #6b7280;
+    }
+  }
+</style>

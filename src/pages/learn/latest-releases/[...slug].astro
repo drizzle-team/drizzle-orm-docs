@@ -1,0 +1,220 @@
+---
+import { getCollection } from "astro:content";
+import Breadcrumbs from "@components/layout/Breadcrumbs.astro";
+import MeshLayout from "@/layouts/MeshLayout.astro";
+
+export async function getStaticPaths() {
+  const releasesEntries = await getCollection("latest-releases");
+  return releasesEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const options: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
+---
+
+<MeshLayout frontmatter={entry.data}>
+  <div class="frame__wrap">
+    <div class="frame__column">
+      <div class="learn__title-block">
+        <Breadcrumbs
+          crumbs={{
+            Learn: "/learn",
+            "Latest Releases": "/learn/latest-releases",
+          }}
+        />
+        <div class="latest-release_title">{entry.data.title}</div>
+      </div>
+      <div class="frame__empty-cell"></div>
+    </div>
+    <div class="frame__column--main-content">
+      <div class="frame__main-content-cell">
+        <div class="latest-release_date">
+          {entry.data.pubDate.toLocaleDateString("en-US", options)}
+        </div>
+        <Content />
+        <div class="latest-release_footer"></div>
+      </div>
+      <div class="frame__empty-cell_wrap">
+        <div class="frame__empty-cell--main-content--auto"></div>
+      </div>
+    </div>
+  </div>
+</MeshLayout>
+
+<style>
+  html.dark .latest-release_title {
+    color: #e2e6f0;
+  }
+
+  .latest-release_title {
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 48px;
+    letter-spacing: -0.48px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
+  html.dark .latest-release_date {
+    color: #e6e6e6;
+  }
+
+  .latest-release_date {
+    color: rgba(30, 30, 30, 0.4);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: -0.154px;
+    margin-top: 20px;
+  }
+
+  .latest-release_footer {
+    padding-bottom: 120px;
+  }
+
+  .frame__wrap {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  html.dark .frame__column {
+    border-bottom: 1px solid #303030;
+  }
+
+  .frame__column {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #efefef;
+  }
+
+  html.dark .frame__empty-cell {
+    border-left: 1px solid #303030;
+    border-right: 1px solid #303030;
+  }
+
+  .frame__empty-cell {
+    display: flex;
+    justify-content: center;
+    width: 334px;
+    border-left: 1px solid #efefef;
+    border-right: 1px solid #efefef;
+    margin-right: 62px;
+  }
+
+  html.dark .learn__title-block {
+    border-left: 1px solid #303030;
+  }
+
+  .learn__title-block {
+    display: flex;
+    flex-direction: column;
+    max-width: 920px;
+    width: 100%;
+    margin-left: 128px;
+    padding-left: 24px;
+    padding-right: 72px;
+    padding-top: 24px;
+    flex-shrink: 0;
+    border-left: 1px solid #efefef;
+  }
+
+  .frame__column--main-content {
+    display: flex;
+    justify-content: center;
+    overflow-y: hidden;
+    height: fit-content;
+    min-height: 100%;
+  }
+
+  html.dark .frame__empty-cell--main-content--auto {
+    border-left: 1px solid #303030;
+    border-right: 1px solid #303030;
+  }
+
+  .frame__empty-cell--main-content--auto {
+    height: auto;
+    flex: 1 1 auto;
+    border-left: 1px solid #efefef;
+    border-right: 1px solid #efefef;
+  }
+
+  .frame__empty-cell_wrap {
+    display: flex;
+    flex-direction: column;
+    width: 334px;
+    margin-right: 62px;
+  }
+
+  html.dark .frame__main-content-cell {
+    border-left: 1px solid #303030;
+  }
+
+  .frame__main-content-cell {
+    display: flex;
+    flex-direction: column;
+    max-width: 920px;
+    width: 100%;
+    margin-left: 128px;
+    padding-left: 24px;
+    padding-right: 72px;
+    flex-shrink: 0;
+    border-left: 1px solid #efefef;
+  }
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+    border-left: none;
+  }
+    .latest-release_title {
+      color: #0f172a;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px 0;
+      flex-shrink: 0;
+      border: none;
+    }
+    .frame__empty-cell {
+      display: none;
+    }
+    html.dark .frame__main-content-cell {
+      border-left: none;
+    }
+    .frame__main-content-cell {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      margin: 0;
+      width: 100%;
+      padding: 0 16px 0;
+      flex-shrink: 0;
+      border-left: none;
+    }
+    .frame__empty-cell_wrap {
+      display: none;
+    }
+    .latest-release_footer {
+      padding-bottom: 62px;
+    }
+  }
+</style>

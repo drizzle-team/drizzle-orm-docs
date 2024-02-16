@@ -1,0 +1,160 @@
+---
+import { getCollection } from "astro:content";
+import categories from "@/content/guides/_categories.json";
+
+const articles = await getCollection("guides");
+
+const categoriesPaths = [
+  ...new Set(articles.map((article) => article.slug.split("/")[0])),
+];
+
+interface JSONMap {
+  [key: string]: {
+    [key: string]: string;
+  };
+}
+
+const guidesMap: JSONMap = {};
+
+const mapJSON = import.meta.glob<Record<string, Record<string, string>>>(
+  `../../content/guides/**/_map.json`,
+);
+
+for (const meta in mapJSON) {
+  const parsed = (await mapJSON[meta]()).default;
+  const category = meta.split("/").at(-2);
+  if (!category) continue;
+  guidesMap[category] = parsed;
+}
+
+const groupedArticles = categoriesPaths.map((category) => ({
+  category,
+  articles: [] as typeof articles,
+}));
+
+groupedArticles.forEach((group) => {
+  Object.keys(guidesMap[group.category]).forEach((slug) => {
+    const article = articles.find(
+      (article) => article.slug === `${group.category}/${slug}`,
+    );
+    if (article) {
+      group.articles.push(article);
+    }
+  });
+});
+---
+
+<div class="guides__blocks">
+  {
+    groupedArticles.map(({ category, articles }) => (
+      <div class="guides__block">
+        <div class="guides__block-category">
+          {categories[category as keyof typeof categories]}
+        </div>
+        <div class="guides__block-items">
+          {articles.map((article) => (
+            <div class="guides__block__item">
+              <a
+                class="guides__block__item-link"
+                href={`/learn/guides/${article.slug}`}
+              >
+                {article.data.title}
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .guides__blocks {
+    margin-top: 24px;
+    display: block;
+    column-count: 2;
+    padding-bottom: 120px;
+  }
+
+  .guides__block {
+    break-inside: avoid;
+    display: flex;
+    flex-direction: column;
+  }
+
+  html.dark .guides__block-category {
+    background-color: #171717;
+    color: #e2e6f0;
+  }
+
+  .guides__block-category {
+    margin-bottom: 12px;
+    border-radius: 4px;
+    background: rgba(250, 250, 250, 0.98);
+    padding-top: 1px;
+    padding-bottom: 1px;
+    text-align: center;
+    color: #484848;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+    margin-top: 24px;
+  }
+
+  .guides__block__item {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    line-height: 1.25;
+  }
+
+  html.dark .guides__block__item-link {
+    color: #006be6;
+  }
+
+  .guides__block__item-link {
+    text-decoration: inherit;
+    color: #006adc;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 22.5px;
+  }
+  @media (max-width: 767px) {
+    html.dark .guides__block-category {
+      background-color: #171717;
+      color: #e2e6f0;
+    }
+
+    .guides__block-category {
+      margin-bottom: 12px;
+      border-radius: 4px;
+      background: rgba(250, 250, 250, 0.98);
+      padding-top: 1px;
+      padding-bottom: 1px;
+      text-align: center;
+      color: #484848;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 28px;
+      margin-top: 0;
+    }
+    .guides__block {
+      break-inside: avoid;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .guides__blocks {
+      margin-top: 0px;
+      display: block;
+      column-count: 1;
+      padding-bottom: 60px;
+    }
+    .guides__block__item-link {
+      text-decoration: inherit;
+      color: #006adc;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22.5px;
+    }
+  }
+</style>

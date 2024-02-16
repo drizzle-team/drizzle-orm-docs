@@ -1,0 +1,357 @@
+---
+import { getCollection } from "astro:content";
+import Breadcrumbs from "@components/layout/Breadcrumbs.astro";
+import MeshLayout from "@/layouts/MeshLayout.astro";
+
+const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
+  return id.startsWith("drizzle-with-frameworks/");
+});
+
+const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
+  return id.startsWith("drizzle-with-db/");
+});
+---
+
+<MeshLayout>
+  <div class="frame__wrap">
+    <div class="frame__column">
+      <div class="learn__title-block">
+        <Breadcrumbs
+          crumbs={{
+            Learn: "/learn",
+          }}
+        />
+        <div class="tutorials_title">Tutorials</div>
+      </div>
+      <div class="frame__empty-cell"></div>
+    </div>
+    <div class="frame__column--main-content">
+      <div class="frame__main-content-cell">
+        <div class="tutotials__section">
+          <div class="tutorials__section_title">Complete tutorials</div>
+          <div class="tutorials__section_cards">
+            {
+              drizzleWithFrameworks.map((card) => (
+                <a
+                  href={`/learn/tutorials/${card.slug}`}
+                  class="tutorials__section__card"
+                >
+                  <div class="tutorials__section__card_icons">
+                    {card.data.svgs.map((svg: string, index: number) => (
+                      <>
+                        <Fragment set:html={svg} />
+                        {index !== card.data.svgs.length - 1 ? (
+                          <div>🤝</div>
+                        ) : null}
+                      </>
+                    ))}
+                  </div>
+                  <div class="tutorials__section__card_title">
+                    {card.data.title}
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+        <div class="tutotials__section">
+          <div class="tutorials__section_title">Drizzle with your DB</div>
+          <div class="tutorials__section_cards">
+            {
+              drizzleWithDb.map((card) => (
+                <a
+                  href={`/learn/tutorials/${card.slug}`}
+                  class="tutorials__section__card"
+                >
+                  <div class="tutorials__section__card_icons">
+                    {card.data.svgs.map((svg: string, index: number) => (
+                      <>
+                        <Fragment set:html={svg} />
+                        {index !== card.data.svgs.length - 1 ? (
+                          <div>🤝</div>
+                        ) : null}
+                      </>
+                    ))}
+                  </div>
+                  <div class="tutorials__section__card_title">
+                    {card.data.title}
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+      <div class="frame__empty-cell_wrap">
+        <div class="frame__empty-cell--main-content--auto"></div>
+      </div>
+    </div>
+  </div>
+</MeshLayout>
+
+<style>
+  .tutotials__section {
+    display: flex;
+    flex-direction: column;
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
+
+  html.dark .tutorials_title {
+    color: #e2e6f0;
+  }
+
+  .tutorials_title {
+    color: #0f172a;
+    margin-top: 8px;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 48px;
+    letter-spacing: -0.48px;
+    margin-bottom: 16px;
+  }
+
+  html.dark .tutorials__section_title {
+    color: #e2e6f0;
+  }
+
+  .tutorials__section_title {
+    color: #303030;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.48px;
+    line-height: 130%;
+  }
+
+  .tutorials__section_cards {
+    display: flex;
+    flex-direction: row;
+    margin-top: 16px;
+    gap: 16px;
+  }
+
+  html.dark .tutorials__section__card {
+    border: 1px solid #303030;
+  }
+
+  .tutorials__section__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e6e6e6;
+    border-radius: 2px;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    width: 264px;
+    height: 144px;
+    text-align: center;
+  }
+
+  .tutorials__section__card_icons {
+    align-items: center;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  html.dark .tutorials__section__card_title {
+    color: #e2e6f0;
+  }
+
+  .tutorials__section__card_title {
+    color: #101828;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 16px;
+    line-height: normal;
+  }
+
+  .frame__wrap {
+    width: 100%;
+    min-height: calc(100vh - 104px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  html.dark .frame__column {
+    border-bottom: 1px solid #303030;
+  }
+
+  .frame__column {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #efefef;
+  }
+
+  html.dark .frame__empty-cell {
+    border-left: 1px solid #303030;
+    border-right: 1px solid #303030;
+  }
+
+  .frame__empty-cell {
+    display: flex;
+    justify-content: center;
+    width: 334px;
+    border-left: 1px solid #efefef;
+    border-right: 1px solid #efefef;
+    margin-right: 62px;
+  }
+
+  html.dark .learn__title-block {
+    border-left: 1px solid #303030;
+  }
+
+  .learn__title-block {
+    display: flex;
+    flex-direction: column;
+    max-width: 920px;
+    width: 100%;
+    margin-left: 128px;
+    padding-left: 24px;
+    padding-right: 72px;
+    padding-top: 24px;
+    flex-shrink: 0;
+    border-left: 1px solid #efefef;
+  }
+
+  .frame__column--main-content {
+    display: flex;
+    justify-content: center;
+    overflow-y: hidden;
+    height: fit-content;
+    min-height: 100%;
+    flex: 1;
+  }
+
+  html.dark .frame__empty-cell--main-content--auto {
+    border-left: 1px solid #303030;
+    border-right: 1px solid #303030;
+  }
+
+  .frame__empty-cell--main-content--auto {
+    height: auto;
+    flex: 1 1 auto;
+    border-left: 1px solid #efefef;
+    border-right: 1px solid #efefef;
+  }
+
+  .frame__empty-cell_wrap {
+    display: flex;
+    flex-direction: column;
+    width: 334px;
+    margin-right: 62px;
+  }
+
+  html.dark .frame__main-content-cell {
+    border-left: 1px solid #303030;
+  }
+
+  .frame__main-content-cell {
+    display: flex;
+    flex-direction: column;
+    max-width: 920px;
+    width: 100%;
+    margin-left: 128px;
+    padding-left: 24px;
+    padding-right: 72px;
+    flex-shrink: 0;
+    border-left: 1px solid #efefef;
+  }
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+      border-left: none;
+    }
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px;
+      flex-shrink: 0;
+      border: none;
+    }
+    .tutorials_title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+    }
+    .frame__empty-cell {
+      display: none;
+    }
+    html.dark .frame__main-content-cell {
+      border-left: none;
+    }
+    .frame__main-content-cell {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      margin: 0;
+      width: 100%;
+      padding: 24px 16px 16px;
+      flex-shrink: 0;
+      border-left: none;
+    }
+    .frame__empty-cell_wrap {
+      display: none;
+    }
+    .tutorials__section_title {
+      color: #303030;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+    }
+    .tutotials__section {
+      display: flex;
+      flex-direction: column;
+      margin-top: 0px;
+      margin-bottom: 32px;
+    }
+    .tutorials__section__card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e6e6e6;
+      border-radius: 2px;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      width: 100%;
+      height: 144px;
+      text-align: center;
+    }
+    .tutorials__section_cards {
+      display: flex;
+      flex-direction: row;
+      margin-top: 24px;
+      gap: 16px;
+    }
+    .tutorials__section__card_title {
+      color: #101828;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      line-height: normal;
+    }
+  }
+</style>
+<style is:global>
+  .tutorials__section__card_icons svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tutorials__section__card_icons svg:nth-child(even) {
+    width: 20px;
+    height: 20px;
+  }
+</style>

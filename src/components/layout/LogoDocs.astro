@@ -1,79 +1,146 @@
 ---
+import DocsIcon from "@components/Icons/DocsIcon.astro";
+import LearnIcon from "@components/Icons/LearnIcon.astro";
+import BoltIcon from "@components/Icons/BoltIcon.astro";
+const { pathname } = Astro.url;
+
+const isDocs = ["docs", "kit-docs", "drizzle-studio"].some((path) =>
+  pathname.startsWith(`/${path}`),
+);
+const isLearn = pathname.startsWith("/learn");
+const isBenchmark = pathname.startsWith("/benchmarks");
+const condition = isDocs
+  ? "/docs/overview"
+  : isBenchmark
+    ? "/benchmarks"
+    : "/learn";
 ---
+
 <div class="logo-wrap">
-  <a class="nav_logo" href={'/'}>
+  <a class="nav_logo" href={"/"}>
     <div class="logo-svg">
       <svg
-      width="160"
-      height="160"
-      viewBox="0 0 160 160"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        width="9.63139"
-        height="40.8516"
-        rx="4.8157"
-        transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)"
-        fill="currentColor"
-      />
-      <rect
-        width="9.63139"
-        height="40.8516"
-        rx="4.8157"
-        transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)"
-        fill="currentColor"
-      />
-      <rect
-        width="9.63139"
-        height="40.8516"
-        rx="4.8157"
-        transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)"
-        fill="currentColor"
-      />
-      <rect
-        width="9.63139"
-        height="40.8516"
-        rx="4.8157"
-        transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)"
-        fill="currentColor"
-      />
-    </svg>
+        width="160"
+        height="160"
+        viewBox="0 0 160 160"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          width="9.63139"
+          height="40.8516"
+          rx="4.8157"
+          transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)"
+          fill="currentColor"></rect>
+        <rect
+          width="9.63139"
+          height="40.8516"
+          rx="4.8157"
+          transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)"
+          fill="currentColor"></rect>
+        <rect
+          width="9.63139"
+          height="40.8516"
+          rx="4.8157"
+          transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)"
+          fill="currentColor"></rect>
+        <rect
+          width="9.63139"
+          height="40.8516"
+          rx="4.8157"
+          transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)"
+          fill="currentColor"></rect>
+      </svg>
     </div>
     <div>Drizzle</div>
   </a>
-  <a href="/docs/overview" class="docs-text">
-    <div class="docs-icon">
-      <svg viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-sm"><path d="M14.477 12.0001H7.17725V2.91919H14.477C14.8606 2.91919 15.1716 3.23015 15.1716 3.61374V11.3055C15.1716 11.6891 14.8606 12.0001 14.477 12.0001Z" fill="hsl(211, 100%, 43.2%)"></path><path d="M1.1432 12.0001H7.60645V2.91919H1.1432C0.759611 2.91919 0.448652 3.23015 0.448652 3.61374V11.3055C0.448652 11.6891 0.759611 12.0001 1.1432 12.0001Z" fill="hsl(211, 100%, 43.2%)"></path><path d="M7.44238 2.75447V11.2081C6.25791 10.0362 1.9577 10.2382 1.9577 10.2382V0.893055C1.9577 0.893055 5.71355 0.264309 7.44238 2.75447Z" fill="hsl(208, 77.5%, 76.9%)"></path><path d="M8.19653 2.75447V11.2081C9.38101 10.0362 13.6812 10.2382 13.6812 10.2382V0.893055C13.6812 0.893055 9.92537 0.264309 8.19653 2.75447Z" fill="hsl(208, 77.5%, 76.9%)"></path>
-      </svg>
+  <div class="logo__section__selector">
+    <button class="logo__section__dropdown-btn" data-section-selector>
+      <div class="docs-text">
+        <div class="logo__section-icon">
+          <span class="logo__section-icon--docs">
+            {isDocs && <DocsIcon />}
+          </span>
+          {isLearn && <LearnIcon />}
+          {isBenchmark && <BoltIcon />}
+        </div>
+        <div class="logo__section-text">
+          {isDocs && "Docs"}
+          {isLearn && "Learn"}
+          {isBenchmark && "Benchmarks"}
+        </div>
+      </div>
+      <div class="logo__section__selector-current-num" data-current-section-num>
+        {isDocs && "1"}
+        {isBenchmark && "2"}
+        {isLearn && "3"}
+      </div>
+    </button>
+    <a class="logo__section__mobile-btn" href={condition}>
+      <div class="docs-text">
+        <div class="logo__section-icon">
+          <span class="logo__section-icon--docs">
+            {isDocs && <DocsIcon />}
+          </span>
+          {isLearn && <LearnIcon />}
+          {isBenchmark && <BoltIcon />}
+        </div>
+        <div class="logo__section-text">
+          {isDocs && "Docs"}
+          {isLearn && "Learn"}
+          {isBenchmark && "Benchmarks"}
+        </div>
+      </div>
+    </a>
+    <div class="logo__section__selector-items hidden">
+      <a class="logo__section__selector-item--docs" href="/docs/overview">
+        <div class="logo__section__selector-item__icon">
+          <DocsIcon />
+        </div>
+        <div>Docs</div>
+        <div class="logo__section__selector-current-num--dropdown">1</div>
+      </a>
+      <a class="logo__section__selector-item" href="/benchmarks">
+        <div class="logo__section__selector-item__icon">
+          <BoltIcon />
+        </div>
+        <div>Benchmarks</div>
+        <div class="logo__section__selector-current-num--dropdown">2</div>
+      </a>
+      <a class="logo__section__selector-item" href="/learn">
+        <div class="logo__section__selector-item__icon">
+          <LearnIcon />
+        </div>
+        <div>Learn</div>
+        <div class="logo__section__selector-current-num--dropdown">3</div>
+      </a>
     </div>
-    Docs
-  </a>
+  </div>
 </div>
 <style>
   .logo-wrap {
     display: flex;
     align-items: center;
     font-weight: 600;
+    flex: 1;
   }
 
-  .logo-svg svg{
+  .logo-svg svg {
     width: 36px;
     height: 36px;
     color: #000000;
     margin-right: 4px;
   }
-  
-  html[class~=dark] .logo-svg svg{
-    color: #C5F74F;
+
+  html[class~="dark"] .logo-svg svg {
+    color: #c5f74f;
   }
 
-  html[class~=dark] .docs-icon {
+  html[class~="dark"] .logo__section-icon {
     background-color: rgb(16, 42, 76);
   }
-  
-  .docs-icon {
-    margin-left: 12px;
+
+  .logo__section-icon {
     margin-right: 8px;
     display: flex;
     align-items: center;
@@ -84,14 +151,18 @@
     width: 24px;
   }
 
+  html.dark .logo__section-text {
+    color: rgb(243, 244, 246);
+  }
+
+  .logo__section-text {
+    color: #000;
+    margin-right: 4px;
+  }
+
   .docs-text {
     display: flex;
     align-items: center;
-  }
-
-  .docs-icon svg {
-    width: 16px;
-    height: 16px;
   }
 
   .nav_logo {
@@ -100,5 +171,288 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
+  }
+
+  .logo__section__selector {
+    position: relative;
+    user-select: none;
+    color: #7e868c;
+    margin-left: 8px;
+  }
+
+  .logo__section__dropdown-btn {
+    display: flex;
+    align-items: center;
+    height: 34px;
+    cursor: pointer;
+    padding: 2px 4px 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .logo__section__selector-item__icon {
+    display: flex;
+    height: 40px;
+    width: 40px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  html.dark .logo__section__dropdown-btn:hover {
+    background-color: #171717;
+  }
+
+  .logo__section__dropdown-btn:hover {
+    background-color: #f5f5f7;
+  }
+
+  html.dark .logo__section__selector-current-num,
+  html.dark .logo__section__selector-current-num--dropdown {
+    background-color: #171717;
+  }
+  .logo__section__mobile-btn {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    .logo__section__dropdown-btn {
+      display: none;
+    }
+    .logo__section__mobile-btn {
+      display: flex;
+      align-items: center;
+      height: 34px;
+      cursor: pointer;
+      padding: 2px 4px 2px 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease-in-out;
+    }
+  }
+  .logo__section__selector-current-num,
+  .logo__section__selector-current-num--dropdown {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    font-weight: 600;
+    gap: 2px;
+    height: 20px;
+    color: #909090;
+    border-radius: 4px;
+    justify-content: center;
+    position: relative;
+    width: 20px;
+    font-size: 12px;
+    background-color: #f5f5f7;
+    margin-left: auto;
+  }
+
+  html.dark .logo__section__selector-current-num--dropdown {
+    background-color: #1b1b1b;
+  }
+
+  .logo__section__selector-current-num--dropdown {
+    background-color: #ececf0;
+  }
+
+  html.dark .logo__section__selector-items {
+    background-color: #111;
+    border: 1px solid #333;
+    box-shadow: none;
+  }
+
+  .logo__section__selector-items {
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #e4e4e5;
+    box-shadow: 0 0 16px rgba(17, 17, 26, 0.1);
+    border-radius: 4px;
+    flex-direction: column;
+    padding: 8px;
+    gap: 2px;
+    position: absolute;
+    left: 0;
+    top: calc(100% + 4px);
+    width: 200px;
+    z-index: 99;
+  }
+
+  .logo__section__selector-item,
+  .logo__section__selector-item--docs {
+    align-items: center;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    color: #6b7280;
+    font-size: 16px;
+    font-weight: 500;
+    transition-property: color, background-color;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+    padding-right: 8px;
+  }
+
+  html.dark .logo__section__selector-item:hover,
+  html.dark .logo__section__selector-item--docs:hover,
+  html.dark .logo__section__selector-item:focus,
+  html.dark .logo__section__selector-item--docs:focus {
+    background-color: #171717;
+    color: #f3f4f6;
+  }
+
+  .logo__section__selector-item:hover,
+  .logo__section__selector-item--docs:hover,
+  .logo__section__selector-item:focus,
+  .logo__section__selector-item--docs:focus {
+    background-color: #f5f5f7;
+    color: #000;
+  }
+</style>
+<script>
+  const sectionSelector = document.querySelector("[data-section-selector]");
+
+  const currentSectionNum = document.querySelector(
+    "[data-current-section-num]",
+  );
+  const sectionSelectorItems = document.querySelector(
+    ".logo__section__selector-items",
+  );
+  if (sectionSelector && sectionSelectorItems) {
+    sectionSelector.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sectionSelector.classList.toggle("logo__section__selector-item--active");
+      sectionSelectorItems.classList.toggle("hidden");
+    });
+  }
+  window.addEventListener("click", (e) => {
+    const clickedElement = e.target as HTMLElement;
+    if (!clickedElement.matches(".logo__section__selector-items")) {
+      if (
+        sectionSelectorItems &&
+        sectionSelector &&
+        !sectionSelectorItems.classList.contains("hidden") &&
+        sectionSelector.classList.contains(
+          "logo__section__selector-item--active",
+        )
+      ) {
+        sectionSelector.classList.remove(
+          "logo__section__selector-item--active",
+        );
+        sectionSelectorItems.classList.add("hidden");
+      }
+    }
+  });
+
+  let pos = 0;
+  let maxpos = sectionSelectorItems
+    ? sectionSelectorItems.children.length - 1
+    : 0;
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "1" || e.key === "2" || e.key === "3") {
+      e.preventDefault();
+      if (sectionSelectorItems && sectionSelector && currentSectionNum) {
+        pos = +e.key - 1;
+        if (
+          currentSectionNum.textContent?.trim() === e.key &&
+          sectionSelectorItems.classList.contains("hidden")
+        ) {
+          sectionSelector.classList.add("logo__section__selector-item--active");
+          sectionSelectorItems.classList.remove("hidden");
+        } else {
+          if (e.key === "1") {
+            window.location.href = "/docs/overview";
+          }
+          if (e.key === "2") {
+            window.location.href = "/benchmarks";
+          }
+          if (e.key === "3") {
+            window.location.href = "/learn";
+          }
+        }
+      }
+    }
+    if (e.key === "Escape") {
+      if (sectionSelectorItems && sectionSelector) {
+        sectionSelector.classList.remove(
+          "logo__section__selector-item--active",
+        );
+        sectionSelectorItems.classList.add("hidden");
+      }
+    }
+    if (
+      sectionSelectorItems &&
+      !sectionSelectorItems?.classList.contains("hidden")
+    ) {
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        pos = pos == 0 ? maxpos : pos - 1;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        pos = pos == maxpos ? 0 : pos + 1;
+      }
+      (sectionSelectorItems.children[pos] as HTMLAnchorElement).focus();
+    }
+  });
+</script>
+<style is:global>
+  html.dark .logo__section-icon svg {
+    color: rgb(150, 199, 242);
+  }
+
+  html.dark .logo__section__selector-item--docs svg {
+    color: #3f4149;
+    fill: #6b7280;
+  }
+
+  html.dark .logo__section-icon--docs svg,
+  html.dark .logo__section__selector-item--docs:hover svg,
+  .logo__section__selector-item--docs:hover svg,
+  html.dark .logo__section__selector-item--docs:focus svg,
+  .logo__section__selector-item--docs:focus svg {
+    color: rgb(0, 106, 220);
+    fill: rgb(150, 199, 242);
+  }
+
+  .logo__section__selector-item--docs svg {
+    color: #6b7280;
+    fill: #b6b8c0;
+  }
+
+  .logo__section-icon svg {
+    width: 16px;
+    height: 16px;
+    color: rgb(0, 106, 220);
+    fill: rgb(150, 199, 242);
+  }
+
+  html.dark .logo__section__selector-item:hover svg,
+  html.dark .logo__section__selector-item:focus svg {
+    color: #96c7f2;
+  }
+  .logo__section__selector-item:hover svg,
+  .logo__section__selector-item:focus svg {
+    color: #006adc;
+  }
+  .logo__section__selector-item svg,
+  .logo__section__selector-item--docs svg {
+    width: 24px;
+    height: 24px;
+    color: rgb(107, 114, 128);
+    transition: all 0.2s ease-in-out;
+  }
+
+  html.dark .logo__section__selector-item--active {
+    background-color: #171717;
+  }
+
+  .logo__section__selector-item--active {
+    background-color: #f5f5f7;
+  }
+
+  .logo__section__selector-item--active .logo__section__selector-chevron {
+    opacity: 1 !important;
   }
 </style>

@@ -84,6 +84,7 @@ export function remarkCodeSnippets(): Plugin<[], Root> {
       const {
         title: metaTitle,
         copy,
+        collapsable,
         lineMarkings,
         inlineMarkings,
       } = parseMeta(code.meta || "");
@@ -151,6 +152,7 @@ export function remarkCodeSnippets(): Plugin<[], Root> {
         lang: code.lang,
         title: encodeMarkdownStringProp(title),
         copy,
+        collapsable,
         removedLineIndex,
         removedLineCount,
         lineMarkings: encodeMarkdownStringArrayProp(lineMarkings),
@@ -201,6 +203,13 @@ function parseMeta(meta: string) {
     return "";
   });
 
+  let hasCollapse = false;
+  meta = meta.replace(/(?:\s|^)collapsable(?:\s|$)/, () => {
+    hasCollapse = true;
+    return "";
+  });
+
+
   // Find line marking definitions inside curly braces, with an optional marker type prefix.
   //
   // Examples:
@@ -246,6 +255,7 @@ function parseMeta(meta: string) {
   return {
     title,
     copy: hasCopy,
+    collapsable: hasCollapse,
     lineMarkings,
     inlineMarkings,
     meta,
