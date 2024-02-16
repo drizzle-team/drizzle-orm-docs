@@ -2,10 +2,13 @@
 import { getCollection } from "astro:content";
 import Breadcrumbs from "@components/layout/Breadcrumbs.astro";
 import MeshLayout from "@/layouts/MeshLayout.astro";
-import PlusIcon from "@components/Icons/PlusIcon.astro";
 
 const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
   return id.startsWith("drizzle-with-frameworks/");
+});
+
+const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
+  return id.startsWith("drizzle-with-db/");
 });
 ---
 
@@ -25,9 +28,7 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
     <div class="frame__column--main-content">
       <div class="frame__main-content-cell">
         <div class="tutotials__section">
-          <div class="tutorials__section_title">
-            Drizzle with your frameworks
-          </div>
+          <div class="tutorials__section_title">Complete tutorials</div>
           <div class="tutorials__section_cards">
             {
               drizzleWithFrameworks.map((card) => (
@@ -40,7 +41,7 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
                       <>
                         <Fragment set:html={svg} />
                         {index !== card.data.svgs.length - 1 ? (
-                          <PlusIcon />
+                          <div>🤝</div>
                         ) : null}
                       </>
                     ))}
@@ -54,10 +55,10 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
           </div>
         </div>
         <div class="tutotials__section">
-          <div class="tutorials__section_title">Drizzle with serverless db</div>
+          <div class="tutorials__section_title">Drizzle with your DB</div>
           <div class="tutorials__section_cards">
             {
-              drizzleWithFrameworks.map((card) => (
+              drizzleWithDb.map((card) => (
                 <a
                   href={`/learn/tutorials/${card.slug}`}
                   class="tutorials__section__card"
@@ -172,7 +173,7 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
 
   .frame__wrap {
     width: 100%;
-    height: auto;
+    min-height: calc(100vh - 104px);
     display: flex;
     flex-direction: column;
   }
@@ -224,6 +225,7 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
     overflow-y: hidden;
     height: fit-content;
     min-height: 100%;
+    flex: 1;
   }
 
   html.dark .frame__empty-cell--main-content--auto {

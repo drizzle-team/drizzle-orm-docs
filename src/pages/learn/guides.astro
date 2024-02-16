@@ -25,11 +25,11 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
       <div class="frame__main-content-cell">
         <div class="guides__selected-guides">
           <div class="guides__selected-guides__card">
-            <div class="guides__selected-guides__card_title">Ecosystem</div>
+            <div class="guides__selected-guides__card_title">Conditional filters in query</div>
             <div class="guides__selected-guides__card_description">
-              Use React and JSX with Drizzle
+              This example demonstrates how to implement conditional filtering.
             </div>
-            <a href="#" class="guides__selected-guides__card_view">
+            <a href="/learn/guides/queries/conditional-filters-in-query" class="guides__selected-guides__card_view">
               View <svg
                 class="guides__selected-guides__card_arrow"
                 width="20"
@@ -54,11 +54,11 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
             </a>
           </div>
           <div class="guides__selected-guides__card">
-            <div class="guides__selected-guides__card_title">Runtime</div>
+            <div class="guides__selected-guides__card_title">Counting Related Entities</div>
             <div class="guides__selected-guides__card_description">
-              Use EdgeDB with Drizzle
+              This example demonstrates how to count related entities.
             </div>
-            <a href="#" class="guides__selected-guides__card_view">
+            <a href="/learn/guides/queries/counting-related-entities" class="guides__selected-guides__card_view">
               View <svg
                 class="guides__selected-guides__card_arrow"
                 width="20"
@@ -83,11 +83,11 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
             </a>
           </div>
           <div class="guides__selected-guides__card">
-            <div class="guides__selected-guides__card_title">Streams</div>
+            <div class="guides__selected-guides__card_title">Incrementing a value</div>
             <div class="guides__selected-guides__card_description">
-              Run Drizzle as a daemon with PM2
+              This example demonstrates how to increment a value.
             </div>
-            <a href="#" class="guides__selected-guides__card_view">
+            <a href="/learn/guides/queries/incrementing-a-value" class="guides__selected-guides__card_view">
               View <svg
                 class="guides__selected-guides__card_arrow"
                 width="20"
@@ -213,7 +213,7 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
 
   .frame__wrap {
     width: 100%;
-    height: auto;
+    min-height: calc(100vh - 104px);
     display: flex;
     flex-direction: column;
   }
@@ -265,6 +265,7 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
     overflow-y: hidden;
     height: fit-content;
     min-height: 100%;
+    flex: 1;
   }
 
   html.dark .frame__empty-cell--main-content--auto {

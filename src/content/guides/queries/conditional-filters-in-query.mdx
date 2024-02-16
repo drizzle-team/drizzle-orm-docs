@@ -4,7 +4,7 @@ title: Conditional filters in query
 
 This example demonstrates how to implement conditional filtering.
 
-## Schema
+### Schema
 
 ```ts
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -22,7 +22,7 @@ export const orders = pgTable('orders', {
 2. **`priceFilter`**: Filters orders with a price greater than or equal to 1000.
 3. **`statusFilter`**: Filters orders by the status “pending”.
 
-## Query
+### Query
 
 ```ts
 import { SQLWrapper, and, eq, gte, ilike } from 'drizzle-orm';
@@ -44,7 +44,7 @@ const result = await db
 
 Selects rows from the **`orders`** table where the `title` is similar to 'my-order', the `price` is at least 1000, and the `status` is “pending”.
 
-## Generated SQL
+### Generated SQL
 
 ```bash
 {

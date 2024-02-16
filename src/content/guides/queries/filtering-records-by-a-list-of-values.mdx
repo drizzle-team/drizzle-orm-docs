@@ -4,7 +4,7 @@ title: Filtering records by a list of values
 
 This example demonstrates how to implement filtering by list of values.
 
-## Schema
+### Schema
 
 ```ts
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -22,7 +22,7 @@ export const orders = pgTable('orders', {
 
 `Warning:` If you pass an array of 0 elements to the `IN` operator that will result in a failed query, so a check of array length > 0 is required.
 
-## Query
+### Query
 
 ```ts
 import { inArray } from 'drizzle-orm';

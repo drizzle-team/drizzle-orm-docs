@@ -4,7 +4,7 @@ title: Toggling a boolean field
 
 This query demonstrates how to toggle a boolean field.
 
-## Schema
+### Schema
 
 ```ts
 import { boolean, pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -18,9 +18,11 @@ export const tasks = pgTable('tasks', {
 
 The query invert the value of the **`done`** column, which is a boolean.
 
-## Query
+### Query
 
 ```ts
+import { sql } from 'drizzle-orm';
+
 await db.update(tasks).set({
   done: sql`NOT ${tasks.done}`,
 });

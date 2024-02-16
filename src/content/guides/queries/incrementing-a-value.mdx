@@ -2,7 +2,7 @@
 title: Incrementing a value
 ---
 
-## Schema
+### Schema
 
 ```ts
 import { pgTable, serial, text, integer } from 'drizzle-orm';
@@ -16,9 +16,11 @@ export const users = pgTable('users', {
 
 To increment the number of logins (**`logins`**) for a user, use the update (**`update`**) query. In this example, we increment the **`logins`** value by 1 for the user with **`id = 1`**.
 
-## Increment value
+### Increment value
 
 ```ts
+import { eq, sql } from 'drizzle-orm';
+
 const id = 1
 
 await db

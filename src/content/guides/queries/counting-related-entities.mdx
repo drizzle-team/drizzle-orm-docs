@@ -2,7 +2,7 @@
 title: Counting Related Entities
 ---
 
-## Schema
+### Schema
 
 ```ts
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -24,9 +24,11 @@ export const posts = pgTable('posts', {
 
 `cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
 
-## Count query
+### Count query
 
 ```ts
+import { count, eq, sql } from 'drizzle-orm';
+
 const id = 1;
 
 const response = await db

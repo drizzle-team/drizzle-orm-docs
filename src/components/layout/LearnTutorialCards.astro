@@ -1,0 +1,152 @@
+---
+import { getCollection } from "astro:content";
+
+import DrizzleLogo from "@components/Icons/DrizzleLogo";
+import HandDrawnArrowRightIcon from "@components/Icons/HandDrawnArrowRightIcon.astro";
+import PrismaIcon from "@components/Icons/PrismaIcon";
+import SequelizeIcon from "@components/Icons/SequelizeIcon.astro";
+import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
+
+const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
+  return id.startsWith("drizzle-with-frameworks/");
+});
+
+const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
+  return id.startsWith("drizzle-with-db/");
+});
+---
+
+<div class="learn__migrate-from_cards">
+  {
+    drizzleWithFrameworks.map((card) => (
+      <a
+        href={`/learn/tutorials/${card.slug}`}
+        class="tutorials__section__card"
+      >
+        <div class="tutorials__section__card_icons">
+          {card.data.svgs.map((svg: string, index: number) => (
+            <>
+              <Fragment set:html={svg} />
+              {index !== card.data.svgs.length - 1 ? (
+                <div>🤝</div>
+              ) : null}
+            </>
+          ))}
+        </div>
+        <div class="tutorials__section__card_title">
+          {card.data.title}
+        </div>
+      </a>
+    ))
+  }
+  {
+    drizzleWithDb.map((card) => (
+      <a
+        href={`/learn/tutorials/${card.slug}`}
+        class="tutorials__section__card"
+      >
+        <div class="tutorials__section__card_icons">
+          {card.data.svgs.map((svg: string, index: number) => (
+            <>
+              <Fragment set:html={svg} />
+              {index !== card.data.svgs.length - 1 ? (
+                <div>🤝</div>
+              ) : null}
+            </>
+          ))}
+        </div>
+        <div class="tutorials__section__card_title">
+          {card.data.title}
+        </div>
+      </a>
+    ))
+  }
+</div>
+<style>
+  .learn__migrate-from_cards {
+    display: flex;
+    gap: 16px;
+  }
+
+
+  html.dark .tutorials__section__card {
+    border: 1px solid #303030;
+  }
+
+  .tutorials__section__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e6e6e6;
+    border-radius: 2px;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    width: 264px;
+    height: 144px;
+    text-align: center;
+  }
+
+  .tutorials__section__card_icons {
+    align-items: center;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  html.dark .tutorials__section__card_title {
+    color: #e2e6f0;
+  }
+
+  .tutorials__section__card_title {
+    color: #101828;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 16px;
+    line-height: normal;
+  }
+
+  @media (max-width: 767px) {
+    .learn__migrate-from_cards {
+      display: flex;
+      gap: 12px;
+      flex-direction: column;
+    }
+    .tutorials__section__card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e6e6e6;
+      border-radius: 2px;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      width: 100%;
+      height: 144px;
+      text-align: center;
+    }
+    .tutorials__section__card_title {
+      color: #101828;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      line-height: normal;
+    }
+  }
+</style>
+<style is:global>
+  .tutorials__section__card_icons svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tutorials__section__card_icons svg:nth-child(even) {
+    width: 20px;
+    height: 20px;
+  }
+</style>
