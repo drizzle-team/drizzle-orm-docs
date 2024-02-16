@@ -2,11 +2,17 @@
 import { getCollection } from "astro:content";
 
 const articles = await getCollection("latest-releases");
-const filteredArticles = articles
-  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime());
+const filteredArticles = articles.sort(
+  (a, b) =>
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+);
 
 const prevUpdates = filteredArticles.slice(0, 3);
-const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" };
+const options: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
 ---
 
 <div class="latest-updates_wrap">
@@ -14,6 +20,7 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
     <div class="latest-updates__header_title">Latest Updates</div>
     <a href="/learn/latest-releases" class="latest-updates__header_view-all">
       View all <svg
+        class="guides__selected-guides__card_arrow"
         width="20"
         height="20"
         viewBox="0 0 20 20"
@@ -38,12 +45,18 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
   <div class="latest-updates__cards">
     {
       prevUpdates.map((update) => (
-        <a href={`/learn/latest-releases/${update.slug}`} class="latest-updates__card">
+        <a
+          href={`/learn/latest-releases/${update.slug}`}
+          class="latest-updates__card"
+        >
           <div class="latest-updates__card_title">{update.data.title}</div>
-          <div class="latest-updates__card_date">{update.data.pubDate.toLocaleDateString("en-US", options)}</div>
+          <div class="latest-updates__card_date">
+            {update.data.pubDate.toLocaleDateString("en-US", options)}
+          </div>
           <div class="latest-updates__card_description">
             {update.data.description}
           </div>
+          <div class="latest-updates__card_link">Read more</div>
         </a>
       ))
     }
@@ -59,7 +72,6 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
     width: 100%;
     padding-bottom: 130px;
   }
-
 
   .latest-updates__header {
     display: flex;
@@ -79,7 +91,7 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
   }
 
   html.dark .latest-updates__header_view-all {
-    color: #006BE6;
+    color: #006be6;
   }
 
   .latest-updates__header_view-all {
@@ -127,7 +139,7 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
   }
 
   html.dark .latest-updates__card_date {
-    color: #E6E6E6;
+    color: #e6e6e6;
   }
 
   .latest-updates__card_date {
@@ -139,7 +151,7 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
   }
 
   html.dark .latest-updates__card_description {
-    color: #F3F4F6;
+    color: #f3f4f6;
   }
 
   .latest-updates__card_description {
@@ -148,5 +160,71 @@ const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", d
     font-weight: 400;
     letter-spacing: -0.176px;
     margin-top: 16px;
+  }
+  .latest-updates__card_link {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    .latest-updates_wrap {
+      margin-top: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding-bottom: 72px;
+    }
+    .latest-updates__cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      width: 100%;
+    }
+    html.dark .latest-updates__card_description {
+      color: #f3f4f6;
+    }
+
+    .latest-updates__card_description {
+      color: #5f5f61;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.176px;
+      margin-top: 12px;
+      line-height: 16.71px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      text-overflow: ellipsis;
+    }
+    .latest-updates__card_link {
+      display: flex;
+      margin-top: 8px;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 16.71px;
+    }
+    .latest-updates__header_title {
+      color: #303030;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 26px;
+      letter-spacing: -0.48px;
+    }
+    .latest-updates__header_view-all {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: #006adc;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .guides__selected-guides__card_arrow {
+      height: 16px;
+      width: 16px;
+    }
   }
 </style>

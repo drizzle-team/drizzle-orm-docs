@@ -31,6 +31,7 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
             </div>
             <a href="#" class="guides__selected-guides__card_view">
               View <svg
+                class="guides__selected-guides__card_arrow"
                 width="20"
                 height="20"
                 viewBox="0 0 20 20"
@@ -59,6 +60,7 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
             </div>
             <a href="#" class="guides__selected-guides__card_view">
               View <svg
+                class="guides__selected-guides__card_arrow"
                 width="20"
                 height="20"
                 viewBox="0 0 20 20"
@@ -87,6 +89,7 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
             </div>
             <a href="#" class="guides__selected-guides__card_view">
               View <svg
+                class="guides__selected-guides__card_arrow"
                 width="20"
                 height="20"
                 viewBox="0 0 20 20"
@@ -298,5 +301,99 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
     padding-right: 72px;
     flex-shrink: 0;
     border-left: 1px solid #efefef;
+  }
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+      border-left: none;
+    }
+
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px;
+      flex-shrink: 0;
+      border-left: none;
+    }
+    .frame__empty-cell {
+      display: none;
+    }
+    html.dark .guides_title {
+      color: #e2e6f0;
+    }
+
+    .guides_title {
+      color: #0f172a;
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 48px;
+      letter-spacing: -0.48px;
+    }
+    html.dark .guides_description {
+      color: #f3f4f6;
+    }
+
+    .guides_description {
+      color: #1e1e1e;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.176px;
+      margin-top: 0px;
+      line-height: 18.2px;
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+    html.dark .frame__main-content-cell {
+      border-left: none;
+    }
+    .frame__main-content-cell {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      margin: 0;
+      width: 100%;
+      padding: 0 16px;
+      flex-shrink: 0;
+      border-left: none;
+    }
+
+    .frame__empty-cell_wrap {
+      display: none;
+    }
+    .guides__selected-guides {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      margin-top: 24px;
+      flex-direction: column;
+    }
+    html.dark .guides__selected-guides__card_title {
+      color: #e2e6f0;
+    }
+
+    .guides__selected-guides__card_title {
+      color: #222124;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 20.8px;
+    }
+    .guides__selected-guides__card_view {
+      display: flex;
+      gap: 8px;
+      color: #006adc;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 130%;
+      margin-top: 20px;
+      text-decoration: none;
+      align-items: center;
+    }
+    .guides__selected-guides__card_arrow {
+      height: 16px;
+      width: 16px;
+    }
   }
 </style>

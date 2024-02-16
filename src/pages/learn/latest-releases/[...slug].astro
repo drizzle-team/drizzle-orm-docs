@@ -21,36 +21,35 @@ const options: Intl.DateTimeFormatOptions = {
 ---
 
 <MeshLayout frontmatter={entry.data}>
-    <div class="frame__wrap">
-      <div class="frame__column">
-        <div class="learn__title-block">
-          <Breadcrumbs
-            crumbs={{
-              Learn: "/learn",
-              "Latest Releases": "/learn/latest-releases",
-            }}
-          />
-          <div class="latest-release_title">{entry.data.title}</div>
-        </div>
-        <div class="frame__empty-cell"></div>
+  <div class="frame__wrap">
+    <div class="frame__column">
+      <div class="learn__title-block">
+        <Breadcrumbs
+          crumbs={{
+            Learn: "/learn",
+            "Latest Releases": "/learn/latest-releases",
+          }}
+        />
+        <div class="latest-release_title">{entry.data.title}</div>
       </div>
-      <div class="frame__column--main-content">
-        <div class="frame__main-content-cell">
-          <div class="latest-release_date">
-            {entry.data.pubDate.toLocaleDateString("en-US", options)}
-          </div>
-          <Content />
-          <div class="latest-release_footer"></div>
+      <div class="frame__empty-cell"></div>
+    </div>
+    <div class="frame__column--main-content">
+      <div class="frame__main-content-cell">
+        <div class="latest-release_date">
+          {entry.data.pubDate.toLocaleDateString("en-US", options)}
         </div>
-        <div class="frame__empty-cell_wrap">
-          <div class="frame__empty-cell--main-content--auto"></div>
-        </div>
+        <Content />
+        <div class="latest-release_footer"></div>
+      </div>
+      <div class="frame__empty-cell_wrap">
+        <div class="frame__empty-cell--main-content--auto"></div>
       </div>
     </div>
+  </div>
 </MeshLayout>
 
 <style>
-
   html.dark .latest-release_title {
     color: #e2e6f0;
   }
@@ -171,5 +170,51 @@ const options: Intl.DateTimeFormatOptions = {
     padding-right: 72px;
     flex-shrink: 0;
     border-left: 1px solid #efefef;
+  }
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+    border-left: none;
+  }
+    .latest-release_title {
+      color: #0f172a;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px 0;
+      flex-shrink: 0;
+      border: none;
+    }
+    .frame__empty-cell {
+      display: none;
+    }
+    html.dark .frame__main-content-cell {
+      border-left: none;
+    }
+    .frame__main-content-cell {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      margin: 0;
+      width: 100%;
+      padding: 0 16px 0;
+      flex-shrink: 0;
+      border-left: none;
+    }
+    .frame__empty-cell_wrap {
+      display: none;
+    }
+    .latest-release_footer {
+      padding-bottom: 62px;
+    }
   }
 </style>

@@ -80,17 +80,6 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
             }
           </div>
         </div>
-        <div class="tutotials__section">
-          <div class="tutorials__section_title">Drizzle with Edge runtimes</div>
-          <div class="tutorials__section_cards">
-            <a href="#" class="tutorials__section__card">
-              <div class="tutorials__section__card_icons"></div>
-              <div class="tutorials__section__card_title">
-                Drizzle + Next.js + Neon
-              </div>
-            </a>
-          </div>
-        </div>
       </div>
       <div class="frame__empty-cell_wrap">
         <div class="frame__empty-cell--main-content--auto"></div>
@@ -270,6 +259,87 @@ const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
     padding-right: 72px;
     flex-shrink: 0;
     border-left: 1px solid #efefef;
+  }
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+      border-left: none;
+    }
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px;
+      flex-shrink: 0;
+      border: none;
+    }
+    .tutorials_title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+    }
+    .frame__empty-cell {
+      display: none;
+    }
+    html.dark .frame__main-content-cell {
+      border-left: none;
+    }
+    .frame__main-content-cell {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      margin: 0;
+      width: 100%;
+      padding: 24px 16px 16px;
+      flex-shrink: 0;
+      border-left: none;
+    }
+    .frame__empty-cell_wrap {
+      display: none;
+    }
+    .tutorials__section_title {
+      color: #303030;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+    }
+    .tutotials__section {
+      display: flex;
+      flex-direction: column;
+      margin-top: 0px;
+      margin-bottom: 32px;
+    }
+    .tutorials__section__card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e6e6e6;
+      border-radius: 2px;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      width: 100%;
+      height: 144px;
+      text-align: center;
+    }
+    .tutorials__section_cards {
+      display: flex;
+      flex-direction: row;
+      margin-top: 24px;
+      gap: 16px;
+    }
+    .tutorials__section__card_title {
+      color: #101828;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      line-height: normal;
+    }
   }
 </style>
 <style is:global>

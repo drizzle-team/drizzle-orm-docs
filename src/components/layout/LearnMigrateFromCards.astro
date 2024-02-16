@@ -15,7 +15,10 @@ import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
     </div>
     <div class="learn__migrate-from_card-title">Migrate from Prisma</div>
   </a>
-  <a href="/learn/migrate/migrate-from-sequelize" class="learn__migrate-from_card">
+  <a
+    href="/learn/migrate/migrate-from-sequelize"
+    class="learn__migrate-from_card"
+  >
     <div class="learn__migrate-from_card-image">
       <SequelizeIcon />
       <HandDrawnArrowRightIcon />
@@ -23,7 +26,10 @@ import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
     </div>
     <div class="learn__migrate-from_card-title">Migrate from Sequelize</div>
   </a>
-  <a href="/learn/migrate/migrate-from-typeorm" class="learn__migrate-from_card">
+  <a
+    href="/learn/migrate/migrate-from-typeorm"
+    class="learn__migrate-from_card"
+  >
     <div class="learn__migrate-from_card-image">
       <TypeORMIcon />
       <HandDrawnArrowRightIcon />
@@ -76,6 +82,26 @@ import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
     line-height: normal;
     margin-top: 16px;
     text-align: center;
+  }
+  @media (max-width: 767px) {
+    .learn__migrate-from_cards {
+      display: flex;
+      gap: 12px;
+      flex-direction: column;
+    }
+    .learn__migrate-from_card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      border-radius: 2px;
+      border: 1px solid #e6e6e6;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      height: 144px;
+    }
   }
 </style>
 <style is:global>
