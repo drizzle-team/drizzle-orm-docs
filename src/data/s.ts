@@ -130,6 +130,27 @@ export const sponsorsData: ISponsor[] = [
       padding: "10px",
     },
   },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/snaplet",
+      name: "Snaplet",
+      avatarUrl: "/images/snaplet.png",
+    },
+    createdAt: "2023-06-11T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+    darkStyle: {
+      padding: "6px",
+    },
+    lightStyle: {
+      padding: "6px",
+    },
+  },
 ];
 
 export default sponsorsData;
