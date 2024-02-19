@@ -350,7 +350,7 @@ const condition = isDocs
     : 0;
 
   window.addEventListener("keydown", (e) => {
-    if (e.key === "1" || e.key === "2" || e.key === "3") {
+    if (!e.metaKey && (e.key === "1" || e.key === "2" || e.key === "3")) {
       e.preventDefault();
       if (sectionSelectorItems && sectionSelector && currentSectionNum) {
         pos = +e.key - 1;
