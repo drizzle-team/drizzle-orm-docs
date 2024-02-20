@@ -1,47 +1,49 @@
 ---
 title: SQL Increment value
 ---
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
-This guide demonstrates how to increment value in `Drizzle` and `SQL`.
-
-### Prerequisites
-
-- Initialize `Drizzle client` with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
+**Prerequisites**
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
 - [Update statement](/docs/update);
 - [Filters](/docs/operators);
+- [sql operator](/docs/sql);
 
-### Drizzle Query
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-```tsx {8}
-// imports
+Increment value in **Drizzle** and **SQL**
+
+<Section>
+```tsx copy {8}
+import { eq, sql } from 'drizzle-orm';
 
 const db = drizzle(...)
   
 await db
-  .update(users)
+  .update(table)
   .set({
-    logins: sql`${users.logins} + 1`,
+    counter: sql`${table.counter} + 1`,
   })
-  .where(eq(users.id, 1));
+  .where(eq(table.id, 1));
 ```
-
-### SQL Query
 
 ```sql
-update "users" set "logins" = "users"."logins" + 1 where "users"."id" = 1;
+update "table" set "counter" = "table"."counter" + 1 where "table"."id" = 1;
 ```
+</Section>
 
-### Custom increment function
+Also, you can do your custom increment function:
 
-```tsx
+```tsx copy
 const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value: number) => {
   return sql`${column} + ${value}`;
 };
 
 await db
-  .update(users)
+  .update(table)
   .set({
-    logins: increment(users.logins, 10),
+    counter: increment(table.counter, 10),
   })
-  .where(eq(users.id, 1));
+  .where(eq(table.id, 1));
 ```
