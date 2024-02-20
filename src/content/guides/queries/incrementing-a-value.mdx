@@ -1,32 +1,47 @@
 ---
-title: Incrementing a value
+title: SQL Increment value
 ---
 
-### Schema
+This guide demonstrates how to increment value in `Drizzle` and `SQL`.
 
-```ts
-import { pgTable, serial, text, integer } from 'drizzle-orm';
+### Prerequisites
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  logins: integer('logins').notNull().default(0),
-});
+- Initialize `Drizzle client` with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
+- [Update statement](/docs/update);
+- [Filters](/docs/operators);
+
+### Drizzle Query
+
+```tsx {8}
+// imports
+
+const db = drizzle(...)
+  
+await db
+  .update(users)
+  .set({
+    logins: sql`${users.logins} + 1`,
+  })
+  .where(eq(users.id, 1));
 ```
 
-To increment the number of logins (**`logins`**) for a user, use the update (**`update`**) query. In this example, we increment the **`logins`** value by 1 for the user with **`id = 1`**.
+### SQL Query
 
-### Increment value
+```sql
+update "users" set "logins" = "users"."logins" + 1 where "users"."id" = 1;
+```
 
-```ts
-import { eq, sql } from 'drizzle-orm';
+### Custom increment function
 
-const id = 1
+```tsx
+const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value: number) => {
+  return sql`${column} + ${value}`;
+};
 
 await db
-    .update(users)
-    .set({
-      logins: sql`${users.logins} + 1`,
-    })
-    .where(eq(users.id, id));
+  .update(users)
+  .set({
+    logins: increment(users.logins, 10),
+  })
+  .where(eq(users.id, 1));
 ```
