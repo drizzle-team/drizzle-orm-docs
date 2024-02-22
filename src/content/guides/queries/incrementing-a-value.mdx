@@ -12,7 +12,7 @@ import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-Drizzle API designed to be SQL-like, so you can have access to the full power of SQL.
+To increment column value use `update().set()` method like below:
 
 <Section>
 ```tsx copy {8}
@@ -33,9 +33,13 @@ update "table" set "counter" = "table"."counter" + 1 where "table"."id" = 1;
 ```
 </Section>
 
-You can create your custom increment function:
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom increment function:
 
 ```tsx copy
+import { AnyMySqlColumn } from 'drizzle-orm/mysql-core';
+import { AnyPgColumn } from 'drizzle-orm/pg-core';
+import { AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
+
 const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value = 1) => {
   return sql`${column} + ${value}`;
 };
