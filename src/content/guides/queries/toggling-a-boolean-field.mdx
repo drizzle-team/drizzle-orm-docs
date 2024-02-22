@@ -1,29 +1,39 @@
 ---
-title: Toggling a boolean field
+title: SQL Toggle value
 ---
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
-This query demonstrates how to toggle a boolean field.
+**Prerequisites**
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
+- [Update statement](/docs/update);
+- [Filters](/docs/operators);
+- [not operator](/docs/operators#not);
+- Boolean data type in [MySQL](/docs/column-types/mysql#boolean) and [SQLite](/docs/column-types/sqlite#boolean);
 
-### Schema
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-```ts
-import { boolean, pgTable, serial, text } from 'drizzle-orm/pg-core';
+To toggle column value use `update().set()` method like below:
 
-export const tasks = pgTable('tasks', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  done: boolean('done').notNull().default(false),
-});
+<Section>
+```tsx copy {8}
+import { eq, not } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+await db
+  .update(table)
+  .set({
+    isActive: not(table.isActive),
+  })
+  .where(eq(table.id, 1));
 ```
 
-The query invert the value of the **`done`** column, which is a boolean.
-
-### Query
-
-```ts
-import { sql } from 'drizzle-orm';
-
-await db.update(tasks).set({
-  done: sql`NOT ${tasks.done}`,
-});
+```sql
+update "table" set "is_active" = not "table"."is_active" where "table"."id" = 1;
 ```
+</Section>
+
+<Callout type="info" emoji="ℹ️">
+   Please note that there is no boolean type in MySQL and SQLite; instead, MySQL uses tinyint(1) as an alias, while SQLite stores boolean values as integers 0 (false) and 1 (true). 
+</Callout>
