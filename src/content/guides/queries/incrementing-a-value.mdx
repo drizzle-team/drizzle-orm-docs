@@ -12,7 +12,7 @@ import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-Increment value in **Drizzle** and **SQL**
+Drizzle API designed to be SQL-like, so you can have access to the full power of SQL.
 
 <Section>
 ```tsx copy {8}
@@ -33,10 +33,10 @@ update "table" set "counter" = "table"."counter" + 1 where "table"."id" = 1;
 ```
 </Section>
 
-Also, you can do your custom increment function:
+You can create your custom increment function:
 
 ```tsx copy
-const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value: number) => {
+const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value = 1) => {
   return sql`${column} + ${value}`;
 };
 
