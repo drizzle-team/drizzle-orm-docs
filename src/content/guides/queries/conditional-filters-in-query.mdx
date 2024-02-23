@@ -1,54 +1,63 @@
 ---
 title: Conditional filters in query
 ---
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
-This example demonstrates how to implement conditional filtering.
+**Prerequisites**
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
+- [Select statement](/docs/select);
+- [Filters](/docs/operators);
 
-### Schema
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-```ts
-import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+To pass conditional filters in query use `and()` or `or()` operators in `.where()` method of select statement. Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you add conditional filters to query using variable or logical operators. `undefined` is used where conditions are not met and will be ignored.
 
-export const orders = pgTable('orders', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  price: integer('price').notNull(),
-  status: text('status', { enum: ['done', 'pending'] }).notNull(),
-});
-```
+<Section>
+```tsx copy {5,8,12,16,22}
+import { SQL, and, eq, gte, inArray } from 'drizzle-orm';
 
-1. **`searchFilter`**: Filters orders by partial match in the title using **`ilike`**.
-2. **`priceFilter`**: Filters orders with a price greater than or equal to 1000.
-3. **`statusFilter`**: Filters orders by the status “pending”.
+const db = drizzle(...)
 
-### Query
+const where: SQL[] = [];
 
-```ts
-import { SQLWrapper, and, eq, gte, ilike } from 'drizzle-orm';
-
-const filters: SQLWrapper[] = [];
-const searchFilter = true;
-const priceFilter = true;
-const statusFilter = true;
-
-if (searchFilter) filters.push(ilike(orders.title, 'my-order'));
-if (priceFilter) filters.push(gte(orders.price, 1000));
-if (statusFilter) filters.push(eq(orders.status, 'pending'));
-
-const result = await db
-  .select()
-  .from(orders)
-  .where(and(...filters));
-```
-
-Selects rows from the **`orders`** table where the `title` is similar to 'my-order', the `price` is at least 1000, and the `status` is “pending”.
-
-### Generated SQL
-
-```bash
-{
-  sql: 'select "id", "title", "description", "price", "status" from "orders" where ("orders"."title" ilike $1 and "orders"."price" >= $2 and "orders"."status" = $3)',
-  params: [ 'my-order', 1000, 'pending' ]
+if (condition1) {
+  where.push(inArray(table.column1, [10, 11, 12, 13, 14]));
 }
+
+if (condition2) {
+  where.push(eq(table.column2, 'value'));
+}
+
+if (condition3) {
+  where.push(gte(table.column3, 100));
+}
+
+await db
+  .select()
+  .from(table)
+  .where(and(...where));
 ```
+
+```tsx copy {8,9,10,11,12,13,14}
+import { and, eq, gte, inArray } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+await db
+  .select()
+  .from(table)
+  .where(
+    and(
+      condition1 ? inArray(table.column1, [10, 11, 12, 13, 14]) : undefined,
+      condition2 && eq(table.column2, 'value'),
+      condition3 && gte(table.column3, 100),
+    ),
+  );
+```
+
+```sql
+select "id", "column1", "column2", "column3" from "table" where ("table"."column1" in (10, 11, 12, 13, 14) and "table"."column2" = 'value' and "table"."column3" >= 100);
+```
+</Section>
+
