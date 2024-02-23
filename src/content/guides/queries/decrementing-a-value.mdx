@@ -47,7 +47,8 @@ const decrement = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value
 await db
   .update(table)
   .set({
-    counter: decrement(table.counter, 10),
+    counter1: decrement(table.counter1),
+    counter2: decrement(table.counter2, 10),
   })
   .where(eq(table.id, 1));
 ```

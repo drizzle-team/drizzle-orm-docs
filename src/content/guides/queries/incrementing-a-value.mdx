@@ -47,7 +47,8 @@ const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value
 await db
   .update(table)
   .set({
-    counter: increment(table.counter, 10),
+    counter1: increment(table.counter1),
+    counter2: increment(table.counter2, 10),
   })
   .where(eq(table.id, 1));
 ```
