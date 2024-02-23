@@ -27,7 +27,8 @@ await db
 ```
 
 ```sql
-select "id", "title", "category", "views_count" from "posts" where "posts"."title" ilike 'Artificial Intelligence';
+select "id", "title", "category", "views_count" from "posts"
+where "posts"."title" ilike 'Artificial Intelligence';
 ```
 </Section>
 
@@ -53,7 +54,9 @@ await db
 
 ```sql
 select "id", "title", "category", "views_count" from "posts"
-where ("posts"."title" ilike 'Artificial Intelligence' and "posts"."category" in ('Technology', 'Science', 'Art') and "posts"."views_count" > 200);
+where ("posts"."title" ilike 'Artificial Intelligence'
+and "posts"."category" in ('Technology', 'Science', 'Art')
+and "posts"."views_count" > 200);
 ```
 </Section>
 
@@ -87,6 +90,8 @@ await db
 
 ```sql
 select "id", "title", "category", "views_count" from "posts"
-where ("posts"."title" ilike 'Artificial Intelligence' and "posts"."category" in ('Technology', 'Science', 'Art') and "posts"."views_count" > 200);
+where ("posts"."title" ilike 'Artificial Intelligence'
+and "posts"."category" in ('Technology', 'Science', 'Art')
+and "posts"."views_count" > 200);
 ```
 </Section>
