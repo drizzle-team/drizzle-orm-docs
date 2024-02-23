@@ -1,17 +1,14 @@
 ---
 title: DrizzleORM v0.29.4 release
 pubDate: 2024-02-22
-description: Added Neon HTTP Batch support and updated the default behavior and instances of `database-js`.
+description: Added Neon HTTP Batch support and updated the default behavior and instances of database-js.
 ---
 
 ## New Features
 
-### 🎉 **Neon HTTP Batch**
-
+### 🎉 Neon HTTP Batch
 For more info you can check [Neon docs](https://neon.tech/docs/serverless/serverless-driver#issue-multiple-queries-with-the-transaction-function)
-
 **Example**
-
 ```ts
 const batchResponse: BatchType = await db.batch([
 	db.insert(usersTable).values({ id: 1, name: 'John' }).returning({
