@@ -7,57 +7,86 @@ import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 **Prerequisites**
 - Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
 - [Select statement](/docs/select);
-- [Filters](/docs/operators);
+- [Filtering](/docs/select#filtering);
+- [Filter operators](/docs/operators);
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-To pass conditional filters in query use `and()` or `or()` operators in `.where()` method of select statement. Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you add conditional filters to query using variable or logical operators. `undefined` is used where conditions are not met and will be ignored.
+To pass a conditional filter in query you can use `.where()` method and logical operator like below:
 
 <Section>
-```tsx copy {5,8,12,16,22}
-import { SQL, and, eq, gte, inArray } from 'drizzle-orm';
+```tsx copy {7}
+import { ilike } from 'drizzle-orm';
 
 const db = drizzle(...)
 
-const where: SQL[] = [];
-
-if (condition1) {
-  where.push(inArray(table.column1, [10, 11, 12, 13, 14]));
-}
-
-if (condition2) {
-  where.push(eq(table.column2, 'value'));
-}
-
-if (condition3) {
-  where.push(gte(table.column3, 100));
-}
-
 await db
   .select()
-  .from(table)
-  .where(and(...where));
+  .from(posts)
+  .where(searchParam && ilike(posts.title, searchParam));
 ```
 
+```sql
+select "id", "title", "category", "views_count" from "posts" where "posts"."title" ilike 'Artificial Intelligence';
+```
+</Section>
+
+To combine conditional filters you can use `and()` or `or()` with logical operators in `.where()` method like below:
+
+<Section>
 ```tsx copy {8,9,10,11,12,13,14}
-import { and, eq, gte, inArray } from 'drizzle-orm';
+import { and, gt, ilike, inArray } from 'drizzle-orm';
 
 const db = drizzle(...)
 
 await db
   .select()
-  .from(table)
+  .from(posts)
   .where(
     and(
-      condition1 ? inArray(table.column1, [10, 11, 12, 13, 14]) : undefined,
-      condition2 && eq(table.column2, 'value'),
-      condition3 && gte(table.column3, 100),
+      searchParam && ilike(posts.title, searchParam),
+      filterByCategories.length > 0 ? inArray(posts.category, filterByCategories) : undefined,
+      minViews > 100 ? gt(posts.viewsCount, minViews) : undefined,
     ),
   );
 ```
 
 ```sql
-select "id", "column1", "column2", "column3" from "table" where ("table"."column1" in (10, 11, 12, 13, 14) and "table"."column2" = 'value' and "table"."column3" >= 100);
+select "id", "title", "category", "views_count" from "posts"
+where ("posts"."title" ilike 'Artificial Intelligence' and "posts"."category" in ('Technology', 'Science', 'Art') and "posts"."views_count" > 200);
 ```
 </Section>
 
+If you need to combine conditional filters in different part of the project you can create a variable, push filters and then pass it to `and()` or `or()` operators in `.where()` method like below:
+
+<Section>
+```tsx copy {5,8,12,16,22}
+import { SQL, and, gt, ilike, inArray } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+const where: SQL[] = [];
+
+if (searchParam) {
+  where.push(ilike(posts.title, searchParam));
+}
+
+if (filterByCategories.length > 0) {
+  where.push(inArray(posts.category, filterByCategories));
+}
+
+if (minViews > 200) {
+  where.push(gt(posts.viewsCount, minViews));
+}
+
+await db
+  .select()
+  .from(posts)
+  .where(and(...where));
+```
+
+```sql
+select "id", "title", "category", "views_count" from "posts"
+where ("posts"."title" ilike 'Artificial Intelligence' and "posts"."category" in ('Technology', 'Science', 'Art') and "posts"."views_count" > 200);
+```
+</Section>
