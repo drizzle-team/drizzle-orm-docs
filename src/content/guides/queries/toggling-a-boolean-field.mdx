@@ -2,7 +2,6 @@
 title: SQL Toggle value
 ---
 import Section from "@mdx/Section.astro";
-import Callout from '@components/markdown/Callout.astro';
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
 **Prerequisites**
@@ -14,7 +13,7 @@ import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-To toggle column value use `update().set()` method like below:
+To toggle a column value you can use `update().set()` method like below:
 
 <Section>
 ```tsx copy {8}
@@ -35,6 +34,6 @@ update "table" set "is_active" = not "table"."is_active" where "table"."id" = 1;
 ```
 </Section>
 
-<Callout type="info" emoji="ℹ️">
-   Please note that there is no boolean type in MySQL and SQLite; instead, MySQL uses tinyint(1) as an alias, while SQLite stores boolean values as integers 0 (false) and 1 (true). 
-</Callout>
+Please note that there is no boolean type in MySQL and SQLite.
+MySQL uses tinyint(1).
+SQLite uses integers 0 (false) and 1 (true). 
