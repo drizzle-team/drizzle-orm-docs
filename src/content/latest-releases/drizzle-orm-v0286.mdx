@@ -95,7 +95,7 @@ Example
 const query = db.query.usersTable.findFirst().toSQL();
 ```
 
-### 🎉 Added new PostgreSQL operators for Arrays - thanks @L-Mario564
+### 🎉 Added new PostgreSQL operators for Arrays
 
 List of operators and usage examples
 `arrayContains`, `arrayContained`, `arrayOverlaps`
@@ -117,7 +117,7 @@ const withSubQuery = await db.select({ id: posts.id }).from(posts)
 	));
 ```
 
-### 🎉 Add more SQL operators for where filter function in Relational Queries - thanks @cayter!
+### 🎉 Add more SQL operators for where filter function in Relational Queries
 
 **Before**
 
@@ -137,10 +137,10 @@ await db.users.findFirst({
 })
 ```
 
-## Bug Fixes
+## Fixes
 
-- 🐛 [Correct where in on conflict in sqlite](https://github.com/drizzle-team/drizzle-orm/pull/1076) - Thanks @hanssonduck!
-- 🐛 [Fix libsql/client type import](https://github.com/drizzle-team/drizzle-orm/pull/1122) - Thanks @luisfvieirasilva!
-- 🐛 [Fix: raw sql query not being mapped properly on RDS](https://github.com/drizzle-team/drizzle-orm/pull/1071) - Thanks @boian-ivanov
-- 🐛 [Fix Datetime mapping for MySQL](https://github.com/drizzle-team/drizzle-orm/pull/1082) - thanks @Angelelz
-- 🐛 [Fix smallserial generating as serial](https://github.com/drizzle-team/drizzle-orm/pull/1127) - thanks @L-Mario564
+- [Correct where in on conflict in sqlite](https://github.com/drizzle-team/drizzle-orm/pull/1076)
+- [Fix libsql/client type import](https://github.com/drizzle-team/drizzle-orm/pull/1122)
+- [Fix: raw sql query not being mapped properly on RDS](https://github.com/drizzle-team/drizzle-orm/pull/1071)
+- [Fix Datetime mapping for MySQL](https://github.com/drizzle-team/drizzle-orm/pull/1082)
+- [Fix smallserial generating as serial](https://github.com/drizzle-team/drizzle-orm/pull/1127)
