@@ -36,11 +36,9 @@ update "table" set "counter" = "table"."counter" + 1 where "table"."id" = 1;
 Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom increment function:
 
 ```tsx copy
-import { AnyMySqlColumn } from 'drizzle-orm/mysql-core';
-import { AnyPgColumn } from 'drizzle-orm/pg-core';
-import { AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
+import { AnyColumn } from 'drizzle-orm';
 
-const increment = (column: AnyPgColumn | AnyMySqlColumn | AnySQLiteColumn, value = 1) => {
+const increment = (column: AnyColumn, value = 1) => {
   return sql`${column} + ${value}`;
 };
 
