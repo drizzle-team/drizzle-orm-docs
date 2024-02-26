@@ -25,7 +25,7 @@ Here is a list of functions and equivalent using `sql` template
 
 count
 
-```ts
+```ts copy
 await db.select({ value: count() }).from(users);
 await db.select({ value: count(users.id) }).from(users);
 
@@ -40,7 +40,7 @@ await db.select({
 
 countDistinct
 
-```ts
+```ts copy
 await db.select({ value: countDistinct(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -51,7 +51,7 @@ await db.select({
 
 avg
 
-```ts
+```ts copy
 await db.select({ value: avg(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -62,7 +62,7 @@ await db.select({
 
 avgDistinct
 
-```ts
+```ts copy
 await db.select({ value: avgDistinct(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -73,7 +73,7 @@ await db.select({
 
 sum
 
-```ts
+```ts copy
 await db.select({ value: sum(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -84,7 +84,7 @@ await db.select({
 
 sumDistinct
 
-```ts
+```ts copy
 await db.select({ value: sumDistinct(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -95,7 +95,7 @@ await db.select({
 
 max
 
-```ts
+```ts copy
 await db.select({ value: max(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -106,7 +106,7 @@ await db.select({
 
 min
 
-```ts
+```ts copy
 await db.select({ value: min(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -137,7 +137,7 @@ You can install those packages for typescript support in your IDE
 
 Create a `.eslintrc.yml` file, add `drizzle` to the `plugins`, and specify the rules you want to use. You can find a list of all existing rules below
 
-```yaml
+```yaml copy
 root: true
 parser: '@typescript-eslint/parser'
 parserOptions:
@@ -153,7 +153,7 @@ rules:
 
 This plugin exports an all config that makes use of all rules (except for deprecated ones).
 
-```yaml
+```yaml copy
 root: true
 extends:
   - "plugin:drizzle/all"
@@ -166,7 +166,7 @@ plugins:
 
 At the moment, `all` is equivalent to `recommended`
 
-```yaml
+```yaml copy
 root: true
 extends:
   - "plugin:drizzle/recommended"
@@ -191,13 +191,13 @@ Optionally, you can define a `drizzleObjectName` in the plugin options that acce
 
 Example, config 1:
 
-```json
+```json copy
 "rules": {
   "drizzle/enforce-delete-with-where": ["error"]
 }
 ```
 
-```ts
+```ts copy
 class MyClass {
   public delete() {
     return {}
@@ -216,13 +216,13 @@ db.delete()
 
 Example, config 2:
 
-```json
+```json copy
 "rules": {
   "drizzle/enforce-delete-with-where": ["error", { "drizzleObjectName": ["db"] }],
 }
 ```
 
-```ts
+```ts copy
 class MyClass {
   public delete() {
     return {}
@@ -251,13 +251,13 @@ Optionally, you can define a `drizzleObjectName` in the plugin options that acce
 
 Example, config 1:
 
-```json
+```json copy
 "rules": {
   "drizzle/enforce-update-with-where": ["error"]
 }
 ```
 
-```ts
+```ts copy
 class MyClass {
   public update() {
     return {}
@@ -276,13 +276,13 @@ db.update()
 
 Example, config 2:
 
-```json
+```json copy
 "rules": {
   "drizzle/enforce-update-with-where": ["error", { "drizzleObjectName": ["db"] }],
 }
 ```
 
-```ts
+```ts copy
 class MyClass {
   public update() {
     return {}

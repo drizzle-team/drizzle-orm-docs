@@ -18,7 +18,7 @@ You can specify any logic and any implementation for a function like `cuid()` fo
 
 > Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`
 
-```ts
+```ts copy
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
 import { createId } from '@paralleldrive/cuid2';
 
@@ -31,7 +31,7 @@ const table = mysqlTable('table', {
 
 - 🛠 Deprecated `InferModel` type in favor of more explicit `InferSelectModel` and `InferInsertModel`
 
-```ts
+```ts copy
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm'
 
 const usersTable = pgTable('users', {

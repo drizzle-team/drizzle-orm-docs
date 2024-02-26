@@ -1,14 +1,15 @@
 ---
 pubDate: 2022-07-20
-title: DrizzleORM v0.11 | 18 months into development
+title: DrizzleORM v0.11.0 release
 description: DrizzleORM - is an open source TypeScript ORM, supports PostgreSQL and about to have MySQL and SQLite support in couple of weeks. We've decided it's time to share it with public.
 ---
+import Section from "@mdx/Section.astro";
 
 DrizzleORM - is an open source TypeScript ORM, supports PostgreSQL and about to have MySQL and SQLite support in couple of weeks. We've decided it's time to share it with public.
 
 With drizzle you have a fully typed SQL schema in-code which benefits you in multiple different major ways, which I'll cover later
 
-```
+```ts
 // declaring enum in database
 export const popularityEnum = createEnum({ alias: 'popularity', values: ['unknown', 'known', 'popular'] });
 
@@ -40,7 +41,7 @@ export class CitiesTable extends PgTable<CitiesTable> {
 
 This is quick start example of how you connect to the database and make your first query with typed result
 
-```
+```ts
 import { drizzle, PgTable } from 'drizzle-orm'
 
 export class UsersTable extends PgTable<UsersTable> {
@@ -62,7 +63,7 @@ const users: User[] = await usersTable.select().execute();
 
 This is how you use `WHERE` statement with filters, run partial select queries, use `limit/offset` and `orderBy`
 
-```
+```ts
 await table.select().where(
   eq(table.id, 42)
 ).execute();
@@ -91,7 +92,7 @@ await table.select().orderBy((table) => table.name, Order.DESC)
 
 This is how you run `inserts`, `updates` and `deletes`
 
-```
+```ts
 const result = await usersTable.insert({
   name: "Andrew",
   createdAt: new Date(),
@@ -117,7 +118,7 @@ await usersTable.delete()
 
 One of the most powerful features we have in our ORM are fully typed joins, compiler won't let you make a mistake
 
-```
+```ts
 const usersTable = new UsersTable(db);
 const citiesTable = new CitiesTable(db);
 
@@ -131,7 +132,7 @@ const citiesWithUsers: { city: City, user: User }[] = result.map((city, user) =>
 
 Here's a `many to many` relationship example
 
-```
+```ts
 export class UsersTable extends PgTable<UsersTable> {
   id = this.serial("id").primaryKey();
     name = this.varchar("name");
@@ -163,10 +164,11 @@ Last but not least are migrations. We've implemented a CLI tool for automatic mi
 
 For a typescript schema below
 
-```
+<Section>
+```ts
 import { PgTable } from "drizzle-orm";
 
-export class UsersTable extends PgTable <UsersTable> {
+export class UsersTable extends PgTable<UsersTable> {
   public id = this.serial("id").primaryKey();
   public fullName = this.varchar("full_name", { size: 256 });
 
@@ -177,7 +179,7 @@ export class UsersTable extends PgTable <UsersTable> {
   }
 }
 
-export class AuthOtpTable extends PgTable <AuthOtpTable> {
+export class AuthOtpTable extends PgTable<AuthOtpTable> {
   public id = this.serial("id").primaryKey();
   public phone = this.varchar("phone", { size: 256 });
   public userId = this.int("user_id").foreignKey(UsersTable, (t) => t.id);
@@ -188,9 +190,8 @@ export class AuthOtpTable extends PgTable <AuthOtpTable> {
 }
 ```
 
-It will automatically generate SQL migration
-
-```
+```sql
+-- SQL migration
 CREATE TABLE IF NOT EXISTS auth_otp (
     "id" SERIAL PRIMARY KEY,
     "phone" character varying(256),
@@ -210,11 +211,4 @@ END $$;
 
 CREATE INDEX IF NOT EXISTS users_full_name_index ON users (full_name);
 ```
-
-Feel free to give it a try - https://www.npmjs.com/package/drizzle-orm
-
-If you have any questions or feature request - reach me out on [tweeter](https://twitter.com/_alexblokh).
-
-
-
-Thanks!
+</Section>

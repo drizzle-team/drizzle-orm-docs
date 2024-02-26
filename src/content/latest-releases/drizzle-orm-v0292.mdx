@@ -14,7 +14,7 @@ description: Implemented enhancements in the planescale relational tests. Correc
 
 ## ESLint Drizzle Plugin, v0.2.3
 
-```bash
+```bash copy
 npm i eslint-plugin-drizzle@0.2.3
 ```
 
@@ -29,13 +29,13 @@ npm i eslint-plugin-drizzle@0.2.3
 
 For starting with Expo SQLite Driver, you need to install `expo-sqlite` and `drizzle-orm` packages.
 
-```bash
+```bash copy
 npm install drizzle-orm expo-sqlite@next
 ```
 
 Then, you can use it like this:
 
-```ts
+```ts copy
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite/next";
 
@@ -58,7 +58,7 @@ If you want to use Drizzle Migrations, you need to update babel and metro config
 
 1. Install `babel-plugin-inline-import` package.
 
-```bash
+```bash copy
 npm install babel-plugin-inline-import
 ```
 
@@ -88,7 +88,7 @@ module.exports = config;
 
 3. Create `drizzle.config.ts` file in your project root folder.
 
-```ts
+```ts copy
 import type { Config } from 'drizzle-kit';
 
 export default {
@@ -100,13 +100,13 @@ export default {
 
 After creating schema file and drizzle.config.ts file, you can generate migrations like this:
 
-```bash
+```bash copy
 npx drizzle-kit generate:sqlite
 ```
 
 Then you need to import `migrations.js` file in your `App.tsx` file from `./drizzle` folder and use hook `useMigrations` or `migrate` function.
 
-```ts
+```ts copy
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite/next";
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';

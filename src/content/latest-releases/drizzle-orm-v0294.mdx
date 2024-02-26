@@ -3,16 +3,23 @@ title: DrizzleORM v0.29.4 release
 pubDate: 2024-02-22
 description: Added Neon HTTP Batch support and updated the default behavior and instances of database-js.
 ---
+import Section from "@mdx/Section.astro";
 
 ## New Features
 
 ### 🎉 Neon HTTP Batch
 
-For more info you can check [Neon docs](https://neon.tech/docs/serverless/serverless-driver#issue-multiple-queries-with-the-transaction-function)
+For more info you can check [Neon docs](https://neon.tech/docs/serverless/serverless-driver#issue-multiple-queries-with-the-transaction-function) and [Get started with Neon and Drizzle](https://orm.drizzle.team/docs/get-started-postgresql#neon).
 
-**Example**
+<Section>
+```ts copy
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { usersTable } from './schema';
 
-```ts
+const sql = neon(process.env.DRIZZLE_DATABASE_URL!);
+const db = drizzle(sql);
+
 const batchResponse: BatchType = await db.batch([
 	db.insert(usersTable).values({ id: 1, name: 'John' }).returning({
 		id: usersTable.id,
@@ -43,6 +50,7 @@ type BatchType = [
 	} | undefined,
 ];
 ```
+</Section>
 
 ## Improvements
 
@@ -50,7 +58,7 @@ Thanks to the `database-js` and `PlanetScale` teams, we have updated the default
 
 As suggested by the `database-js` core team, you should use the `Client` instance instead of `connect()`:
 
-```typescript
+```ts copy
 import { Client } from '@planetscale/database';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 

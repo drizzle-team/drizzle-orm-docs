@@ -3,6 +3,7 @@ title: DrizzleORM v0.29.0 release
 pubDate: 2023-11-09
 description: Added new features like unsigned option for bigint in MySQL, improved query builder types, added possibility to specify name for primary keys and foreign keys, read replicas support, set operators support, new MySQL and PostgreSQL proxy drivers, D1 Batch API support.
 ---
+import Section from "@mdx/Section.astro";
 
 > Drizzle ORM version `0.29.0` will require a minimum Drizzle Kit version of `0.20.0`, and vice versa. Therefore, when upgrading to a newer version of Drizzle ORM, you will also need to upgrade Drizzle Kit. This may result in some breaking changes throughout the versions, especially if you need to upgrade Drizzle Kit and your Drizzle ORM version is older than `<0.28.0`
 
@@ -12,7 +13,7 @@ description: Added new features like unsigned option for bigint in MySQL, improv
 
 You can now specify `bigint unsigned` type
 
-```ts
+```ts copy
 const table = mysqlTable('table', {
   id: bigint('id', { mode: 'number', unsigned: true }),
 });
@@ -24,7 +25,7 @@ Read more in [docs](https://orm.drizzle.team/docs/column-types/mysql#bigint)
 
 Starting from `0.29.0` by default, as all the query builders in Drizzle try to conform to SQL as much as possible, you can only invoke most of the methods once. For example, in a SELECT statement there might only be one WHERE clause, so you can only invoke .where() once:
 
-```ts
+```ts copy
 const query = db
   .select()
   .from(users)
@@ -36,7 +37,7 @@ This behavior is useful for conventional query building, i.e. when you create th
 
 Let's see how it works by implementing a simple withPagination function that adds LIMIT and OFFSET clauses to a query based on the provided page number and an optional page size:
 
-```ts
+```ts copy
 function withPagination<T extends PgSelect>(
   qb: T,
   page: number,
@@ -54,7 +55,7 @@ withPagination(dynamicQuery, 1); // ✅ OK
 
 Note that the withPagination function is generic, which allows you to modify the result type of the query builder inside it, for example by adding a join:
 
-```ts
+```ts copy
 function withFriends<T extends PgSelect>(qb: T) {
   return qb.leftJoin(friends, eq(friends.userId, users.id));
 }
@@ -69,7 +70,7 @@ Read more in [docs](https://orm.drizzle.team/docs/dynamic-query-building)
 
 There is an issue when constraint names exceed the 64-character limit of the database. This causes the database engine to truncate the name, potentially leading to issues. Starting from `0.29.0`, you have the option to specify custom names for both `primaryKey()` and `foreignKey()`. We have also deprecated the old `primaryKey()` syntax, which can still be used but will be removed in future releases
 
-```ts
+```ts copy
 const table = pgTable('table', {
   id: integer('id'),
   name: text('name'),
@@ -89,7 +90,7 @@ Read more in [docs](https://orm.drizzle.team/docs/indexes-constraints#composite-
 
 You can now use the Drizzle `withReplica` function to specify different database connections for read replicas and the main instance for write operations. By default, `withReplicas` will use a random read replica for read operations and the main instance for all other data modification operations. You can also specify custom logic for choosing which read replica connection to use. You have the freedom to make any weighted, custom decision for that. Here are some usage examples:
 
-```ts
+```ts copy
 const primaryDb = drizzle(client);
 const read1 = drizzle(client);
 const read2 = drizzle(client);
@@ -108,7 +109,7 @@ db.delete(usersTable).where(eq(usersTable.id, 1))
 
 Implementation example of custom logic for selecting read replicas, where the first replica has a 70% chance of being chosen, and the second replica has a 30% chance of being chosen. Note that you can implement any type of random selection for read replicas
 
-```ts
+```ts copy
 const db = withReplicas(primaryDb, [read1, read2], (replicas) => {
     const weight = [0.7, 0.3];
     let cumulativeProbability = 0;
@@ -133,8 +134,9 @@ Huge thanks to @Angelelz for the significant contribution he made, from API disc
 Usage examples:
 All set operators can be used in a two ways: `import approach` or `builder approach`
 
-##### Import approach
-```ts
+<Section>
+```ts copy
+// Import approach
 import { union } from 'drizzle-orm/pg-core'
 
 const allUsersQuery = db.select().from(users);
@@ -143,10 +145,11 @@ const allCustomersQuery = db.select().from(customers);
 const result = await union(allUsersQuery, allCustomersQuery)
 ```
 
-##### Builder approach
-```ts
+```ts copy
+// Builder approach
 const result = await db.select().from(users).union(db.select().from(customers));
 ```
+</Section>
 
 Read more in [docs](https://orm.drizzle.team/docs/set-operations)
 
@@ -158,7 +161,7 @@ You need to implement two endpoints on your server that will be used for queries
 
 You can find both server and driver implementation examples in the `./examples/mysql-proxy` folder
 
-```ts
+```ts copy
 // Driver
 import axios from 'axios';
 import { eq } from 'drizzle-orm/expressions';
@@ -215,7 +218,7 @@ You need to implement two endpoints on your server that will be used for queries
 
 You can find both server and driver implementation examples in the `./examples/pg-proxy` folder
 
-```ts
+```ts copy
 import axios from 'axios';
 import { eq } from 'drizzle-orm/expressions';
 import { drizzle } from 'drizzle-orm/pg-proxy';
@@ -255,7 +258,8 @@ Reference: https://developers.cloudflare.com/d1/platform/client-api/#dbbatch
 
 Batch API usage example:
 
-```ts
+<Section>
+```ts copy
 const batchResponse = await db.batch([
   db.insert(usersTable).values({ id: 1, name: 'John' }).returning({
     id: usersTable.id,
@@ -268,8 +272,6 @@ const batchResponse = await db.batch([
   ),
 ]);
 ```
-
-Type for `batchResponse` in this example would be:
 
 ```ts
 type BatchResponse = [
@@ -295,6 +297,7 @@ type BatchResponse = [
   }[],
 ];
 ```
+</Section>
 
 All possible builders that can be used inside `db.batch`:
 
