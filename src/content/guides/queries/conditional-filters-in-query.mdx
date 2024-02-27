@@ -3,95 +3,97 @@ title: Conditional filters in query
 ---
 import Section from "@mdx/Section.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
 
-**Prerequisites**
+<Prerequisites>
 - Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
 - [Select statement](/docs/select);
 - [Filtering](/docs/select#filtering);
 - [Filter operators](/docs/operators);
+</Prerequisites>
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
 To pass a conditional filter in query you can use `.where()` method and logical operator like below:
 
 <Section>
-```tsx copy {8}
+```tsx copy {9}
 import { ilike } from 'drizzle-orm';
 
 const db = drizzle(...)
 
-await db
-  .select()
-  .from(posts)
-  .where(searchParam && ilike(posts.title, searchParam));
+const searchPosts = async (term?: string) => {
+  await db
+    .select()
+    .from(posts)
+    .where(term ? ilike(posts.title, term) : undefined);
+};
+
+await searchPosts();
+await searchPosts('AI');
 ```
 
+
 ```sql
-select "id", "title", "category", "views_count" from "posts"
-where "posts"."title" ilike 'Artificial Intelligence';
+select * from posts;
+select * from posts where title ilike 'AI';
 ```
 </Section>
 
-To combine conditional filters you can use `and()` or `or()` with logical operators in `.where()` method like below:
+To combine conditional filters you can use `and()` or `or()` operators like below:
 
 <Section>
-```tsx copy {8,9,10,11,12,13,14}
+```tsx copy {9,10,11,12,13,14,15}
 import { and, gt, ilike, inArray } from 'drizzle-orm';
 
 const db = drizzle(...)
 
-await db
-  .select()
-  .from(posts)
-  .where(
-    and(
-      searchParam && ilike(posts.title, searchParam),
-      filterByCategories.length > 0 ? inArray(posts.category, filterByCategories) : undefined,
-      minViews > 100 ? gt(posts.viewsCount, minViews) : undefined,
-    ),
-  );
+const searchPosts = async (term?: string, categories: string[] = [], views = 0) => {
+  await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        term ? ilike(posts.title, term) : undefined,
+        categories.length > 0 ? inArray(posts.category, categories) : undefined,
+        views > 100 ? gt(posts.views, views) : undefined,
+      ),
+    );
+};
+
+await searchPosts();
+await searchPosts('AI', ['Tech', 'Art', 'Science'], 200);
 ```
 
 ```sql
-select "id", "title", "category", "views_count" from "posts"
-where ("posts"."title" ilike 'Artificial Intelligence'
-and "posts"."category" in ('Technology', 'Science', 'Art')
-and "posts"."views_count" > 200);
+select * from posts;
+select * from posts
+  where (
+    title ilike 'AI'
+    and category in ('Tech', 'Science', 'Art')
+    and views > 200
+  );
 ```
 </Section>
 
-If you need to combine conditional filters in different part of the project you can create a variable, push filters and then pass it to `and()` or `or()` operators in `.where()` method like below:
+If you need to combine conditional filters in different part of the project you can create a variable, push filters and then use it in `.where()` method with `and()` or `or()` operators like below:
 
-<Section>
-```tsx copy {5,8,12,16,22}
-import { SQL, and, gt, ilike, inArray } from 'drizzle-orm';
+```tsx copy {5,6,7,8,14}
+import { SQL, ... } from 'drizzle-orm';
 
 const db = drizzle(...)
 
-const where: SQL[] = [];
+const filters: SQL[] = [];
+filters.push(ilike(posts.title, 'AI'));
+filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
+filters.push(gt(posts.views, 200));
 
-if (searchParam) {
-  where.push(ilike(posts.title, searchParam));
-}
+const searchPosts = async (filters: SQL[]) => {
+  await db
+    .select()
+    .from(posts)
+    .where(and(...filters));
+};
 
-if (filterByCategories.length > 0) {
-  where.push(inArray(posts.category, filterByCategories));
-}
-
-if (minViews > 200) {
-  where.push(gt(posts.viewsCount, minViews));
-}
-
-await db
-  .select()
-  .from(posts)
-  .where(and(...where));
+await searchPosts(filters);
 ```
-
-```sql
-select "id", "title", "category", "views_count" from "posts"
-where ("posts"."title" ilike 'Artificial Intelligence'
-and "posts"."category" in ('Technology', 'Science', 'Art')
-and "posts"."views_count" > 200);
-```
-</Section>
