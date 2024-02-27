@@ -3,13 +3,15 @@ title: SQL Toggle value
 ---
 import Section from "@mdx/Section.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
 
-**Prerequisites**
+<Prerequisites>
 - Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
 - [Update statement](/docs/update);
 - [Filters](/docs/operators);
 - [not operator](/docs/operators#not);
 - Boolean data type in [MySQL](/docs/column-types/mysql#boolean) and [SQLite](/docs/column-types/sqlite#boolean);
+</Prerequisites>
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
@@ -30,7 +32,7 @@ await db
 ```
 
 ```sql
-update "table" set "is_active" = not "table"."is_active" where "table"."id" = 1;
+update "table" set "is_active" = not "is_active" where "id" = 1;
 ```
 </Section>
 
