@@ -1,0 +1,121 @@
+---
+title: Include or Exclude Columns in Query
+---
+
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+
+<Prerequisites>
+- Get started with [PostgreSQL](https://orm.drizzle.team/docs/get-started-postgresql), [MySQL](https://orm.drizzle.team/docs/get-started-mysql), [SQLite](https://orm.drizzle.team/docs/get-started-sqlite)
+- [Select statement](https://orm.drizzle.team/docs/select)
+- [Get typed table columns](https://orm.drizzle.team/docs/goodies#get-typed-table-columns)
+- [Relational queries](https://orm.drizzle.team/docs/rqb)
+- [Partial select with relational queries](https://orm.drizzle.team/docs/rqb#partial-fields-select)
+</Prerequisites>
+
+To include all columns in query you can use `.select()` method without arguments and `getTableColumns()` function:
+
+<Section>
+```ts
+import { getTableColumns } from 'drizzle-orm';
+import { posts, comments } from './schema'
+
+const db = drizzle(...);
+
+await db.select().from(posts);
+await db.select({ ...getTableColumns(posts), extra1: ... }).from(posts);
+```
+
+```sql
+select * from posts;
+select posts.*, extra_column1 from posts;
+```
+</Section>
+
+To include specific columns in query you can use `.select()` method with columns you want to include:
+
+<Section>
+```ts
+import { getTableColumns } from 'drizzle-orm';
+import { posts, comments } from './schema'
+
+const db = drizzle(...);
+
+await db.select({ title: posts.title }).from(posts);
+await db
+  .select({
+    postId: posts.id,
+    comments: getTableColumns(comments),
+  })
+  .from(posts)
+  .leftJoin(comments, eq(posts.id, comments.postId));
+```
+
+```sql
+select "title" from posts;
+select posts.id, comments.* from posts left join comments on posts.id = comments.postId;
+```
+</Section>
+
+Drizzle has simple relational queries API, so you can easily include or exclude columns like this:
+
+<Section>
+```ts
+import * as schema from './schema';
+
+const db = drizzle(..., { schema });
+
+await db.query.posts.findMany();
+await db.query.posts.findMany({
+  columns: {
+    title: true,
+  },
+});
+await db.query.posts.findMany({
+  columns: {
+    title: false,
+  },
+});
+await db.query.posts.findMany({
+  columns: {
+    id: true,
+  },
+  with: {
+    comments: true,
+  },
+});
+```
+
+```sql
+select * from posts;
+select "title" from posts;
+select all_columns_except_title from posts;
+select posts.id, comments.* from posts left join lateral ...;
+```
+</Section>
+
+You can create custom solution for conditional select like this:
+
+<Section>
+```ts
+const searchPosts = async (withTitle = false) => {
+  return await db
+    .select({
+      id: posts.id,
+      ...(withTitle && { title: posts.title }),
+    })
+    .from(posts);
+};
+
+await searchPosts();
+await searchPosts(true);
+```
+
+```sql
+select "id" from posts;
+select "id", "title" from posts;
+```
+</Section>
