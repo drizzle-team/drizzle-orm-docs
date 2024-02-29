@@ -1,0 +1,83 @@
+---
+title: Count rows
+---
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
+- [Select statement](/docs/select);
+- [Filters](/docs/operators);
+- [sql operator](/docs/sql);
+</Prerequisites>
+
+To count all rows in table you can use `count()` function or `sql` operator like below:
+
+<Section>
+```ts
+import { count, sql } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+await db.select({ count: count(products.id) }).from(products);
+await db.select({ count: sql`count(${products.id})`.mapWith(Number) }).from(products);
+await db.select({ count: sql`cast(count(${products.id}) as integer)` }).from(products);
+```
+
+```sql
+select count("id") from products;
+select count("id") from products;
+select cast(count("id") as integer) from products;
+```
+</Section>
+
+> In PostgreSQL and MySQL `cast(... as int)` is necessary because `count()` returns `bigint`, which is treated as string value instead of number. In SQLite it is not necessary to cast the result because `count()` returns `integer`.
+`count(products.id)` internally uses ``sql`count(${products.id})`.mapWith(Number)``, casting the result to a number at runtime. In contrast, `cast(count(${products.id}) as integer)` performs the conversion at the query level.
+
+
+To count rows that match a condition you can use `count()` function and `.where()` method:
+
+<Section>
+```ts
+import { count } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+await db
+  .select({ count: count(products.id) })
+  .from(products)
+  .where(gt(products.price, 100));
+```
+
+```sql
+select count("id") from products where price > 100
+```
+</Section>
+
+To count rows that relates to another table you can use `count()` function and `.letfJoin()` method:
+
+<Section>
+```ts
+import { count } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+await db
+  .select({
+    commentsCount: count(comments.id),
+  })
+  .from(posts)
+  .where(eq(posts.id, 1))
+  .leftJoin(comments, eq(posts.id, comments.postId));
+```
+
+```sql
+select 
+  count(comments.id) 
+from 
+  posts 
+  left join comments on posts.id = comments.post_id 
+where 
+  posts.id = 1;
+```
+</Section>
