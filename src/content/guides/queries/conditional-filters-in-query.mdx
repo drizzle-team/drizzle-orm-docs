@@ -5,6 +5,8 @@ import Section from "@mdx/Section.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+
 <Prerequisites>
 - Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
 - [Select statement](/docs/select);
@@ -12,12 +14,10 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 - [Filter operators](/docs/operators);
 </Prerequisites>
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
-
 To pass a conditional filter in query you can use `.where()` method and logical operator like below:
 
 <Section>
-```tsx copy {9}
+```ts copy {9}
 import { ilike } from 'drizzle-orm';
 
 const db = drizzle(...)
@@ -43,7 +43,7 @@ select * from posts where title ilike 'AI';
 To combine conditional filters you can use `and()` or `or()` operators like below:
 
 <Section>
-```tsx copy {9,10,11,12,13,14,15}
+```ts copy {9,10,11,12,13,14,15}
 import { and, gt, ilike, inArray } from 'drizzle-orm';
 
 const db = drizzle(...)
@@ -78,15 +78,10 @@ select * from posts
 
 If you need to combine conditional filters in different part of the project you can create a variable, push filters and then use it in `.where()` method with `and()` or `or()` operators like below:
 
-```tsx copy {5,6,7,8,14}
+```ts copy {9,12}
 import { SQL, ... } from 'drizzle-orm';
 
 const db = drizzle(...)
-
-const filters: SQL[] = [];
-filters.push(ilike(posts.title, 'AI'));
-filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
-filters.push(gt(posts.views, 200));
 
 const searchPosts = async (filters: SQL[]) => {
   await db
@@ -95,5 +90,52 @@ const searchPosts = async (filters: SQL[]) => {
     .where(and(...filters));
 };
 
+const filters: SQL[] = [];
+filters.push(ilike(posts.title, 'AI'));
+filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
+filters.push(gt(posts.views, 200));
+
 await searchPosts(filters);
+```
+
+**Bonus section**: Drizzle has useful and flexible API, which lets you create your custom solutions. This is how you can create a custom filter operator:
+
+<Section>
+
+```ts copy
+import { AnyColumn, ... } from 'drizzle-orm';
+
+const lengthGt = (column: AnyColumn, value: number) => {
+  return sql`length(${column}) < ${value}`;
+};
+
+const searchPosts = async (maxTitleLength?: number, views = 0) => {
+  await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        maxTitleLength ? lengthGt(posts.title, maxTitleLength) : undefined,
+        views > 100 ? gt(posts.views, views) : undefined,
+      ),
+    );
+};
+
+await searchPosts(8, 200);
+await searchPosts(8);
+```
+
+```sql
+select * from posts where (length(title) < 8 and views > 200);
+select * from posts where length(title) < 8;
+```
+</Section>
+
+It is possible because `.where()` method and `and()`, `or()` operators accept SQL expression or undefined which will be ignored. In Drizzle all operators return SQL expression under the hood:
+
+```js
+// example of gt operator
+const gt = (left, right) => {
+  return sql`${left} > ${bindIfParam(right, left)}`; // bindIfParam is internal function for binding parameters
+};
 ```
