@@ -105,7 +105,7 @@ await searchPosts(filters);
 ```ts copy
 import { AnyColumn, ... } from 'drizzle-orm';
 
-const lengthGt = (column: AnyColumn, value: number) => {
+const lengthLt = (column: AnyColumn, value: number) => {
   return sql`length(${column}) < ${value}`;
 };
 
@@ -115,7 +115,7 @@ const searchPosts = async (maxTitleLength?: number, views = 0) => {
     .from(posts)
     .where(
       and(
-        maxTitleLength ? lengthGt(posts.title, maxTitleLength) : undefined,
+        maxTitleLength ? lengthLt(posts.title, maxTitleLength) : undefined,
         views > 100 ? gt(posts.views, views) : undefined,
       ),
     );
