@@ -105,6 +105,8 @@ await searchPosts(filters);
 ```ts copy
 import { AnyColumn, ... } from 'drizzle-orm';
 
+const db = drizzle(...);
+
 const lengthLt = (column: AnyColumn, value: number) => {
   return sql`length(${column}) < ${value}`;
 };
@@ -134,8 +136,8 @@ select * from posts where length(title) < 8;
 It is possible because `.where()` method and `and()`, `or()` operators accept SQL expression or undefined which will be ignored. In Drizzle all operators return SQL expression under the hood:
 
 ```js
-// example of gt operator
-const gt = (left, right) => {
-  return sql`${left} > ${bindIfParam(right, left)}`; // bindIfParam is internal function for binding parameters
+// example of lt operator
+const lt = (left, right) => {
+  return sql`${left} < ${bindIfParam(right, left)}`; // bindIfParam is internal function for binding parameters
 };
 ```
