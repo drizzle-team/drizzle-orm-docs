@@ -37,7 +37,7 @@ update "table" set "counter" = "counter" + 1 where "id" = 1;
 
 Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom increment function:
 
-```ts copy
+```ts copy {4,12,13}
 import { AnyColumn } from 'drizzle-orm';
 
 const increment = (column: AnyColumn, value = 1) => {
