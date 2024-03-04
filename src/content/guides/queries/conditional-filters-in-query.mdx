@@ -98,46 +98,45 @@ filters.push(gt(posts.views, 200));
 await searchPosts(filters);
 ```
 
-**Bonus section**: Drizzle has useful and flexible API, which lets you create your custom solutions. This is how you can create a custom filter operator:
+Drizzle has useful and flexible API, which lets you create your custom solutions. This is how you can create a custom filter operator:
 
 <Section>
 
-```ts copy
+```ts copy {6,15}
 import { AnyColumn, ... } from 'drizzle-orm';
 
 const db = drizzle(...);
 
-const lengthLt = (column: AnyColumn, value: number) => {
+const lenLt = (column: AnyColumn, value: number) => {
   return sql`length(${column}) < ${value}`;
 };
 
-const searchPosts = async (maxTitleLength?: number, views = 0) => {
+const searchPosts = async (maxLen = 0, views = 0) => {
   await db
     .select()
     .from(posts)
     .where(
       and(
-        maxTitleLength ? lengthLt(posts.title, maxTitleLength) : undefined,
+        maxLen ? lenLt(posts.title, maxLen) : undefined,
         views > 100 ? gt(posts.views, views) : undefined,
       ),
     );
 };
 
-await searchPosts(8, 200);
 await searchPosts(8);
+await searchPosts(8, 200);
 ```
 
 ```sql
-select * from posts where (length(title) < 8 and views > 200);
 select * from posts where length(title) < 8;
+select * from posts where (length(title) < 8 and views > 200);
 ```
 </Section>
 
-It is possible because `.where()` method and `and()`, `or()` operators accept SQL expression or undefined which will be ignored. In Drizzle all operators return SQL expression under the hood:
+Drizzle filter operators are just SQL expressions under the hood. This is example of how `lt` operator is implemented in Drizzle:
 
 ```js
-// example of lt operator
 const lt = (left, right) => {
-  return sql`${left} < ${bindIfParam(right, left)}`; // bindIfParam is internal function for binding parameters
+  return sql`${left} < ${bindIfParam(right, left)}`; // bindIfParam is internal magic function
 };
 ```

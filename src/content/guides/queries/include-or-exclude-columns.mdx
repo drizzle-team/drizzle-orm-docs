@@ -3,8 +3,9 @@ title: Include or Exclude Columns in Query
 ---
 
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
-import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
@@ -16,159 +17,258 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 - [Partial select with relational queries](/docs/rqb#partial-fields-select)
 </Prerequisites>
 
-To include all columns in query you can use `.select()` method without arguments or `getTableColumns()` function like this:
+Drizzle has flexible API for including or excluding columns in query. To include all columns you can use `.select()` method or `getTableColumns()` function like this:
 
-<Section>
-```ts copy {6,15}
-import { count, getTableColumns } from 'drizzle-orm';
-import { posts, comments } from './schema';
+<CodeTabs items={["index.ts", "schema.ts"]}>
+	<CodeTab>
+    ```ts copy {6,15}
+    import { count, getTableColumns } from 'drizzle-orm';
+    import { posts, comments } from './schema';
 
-const db = drizzle(...);
+    const db = drizzle(...);
 
-await db.select().from(posts);
-/*
-  {
-    id: number;
-    title: string;
-    content: string;
-    views: number;
-  }[]
-*/
-await db.select({ ...getTableColumns(posts), count: count(posts.id) }).from(posts);
-/*
-  {
-    id: number;
-    title: string;
-    content: string;
-    views: number;
-    count: number;
-  }[]
-*/
-```
-</Section>
+    await db.select().from(posts);
 
-To include specific columns in query you can use `.select()` method with columns you want to include:
-
-<Section>
-```ts copy {6,13,14,15,16}
-import { getTableColumns } from 'drizzle-orm';
-import { posts, comments } from './schema';
-
-const db = drizzle(...);
-
-await db.select({ title: posts.title }).from(posts);
-/*
-  {
-    title: string;
-  }[]
-*/
-await db
-  .select({
-    postId: posts.id,
-    comment: getTableColumns(comments), // equivalent to "comment: comments"
-  })
-  .from(posts)
-  .leftJoin(comments, eq(posts.id, comments.postId));
-/*
-  {
-    postId: number;
-    comment: {
+    type Response = {
       id: number;
+      title: string;
       content: string;
+      views: number;
+    }[];
+    ```
+
+    ```ts copy {1}
+    await db.select({ ...getTableColumns(posts), count: count(posts.id) }).from(posts);
+
+    type Response = {
+      id: number;
+      title: string;
+      content: string;
+      views: number;
+      count: number;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    views: integer('views').notNull().default(0),
+  });
+	```
+</CodeTabs>
+
+To include specific columns you can use `.select()` method like this:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+	<CodeTab>
+    ```ts copy {6,13,14,15,16}
+    import { getTableColumns } from 'drizzle-orm';
+    import { posts, comments } from './schema';
+
+    const db = drizzle(...);
+
+    await db.select({ title: posts.title }).from(posts);
+
+    type Response = {
+      title: string;
+    }[];
+    ```
+  
+    ```ts copy {3,4}
+    await db
+      .select({
+        postId: posts.id,
+        comment: getTableColumns(comments), // equivalent to "comment: comments"
+      })
+      .from(posts)
+      .leftJoin(comments, eq(posts.id, comments.postId));
+
+    type Response = {
       postId: number;
-    } | null;
-  }[]
-*/
-```
-</Section>
+      comment: {
+        id: number;
+        content: string;
+        postId: number;
+        createdAt: Date;
+      } | null;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    views: integer('views').notNull().default(0),
+  });
+
+  export const comments = pgTable('comments', {
+    id: serial('id').primaryKey(),
+    postId: integer('post_id')
+      .notNull()
+      .references(() => posts.id),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  });
+	```
+</CodeTabs>
 
 
-To exclude columns in query you can use `.select()` method and `getTableColumns()` function like this:
+To exclude columns you can use `.select()` method and `getTableColumns()` function like this:
 
-<Section>
-```ts copy {6,8}
-import { getTableColumns } from 'drizzle-orm';
-import { posts } from './schema';
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {6,8}
+    import { getTableColumns } from 'drizzle-orm';
+    import { posts } from './schema';
 
-const db = drizzle(...);
+    const db = drizzle(...);
 
-const { content, ...rest } = getTableColumns(posts); // exclude "content" column
+    const { content, ...rest } = getTableColumns(posts); // exclude "content" column
 
-await db.select({ ...rest }).from(posts); // select all other columns
-/*
-  {
-    id: number;
-    title: string;
-    views: number;
-  }[]
-*/
-```
-</Section>
+    await db.select({ ...rest }).from(posts); // select all other columns
+
+    type Response = {
+      id: number;
+      title: string;
+      views: number;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    views: integer('views').notNull().default(0),
+  });
+	```
+</CodeTabs>
 
 Drizzle has useful relational queries API, so you can easily include or exclude columns like this:
 
-<Section>
-```ts copy {5,7,8,9,12,13,14,17,18,19,20,21,22}
-import * as schema from './schema';
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {5,7,8,9,12,13,14,17,18,19,20,21,22}
+    import * as schema from './schema';
 
-const db = drizzle(..., { schema });
+    const db = drizzle(..., { schema });
 
-await db.query.posts.findMany(); // select all columns
-await db.query.posts.findMany({
-  columns: {
-    title: true, // include
-  },
-});
-await db.query.posts.findMany({
-  columns: {
-    content: false, // exclude
-  },
-});
-await db.query.posts.findMany({
-  columns: {
-    id: true,
-  },
-  with: {
-    comments: true, // include comments relation
-  },
-});
-/*
-  {
-    id: number;
-    comments: {
+    await db.query.posts.findMany(); // select all columns
+    await db.query.posts.findMany({
+      columns: {
+        title: true, // include
+      },
+    });
+    await db.query.posts.findMany({
+      columns: {
+        content: false, // exclude
+      },
+    });
+    ```
+
+    ```ts copy {5,6,7,8,9,10,11,12}
+    await db.query.posts.findMany({
+      columns: {
+        id: true,
+      },
+      with: {
+        comments: {
+          columns: { // exlcude columns in relation
+            postId: false,
+            createdAt: false,
+          },
+        },
+      },
+    });
+
+    type Response = {
       id: number;
-      content: string;
-      postId: number;
+      comments: {
+        id: number;
+        content: string;
+      }[];
     }[];
-  }[]
-*/
-```
-</Section>
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { relations } from 'drizzle-orm';
+  import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    views: integer('views').notNull().default(0),
+  });
+
+  export const comments = pgTable('comments', {
+    id: serial('id').primaryKey(),
+    postId: integer('post_id')
+      .notNull()
+      .references(() => posts.id),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  });
+
+  export const postsRelations = relations(posts, ({ many }) => ({
+    comments: many(comments),
+  }));
+
+  export const commentsRelations = relations(comments, ({ one }) => ({
+    post: one(posts, { fields: [comments.postId], references: [posts.id] }),
+  }));
+  ```
+</CodeTabs>
 
 This is how you can create custom solution for conditional select:
 
-<Section>
-```ts copy
-import { posts } from './schema';
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy
+    import { posts } from './schema';
 
-const db = drizzle(...);
+    const db = drizzle(...);
 
-const searchPosts = async (withTitle = false) => {
-  await db
-    .select({
-      id: posts.id,
-      ...(withTitle && { title: posts.title }),
-    })
-    .from(posts);
-};
+    const searchPosts = async (withTitle = false) => {
+      await db
+        .select({
+          id: posts.id,
+          ...(withTitle && { title: posts.title }),
+        })
+        .from(posts);
+    };
 
-await searchPosts();
-await searchPosts(true);
-/*
-  {
-    id: number;
-    title?: string | undefined;
-  }[]
-*/
-```
-</Section>
+    await searchPosts();
+    await searchPosts(true);
+
+    type Response = {
+      id: number;
+      title?: string | undefined;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    views: integer('views').notNull().default(0),
+  });
+	```
+</CodeTabs>

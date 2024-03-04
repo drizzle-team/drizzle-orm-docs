@@ -4,6 +4,8 @@ title: Count rows
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
@@ -12,29 +14,75 @@ import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 - [Select statement](/docs/select)
 - [Filters](/docs/operators)
 - [sql operator](/docs/sql)
+- [Joins](/docs/joins)
+- [Aggregations](/docs/select#aggregations)
 - [Aggregation helpers](/docs/select#aggregations-helpers)
 </Prerequisites>
 
 To count all rows in table you can use `count()` function or `sql` operator like below:
 
 <Section>
-```ts copy {5,7,11}
+```ts copy {5,8}
 import { count, sql } from 'drizzle-orm';
 
-const db = drizzle(...)
+const db = drizzle(...);
 
 await db.select({ count: count(products.id) }).from(products);
-// It's equivalent to writing like this. `mapWith(Number)` cast the result to a number at runtime
+
+// Under the hood, the count() function casts its result to a number at runtime.
 await db.select({ count: sql`count(${products.id})`.mapWith(Number) }).from(products);
-// In PostgreSQL and MySQL, `cast(... as integer)` is needed because `count()` returns bigint,
-// treated as a string.
-// In SQLite, casting isn't necessary as `count()` returns integer.
-await db.select({ count: sql<number>`cast(count(${products.id}) as integer)` }).from(products);
+
+type Response = {
+  count: number;
+}[];
 ```
 
 ```sql
 select count("id") from products;
+```
+</Section>
+
+Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL and MySQL `count()` function returns bigint, which is interpreted as string by driver, so it should be casted to integer. This is how you can do it:
+
+<Section>
+```ts copy {6,9}
+import { AnyColumn, sql } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+const customCount = (column: AnyColumn) => {
+  return sql<number>`cast(count(${column}) as integer)`;
+};
+
+await db.select({ count: customCount(products.id) }).from(products);
+
+type Response = {
+  count: number;
+}[];
+```
+
+```sql
 select cast(count("id") as integer) from products;
+```
+</Section>
+
+In SQLite, casting isn't necessary as `count()` returns integer.
+
+<Section>
+```ts copy {5}
+import { sql } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+await db.select({ count: sql<number>`count(${products.id})` }).from(products);
+
+type Response = {
+  count: number;
+}[];
+```
+
+```sql
+select count("id") from products;
 ```
 </Section>
 
@@ -44,7 +92,7 @@ To count rows that match a condition you can use `count()` function and `.where(
 ```ts copy {6,8}
 import { count, gt } from 'drizzle-orm';
 
-const db = drizzle(...)
+const db = drizzle(...);
 
 await db
   .select({ count: count(products.id) })
@@ -57,52 +105,49 @@ select count("id") from products where price > 100
 ```
 </Section>
 
-To count rows that relates to another table you can use `count()` function and `.letfJoin()` method:
+This is how you can use `count()` function with joins and aggregations:
 
-<Section>
-```ts copy {7,11}
-import { count, eq } from 'drizzle-orm';
+<CodeTabs items={["index.ts", "schema.ts"]}>
+	<CodeTab>
+    ```ts copy {10,13,14,15}
+    import { count, eq } from 'drizzle-orm';
+    import { countries, cities } from './schema';
 
-const db = drizzle(...)
+    const db = drizzle(...);
 
-await db
-  .select({
-    commentsCount: count(comments.id),
-  })
-  .from(posts)
-  .where(eq(posts.id, 1))
-  .leftJoin(comments, eq(posts.id, comments.postId));
-```
+    // Count cities in each country
+    await db
+      .select({
+        country: countries.name,
+        citiesCount: count(cities.id),
+      })
+      .from(countries)
+      .leftJoin(cities, eq(countries.id, cities.countryId))
+      .groupBy(countries.id)
+      .orderBy(countries.name);
+    ```
 
-```sql
-select 
-  count(comments.id) 
-from 
-  posts 
-  left join comments on posts.id = comments.post_id 
-where 
-  posts.id = 1;
-```
-</Section>
+    ```sql
+    select countries.name, count("cities"."id") from countries
+      left join cities on countries.id = cities.country_id
+      group by countries.id
+      order by countries.name;
+    ```
+  </CodeTab>
+  ```ts
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
-**Bonus**: You can сount alien sightings by location and round the result to the nearest 100 for generalization like this:
+  export const countries = pgTable('countries', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+  });
 
-<Section>
-```ts
-import { sql } from 'drizzle-orm';
-
-const db = drizzle(...)
-
-await db
-  .select({
-    location: aliensSightings.location,
-    countSightings: sql`cast(round(count(${aliensSightings.id}) / 100.0) * 100 as integer)`,
-  })
-  .from(aliensSightings)
-  .groupBy(aliensSightings.location);
-```
-
-```sql
-select location, cast(round(count("id") / 100.0) * 100 as integer) from aliens_sightings group by location;
-```
-</Section>
+  export const cities = pgTable('cities', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    countryId: integer('country_id')
+      .notNull()
+      .references(() => countries.id),
+  });
+  ```
+</CodeTabs>
