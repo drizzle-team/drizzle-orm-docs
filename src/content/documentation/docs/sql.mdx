@@ -64,12 +64,12 @@ This feature is particularly useful in partial select queries, ensuring consiste
 
 ```typescript
 // without sql<T> type defined
-const response: { id: unknown }[] = await db.select({
+const response: { lowerName: unknown }[] = await db.select({
     lowerName: sql`lower(${usersTable.id})`
 }).from(usersTable);
 
 // with sql<T> type defined
-const response: { id: string }[] = await db.select({
+const response: { lowerName: string }[] = await db.select({
     lowerName: sql<string>`lower(${usersTable.id})`
 }).from(usersTable);
 ```
