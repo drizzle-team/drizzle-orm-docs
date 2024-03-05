@@ -42,7 +42,7 @@ To count all rows in table you can use `count()` function or `sql` operator like
     ```
 
     ```sql
-    select count("*") from products;
+    select count(*) from products;
     ```
   </CodeTab>
   ```ts
@@ -79,15 +79,14 @@ select count("discount") from products;
 Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL and MySQL `count()` function returns bigint, which is interpreted as string by their drivers, so it should be casted to integer:
 
 <Section>
-```ts copy {6,8,12,13}
+```ts copy {5,7,11,12}
 import { AnyColumn, sql } from 'drizzle-orm';
 
-// In MySQL cast to unsigned integer
 const customCount = (column?: AnyColumn) => {
   if (column) {
-    return sql<number>`cast(count(${column}) as integer)`;
+    return sql<number>`cast(count(${column}) as integer)`; // In MySQL cast to unsigned integer
   } else {
-    return sql<number>`cast(count(*) as integer)`;
+    return sql<number>`cast(count(*) as integer)`; // In MySQL cast to unsigned integer
   }
 };
 

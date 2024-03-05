@@ -69,7 +69,7 @@ To include specific columns you can use `.select()` method like this:
   ```
 </Section>
 
-To include all columns with extra columns you can use `getTableColumns()` function like this:
+To include all columns with extra columns you can use `getTableColumns()` utility function like this:
 
 <Section>
   ```ts copy {5,6}
@@ -95,7 +95,7 @@ To include all columns with extra columns you can use `getTableColumns()` functi
   ```
 </Section>
 
-To exclude columns you can use `getTableColumns()` function like this:
+To exclude columns you can use `getTableColumns()` utility function like this:
 
 <Section>
   ```ts copy {3,5}
@@ -120,17 +120,18 @@ This is how you can include or exclude columns with joins:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {4,8,9,10}
+    ```ts copy {5,9,10,11}
     import { eq, getTableColumns } from 'drizzle-orm';
     import { comments, posts, users } from './db/schema';
 
+    // exclude "userId" and "postId" columns from "comments"
     const { userId, postId, ...rest } = getTableColumns(comments);
 
     await db
       .select({
-        postId: posts.id,
-        comment: { ...rest },
-        user: getTableColumns(users), // equivalent to "user: users"
+        postId: posts.id, // include "id" column from "posts"
+        comment: { ...rest }, // include all other columns
+        user: users, // equivalent to getTableColumns(users)
       })
       .from(posts)
       .leftJoin(comments, eq(posts.id, comments.postId))
@@ -181,48 +182,6 @@ This is how you can include or exclude columns with joins:
   });
   ```
 </CodeTabs>
-
-This is how you can create custom solution for conditional select:
-
-<CodeTabs items={["index.ts", "schema.ts"]}>
-  <CodeTab>
-    ```ts copy {7}
-    import { posts } from './schema';
-
-    const searchPosts = async (withTitle = false) => {
-      await db
-        .select({
-          id: posts.id,
-          ...(withTitle && { title: posts.title }),
-        })
-        .from(posts);
-    };
-
-    await searchPosts();
-    await searchPosts(true);
-    ```
-
-    ```ts
-    // result type
-    type Result = {
-      id: number;
-      title?: string | undefined;
-    }[];
-    ```
-  </CodeTab>
-
-  ```ts copy
-  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
-
-  export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    views: integer('views').notNull().default(0),
-  });
-	```
-</CodeTabs>
-
 
 Drizzle has useful relational queries API, that lets you easily include or exclude columns in queries. This is how you can include all columns:
 
@@ -335,16 +294,16 @@ This is how you can include or exclude columns with relations using relational q
 
   await db.query.posts.findMany({
     columns: {
-      id: true,
+      id: true, // include "id" column
     },
     with: {
       comments: {
         columns: {
-          userId: false,
-          postId: false,
+          userId: false, // exclude "userId" column
+          postId: false, // exclude "postId" column
         },
       },
-      user: true,
+      user: true, // include all columns from "users" table
     },
   });
   ```
@@ -408,4 +367,45 @@ This is how you can include or exclude columns with relations using relational q
     user: one(users, { fields: [comments.userId], references: [users.id] }),
   }));
   ```
+</CodeTabs>
+
+This is how you can create custom solution for conditional select:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {7}
+    import { posts } from './schema';
+
+    const searchPosts = async (withTitle = false) => {
+      await db
+        .select({
+          id: posts.id,
+          ...(withTitle && { title: posts.title }),
+        })
+        .from(posts);
+    };
+
+    await searchPosts();
+    await searchPosts(true);
+    ```
+
+    ```ts
+    // result type
+    type Result = {
+      id: number;
+      title?: string | undefined;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    views: integer('views').notNull().default(0),
+  });
+	```
 </CodeTabs>
