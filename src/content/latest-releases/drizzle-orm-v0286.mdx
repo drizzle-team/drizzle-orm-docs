@@ -1,7 +1,7 @@
 ---
 title: DrizzleORM v0.28.6 release
 pubDate: 2023-09-06
-description: Changed datetime mapping for MySQL, added LibSQL batch API support, added JSON mode for text in SQLite, added .toSQL() to Relational Query API calls, added new PostgreSQL operators for Arrays, added more SQL operators for the 'where' function in Relational Queries, and fixed bugs.
+description: Changed datetime mapping for MySQL, added LibSQL batch API support, added JSON mode for text in SQLite, added '.toSQL()' to Relational Query API calls, added new PostgreSQL operators for Arrays, added more SQL operators for the 'where' function in Relational Queries, and fixed bugs.
 ---
 import Section from "@mdx/Section.astro";
 
@@ -80,6 +80,8 @@ More usage examples here: [integration-tests/tests/libsql-batch.test.ts](https:/
 
 ### 🎉 Add json mode for text in SQLite
 
+Read more in [docs](https://orm.drizzle.team/docs/get-started-postgresql#http-proxy)
+
 ```ts copy
 const test = sqliteTable('test', {
 	dataTyped: text('data_typed', { mode: 'json' }).$type<{ a: 1 }>().notNull(),
@@ -96,6 +98,8 @@ const query = db.query.usersTable.findFirst().toSQL();
 
 List of operators and usage examples
 `arrayContains`, `arrayContained`, `arrayOverlaps`
+
+Read more in [docs](https://orm.drizzle.team/docs/get-started-postgresql#http-proxy)
 
 ```ts copy
 const contains = await db.select({ id: posts.id }).from(posts)
@@ -115,6 +119,8 @@ const withSubQuery = await db.select({ id: posts.id }).from(posts)
 ```
 
 ### 🎉 Add more SQL operators for where filter function in Relational Queries
+
+You can find more examples in [docs](https://orm.drizzle.team/docs/rqb#select-filters)
 
 <Section>
 ```ts
@@ -136,8 +142,8 @@ await db.users.findFirst({
 
 ## Fixes
 
-- [Correct where in on conflict in sqlite](https://github.com/drizzle-team/drizzle-orm/pull/1076)
-- [Fix libsql/client type import](https://github.com/drizzle-team/drizzle-orm/pull/1122)
-- [Fix: raw sql query not being mapped properly on RDS](https://github.com/drizzle-team/drizzle-orm/pull/1071)
-- [Fix Datetime mapping for MySQL](https://github.com/drizzle-team/drizzle-orm/pull/1082)
-- [Fix smallserial generating as serial](https://github.com/drizzle-team/drizzle-orm/pull/1127)
+- Correct where in on conflict in sqlite ([#1076](https://github.com/drizzle-team/drizzle-orm/pull/1076))
+- Fix libsql/client type import ([#1122](https://github.com/drizzle-team/drizzle-orm/pull/1122))
+- Fix: raw sql query not being mapped properly on RDS ([#1071](https://github.com/drizzle-team/drizzle-orm/pull/1071))
+- Fix Datetime mapping for MySQL ([#1082](https://github.com/drizzle-team/drizzle-orm/pull/1082))
+- Fix smallserial generating as serial ([#1127](https://github.com/drizzle-team/drizzle-orm/pull/1127))

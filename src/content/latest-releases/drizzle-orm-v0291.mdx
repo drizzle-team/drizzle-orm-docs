@@ -7,8 +7,8 @@ import Npm from "@mdx/Npm.astro";
 
 ## Fixes
 
-- Forward args correctly when using withReplica feature
-- Fix selectDistinctOn not working with multiple columns
+- Forward args correctly when using withReplica feature ([#1536](https://github.com/drizzle-team/drizzle-orm/pull/1536))
+- Fix selectDistinctOn not working with multiple columns ([#1466](https://github.com/drizzle-team/drizzle-orm/pull/1466))
 
 ## New Features/Helpers
 
@@ -21,7 +21,7 @@ You can now access more information, hints, documentation links, etc. while deve
 > Remember, aggregation functions are often used with the GROUP BY clause of the SELECT statement. So if you are selecting using aggregating functions and other columns in one query,
 be sure to use the `.groupBy` clause
 
-Here is a list of functions and equivalent using `sql` template
+Here is a list of functions and equivalent using `sql` template:
 
 count
 
@@ -115,11 +115,13 @@ await db.select({
 }).from(users);
 ```
 
+To find more information check docs: [aggregation helpers](https://orm.drizzle.team/docs/select#aggregations-helpers)
+
 ## New Packages
 
 ### Drizzle ESLint Plugin
 
-For cases where it's impossible to perform type checks for specific scenarios, or where it's possible but error messages would be challenging to understand, we've decided to create an ESLint package with recommended rules. This package aims to assist developers in handling crucial scenarios during development
+For cases where it's impossible to perform type checks for specific scenarios, or where it's possible but error messages would be challenging to understand, we've decided to create an ESLint package with recommended rules. This package aims to assist developers in handling crucial scenarios during development. For more information you can check [docs](https://orm.drizzle.team/docs/eslint-plugin).
 
 ### Install
 

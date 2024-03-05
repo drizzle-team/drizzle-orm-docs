@@ -210,6 +210,8 @@ async function main() {
 }
 ```
 
+Read more in [docs](https://orm.drizzle.team/docs/get-started-mysql#http-proxy)
+
 ### 🎉 New PostgreSQL Proxy Driver
 
 Same as MySQL you can now implement your own http driver for PostgreSQL database. You can find usage examples in the `./examples/pg-proxy` folder
@@ -251,6 +253,8 @@ async function main() {
   const usersToCityResponse = await db.select().from(users).leftJoin(cities, eq(users.cityId, cities.id));
 }
 ```
+
+Read more in [docs](https://orm.drizzle.team/docs/get-started-postgresql#http-proxy)
 
 ### 🎉 `D1` Batch API support
 
