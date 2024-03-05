@@ -8,10 +8,9 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite);
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite);
 - [Select statement](/docs/select);
-- [Filtering](/docs/select#filtering);
-- [Filter operators](/docs/operators);
+- [Filtering](/docs/select#filtering) and [Filter operators](/docs/operators);
 </Prerequisites>
 
 To pass a conditional filter in query you can use `.where()` method and logical operator like below:
@@ -43,10 +42,8 @@ select * from posts where title ilike 'AI';
 To combine conditional filters you can use `and()` or `or()` operators like below:
 
 <Section>
-```ts copy {9,10,11,12,13,14,15}
+```ts copy {7,8,9,10,11,12,13}
 import { and, gt, ilike, inArray } from 'drizzle-orm';
-
-const db = drizzle(...)
 
 const searchPosts = async (term?: string, categories: string[] = [], views = 0) => {
   await db
@@ -78,10 +75,8 @@ select * from posts
 
 If you need to combine conditional filters in different part of the project you can create a variable, push filters and then use it in `.where()` method with `and()` or `or()` operators like below:
 
-```ts copy {9,12}
+```ts copy {7,10}
 import { SQL, ... } from 'drizzle-orm';
-
-const db = drizzle(...)
 
 const searchPosts = async (filters: SQL[]) => {
   await db
@@ -102,12 +97,11 @@ Drizzle has useful and flexible API, which lets you create your custom solutions
 
 <Section>
 
-```ts copy {6,15}
+```ts copy {5,14}
 import { AnyColumn, ... } from 'drizzle-orm';
 
-const db = drizzle(...);
-
-const lenLt = (column: AnyColumn, value: number) => {
+// length less than
+const lenlt = (column: AnyColumn, value: number) => {
   return sql`length(${column}) < ${value}`;
 };
 
@@ -117,7 +111,7 @@ const searchPosts = async (maxLen = 0, views = 0) => {
     .from(posts)
     .where(
       and(
-        maxLen ? lenLt(posts.title, maxLen) : undefined,
+        maxLen ? lenlt(posts.title, maxLen) : undefined,
         views > 100 ? gt(posts.views, views) : undefined,
       ),
     );

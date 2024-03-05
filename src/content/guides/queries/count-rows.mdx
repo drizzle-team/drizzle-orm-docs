@@ -6,102 +6,139 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import CodeTabs from '@components/markdown/CodeTabs.astro';
 import CodeTab from '@components/markdown/CodeTab.astro';
+import Callout from '@components/markdown/Callout.astro';
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql), [SQLite](/docs/get-started-sqlite)
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
 - [Select statement](/docs/select)
-- [Filters](/docs/operators)
-- [sql operator](/docs/sql)
+- [Filters](/docs/operators) and [sql operator](/docs/sql)
+- [Aggregations](/docs/select#aggregations) and [Aggregation helpers](/docs/select#aggregations-helpers)
 - [Joins](/docs/joins)
-- [Aggregations](/docs/select#aggregations)
-- [Aggregation helpers](/docs/select#aggregations-helpers)
 </Prerequisites>
 
 To count all rows in table you can use `count()` function or `sql` operator like below:
 
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {6,9}
+    import { count, sql } from 'drizzle-orm';
+    import { products } from './schema';
+
+    const db = drizzle(...);
+
+    await db.select({ count: count() }).from(products);
+
+    // Under the hood, the count() function casts its result to a number at runtime.
+    await db.select({ count: sql`count(*)`.mapWith(Number) }).from(products);
+    ```
+
+    ```ts
+    // result type
+    type Result = {
+      count: number;
+    }[];
+    ```
+
+    ```sql
+    select count("*") from products;
+    ```
+  </CodeTab>
+  ```ts
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const products = pgTable('products', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    discount: integer('discount'),
+    price: integer('price').notNull(),
+  });
+  ```
+</CodeTabs>
+
+To count rows where the specified column contains non-NULL values you can use `count()` function with a column:
+
 <Section>
-```ts copy {5,8}
-import { count, sql } from 'drizzle-orm';
+```ts copy {1}
+await db.select({ count: count(products.discount) }).from(products);
+```
 
-const db = drizzle(...);
-
-await db.select({ count: count(products.id) }).from(products);
-
-// Under the hood, the count() function casts its result to a number at runtime.
-await db.select({ count: sql`count(${products.id})`.mapWith(Number) }).from(products);
-
-type Response = {
+```ts
+// result type
+type Result = {
   count: number;
 }[];
 ```
 
 ```sql
-select count("id") from products;
+select count("discount") from products;
 ```
 </Section>
 
-Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL and MySQL `count()` function returns bigint, which is interpreted as string by driver, so it should be casted to integer. This is how you can do it:
+Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL and MySQL `count()` function returns bigint, which is interpreted as string by their drivers, so it should be casted to integer:
 
 <Section>
-```ts copy {6,9}
+```ts copy {6,8,12,13}
 import { AnyColumn, sql } from 'drizzle-orm';
 
-const db = drizzle(...);
-
-const customCount = (column: AnyColumn) => {
-  return sql<number>`cast(count(${column}) as integer)`;
+// In MySQL cast to unsigned integer
+const customCount = (column?: AnyColumn) => {
+  if (column) {
+    return sql<number>`cast(count(${column}) as integer)`;
+  } else {
+    return sql<number>`cast(count(*) as integer)`;
+  }
 };
 
-await db.select({ count: customCount(products.id) }).from(products);
-
-type Response = {
-  count: number;
-}[];
+await db.select({ count: customCount() }).from(products);
+await db.select({ count: customCount(products.discount) }).from(products);
 ```
 
 ```sql
-select cast(count("id") as integer) from products;
+select cast(count(*) as integer) from products;
+select cast(count("discount") as integer) from products;
 ```
 </Section>
 
-In SQLite, casting isn't necessary as `count()` returns integer.
+In SQLite, `count()` result returns as integer.
 
 <Section>
-```ts copy {5}
+```ts copy {3,4}
 import { sql } from 'drizzle-orm';
 
-const db = drizzle(...);
-
-await db.select({ count: sql<number>`count(${products.id})` }).from(products);
-
-type Response = {
-  count: number;
-}[];
+await db.select({ count: sql<number>`count(*)` }).from(products);
+await db.select({ count: sql<number>`count(${products.discount})` }).from(products);
 ```
 
 ```sql
-select count("id") from products;
+select count(*) from products;
+select count("discount") from products;
 ```
 </Section>
 
-To count rows that match a condition you can use `count()` function and `.where()` method:
+<Callout type="warning">
+By specifying `sql<number>`, you are telling Drizzle that the **expected** type of the field is `number`.<br />
+If you specify it incorrectly (e.g. use `sql<string>` for a field that will be returned as a number), the runtime value won't match the expected type.
+Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
+
+If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
+</Callout>
+
+To count rows that match a condition you can use `.where()` method:
 
 <Section>
-```ts copy {6,8}
+```ts copy {4,6}
 import { count, gt } from 'drizzle-orm';
 
-const db = drizzle(...);
-
 await db
-  .select({ count: count(products.id) })
+  .select({ count: count() })
   .from(products)
   .where(gt(products.price, 100));
 ```
 
 ```sql
-select count("id") from products where price > 100
+select count(*) from products where price > 100
 ```
 </Section>
 
@@ -109,11 +146,9 @@ This is how you can use `count()` function with joins and aggregations:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
 	<CodeTab>
-    ```ts copy {10,13,14,15}
+    ```ts copy {8,11,12,13}
     import { count, eq } from 'drizzle-orm';
     import { countries, cities } from './schema';
-
-    const db = drizzle(...);
 
     // Count cities in each country
     await db
@@ -145,9 +180,7 @@ This is how you can use `count()` function with joins and aggregations:
   export const cities = pgTable('cities', {
     id: serial('id').primaryKey(),
     name: text('name').notNull(),
-    countryId: integer('country_id')
-      .notNull()
-      .references(() => countries.id),
+    countryId: integer('country_id').notNull().references(() => countries.id),
   });
   ```
 </CodeTabs>
