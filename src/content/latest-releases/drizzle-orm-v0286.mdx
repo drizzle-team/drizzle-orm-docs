@@ -21,7 +21,7 @@ Reference: https://docs.turso.tech/reference/client-access/javascript-typescript
 Batch API usage example:
 
 <Section>
-```ts copy
+```ts copy {1}
 const batchResponse = await db.batch([
 	db.insert(usersTable).values({ id: 1, name: 'John' }).returning({
 		id: usersTable.id,
@@ -82,7 +82,7 @@ More usage examples here: [integration-tests/tests/libsql-batch.test.ts](https:/
 
 Read more in [docs](https://orm.drizzle.team/docs/get-started-postgresql#http-proxy)
 
-```ts copy
+```ts copy {2}
 const test = sqliteTable('test', {
 	dataTyped: text('data_typed', { mode: 'json' }).$type<{ a: 1 }>().notNull(),
 });
@@ -90,7 +90,7 @@ const test = sqliteTable('test', {
 
 ### 🎉 Add `.toSQL()` to Relational Query API calls
 
-```ts copy
+```ts copy {1}
 const query = db.query.usersTable.findFirst().toSQL();
 ```
 
@@ -101,7 +101,7 @@ List of operators and usage examples
 
 Read more in [docs](https://orm.drizzle.team/docs/get-started-postgresql#http-proxy)
 
-```ts copy
+```ts copy {2,5,8,11,12,13,14}
 const contains = await db.select({ id: posts.id }).from(posts)
 	.where(arrayContains(posts.tags, ['Typescript', 'ORM']));
 
@@ -132,7 +132,7 @@ await db.users.findFirst({
 })
 ```
 
-```ts copy
+```ts copy {3}
 // After
 await db.users.findFirst({
   where: (table, { inArray }) => inArray(table.id, [ ... ])

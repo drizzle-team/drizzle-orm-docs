@@ -25,7 +25,7 @@ Here is a list of functions and equivalent using `sql` template:
 
 count
 
-```ts copy
+```ts copy {1,2,6,9}
 await db.select({ value: count() }).from(users);
 await db.select({ value: count(users.id) }).from(users);
 
@@ -40,7 +40,7 @@ await db.select({
 
 countDistinct
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: countDistinct(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -51,7 +51,7 @@ await db.select({
 
 avg
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: avg(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -62,7 +62,7 @@ await db.select({
 
 avgDistinct
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: avgDistinct(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -73,7 +73,7 @@ await db.select({
 
 sum
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: sum(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -84,7 +84,7 @@ await db.select({
 
 sumDistinct
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: sumDistinct(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -95,7 +95,7 @@ await db.select({
 
 max
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: max(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -106,7 +106,7 @@ await db.select({
 
 min
 
-```ts copy
+```ts copy {1,5}
 await db.select({ value: min(users.id) }).from(users);
 
 // It's equivalent to writing
@@ -139,7 +139,7 @@ You can install those packages for typescript support in your IDE
 
 Create a `.eslintrc.yml` file, add `drizzle` to the `plugins`, and specify the rules you want to use. You can find a list of all existing rules below
 
-```yaml copy
+```yaml copy {6,8,9}
 root: true
 parser: '@typescript-eslint/parser'
 parserOptions:

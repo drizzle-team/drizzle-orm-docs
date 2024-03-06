@@ -36,7 +36,7 @@ npm install drizzle-orm expo-sqlite@next
 
 Then, you can use it like this:
 
-```ts copy
+```ts copy {4,6}
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite/next";
 
@@ -107,7 +107,7 @@ npx drizzle-kit generate:sqlite
 
 Then you need to import `migrations.js` file in your `App.tsx` file from `./drizzle` folder and use hook `useMigrations` or `migrate` function.
 
-```ts copy
+```ts copy {4,11}
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite/next";
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
