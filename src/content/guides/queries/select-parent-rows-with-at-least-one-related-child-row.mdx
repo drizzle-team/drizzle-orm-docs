@@ -19,7 +19,6 @@ import Section from "@mdx/Section.astro";
 
 This guide demonstrates how to select parent rows with the condition of having at least one related child row. Below, there are examples of schema definitions and the corresponding database data:
 
-<CodeTabs items={["schema.ts", "users.db", "posts.db"]}>
   ```ts copy
   import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
@@ -36,6 +35,8 @@ This guide demonstrates how to select parent rows with the condition of having a
     userId: integer('user_id').notNull().references(() => users.id),
   });
   ```
+
+<CodeTabs items={["users.db", "posts.db"]}>
   <CodeTab>
     ```plaintext
      id |    name    |        email         
@@ -76,6 +77,12 @@ To select parent rows with at least one related child row and retrieve child dat
     .orderBy(users.id);
   ```
 
+  ```sql
+  select users.*, posts.* from users
+    inner join posts on users.id = posts.user_id
+    order by users.id;
+  ```
+
   ```ts
   // result data, there is no user with id 2 because he has no posts
   [
@@ -108,29 +115,6 @@ To select parent rows with at least one related child row and retrieve child dat
     }
   ]
   ```
-
-  ```ts
-  // result type
-  type Result = {
-    user: {
-      id: number;
-      name: string;
-      email: string;
-    };
-    post: {
-      id: number;
-      title: string;
-      content: string;
-      userId: number;
-    };
-  }[];
-  ```
-
-  ```sql
-  select users.*, posts.* from users
-    inner join posts on users.id = posts.user_id
-    order by users.id;
-  ```
 </Section>
 
 To only select parent rows with at least one related child row you can use subquery with `exists()` function like this:
@@ -147,24 +131,15 @@ const sq = db
 await db.select().from(users).where(exists(sq));
 ```
 
+```sql
+select * from users where exists (select 1 from posts where posts.user_id = users.id);
+```
+
 ```ts
 // result data, there is no user with id 2 because he has no posts
 [
   { id: 1, name: 'John Doe', email: 'john_doe@email.com' },
   { id: 3, name: 'Nick Smith', email: 'nick_smith@email.com' }
 ]
-```
-
-```ts
-// result type
-type Result = {
-  id: number;
-  name: string;
-  email: string;
-}[];
-```
-
-```sql
-select * from users where exists (select 1 from posts where posts.user_id = users.id);
 ```
 </Section>
