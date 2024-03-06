@@ -37,7 +37,8 @@ groupedArticles.forEach((group) => {
     const article = articles.find(
       (article) => article.slug === `${group.category}/${slug}`,
     );
-    if (article) {
+
+    if (article.data.customSlug) {
       group.articles.push(article);
     }
   });

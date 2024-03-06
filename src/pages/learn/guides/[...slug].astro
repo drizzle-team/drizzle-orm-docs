@@ -7,10 +7,13 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
 
 export async function getStaticPaths() {
   const releasesEntries = await getCollection("guides");
-  return releasesEntries.map((entry) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+
+  return releasesEntries
+    .filter((entry) => !!entry.data.customSlug)
+    .map((entry) => ({
+      params: { slug: entry.slug },
+      props: { entry },
+    }));
 }
 
 const { slug } = Astro.params;
