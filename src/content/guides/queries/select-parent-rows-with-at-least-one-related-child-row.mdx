@@ -39,21 +39,29 @@ This guide demonstrates how to select parent rows with the condition of having a
 <CodeTabs items={["users.db", "posts.db"]}>
   <CodeTab>
     ```plaintext
-     id |    name    |        email         
-    ----+------------+----------------------
-      1 | John Doe   | john_doe@email.com
-      2 | Tom Brown  | tom_brown@email.com
-      3 | Nick Smith | nick_smith@email.com
+    +----+------------+----------------------+
+    | id |    name    |        email         |
+    +----+------------+----------------------+
+    |  1 | John Doe   | john_doe@email.com   |
+    +----+------------+----------------------+
+    |  2 | Tom Brown  | tom_brown@email.com  |
+    +----+------------+----------------------+
+    |  3 | Nick Smith | nick_smith@email.com |
+    +----+------------+----------------------+
     ```
   </CodeTab>
 
   <CodeTab>
     ```plaintext
-     id | title  |          content           | user_id 
-    ----+--------+----------------------------+---------
-      1 | Post 1 | This is the text of post 1 |       1
-      2 | Post 2 | This is the text of post 2 |       1
-      3 | Post 3 | This is the text of post 3 |       3
+    +----+--------+-----------------------------+---------+
+    | id | title  |          content            | user_id |
+    +----+--------+-----------------------------+---------+
+    |  1 | Post 1 | This is the text of post 1  |       1 |
+    +----+--------+-----------------------------+---------+
+    |  2 | Post 2 | This is the text of post 2  |       1 |
+    +----+--------+-----------------------------+---------+
+    |  3 | Post 3 | This is the text of post 3  |       3 |
+    +----+--------+-----------------------------+---------+
     ```
   </CodeTab>
 </CodeTabs>
