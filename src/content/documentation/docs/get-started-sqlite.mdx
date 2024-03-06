@@ -375,6 +375,40 @@ const db = drizzle(async (sql, params, method) => {
   }
 });
 ```
+
+**Batch support**
+
+Sqlite Proxy supports batch requests, the same as it's done for all other drivers. Check full [docs](/docs/batch-api)
+
+You will need to specify a specific callback for batch queries and handle requests to proxy server:
+
+```ts
+import { drizzle } from 'drizzle-orm/sqlite-proxy';
+
+type ResponseType = { rows: any[][] | any[] }[];
+
+const db = drizzle(async (sql, params, method) => {
+  // single queries logic. Same as in code above
+}, async (queries: { sql: string, params: any[], method: 'all' | 'run' | 'get' | 'values'}[]) => {
+		try {
+			const result: ResponseType = await axios.post('http://localhost:3000/batch', { queries });
+
+			return result;
+		} catch (e: any) {
+			console.error('Error from sqlite proxy server:', e);
+			throw e;
+		}
+	});
+```
+
+And then you can use `db.batch([])` method, that will proxy all queries
+
+<Callout>
+  Response from the batch should be an array of raw values (an array within an array), in the same order as they were sent to the proxy server
+</Callout>
+
+---
+
 Unless you plan on writing every SQL query by hand, a table declaration is helpful:
 ```typescript copy
 import { sql } from "drizzle-orm";
