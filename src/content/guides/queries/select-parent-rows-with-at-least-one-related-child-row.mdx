@@ -1,0 +1,104 @@
+---
+title: Select parent rows with at least one related child row
+---
+
+import Prerequisites from "@mdx/Prerequisites.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+import Section from "@mdx/Section.astro";
+
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- [Select statement](/docs/select)
+- [Inner join](/docs/joins#inner-join)
+- [Filter operators](/docs/operators) and [exists function](/docs/operators#exists)
+</Prerequisites>
+
+To select parent rows with at least one related child row and retrieve child data you can use `.innerJoin()` method:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+  ```ts copy {12}
+  import { eq } from 'drizzle-orm';
+  import { users, posts } from './schema';
+
+  const db = drizzle(...);
+
+  await db
+    .select({
+      user: users,
+      post: posts,
+    })
+    .from(users)
+    .innerJoin(posts, eq(users.id, posts.userId));
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+    post: {
+      id: number;
+      title: string;
+      content: string;
+      userId: number;
+    };
+  }[];
+  ```
+
+  ```sql
+  select users.*, posts.* from users inner join posts on users.id = posts.user_id;
+  ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const users = pgTable('users', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+  });
+
+  export const posts = pgTable('posts', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    userId: integer('user_id').notNull().references(() => users.id),
+  });
+  ```
+</CodeTabs>
+
+To select only parent rows with at least one related child row you can use `exists()` function like this:
+
+<Section>
+```ts copy {8}
+import { eq, exists, sql } from 'drizzle-orm';
+
+const query = db
+  .select({ id: sql`1` })
+  .from(posts)
+  .where(eq(posts.userId, users.id));
+
+await db.select().from(users).where(exists(query));
+```
+
+```ts
+type Result = {
+  id: number;
+  name: string;
+  email: string;
+}[];
+```
+
+```sql
+select * from users where exists (select 1 from posts where posts.user_id = users.id);
+```
+</Section>
