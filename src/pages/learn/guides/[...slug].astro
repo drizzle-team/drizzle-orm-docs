@@ -8,13 +8,51 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
 export async function getStaticPaths() {
   const releasesEntries = await getCollection("guides");
 
-  return releasesEntries
-    .filter((entry) => !!entry.data.customSlug)
-    .map((entry) => ({
-      params: { slug: entry.slug },
-      props: { entry },
-    }));
+  const filteredEntries = releasesEntries.filter(
+    (entry) => !!entry.data.slug,
+  );
+
+  const staticPaths = filteredEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+
+  return staticPaths;
 }
+
+// export async function getStaticPaths() {
+//   const releasesEntries = await getCollection("guides");
+
+//   // Filter entries that have a customSlug
+//   const filteredEntries = releasesEntries.filter(
+//     (entry) => !!entry.data.customSlug,
+//   );
+
+//   const staticPaths = [];
+
+//   filteredEntries.forEach((entry) => {
+//     // Check if the slug already exists in the staticPaths array
+//     const slugExists = staticPaths.some(
+//       (path) => path.params.slug === entry.data.customSlug,
+//     );
+
+//     // If the slug already exists, throw an error
+//     // if (slugExists) {
+//     //   throw new Error(`Duplicate slug found: ${entry.data.customSlug}`);
+//     // }
+
+//     const { customSlug } = entry.data;
+
+//     staticPaths.push({
+//       params: { slug: customSlug },
+//       props: { entry },
+//     });
+//   });
+
+//   console.log(staticPaths);
+
+//   return staticPaths;
+// }
 
 const { slug } = Astro.params;
 const { entry } = Astro.props;

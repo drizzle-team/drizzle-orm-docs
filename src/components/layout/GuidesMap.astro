@@ -35,10 +35,10 @@ const groupedArticles = categoriesPaths.map((category) => ({
 groupedArticles.forEach((group) => {
   Object.keys(guidesMap[group.category]).forEach((slug) => {
     const article = articles.find(
-      (article) => article.slug === `${group.category}/${slug}`,
+      (article) => article.data.slug === `${group.category}/${slug}`,
     );
 
-    if (article.data.customSlug) {
+    if (article?.data.slug) {
       group.articles.push(article);
     }
   });

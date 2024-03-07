@@ -6,14 +6,16 @@ import MeshLayout from "@/layouts/MeshLayout.astro";
 
 export async function getStaticPaths() {
   const releasesEntries = await getCollection("guides");
+  
   const paths = [
-    ...new Set(releasesEntries.map((entry) => entry.slug.split("/")[0])),
+    ...new Set(releasesEntries.map((entry) => entry.data.slug.split("/")[0])),
   ];
+
   return paths.map((path) => ({
     params: { category: path },
     props: {
       relativeEntries: releasesEntries.filter(
-        (entry) => entry.slug.split("/")[0] === path,
+        (entry) => entry.data.slug.split("/")[0] === path,
       ),
     },
   }));
@@ -44,7 +46,7 @@ const { category } = Astro.params;
                   {entry.data.title}
                 </div>
                 <a
-                  href={`/learn/guides/${entry.slug}`}
+                  href={`/learn/guides/${entry.data.slug}`}
                   class="guides__selected-guides__card_view"
                 >
                   View
