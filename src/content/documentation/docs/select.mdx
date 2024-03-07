@@ -2,6 +2,7 @@ import Tab from '@components/markdown/Tab.astro';
 import Tabs from '@components/markdown/Tabs.astro';
 import Callout from '@components/markdown/Callout.astro';
 import Section from '@components/markdown/Section.astro';
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 
 # SQL Select
 Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
@@ -335,6 +336,11 @@ select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 </Section>
 
 ## WITH clause
+
+<Callout>
+  Check how to use WITH statement with [insert](/docs/insert#with-insert-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)
+</Callout>
+
 Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
 <Section>
 ```typescript copy
@@ -387,6 +393,32 @@ select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"
     on "users"."id" = "sq"."id";
 ```
 </Section>
+
+## Iterator
+
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false,  }} />
+
+If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
+
+```ts copy
+const iterator = await db.select().from(users).iterator();
+
+for await (const row of iterator) {
+  console.log(row);
+}
+```
+
+It also works with prepared statements:
+
+```ts copy
+const query = await db.select().from(users).prepare();
+const iterator = await query.iterator();
+
+for await (const row of iterator) {
+  console.log(row);
+}
+```
+
 ## Aggregations
 With Drizzle, you can do aggregations using functions like `sum`, `count`, `avg`, etc. by
 grouping and filtering with `.groupBy()` and `.having()` respectfully, same as you would do in raw SQL:

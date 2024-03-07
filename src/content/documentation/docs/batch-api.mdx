@@ -20,7 +20,7 @@ sequentially, non-concurrently.
 Batched statements are SQL transactions. If a statement in the sequence fails, 
 then an error is returned for that specific statement, and it aborts or rolls back the entire sequence.
 
-Drizzle ORM provides APIs to run SQL statements in batch for `LibSQL` and `D1` (__WIP__):
+Drizzle ORM provides APIs to run SQL statements in batch for `LibSQL`, `Neon` and `D1`:
 ```ts
 const batchResponse: BatchResponse = await db.batch([
 	db.insert(usersTable).values({ id: 1, name: 'John' }).returning({ id: usersTable.id }),
@@ -31,7 +31,7 @@ const batchResponse: BatchResponse = await db.batch([
 ]);
 ```
 Type for `batchResponse` in this example would be:
-<Tabs items={["libSQL", "D1"]}>
+<Tabs items={["libSQL", "Neon", "D1"]}>
 <Tab>
 ```ts
 type BatchResponse = [
@@ -39,6 +39,32 @@ type BatchResponse = [
 		id: number;
 	}[],
 	ResultSet,
+	{
+		id: number;
+		name: string;
+		verified: number;
+		invitedBy: number | null;
+	}[],
+	{
+		id: number;
+		name: string;
+		verified: number;
+		invitedBy: number | null;
+	}[],
+	{
+		id: number;
+		invitedBy: number | null;
+	}[],
+]
+```
+</Tab>
+<Tab>
+```ts
+type BatchResponse = [
+	{
+		id: number;
+	}[],
+	NeonHttpQueryResult,
 	{
 		id: number;
 		name: string;
@@ -81,7 +107,7 @@ type BatchResponse = [
     id: number;
     invitedBy: number | null;
   }[],
-];
+]
 ```
 </Tab>
 </Tabs>
@@ -92,6 +118,7 @@ db.all(),
 db.get(),
 db.values(),
 db.run(),
+db.execute(),
 db.query.<table>.findMany(),
 db.query.<table>.findFirst(),
 db.select()...,

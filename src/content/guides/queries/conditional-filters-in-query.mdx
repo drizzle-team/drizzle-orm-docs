@@ -1,54 +1,136 @@
 ---
 title: Conditional filters in query
 ---
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
 
-This example demonstrates how to implement conditional filtering.
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-### Schema
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite);
+- [Select statement](/docs/select);
+- [Filtering](/docs/select#filtering) and [Filter operators](/docs/operators);
+</Prerequisites>
 
-```ts
-import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+To pass a conditional filter in query you can use `.where()` method and logical operator like below:
 
-export const orders = pgTable('orders', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  price: integer('price').notNull(),
-  status: text('status', { enum: ['done', 'pending'] }).notNull(),
-});
+<Section>
+```ts copy {9}
+import { ilike } from 'drizzle-orm';
+
+const db = drizzle(...)
+
+const searchPosts = async (term?: string) => {
+  await db
+    .select()
+    .from(posts)
+    .where(term ? ilike(posts.title, term) : undefined);
+};
+
+await searchPosts();
+await searchPosts('AI');
 ```
 
-1. **`searchFilter`**: Filters orders by partial match in the title using **`ilike`**.
-2. **`priceFilter`**: Filters orders with a price greater than or equal to 1000.
-3. **`statusFilter`**: Filters orders by the status “pending”.
 
-### Query
+```sql
+select * from posts;
+select * from posts where title ilike 'AI';
+```
+</Section>
 
-```ts
-import { SQLWrapper, and, eq, gte, ilike } from 'drizzle-orm';
+To combine conditional filters you can use `and()` or `or()` operators like below:
 
-const filters: SQLWrapper[] = [];
-const searchFilter = true;
-const priceFilter = true;
-const statusFilter = true;
+<Section>
+```ts copy {7,8,9,10,11,12,13}
+import { and, gt, ilike, inArray } from 'drizzle-orm';
 
-if (searchFilter) filters.push(ilike(orders.title, 'my-order'));
-if (priceFilter) filters.push(gte(orders.price, 1000));
-if (statusFilter) filters.push(eq(orders.status, 'pending'));
+const searchPosts = async (term?: string, categories: string[] = [], views = 0) => {
+  await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        term ? ilike(posts.title, term) : undefined,
+        categories.length > 0 ? inArray(posts.category, categories) : undefined,
+        views > 100 ? gt(posts.views, views) : undefined,
+      ),
+    );
+};
 
-const result = await db
-  .select()
-  .from(orders)
-  .where(and(...filters));
+await searchPosts();
+await searchPosts('AI', ['Tech', 'Art', 'Science'], 200);
 ```
 
-Selects rows from the **`orders`** table where the `title` is similar to 'my-order', the `price` is at least 1000, and the `status` is “pending”.
+```sql
+select * from posts;
+select * from posts
+  where (
+    title ilike 'AI'
+    and category in ('Tech', 'Science', 'Art')
+    and views > 200
+  );
+```
+</Section>
 
-### Generated SQL
+If you need to combine conditional filters in different part of the project you can create a variable, push filters and then use it in `.where()` method with `and()` or `or()` operators like below:
 
-```bash
-{
-  sql: 'select "id", "title", "description", "price", "status" from "orders" where ("orders"."title" ilike $1 and "orders"."price" >= $2 and "orders"."status" = $3)',
-  params: [ 'my-order', 1000, 'pending' ]
-}
+```ts copy {7,10}
+import { SQL, ... } from 'drizzle-orm';
+
+const searchPosts = async (filters: SQL[]) => {
+  await db
+    .select()
+    .from(posts)
+    .where(and(...filters));
+};
+
+const filters: SQL[] = [];
+filters.push(ilike(posts.title, 'AI'));
+filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
+filters.push(gt(posts.views, 200));
+
+await searchPosts(filters);
+```
+
+Drizzle has useful and flexible API, which lets you create your custom solutions. This is how you can create a custom filter operator:
+
+<Section>
+
+```ts copy {5,14}
+import { AnyColumn, ... } from 'drizzle-orm';
+
+// length less than
+const lenlt = (column: AnyColumn, value: number) => {
+  return sql`length(${column}) < ${value}`;
+};
+
+const searchPosts = async (maxLen = 0, views = 0) => {
+  await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        maxLen ? lenlt(posts.title, maxLen) : undefined,
+        views > 100 ? gt(posts.views, views) : undefined,
+      ),
+    );
+};
+
+await searchPosts(8);
+await searchPosts(8, 200);
+```
+
+```sql
+select * from posts where length(title) < 8;
+select * from posts where (length(title) < 8 and views > 200);
+```
+</Section>
+
+Drizzle filter operators are just SQL expressions under the hood. This is example of how `lt` operator is implemented in Drizzle:
+
+```js
+const lt = (left, right) => {
+  return sql`${left} < ${bindIfParam(right, left)}`; // bindIfParam is internal magic function
+};
 ```

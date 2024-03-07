@@ -28,17 +28,22 @@ drizzle-orm @planetscale/database
 
 ```typescript copy filename="index.ts"
 import { drizzle } from "drizzle-orm/planetscale-serverless";
-import { connect } from "@planetscale/database";
+import { Client } from "@planetscale/database";
 
-// create the connection
-const connection = connect({
+const client = new Client({
   host: process.env["DATABASE_HOST"],
   username: process.env["DATABASE_USERNAME"],
   password: process.env["DATABASE_PASSWORD"],
 });
 
-const db = drizzle(connection);
+const db = drizzle(client);
 ```
+
+<Callout type="warning" emoji="⚠️">
+Previously, we were suggesting the use of the `connect()` function from the `database-js` driver. However, after receiving a suggestion from the PlanetScale Team and the authors of database-js, we are now enforcing the use of the `Client` instance to handle connections to PlanetScale.
+
+Please note that you will receive a warning to switch from `connect()` to `new Client()`, and starting from version `0.30.0`, you will encounter an error and be required to use the `Client` connection. Make sure to migrate from `connect()` to `Client`
+</Callout>
 
 Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
 we think they're outstanding 🙌

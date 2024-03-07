@@ -1,32 +1,53 @@
 ---
-title: Incrementing a value
+title: SQL Increment value
 ---
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
 
-### Schema
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
-```ts
-import { pgTable, serial, text, integer } from 'drizzle-orm';
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- [Update statement](/docs/update)
+- [Filters](/docs/operators) and [sql operator](/docs/sql)
+</Prerequisites>
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  logins: integer('logins').notNull().default(0),
-});
-```
+To increment a column value you can use `update().set()` method like below:
 
-To increment the number of logins (**`logins`**) for a user, use the update (**`update`**) query. In this example, we increment the **`logins`** value by 1 for the user with **`id = 1`**.
-
-### Increment value
-
-```ts
+<Section>
+```ts copy {8}
 import { eq, sql } from 'drizzle-orm';
 
-const id = 1
+const db = drizzle(...)
+  
+await db
+  .update(table)
+  .set({
+    counter: sql`${table.counter} + 1`,
+  })
+  .where(eq(table.id, 1));
+```
+
+```sql
+update "table" set "counter" = "counter" + 1 where "id" = 1;
+```
+</Section>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom increment function:
+
+```ts copy {4,10,11}
+import { AnyColumn } from 'drizzle-orm';
+
+const increment = (column: AnyColumn, value = 1) => {
+  return sql`${column} + ${value}`;
+};
 
 await db
-    .update(users)
-    .set({
-      logins: sql`${users.logins} + 1`,
-    })
-    .where(eq(users.id, id));
+  .update(table)
+  .set({
+    counter1: increment(table.counter1),
+    counter2: increment(table.counter2, 10),
+  })
+  .where(eq(table.id, 1));
 ```

@@ -1,0 +1,250 @@
+---
+title: SQL Limit/Offset pagination
+---
+
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- [Select statement](/docs/select) with [order by clause](/docs/select#order-by) and [limit & offset clauses](/docs/select#limit--offset)
+- [Relational queries](/docs/rqb) with [order by clause](/docs/rqb#order-by) and [limit & offset clauses](/docs/rqb#limit--offset)
+- [Dynamic query building](/docs/dynamic-query-building)
+</Prerequisites>
+
+This guide demonstrates benefits and drawbacks of `limit/offset` pagination and how to implement it in Drizzle.
+
+There are two main benefits of `limit/offset` pagination: it's simple to implement and pages are easily reachable, which means that you can navigate to any page without having to save the state of the previous pages. Limit is the number of rows to return (page size) and offset is the number of rows to skip ((page number - 1) * page size).
+
+Below, there are example of schema definition and the corresponding database data:
+
+<Section>
+```ts copy
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+```
+
+```plaintext
++----+------------+-----------+-----------------------------+
+| id | first_name | last_name |         created_at          |
++----+------------+-----------+-----------------------------+
+|  1 | John       | Doe       | 2024-03-06 16:27:46.592596  |
++----+------------+-----------+-----------------------------+
+|  2 | Tom        | Brown     | 2024-03-06 16:29:46.512345  |
++----+------------+-----------+-----------------------------+
+|  3 | Jane       | Doe       | 2024-03-06 16:32:46.623456  |
++----+------------+-----------+-----------------------------+
+|  4 | Teddy      | McDonald  | 2024-03-06 16:38:46.734567  |
++----+------------+-----------+-----------------------------+
+|  5 | Luke       | Skywalker | 2024-03-06 16:44:46.845678  |
++----+------------+-----------+-----------------------------+
+|  6 | Leia       | Organa    | 2024-03-06 17:08:46.956789  |
++----+------------+-----------+-----------------------------+
+|  7 | Jabba      | Hutt      | 2024-03-06 17:26:46.067890  |
++----+------------+-----------+-----------------------------+
+|  8 | Tom        | Green     | 2024-03-06 18:00:27.253295  |
++----+------------+-----------+-----------------------------+
+```
+</Section>
+
+To have proper pagination you have to be sure that rows are returned in the same order every time. The best way to achieve it is to order by a unique column.
+If you have to order by a non-unique column, you should append a unique column to the ordering, primary key is the simpliest way to do it. Adding the order by clause insures that data is reliable. The ordering is ascending by default.
+
+This is how you can implement it using `.select()` method:
+
+<Section>
+```ts copy {9,10,11}
+import { users } from './schema';
+
+const db = drizzle(...);
+
+const getUsers = async (limit = 4, page = 1) => {
+  await db
+    .select()
+    .from(users)
+    .orderBy(users.firstName, users.id) // order by first_name (non-unique), id (pk)
+    .limit(limit) // the number of rows to return (page_size)
+    .offset((page - 1) * limit); // the number of rows to skip ((page_number - 1) * page_size)
+};
+
+// Navigates to the second page, skip first 4 rows and retrieve 5-8 rows
+await getUsers(4, 2);
+```
+
+```sql
+select * from users order by first_name, id limit 4 offset 4;
+```
+
+```ts
+// 5-8 rows returned
+[
+  {
+    id: 5,
+    firstName: 'Luke',
+    lastName: 'Skywalker',
+    createdAt: 2024-03-06T16:44:46.845Z
+  },
+  {
+    id: 4,
+    firstName: 'Teddy',
+    lastName: 'McDonald',
+    createdAt: 2024-03-06T16:38:46.734Z
+  },
+  {
+    id: 2,
+    firstName: 'Tom',
+    lastName: 'Brown',
+    createdAt: 2024-03-06T16:29:46.512Z
+  },
+  {
+    id: 8,
+    firstName: 'Tom',
+    lastName: 'Green',
+    createdAt: 2024-03-06T18:00:27.253Z
+  }
+]
+```
+</Section>
+
+Drizzle has useful relational queries API, that lets you easily implement `limit/offset` pagination in queries:
+
+<Section>
+```ts copy {7,8,9}
+import * as schema from './db/schema';
+
+const db = drizzle(..., { schema });
+
+const getUsers = async (limit = 4, page = 1) => {
+  await db.query.users.findMany({
+    orderBy: (users, { asc }) => [asc(users.firstName), asc(users.id)],
+    limit,
+    offset: (page - 1) * limit,
+  }),
+};
+
+await getUsers(4, 2);
+```
+</Section>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you can create custom function for pagination using `.$dynamic()` function:
+
+<Section>
+```ts copy {11,12,13,17,19}
+import { SQL } from 'drizzle-orm';
+import { PgColumn, PgSelect } from 'drizzle-orm/pg-core';
+
+function withPagination<T extends PgSelect>(
+  qb: T,
+  orderByColumns: Array<PgColumn | SQL | SQL.Aliased>,
+  limit = 4,
+  page = 1,
+) {
+  return qb
+    .orderBy(...orderByColumns)
+    .limit(limit)
+    .offset((page - 1) * limit);
+}
+
+const query = db.select().from(users);
+const dynamicQuery = query.$dynamic();
+
+await withPagination(dynamicQuery, [users.firstName, users.id], 4, 2);
+```
+
+</Section>
+
+
+One of drawbacks of `limit/offset` pagination is that some rows can be inserted or deleted between requests. This can lead to the same row being returned on different pages or rows being skipped.
+
+This is how it works:
+
+<Section>
+```ts copy
+// user is browsing the first page
+await getUsers();
+```
+
+```ts
+// results for the first page
+[
+  {
+    id: 7,
+    firstName: 'Jabba',
+    lastName: 'Hutt',
+    createdAt: 2024-03-06T17:26:46.067Z
+  },
+  {
+    id: 3,
+    firstName: 'Jane',
+    lastName: 'Doe',
+    createdAt: 2024-03-06T16:32:46.623Z
+  },
+  {
+    id: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    createdAt: 2024-03-06T16:27:46.592Z
+  },
+  {
+    id: 6,
+    firstName: 'Leia',
+    lastName: 'Organa',
+    createdAt: 2024-03-06T17:08:46.956Z
+  }
+]
+```
+
+```ts
+// while user is browsing the first page, a new row is inserted
+await db.insert(users).values({
+  firstName: 'Jimmy',
+  lastName: 'Doe',
+});
+
+// user navigates to the second page
+await getUsers(4,2);
+```
+
+```ts
+// user see the duplicate and the inserted row is skipped
+[
+  {
+    id: 6, // already seen on the first page
+    firstName: 'Leia',
+    lastName: 'Organa',
+    createdAt: 2024-03-06T17:08:46.956Z
+  },
+  {
+    id: 5,
+    firstName: 'Luke',
+    lastName: 'Skywalker',
+    createdAt: 2024-03-06T16:44:46.845Z
+  },
+  {
+    id: 4,
+    firstName: 'Teddy',
+    lastName: 'McDonald',
+    createdAt: 2024-03-06T16:38:46.734Z
+  },
+  {
+    id: 2,
+    firstName: 'Tom',
+    lastName: 'Brown',
+    createdAt: 2024-03-06T16:29:46.512Z
+  }
+]
+```
+</Section>
+
+Another drawback of `limit/offset` pagination is that it's not efficient for large tables. The database has to scan all rows before the offset to skip them. This means that the query will be slower and slower as the offset increases.

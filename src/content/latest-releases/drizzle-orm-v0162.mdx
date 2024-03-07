@@ -3,6 +3,7 @@ title: DrizzleORM v0.16.2 release
 pubDate: 2023-01-21
 description: Drizzle ORM - is an idiomatic TypeScript ORM which can be used as query builder and as an ORM being the source of truth for SQL schema and CLI for automatic migrations generation.
 ---
+import Section from "@mdx/Section.astro";
 
 Drizzle ORM - is an idiomatic TypeScript ORM which can be used as query builder and as an ORM being the source of truth for SQL schema and CLI for automatic migrations generation.
 
@@ -12,7 +13,8 @@ Since last major update we've added numerous requested features 🚀
 
 You can now declare [PostgreSQL schemas](https://www.postgresql.org/docs/current/ddl-schemas.html) and tables to be created within this schema
 
-```typescript
+<Section>
+```ts copy
 // src/schema.ts
 import { pgSchema } from "drizzle-orm-pg";
 
@@ -24,12 +26,6 @@ export const users = mySchema("users", {
   email: text("email"),
 });
 ```
-
-[drizzle-kit](https://driz.link/kit) will automatically generate all needed SQL migrations ```shell drizzle-kit
-generate:pg --schema=src/schema.ts --out=migrations/ ```
-
-which will automatically generate you SQL migration
-
 ```sql
 CREATE SCHEMA "my_schema";
 
@@ -39,12 +35,19 @@ CREATE TABLE IF NOT EXISTS "my_schema"."users" (
 	"email" text
 );
 ```
+</Section>
+
+[drizzle-kit](https://driz.link/kit) will automatically generate all needed SQL migrations
+
+ ```shell 
+drizzle-kit generate:pg --schema=src/schema.ts --out=migrations/ 
+ ```
 
 ### 🎉 MySQL databases/schemas
 
 You can now declare [MySQL databases/schemas](https://dev.mysql.com/doc/refman/8.0/en/create-database.html) and tables to be created within it
 
-```typescript
+```ts copy
 // schema.ts
 import { mysqlSchema } from "drizzle-orm-mysql";
 
@@ -89,7 +92,7 @@ drizzle-kit introspect:pg --out=migrations/ --connectionString=postgresql://user
 
 it will print you `schema.ts`
 
-```typescript
+```ts copy
 export const myEnum = pgEnum("my_enum", ["one", "two", "three"]);
 export const mySchema = pgSchema("my_schema");
 
@@ -182,7 +185,7 @@ export const example = pgTable(
 
 We've added full support for [postgres.js](https://github.com/porsager/postgres), it is lightweight and it is fast 🚀
 
-```typescript
+```ts copy
 // schema.ts
 import { pgTable, serial, text, varchar } from "drizzle-orm-pg";
 export const users = pgTable("users", {
@@ -208,7 +211,7 @@ Full PostgreSQL docs see [here](https://github.com/drizzle-team/drizzle-orm/tree
 
 We've added useful operators for you to create any needed non-native PostgreSQL or MySQL types
 
-```typescript
+```ts copy
 // PostgreSQL
 const customText = customType<{ data: string }>({
   dataType() {
@@ -231,5 +234,3 @@ const usersTable = mysqlTable("users", {
   name: customText("name").notNull(),
 });
 ```
-
-Thanks!

@@ -350,7 +350,13 @@ const condition = isDocs
     : 0;
 
   window.addEventListener("keydown", (e) => {
-    if (!e.metaKey && (e.key === "1" || e.key === "2" || e.key === "3")) {
+    console.log(document.activeElement);
+    if (!e.metaKey 
+      && (e.key === "1" || e.key === "2" || e.key === "3")
+      && document.activeElement!.tagName.toLowerCase() !== 'input' 
+      && document.activeElement!.tagName.toLowerCase() !== 'textarea'
+      && document.activeElement!.id !== 'inkeep-shadow:r2:'
+    ) {
       e.preventDefault();
       if (sectionSelectorItems && sectionSelector && currentSectionNum) {
         pos = +e.key - 1;
