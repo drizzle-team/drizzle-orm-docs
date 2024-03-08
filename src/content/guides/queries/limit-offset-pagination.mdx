@@ -36,25 +36,25 @@ export const users = pgTable('users', {
 ```
 
 ```plaintext
-+----+------------+-----------+-----------------------------+
-| id | first_name | last_name |         created_at          |
-+----+------------+-----------+-----------------------------+
-|  1 | John       | Doe       | 2024-03-06 16:27:46.592596  |
-+----+------------+-----------+-----------------------------+
-|  2 | Tom        | Brown     | 2024-03-06 16:29:46.512345  |
-+----+------------+-----------+-----------------------------+
-|  3 | Jane       | Doe       | 2024-03-06 16:32:46.623456  |
-+----+------------+-----------+-----------------------------+
-|  4 | Teddy      | McDonald  | 2024-03-06 16:38:46.734567  |
-+----+------------+-----------+-----------------------------+
-|  5 | Luke       | Skywalker | 2024-03-06 16:44:46.845678  |
-+----+------------+-----------+-----------------------------+
-|  6 | Leia       | Organa    | 2024-03-06 17:08:46.956789  |
-+----+------------+-----------+-----------------------------+
-|  7 | Jabba      | Hutt      | 2024-03-06 17:26:46.067890  |
-+----+------------+-----------+-----------------------------+
-|  8 | Tom        | Green     | 2024-03-06 18:00:27.253295  |
-+----+------------+-----------+-----------------------------+
++----+------------+-----------+----------------------------+
+| id | first_name | last_name |         created_at         |
++----+------------+-----------+----------------------------+
+|  1 | Alice      | Johnson   | 2024-03-08 12:23:55.251797 |
++----+------------+-----------+----------------------------+
+|  2 | Alex       | Smith     | 2024-03-08 12:25:55.182    |
++----+------------+-----------+----------------------------+
+|  3 | Aaron      | Williams  | 2024-03-08 12:28:55.182    |
++----+------------+-----------+----------------------------+
+|  4 | Brian      | Brown     | 2024-03-08 12:34:55.182    |
++----+------------+-----------+----------------------------+
+|  5 | Beth       | Davis     | 2024-03-08 12:40:55.182    |
++----+------------+-----------+----------------------------+
+|  6 | Charlie    | Miller    | 2024-03-08 13:04:55.182    |
++----+------------+-----------+----------------------------+
+|  7 | Clara      | Wilson    | 2024-03-08 13:22:55.182    |
++----+------------+-----------+----------------------------+
+|  8 | David      | Moore     | 2024-03-08 13:34:55.182    |
++----+------------+-----------+----------------------------+
 ```
 </Section>
 
@@ -90,28 +90,28 @@ select * from users order by first_name, id limit 4 offset 4;
 // 5-8 rows returned
 [
   {
-    id: 5,
-    firstName: 'Luke',
-    lastName: 'Skywalker',
-    createdAt: 2024-03-06T16:44:46.845Z
-  },
-  {
     id: 4,
-    firstName: 'Teddy',
-    lastName: 'McDonald',
-    createdAt: 2024-03-06T16:38:46.734Z
+    firstName: 'Brian',
+    lastName: 'Brown',
+    createdAt: 2024-03-08T12:34:55.182Z
   },
   {
-    id: 2,
-    firstName: 'Tom',
-    lastName: 'Brown',
-    createdAt: 2024-03-06T16:29:46.512Z
+    id: 6,
+    firstName: 'Charlie',
+    lastName: 'Miller',
+    createdAt: 2024-03-08T13:04:55.182Z
+  },
+  {
+    id: 7,
+    firstName: 'Clara',
+    lastName: 'Wilson',
+    createdAt: 2024-03-08T13:22:55.182Z
   },
   {
     id: 8,
-    firstName: 'Tom',
-    lastName: 'Green',
-    createdAt: 2024-03-06T18:00:27.253Z
+    firstName: 'David',
+    lastName: 'Moore',
+    createdAt: 2024-03-08T13:34:55.182Z
   }
 ]
 ```
@@ -179,28 +179,28 @@ await getUsers();
 // results for the first page
 [
   {
-    id: 7,
-    firstName: 'Jabba',
-    lastName: 'Hutt',
-    createdAt: 2024-03-06T17:26:46.067Z
+    id: 3,
+    firstName: 'Aaron',
+    lastName: 'Williams',
+    createdAt: 2024-03-08T12:28:55.182Z
   },
   {
-    id: 3,
-    firstName: 'Jane',
-    lastName: 'Doe',
-    createdAt: 2024-03-06T16:32:46.623Z
+    id: 2,
+    firstName: 'Alex',
+    lastName: 'Smith',
+    createdAt: 2024-03-08T12:25:55.182Z
   },
   {
     id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    createdAt: 2024-03-06T16:27:46.592Z
+    firstName: 'Alice',
+    lastName: 'Johnson',
+    createdAt: 2024-03-08T12:23:55.251Z
   },
   {
-    id: 6,
-    firstName: 'Leia',
-    lastName: 'Organa',
-    createdAt: 2024-03-06T17:08:46.956Z
+    id: 5,
+    firstName: 'Beth',
+    lastName: 'Davis',
+    createdAt: 2024-03-08T12:40:55.182Z
   }
 ]
 ```
@@ -208,8 +208,8 @@ await getUsers();
 ```ts
 // while user is browsing the first page, a new row is inserted
 await db.insert(users).values({
-  firstName: 'Jimmy',
-  lastName: 'Doe',
+  firstName: 'Aaron',
+  lastName: 'Anderson',
 });
 
 // user navigates to the second page
@@ -220,28 +220,28 @@ await getUsers(4,2);
 // user see the duplicate and the inserted row is skipped
 [
   {
-    id: 6, // already seen on the first page
-    firstName: 'Leia',
-    lastName: 'Organa',
-    createdAt: 2024-03-06T17:08:46.956Z
-  },
-  {
-    id: 5,
-    firstName: 'Luke',
-    lastName: 'Skywalker',
-    createdAt: 2024-03-06T16:44:46.845Z
+    id: 5, // already seen on the first page
+    firstName: 'Beth',
+    lastName: 'Davis',
+    createdAt: 2024-03-08T12:40:55.182Z
   },
   {
     id: 4,
-    firstName: 'Teddy',
-    lastName: 'McDonald',
-    createdAt: 2024-03-06T16:38:46.734Z
+    firstName: 'Brian',
+    lastName: 'Brown',
+    createdAt: 2024-03-08T12:34:55.182Z
   },
   {
-    id: 2,
-    firstName: 'Tom',
-    lastName: 'Brown',
-    createdAt: 2024-03-06T16:29:46.512Z
+    id: 6,
+    firstName: 'Charlie',
+    lastName: 'Miller',
+    createdAt: 2024-03-08T13:04:55.182Z
+  },
+  {
+    id: 7,
+    firstName: 'Clara',
+    lastName: 'Wilson',
+    createdAt: 2024-03-08T13:22:55.182Z
   }
 ]
 ```
