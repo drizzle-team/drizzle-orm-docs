@@ -1,6 +1,6 @@
 <div class="theme__desktop">
   <div class="theme__wrap">
-    <div class="theme__current-btn">
+    <div class="theme__current-btn" id="theme-btn">
       <div class="theme_icon" data-current-theme-icon>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,26 +42,6 @@
         </div>
         Dark
       </div>
-    </div>
-  </div>
-</div>
-
-<div class="theme__mobile">
-  <div class="theme__current-btn theme__current-btn-select">
-    <select id="theme__select" aria-label="Theme selector" title="Select theme" class="theme__select">
-      <option value="system">System</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </select>
-    <div class="theme_icon" data-current-theme-icon>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92488 18.0751 1.00001 12 1V23Z" fill="currentColor"/>
-      </svg>
-    </div>
-    <div class="theme__chevron">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
-        <polyline points="6 9 12 15 18 9"></polyline></svg>
     </div>
   </div>
 </div>
@@ -131,6 +111,8 @@ html[class~=dark] .theme__current-btn {
   border-radius: 4px;
   font-weight: 600;
   height: 36px;
+  min-height: 36px;
+  max-height: 36px;
   position: relative;
   cursor: pointer;
   gap: 2px;
@@ -153,6 +135,7 @@ html[class~=dark] .theme__items {
   top: calc(100% + 4px);
   right: 0;
   font-size: 13px;
+  z-index: 5;
 }
 
 html[class~=dark] .theme__item:hover {
@@ -186,6 +169,7 @@ html[class~=dark] .theme__item:hover {
   left: 0;
   width: 50px;
   height: 36px;
+  min-height: 36px;
   appearance: none;
   cursor: pointer;
   color: transparent;
@@ -204,5 +188,9 @@ html[class~=dark] .theme__item:hover {
   .theme__mobile {
     display: contents;
   } 
+
+  .theme__current-btn {
+    margin-top: 24px;
+  }
 }
 </style>

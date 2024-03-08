@@ -2,74 +2,76 @@
 import EndOfContent from "@components/layout/EndOfContent.astro";
 import GlobalStyles from "@components/layout/GlobalStyles.astro";
 import MDXStyles from "@components/layout/MDXStyles.astro";
-import type { IHeading } from "../types/astro";
 import Banner from "@components/layout/Banner.astro";
-import Footer from "@components/layout/Footer.astro";
-import getContentTree from "@/utils/getContentTree";
-import Navbar from "@components/layout/Navbar/Navbar.astro";
-import RightAside from "@components/layout/RightAside.astro";
-import HeadingsSideBar from "@components/layout/HeadingsSideBar.astro";
-import InitComponentsScripts from "@components/layout/InitComponentsScripts.astro";
 import BaseHead from "@components/baseHead/BaseHead.astro";
+import Header from "../components/layout/Header.astro";
+import RightAside from "../components/layout/RightAside.astro";
+import Footer from "../components/layout/Footer.astro";
+import DocsSidebar from "../components/layout/DocsSidebar.astro";
+import getContentTree from "@/utils/getContentTree";
+import type { IHeading } from "@/types/astro";
 
 interface Props {
-  title: string;
+  customTitle?: string;
   description?: string;
   headings: IHeading[];
 }
-const { headings, description } = Astro.props;
+
+const { customTitle, headings, description } = Astro.props;
 const { slug } = Astro.params;
-const { filteredHeadings, title } = await getContentTree({
+const { tree, filteredHeadings, title } = await getContentTree({
   headings,
   slug,
 });
-const defaultTitle = "Learn";
 ---
 
 <!doctype html>
 <html lang="en">
   <BaseHead
-    title={`Drizzle ORM - ${title || defaultTitle}`}
+    title={`Drizzle ORM - ${customTitle || title}`}
     description={description}
   />
   <body class="banner-shown">
     <GlobalStyles />
     <MDXStyles />
     <Banner />
-    <Navbar />
     <main class="documentation-container">
-      <HeadingsSideBar filteredHeadings={filteredHeadings} />
-      <div class="documentation-content-wrap scrollbar">
-        <div class="documentation-content">
-          <slot />
-          <EndOfContent />
-          <Footer />
-        </div>
-        <div class="right-aside-container">
-          <RightAside />
+      <DocsSidebar tree={tree} headings={filteredHeadings} />
+      <div style="display: flex; flex-direction: column; width: 100%;">
+        <Header />
+        <div class="documentation-content-wrap scrollbar">
+          <div class="documentation-content">
+            <slot />
+            <EndOfContent />
+            <Footer />
+          </div>
+          <div class="right-aside-container">
+            <RightAside />
+          </div>
         </div>
       </div>
     </main>
-    <InitComponentsScripts />
-    <style is:global>
-      .documentation-header {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        width: 100%;
+    <style>
+      .right-aside-container {
+        position: relative;
       }
 
+      @media screen and (max-width: 1024px) {
+        .documentation-content-wrap {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .right-aside-container {
+          display: none;
+        }
+      }
+    </style>
+    <style is:global>
       .documentation-content-wrap {
         display: grid;
         width: 100%;
         grid-template-columns: minmax(0, 1fr) 260px;
         overflow-y: scroll;
         overflow-x: hidden;
-      }
-
-      .right-aside-container {
-        position: relative;
       }
 
       .navigation_nav_container_blur {
@@ -106,14 +108,34 @@ const defaultTitle = "Learn";
       }
 
       body[class~="banner-shown"] .documentation-container {
-        max-height: calc(100vh - 104px);
+        height: calc(100dvh - 40px);
       }
 
       .documentation-content {
         padding-left: 48px;
         padding-right: 40px;
+        padding-top: 1rem;
         width: 100%;
+        max-width: 892px;
         position: relative;
+      }
+
+      html.dark .documentation-content::before {
+        background: linear-gradient(180deg, #111 0%, rgba(0, 0, 0, 0) 100%);
+      }
+
+      .documentation-content::before {
+        content: "";
+        display: block;
+        height: 24px;
+        margin-bottom: -16px;
+        pointer-events: none;
+        position: sticky;
+        top: 0;
+        width: 100%;
+        background: linear-gradient(180deg, #fff 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 9;
       }
 
       @media screen and (max-width: 1279px) {
@@ -124,9 +146,6 @@ const defaultTitle = "Learn";
       }
 
       @media screen and (max-width: 1024px) {
-        .documentation-content-wrap {
-          grid-template-columns: minmax(0, 1fr);
-        }
         .right-aside-container {
           display: none;
         }

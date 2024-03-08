@@ -4,10 +4,6 @@ import DialectTab from "./DialectTab.astro";
 
 const { slug = "" } = Astro.params;
 
-const svgs = await import.meta.glob<Record<string, any>>("/public/svg/*.svg", {
-  as: "raw",
-});
-
 const current = Object.keys(dialects).find((key) => {
   const item = dialects[key].href.split("/").at(-1);
   const slugDialect = slug.split("/").at(-1);
@@ -33,7 +29,7 @@ const getLinkWithDialect = (dialect: string) => {
           ]}
           href={getLinkWithDialect(dialects[name].href)}
         >
-          <DialectTab card={dialects[name]} svgs={svgs} />
+          <DialectTab card={dialects[name]} />
         </a>
       ))
     }
@@ -47,29 +43,38 @@ const getLinkWithDialect = (dialect: string) => {
     display: flex;
     margin-left: -48px;
     width: calc(100% + 48px + 40px);
-
-
     margin-top: -16px;
     height: 44px;
     z-index: 19;
     margin-bottom: 32px;
   }
 
+  html.dark .dialect-tabs::after {
+    background: linear-gradient(180deg, #111, transparent);
+  }
+
+  .dialect-tabs::after {
+    background: linear-gradient(180deg, #fff, transparent);
+    content: "";
+    height: 24px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+  }
+
   html.dark .dialect-tabs {
-    border-bottom: 1px solid rgb(48, 48, 48);
-    border-right: 1px solid rgb(48, 48, 48);
     background-color: #111;
     border-top: none;
   }
 
   .dialect-tabs {
-    border-bottom: 1px solid #efefef;
-    border-top: 1px solid #efefef;
-    border-right: 1px solid #efefef;
     background-color: #ffffff;
     display: flex;
     width: 100%;
     height: 44px;
+    position: relative;
   }
 
   html.dark .dialect-tabs__tab {
@@ -94,10 +99,14 @@ const getLinkWithDialect = (dialect: string) => {
 
   html.dark .dialect-tabs__tab {
     border-right: 1px solid rgb(48, 48, 48);
+    border-top: 1px solid rgb(48, 48, 48);
+    border-bottom: 1px solid rgb(48, 48, 48);
   }
 
   .dialect-tabs__tab {
+    border-top: 1px solid #efefef;
     border-right: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
   }
 
   html.dark .dialect-tabs__tab--active {

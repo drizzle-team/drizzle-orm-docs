@@ -40,8 +40,10 @@ import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
 </div>
 <style>
   .learn__migrate-from_cards {
-    display: flex;
+    display: grid;
     gap: 16px;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, 240px);
   }
 
   html.dark .learn__migrate-from_card {
@@ -53,7 +55,6 @@ import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 264px;
     border-radius: 2px;
     border: 1px solid #e6e6e6;
     color: inherit;

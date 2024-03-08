@@ -63,9 +63,12 @@ const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
   }
 </div>
 <style>
+
   .learn__migrate-from_cards {
-    display: flex;
+    display: grid;
     gap: 16px;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, 240px);
   }
 
 
@@ -83,7 +86,6 @@ const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
     color: inherit;
     cursor: pointer;
     text-decoration: none;
-    width: 264px;
     height: 144px;
     text-align: center;
   }

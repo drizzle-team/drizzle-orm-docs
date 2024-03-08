@@ -1,57 +1,113 @@
 ---
-import ThemeSelector from "../ThemeSelector/ThemeSelector.astro";
-import MobileNav from "../MobileNav.astro";
-import CenteredSearchWithAI from "../CenteredSearchWithAI.astro";
-import LogoDocs from "../LogoDocs.astro";
+import CenteredSearchWithAI from "./CenteredSearchWithAI.astro";
+import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
+import Logo from "./Logo.astro";
+import GithubStars from './GithubStars.astro'
 ---
 
-<div id="nav_container" class="nav_container">
-  <div class="nav_container_blur"></div>
-  <div class="nav_content_wrap">
-    <LogoDocs />
-    <div class="nav_desktop">
-      <CenteredSearchWithAI />
-    </div>
-    <div class="nav_theme-wrap">
-      <ThemeSelector />
-    </div>
-    <div class="nav_mobile">
-      <div class="burger" data-nav-burger-btn>
-        <svg
-          fill="none"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <g>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16"></path>
-          </g>
+<div class="header" id="header">
+  <div class="header__mobile-logo">
+    <Logo />
+  </div>
+  <CenteredSearchWithAI />
+  <div class="header_nav">
+    <a class="header_nav__link" href="/docs/overview">Documentation</a>
+    <a class="header_nav__link" href="/learn">Learn</a>
+    <GithubStars stars={18}/>
+    <ThemeSelector />
+    <div class="burger" data-nav-burger-btn>
+      <svg
+        fill="none"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <g>
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 12h16"></path>
-          <g>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 18h16"></path>
-          </g>
-        </svg>
-      </div>
+            d="M4 6h16"></path>
+        </g>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 12h16"></path>
+        <g>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 18h16"></path>
+        </g>
+      </svg>
     </div>
   </div>
 </div>
 
-<div class="nav_mobile">
-  <MobileNav />
-</div>
+<style>
+  html.dark .header {
+    background-color: #111;
+  }
+
+  .header {
+    background-color: #fff;
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 24px;
+    padding-right: 22px;
+    z-index: 100;
+  }
+
+  .header_nav {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  html.dark .header_nav__link {
+    color: #9ca3af;
+  }
+
+  html.dark .header_nav__link:hover {
+    color: #e5e7eb;
+  }
+
+  .header_nav__link {
+    border-radius: 4px;
+    cursor: pointer;
+    color: #4b5563;
+    display: inline-block;
+    font-size: 14px;
+    margin-left: -8px;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    padding: 8px;
+    position: relative;
+    text-decoration: inherit;
+    white-space: nowrap;
+  }
+
+  .header_nav__link:hover {
+    color: rgb(31, 41, 55);
+  }
+
+  @media screen and (max-width: 768px) {
+    .header_nav__link {
+      display: none;
+    }
+
+    .header {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+</style>
+
 <script is:inline>
   const currentThemeIcons = document.querySelectorAll(
     "[data-current-theme-icon]",
@@ -107,10 +163,11 @@ import LogoDocs from "../LogoDocs.astro";
   const dropdownItems = document.getElementById("theme-dropdown-items");
   const themeItems = document.querySelectorAll("[data-theme-value]");
 
-  const themeCurrentBtn = document.querySelector(".theme__current-btn");
+  const themeCurrentBtn = document.getElementById("theme-btn");
   if (themeCurrentBtn) {
     themeCurrentBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      console.log('test');
       if (dropdownItems) {
         dropdownItems.classList.toggle("d-flex");
       }
@@ -149,6 +206,23 @@ import LogoDocs from "../LogoDocs.astro";
 
   updateIcon();
 </script>
+<script>
+  const burgerBtn = document.querySelector("[data-nav-burger-btn]");
+  const navContainer = document.getElementById("header");
+  const aside = document.getElementById("aside");
+
+  if (burgerBtn && navContainer && aside) {
+    burgerBtn.addEventListener("click", () => {
+      navContainer.classList.toggle("nav_container_open");
+      aside.classList.toggle("invisible");
+      document.body.style.overflow = navContainer.classList.contains(
+        "nav_container_open",
+      )
+        ? "hidden"
+        : "auto";
+    });
+  }
+</script>
 
 <style>
   .nav_container {
@@ -158,8 +232,12 @@ import LogoDocs from "../LogoDocs.astro";
     width: 100%;
   }
 
+  .header__mobile-logo {
+    display: none;
+  }
+
   html[class~="dark"] .nav_container_blur {
-    background-color: hsla(0, 0%, 7%, 0.8) !important;
+    background-color: rgba(18, 18, 18, 0.8);
     box-shadow:
       0 0 transparent,
       0 0 transparent,
@@ -188,18 +266,19 @@ import LogoDocs from "../LogoDocs.astro";
     height: 64px;
     max-width: 1440px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 8px;
     padding-left: max(env(safe-area-inset-left), 24px);
     padding-right: max(env(safe-area-inset-right), 24px);
   }
 
-  .nav_theme-wrap {
+  .nav_logo {
+    outline-offset: 2px;
+    outline: 2px solid transparent;
+    border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    width: 100%;
-    flex: 1;
+    margin-right: auto;
   }
 
   .nav_desktop {
@@ -240,7 +319,7 @@ import LogoDocs from "../LogoDocs.astro";
   }
 
   .burger {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     width: 40px;
@@ -266,13 +345,6 @@ import LogoDocs from "../LogoDocs.astro";
       opacity 0.2s 0.2s;
   }
 
-  .inkeep-container {
-    display: block;
-    position: absolute;
-    height: 0;
-    z-index: 11;
-  }
-
   @media screen and (max-width: 768px) {
     .nav_content_wrap {
       padding-left: max(env(safe-area-inset-left), 16px);
@@ -292,26 +364,16 @@ import LogoDocs from "../LogoDocs.astro";
       display: contents;
     }
 
-    .nav_theme-wrap {
-      width: unset;
-      margin-left: auto;
+    .header__mobile-logo {
+      display: block;
+    }
+
+    .header::before {
+      display: none;
+    }
+
+    .burger {
+      display: flex;
     }
   }
 </style>
-<script is:inline>
-  const burgerBtn = document.querySelector("[data-nav-burger-btn]");
-  const navContainer = document.getElementById("nav_container");
-  const navMobile = document.getElementById("nav_mobile");
-
-  if (burgerBtn && navContainer && navMobile) {
-    burgerBtn.addEventListener("click", () => {
-      navContainer.classList.toggle("nav_container_open");
-      navMobile.classList.toggle("invisible");
-      document.body.style.overflow = navContainer.classList.contains(
-        "nav_container_open",
-      )
-        ? "hidden"
-        : "auto";
-    });
-  }
-</script>

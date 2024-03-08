@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import Breadcrumbs from "@components/layout/Breadcrumbs.astro";
-import MeshLayout from "@/layouts/MeshLayout.astro";
+import Layout from "@/layouts/LearnLayout.astro";
 
 const articles = await getCollection("latest-releases");
 const filteredArticles = articles.sort(
@@ -16,49 +15,32 @@ const options: Intl.DateTimeFormatOptions = {
 };
 ---
 
-<MeshLayout>
-  <div class="frame__wrap">
-    <div class="frame__column">
-      <div class="learn__title-block">
-        <Breadcrumbs
-          crumbs={{
-            Learn: "/learn",
-          }}
-        />
-        <div class="latest-releases_title">Latest Releases</div>
-      </div>
-      <div class="frame__empty-cell"></div>
-    </div>
-    <div class="frame__column--main-content">
-      <div class="frame__main-content-cell">
-        <div class="latest-updates__cards">
-          {
-            filteredArticles.map((update) => (
-              <a
-                href={`/learn/latest-releases/${update.slug}`}
-                class="latest-updates__card"
-              >
-                <div class="latest-updates__card_title">
-                  {update.data.title}
-                </div>
-                <div class="latest-updates__card_date">
-                  {update.data.pubDate.toLocaleDateString("en-US", options)}
-                </div>
-                <div class="latest-updates__card_description">
-                  {update.data.description}
-                </div>
-                <div class="latest-updates__card_link">Read more</div>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-      <div class="frame__empty-cell_wrap">
-        <div class="frame__empty-cell--main-content--auto"></div>
-      </div>
-    </div>
+<Layout customTitle="Latest releases">
+  <div class="learn__title-block">
+    <div class="latest-releases_title">Latest Releases</div>
   </div>
-</MeshLayout>
+  <div class="latest-updates__cards">
+    {
+      filteredArticles.map((update) => (
+        <a
+          href={`/learn/latest-releases/${update.slug}`}
+          class="latest-updates__card"
+        >
+          <div class="latest-updates__card_title">
+            {update.data.title}
+          </div>
+          <div class="latest-updates__card_date">
+            {update.data.pubDate.toLocaleDateString("en-US", options)}
+          </div>
+          <div class="latest-updates__card_description">
+            {update.data.description}
+          </div>
+          <div class="latest-updates__card_link">Read more</div>
+        </a>
+      ))
+    }
+  </div>
+</Layout>
 
 <style>
   html.dark .latest-releases_title {
@@ -81,7 +63,6 @@ const options: Intl.DateTimeFormatOptions = {
     gap: 16px;
     margin-top: 24px;
     width: 100%;
-    padding-bottom: 120px;
   }
 
   html.dark .latest-updates__card {
@@ -133,97 +114,13 @@ const options: Intl.DateTimeFormatOptions = {
     margin-top: 16px;
   }
 
-  .frame__wrap {
-    width: 100%;
-    min-height: calc(100vh - 104px);
-    display: flex;
-    flex-direction: column;
-  }
-
-  html.dark .frame__column {
-    border-bottom: 1px solid #303030;
-  }
-
-  .frame__column {
-    display: flex;
-    justify-content: center;
-    border-bottom: 1px solid #efefef;
-  }
-
-  html.dark .frame__empty-cell {
-    border-left: 1px solid #303030;
-    border-right: 1px solid #303030;
-  }
-
-  .frame__empty-cell {
-    display: flex;
-    justify-content: center;
-    width: 334px;
-    border-left: 1px solid #efefef;
-    border-right: 1px solid #efefef;
-    margin-right: 62px;
-  }
-
-  html.dark .learn__title-block {
-    border-left: 1px solid #303030;
-  }
-
   .learn__title-block {
     display: flex;
     flex-direction: column;
-    max-width: 920px;
     width: 100%;
-    margin-left: 128px;
-    padding-left: 24px;
-    padding-right: 72px;
-    padding-top: 24px;
     flex-shrink: 0;
-    border-left: 1px solid #efefef;
   }
 
-  .frame__column--main-content {
-    display: flex;
-    justify-content: center;
-    overflow-y: hidden;
-    height: fit-content;
-    min-height: 100%;
-    flex: 1;
-  }
-
-  html.dark .frame__empty-cell--main-content--auto {
-    border-left: 1px solid #303030;
-    border-right: 1px solid #303030;
-  }
-
-  .frame__empty-cell--main-content--auto {
-    height: auto;
-    flex: 1 1 auto;
-    border-left: 1px solid #efefef;
-    border-right: 1px solid #efefef;
-  }
-
-  .frame__empty-cell_wrap {
-    display: flex;
-    flex-direction: column;
-    width: 334px;
-    margin-right: 62px;
-  }
-
-  html.dark .frame__main-content-cell {
-    border-left: 1px solid #303030;
-  }
-
-  .frame__main-content-cell {
-    display: flex;
-    flex-direction: column;
-    max-width: 920px;
-    width: 100%;
-    margin-left: 128px;
-    padding-left: 24px;
-    padding-right: 72px;
-    flex-shrink: 0;
-    border-left: 1px solid #efefef;
-  }
   .latest-updates__card_link {
     display: none;
   }
@@ -250,28 +147,6 @@ const options: Intl.DateTimeFormatOptions = {
       letter-spacing: -0.5px;
       margin-top: 8px;
     }
-    .learn__buttons {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
-      margin-top: 24px;
-      flex-direction: column;
-    }
-    .learn__button--primary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 36px;
-      border-radius: 4px;
-      border: 1px solid #e7ebef;
-      font-size: 12px;
-      font-weight: 500;
-      text-decoration: none;
-      line-height: 15.6px;
-      color: #222124;
-      cursor: pointer;
-    }
     html.dark .learn__title-block {
       border-left: none;
     }
@@ -284,35 +159,6 @@ const options: Intl.DateTimeFormatOptions = {
       padding: 0 16px;
       flex-shrink: 0;
       border: none;
-    }
-    .frame__empty-cell {
-      display: none;
-    }
-    html.dark .frame__main-content-cell {
-      border-left: none;
-    }
-    .frame__main-content-cell {
-      display: flex;
-      flex-direction: column;
-      max-width: 920px;
-      margin: 0;
-      width: 100%;
-      padding: 0 16px 0;
-      flex-shrink: 0;
-      border-left: none;
-    }
-    .frame__empty-cell_wrap {
-      display: none;
-    }
-    html.dark .learn__migrate-from_title {
-      color: #e2e8f0;
-    }
-    .learn__migrate-from_title {
-      color: #303030;
-      font-size: 20px;
-      font-weight: 600;
-      line-height: 26px;
-      letter-spacing: -0.48px;
     }
     .latest-updates__card_title {
       color: #222124;
