@@ -4,10 +4,17 @@ import Layout from "@/layouts/LearnLayout.astro";
 
 export async function getStaticPaths() {
   const releasesEntries = await getCollection("guides");
-  return releasesEntries.map((entry) => ({
+
+  const filteredEntries = releasesEntries.filter(
+    (entry) => !!entry.data.slug,
+  );
+
+  const staticPaths = filteredEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));
+
+  return staticPaths;
 }
 
 const { entry } = Astro.props;
