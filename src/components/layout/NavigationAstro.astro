@@ -1,68 +1,19 @@
 ---
-import Logo from "./Logo.astro";
 import NavItem from "./NavItem.astro";
-import SearchBar from "./SearchBar.astro";
-import Socials from "./Socials.astro";
 import MobileNav from "./MobileNav.astro";
-import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
+import GithubStars from "./GithubStars.astro";
+import Logo from "./Logo.astro";
 ---
 
 <div id="nav_container" class="nav_container">
-  <div class="nav_container_blur"></div>
   <div class="nav_content_wrap">
-    <a class="nav_logo" href={"/"}>
-      <div>
-        <Logo />
-      </div>
-    </a>
-    <div class="nav_desktop">
-      <NavItem
-        value="Benchmarks"
-        href="/benchmarks"
-        activeKeywords={["/benchmarks"]}
-      />
-      <NavItem
-        value="Documentation"
-        href="/docs/overview"
-        activeKeywords={["/kit-docs", "/docs"]}
-      />
-      <SearchBar />
-      <Socials />
-    </div>
-    <div class="nav_theme-wrap">
-      <ThemeSelector />
-    </div>
-    <div class="nav_mobile">
-      <div class="burger" data-nav-burger-btn>
-        <svg
-          fill="none"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <g>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16"></path>
-          </g>
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 12h16"></path>
-          <g>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 18h16"></path>
-          </g>
-        </svg>
-      </div>
-    </div>
+    <Logo />
+    <GithubStars stars={18} />
+    <NavItem
+      value="Docs"
+      href="/docs/overview"
+      activeKeywords={["/kit-docs", "/docs"]}
+    />
   </div>
 </div>
 
@@ -190,36 +141,12 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
 
 <style>
   .nav_container {
-    position: sticky;
-    top: 0;
     z-index: 20;
     width: 100%;
   }
 
-  html[class~="dark"] .nav_container_blur {
-    background-color: rgba(18, 18, 18, 0.8);
-    box-shadow:
-      0 0 transparent,
-      0 0 transparent,
-      0 -1px 0 hsla(0, 0%, 100%, 0.1) inset;
-  }
-
-  .nav_container_blur {
-    backdrop-filter: blur(12px);
-    pointer-events: none;
-    position: absolute;
-    z-index: -1;
-    height: 100%;
-    width: 100%;
-    background-color: hsla(0, 0%, 100%, 0.85);
-    box-shadow:
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0.02) 0px 2px 4px 0px,
-      rgba(0, 0, 0, 0.06) 0px 1px 0px 0px;
-  }
-
   .nav_content_wrap {
+    position: relative;
     margin-left: auto;
     margin-right: auto;
     display: flex;
@@ -227,9 +154,24 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
     max-width: 1440px;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 16px;
     padding-left: max(env(safe-area-inset-left), 24px);
     padding-right: max(env(safe-area-inset-right), 24px);
+  }
+
+  html.dark .nav_content_wrap::after {
+    background: linear-gradient(180deg, #111 0%, transparent 100%);
+  }
+
+  .nav_content_wrap::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(180deg, #fff 0%, transparent 100%);
+    z-index: 10;
   }
 
   .nav_logo {
@@ -309,13 +251,6 @@ import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
     .nav_content_wrap {
       padding-left: max(env(safe-area-inset-left), 16px);
       padding-right: max(env(safe-area-inset-right), 16px);
-    }
-
-    .nav_container {
-      top: 0px;
-    }
-    body[class~="banner-shown"] .nav_container {
-      top: 40px;
     }
     .nav_desktop {
       display: none;

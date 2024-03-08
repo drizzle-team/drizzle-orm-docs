@@ -1,9 +1,8 @@
 ---
 import { getCollection } from "astro:content";
-import Breadcrumbs from "@components/layout/Breadcrumbs.astro";
-import MigrateLayout from "@/layouts/MigrateLayout.astro";
 import CustomHeader from "@components/layout/CustomHeader.astro";
 import Link from "@mdx/Link.astro";
+import Layout from "@/layouts/LearnLayout.astro";
 
 export async function getStaticPaths() {
   const releasesEntries = await getCollection("tutorials");
@@ -14,19 +13,11 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content, headings } = await entry.render();
+const { Content } = await entry.render();
 ---
-<MigrateLayout
-  title={entry.data.title}
-  description={entry.data.description}
-  headings={headings}
+<Layout
+  customTitle={entry.data.title}
 >
-  <Breadcrumbs
-    crumbs={{
-      Learn: "/learn",
-      Tutorials: "/learn/tutorials",
-    }}
-  />
   {entry.data?.title && <CustomHeader>{entry.data.title}</CustomHeader>}
   <Content components={{ a: Link }} />
-</MigrateLayout>
+</Layout>

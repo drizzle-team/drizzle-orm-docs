@@ -1,128 +1,82 @@
 ---
 import DocsIcon from "@components/Icons/DocsIcon.astro";
 import LearnIcon from "@components/Icons/LearnIcon.astro";
-import BoltIcon from "@components/Icons/BoltIcon.astro";
 const { pathname } = Astro.url;
 
 const isDocs = ["docs", "kit-docs", "drizzle-studio"].some((path) =>
   pathname.startsWith(`/${path}`),
 );
 const isLearn = pathname.startsWith("/learn");
-const isBenchmark = pathname.startsWith("/benchmarks");
-const condition = isDocs
-  ? "/docs/overview"
-  : isBenchmark
-    ? "/benchmarks"
-    : "/learn";
+const condition = isDocs ? "/docs/overview" : "/learn";
 ---
 
-<div class="logo-wrap">
-  <a class="nav_logo" href={"/"}>
-    <div class="logo-svg">
-      <svg
-        width="160"
-        height="160"
-        viewBox="0 0 160 160"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect
-          width="9.63139"
-          height="40.8516"
-          rx="4.8157"
-          transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)"
-          fill="currentColor"></rect>
-        <rect
-          width="9.63139"
-          height="40.8516"
-          rx="4.8157"
-          transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)"
-          fill="currentColor"></rect>
-        <rect
-          width="9.63139"
-          height="40.8516"
-          rx="4.8157"
-          transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)"
-          fill="currentColor"></rect>
-        <rect
-          width="9.63139"
-          height="40.8516"
-          rx="4.8157"
-          transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)"
-          fill="currentColor"></rect>
-      </svg>
+<div class="logo__section__selector">
+  <button class="logo__section__dropdown-btn" data-section-selector>
+    <div class="docs-text">
+      <div class="logo__section-icon">
+        <span class="logo__section-icon--docs">
+          {isDocs && <DocsIcon />}
+        </span>
+        {isLearn && <LearnIcon />}
+      </div>
+      <div class="logo__section-text">
+        {isDocs && "Docs"}
+        {isLearn && "Learn"}
+      </div>
     </div>
-    <div>Drizzle</div>
-  </a>
-  <div class="logo__section__selector">
-    <button class="logo__section__dropdown-btn" data-section-selector>
-      <div class="docs-text">
-        <div class="logo__section-icon">
-          <span class="logo__section-icon--docs">
-            {isDocs && <DocsIcon />}
-          </span>
-          {isLearn && <LearnIcon />}
-          {isBenchmark && <BoltIcon />}
-        </div>
-        <div class="logo__section-text">
-          {isDocs && "Docs"}
-          {isLearn && "Learn"}
-          {isBenchmark && "Benchmarks"}
-        </div>
+    <div class="logo__section__selector-current-num" data-current-section-num>
+      {isDocs && "1"}
+      {isLearn && "2"}
+    </div>
+  </button>
+  <div class="logo__section__selector-items hidden">
+    <a class="logo__section__selector-item--docs" href="/docs/overview">
+      <div class="logo__section__selector-item__icon">
+        <DocsIcon />
       </div>
-      <div class="logo__section__selector-current-num" data-current-section-num>
-        {isDocs && "1"}
-        {isBenchmark && "2"}
-        {isLearn && "3"}
-      </div>
-    </button>
-    <a class="logo__section__mobile-btn" href={condition}>
-      <div class="docs-text">
-        <div class="logo__section-icon">
-          <span class="logo__section-icon--docs">
-            {isDocs && <DocsIcon />}
-          </span>
-          {isLearn && <LearnIcon />}
-          {isBenchmark && <BoltIcon />}
-        </div>
-        <div class="logo__section-text">
-          {isDocs && "Docs"}
-          {isLearn && "Learn"}
-          {isBenchmark && "Benchmarks"}
-        </div>
-      </div>
+      <div>Docs</div>
+      <div class="logo__section__selector-current-num--dropdown">1</div>
     </a>
-    <div class="logo__section__selector-items hidden">
-      <a class="logo__section__selector-item--docs" href="/docs/overview">
-        <div class="logo__section__selector-item__icon">
-          <DocsIcon />
-        </div>
-        <div>Docs</div>
-        <div class="logo__section__selector-current-num--dropdown">1</div>
-      </a>
-      <a class="logo__section__selector-item" href="/benchmarks">
-        <div class="logo__section__selector-item__icon">
-          <BoltIcon />
-        </div>
-        <div>Benchmarks</div>
-        <div class="logo__section__selector-current-num--dropdown">2</div>
-      </a>
-      <a class="logo__section__selector-item" href="/learn">
-        <div class="logo__section__selector-item__icon">
-          <LearnIcon />
-        </div>
-        <div>Learn</div>
-        <div class="logo__section__selector-current-num--dropdown">3</div>
-      </a>
-    </div>
+    <a class="logo__section__selector-item" href="/learn">
+      <div class="logo__section__selector-item__icon">
+        <LearnIcon />
+      </div>
+      <div>Learn</div>
+      <div class="logo__section__selector-current-num--dropdown">2</div>
+    </a>
   </div>
 </div>
+
+<!-- MOBILE -->
+<div class="logo__section__dropdown-select">
+  <div class="logo__section__dropdown-content">
+    <div class="logo__section-icon">
+      <span class="logo__section-icon--docs">
+        {isDocs && <DocsIcon />}
+      </span>
+      {isLearn && <LearnIcon />}
+    </div>
+    <div class="logo__section-text">
+      {isDocs && "Docs"}
+      {isLearn && "Learn"}
+    </div>
+  </div>
+  <select
+    id="section__select"
+    aria-label="Section selector"
+    title="Select section"
+    class="section__select"
+  >
+    <option selected={isDocs} value="docs">Docs</option>
+    <option selected={isLearn} value="learn">Learn</option>
+  </select>
+</div>
+
 <style>
   .logo-wrap {
     display: flex;
     align-items: center;
     font-weight: 600;
-    flex: 1;
   }
 
   .logo-svg svg {
@@ -173,29 +127,44 @@ const condition = isDocs
     align-items: center;
   }
 
+  html.dark .logo__section__selector {
+    background-color: #111;
+    border: 1px solid #404040;
+  }
+
   .logo__section__selector {
     position: relative;
     user-select: none;
     color: #7e868c;
-    margin-left: 8px;
+    background-color: hsla(210, 7%, 95%, .27);
+    border: 1px solid rgba(33, 39, 46, .12);
+    border-radius: 4px;
   }
 
   .logo__section__dropdown-btn {
     display: flex;
     align-items: center;
-    height: 34px;
+    height: 40px;
     cursor: pointer;
-    padding: 2px 4px 2px 4px;
+    padding: 0 8px;
     border-radius: 4px;
+    width: 100%;
     transition: background-color 0.2s ease-in-out;
+  }
+
+  html.dark .logo__section__selector-item__icon {
+    background-color: #102a4c;
   }
 
   .logo__section__selector-item__icon {
     display: flex;
-    height: 40px;
-    width: 40px;
+    height: 24px;
+    width: 24px;
     align-items: center;
     justify-content: center;
+    background-color: #e1f0ff;
+    margin-right: 8px;
+    border-radius: 4px;
   }
 
   html.dark .logo__section__dropdown-btn:hover {
@@ -203,7 +172,8 @@ const condition = isDocs
   }
 
   .logo__section__dropdown-btn:hover {
-    background-color: #f5f5f7;
+    background-color: #f8fafc;
+    border-color: #d1d5db;
   }
 
   html.dark .logo__section__selector-current-num,
@@ -212,20 +182,6 @@ const condition = isDocs
   }
   .logo__section__mobile-btn {
     display: none;
-  }
-  @media (max-width: 767px) {
-    .logo__section__dropdown-btn {
-      display: none;
-    }
-    .logo__section__mobile-btn {
-      display: flex;
-      align-items: center;
-      height: 34px;
-      cursor: pointer;
-      padding: 2px 4px 2px 4px;
-      border-radius: 4px;
-      transition: background-color 0.2s ease-in-out;
-    }
   }
   .logo__section__selector-current-num,
   .logo__section__selector-current-num--dropdown {
@@ -267,12 +223,11 @@ const condition = isDocs
     box-shadow: 0 0 16px rgba(17, 17, 26, 0.1);
     border-radius: 4px;
     flex-direction: column;
-    padding: 8px;
     gap: 2px;
     position: absolute;
-    left: 0;
+    left: -1px;
+    right: -1px;
     top: calc(100% + 4px);
-    width: 200px;
     z-index: 99;
   }
 
@@ -284,13 +239,14 @@ const condition = isDocs
     display: flex;
     justify-content: flex-start;
     width: 100%;
+    height: 40px;
     color: #6b7280;
     font-size: 16px;
     font-weight: 500;
     transition-property: color, background-color;
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
-    padding-right: 8px;
+    padding: 0 8px;
   }
 
   html.dark .logo__section__selector-item:hover,
@@ -307,6 +263,51 @@ const condition = isDocs
   .logo__section__selector-item--docs:focus {
     background-color: #f5f5f7;
     color: #000;
+  }
+
+  .logo__section__dropdown-select {
+    position: relative;
+    display: none;
+  }
+
+  .section__select {
+    appearance: none;
+    background: none;
+    color: transparent;
+    cursor: pointer;
+    right: 0;
+    left: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+  }
+
+  html.dark .logo__section__dropdown-content {
+    background-color: #111;
+    border: 1px solid #404040;
+  }
+
+  .logo__section__dropdown-content {
+    align-items: center;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    height: 40px;
+    padding: 0 8px;
+    transition: background-color 0.2s ease-in-out;
+    width: 100%;
+    border-radius: 4px;
+    background-color: hsla(210, 7%, 95%, .27);
+    border: 1px solid rgba(33, 39, 46, .12);
+  }
+
+  @media screen and (max-width: 768px) {
+    .logo__section__selector {
+      display: none;
+    }
+    .logo__section__dropdown-select {
+      display: flex;
+    }
   }
 </style>
 <script>
@@ -350,12 +351,12 @@ const condition = isDocs
     : 0;
 
   window.addEventListener("keydown", (e) => {
-    console.log(document.activeElement);
-    if (!e.metaKey 
-      && (e.key === "1" || e.key === "2" || e.key === "3")
-      && document.activeElement!.tagName.toLowerCase() !== 'input' 
-      && document.activeElement!.tagName.toLowerCase() !== 'textarea'
-      && document.activeElement!.id !== 'inkeep-shadow:r2:'
+    if (
+      !e.metaKey &&
+      (e.key === "1" || e.key === "2") &&
+      document.activeElement!.tagName.toLowerCase() !== "input" &&
+      document.activeElement!.tagName.toLowerCase() !== "textarea" &&
+      document.activeElement!.id !== "inkeep-shadow:r2:"
     ) {
       e.preventDefault();
       if (sectionSelectorItems && sectionSelector && currentSectionNum) {
@@ -371,9 +372,6 @@ const condition = isDocs
             window.location.href = "/docs/overview";
           }
           if (e.key === "2") {
-            window.location.href = "/benchmarks";
-          }
-          if (e.key === "3") {
             window.location.href = "/learn";
           }
         }
@@ -402,6 +400,19 @@ const condition = isDocs
       (sectionSelectorItems.children[pos] as HTMLAnchorElement).focus();
     }
   });
+
+  const sectionSelect = document.getElementById("section__select");
+  if (sectionSelect) {
+    sectionSelect.addEventListener("change", (e) => {
+      const value = (e.target as HTMLSelectElement).value;
+      if (value === "docs") {
+        window.location.href = "/docs/overview";
+      }
+      if (value === "learn") {
+        window.location.href = "/learn";
+      }
+    });
+  }
 </script>
 <style is:global>
   html.dark .logo__section-icon svg {
@@ -444,8 +455,8 @@ const condition = isDocs
   }
   .logo__section__selector-item svg,
   .logo__section__selector-item--docs svg {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     color: rgb(107, 114, 128);
     transition: all 0.2s ease-in-out;
   }
