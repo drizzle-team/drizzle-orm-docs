@@ -1,6 +1,6 @@
 ---
 import CenteredSearchWithAI from "./CenteredSearchWithAI.astro";
-import ThemeSelector from "./ThemeSelector/ThemeSelector.astro";
+import ThemeSelector from "./ThemeSelector.astro";
 import Logo from "./Logo.astro";
 import GithubStars from './GithubStars.astro'
 ---
@@ -167,7 +167,6 @@ import GithubStars from './GithubStars.astro'
   if (themeCurrentBtn) {
     themeCurrentBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      console.log('test');
       if (dropdownItems) {
         dropdownItems.classList.toggle("d-flex");
       }

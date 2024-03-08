@@ -1,24 +1,25 @@
 ---
 import NavItem from "./NavItem.astro";
-import MobileNav from "./MobileNav.astro";
 import GithubStars from "./GithubStars.astro";
 import Logo from "./Logo.astro";
+import LandingNavbar from "./LandingNavbar.astro";
 ---
 
 <div id="nav_container" class="nav_container">
   <div class="nav_content_wrap">
-    <Logo />
-    <GithubStars stars={18} />
-    <NavItem
-      value="Docs"
-      href="/docs/overview"
-      activeKeywords={["/kit-docs", "/docs"]}
-    />
+    <div style="display: flex; align-items: center; flex: 1;">
+      <Logo />
+    </div>
+    <LandingNavbar />
+    <div style="display: flex; align-items: center; flex: 1; justify-content: flex-end; gap: 24px;">
+      <GithubStars stars={18} />
+      <NavItem
+        value="Docs"
+        href="/docs/overview"
+        activeKeywords={["/kit-docs", "/docs"]}
+      />  
+    </div>
   </div>
-</div>
-
-<div class="nav_mobile">
-  <MobileNav />
 </div>
 <script is:inline>
   const currentThemeIcons = document.querySelectorAll(
@@ -153,7 +154,7 @@ import Logo from "./Logo.astro";
     height: 64px;
     max-width: 1440px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 16px;
     padding-left: max(env(safe-area-inset-left), 24px);
     padding-right: max(env(safe-area-inset-right), 24px);
