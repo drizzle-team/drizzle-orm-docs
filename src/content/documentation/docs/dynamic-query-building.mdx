@@ -28,7 +28,7 @@ function withPagination<T extends PgSelect>(
 	page: number,
 	pageSize: number = 10,
 ) {
-	return qb.limit(pageSize).offset(page * pageSize);
+	return qb.limit(pageSize).offset(page * pageSize - pageSize);
 }
 
 const query = db.select().from(users).where(eq(users.id, 1));
