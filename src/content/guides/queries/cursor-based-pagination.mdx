@@ -32,7 +32,7 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
       .select()
       .from(users)
       .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
-      .limit(limit) // the number of rows to return (page_size)
+      .limit(limit) // the number of rows to return
       .orderBy(asc(users.id)); // ordering
   };
 
@@ -106,6 +106,26 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   ```
 
 </CodeTabs>
+
+If you need dynamic order by you can do like below:
+
+```ts copy {6,7,8}
+const getUsers = async (order: 'asc' | 'desc' = 'asc', cursor?: number, limit = 3) => {
+  await db
+    .select()
+    .from(users)
+    // cursor comparison
+    .where(cursor ? (order === 'asc' ? gt(users.id, cursor) : lt(users.id, cursor)) : undefined)
+    .limit(limit)
+    .orderBy(order === 'asc' ? asc(users.id) : desc(users.id));
+};
+
+await getUsers();
+await getUsers('asc', 3);
+// descending order
+await getUsers('desc');
+await getUsers('desc', 7);
+```
 
 The main idea of this pagination is to use cursor as a pointer to a specific row in a dataset, indicating the end of the last page. For correct ordering and cursor comparison, cursor should be unique and sequential.
 
