@@ -21,25 +21,23 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-  ```ts copy {10,11,12,18}
+  ```ts copy {10,11,12}
   import { asc, gt } from 'drizzle-orm';
   import { users } from './schema';
 
   const db = drizzle(...);
 
-  const getUsers = async (cursor?: number, limit = 3) => {
+  const nextUserPage = async (cursor?: number, pageSize = 3) => {
     await db
       .select()
       .from(users)
       .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
-      .limit(limit) // the number of rows to return
+      .limit(pageSize) // the number of rows to return
       .orderBy(asc(users.id)); // ordering
   };
 
-  // navigates to the first page
-  await getUsers();
-  // navigates to the next page, pass the cursor of the last row of the first page (id)
-  await getUsers(3);
+  // pass the cursor of the last row of the previous page (id)
+  await nextUserPage(3);
   ```
 
   ```sql
@@ -70,6 +68,7 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   ]
   ```
   </CodeTab>
+  <CodeTab>
   ```ts copy
   import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
@@ -79,8 +78,9 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
     lastName: text('last_name').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
+  ```
 
-  /*
+  ```plaintext
   +----+------------+------------+----------------------------+
   | id | first_name | last_name  |         created_at         |
   +----+------------+------------+----------------------------+
@@ -102,45 +102,45 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   +----+------------+------------+----------------------------+
   |  9 | Aaron      | Anderson   | 2024-03-08 12:40:33.677235 |
   +----+------------+------------+----------------------------+
-  */
   ```
+  </CodeTab>
 
 </CodeTabs>
 
 If you need dynamic order by you can do like below:
 
-```ts copy {6,7,8}
-const getUsers = async (order: 'asc' | 'desc' = 'asc', cursor?: number, limit = 3) => {
+```ts copy {6,8}
+const nextUserPage = async (order: 'asc' | 'desc' = 'asc', cursor?: number, pageSize = 3) => {
   await db
     .select()
     .from(users)
     // cursor comparison
     .where(cursor ? (order === 'asc' ? gt(users.id, cursor) : lt(users.id, cursor)) : undefined)
-    .limit(limit)
+    .limit(pageSize)
     .orderBy(order === 'asc' ? asc(users.id) : desc(users.id));
 };
 
-await getUsers();
-await getUsers('asc', 3);
+await nextUserPage();
+await nextUserPage('asc', 3);
 // descending order
-await getUsers('desc');
-await getUsers('desc', 7);
+await nextUserPage('desc');
+await nextUserPage('desc', 7);
 ```
 
-The main idea of this pagination is to use cursor as a pointer to a specific row in a dataset, indicating the end of the last page. For correct ordering and cursor comparison, cursor should be unique and sequential.
+The main idea of this pagination is to use cursor as a pointer to a specific row in a dataset, indicating the end of the previous page. For correct ordering and cursor comparison, cursor should be unique and sequential.
 
-If you need to order by a non-unique and non-sequential column, you can use multiple columns as a cursor. This is how you can do it:
+If you need to order by a non-unique and non-sequential column, you can use multiple columns for cursor. This is how you can do it:
 
 <Section>
-```ts copy {13,14,15,16,17,18,19,20,21,22}
+```ts copy {14,15,16,17,18,19,22}
 import { and, asc, eq, gt, or } from 'drizzle-orm';
 
-const getUsers = async (
+const nextUserPage = async (
   cursor?: {
     id: number;
     firstName: string;
   },
-  limit = 3,
+  pageSize = 3,
 ) => {
   await db
     .select()
@@ -153,14 +153,12 @@ const getUsers = async (
           )
         : undefined,
     )
-    .limit(limit)
+    .limit(pageSize)
     .orderBy(asc(users.firstName), asc(users.id));
 };
 
-// first page
-await getUsers();
-// pass the cursor of the last row of the first page (id & firstName)
-await getUsers({
+// pass the cursor from previous page (id & firstName)
+await nextUserPage({
   id: 2,
   firstName: 'Alex',
 });
@@ -197,7 +195,7 @@ select * from users
 ```
 </Section>
 
-Also you have to create indices for the columns that you use as the cursor to make the query efficient.
+Make sure to create indices for the columns that you use for cursor to make query efficient.
 
 <Section>
 ```ts copy {7,8}
@@ -220,24 +218,24 @@ CREATE INDEX IF NOT EXISTS "first_name_and_id_index" ON "users" ("first_name" AS
 ```
 </Section>
 
-If you are using primary key which is not sequential (e.g. UUID), you should add sequential column (e.g. created_at column) and use multiple cursor.
+If you are using primary key which is not sequential (e.g. `UUIDv4`), you should add sequential column (e.g. `created_at` column) and use multiple cursor.
 This is how you can do it:
 
 <Section>
-```ts copy {11,12,13,14,15,16,17,18,19,20,21}
+```ts copy {12,13,14,15,16,17,18,21}
 
-const getUsers = async (
+const nextUserPage = async (
   cursor?: {
     id: string;
     createdAt: Date;
   },
-  limit = 3,
+  pageSize = 3,
 ) => {
   await db
     .select()
     .from(users)
     .where(
-      // don't forget to add indices for the columns that you use as the cursor
+      // make sure to add indices for the columns that you use for cursor
       cursor
         ? or(
             gt(users.createdAt, cursor.createdAt),
@@ -245,13 +243,12 @@ const getUsers = async (
           )
         : undefined,
     )
-    .limit(limit)
+    .limit(pageSize)
     .orderBy(asc(users.createdAt), asc(users.id));
 };
 
-await getUsers();
-// navigate to the next page, pass the cursor of the last row of the first page (id & createdAt)
-await getUsers({
+// pass the cursor from previous page (id & createdAt)
+await nextUserPage({
   id: '66ed00a4-c020-4dfd-a1ca-5d2e4e54d174',
   createdAt: new Date('2024-03-09T17:59:36.406Z'),
 });
@@ -265,23 +262,20 @@ import * as schema from './db/schema';
 
 const db = drizzle(..., { schema });
 
-const getUsers = async (cursor?: number, limit = 3) => {
+const nextUserPage = async (cursor?: number, pageSize = 3) => {
   await db.query.users.findMany({
     where: (users, { gt }) => (cursor ? gt(users.id, cursor) : undefined),
     orderBy: (users, { asc }) => asc(users.id),
-    limit,
+    limit: pageSize,
   });
 };
 
-await getUsers();
 // next page, cursor of last row of the first page (id = 3)
-await getUsers(3);
+await nextUserPage(3);
 ```
 
-There are two main benefits of `cursor-based` pagination: consistent query results, with no skipped or duplicated rows due to insert or delete operations, and greater efficiency compared to `limit/offset` pagination because it does not need to scan and skip previous rows to access the next page.
+**Benefits** of `cursor-based` pagination: consistent query results, with no skipped or duplicated rows due to insert or delete operations, and greater efficiency compared to `limit/offset` pagination because it does not need to scan and skip previous rows to access the next page.
 
-However, there are drawbacks to consider before choosing a pagination method. One drawback of `cursor-based` pagination is the inability to directly navigate to a specific page. To navigate to the next page you must use cursor from the previous page.
+**Drawbacks** of `cursor-based` pagination: the inability to directly navigate to a specific page and complexity of implementation. Since you add more columns to the sort order, you'll need to add more filters to the `where` clause for the cursor comparison to ensure consistent pagination.
 
-Another drawback is the complexity of implementation. You always have to think carefully about constructing the cursor, since we add more columns to the sort order, we'll need to add more filters to the `where` clause for the cursor comparison to ensure consistent pagination. Moreover, it is essential to create indices for the columns used as the cursor to make the query efficient.
-
-So, if you need to directly navigate to a specific page or you need simple implementation of pagination, you should consider using [offset/limit](/learn/guides/queries/limit-offset-pagination) pagination instead.
+So, if you need to directly navigate to a specific page or you need simpler implementation of pagination, you should consider using [offset/limit](/learn/guides/queries/limit-offset-pagination) pagination instead.
