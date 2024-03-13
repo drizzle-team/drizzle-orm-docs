@@ -3,6 +3,7 @@ import GlobalStyles from "@components/layout/GlobalStyles.astro";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
 import Footer from "@components/layout/Footer.astro";
 import BaseHead from "@components/baseHead/BaseHead.astro";
+import Banner from "@components/layout/Banner.astro";
 
 interface Props {
   title: string;
@@ -14,7 +15,8 @@ const { title } = Astro.props;
 <!doctype html>
 <html lang="en">
   <BaseHead title={title} />
-  <body>
+  <body class="banner-shown">
+    <Banner />
     <GlobalStyles />
     <NavigationAstro />
     <main class="landing-wrap scrollbar">

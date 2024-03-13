@@ -2,71 +2,98 @@
 import CenteredSearchWithAI from "./CenteredSearchWithAI.astro";
 import ThemeSelector from "./ThemeSelector.astro";
 import Logo from "./Logo.astro";
-import GithubStars from './GithubStars.astro'
+import GithubStars from "./GithubStars.astro";
 ---
 
 <div class="header" id="header">
-  <div class="header__mobile-logo">
-    <Logo />
-  </div>
-  <CenteredSearchWithAI />
-  <div class="header_nav">
-    <a class="header_nav__link" href="/docs/overview">Documentation</a>
-    <a class="header_nav__link" href="/learn">Learn</a>
-    <GithubStars stars={18}/>
-    <ThemeSelector />
-    <div class="burger" data-nav-burger-btn>
-      <svg
-        fill="none"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <g>
+  <div class="header_content">
+    <div class="header__logo">
+      <Logo />
+    </div>
+    <CenteredSearchWithAI />
+    <div class="header_nav">
+      <GithubStars stars={18} />
+      <ThemeSelector />
+      <div class="burger" data-nav-burger-btn>
+        <svg
+          fill="none"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <g>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16"></path>
+          </g>
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16"></path>
-        </g>
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 12h16"></path>
-        <g>
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 18h16"></path>
-        </g>
-      </svg>
+            d="M4 12h16"></path>
+          <g>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 18h16"></path>
+          </g>
+        </svg>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
   html.dark .header {
-    background-color: #111;
+    background-color: #121212cc;
+    box-shadow:
+      0 0 transparent,
+      0 0 transparent,
+      inset 0 -1px #ffffff1a;
   }
 
   .header {
-    background-color: #fff;
+    background-color: #ffffffd9;
+    box-shadow:
+      0 0 0 0 transparent,
+      0 0 0 0 transparent,
+      0 2px 4px #00000005,
+      0 1px #0000000f;
+    
+    z-index: 100;
+    position: relative;
+  }
+
+  .header_content {
     display: flex;
     min-height: 64px;
     align-items: center;
     justify-content: space-between;
     padding-left: 24px;
     padding-right: 22px;
-    z-index: 100;
+    margin: 0 auto;
+    max-width: 1440px;
+    width: 100%;
+  }
+
+  .header__logo {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    font-weight: 600;
   }
 
   .header_nav {
     display: flex;
-    gap: 16px;
+    gap: 8px;
     align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+    width: 100%;
   }
 
   html.dark .header_nav__link {
@@ -101,110 +128,12 @@ import GithubStars from './GithubStars.astro'
       display: none;
     }
 
-    .header {
+    .header_content {
       padding-left: 16px;
       padding-right: 16px;
     }
   }
 </style>
-
-<script is:inline>
-  const currentThemeIcons = document.querySelectorAll(
-    "[data-current-theme-icon]",
-  );
-
-  const systemIconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92488 18.0751 1.00001 12 1V23Z" fill="currentColor"/>
-  </svg>`;
-
-  const lightIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
-
-  const darkIconSvg = `<svg fill="none"viewBox="2 2 20 20"width="16"height="16"stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="currentColor" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-    </svg>`;
-  const themeSelect = document.getElementById("theme__select");
-
-  const updateIcon = () => {
-    const theme = localStorage.getItem("theme");
-    if (!theme || !currentThemeIcons) return;
-    currentThemeIcons.forEach((currentThemeIcon) => {
-      if (theme === "system") {
-        currentThemeIcon.innerHTML = systemIconSvg;
-      } else if (theme === "light") {
-        currentThemeIcon.innerHTML = lightIconSvg;
-      } else if (theme === "dark") {
-        currentThemeIcon.innerHTML = darkIconSvg;
-      }
-      themeSelect.value = theme;
-    });
-    let themeName = "";
-
-    if (theme === "system") {
-      themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    } else {
-      themeName = theme;
-    }
-    if (window.inkeepWidget) {
-      window.inkeepWidget.render({
-        baseSettings: {
-          theme: {
-            colorMode: {
-              forcedColorMode: themeName,
-            },
-          },
-        },
-      });
-    }
-  };
-
-  const dropdownItems = document.getElementById("theme-dropdown-items");
-  const themeItems = document.querySelectorAll("[data-theme-value]");
-
-  const themeCurrentBtn = document.getElementById("theme-btn");
-  if (themeCurrentBtn) {
-    themeCurrentBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (dropdownItems) {
-        dropdownItems.classList.toggle("d-flex");
-      }
-    });
-  }
-
-  window.addEventListener("click", (e) => {
-    const clickedElement = e.target;
-    if (!clickedElement.matches(".dialect-selector__button")) {
-      if (dropdownItems && dropdownItems.classList.contains("d-flex")) {
-        dropdownItems.classList.remove("d-flex");
-      }
-    }
-  });
-
-  if (themeItems) {
-    themeItems.forEach((element) => {
-      element.addEventListener("click", () => {
-        const theme = element.dataset.themeValue;
-        if (!theme) return;
-        setPreference(theme);
-        updateIcon();
-        dropdownItems.classList.remove("d-flex");
-      });
-    });
-  }
-
-  if (themeSelect) {
-    themeSelect.addEventListener("change", (e) => {
-      const theme = e.target.value;
-      if (!theme) return;
-      setPreference(theme);
-      updateIcon();
-    });
-  }
-
-  updateIcon();
-</script>
 <script>
   const burgerBtn = document.querySelector("[data-nav-burger-btn]");
   const navContainer = document.getElementById("header");
@@ -229,10 +158,6 @@ import GithubStars from './GithubStars.astro'
     top: 0;
     z-index: 20;
     width: 100%;
-  }
-
-  .header__mobile-logo {
-    display: none;
   }
 
   html[class~="dark"] .nav_container_blur {
@@ -361,10 +286,6 @@ import GithubStars from './GithubStars.astro'
     }
     .nav_mobile {
       display: contents;
-    }
-
-    .header__mobile-logo {
-      display: block;
     }
 
     .header::before {
