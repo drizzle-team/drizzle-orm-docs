@@ -47,13 +47,18 @@ We bring all the familiar **[SQL schema](/docs/sql-schema-declaration)**, **[que
 **[automatic migrations](/docs/migrations)** and **[one more thing](/docs/rqb)** ✨
 
 <CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
-```typescript copy
-// Access your data
-await db
-	.select()
-	.from(countries)
-	.leftJoin(cities, eq(cities.countryId, countries.id))
-	.where(eq(countries.id, 10))
+```ts twoslash
+interface IdLabel {id: number, /* some fields */ }
+interface NameLabel {name: string, /* other fields */ }
+type NameOrId<T extends number | string> = T extends number ? IdLabel : NameLabel;
+// This comment should not be included
+
+// ---cut---
+function createLabel<T extends number | string>(idOrName: T): NameOrId<T> {
+  throw "unimplemented"
+}
+
+let a = createLabel("typescript");
 ```
 ```typescript copy
 // manage your schema

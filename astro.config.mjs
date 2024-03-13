@@ -10,6 +10,8 @@ import {
 } from "./integration/astro-code-snippets";
 import sitemap from "@astrojs/sitemap";
 
+import {transformerTwoslash} from "@shikijs/twoslash";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://orm.drizzle.team",
@@ -24,10 +26,10 @@ export default defineConfig({
     defaultStrategy: "viewport",
   },
   integrations: [
-    AutoImport({
-      imports: [codeSnippetAutoImport],
-    }),
-    astroCodeSnippets(),
+    // AutoImport({
+    //   imports: [codeSnippetAutoImport],
+    // }),
+    // astroCodeSnippets(),
     mdx(),
     react({
       experimentalReactChildren: true,
@@ -50,11 +52,12 @@ export default defineConfig({
       ],
     ],
     shikiConfig: {
-      theme: "css-variables",
+      theme: "github-light",
+      transformers: [transformerTwoslash({explicitTrigger: true})],
     },
   },
-  shikiConfig: {
-    wrap: true,
-    skipInline: false,
-  },
+  // shikiConfig: {
+  //   wrap: true,
+  //   skipInline: false,
+  // },
 });
