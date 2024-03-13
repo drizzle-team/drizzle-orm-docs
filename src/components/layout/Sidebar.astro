@@ -1,6 +1,8 @@
 ---
 import Logo from "./Logo.astro";
 import NavDropdown from "./NavDropdown.astro";
+import ThemeSelectorMobile from "./ThemeSelectorMobile.astro";
+import ToggleSections from "./ToggleSections.astro";
 
 const { pathname } = Astro.url;
 
@@ -17,8 +19,7 @@ if (pathname.includes("/guides")) {
 
 <div class="aside invisible" id="aside">
   <div class="aside-content aside-scroll scrollbar">
-    <Logo />
-    <NavDropdown />
+    <ToggleSections />
     <div class="aside__navigation">
       <a
         href="/learn"
@@ -48,25 +49,7 @@ if (pathname.includes("/guides")) {
           activeItem === "latest-releases" && "aside__navigation_item--active",
         ]}>Latest releases</a
       >
-      <div class="theme__mobile">
-        <div class="theme__current-btn theme__current-btn-select">
-          <select id="theme__select" aria-label="Theme selector" title="Select theme" class="theme__select">
-            <option value="system">System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-          <div class="theme_icon" data-current-theme-icon>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92488 18.0751 1.00001 12 1V23Z" fill="currentColor"/>
-            </svg>
-          </div>
-          <div class="theme__chevron">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
-              <polyline points="6 9 12 15 18 9"></polyline></svg>
-          </div>
-        </div>
-      </div>
+      <ThemeSelectorMobile />
     </div>
   </div>
 </div>
