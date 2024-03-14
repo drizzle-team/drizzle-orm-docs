@@ -12,12 +12,11 @@ This guide provides a straightforward approach to migrating a basic **Prisma** p
 
 Regardless of your application type or API layer, the steps to transition from **Prisma** to **Drizzle ORM** remain consistent:
 
-1. Install **Drizzle Kit**
+1. Install **Drizzle ORM** & **Drizzle Kit**
 2. Setup **Drizzle config** file
 3. Introspect your database
-4. Install **Drizzle ORM**
-5. Connect **Drizzle ORM** to your database
-6. Transition your **Prisma** queries to **Drizzle ORM** queries.
+4. Connect **Drizzle ORM** to your database
+5. Transition your **Prisma** queries to **Drizzle ORM** queries
 
 These steps are applicable whether you're developing a REST API (for example, with Express, Koa, or NestJS) or any other type of application that utilizes **Prisma** for database interactions.
 
@@ -178,12 +177,13 @@ This guide uses the following file structure:
 
 <Steps>
 
-#### Install Drizzle Kit
+#### Install Drizzle ORM & Drizzle Kit
 
-The first step is to install **Drizzle Kit** in your project. **Drizzle Kit** - CLI companion for automatic SQL migrations generation and rapid prototyping.
+The first step is to install **Drizzle ORM** and `pg` package which we will use as a driver. The second step is to install **Drizzle Kit** and types for `pg`. [Drizzle Kit](/kit-docs/overview) - CLI companion for automatic SQL migrations generation and rapid prototyping. 
 
 <Npm>
--D drizzle-kit
+drizzle-orm pg
+-D drizzle-kit @types/pg
 </Npm>
 
 #### Setup Drizzle config file
@@ -193,19 +193,19 @@ The first step is to install **Drizzle Kit** in your project. **Drizzle Kit** - 
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
+import 'dotenv/config'; // make sure to install dotenv package
 import type { Config } from 'drizzle-kit';
-import { resolve } from 'node:path';
 
 export default {
   driver: 'pg',
   out: './src/drizzle',
-  schema: [resolve(__dirname, './src/drizzle/schema.ts')],
+  schema: './src/drizzle/schema.ts',
   dbCredentials: {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: process.env.DB_HOST!,
+    port: Number(process.env.DB_PORT!),
+    user: process.env.DB_USERNAME!,
+    password: process.env.DB_PASSWORD!,
+    database: process.env.DB_NAME!,
   },
   // Print all statements
   verbose: true,
@@ -409,15 +409,6 @@ Now we have the following file structure:
  └ 📜 tsconfig.json
 ```
 
-#### Install Drizzle ORM
-
-Also, install the `pg` driver and its types.
-
-<Npm>
-drizzle-orm pg
--D @types/pg
-</Npm>
-
 #### Connect Drizzle ORM to your database
 
 Create a `db.ts` file in the `src/drizzle` folder and set up your database configuration:
@@ -428,11 +419,11 @@ import { Client } from 'pg';
 import * as schema from './schema';
 
 export const client = new Client({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST!,
+  port: Number(process.env.DB_PORT!),
+  user: process.env.DB_USERNAME!,
+  password: process.env.DB_PASSWORD!,
+  database: process.env.DB_NAME!,
 });
 
 // { schema } is used for relational queries
