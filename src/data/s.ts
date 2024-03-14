@@ -151,6 +151,21 @@ export const sponsorsData: ISponsor[] = [
       padding: "6px",
     },
   },
+  {
+    tier: {
+      name: "$250 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "unkey.dev",
+      name: "Unkey",
+      avatarUrl: "/images/unkey.jpeg",
+    },
+    createdAt: "2023-06-11T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];
 
 export default sponsorsData;

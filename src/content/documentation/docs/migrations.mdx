@@ -3,10 +3,10 @@ import Steps from '@components/markdown/Steps.astro';
 
 # Migrations
 The most important thing about Drizzle is that you can use its schema as a source of truth for everything else.<br />
-[drizzle-kit](/kit-docs) is a CLI companion for Drizzle ORM which you can use to generate SQL migrations automatically based on your schema changes
+[drizzle-kit](/kit-docs/overview) is a CLI companion for Drizzle ORM which you can use to generate SQL migrations automatically based on your schema changes
 or apply those changes directly to the database.
 
-See [detailed docs](/kit-docs) for extended examples and walk-throughs.
+See [detailed docs](/kit-docs/overview) for extended examples and walk-throughs.
 
 ## Quick start
 
@@ -121,3 +121,30 @@ await connection.end();
 pnpm tsx src/migrate.ts
 ```
 </Steps>
+
+### Configurations
+
+- **Custom table for migrations**
+
+By default, all information about executed migrations will be stored in the database inside the `__drizzle_migrations` table, 
+and for PostgreSQL, inside the `drizzle` schema. However, you can configure where to store those records.
+
+To add a custom table name for migrations stored inside your database, you should use the `migrationsTable` option
+
+Usage example
+```ts
+await migrate(db, { migrationsFolder: './drizzle', migrationsTable: 'my_migrations' });
+```
+
+- **Custom schema for migrations**
+
+<Callout>
+  Works only with PostgreSQL databases
+</Callout>
+
+To add a custom schema name for migrations stored inside your database, you should use the `migrationsSchema` option
+
+Usage example
+```ts
+await migrate(db, { migrationsFolder: './drizzle', migrationsSchema: 'custom' });
+```
