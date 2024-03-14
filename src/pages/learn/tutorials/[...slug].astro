@@ -5,9 +5,9 @@ import Link from "@mdx/Link.astro";
 import Layout from "@/layouts/LearnLayout.astro";
 
 export async function getStaticPaths() {
-  const releasesEntries = await getCollection("tutorials");
-  return releasesEntries.map((entry) => ({
-    params: { slug: entry.slug },
+  const tutorialEntries = await getCollection("tutorials");
+  return tutorialEntries.map((entry) => ({
+    params: { slug: entry.slug.split("/").at(-1) },
     props: { entry },
   }));
 }
