@@ -1,7 +1,17 @@
 <div class="benchmark__header">
   <div class="benchmark__header_title">Performance</div>
-  <div class="benchmark__header_description">We ran <del>biased</del> meaningful benchmarks for you!</div>
-  <div class="benchmark__header_description">Results are in the awesome dashboard below 👇</div>
+  <div class="benchmark__header_description">
+    We ran <span class="del-word"
+      >biased<svg viewBox="0 0 336 19" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 9.5H327" stroke-width="18" stroke-linecap="round"/>
+        <path d="M9 9.5H327" stroke-width="7" stroke-linecap="round"/>
+        </svg>
+        
+    </span> meaningful benchmarks for you!
+  </div>
+  <div class="benchmark__header_description">
+    Results are in the awesome dashboard below 👇
+  </div>
 </div>
 
 <style>
@@ -29,7 +39,43 @@
     max-width: 500px;
   }
 
-  @media screen and (max-width: 599px){
+  .del-word {
+    position: relative;
+  }
+
+  .del-word svg {
+    position: absolute;
+    top: 60%;
+    transform: translateY(-50%);
+    left: 0;
+    width: 90%;
+    bottom: 0;
+    stroke-width: 14;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  html.dark .del-word svg path:nth-child(1) {
+    stroke: #111;
+  }
+
+  html.dark .del-word svg path:nth-child(2) {
+    stroke: #fff;
+  }
+
+  .del-word svg path:nth-child(1) {
+    stroke: #334155;
+  }
+
+  .del-word svg path:nth-child(2) {
+    stroke: #fff;
+  }
+
+  .benchmark__header_description del {
+    text-decoration-color: #4bb74a;
+  }
+
+  @media screen and (max-width: 599px) {
     .benchmark__header_title {
       font-size: 30px;
     }
