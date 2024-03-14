@@ -4,10 +4,6 @@ import DialectTab from "./DialectTab.astro";
 
 const { slug = "" } = Astro.params;
 
-const svgs = await import.meta.glob<Record<string, any>>("/public/svg/*.svg", {
-  as: "raw",
-});
-
 const current = Object.keys(dialects).find((key) => {
   const item = dialects[key].href.split("/").at(-1);
   const slugDialect = slug.split("/").at(-1);
@@ -33,7 +29,7 @@ const getLinkWithDialect = (dialect: string) => {
           ]}
           href={getLinkWithDialect(dialects[name].href)}
         >
-          <DialectTab card={dialects[name]} svgs={svgs} />
+          <DialectTab card={dialects[name]} />
         </a>
       ))
     }
@@ -41,39 +37,60 @@ const getLinkWithDialect = (dialect: string) => {
 </div>
 
 <style>
+  html.dark .dialect-tabs__container {
+    background-color: #111;
+  }
+
   .dialect-tabs__container {
     position: sticky;
     top: 0;
     display: flex;
-    margin-left: -48px;
-    width: calc(100% + 48px + 40px);
-
-
-    margin-top: -16px;
-    height: 44px;
+    align-items: center;
+    margin-top: -40px;
+    padding-top: 16px;
     z-index: 19;
     margin-bottom: 32px;
+    background-color: #fff;
+  }
+
+  html.dark .dialect-tabs__container::after {
+    background: linear-gradient(180deg, #111, transparent);
+  }
+
+  .dialect-tabs__container::after {
+    background: linear-gradient(180deg, #fff, transparent);
+    content: "";
+    height: 24px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    width: 100%;
   }
 
   html.dark .dialect-tabs {
-    border-bottom: 1px solid rgb(48, 48, 48);
-    border-right: 1px solid rgb(48, 48, 48);
-    background-color: #111;
-    border-top: none;
+    background-color: #000;
+    /* box-shadow: 0rem -.0625rem 0rem .0625rem #000000 inset, 0rem 0rem 0rem .0625rem #000000ff inset; */
+    box-shadow: none;
   }
 
   .dialect-tabs {
-    border-bottom: 1px solid #efefef;
-    border-top: 1px solid #efefef;
-    border-right: 1px solid #efefef;
-    background-color: #ffffff;
     display: flex;
-    width: 100%;
-    height: 44px;
+    align-items: center;
+    width: fit-content;
+    height: 40px;
+    position: relative;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 0 4px;
+    gap: 4px;
+    box-shadow:
+      rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset,
+      rgb(255, 255, 255) 0px 0.5px 0px 1.5px inset;
   }
 
   html.dark .dialect-tabs__tab {
-    background-color: #111111;
+    background-color: #000;
     color: #d5d5d5;
   }
 
@@ -82,73 +99,60 @@ const getLinkWithDialect = (dialect: string) => {
     align-items: center;
     width: fit-content;
     border-radius: 0;
-    padding: 8px 16px;
+    padding: 0 16px;
+    height: 32px;
     gap: 8px;
     font-size: 16px;
     font-weight: 400;
     gap: 8px;
     text-decoration: none;
-    color: #3b3f4b;
-    background-color: #ffffff;
+    color: rgb(33, 39, 46);
+    border-radius: 4px;
   }
 
-  html.dark .dialect-tabs__tab {
-    border-right: 1px solid rgb(48, 48, 48);
-  }
 
-  .dialect-tabs__tab {
-    border-right: 1px solid #efefef;
-  }
-
-  html.dark .dialect-tabs__tab--active {
+  html.dark .dialect-tabs__tab:hover {
     background-color: #171717;
   }
 
+  html.dark .dialect-tabs__tab--active:hover {
+    background-color: #111;
+  }
+
+
+  .dialect-tabs__tab:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  html.dark .dialect-tabs__tab--active {
+    background-color: #111;
+    box-shadow: 0rem 0rem 0rem .0625rem #000000ff inset, 0rem .03125rem 0rem .09375rem #666666ff inset;
+  }
+
   .dialect-tabs__tab--active {
-    background-color: #f8fafc;
+    background-color: #fff;
+    color: #000;
+    box-shadow:
+      rgb(181, 181, 181) 0px -1px 0px 0px inset,
+      rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset,
+      rgb(255, 255, 255) 0px 0.5px 0px 1.5px inset;
+  }
+
+  .dialect-tabs__tab--active:hover {
+    background-color: #fff;
   }
 
   @media screen and (max-width: 1279px) {
     .dialect-tabs__container {
-      margin-left: -24px;
-      width: calc(100% + 24px + 12px);
     }
   }
 
   @media screen and (max-width: 768px) {
     .dialect-tabs__container {
-      margin-left: -16px;
       width: calc(100% + 32px);
-    }
-    .dialect-tabs {
-      max-height: 36px;
     }
   }
 </style>
-<script is:inline>
-  const dialectContainer = document.querySelector(
-    ".documentation-content-wrap",
-  );
-
-  const dialectTabs = document.querySelector(".dialect-tabs");
-
-  const getMaxHeightForDialectTabs = (initialValue, scrollTop, minHeight) => {
-    return Math.max(initialValue - scrollTop, minHeight) + "px";
-  };
-
-  if (dialectContainer && dialectTabs) {
-    const initialTabsHeight = dialectTabs.offsetHeight;
-
-    dialectContainer.addEventListener("scroll", function () {
-      const scrollTop = dialectContainer.scrollTop;
-      dialectTabs.style.height = getMaxHeightForDialectTabs(
-        initialTabsHeight,
-        scrollTop,
-        36,
-      );
-    });
-  }
-</script>
 <script>
   import updateDialectLinks from "@/utils/updateDialectLinks";
 

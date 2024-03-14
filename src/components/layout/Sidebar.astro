@@ -1,0 +1,184 @@
+---
+import Logo from "./Logo.astro";
+import NavDropdown from "./NavDropdown.astro";
+import ThemeSelectorMobile from "./ThemeSelectorMobile.astro";
+import ToggleSections from "./ToggleSections.astro";
+
+const { pathname } = Astro.url;
+
+let activeItem = "overview";
+
+if (pathname.includes("/guides")) {
+  activeItem = "guides";
+} else if (pathname.includes("/tutorials")) {
+  activeItem = "tutorials";
+} else if (pathname.includes("/latest-releases")) {
+  activeItem = "latest-releases";
+}
+---
+
+<div class="aside invisible" id="aside">
+  <div class="aside-content aside-scroll scrollbar">
+    <ToggleSections />
+    <div class="aside__navigation">
+      <a
+        href="/learn"
+        class:list={[
+          "aside__navigation_item",
+          activeItem === "overview" && "aside__navigation_item--active",
+        ]}>Overview</a
+      >
+      <a
+        href="/learn/guides"
+        class:list={[
+          "aside__navigation_item",
+          activeItem === "guides" && "aside__navigation_item--active",
+        ]}>Guides</a
+      >
+      <a
+        href="/learn/tutorials"
+        class:list={[
+          "aside__navigation_item",
+          activeItem === "tutorials" && "aside__navigation_item--active",
+        ]}>Tutorials</a
+      >
+      <a
+        href="/learn/latest-releases"
+        class:list={[
+          "aside__navigation_item",
+          activeItem === "latest-releases" && "aside__navigation_item--active",
+        ]}>Latest releases</a
+      >
+      <ThemeSelectorMobile />
+    </div>
+  </div>
+</div>
+<style>
+  body[class~="banner-shown"] .aside-content {
+    max-height: calc(100vh - 40px);
+  }
+
+  .aside-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100vh - 64px);
+  }
+
+  .aside__navigation {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 24px;
+    gap: 4px;
+  }
+
+  html.dark .aside__navigation_item {
+    color: #9ca3af;
+  }
+
+  html.dark .aside__navigation_item:hover {
+    color: rgb(249, 250, 251);
+    background: rgba(224, 243, 255, 0.05);
+  }
+
+  .aside__navigation_item:hover {
+    color: rgb(17, 24, 39);
+    background: rgb(243, 244, 246);
+  }
+
+  .aside__navigation_item {
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: rgb(107, 114, 128);
+    line-height: 24px;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+  }
+
+  html.dark .aside__navigation_item--active, html.dark .aside__navigation_item--active:hover {
+    color: rgb(0, 138, 230);
+    background-color: rgba(82, 186, 255, 0.1);
+  }
+
+  .aside__navigation_item--active, .aside__navigation_item--active:hover {
+    color: rgb(0, 76, 163);
+    background-color: rgb(224, 239, 255);
+    font-weight: 700;
+  }
+
+  @media screen and (max-width: 768px) {
+    .aside-content,
+    body[class~="banner-shown"] .aside-content {
+      height: inherit;
+      overflow: visible;
+      max-height: inherit;
+    }
+  }
+</style>
+<style is:global>
+  html[class~="dark"] .aside {
+    border-right: 1px solid #303030;
+  }
+
+  .aside {
+    height: 100%;
+    border-right: 1px solid #efefef;
+    display: flex;
+    flex-direction: column;
+    transition-property: all;
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    position: sticky;
+    width: 256px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    box-shadow:
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0.02) 0px 2px 4px 0px,
+      rgba(0, 0, 0, 0.06) 1px 0px 0px 0px;
+    mask-image: linear-gradient(
+      to bottom,
+      #000,
+      #000 calc(100% - 20px),
+      transparent
+    );
+  }
+
+  .aside-scroll {
+    padding: 0 16px 0 24px;
+  }
+
+
+  @media screen and (max-width: 768px) {
+    html.dark .aside {
+      border-right: none;
+      background: #111;
+    }
+
+    .aside {
+      z-index: 100;
+      position: absolute;
+      top: 104px;
+      height: calc(100% - 104px);
+      left: 0;
+      width: 100%;
+      background: #fff;
+      mask-image: none;
+      border-right: none;
+    }
+
+    .aside .logo-wrap {
+      display: none;
+    }
+
+    .aside-scroll {
+      padding: 0 16px 0 16px;
+    }
+  }
+</style>

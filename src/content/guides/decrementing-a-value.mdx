@@ -1,5 +1,6 @@
 ---
-title: SQL Increment value
+title: SQL Decrement value
+slug: decrementing-a-value
 ---
 import Section from "@mdx/Section.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
@@ -13,7 +14,7 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 - [Filters](/docs/operators) and [sql operator](/docs/sql)
 </Prerequisites>
 
-To increment a column value you can use `update().set()` method like below:
+To decrement a column value you can use `update().set()` method like below:
 
 <Section>
 ```ts copy {8}
@@ -24,30 +25,30 @@ const db = drizzle(...)
 await db
   .update(table)
   .set({
-    counter: sql`${table.counter} + 1`,
+    counter: sql`${table.counter} - 1`,
   })
   .where(eq(table.id, 1));
 ```
 
 ```sql
-update "table" set "counter" = "counter" + 1 where "id" = 1;
+update "table" set "counter" = "counter" - 1 where "id" = 1;
 ```
 </Section>
 
-Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom increment function:
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom decrement function:
 
 ```ts copy {4,10,11}
 import { AnyColumn } from 'drizzle-orm';
 
-const increment = (column: AnyColumn, value = 1) => {
-  return sql`${column} + ${value}`;
+const decrement = (column: AnyColumn, value = 1) => {
+  return sql`${column} - ${value}`;
 };
 
 await db
   .update(table)
   .set({
-    counter1: increment(table.counter1),
-    counter2: increment(table.counter2, 10),
+    counter1: decrement(table.counter1),
+    counter2: decrement(table.counter2, 10),
   })
   .where(eq(table.id, 1));
 ```

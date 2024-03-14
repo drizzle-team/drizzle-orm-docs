@@ -1,6 +1,5 @@
 ---
 import { dialects } from "@/data/dialects";
-import DialectSwitcher from "./DialectSwitcher/DialectSwitcher.astro";
 import DialectTabs from "./DialectTabs.astro";
 
 const { slug } = Astro.params;
@@ -9,7 +8,6 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
 {pageHasDialects && <DialectTabs />}
 <div class="header__wrap">
   <h1><slot/></h1>
-  <!-- {pageHasDialects && <DialectSwitcher slug={slug!} />} -->
 </div>
 
 <style>

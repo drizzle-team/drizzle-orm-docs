@@ -1,7 +1,9 @@
 ---
 import type { IHeading, TreeNode } from '@/types/astro';
-import ToggleLib from './ToggleLib.astro';
 import AsideAstro from './AsideAstro.astro';
+import Logo from './Logo.astro';
+import NavDropdown from './NavDropdown.astro';
+import ToggleSections from './ToggleSections.astro';
 
 interface Props {
   slug?: string;
@@ -11,8 +13,40 @@ interface Props {
 
 const { slug, tree, filteredHeadings } = Astro.props;
 ---
-<ToggleLib slug={slug!}/>
+<div class="nav_sticky">
+  <!-- <NavDropdown /> -->
+  <ToggleSections />
+</div>
 <AsideAstro tree={tree} headings={filteredHeadings} slug={slug!}/>
+<style>
+
+html[class~="dark"] .nav_sticky {
+    background-color: #111111;
+  }
+  .nav_sticky {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    padding-bottom: 16px;
+  }
+
+  html.dark .nav_sticky::after {
+    background: linear-gradient(to bottom, #111111 0%, transparent 100%);
+  }
+
+  .nav_sticky::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, #ffffff 0%, transparent 100%);
+    pointer-events: none;
+  }
+</style>
 <style is:global>
   
   html[class~=dark] .nav-item {
@@ -35,10 +69,6 @@ const { slug, tree, filteredHeadings } = Astro.props;
     border-left: 1px solid rgb(209, 213, 219);
   }
 
-  body[class~=banner-shown] .aside-content {
-			max-height: calc(100vh - 104px);
-		}
-
   .aside-content {
     display: flex;
     flex-direction: column;
@@ -46,15 +76,13 @@ const { slug, tree, filteredHeadings } = Astro.props;
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    height: calc(100vh - 64px);
   }
 
   .nav-items {
     display: flex;
     flex-direction: column;
     margin-bottom: auto;
-    margin-top: 16px;
-    padding: 16px 16px 16px 24px;
+    padding: 16px 16px 16px 0;
   }
 
   .nav-item--active {
@@ -154,8 +182,11 @@ const { slug, tree, filteredHeadings } = Astro.props;
 
     .aside-content, body[class~=banner-shown] .aside-content {
       height: inherit;
-      overflow: visible;
       max-height: inherit;
+    }
+
+    [data-headings] {
+      display: none;
     }
   }
 </style>

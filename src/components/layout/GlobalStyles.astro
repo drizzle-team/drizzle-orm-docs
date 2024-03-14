@@ -365,8 +365,8 @@
   }
 
   .search-wrap--centered {
-    width: 100%;
     max-width: 300px;
+    width: 100%;
   }
 
   .search-wrap--centered .DocSearch-Button {
@@ -395,11 +395,6 @@
 
   input:focus-visible {
     box-shadow: none !important;
-  }
-
-  .invisible {
-    opacity: 0 !important;
-    pointer-events: none;
   }
 
   /* CALLOUT */
@@ -573,6 +568,10 @@
 
   .hidden {
     display: none;
+  }
+
+  .relative {
+    position: relative;
   }
 
   .codetabs_wrapper {
@@ -819,6 +818,14 @@
   html[class~="dark"] .steps h4:before {
     border-color: #111111;
     background-color: #262626;
+  }
+
+
+  @media screen and (max-width: 768px) {
+    .invisible {
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 </style>
 
