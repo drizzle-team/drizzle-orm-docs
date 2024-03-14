@@ -10,6 +10,7 @@ import RightAside from "../components/layout/RightAside.astro";
 import Footer from "../components/layout/Footer.astro";
 import DocsSidebar from "../components/layout/DocsSidebar.astro";
 import getContentTree from "@/utils/getContentTree";
+import ThemeScript from '@/components/layout/ThemeScript.astro';
 import type { IHeading } from "@/types/astro";
 
 interface Props {
@@ -39,6 +40,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
     <Header />
     <main class="documentation-container">
       <DocsSidebar tree={tree} headings={filteredHeadings} />
+      <ThemeScript />
       <div class="documentation-content-wrap scrollbar">
         <div class="documentation-content">
           <slot />
