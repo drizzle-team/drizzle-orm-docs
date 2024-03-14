@@ -2,13 +2,15 @@
 import { getCollection } from "astro:content";
 import Layout from "@/layouts/LearnLayout.astro";
 
-const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
-  return id.startsWith("drizzle-with-frameworks/");
-});
+const tutorials = await getCollection("tutorials");
 
-const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
-  return id.startsWith("drizzle-with-db/");
-});
+const formattedTutorials = tutorials.map((tutorial) => (
+  {
+    ...tutorial,
+    slug: tutorial.slug.split("/").at(-1),
+  }
+));
+
 ---
 
 <Layout customTitle="Tutorials">
@@ -16,12 +18,7 @@ const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
     <div class="tutorials_title">Tutorials</div>
   </div>
   <div class="tutorials__items">
-    {drizzleWithFrameworks.map((tutorial) => (
-      <div class="tutorials__item"> <a class="tutorials__item_link" href={`/learn/tutorials/${tutorial.slug}`}>
-          {tutorial.data.title}
-        </a></div>
-    ))}
-    {drizzleWithDb.map((tutorial) => (
+    {formattedTutorials.map((tutorial) => (
       <div class="tutorials__item"> <a class="tutorials__item_link" href={`/learn/tutorials/${tutorial.slug}`}>
           {tutorial.data.title}
         </a></div>

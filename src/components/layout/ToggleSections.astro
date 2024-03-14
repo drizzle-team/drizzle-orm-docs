@@ -1,5 +1,5 @@
 ---
-import BracketsIcon from "@components/Icons/BracketsIcon.astro";
+import LayersIcon from "@components/Icons/LayersIcon.astro";
 import DocsIcon from "@components/Icons/DocsIcon.astro";
 import LearnIcon from "@components/Icons/LearnIcon.astro";
 
@@ -13,6 +13,14 @@ const slug = Astro.url.pathname || "";
         <DocsIcon />
       </div>
       <div class="text">Docs</div>
+    </div>
+  </a>
+  <a href="/kit-docs/overview">
+    <div class:list={["button", slug.startsWith("/kit-docs") && "selected"]}>
+      <div class="icon layers">
+        <LayersIcon />
+      </div>
+      <div class="text">Drizzle Kit</div>
     </div>
   </a>
   <a href="/learn">
@@ -148,6 +156,11 @@ const slug = Astro.url.pathname || "";
   .wrap .icon svg {
     width: 20px;
     height: 20px;
+  }
+
+  .wrap .layers svg {
+    width: 24px;
+    height: 24px;
   }
 
   html.dark .button:not(.selected):hover .docs svg {
