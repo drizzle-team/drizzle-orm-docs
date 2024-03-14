@@ -1,46 +1,19 @@
 ---
 import { getCollection } from "astro:content";
 
-import DrizzleLogo from "@components/Icons/DrizzleLogo";
-import HandDrawnArrowRightIcon from "@components/Icons/HandDrawnArrowRightIcon.astro";
-import PrismaIcon from "@components/Icons/PrismaIcon";
-import SequelizeIcon from "@components/Icons/SequelizeIcon.astro";
-import TypeORMIcon from "@components/Icons/TypeORMIcon.astro";
+const tutorials = await getCollection("tutorials");
 
-const drizzleWithFrameworks = await getCollection("tutorials", ({ id }) => {
-  return id.startsWith("drizzle-with-frameworks/");
-});
-
-const drizzleWithDb = await getCollection("tutorials", ({ id }) => {
-  return id.startsWith("drizzle-with-db/");
-});
+const formattedTutorials = tutorials.map((tutorial) => (
+  {
+    ...tutorial,
+    slug: tutorial.slug.split("/").at(-1),
+  }
+));
 ---
 
 <div class="learn__migrate-from_cards">
   {
-    drizzleWithFrameworks.map((card) => (
-      <a
-        href={`/learn/tutorials/${card.slug}`}
-        class="tutorials__section__card"
-      >
-        <div class="tutorials__section__card_icons">
-          {card.data.svgs.map((svg: string, index: number) => (
-            <>
-              <Fragment set:html={svg} />
-              {index !== card.data.svgs.length - 1 ? (
-                <div>🤝</div>
-              ) : null}
-            </>
-          ))}
-        </div>
-        <div class="tutorials__section__card_title">
-          {card.data.title}
-        </div>
-      </a>
-    ))
-  }
-  {
-    drizzleWithDb.map((card) => (
+    formattedTutorials.map((card) => (
       <a
         href={`/learn/tutorials/${card.slug}`}
         class="tutorials__section__card"
