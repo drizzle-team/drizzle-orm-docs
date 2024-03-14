@@ -9,7 +9,6 @@ import Footer from "../components/layout/Footer.astro";
 import getContentTree from "@/utils/getContentTree";
 import type { IHeading } from "@/types/astro";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
-import ThemeScript from "@components/layout/ThemeScript.astro";
 
 interface Props {
   customTitle?: string;
@@ -37,7 +36,6 @@ const { title } = await getContentTree({
     <MDXStyles />
     <Banner />
     <NavigationAstro />
-    <ThemeScript />
     <main class:list={["documentation-container scrollbar", isStudio && "relative"]}>
       <div class="documentation-content">
         <slot />
