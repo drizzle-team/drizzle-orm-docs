@@ -1,7 +1,7 @@
 ---
-import Twit from './Twit.astro';
-import TwitPlaceholder from './TwitPlaceholder.astro';
-import { Comments } from './Comments.ts';
+import Twit from "./Twit.astro";
+import TwitPlaceholder from "./TwitPlaceholder.astro";
+import { Comments } from "./Comments.ts";
 ---
 
 <div class="wrap">
@@ -9,85 +9,91 @@ import { Comments } from './Comments.ts';
   <div class="grid_scroll">
     <div class="grid_wrapper">
       <div class="grid">
-        {Comments.map((c) => {
-          if (c.name) {
-            return <Twit twit={c} />;
-          }
-          return <TwitPlaceholder />;
-        })}
+        {
+          Comments.map((c) => {
+            if (c.name) {
+              return c.href ? (
+                <a href={c.href} target="_blank" rel="noreferrer nofollow">
+                  <Twit twit={c} />
+                </a>
+              ) : (
+                <Twit twit={c} />
+              );
+            }
+            return <TwitPlaceholder />;
+          })
+        }
       </div>
     </div>
   </div>
 </div>
 <style>
-.wrap {
+  .wrap {
     display: flex;
     flex-direction: column;
     gap: 30px;
     margin-top: 160px;
-}
+  }
 
-.header {
+  .header {
     text-align: center;
     font-size: 32px;
     font-weight: 600;
-}
+  }
 
-.grid {
+  .grid {
     column-gap: 20px;
     column-fill: initial;
     column-count: 3;
-}
+  }
 
-.top_twits {
+  .top_twits {
     display: none;
-}
+  }
 
-.column {
+  .column {
     display: flex;
     flex-direction: column;
     gap: 20px;
-}
+  }
 
-@media (max-width: 900px) {
+  @media (max-width: 900px) {
     .header {
-        font-size: 20px;
+      font-size: 20px;
     }
-}
+  }
 
-@media (max-width: 767px) {
+  @media (max-width: 767px) {
     .grid {
-        column-count: 2;
+      column-count: 2;
     }
-}
+  }
 
-
-@media (max-width: 599px) {
+  @media (max-width: 599px) {
     .grid_scroll {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-        overflow-x: auto;
-        overflow-y: hidden;
-        width: 100vw;
-        margin-left: -24px;
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100vw;
+      margin-left: -24px;
     }
     .grid_scroll::-webkit-scrollbar {
-        display: none;
+      display: none;
     }
     .grid_wrapper {
-        width: fit-content;
+      width: fit-content;
     }
     .grid {
-        column-count: 3;
-        width: 100%;
-        padding: 0 24px;
-        column-gap: 10px;
+      column-count: 3;
+      width: 100%;
+      padding: 0 24px;
+      column-gap: 10px;
     }
     .top_twits {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-}
-
+  }
 </style>
