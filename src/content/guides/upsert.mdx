@@ -1,0 +1,124 @@
+---
+title: Upsert Query
+slug: upsert
+---
+
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- [Insert statement](/docs/insert) and [onDuplicateKeyUpdate method](/docs/insert#on-duplicate-key-update)
+- [Composite primary key](/docs/indexes-constraints#composite-primary-key)
+</Prerequisites>
+
+To implement an upsert query in PostgreSQL and SQLite with Drizzle you can use `.onConflictDoUpdate()` method:
+
+<Section>
+```ts copy {8,9,10,11}
+import { users } from './schema';
+
+const db = drizzle(...);
+
+await db
+  .insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { name: 'Super John' },
+  });
+```
+
+```sql
+insert into users ("id", "name") values (1, 'John')
+  on conflict ("id") do update set name = 'Super John';
+```
+</Section>
+
+This is how you can implement an upsert query with array of values in PostgreSQL and SQLite:
+
+<Section>
+```ts copy {5,8}
+import { sql } from 'drizzle-orm';
+
+await db
+  .insert(users)
+  .values(values) // array of values
+  .onConflictDoUpdate({
+    target: [users.id],
+    set: { lastLogin: sql`excluded.last_login` }, // update with the new value
+  });
+```
+
+```sql
+insert into users ("id", "name", "last_login")
+  values (1, 'John', '2024-03-15T13:13:42.035Z'), ...other_values
+  on conflict ("id") do update set last_login = excluded.last_login;
+```
+</Section>
+
+This is how you can implement an upsert query with multiple targets in PostgreSQL and SQLite:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { inventory } from './schema';
+
+await db
+  .insert(inventory)
+  .values({ warehouseId: 1, productId: 1, quantity: 100 })
+  .onConflictDoUpdate({
+    target: [inventory.warehouseId, inventory.productId], // composite primary key
+    set: { quantity: sql`${inventory.quantity} + 100` }, // add 100 to the existing quantity
+  });
+```
+
+```sql
+insert into inventory ("warehouse_id", "product_id", "quantity") values (1, 1, 100)
+  on conflict ("warehouse_id","product_id") do update set quantity = quantity + 100;
+```
+</Section>
+
+To implement an upsert query in MySQL with Drizzle you can use `.onDuplicateKeyUpdate()` method. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if any unique index conflicts.
+
+This is how you can do it:
+
+<Section>
+```ts copy {4}
+await db
+  .insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { name: 'Super John' } });
+```
+
+```sql
+insert into users (`id`, `first_name`) values (1, 'John')
+  on duplicate key update first_name = 'Super John';
+```
+</Section>
+
+This is how you can implement an upsert query with array of values in MySQL:
+
+<Section>
+```ts copy {5,8}
+import { sql } from 'drizzle-orm';
+
+await db
+  .insert(users)
+  .values(values) // array of values
+  .onDuplicateKeyUpdate({
+    set: {
+      lastLogin: sql`values(last_login)`, // update with the new value
+    },
+  });
+```
+
+```sql
+insert into users (`id`, `name`, `last_login`)
+  values (1, 'John', '2024-03-15 13:30:59.407'), ...other_values
+  on duplicate key update last_login = values(last_login);
+```
+</Section>
