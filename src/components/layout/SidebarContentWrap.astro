@@ -3,6 +3,7 @@ import type { IHeading, TreeNode } from '@/types/astro';
 import AsideAstro from './AsideAstro.astro';
 import Logo from './Logo.astro';
 import NavDropdown from './NavDropdown.astro';
+import ToggleSections from './ToggleSections.astro';
 
 interface Props {
   slug?: string;
@@ -13,8 +14,8 @@ interface Props {
 const { slug, tree, filteredHeadings } = Astro.props;
 ---
 <div class="nav_sticky">
-  <Logo />
-  <NavDropdown />
+  <!-- <NavDropdown /> -->
+  <ToggleSections />
 </div>
 <AsideAstro tree={tree} headings={filteredHeadings} slug={slug!}/>
 <style>
