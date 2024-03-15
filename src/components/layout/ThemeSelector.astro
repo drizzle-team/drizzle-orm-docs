@@ -19,15 +19,6 @@ const { isAccent } = Astro.props;
       </div>
     </div>
     <div id="theme-dropdown-items" class="theme__items">
-      <div data-theme-value="system" class="theme__item">
-        <div class="theme_icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92488 18.0751 1.00001 12 1V23Z" fill="currentColor"/>
-          </svg>
-        </div>
-        System
-      </div>
       <div data-theme-value="light" class="theme__item">
         <div class="theme_icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -47,6 +38,15 @@ const { isAccent } = Astro.props;
           </svg>
         </div>
         Dark
+      </div>
+      <div data-theme-value="system" class="theme__item">
+        <div class="theme_icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92488 18.0751 1.00001 12 1V23Z" fill="currentColor"/>
+          </svg>
+        </div>
+        System
       </div>
     </div>
   </div>
@@ -73,6 +73,10 @@ html[class~=dark] .theme__current-btn:hover {
 
 html.dark .theme__current-btn--accent {
   color: #e1e3e6;
+}
+
+.theme__current-btn--accent {
+  color: #4b5563;
 }
 
 html[class~=dark] .theme__current-btn {
