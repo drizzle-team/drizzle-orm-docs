@@ -63,6 +63,8 @@ await db.insert(users)
   .onConflictDoNothing({ target: users.id });
 ```
 
+### On conflict do update
+
 This is how you upsert with `onConflictDoUpdate`, you can specify `set` and `where` clauses.
 
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
