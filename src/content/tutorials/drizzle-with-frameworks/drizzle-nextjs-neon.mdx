@@ -329,7 +329,7 @@ const Todo: FC<Props> = ({
 
   // Event handler for toggling "done" status
   const handleIsDone = async () => {
-    toggleIsTodoDone(todo.id, !isDone);
+    toggleIsTodoDone(todo.id);
     setIsDone((prev) => !prev);
   };
 
@@ -511,11 +511,11 @@ export const deleteTodo = async (id: number) => {
   revalidatePath("/");
 };
 
-export const toggleTodo = async (id: number, done: boolean) => {
+export const toggleTodo = async (id: number) => {
   await db
     .update(todo)
     .set({
-      done: done,
+      done: not(todo.done),
     })
     .where(eq(todo.id, id));
 
