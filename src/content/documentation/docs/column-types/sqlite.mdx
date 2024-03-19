@@ -280,9 +280,9 @@ const table = sqliteTable("table", {
 
 ```sql
 CREATE TABLE `table` (
-	`time` text DEFAULT CURRENT_TIME
-	`date` text DEFAULT CURRENT_DATE
-	`timestamp` text DEFAULT CURRENT_TIMESTAMP
+	`time` text DEFAULT (CURRENT_TIME)
+	`date` text DEFAULT (CURRENT_DATE)
+	`timestamp` text DEFAULT (CURRENT_TIMESTAMP)
 );
 ```
 </Section>
