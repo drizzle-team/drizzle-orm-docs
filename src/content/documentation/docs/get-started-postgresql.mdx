@@ -7,6 +7,7 @@ import AnchorCards from '@components/markdown/AnchorCards.astro';
 
 <AnchorCards cards={{
   "Neon": "#neon",
+  "Xata": "#xata",
   "Postgres.JS": "#postgresjs",
   "node-postgres": "#node-postgres",
   "Vercel Postgres" : "#vercel-postgres",
@@ -68,7 +69,7 @@ According their **[official website](https://xata.io)**, Xata is a Postgres data
 Drizzle ORM natively supports both the `xata` driver with `drizzle-orm/xata` package and the **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)** drivers for accessing a Xata Postgres database.
 
 <Npm>
-drizzle-orm @xata.io/drizzle @xata.io/client
+drizzle-orm @xata.io/client
 -D drizzle-kit
 </Npm>
 
@@ -79,7 +80,7 @@ The following example use the Xata generated client, which you obtain by running
 <Tabs items={['HTTP', 'TCP', 'TCP (pool)']}>
 <Tab>
 ```typescript copy filename="index.ts"
-import { drizzle } from '@xata.io/drizzle';
+import { drizzle } from 'drizzle-orm/xata-http';
 import { getXataClient } from './xata'; // Generated client
 
 const xata = getXataClient();
@@ -90,7 +91,7 @@ const result = await db.select().from(...);
 </Tab>
 <Tab>
 ```typescript copy filename="index.ts"
-import { drizzle } from '@xata.io/drizzle/pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { getXataClient } from './xata'; // Generated client
 import { Client } from 'pg';
 
@@ -101,7 +102,7 @@ const db = drizzle(client);
 </Tab>
 <Tab>
 ```typescript copy filename="index.ts"
-import { drizzle } from '@xata.io/drizzle/pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { getXataClient } from './xata'; // Generated client
 import { Pool } from 'pg';
 
