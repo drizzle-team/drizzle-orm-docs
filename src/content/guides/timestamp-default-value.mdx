@@ -1,6 +1,6 @@
 ---
-title: SQL Current timestamp
-slug: current-timestamp
+title: SQL Timestamp as a default value
+slug: timestamp-default-value
 ---
 
 import Section from "@mdx/Section.astro";
@@ -19,7 +19,7 @@ import CodeTab from '@components/markdown/CodeTab.astro';
 
 ### SQLite
 
-To implement `current_timestamp` in SQLite with Drizzle, you can use the `sql`` operator` and `unixepoch()` function to get the current timestamp in seconds:
+To implement unix timestamp as a default value in SQLite with Drizzle, you can use the `sql`` operator` and `unixepoch()` function to get the number of seconds since `1970-01-01 00:00:00 UTC`:
 
 <CodeTabs items={["schema.ts", "migration.sql"]}>
   <CodeTab>
@@ -45,7 +45,7 @@ To implement `current_timestamp` in SQLite with Drizzle, you can use the `sql`` 
   ```
 </CodeTabs>
 
-The `mode` option defines how values are handled in the application. With `timestamp` mode, values are treated as `Date` objects for ease of use, but stored as integer timestamp in the database.
+The `mode` option defines how values are handled in the application. With `timestamp` mode, values are treated as `Date` objects for ease of use, but stored as unix timestamp in the database.
 
 <Section>
 ```ts copy {2,5}
@@ -77,7 +77,7 @@ Stored data in db
 ```
 </Section>
 
-You can also use `unixepoch()` equivalent - `strftime('%s')` function with `%s` format which returns seconds since 1970-01-01, but according to the [SQLite documentation](https://www.sqlite.org/lang_datefunc.html), `unixepoch()` is more efficient and recommended because it does not incur the format conversion costs or inexactitude resulting from use of the '%s' format specifier.
+You can also use `unixepoch()` equivalent - `strftime('%s')` function with `%s` format which returns seconds since `1970-01-01`, but according to the [SQLite documentation](https://www.sqlite.org/lang_datefunc.html), `unixepoch()` is more efficient and recommended because it does not incur the format conversion costs or inexactitude resulting from use of the `%s` format specifier.
 
 ```ts copy {9}
 import { sql } from 'drizzle-orm';
