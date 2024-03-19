@@ -89,6 +89,17 @@ const Databases: {
       fill: "#F0F0F0",
     },
   },
+  MariaDB: {
+    imageSrc: "/public/svg/mariadb.svg",
+    lightStyle: {
+      width: 24,
+      fill: "#00546B",
+    },
+    darkStyle: {
+      width: 24,
+      fill: "#F0F0F0",
+    },
+  },
   SQLite: {
     imageSrc: "/public/svg/sqlite.svg",
     lightStyle: {
