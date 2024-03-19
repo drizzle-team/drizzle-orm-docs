@@ -512,7 +512,7 @@ select count(distinct "id") from "users";
 ```ts
 // It's equivalent to writing
 await db.select({ 
-  value: sql`count(${users.id})`.mapWith(Number) 
+  value: sql`count(distinct ${users.id})`.mapWith(Number) 
 }).from(users);
 ```
 </Section>
