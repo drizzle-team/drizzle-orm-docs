@@ -13,6 +13,7 @@ import FredKSchott from "@/assets/images/twits/FredKSchott.jpg";
 import JacobWolf from "@/assets/images/twits/JacobWolf.jpg";
 import jamesrperkinsTwit from "@/assets/images/twits/jamesrperkinsTwit.png";
 import saltyAomTwit from "@/assets/images/twits/saltyAomTwit.jpg";
+import EddyVinckk from "@/assets/images/twits/EddyVinckk.jpg";
 
 // Twit images
 
@@ -56,11 +57,11 @@ const Comments: IComment[] = [
     text: "Django had it in 2008",
   },
   {
-    avatar: JacobWolf,
-    name: "Jacob Wolf 🐝",
-    login: "JacobWolf",
-    text: "I love @DrizzleORM.",
-    href: "https://x.com/JacobWolf/status/1768061278776349151?s=20",
+    avatar: EddyVinckk,
+    name: "Eddy Vinck",
+    login: "EddyVinckk",
+    text: `I love @DrizzleORM\n\nthat's it, that's the tweet`,
+    href: "https://x.com/EddyVinckk/status/1770052528941478333?s=20",
   },
   {
     avatar: t3dotgg,
@@ -90,6 +91,13 @@ const Comments: IComment[] = [
     text: "Sorry @DrizzleORM you suck!",
     href: "https://x.com/james_r_perkins/status/1766156735155196201?s=20",
     twitImage: jamesrperkinsTwit,
+  },
+  {
+    avatar: JacobWolf,
+    name: "Jacob Wolf 🐝",
+    login: "JacobWolf",
+    text: "I love @DrizzleORM.",
+    href: "https://x.com/JacobWolf/status/1768061278776349151?s=20",
   },
   {
     avatar: FredKSchott,
