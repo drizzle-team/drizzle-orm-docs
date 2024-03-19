@@ -1,0 +1,97 @@
+---
+title: SQL Current timestamp
+slug: current-timestamp
+---
+
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@components/markdown/Callout.astro';
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+
+<IsSupportedChipGroup chips={{PostgreSQL: false, MySQL: false, SQLite: true}}/>
+
+<Prerequisites>
+- Get started with [SQLite](/docs/get-started-sqlite)
+- [sql operator](/docs/sql)
+</Prerequisites>
+
+### SQLite
+
+To implement `current_timestamp` in SQLite with Drizzle, you can use the `sql`` operator` and `unixepoch()` function to get the current timestamp in seconds:
+
+<CodeTabs items={["schema.ts", "migration.sql"]}>
+  <CodeTab>
+  ```ts copy {7,8,9}
+    import { sql } from 'drizzle-orm';
+    import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+    export const users = sqliteTable('users', {
+      id: integer('id').primaryKey(),
+      name: text('name').notNull(),
+      createdAt: integer('created_at', { mode: 'timestamp' })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    });
+    ```
+  </CodeTab>
+  ```sql
+  CREATE TABLE `users` (
+    `id` integer PRIMARY KEY NOT NULL,
+    `name` text NOT NULL,
+    `created_at` integer DEFAULT (unixepoch()) NOT NULL
+  );
+  ```
+</CodeTabs>
+
+The `mode` option defines how values are handled in the application. With `timestamp` mode, values are treated as `Date` objects for ease of use, but stored as integer timestamp in the database.
+
+<Section>
+```ts copy {2,5}
+// insert row with default value for createdAt
+await db.insert(users).values({ name: 'John Doe' });
+
+// insert row with custom value for createdAt
+await db.insert(users).values({ name: 'Jane Doe', createdAt: new Date() });
+```
+
+
+```plaintext
+Stored data in db
++----+----------+------------+
+| id | name     | created_at |
++----+----------+------------+
+|  1 | John Doe | 1710857384 |
++----+----------+------------+
+|  2 | Jane Doe | 1710857384 |
++----+----------+------------+
+```
+
+```ts
+// Result after select
+[
+  { id: 1, name: 'John Doe', createdAt: 2024-03-19T14:09:44.000Z },
+  { id: 2, name: 'Jane Doe', createdAt: 2024-03-19T14:09:44.000Z }
+]
+```
+</Section>
+
+You can also use `unixepoch()` equivalent - `strftime('%s')` function with `%s` format which returns seconds since 1970-01-01, but according to the [SQLite documentation](https://www.sqlite.org/lang_datefunc.html), `unixepoch()` is more efficient and recommended because it does not incur the format conversion costs or inexactitude resulting from use of the '%s' format specifier.
+
+```ts copy {9}
+import { sql } from 'drizzle-orm';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(strftime('%s'))`),
+});
+```
+
+<Callout type="warning">
+When declaring default value in `sql`` operator` you are responsible for ensuring that the value is in the correct format (statement or just value). So, if you use  function in `sql`` operator`, make sure to wrap it in parentheses to ensure it's properly interpreted as a separate statement (e.g. `(unixepoch())`). 
+</Callout>
