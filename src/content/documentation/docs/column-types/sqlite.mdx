@@ -272,9 +272,9 @@ import { sql } from "drizzle-orm";
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable("table", {
-  time: text("time").default(sql`CURRENT_TIME`),
-  date: text("date").default(sql`CURRENT_DATE`),
-  timestamp: text("timestamp").default(sql`CURRENT_TIMESTAMP`),
+  time: text("time").default(sql`(CURRENT_TIME)`),
+  date: text("date").default(sql`(CURRENT_DATE)`),
+  timestamp: text("timestamp").default(sql`(CURRENT_TIMESTAMP)`),
 });
 ```
 
