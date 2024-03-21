@@ -24,7 +24,7 @@ Here, we're installing the necessary packages: **`drizzle-orm`** for database in
 
 #### Connect Drizzle ORM to the Neon database
 
-```tsx
+```tsx copy filename="db/drizzle.ts"
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 
@@ -42,7 +42,7 @@ In this snippet, we import functionality from **`@neondatabase/serverless`** and
 
 **Then, set up** the Drizzle configuration. **Drizzle config** is a configuration file used by **Drizzle Kit**. It contains all the information about your database connection, migration folder, and schema files.
 
-```tsx
+```tsx copy filename="drizzle.config.ts"
 import "dotenv/config";
 import type {Config} from "drizzle-kit";
 
@@ -60,7 +60,7 @@ This configuration file specifies the database schema location, path for generat
 
 #### Declare todos schema
 
-```tsx
+```tsx copy filename="db/schema.ts"
 import { integer, text, boolean, pgTable } from "drizzle-orm/pg-core";
 
 export const todo = pgTable("todo", {
@@ -99,7 +99,7 @@ npx drizzle-kit push:pg
 <Tabs items={['Add todo', 'Get todos', 'Edit todo', 'Toggle todo', 'Delete todo']}>
   <Tab>
     <Section>
-    ```tsx
+    ```tsx copy filename="actions/todoActions.ts"
     import db from "@/db/drizzle";
     import { todo } from "@/db/schema";
 
@@ -115,7 +115,7 @@ npx drizzle-kit push:pg
   </Tab> 
   <Tab>
     <Section>
-    ```tsx
+    ```tsx copy filename="actions/todoActions.ts"
     import db from "@/db/drizzle";
     import { todo } from "@/db/schema";
     import { asc } from 'drizzle-orm';
@@ -130,7 +130,7 @@ npx drizzle-kit push:pg
   </Tab>
   <Tab>
     <Section>
-    ```tsx
+    ```tsx copy filename="actions/todoActions.ts"
     import db from "@/db/drizzle";
     import { todo } from "@/db/schema";
     import { eq } from 'drizzle-orm';
@@ -148,7 +148,7 @@ npx drizzle-kit push:pg
   </Tab>
   <Tab>
     <Section>
-    ```tsx
+    ```tsx copy filename="actions/todoActions.ts"
     import db from "@/db/drizzle";
     import { todo } from "@/db/schema";
     import { eq, not } from 'drizzle-orm';
@@ -166,7 +166,7 @@ npx drizzle-kit push:pg
   </Tab>
     <Tab>
     <Section>
-    ```tsx
+    ```tsx copy filename="actions/todoActions.ts"
     import db from "@/db/drizzle";
     import { todo } from "@/db/schema";
     import { eq } from 'drizzle-orm';

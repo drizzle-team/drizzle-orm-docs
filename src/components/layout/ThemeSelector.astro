@@ -1,6 +1,16 @@
+---
+import ThemeScript from './ThemeScript.astro';
+
+interface Props { 
+  isAccent?: boolean;
+}
+
+const { isAccent } = Astro.props;
+---
+
 <div class="theme__desktop">
   <div class="theme__wrap">
-    <div class="theme__current-btn" id="theme-btn">
+    <div class:list={["theme__current-btn", isAccent && 'theme__current-btn--accent']} id="theme-btn">
       <div class="theme_icon" data-current-theme-icon>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -41,6 +51,7 @@
     </div>
   </div>
 </div>
+<ThemeScript />
 
 <style is:global>
 .theme__desktop {
@@ -55,8 +66,13 @@
 }
 
 html[class~=dark] .theme__current-btn:hover {
-  background-color: #171717;
-  border-color: #404040;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #686868;
+  color: #e1e3e6;
+}
+
+html.dark .theme__current-btn--accent {
+  color: #e1e3e6;
 }
 
 html[class~=dark] .theme__current-btn {
@@ -65,8 +81,11 @@ html[class~=dark] .theme__current-btn {
 }
 
 .theme__current-btn:hover {
-  background-color: #f8fafc;
-  border-color: #d1d5db;
+  border-color: #b8bfc8;
+}
+
+.theme__current-btn--accent:hover {
+  color: #000;
 }
 
 .theme__current-btn {
@@ -87,6 +106,7 @@ html[class~=dark] .theme__current-btn {
   z-index: 5;
   cursor: pointer;
   gap: 2px;
+  transition: all .2s ease;
 }
 
 html[class~=dark] .theme__items {

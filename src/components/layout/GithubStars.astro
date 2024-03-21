@@ -14,7 +14,9 @@ const { stars, isAccent} = Astro.props;
 <style>
 
   html.dark .github-stars_wrap:hover {
-    color: #fff;
+    color: #e1e3e6;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #686868;
   }
 
   html.dark .github-stars_wrap {
@@ -25,6 +27,7 @@ const { stars, isAccent} = Astro.props;
 
   .github-stars_wrap:hover {
     color: #000;
+    border-color: #b8bfc8;
   }
 
   .github-stars_wrap {
@@ -37,7 +40,7 @@ const { stars, isAccent} = Astro.props;
     background-color: hsla(210, 7%, 95%, .27);
     border: 1px solid rgba(33, 39, 46, .12);
     color: #909090;
-    transition: color 0.2s ease-in-out;
+    transition: all 0.2s ease;
   }
 
   .github-stars__wrap_number {

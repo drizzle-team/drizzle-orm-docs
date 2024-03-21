@@ -69,7 +69,9 @@ const sponsorsHandler = async () => {
   coffee = coffee.filter((s) => filterFunc(s));
 
   pastSponsors = pastSponsors.filter(
-    (s) => s.sponsorEntity.login !== "chiselstrike",
+    (s) =>
+      s.sponsorEntity.login !== "chiselstrike" &&
+      s.sponsorEntity.login !== "unkeyed",
   );
 
   const arrays = [

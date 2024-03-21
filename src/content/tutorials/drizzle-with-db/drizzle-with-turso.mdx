@@ -57,7 +57,7 @@ drizzle-orm @libsql/client
 
 To connect Drizzle ORM with your Turso database, you'll need to create a client using the **`@libsql/client`** package, configuring it with the connection URL and authentication token from your **`.env`** file. This client is then passed to Drizzle to establish the connection.
 
-```tsx
+```tsx copy filename="src/db/db.ts"
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
@@ -72,7 +72,7 @@ export const db = drizzle(client);
 
 **Then, set up** the Drizzle configuration. **Drizzle config** is a configuration file used by **Drizzle Kit**. It contains all the information about your database connection, migration folder, and schema files.
 
-```tsx
+```tsx copy filename="drizzle.config.ts"
 import 'dotenv/config';
 import type { Config } from 'drizzle-kit';
 
@@ -91,7 +91,7 @@ This configuration file specifies the database schema location, path for generat
 
 Finally, you'll define the schemas for your database tables. In this guide, two schemas are created: **`users`** and **`posts`**.
 
-```tsx
+```tsx copy filename="src/db/schema.ts"
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -208,7 +208,7 @@ For instance, we will create `user.ts`  and `post.ts`  files in `src/functions` 
 
 The functions **`insertUser`** and **`insertPost`** are straightforward examples of how to insert data into the **`users`** and **`posts`** tables.
 
-```tsx
+```tsx copy filename="src/functions/user.ts"
 import { db } from '../db/db';
 import { InsertUser, users } from '../db/schema';
 
@@ -217,7 +217,7 @@ export async function insertUser(data: InsertUser): Promise<void> {
 }
 ```
 
-```tsx
+```tsx copy filename="src/functions/post.ts"
 import { db } from '../db/db';
 import { InsertPost, posts } from '../db/schema';
 
@@ -230,7 +230,7 @@ export async function insertPost(data: InsertPost): Promise<void> {
 
 The function **`getUserWithPosts`** is straightforward example of how to retrieve data with relation:
 
-```tsx
+```tsx copy filename="src/functions/user.ts"
 import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { SelectPost, SelectUser, users, posts } from '../db/schema';
@@ -254,7 +254,7 @@ Alternatively, you can use [relational queries](https://orm.drizzle.team/docs/rq
 
 The **`patchPost`** function illustrates how to update existing records. It highlights the use of the **`returning()`** function to fetch the updated records after the operation.
 
-```tsx
+```tsx copy filename="src/functions/post.ts"
 import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { posts, SelectPost } from '../db/schema';
@@ -273,7 +273,7 @@ export async function patchPost(
 
 Finally, the **`deleteUser`** function shows how to remove a user from the database. Due to the relational integrity constraints defined in your schema (e.g., cascade delete), deleting a user will also remove all their associated posts.
 
-```tsx
+```tsx copy filename="src/functions/user.ts"
 import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { SelectUser, users } from '../db/schema';

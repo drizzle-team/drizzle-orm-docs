@@ -1,4 +1,11 @@
+import CenteredLayout from "../layouts/CenteredLayout.astro";
+import BenchmarkHeader from "@components/layout/BenchmarkHeader.astro";
+
 import MdxBenchmark from "@components/LandingPage/Benchmark/MdxBenchmark";
+
+<CenteredLayout customTitle="Benchmarks">
+
+<BenchmarkHeader />
 
 <MdxBenchmark client:load />
 
@@ -67,3 +74,4 @@ pnpm start:prisma
 const host = `http://192.168.31.144:3001`; // prisma
 ```
 4. Run tests with `k6 run bench.js` 🚀
+</CenteredLayout>

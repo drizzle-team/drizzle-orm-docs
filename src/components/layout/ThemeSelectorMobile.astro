@@ -1,3 +1,7 @@
+---
+import ThemeMobileScript from '@/components/layout/ThemeMobileScript.astro';
+---
+
 <div class="theme__mobile">
   <div class="theme__current-btn theme__current-btn-select">
     <select
@@ -33,6 +37,7 @@
     </div>
   </div>
 </div>
+<ThemeMobileScript />
 <style is:global>
   .theme__mobile {
     display: none;
@@ -52,19 +57,14 @@
     background: none;
   }
 
-  html[class~=dark] .theme__current-btn:hover {
-  background-color: #171717;
-  border-color: #404040;
-}
-
 html[class~=dark] .theme__current-btn {
   background-color: #111;
   border-color: #404040;
 }
 
 .theme__current-btn:hover {
-  background-color: #f8fafc;
-  border-color: #d1d5db;
+  border-color: #b8bfc8;
+  color: #000;
 }
 
 .theme__current-btn {
