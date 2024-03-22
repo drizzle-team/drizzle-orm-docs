@@ -4,7 +4,7 @@ import Logo from './Logo.astro';
 
 <div class="wrap">
   <div class="container">
-    <div class="footer-top-container">
+    <div class="content">
       <div class="logo-container">
         <div>
           <Logo />
@@ -112,7 +112,7 @@ import Logo from './Logo.astro';
     gap: 64px;
   }
 
-  .footer-top-container {
+  .content {
     display: flex;
     justify-content: space-between;
     align-items: top;
@@ -126,11 +126,12 @@ import Logo from './Logo.astro';
 
   .logo-container p {
     font-size: 14px;
+    margin-top: 2px;
   }
 
   .link-container {
     display: flex;
-    gap: 64px;
+    gap: 32px 64px;
   }
 
   .link-group-title {
@@ -163,6 +164,16 @@ import Logo from './Logo.astro';
   @media screen and (max-width: 768px) {
     .wrap {
       display: block;
+    }
+
+    .content {
+      display: grid;
+      gap: 48px;
+    }
+
+    .link-container {
+      display: flex;
+      flex-wrap: wrap;
     }
   }
 </style>
