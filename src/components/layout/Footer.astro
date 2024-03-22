@@ -6,8 +6,10 @@ import Logo from './Logo.astro';
   <div class="container">
     <div class="footer-top-container">
       <div class="logo-container">
-        <Logo />
-        <p>Headless TypeScript ORM with a head.</p>
+        <div>
+          <Logo />
+          <p>Headless TypeScript ORM with a head.</p>
+        </div>
         <div class="social-media-container">
           <a
             target="_blank"
@@ -114,6 +116,12 @@ import Logo from './Logo.astro';
     display: flex;
     justify-content: space-between;
     align-items: top;
+  }
+
+  .logo-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .logo-container p {
