@@ -1,8 +1,14 @@
 ---
 import Logo from './Logo.astro';
+
+interface Props {
+  isCenteredLayout?: boolean;
+}
+
+const { isCenteredLayout } = Astro.props;
 ---
 
-<div class="wrap">
+<div class:list={['wrap', isCenteredLayout && 'wrap-centered']}>
   <div class="container">
     <div class="content">
       <div class="logo-container">
@@ -99,6 +105,12 @@ import Logo from './Logo.astro';
     color: rgb(0, 0, 0);
   }
 
+  .wrap-centered {
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
   html[class~='dark'] .wrap {
     border-top: 1px solid #2a2a2a;
   }
@@ -145,6 +157,8 @@ import Logo from './Logo.astro';
     display: block;
     font-size: 14px;
     margin-top: 8px;
+    text-decoration: none;
+    color: currentColor;
   }
 
   .link-group-item:first-child {

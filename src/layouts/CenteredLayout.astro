@@ -1,14 +1,14 @@
 ---
-import EndOfContent from "@components/layout/EndOfContent.astro";
-import GlobalStyles from "@components/layout/GlobalStyles.astro";
-import MDXStyles from "@components/layout/MDXStyles.astro";
-import Banner from "@components/layout/Banner.astro";
-import InitComponentsScripts from "@components/layout/InitComponentsScripts.astro";
-import BaseHead from "@components/baseHead/BaseHead.astro";
-import Footer from "../components/layout/Footer.astro";
-import getContentTree from "@/utils/getContentTree";
-import type { IHeading } from "@/types/astro";
-import NavigationAstro from "@components/layout/NavigationAstro.astro";
+import EndOfContent from '@components/layout/EndOfContent.astro';
+import GlobalStyles from '@components/layout/GlobalStyles.astro';
+import MDXStyles from '@components/layout/MDXStyles.astro';
+import Banner from '@components/layout/Banner.astro';
+import InitComponentsScripts from '@components/layout/InitComponentsScripts.astro';
+import BaseHead from '@components/baseHead/BaseHead.astro';
+import Footer from '../components/layout/Footer.astro';
+import getContentTree from '@/utils/getContentTree';
+import type { IHeading } from '@/types/astro';
+import NavigationAstro from '@components/layout/NavigationAstro.astro';
 
 interface Props {
   customTitle?: string;
@@ -27,20 +27,17 @@ const { title } = await getContentTree({
 
 <!doctype html>
 <html lang="en">
-  <BaseHead
-    title={`Drizzle ORM - ${customTitle || title}`}
-    description={description}
-  />
+  <BaseHead title={`Drizzle ORM - ${customTitle || title}`} description={description} />
   <body class="banner-shown">
     <GlobalStyles />
     <MDXStyles />
     <Banner />
     <NavigationAstro />
-    <main class:list={["documentation-container scrollbar", isStudio && "relative"]}>
+    <main class:list={['documentation-container scrollbar', isStudio && 'relative']}>
       <div class="documentation-content">
         <slot />
         <EndOfContent />
-        <Footer />
+        <Footer isCenteredLayout />
       </div>
     </main>
     <InitComponentsScripts />
@@ -90,7 +87,7 @@ const { title } = await getContentTree({
         overflow-x: hidden;
       }
 
-      body[class~="banner-shown"] .documentation-container {
+      body[class~='banner-shown'] .documentation-container {
         height: calc(100dvh - 104px);
       }
 
@@ -120,7 +117,7 @@ const { title } = await getContentTree({
     </style>
     <script>
       const hash = window.location.hash;
-      if (hash !== "") {
+      if (hash !== '') {
         const targetElement = document.querySelector(hash);
         if (targetElement) {
           targetElement.scrollIntoView();
