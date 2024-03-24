@@ -234,7 +234,7 @@ const result: {
 export const user = pgTable("user", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
-  parentId: integer("parent_id").notNull().references((): AnySQLiteColumn => user.id)
+  parentId: integer("parent_id").notNull().references((): AnyPgColumn => user.id)
 });
 ```
 
