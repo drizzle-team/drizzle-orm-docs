@@ -647,6 +647,26 @@ const table = mysqlTable('table', {
 });
 ```
 
+When using `$onUpdate()` or `$onUpdateFn()`, which are simply different aliases for the same function, 
+you can generate defaults at runtime and use these values in all update queries. 
+
+Adds a dynamic update value to the column. The function will be called when the row is updated, 
+and the returned value will be used as the column value if none is provided.
+If no default (or $defaultFn) value is provided, the function will be called
+when the row is inserted as well, and the returned value will be used as the column value.
+
+<Callout type="info" emoji="ℹ️">
+	Note: This value does not affect the `drizzle-kit` behavior, it is only used at runtime in `drizzle-orm`
+</Callout>
+
+```ts
+import { text, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+    alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
+});
+```
+
 ### Primary key 
 
 <Section>
