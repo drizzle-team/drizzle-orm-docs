@@ -128,6 +128,30 @@ const db = drizzle(client);
 
 For more details about using Drizzle with Xata, see the official [Xata docs](https://xata.io/docs/integrations/drizzle).
 
+## PGlite
+
+According to the **[official repo](https://github.com/electric-sql/pglite)**, PGlite is a WASM Postgres build packaged into a TypeScript client library that enables you to run Postgres in the browser, Node.js and Bun, with no need to install any other dependencies. It is only 2.6mb gzipped.
+
+It can be used as an ephemeral in-memory database, or with persistence either to the file system (Node/Bun) or indexedDB (Browser).
+
+Unlike previous "Postgres in the browser" projects, PGlite does not use a Linux virtual machine - it is simply Postgres in WASM.
+
+<Npm>
+drizzle-orm @electric-sql/pglite
+-D drizzle-kit
+</Npm>
+
+```typescript copy filename="index.ts"
+import { PGlite } from '@electric-sql/pglite';
+import { drizzle } from 'drizzle-orm/pglite';
+
+// In-memory Postgres
+const client = new PGlite();
+const db = drizzle(client);
+
+await db.select().from(users);
+```
+
 ## Postgres.JS
 
 According to the **[official website](https://github.com/porsager/postgres)**, PostgresJS is the fastest fully featured PostgreSQL client for Node.js and Deno.  
