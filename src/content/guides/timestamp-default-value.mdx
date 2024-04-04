@@ -4,13 +4,9 @@ slug: timestamp-default-value
 ---
 
 import Section from "@mdx/Section.astro";
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
-import Callout from '@components/markdown/Callout.astro';
 import CodeTabs from '@components/markdown/CodeTabs.astro';
 import CodeTab from '@components/markdown/CodeTab.astro';
-
-<IsSupportedChipGroup chips={{PostgreSQL: false, MySQL: false, SQLite: true}}/>
 
 <Prerequisites>
 - Get started with [SQLite](/docs/get-started-sqlite)
@@ -23,7 +19,7 @@ To implement unix timestamp as a default value in SQLite with Drizzle, you can u
 
 <CodeTabs items={["schema.ts", "migration.sql"]}>
   <CodeTab>
-  ```ts copy {7,8,9}
+  ```ts copy {9, 12}
     import { sql } from 'drizzle-orm';
     import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -32,7 +28,10 @@ To implement unix timestamp as a default value in SQLite with Drizzle, you can u
       name: text('name').notNull(),
       createdAt: integer('created_at', { mode: 'timestamp' })
         .notNull()
-        .default(sql`(unixepoch())`),
+        .default(sql`(unixepoch())`), // correct ✅
+      createdAt2: integer('created_at2', { mode: 'timestamp' })
+        .notNull()
+        .default(sql`unixepoch()`), // incorrect ❌
     });
     ```
   </CodeTab>
@@ -91,7 +90,3 @@ export const users = sqliteTable('users', {
     .default(sql`(strftime('%s'))`),
 });
 ```
-
-<Callout type="warning">
-When declaring default value in `sql`` operator` you are responsible for ensuring that the value is in the correct format (statement or just value). So, if you use  function in `sql`` operator`, make sure to wrap it in parentheses to ensure it's properly interpreted as a separate statement (e.g. `(unixepoch())`). 
-</Callout>
