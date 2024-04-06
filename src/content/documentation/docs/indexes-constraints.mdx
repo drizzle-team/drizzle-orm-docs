@@ -670,11 +670,11 @@ set return type for reference callback or user a standalone `foreignKey` operato
       parentId: integer("parent_id"),
     }, (table) => {
       return {
-        parentReference: foreignKey(() => ({
+        parentReference: foreignKey({
           columns: [table.parentId],
           foreignColumns: [table.id],
           name: "custom_fk"
-        })),
+        }),
       };
     });
     ```
@@ -760,11 +760,11 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       userLastName: text("user_last_name"),
     }, (table) => {
       return {
-        userReference: foreignKey(() => ({
+        userReference: foreignKey({
           columns: [table.userFirstName, table.userLastName],
           foreignColumns: [user.firstName, user.lastName],
           name: "custom_name"
-        }))
+        })
       }
     });
     ```
