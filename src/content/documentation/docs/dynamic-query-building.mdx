@@ -25,10 +25,10 @@ Let's see how it works by implementing a simple `withPagination` function that a
 ```ts
 function withPagination<T extends PgSelect>(
 	qb: T,
-	page: number,
+	page: number = 1,
 	pageSize: number = 10,
 ) {
-	return qb.limit(pageSize).offset(page * pageSize);
+	return qb.limit(pageSize).offset((page - 1) * pageSize);
 }
 
 const query = db.select().from(users).where(eq(users.id, 1));
