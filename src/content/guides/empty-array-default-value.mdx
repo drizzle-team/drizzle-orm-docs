@@ -17,7 +17,7 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 To set an empty array as a default value in PostgreSQL, you can use `sql` operator with `'{}'` or `ARRAY[]` syntax:
 
 <Section>
-```ts {10,14}
+```ts copy {10,14}
 import { sql } from 'drizzle-orm';
 import { pgTable, serial, text } from 'drizzle-orm/pg-core';
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 MySQL doesn't have an array data type, but you can use `json` data type for the same purpose. To set an empty array as a default value in MySQL, you can use `JSON_ARRAY()` function or `sql` operator with `('[]')` syntax:
 
 <Section>
-```ts {7,11,15}
+```ts copy {7,11,15}
 import { sql } from 'drizzle-orm';
 import { json, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
 
@@ -91,7 +91,7 @@ You can specify `.$type<..>()` for json object inference, it will not check runt
 SQLite doesn't have an array data type, but you can use `text` data type for the same purpose. To set an empty array as a default value in SQLite, you can use `json_array()` function or `sql` operator with `'[]'` syntax:
 
 <Section>
-```ts {9,13}
+```ts copy {9,13}
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
