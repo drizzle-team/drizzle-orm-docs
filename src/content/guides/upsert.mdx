@@ -170,6 +170,35 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
   ```
 </CodeTabs>
 
+In addition to the custom function, if you need to programatically return any calculations or values on any fields during the upsert, you can follow the example below:
+
+```ts copy {15}
+const values = [
+  {
+    id: 1,
+    lastLogin: '2024-03-16T15:44:41.141Z', // this date needs to be updated within the upsert
+    active: true,
+  },
+  // other items
+];
+
+const setValues = buildConflictUpdateColumns(users, [
+	  'active'
+    // any other properties to be included
+]);
+
+await db
+  .insert(users)
+  .values(values)
+  .onConflictDoUpdate({
+    target: users.id
+    set: {
+      ...setValues,
+      updatedOn: new Date().toISOString(),
+    },
+  });
+```
+
 This is how you can implement an upsert query with multiple targets in PostgreSQL and SQLite:
 
 <Section>
