@@ -38,8 +38,8 @@ const Databases: {
   },
   Turso: {
     imageSrc: {
-      lightThemeSrc: "/public/svg/turso.svg",
-      darkThemeSrc: "/public/svg/turso-light.svg",
+      lightThemeSrc: "/public/svg/new-turso.svg",
+      darkThemeSrc: "/public/svg/new-turso-light.svg",
     },
     lightStyle: {
       width: 32,

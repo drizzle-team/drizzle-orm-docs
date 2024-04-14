@@ -67,10 +67,11 @@ export const sponsorsData: ISponsor[] = [
     imageType: ImageType.SVG,
     darkStyle: {
       background:
-        'url("/svg/turso-light.svg") 0% 0% / cover no-repeat content-box',
+        'url("/svg/new-turso-light.svg") 0% 0% / cover no-repeat content-box',
     },
     lightStyle: {
-      background: 'url("/svg/turso.svg") 0% 0% / cover no-repeat content-box',
+      background:
+        'url("/svg/new-turso.svg") 0% 0% / cover no-repeat content-box',
     },
   },
   {
