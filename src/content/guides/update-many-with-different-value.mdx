@@ -1,0 +1,57 @@
+---
+title: Update many with different value for each row
+slug: update-many-with-different-value
+---
+
+import Section from "@mdx/Section.astro";
+
+To implement update many with different value for each row you can use `sql` operator with `case` statement and `.update().set()` methods like this:
+
+<Section>
+```ts
+import { SQL, inArray, sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const db = drizzle(...);
+
+const inputs = [
+  {
+    id: 1,
+    city: 'New York',
+  },
+  {
+    id: 2,
+    city: 'Los Angeles',
+  },
+  {
+    id: 3,
+    city: 'Chicago',
+  },
+];
+
+const sqlChunks: SQL[] = [];
+const ids: number[] = [];
+
+sqlChunks.push(sql`(case`);
+
+for (const input of inputs) {
+  sqlChunks.push(sql`when ${users.id} = ${input.id} then ${input.city}`);
+  ids.push(input.id);
+}
+
+sqlChunks.push(sql`end)`);
+
+if (ids.length === 0) {
+  return;
+}
+
+const finalSql: SQL = sql.join(sqlChunks, sql.raw(' '));
+
+await db.update(users).set({ city: finalSql }).where(inArray(users.id, ids));
+```
+
+```sql
+update users set "city" = (case when id = 1 then 'New York' when id = 2 then 'Los Angeles' when id = 3 then 'Chicago' end)
+where id in (1, 2, 3)
+```
+</Section>
