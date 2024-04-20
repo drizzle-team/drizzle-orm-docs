@@ -192,6 +192,35 @@ insert into inventory ("warehouse_id", "product_id", "quantity") values (1, 1, 1
 ```
 </Section>
 
+If you want to update all columns except of specific one, you can leave the previous value like this:
+
+<Section>
+```ts copy {16}
+import { sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const data = {
+  id: 1,
+  name: 'John',
+  email: 'john@email.com',
+  age: 29,
+};
+
+await db
+  .insert(users)
+  .values(data)
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { ...data, email: sql`${users.email}` }, // leave email as it was
+});
+```
+
+```sql
+insert into users ("id", "name", "email", "age") values (1, 'John', 'john@email.com', 29)
+  on conflict ("id") do update set id = 1, name = 'John', email = email, age = 29;
+```
+</Section>
+
 ### MySQL
 
 To implement an upsert query in MySQL with Drizzle you can use `.onDuplicateKeyUpdate()` method. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if any unique index conflicts.
@@ -329,3 +358,31 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
   });
   ```
 </CodeTabs>
+
+If you want to update all columns except of specific one, you can leave the previous value like this:
+
+<Section>
+```ts copy {15}
+import { sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const data = {
+  id: 1,
+  name: 'John',
+  email: 'john@email.com',
+  age: 29,
+};
+
+await db
+  .insert(users)
+  .values(data)
+  .onDuplicateKeyUpdate({
+    set: { ...data, email: sql`${users.email}` }, // leave email as it was
+});
+```
+
+```sql
+insert into users (`id`, `name`, `email`, `age`) values (1, 'John', 'john@email.com', 29)
+  on duplicate key update id = 1, name = 'John', email = email, age = 29;
+```
+</Section>

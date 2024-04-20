@@ -14,6 +14,8 @@ import JacobWolf from "@/assets/images/twits/JacobWolf.jpg";
 import jamesrperkinsTwit from "@/assets/images/twits/jamesrperkinsTwit.png";
 import saltyAomTwit from "@/assets/images/twits/saltyAomTwit.jpg";
 import EddyVinckk from "@/assets/images/twits/EddyVinckk.jpg";
+import chribjel from "@/assets/images/twits/chribjel.jpg";
+import chribjelTwit from "@/assets/images/twits/chribjelTwit.png";
 
 // Twit images
 
@@ -64,6 +66,13 @@ const Comments: IComment[] = [
     href: "https://x.com/EddyVinckk/status/1770052528941478333?s=20",
   },
   {
+    avatar: JacobWolf,
+    name: "Jacob Wolf 🐝",
+    login: "JacobWolf",
+    text: "I love @DrizzleORM.",
+    href: "https://x.com/JacobWolf/status/1768061278776349151?s=20",
+  },
+  {
     avatar: t3dotgg,
     name: "Theo",
     login: "t3dotgg",
@@ -93,11 +102,11 @@ const Comments: IComment[] = [
     twitImage: jamesrperkinsTwit,
   },
   {
-    avatar: JacobWolf,
-    name: "Jacob Wolf 🐝",
-    login: "JacobWolf",
-    text: "I love @DrizzleORM.",
-    href: "https://x.com/JacobWolf/status/1768061278776349151?s=20",
+    avatar: tslamoon1,
+    name: "tslamoon",
+    login: "tslamoon1",
+    text: "I'll shave my head if drizzle adds MSSQL support by the end of September.",
+    href: "https://x.com/tslamoon1/status/1700416378237530419?s=20",
   },
   {
     avatar: FredKSchott,
@@ -114,19 +123,20 @@ const Comments: IComment[] = [
     href: "https://x.com/_raynirola/status/1666028176789872642?s=20",
   },
   {
-    avatar: tslamoon1,
-    name: "tslamoon",
-    login: "tslamoon1",
-    text: "I'll shave my head if drizzle adds MSSQL support by the end of September.",
-    href: "https://x.com/tslamoon1/status/1700416378237530419?s=20",
-  },
-  {
     avatar: saltyAom,
     name: "SaltyAom",
     login: "saltyAom",
     text: `Prisma Bun: 1.4 MB/s\nDrizzle Bun: 9.8 MB/s`,
     href: "https://x.com/saltyAom/status/1767783124342276526?s=20",
     twitImage: saltyAomTwit,
+  },
+  {
+    avatar: chribjel,
+    name: "Christoffer Bjelke",
+    login: "chribjel",
+    text: `How many times has this little shit snuck into your dependencies?`,
+    href: "https://x.com/chribjel/status/1778851727954837727",
+    twitImage: chribjelTwit,
   },
 ];
 

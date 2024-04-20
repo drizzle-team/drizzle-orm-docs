@@ -38,14 +38,14 @@ const Databases: {
   },
   Turso: {
     imageSrc: {
-      lightThemeSrc: "/public/svg/turso-light.svg",
-      darkThemeSrc: "/public/svg/turso.svg",
+      lightThemeSrc: "/public/svg/new-turso.svg",
+      darkThemeSrc: "/public/svg/new-turso-light.svg",
     },
     lightStyle: {
-      width: 28,
+      width: 32,
     },
     darkStyle: {
-      width: 28,
+      width: 32,
     },
     sponsorUrl: "https://driz.link/turso",
   },
