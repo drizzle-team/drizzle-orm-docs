@@ -1,6 +1,8 @@
 import IsSupportedChipGroup from '@components/markdown/IsSupportedChipGroup.astro';
 import Section from '@components/markdown/Section.astro';
 import Callout from '@components/markdown/Callout.astro';
+import Tab from '@components/markdown/Tab.astro';
+import Tabs from '@components/markdown/Tabs.astro';
 
 # SQL Insert
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
@@ -65,8 +67,6 @@ await db.insert(users)
 
 ### On conflict do update
 
-This is how you upsert with `onConflictDoUpdate`, you can specify `set` and `where` clauses.
-
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
 
 `onConflictDoUpdate` will update the row if there's a conflict:
@@ -76,16 +76,44 @@ await db.insert(users)
   .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
 ```
 
-Upsert with `where` clause for `onConflictDoUpdate`:
+#### `where` clauses
+
+`on conflict do update` can have a `where` clause in two different places -
+as part of the conflict target (i.e. for partial indexes) or as part of the `update` clause:
+
+```sql
+insert into employees (employee_id, name)
+values (123, 'John Doe')
+on conflict (employee_id) where name <> 'John Doe'
+do update set name = excluded.name
+
+insert into employees (employee_id, name)
+values (123, 'John Doe')
+on conflict (employee_id) do update set name = excluded.name
+where name <> 'John Doe';
+```
+
+To specify these conditions in Drizzle, you can use `setWhere` and `targetWhere` clauses:
+
 ```typescript
-await db.insert(users)
-  .values({ id: 1, name: 'John' })
+await db.insert(employees)
+  .values({ employeeId: 123, name: 'John Doe' })
   .onConflictDoUpdate({
-    target: users.id,
-    set: { name: 'John1' },
-    where: sql`${users.createdAt} > '2023-01-01'::date`,
+    target: employees.employeeId,
+    targetWhere: sql`name <> 'John Doe'`,
+    set: { name: sql`excluded.name` }
+  });
+
+await db.insert(employees)
+  .values({ employeeId: 123, name: 'John Doe' })
+  .onConflictDoUpdate({
+    target: employees.employeeId,
+    set: { name: 'John Doe' },
+    setWhere: sql`name <> 'John Doe'`
   });
 ```
+
+<hr />
 
 Upsert with composite indexes, or composite primary keys for `onConflictDoUpdate`:
 
