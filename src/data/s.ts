@@ -163,7 +163,7 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "unkey.dev",
+      login: "driz.link/silver-sponsor-unkey",
       name: "Unkey",
       avatarUrl: "/images/unkey.jpeg",
     },
