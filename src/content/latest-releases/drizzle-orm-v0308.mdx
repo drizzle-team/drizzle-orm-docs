@@ -25,6 +25,24 @@ To get started with Drizzle and D1 follow the [documentation](/docs/get-started-
 
 - Split `where` clause in Postgres `.onConflictDoUpdate` method into `setWhere` and `targetWhere` clauses, to support both `where` cases in `on conflict ...` clause (fixes [#1628](https://github.com/drizzle-team/drizzle-orm/issues/1628), [#1302](https://github.com/drizzle-team/drizzle-orm/issues/1302) via [#2056](https://github.com/drizzle-team/drizzle-orm/pull/2056)). 
 
+```ts copy
+await db.insert(employees)
+  .values({ employeeId: 123, name: 'John Doe' })
+  .onConflictDoUpdate({
+    target: employees.employeeId,
+    targetWhere: sql`name <> 'John Doe'`,
+    set: { name: sql`excluded.name` }
+  });
+  
+await db.insert(employees)
+  .values({ employeeId: 123, name: 'John Doe' })
+  .onConflictDoUpdate({
+    target: employees.employeeId,
+    set: { name: 'John Doe' },
+    setWhere: sql`name <> 'John Doe'`
+  });
+```
+
 Learn more about `.onConflictDoUpdate` method [here](/docs/insert#on-conflict-do-update).
 - Fixed query generation for `where` clause in Postgres `.onConflictDoNothing` method, as it was placed in a wrong spot (fixes [#1628](https://github.com/drizzle-team/drizzle-orm/issues/1628) via [#2056](https://github.com/drizzle-team/drizzle-orm/pull/2056)).
 
