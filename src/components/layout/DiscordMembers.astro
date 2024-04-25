@@ -1,0 +1,76 @@
+---
+interface Props {
+	isAccent?: boolean;
+}
+
+const { isAccent } = Astro.props;
+
+import { DiscordIcon } from "@components/Icons/Icons";
+
+const response = await fetch(
+	'https://discord.com/api/v9/invites/yfjTbVXMW4?with_counts=true'
+);
+const data: { approximate_member_count: number } = await response.json();
+const { approximate_member_count: members } = data;
+const displayMembers = Math.floor(members / 100) / 10;
+---
+
+<a
+	target="_blank"
+	rel="noreferrer nofollow"
+	href="https://discord.gg/yfjTbVXMW4"
+	class:list={["discord-members_wrap", isAccent && "discord-members_wrap--accent"]}
+>
+	<DiscordIcon />
+	<span class="discord-members__wrap_number">{displayMembers}k</span>
+</a>
+
+<style>
+	html.dark .discord-members_wrap:hover {
+		color: #e1e3e6;
+		background-color: rgba(255, 255, 255, 0.05);
+		border-color: #686868;
+	}
+
+	html.dark .discord-members_wrap {
+		background-color: #111;
+		border-color: #404040;
+		color: rgb(126, 134, 140);
+	}
+
+	.discord-members_wrap:hover {
+		color: #000;
+		border-color: #b8bfc8;
+	}
+
+	.discord-members_wrap {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px;
+		border-radius: 8px;
+		height: 36px;
+		background-color: hsla(210, 7%, 95%, 0.27);
+		border: 1px solid rgba(33, 39, 46, 0.12);
+		color: #909090;
+		transition: all 0.2s ease;
+	}
+
+	.discord-members__wrap_number {
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	html.dark .discord-members_wrap--accent {
+		color: #e1e3e6;
+	}
+
+	.discord-members_wrap--accent {
+		color: #000;
+	}
+</style>
+<style is:global>
+	.github-stars_wrap svg {
+		width: 20px;
+	}
+</style>

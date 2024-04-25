@@ -5,6 +5,7 @@ import Logo from "./Logo.astro";
 import LandingNavbar from "./LandingNavbar.astro";
 import ThemeSelector from "./ThemeSelector.astro";
 import ThemeSelectorMobile from "./ThemeSelectorMobile.astro";
+import DiscordMembers from "./DiscordMembers.astro";
 ---
 
 <div id="nav_container" class="nav_container">
@@ -14,14 +15,15 @@ import ThemeSelectorMobile from "./ThemeSelectorMobile.astro";
     </div>
     <LandingNavbar />
     <div class="nav_buttons">
-      <GithubStars isAccent={true} stars={18} />
-      <ThemeSelector isAccent={true} />
-      <!-- <ThemeSelectorMobile /> -->
       <NavItem
         value="Get started"
         href="/docs/overview"
         activeKeywords={["/kit-docs", "/docs"]}
       />
+      <GithubStars isAccent={true} stars={18} />
+      <DiscordMembers isAccent={true} />
+      <ThemeSelector isAccent={true} />
+      <!-- <ThemeSelectorMobile /> -->
     </div>
   </div>
 </div>
