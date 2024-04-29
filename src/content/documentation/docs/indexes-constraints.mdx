@@ -670,11 +670,11 @@ set return type for reference callback or user a standalone `foreignKey` operato
       parentId: integer("parent_id"),
     }, (table) => {
       return {
-        parentReference: foreignKey(() => ({
+        parentReference: foreignKey({
           columns: [table.parentId],
           foreignColumns: [table.id],
           name: "custom_fk"
-        })),
+        }),
       };
     });
     ```
