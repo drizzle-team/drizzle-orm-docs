@@ -245,8 +245,8 @@ Drizzle ORM delivers name-mapped results from the driver without changing the st
 
 You're free to operate with results the way you want, here's an example of mapping many-one relational data:
 ```typescript
-type User = typeof usersTable.$inferSelect;
-type Pet = typeof usersTable.$inferSelect;
+type User = typeof users.$inferSelect;
+type Pet = typeof pets.$inferSelect;
 
 const rows = db.select({
     user: users,
