@@ -9,11 +9,18 @@ const formattedTutorials = tutorials.map((tutorial) => (
     slug: tutorial.slug.split("/").at(-1),
   }
 ));
+
+const sortedThreeLatestTutorials = formattedTutorials.sort((a, b) => {
+  const dateA = new Date(a.data.date).getTime();
+  const dateB = new Date(b.data.date).getTime();
+  return dateB - dateA;
+}).slice(0, 3);
+
 ---
 
 <div class="learn__migrate-from_cards">
   {
-    formattedTutorials.map((card) => (
+    sortedThreeLatestTutorials.map((card) => (
       <a
         href={`/learn/tutorials/${card.slug}`}
         class="tutorials__section__card"
