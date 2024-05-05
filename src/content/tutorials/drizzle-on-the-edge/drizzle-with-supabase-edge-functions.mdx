@@ -18,6 +18,7 @@ This tutorial demonstrates how to use Drizzle ORM with [Supabase Edge Functions]
 drizzle-orm
 -D drizzle-kit
 </Npm>
+- You should have installed Docker Desktop. It is a prerequisite for local development. Follow the official [docs](https://docs.docker.com/desktop) to install.
 </Prerequisites>
 
 
@@ -28,7 +29,7 @@ To learn how to create a basic Edge Function on your local machine and then depl
 
 Create a new Supabase project in a folder on your local machine:
 
-```bash
+```bash copy
 supabase init
 ```
 
@@ -45,7 +46,7 @@ If you are using Visual Studio Code, follow the [Supabase documentation](https:/
 
 Run the `supabase functions new [FUNCTION_NAME]` command to create a new Edge Function:
 
-```bash
+```bash copy
 supabase functions new drizzle-tutorial
 ```
 
@@ -65,8 +66,8 @@ Create a `import_map.json` file in the `supabase/functions` directory and add im
 ```json copy filename="supabase/functions/import_map.json"
 {
   "imports": {
-    "drizzle-orm": "npm:drizzle-orm@0.30.9",
-    "drizzle-orm/": "npm:/drizzle-orm@0.30.9/"
+    "drizzle-orm": "npm:drizzle-orm@0.30.10",
+    "drizzle-orm/": "npm:/drizzle-orm@0.30.10/"
   }
 }
 ```
@@ -109,7 +110,7 @@ In this tutorial we will use Drizzle kit to generate migrations for our schema.
 
 Run the `drizzle-kit generate:pg` command to generate migrations:
 
-```bash
+```bash copy
 npx drizzle-kit generate:pg
 ```
 
@@ -119,7 +120,7 @@ It will create a new migration file in the `supabase/migrations` directory:
 
 To apply migrations and start the Supabase local development stack, run the following command:
 
-```bash
+```bash copy
 supabase start
 ```
 
@@ -165,7 +166,7 @@ Deno.serve(async (req) => {
 
 Run the following command to test your function locally:
 
-```bash
+```bash copy
 supabase functions serve --no-verify-jwt
 ```
 
@@ -188,13 +189,13 @@ You can create new Supabase project in the [dashboard](https://supabase.com/dash
 
 Copy the `Reference ID` and use it to link your local development project to a hosted Supabase project by running the following command:
 
-```bash
+```bash copy
 supabase link --project-ref <REFERENCE_ID>
 ```
 
 Push your schema changes to the hosted Supabase project by running the following command:
 
-```bash
+```bash copy
 supabase db push
 ```
 
@@ -204,14 +205,9 @@ Navigate to [Database Settings](https://supabase.com/dashboard/project/_/setting
 
 Read more about Connection Pooler in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
 
-Create a `.env` file in the `supabase/functions` directory and add `DATABASE_URL` variable:
-
-```plaintext
-DATABASE_URL=<CONNECTION_STRING>
-```
 Run the following command to set the environment variable:
 
-```bash
+```bash copy
 supabase secrets set DATABASE_URL=<CONNECTION_STRING>
 ```
 
@@ -231,7 +227,7 @@ Learn more about managing environment variables in Supabase Edge Functions in th
 
 Deploy your function by running the following command:
 
-```bash
+```bash copy
 supabase functions deploy drizzle-tutorial --no-verify-jwt
 ```
 </Steps>
