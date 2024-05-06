@@ -90,7 +90,7 @@ export default {
 
 This configuration file specifies the database schema location, path for generating migrations, and database connection through the connection string.
 
-Finally, you'll define the schemas for your database tables. In this guide, two schemas are created: **`users`** and **`posts`**.
+Finally, you'll define the schemas for your database tables. In this tutorial, two schemas are created: **`users`** and **`posts`**.
 
 ```tsx copy filename="src/db/schema.ts"
 import { sql } from 'drizzle-orm';
@@ -110,7 +110,7 @@ export const posts = sqliteTable('posts', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   createdAt: text('created_at')
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
 });
 
@@ -288,6 +288,6 @@ That's it! By implementing these functions, you can perform a full spectrum of C
 
 ### Conclusion
 
-In this guide, we walked through the steps of building a compact application, using Drizzle and Turso to set up a flexible and powerful database environment.
+In this tutorial, we walked through the steps of building a compact application, using Drizzle and Turso to set up a flexible and powerful database environment.
 
 Turso offers a variety of advanced database functionalities, such as replication, among others. For further insights into how Turso can support your database needs, it's recommended to consult their **[documentation](https://docs.turso.tech/)**.
