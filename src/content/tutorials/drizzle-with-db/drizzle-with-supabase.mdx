@@ -1,0 +1,307 @@
+---
+title: "Drizzle with Supabase Database"
+date: "2024-05-07"
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3788 21.6677C12.8679 22.3111 11.8319 21.9586 11.8196 21.137L11.6396 9.12061H19.7194C21.1828 9.12061 21.9991 10.8109 21.089 11.9571L13.3788 21.6677Z" fill="url(#paint0_linear_142_2)"/><path d="M13.3788 21.6677C12.8679 22.3111 11.8319 21.9586 11.8196 21.137L11.6396 9.12061H19.7194C21.1828 9.12061 21.9991 10.8109 21.089 11.9571L13.3788 21.6677Z" fill="url(#paint1_linear_142_2)" fill-opacity="0.2"/><path d="M10.0928 2.33232C10.6037 1.68882 11.6397 2.04141 11.652 2.86299L11.7309 14.8794H3.75221C2.2887 14.8794 1.47247 13.1891 2.38252 12.0429L10.0928 2.33232Z" fill="currentColor"/><defs><linearGradient id="paint0_linear_142_2" x1="11.6396" y1="11.7849" x2="18.8206" y2="14.7967" gradientUnits="userSpaceOnUse"><stop stop-color="currentColor"/><stop offset="1" stop-color="currentColor"/></linearGradient><linearGradient id="paint1_linear_142_2" x1="8.45585" y1="7.42589" x2="11.7308" y2="13.5908" gradientUnits="userSpaceOnUse"><stop/><stop offset="1" stop-opacity="0"/></linearGradient></defs></svg>]
+---
+
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Npm from '@mdx/Npm.astro';
+import Steps from '@mdx/Steps.astro';
+import Section from "@mdx/Section.astro";
+import Callout from '@mdx/Callout.astro';
+
+This tutorial demonstrates how to use Drizzle ORM with [Supabase Database](https://supabase.com/docs/guides/database/overview). Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database.
+
+<Prerequisites>
+- You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
+- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv).
+</Prerequisites>
+
+Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to database with Drizzle ORM.
+
+## Setup Supabase and Drizzle ORM
+
+<Steps>
+#### Create a new Supabase project
+
+You can create new Supabase project in the [dashboard](https://supabase.com/dashboard) or by following this [link](https://database.new/).
+
+#### Setup connection string variable
+
+Navigate to [Database Settings](https://supabase.com/dashboard/project/_/settings/database) and copy the URI from the `Connection String` section. Make sure to use `connection pooling`. Remember to replace the password placeholder with your actual database password.
+
+Add `DATABASE_URL` variable to your `.env` file:
+
+```plaintext
+DATABASE_URL=<CONNECTION_STRING>
+```
+
+Read more about Connection Pooler and pooling modes in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
+
+#### Connect Drizzle ORM to your database
+
+Create a `db.ts` file in the `src/db` directory and set up your database configuration:
+
+```typescript copy filename="src/db/db.ts"
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+
+const client = postgres(process.env.DATABASE_URL!);
+export const db = drizzle(client);
+```
+
+#### Create tables
+
+Create a `schema.ts` file in the `src/db` directory and declare your tables:
+
+```typescript copy filename="src/db/schema.ts"
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+export const usersTable = pgTable('users_table', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age').notNull(),
+  email: text('email').notNull().unique(),
+});
+
+export const postsTable = pgTable('posts_table', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type InsertUser = typeof usersTable.$inferInsert;
+export type SelectUser = typeof usersTable.$inferSelect;
+
+export type InsertPost = typeof postsTable.$inferInsert;
+export type SelectPost = typeof postsTable.$inferSelect;
+```
+
+#### Setup Drizzle config file
+
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
+
+Create a `drizzle.config.ts` file in the root of your project and add the following content:
+
+```typescript copy filename="drizzle.config.ts"
+import 'dotenv/config';
+import type { Config } from 'drizzle-kit';
+
+export default {
+  schema: './src/db/schema.ts',
+  out: './migrations',
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL!,
+  },
+} satisfies Config;
+```
+
+#### Applying changes to the database
+
+You can generate migrations using `drizzle-kit generate:<DIALECT>` command and then run them using the `migrate()` function which is available for each driver.
+
+Generate migrations:
+
+```bash
+npx drizzle-kit generate:pg
+```
+
+These migrations are stored in the `migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+
+Example of a generated migration:
+
+```sql
+CREATE TABLE IF NOT EXISTS "posts_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"content" text NOT NULL,
+	"user_id" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "users_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"age" integer NOT NULL,
+	"email" text NOT NULL,
+	CONSTRAINT "users_table_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "users_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+```
+
+Run migrations:
+
+```typescript copy filename="src/db/migrate.ts"
+import { resolve } from 'node:path';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { db } from './db';
+
+(async () => {
+  try {
+    await migrate(db, { migrationsFolder: resolve(__dirname, '../../migrations') });
+    console.log('Migration successful');
+
+    process.exit(0);
+  } catch (e) {
+    console.error(e);
+
+    process.exit(1);
+  }
+})();
+```
+
+Learn more about [migration process](https://orm.drizzle.team/docs/migrations). Alternatively, you can push changes directly to the database using [push command](/kit-docs/overview#prototyping-with-db-push).
+
+<Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+</Steps>
+
+## Basic file structure
+
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │   ├ 📂 db
+ │   │  ├ 📜 db.ts
+ |   |  ├ 📜 migrate.ts
+ │   │  └ 📜 schema.ts
+ │   └ 📜 index.ts
+ ├ 📂 migrations
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json
+ │  │  └ 📜 0000_snapshot.json
+ │  └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+## Query examples
+
+For instance, we create `src/db/queries.ts` file with the following queries.
+
+#### Insert data
+
+Read more about insert query in the [documentation](/docs/insert).
+
+```typescript copy filename="src/db/queries.ts" {4}
+import { db } from './db';
+import { InsertUser, usersTable } from './schema';
+
+export async function createUser(data: InsertUser) {
+  await db.insert(usersTable).values(data);
+}
+```
+
+#### Select data
+
+Read more about select query in the [documentation](/docs/select).
+
+```typescript copy filename="src/db/queries.ts" {5, 16, 41}
+import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
+import { db } from './db';
+import { InsertUser, SelectUser, postsTable, usersTable } from './schema';
+
+export async function getUserById(id: SelectUser['id']): Promise<
+  Array<{
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }>
+> {
+  return db.select().from(usersTable).where(eq(usersTable.id, id));
+}
+
+export async function getUsersWithPostsCount(
+  page = 1,
+  pageSize = 5,
+): Promise<
+  Array<{
+    postsCount: number;
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }>
+> {
+  return db
+    .select({
+      ...getTableColumns(usersTable),
+      postsCount: count(postsTable.id),
+    })
+    .from(usersTable)
+    .leftJoin(postsTable, eq(usersTable.id, postsTable.userId))
+    .groupBy(usersTable.id)
+    .orderBy(asc(usersTable.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+}
+
+export async function getPostsForLast24Hours(
+  page = 1,
+  pageSize = 5,
+): Promise<
+  Array<{
+    id: number;
+    title: string;
+  }>
+> {
+  return db
+    .select({
+      id: postsTable.id,
+      title: postsTable.title,
+    })
+    .from(postsTable)
+    .where(between(postsTable.createdAt, sql`now() - interval '1 day'`, sql`now()`))
+    .orderBy(asc(postsTable.title), asc(postsTable.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+}
+```
+
+Alternatively, you can use [relational query syntax](/docs/rqb).
+
+#### Update data
+
+Read more about update query in the [documentation](/docs/update).
+
+```typescript copy filename="src/db/queries.ts" {3}
+// imports
+
+export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
+  await db.update(postsTable).set(data).where(eq(postsTable.id, id));
+}
+```
+
+#### Delete data
+
+Read more about delete query in the [documentation](/docs/delete).
+
+```typescript copy filename="src/db/queries.ts" {3}
+// imports
+
+export async function deleteUser(id: SelectUser['id']) {
+  await db.delete(usersTable).where(eq(usersTable.id, id));
+}
+```
