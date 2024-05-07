@@ -151,6 +151,7 @@ END $$;
 Run migrations:
 
 ```typescript copy filename="src/db/migrate.ts"
+import 'dotenv/config';
 import { resolve } from 'node:path';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { db } from './db';
