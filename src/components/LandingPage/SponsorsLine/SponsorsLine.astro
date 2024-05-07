@@ -66,6 +66,10 @@
     un: "driz.link/silver-sponsor-uninbox"
   };
 
+  const customName = {
+    un: "Uninbox"
+  }
+
   const getStyleString = (style: CSSProperties) => {
     return Object.keys(style).reduce((acc, key) => {
       return acc + `${key}: ${style[key as keyof CSSProperties]};`;
@@ -191,7 +195,8 @@
               "#card-name",
             )! as HTMLDivElement;
             if (item.sponsorEntity.name) {
-              cardName.textContent = item.sponsorEntity.name;
+              cardName.textContent = customName[item.sponsorEntity.login as keyof typeof customName] 
+              || item.sponsorEntity.name;
             } else {
               cardName.textContent =
                 item.sponsorEntity.__typename === "User"
