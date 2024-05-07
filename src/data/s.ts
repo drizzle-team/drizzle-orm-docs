@@ -195,6 +195,22 @@ export const sponsorsData: ISponsor[] = [
         'url("/svg/nuxt-green.svg") 0% 0% / cover no-repeat content-box',
     },
   },
+  {
+    tier: {
+      name: "$250 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/silver-sponsor-tidb",
+      name: "TiDB",
+      avatarUrl:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="57" height="65" viewBox="0 0 57 65" fill="none"><path d="M0.849609 16.3821V48.3821L28.5617 64.3838L56.2739 48.3821V16.3821L28.5617 0.383789L0.849609 16.3821Z" fill="#E60C0C"/><path d="M28.5457 11.0675L10.1416 21.6944V32.318L19.3469 27.0029V48.3959L28.5457 53.701V21.6911L37.7477 16.3793L28.5457 11.0675Z" fill="white"/><path d="M37.7998 27.0562V48.3829L47.0383 43.0512V21.7179L37.7998 27.0562Z" fill="white"/></svg>',
+    },
+    createdAt: "2023-11-16T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+  },
 ];
 
 export default sponsorsData;

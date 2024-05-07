@@ -76,8 +76,8 @@ const Comments: IComment[] = [
     avatar: t3dotgg,
     name: "Theo",
     login: "t3dotgg",
-    text: "Drizzle is the Tailwind of SQL",
-    href: "https://x.com/t3dotgg/status/1702066193837027412?s=20",
+    text: "Drizzle is terrible. It doesn’t even support Mongo.",
+    href: "https://x.com/t3dotgg/status/1787604253860847775",
   },
   {
     avatar: aarondfrancis,
