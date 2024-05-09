@@ -42,22 +42,24 @@ Now lets add drizzle configuration file:
  └ 📜 package.json
 ```
 ```ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
+  dialect: "postgresql",
   schema: "./src/schema.ts",
   out: "./drizzle",
-} satisfies Config;
+});
 ```
 
-Add generate command to `package.json` and run our first migrations generation:
+Add `generate` and `migrate` commands to `package.json` and run our first migrations generation:
 
-```json filename="package.json" {5}
+```json filename="package.json" {5,6}
 {
   "name": "first time?",
   "version": "0.0.1",
   "scripts": {
-    "generate": "drizzle-kit generate:pg"
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
   }, 
 }
 ```
@@ -80,28 +82,8 @@ Done! We now have our first SQL migration file 🥳
 ```
 Now lets run our first migration to the database:
 
-```plaintext {5}
-📦 <project root>
- ├ 📂 drizzle
- ├ 📂 src
- │ ├ 📜 schema.ts
- │ └ 📜 index.ts
- ├ 📜 drizzle.config.ts
- └ 📜 package.json
-```
-
-```ts copy filename="index.ts"
-import { drizzle } from "drizzle-orm/postgres-js";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import postgres from "postgres";
-
-const connectionString = "..."
-const sql = postgres(connectionString, { max: 1 })
-const db = drizzle(sql);
-
-await migrate(db, { migrationsFolder: "drizzle" });
-
-await sql.end();
+```shell filename="terminal"
+$ npm run migrate
 ```
 
 That's it, folks!  
