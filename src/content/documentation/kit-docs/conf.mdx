@@ -22,12 +22,13 @@ You can have autocomplete experience and a very convenient environment variables
 <CodeTabs items={["drizzle.config.ts", "drizzle.config.js", "drizzle.config.json"]}>
 <CodeTab>
 ```ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
+  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
   schema: "./src/schema.ts",
   out: "./drizzle",
-} satisfies Config;
+});
 ```
 </CodeTab>
 <CodeTab>
@@ -36,6 +37,7 @@ import type { Config } from "drizzle-kit";
 
 /** @type { import("drizzle-kit").Config } */
 export default {
+  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
   schema: "./src/schema.ts",
   out: "./drizzle",
 };
@@ -44,6 +46,7 @@ export default {
 <CodeTab>
 ```json
 {
+  "dialect": "postgresql",
   "schema": "./src/schema.ts",
   "out": "./drizzle",
 }
@@ -73,11 +76,11 @@ You can have as many separate schema files as you want and define paths to them 
  └ 📜 package.json
 ```
 ```ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/schema.ts",
-} satisfies Config;
+});
 ```
 </Section>
 </Tab>
@@ -99,13 +102,13 @@ export default {
  └ 📜 package.json
 ```
 ```ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/**/schema.ts",
   //or
   schema: ["./src/user/schema.ts", "./src/posts/schema.ts"]
-} satisfies Config;
+});
 ```
 </Section>
 </Tab>
@@ -125,11 +128,11 @@ export default {
  └ 📜 package.json
 ```
 ```ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/schema/*",
-} satisfies Config;
+});
 ```
 </Section>
 </Tab>
@@ -160,12 +163,13 @@ Migration folder contains `.sql` migration files and `_meta` folder which is use
  └ 📜 package.json
 ```
 ```ts {5}
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
+  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
   schema: "./src/schema/*",
   out: "./drizzle",
-} satisfies Config;
+});
 ```
 </Section>
 
@@ -195,16 +199,16 @@ We mirror connection params of database drivers.
 <Tabs items={["Connection URI", "Connection params"]}>
 <Tab>
 ```ts {8}
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
+  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
   schema: "./src/schema/*",
   out: "./drizzle",
-  driver: 'pg',
   dbCredentials: {
-    connectionString: process.env.DB_URL,
+    url: process.env.DB_URL,
   }
-} satisfies Config;
+});
 ```
 <Callout type="info" emoji="ℹ️">
 When using the PlanetScale driver, your connection string must end with `?ssl={"rejectUnauthorized":true}` instead of `?sslaccept=strict`.
@@ -213,14 +217,12 @@ When using the PlanetScale driver, your connection string must end with `?ssl={"
 </Tab>
 <Tab>
 ```ts {10-14}
-import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/schema/*",
   out: "./drizzle",
-  driver: 'pg',
+  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
   dbCredentials: {
     user: "postgres",
     password: process.env.DATABASE_PASSWORD,
@@ -228,7 +230,7 @@ export default {
     port: 5432,
     database: "db",
   }
-} satisfies Config;
+});
 ```
 </Tab>
 </Tabs>
@@ -251,19 +253,17 @@ const users = pgTable('users', {
 });
 ```
 ```ts {7}
-import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/schema/*",
   out: "./drizzle",
-  driver: "mysql2",
+  dialect: "mysql", // "mysql" | "sqlite" | "postgresql"
   dbCredentials: {
-    uri: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL,
   }
   tablesFilter: ["project1_*"],
-} satisfies Config;
+});
 ```
 </Section>
 
