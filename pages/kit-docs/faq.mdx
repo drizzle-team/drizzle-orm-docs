@@ -95,3 +95,23 @@ please ensure the following:
 you may encounter issues if the foreign key constraint name exceeds 64 characters. 
 
 Drizzle generates the foreign key using the following pattern - `${tableFrom}_${columnsFrom}_${tableTo}_${columnsTo}`
+
+### Sqlite migrations and foreign key constraints
+
+Sqlite's `ALTER TABLE` statement is fairly restrictive, leading to situations in which tables must be dropped and recreated to, for example, remove a `NOT NULL` constriant on one of the columns. If the table itself is referenced in a foreign key constraint, though, it cannot be dropped without temproarily disabling foreign key constraints (`PRAGMA foreign_keys = OFF;`), which does not work in drizzle-kit migrations at present.
+
+However, you may be able to use `PRAGMA defer_foreign_keys` instead:
+
+```sql
+CREATE TABLE temp_table AS SELECT * FROM table;--> statement-breakpoint
+
+PRAGMA defer_foreign_keys = ON;--> statement-breakpoint
+
+DROP TABLE table;--> statement-breakpoint
+
+CREATE TABLE table (column  INTEGER, ## used to be NOT NULL);--> statement-breakpoint
+
+INSERT INTO table (column) SELECT column FROM temp_table;--> statement-breakpoint
+
+DROP TABLE temp_table;
+```
