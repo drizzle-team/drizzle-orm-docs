@@ -16,20 +16,23 @@ import AnchorCards from '@components/markdown/AnchorCards.astro';
   "HTTP proxy": "#http-proxy"
 }}/>
 
-## Neon
+## Neon Postgres
 
 According to their **[official website](https://neon.tech)**, Neon is a fully managed serverless Postgres. 
 
 Drizzle ORM natively supports both the **[Neon serverless driver](https://github.com/neondatabase/serverless)** 
- with the `drizzle-orm/neon-serverless` package and the **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)** drivers for accessing a Neon Postgres database.
+with the `drizzle-orm/neon-serverless` package and the **[`postgres`](#postgresjs)** or **[`pg`](#node-postgres)** drivers for accessing a Neon Postgres database.
 
 <Npm>
 drizzle-orm @neondatabase/serverless
 -D drizzle-kit
 </Npm>
 
-With the Neon serverless driver [**[github](https://github.com/neondatabase/serverless)**, **[blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/)**, **[Neon docs](https://neon.tech/docs/serverless/serverless-driver)**],  
-you can access a Neon database from serverless environments — like Cloudflare Workers or Vercel Edge Functions — over HTTP or WebSockets instead of TCP.
+With the Neon serverless driver [**[github](https://github.com/neondatabase/serverless)**, **[Neon docs](https://neon.tech/docs/serverless/serverless-driver)**],  
+you can access a Neon database from serverless environments over HTTP or WebSockets instead of TCP.
+
+This [blog post](https://blog.cloudflare.com/neon-postgres-database-from-workers/) shows how to use Drizzle ORM with the Neon Serverless driver in Cloudflare Workers.
+For a Next.js example that uses Drizzle ORM with Neon database in Vercel edge functions, see the [Todo App with Neon Postgres](https://orm.drizzle.team/learn/tutorials/drizzle-nextjs-neon) tutorial.
 
 Querying over HTTP is faster for single, non-interactive transactions. If you require session or interactive transaction support or a fully-compatible drop-in replacement for the `pg` driver, use WebSockets.
 

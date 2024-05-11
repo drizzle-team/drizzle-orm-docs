@@ -1,0 +1,241 @@
+---
+title: "Drizzle with Neon Postgres"
+date: "2024-05-10"
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.3788 21.6677C12.8679 22.3111 11.8319 21.9586 11.8196 21.137L11.6396 9.12061H19.7194C21.1828 9.12061 21.9991 10.8109 21.089 11.9571L13.3788 21.6677Z" fill="url(#paint0_linear_142_2)"/><path d="M13.3788 21.6677C12.8679 22.3111 11.8319 21.9586 11.8196 21.137L11.6396 9.12061H19.7194C21.1828 9.12061 21.9991 10.8109 21.089 11.9571L13.3788 21.6677Z" fill="url(#paint1_linear_142_2)" fill-opacity="0.2"/><path d="M10.0928 2.33232C10.6037 1.68882 11.6397 2.04141 11.652 2.86299L11.7309 14.8794H3.75221C2.2887 14.8794 1.47247 13.1891 2.38252 12.0429L10.0928 2.33232Z" fill="currentColor"/><defs><linearGradient id="paint0_linear_142_2" x1="11.6396" y1="11.7849" x2="18.8206" y2="14.7967" gradientUnits="userSpaceOnUse"><stop stop-color="currentColor"/><stop offset="1" stop-color="currentColor"/></linearGradient><linearGradient id="paint1_linear_142_2" x1="8.45585" y1="7.42589" x2="11.7308" y2="13.5908" gradientUnits="userSpaceOnUse"><stop/><stop offset="1" stop-opacity="0"/></linearGradient></defs></svg>]
+---
+
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Npm from "@mdx/Npm.astro";
+import Steps from "@mdx/Steps.astro";
+import Section from "@mdx/Section.astro";
+import Callout from "@mdx/Callout.astro";
+
+This tutorial demonstrates how to use Drizzle ORM with [Neon Postgres](https://neon.tech/) database. 
+
+<Prerequisites>
+  - `Neon`, a serverless postgres database. If you do not have an existing Neon account, sign up [here](https://neon.tech). 
+    
+    Your Neon projects come with a ready-to-use Postgres database named `neondb`. We'll use this database in the following examples.
+  
+  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview) along with the [Neon serverless driver](https://neon.tech/docs/serverless/serverless-driver). You can do this by running the following command:
+  <Npm>
+    drizzle-orm 
+    -D drizzle-kit
+    @neondatabase/serverless
+  </Npm>
+  
+  - You should have installed the `dotenv` package for managing environment variables, and `tsx` to run typescript files. 
+  <Npm>
+    dotenv
+    tsx
+  </Npm>  
+</Prerequisites>
+
+## Setup Neon and Drizzle ORM
+
+<Steps>
+#### Create a new Neon project
+
+Log in to the [Neon Console](https://console.neon.tech/app/projects) and navigate to the Projects section. Select a project or click the `New Project` button to create a new one.
+
+#### Retrieve your Neon database connection string
+
+Navigate to the **Connection Details** section in the project console to find your database connection string. It should look similar to this:
+
+```bash
+postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb
+```
+
+Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to our Neon database.
+
+```bash
+DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
+```
+
+#### Connect Drizzle ORM to your database 
+
+Create a `db.ts` file and set up your database configuration:
+
+```typescript copy filename="src/db.ts"
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { config } from "dotenv";
+
+config({ path: ".env" });
+
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql);
+```
+
+#### Create tables
+
+Create a `schema.ts` file and declare your tables:
+
+```typescript copy filename="src/schema.ts"
+import { pgTable, integer, serial, text, timestamp } from "drizzle-orm/pg-core";
+
+export const authors = pgTable("authors", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  bio: text("bio"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const books = pgTable("books", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  authorId: integer("author_id").references(() => authors.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+```
+
+The code defines two tables: `authors`, which will contain the list of all the authors, and `books`, which will contain the list of books written by the authors. Each book is associated with an author using the `authorId` field.
+
+#### Generate migrations
+
+We'll use the drizzle-kit CLI tool. Run the following command in your terminal. 
+
+```bash
+npx drizzle-kit generate:pg --schema src/schema.ts --out ./drizzle
+```
+
+These migrations are stored in the `drizzle`  directory, as specified above. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages. 
+
+Example of the generated migration:
+
+```sql
+CREATE TABLE IF NOT EXISTS "authors" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"bio" text,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "books" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"author_id" integer,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "books" ADD CONSTRAINT "books_author_id_authors_id_fk" FOREIGN KEY ("author_id") REFERENCES "authors"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+```
+
+#### Applying changes to the database
+
+Create a `migrate.ts` file and add the code below. 
+
+```typescript copy filename="src/migrate.ts"
+import { db } from './db';
+import { migrate } from "drizzle-orm/neon-http/migrator";
+import { config } from "dotenv";
+
+config({ path: ".env" });
+
+const main = async () => {
+  try {
+    await migrate(db, { migrationsFolder: "drizzle" });
+    console.log("Migration completed");
+  } catch (error) {
+    console.error("Error during migration:", error);
+    process.exit(1);
+  }
+};
+
+main();
+```
+
+To execute the migration scripts, run the following command. 
+
+```bash
+tsx ./src/migrate.ts
+```
+
+Learn more about the [migration process](https://orm.drizzle.team/docs/migrations).
+
+</Steps>
+
+
+### Basic file structure
+
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │  ├ 📜 db.ts
+ |  ├ 📜 migrate.ts
+ │  └ 📜 schema.ts
+ │  └ 📜 queries.ts
+ ├ 📂 drizzle
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json
+ │  │  └ 📜 0000_snapshot.json
+ │  └ 📜 0000_hesitant_blur.sql
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+## Query examples
+
+#### Insert data
+
+Read more about insert query in the [documentation](/docs/insert).
+
+```typescript copy filename="src/queries.ts"
+import { db } from './db';
+import { authors } from './schema';
+
+export async function createAuthor(name: string, bio: string) {
+  await db.insert(authors).values({ name, bio });
+}
+```
+
+#### Select data
+
+Read more about select query in the [documentation](/docs/select).
+
+```typescript copy filename="src/queries.ts"
+import { eq } from 'drizzle-orm';  
+import { db } from './db';
+import { authors, books } from './schema';
+
+export async function getBooksByAuthor(authorId: number) {
+  return db
+    .select()
+    .from(books)  
+    .where(eq(books.authorId, authorId));
+}
+```
+
+#### Update data
+
+Read more about update query in the [documentation](/docs/update).
+
+```typescript copy filename="src/queries.ts"
+import { eq } from 'drizzle-orm';
+import { db } from './db';  
+import { authors } from './schema';
+
+export async function updateAuthor(id: number, bio: string) {
+  await db.update(authors).set({ bio }).where(eq(authors.id, id));  
+}
+```
+
+#### Delete data
+
+Read more about delete query in the [documentation](/docs/delete).
+
+```typescript copy filename="src/queries.ts" 
+import { eq } from 'drizzle-orm';
+import { db } from './db';
+import { authors } from './schema';
+
+export async function deleteAuthor(id: number) {
+  await db.delete(authors).where(eq(authors.id, id));
+}  
+```
