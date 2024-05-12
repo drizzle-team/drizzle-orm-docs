@@ -150,12 +150,12 @@ export default {
 
 #### Applying changes to the database
 
-You can generate migrations using `drizzle-kit generate:<DIALECT>` command and then run them using the `migrate()` function which is available for each driver.
+You can generate migrations using `drizzle-kit generate` command and then run them using the `migrate()` function which is available for each driver.
 
 Generate migrations:
 
 ```bash
-npx drizzle-kit generate:sqlite
+npx drizzle-kit generate
 ```
 
 These migrations are stored in the `migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
