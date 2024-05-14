@@ -111,12 +111,12 @@ export default defineConfig({
 
 #### Applying changes to the database
 
-You can generate migrations using `drizzle-kit generate:<DIALECT>` command and then run them using the `migrate()` function which is available for each driver.
+You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
 
 Generate migrations:
 
 ```bash
-npx drizzle-kit generate:pg
+npx drizzle-kit generate
 ```
 
 These migrations are stored in the `migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
@@ -150,24 +150,8 @@ END $$;
 
 Run migrations:
 
-```typescript copy filename="src/db/migrate.ts"
-import 'dotenv/config';
-import { resolve } from 'node:path';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { db } from './db';
-
-(async () => {
-  try {
-    await migrate(db, { migrationsFolder: resolve(__dirname, '../../migrations') });
-    console.log('Migration successful');
-
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-
-    process.exit(1);
-  }
-})();
+```bash
+npx drizzle-kit migrate
 ```
 
 Learn more about [migration process](https://orm.drizzle.team/docs/migrations). Alternatively, you can push changes directly to the database using [push command](/kit-docs/overview#prototyping-with-db-push).
@@ -177,14 +161,13 @@ Learn more about [migration process](https://orm.drizzle.team/docs/migrations). 
 
 ## Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts` and schema definitions in `schema.ts`.
 
 ```plaintext
 📦 <project root>
  ├ 📂 src
  │   ├ 📂 db
  │   │  ├ 📜 db.ts
- |   |  ├ 📜 migrate.ts
  │   │  └ 📜 schema.ts
  │   └ 📜 index.ts
  ├ 📂 migrations
