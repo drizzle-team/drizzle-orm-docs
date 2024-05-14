@@ -58,15 +58,15 @@ In this tutorial we use [Supabase PostgreSQL](https://supabase.com/docs/guides/d
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import { type Config } from "drizzle-kit";
+import { Config } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./app/db/schema.ts",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.POSTGRES_URL!,
+    url: process.env.POSTGRES_URL!,
   },
-} satisfies Config;
+});
 ```
 
 Configure your database connection string in the `.env` file:
@@ -190,15 +190,15 @@ You can check quickstart guide for Drizzle with Vercel Postgres client in the [d
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import { type Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./app/db/schema.ts",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.POSTGRES_URL!,
+    url: process.env.POSTGRES_URL!,
   },
-} satisfies Config;
+});
 ```
 
 Configure your database connection string in the `.env` file:
@@ -320,15 +320,15 @@ In this tutorial we use [PlanetScale MySQL](https://planetscale.com/).
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import { type Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./app/db/schema.ts",
-  driver: "mysql2",
+  dialect: "mysql",
   dbCredentials: {
-    uri: process.env.MYSQL_URL!,
+    url: process.env.MYSQL_URL!,
   },
-} satisfies Config;
+});
 ```
 
 Configure your database connection string in the `.env` file:
@@ -454,16 +454,17 @@ You can check [quickstart guide](/docs/get-started-sqlite#turso) or [tutorial](/
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import { type Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./app/db/schema.ts",
+  dialect: "sqlite",
   driver: "turso",
   dbCredentials: {
     url: process.env.TURSO_CONNECTION_URL!,
     authToken: process.env.TURSO_AUTH_TOKEN!,
   },
-} satisfies Config;
+});
 ```
 
 Configure your database connection string in the `.env` file:

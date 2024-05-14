@@ -46,16 +46,16 @@ In this snippet, we import functionality from **`@neondatabase/serverless`** and
 
 ```tsx copy filename="drizzle.config.ts"
 import "dotenv/config";
-import type {Config} from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./db/schema.ts",
   out: "./drizzle",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.NEON_DATABASE_URL!,
+    url: process.env.NEON_DATABASE_URL!,
   },
-} satisfies Config;
+});
 ```
 
 This configuration file specifies the database schema location, path for generating migrations, and database connection through the connection string.
