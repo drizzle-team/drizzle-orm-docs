@@ -142,18 +142,20 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/snaplet",
-      name: "Snaplet",
-      avatarUrl: "/images/snaplet.png",
+      login: "driz.link/neon",
+      name: "Prisma",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
-    createdAt: "2023-06-11T13:32:16Z",
+    createdAt: "2023-11-16T13:32:16Z",
     isActive: true,
-    imageType: ImageType.IMAGE,
+    imageType: ImageType.SVG,
     darkStyle: {
-      padding: "6px",
+      background:
+        'url("/svg/prisma-dark.svg") 0% 0% / cover no-repeat content-box',
     },
     lightStyle: {
-      padding: "6px",
+      background: 'url("/svg/prisma.svg") 0% 0% / cover no-repeat content-box',
     },
   },
   {
