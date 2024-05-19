@@ -10,17 +10,17 @@ import Steps from "@mdx/Steps.astro";
 import Section from "@mdx/Section.astro";
 import Callout from "@mdx/Callout.astro";
 
-This tutorial demonstrates how to use Drizzle ORM with [Neon Postgres](https://neon.tech/) database. 
+This tutorial demonstrates how to use Drizzle ORM with [Neon Postgres](https://neon.tech/) database. If you do not have an existing Neon account, sign up [here](https://neon.tech). 
 
-<Prerequisites>
-  - `Neon`, a serverless postgres database. If you do not have an existing Neon account, sign up [here](https://neon.tech). 
-    
-    Your Neon projects come with a ready-to-use Postgres database named `neondb`. We'll use this database in the following examples.
-  
-  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview) along with the [Neon serverless driver](https://neon.tech/docs/serverless/serverless-driver). You can do this by running the following command:
+<Prerequisites>  
+  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
   <Npm>
     drizzle-orm 
     -D drizzle-kit
+  </Npm>
+
+  - You should also install the [Neon serverless driver](https://neon.tech/docs/serverless/serverless-driver). 
+  <Npm>
     @neondatabase/serverless
   </Npm>
   
@@ -36,7 +36,9 @@ This tutorial demonstrates how to use Drizzle ORM with [Neon Postgres](https://n
 <Steps>
 #### Create a new Neon project
 
-Log in to the [Neon Console](https://console.neon.tech/app/projects) and navigate to the Projects section. Select a project or click the `New Project` button to create a new one.
+Log in to the [Neon Console](https://console.neon.tech/app/projects) and navigate to the Projects section. Select a project or click the `New Project` button to create a new one. 
+
+Your Neon projects come with a ready-to-use Postgres database named `neondb`. We'll use it in this tutorial.
 
 #### Retrieve your Neon database connection string
 
