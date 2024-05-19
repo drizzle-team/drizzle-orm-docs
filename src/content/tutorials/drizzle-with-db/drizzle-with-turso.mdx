@@ -135,22 +135,23 @@ Create a `drizzle.config.ts` file in the root of your project and add the follow
 
 ```typescript copy filename="drizzle.config.ts"
 import 'dotenv/config';
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
+export default defineConfig({
   schema: './src/db/schema.ts',
   out: './migrations',
+  dialect: 'sqlite',
   driver: 'turso',
   dbCredentials: {
     url: process.env.TURSO_CONNECTION_URL!,
     authToken: process.env.TURSO_AUTH_TOKEN!,
   },
-} satisfies Config;
+});
 ```
 
 #### Applying changes to the database
 
-You can generate migrations using `drizzle-kit generate` command and then run them using the `migrate()` function which is available for each driver.
+You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
 
 Generate migrations:
 
@@ -185,24 +186,8 @@ CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
 
 Run migrations:
 
-```typescript copy filename="src/db/migrate.ts"
-import 'dotenv/config';
-import { resolve } from 'node:path';
-import { migrate } from 'drizzle-orm/libsql/migrator';
-import { db } from './db';
-
-(async () => {
-  try {
-    await migrate(db, { migrationsFolder: resolve(__dirname, '../../migrations') });
-    console.log('Migration successful');
-
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-
-    process.exit(1);
-  }
-})();
+```bash
+npx drizzle-kit migrate
 ```
 
 Learn more about [migration process](https://orm.drizzle.team/docs/migrations). Alternatively, you can push changes directly to the database using [push command](/kit-docs/overview#prototyping-with-db-push).
@@ -212,14 +197,13 @@ Learn more about [migration process](https://orm.drizzle.team/docs/migrations). 
 
 ### Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts` and schema definitions in `schema.ts`.
 
 ```plaintext
 📦 <project root>
  ├ 📂 src
  │   ├ 📂 db
  │   │  ├ 📜 db.ts
- |   |  ├ 📜 migrate.ts
  │   │  └ 📜 schema.ts
  │   └ 📜 index.ts
  ├ 📂 migrations

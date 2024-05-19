@@ -43,20 +43,19 @@ Schema-related type definitions, on the other hand, are allowed and even encoura
 Create a `drizzle.config.ts` file in your project root:
 
 ```typescript copy filename="drizzle.config.ts"
-import 'dotenv/config';
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
+export default defineConfig({
 	schema: './src/schema.ts',
 	out: './drizzle',
-	driver: 'mysql2', // 'pg' | 'mysql2' | 'better-sqlite' | 'libsql' | 'turso'
+	dialect: 'mysql', // 'postgresql' | 'mysql' | 'sqlite'
 	dbCredentials: {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
 	},
-} satisfies Config;
+});
 ```
 
 #### Generate the migration
@@ -65,7 +64,7 @@ export default {
 pnpm drizzle-kit generate
 ```
 This will generate a migration SQL file:
-```sql copy filename="drizzle/migrations/0000_better_than_prisma.sql"
+```sql copy filename="drizzle/migrations/0000_migration.sql"
 CREATE TABLE `users` (
  `id` bigint primary key auto_increment,
  `full_name` varchar(256)

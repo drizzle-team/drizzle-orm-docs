@@ -96,12 +96,13 @@ export const usersTable = pgTable('users_table', {
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./supabase/functions/common/schema.ts",
   out: "./supabase/migrations",
-} satisfies Config;
+  dialect: "postgresql",
+});
 ```
 
 In this tutorial we will use Drizzle kit to generate migrations for our schema.

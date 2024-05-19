@@ -40,18 +40,16 @@ export const users = pgTable('users', {
 #### Prepare config file
 Check out extended config file **[docs.](/kit-docs/conf)**
 ```typescript copy filename="drizzle.config.ts"
-import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { defineConfig } from "drizzle-kit";
  
-export default {
+export default defineConfig({
   schema: "./schema/*",
   out: "./drizzle",
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
     url: process.env.DB_URL,
   }
-} satisfies Config;
+});
 ```
 #### Launch Drizzle Studio
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
