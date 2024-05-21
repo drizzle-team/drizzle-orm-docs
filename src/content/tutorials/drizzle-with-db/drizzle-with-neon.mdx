@@ -48,7 +48,7 @@ Navigate to the **Connection Details** section in the project console to find yo
 postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb
 ```
 
-Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to our Neon database.
+Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to the Neon database.
 
 ```bash
 DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
@@ -74,54 +74,87 @@ export const db = drizzle(sql);
 Create a `schema.ts` file and declare your tables:
 
 ```typescript copy filename="src/schema.ts"
-import { pgTable, integer, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const authors = pgTable("authors", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  bio: text("bio"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+export const usersTable = pgTable('users_table', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age').notNull(),
+  email: text('email').notNull().unique(),
 });
 
-export const books = pgTable("books", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  authorId: integer("author_id").references(() => authors.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+export const postsTable = pgTable('posts_table', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
+
+export type InsertUser = typeof usersTable.$inferInsert;
+export type SelectUser = typeof usersTable.$inferSelect;
+
+export type InsertPost = typeof postsTable.$inferInsert;
+export type SelectPost = typeof postsTable.$inferSelect;
 ```
 
-The code defines two tables: `authors`, which will contain the list of all the authors, and `books`, which will contain the list of books written by the authors. Each book is associated with an author using the `authorId` field.
+#### Setup Drizzle config file
+
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
+
+Create a `drizzle.config.ts` file in the root of your project and add the following content:
+
+```typescript copy filename="drizzle.config.ts"
+import "dotenv/config";
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+  schema: "./src/schema.ts",
+  out: "./migrations",
+});
+```
 
 #### Generate migrations
 
 We'll use the drizzle-kit CLI tool. Run the following command in your terminal. 
 
 ```bash
-npx drizzle-kit generate:pg --schema src/schema.ts --out ./drizzle
+npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle`  directory, as specified above. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages. 
+These migrations are stored in the `migrations` directory, as specified in the config. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages. 
 
-Example of the generated migration:
+For example, the migration generated above will create the following SQL:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "authors" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
-	"bio" text,
-	"created_at" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "books" (
+CREATE TABLE IF NOT EXISTS "posts_table" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" text NOT NULL,
-	"author_id" integer,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"content" text NOT NULL,
+	"user_id" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "users_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"age" integer NOT NULL,
+	"email" text NOT NULL,
+	CONSTRAINT "users_table_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "books" ADD CONSTRAINT "books_author_id_authors_id_fk" FOREIGN KEY ("author_id") REFERENCES "authors"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -129,32 +162,10 @@ END $$;
 
 #### Applying changes to the database
 
-Create a `migrate.ts` file and add the code below. 
-
-```typescript copy filename="src/migrate.ts"
-import { db } from './db';
-import { migrate } from "drizzle-orm/neon-http/migrator";
-import { config } from "dotenv";
-
-config({ path: ".env" });
-
-const main = async () => {
-  try {
-    await migrate(db, { migrationsFolder: "drizzle" });
-    console.log("Migration completed");
-  } catch (error) {
-    console.error("Error during migration:", error);
-    process.exit(1);
-  }
-};
-
-main();
-```
-
 To execute the migration scripts, run the following command. 
 
 ```bash
-tsx ./src/migrate.ts
+npx drizzle-kit migrate
 ```
 
 Learn more about the [migration process](https://orm.drizzle.team/docs/migrations).
@@ -170,30 +181,33 @@ This is the basic file structure of the project. In the `src/db` directory, we h
 📦 <project root>
  ├ 📂 src
  │  ├ 📜 db.ts
- |  ├ 📜 migrate.ts
  │  └ 📜 schema.ts
  │  └ 📜 queries.ts
  ├ 📂 drizzle
  │  ├ 📂 meta
  │  │  ├ 📜 _journal.json
  │  │  └ 📜 0000_snapshot.json
- │  └ 📜 0000_hesitant_blur.sql
+ │  └ 📜 0000_dry_richard_fisk.sql
+ ├ 📜 .env
+ ├ 📜 drizzle.config.ts
  ├ 📜 package.json
  └ 📜 tsconfig.json
 ```
 
 ## Query examples
 
+We create a file `src/queries.ts` with some sample queries as below.
+
 #### Insert data
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/queries.ts"
+```typescript copy filename="src/queries.ts" {4}
 import { db } from './db';
-import { authors } from './schema';
+import { InsertUser, usersTable } from './schema';
 
-export async function createAuthor(name: string, bio: string) {
-  await db.insert(authors).values({ name, bio });
+export async function createUser(data: InsertUser) {
+  await db.insert(usersTable).values(data);
 }
 ```
 
@@ -201,30 +215,80 @@ export async function createAuthor(name: string, bio: string) {
 
 Read more about select query in the [documentation](/docs/select).
 
-```typescript copy filename="src/queries.ts"
-import { eq } from 'drizzle-orm';  
+```typescript copy filename="src/queries.ts" {5, 16, 41}
+import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
 import { db } from './db';
-import { authors, books } from './schema';
+import { InsertUser, SelectUser, postsTable, usersTable } from './schema';
 
-export async function getBooksByAuthor(authorId: number) {
+export async function getUserById(id: SelectUser['id']): Promise<
+  Array<{
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }>
+> {
+  return db.select().from(usersTable).where(eq(usersTable.id, id));
+}
+
+export async function getUsersWithPostsCount(
+  page = 1,
+  pageSize = 5,
+): Promise<
+  Array<{
+    postsCount: number;
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }>
+> {
   return db
-    .select()
-    .from(books)  
-    .where(eq(books.authorId, authorId));
+    .select({
+      ...getTableColumns(usersTable),
+      postsCount: count(postsTable.id),
+    })
+    .from(usersTable)
+    .leftJoin(postsTable, eq(usersTable.id, postsTable.userId))
+    .groupBy(usersTable.id)
+    .orderBy(asc(usersTable.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+}
+
+export async function getPostsForLast24Hours(
+  page = 1,
+  pageSize = 5,
+): Promise<
+  Array<{
+    id: number;
+    title: string;
+  }>
+> {
+  return db
+    .select({
+      id: postsTable.id,
+      title: postsTable.title,
+    })
+    .from(postsTable)
+    .where(between(postsTable.createdAt, sql`now() - interval '1 day'`, sql`now()`))
+    .orderBy(asc(postsTable.title), asc(postsTable.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
 }
 ```
+
+Alternatively, you can use [relational query syntax](/docs/rqb).
 
 #### Update data
 
 Read more about update query in the [documentation](/docs/update).
 
-```typescript copy filename="src/queries.ts"
-import { eq } from 'drizzle-orm';
-import { db } from './db';  
-import { authors } from './schema';
+```typescript copy filename="src/queries.ts" {3}
+// imports
 
-export async function updateAuthor(id: number, bio: string) {
-  await db.update(authors).set({ bio }).where(eq(authors.id, id));  
+export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
+  await db.update(postsTable).set(data).where(eq(postsTable.id, id));
 }
 ```
 
@@ -232,12 +296,10 @@ export async function updateAuthor(id: number, bio: string) {
 
 Read more about delete query in the [documentation](/docs/delete).
 
-```typescript copy filename="src/queries.ts" 
-import { eq } from 'drizzle-orm';
-import { db } from './db';
-import { authors } from './schema';
+```typescript copy filename="src/queries.ts" {3}
+// imports
 
-export async function deleteAuthor(id: number) {
-  await db.delete(authors).where(eq(authors.id, id));
-}  
+export async function deleteUser(id: SelectUser['id']) {
+  await db.delete(usersTable).where(eq(usersTable.id, id));
+}
 ```
