@@ -236,7 +236,25 @@ export default defineConfig({
 })
 ```
 
-**D1Credentials** (`d1`) - WIP
+**D1Credentials** (`d1`)
+
+To get all needed credentials from Cloudflare dashboard you need to
+
+- Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and then:
+
+To get `accountId`:
+- Open "Workers & Pages" tab
+- Go to "Overview" 
+- Copy **Account ID** from the right sidebar
+
+To get `databaseId`:
+- Open D1 database you want to connect to and copy **Database ID** 
+
+To get `token`:
+- Open "My profile"
+- Go to "API Tokens"
+- Create token with D1 edit permissions
+
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -244,8 +262,9 @@ export default defineConfig({
   dialect: "sqlite",
   driver: "d1-http",
   dbCredentials: {
-    wranglerConfigPath: 'wrangler.toml',
-    dbName: "d1-test"
+    accountId: "",
+    databaseId: "",
+    token: "",
   }
 })
 ```
