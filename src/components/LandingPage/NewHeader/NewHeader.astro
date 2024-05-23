@@ -1,0 +1,256 @@
+<div class="header_container">
+  <div class="header-left">
+    <div class="title">ORM that lets you settle</div>
+    <div class="tags">
+      <div class="tag">
+        <div class="tag-check">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            width="20"
+            height="20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="tag-text">TypeScript</div>
+      </div>
+      <div class="tag">
+        <div class="tag-check">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            width="20"
+            height="20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="tag-text">TypeScript</div>
+      </div>
+    </div>
+    <div class="buttons">
+      <a href="/docs/overview#why-sql-like" class="button">Why Drizzle</a>
+      <a href="/docs/overview" class="button">Read docs</a>
+      <div class="button button--search">
+        <div class="button-text">Search docs</div>
+        <div id="docsearch"></div>
+      </div>
+      <button id="inkeepButton" class="button">Ask docs</button>
+    </div>
+  </div>
+  <div class="header-right"></div>
+</div>
+<script is:inline>
+  docsearch({
+    container: "#docsearch",
+    appId: "MXZNUT59HV",
+    apiKey: "7c390e262ac8858df0b6624d01d9dfef",
+    indexName: "orm-drizzle",
+    placeholder: "Search documentation...",
+  });
+</script>
+<script type="module">
+
+  const inkeepButton = document.getElementById("inkeepButton");
+
+  // Create a new div element to hold the Inkeep modal and set its id and position
+  const inkeepDiv = document.createElement("div");
+  inkeepDiv.id = "inkeepModal";
+  inkeepDiv.style.position = "absolute";
+  document.body.appendChild(inkeepDiv);
+
+  const handleClose = () => {
+    inkeepWidget.render({
+      ...config,
+      isOpen: false,
+    });
+  };
+
+  const handleOpen = () => {
+    let themeName = localStorage.getItem("theme");
+    if (themeName === "system") {
+      themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    inkeepWidget.render({
+      ...config,
+      isOpen: true,
+      baseSettings: {
+        ...config.properties.baseSettings,
+        theme: {
+          colorMode: {
+            forcedColorMode: themeName,
+          },
+        },
+      },
+    });
+    
+  };
+  const config = {
+    stylesheetUrls: ["/inkeep-styles.css"],
+    componentType: "CustomTrigger", // required
+    targetElement: inkeepDiv, // required
+    properties: {
+      isOpen: false, // required
+      onClose: handleClose, // required
+      onOpen: undefined,
+      baseSettings: {
+        apiKey: "4f4da4a5733032ef8ff23e3b7906954877fd0ee54d58d1e0",
+        integrationId: "clpbm8p9y002ns601vbbswj5i",
+        organizationId: "clog94xy50001s601yapu7swn",
+        organizationDisplayName: "Drizzle ORM",
+        primaryBrandColor: "#FFFFFF",
+        theme: {
+          colorMode: {
+            forcedColorMode: "dark",
+          },
+        },
+      },
+      modalSettings: {
+        defaultView: "AI_CHAT",
+        areOpenHotKeysDisabled: true,
+      },
+      aiChatSettings: {
+        botAvatarSrcUrl: "/svg/drizzle.svg",
+      },
+    },
+  };
+
+  // Embed the widget using the `Inkeep.embed()` function.
+  const inkeepWidget = Inkeep().embed(config);
+
+  // Add event listener to open the Inkeep modal when the button is clicked
+  inkeepButton.addEventListener("click", handleOpen);
+  window.inkeepWidget = inkeepWidget;
+</script>
+<style is:inline>
+  .DocSearch-Button {
+    opacity: 0;
+    margin-left: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+  }
+</style>
+<style>
+  .header_container {
+    max-width: 910px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .buttons {
+    margin-top: 100px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  html.dark .button {
+    color: #282828;
+    background-color: rgb(226, 232, 240);
+  }
+
+  .button {
+    width: 212px;
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    height: 48px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: #282b3b;
+  }
+
+  .button-text {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .button--search {
+    position: relative;
+  }
+
+  #docsearch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .tags {
+    display: flex;
+    gap: 16px;
+  }
+
+  .tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tag-check {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #4bb74a;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+  }
+
+  html.dark .tag-check svg {
+    color: #111111;
+  }
+
+  .tag-check svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 4;
+    color: #ffffff;
+  }
+
+  .tag-text {
+    font-weight: 600;
+  }
+
+  .title {
+    margin-top: 48px;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 48px;
+  }
+</style>
