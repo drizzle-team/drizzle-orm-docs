@@ -1,53 +1,69 @@
+---
+import { Image } from "astro:assets";
+import JavaScriptIcon from "../../Icons/JavaScriptIcon.astro";
+import TypeScriptIcon from "../../Icons/TypeScriptIcon.astro";
+import SecondPic from "../Header/Images/SecondPic.webp";
+import SecondPicDark from "../Header/Images/SecondPic_dark.webp";
+import TopPick from './Images/LiveOnTheEdge.webp';
+import TopPickDark from './Images/LiveOnTheEdgeDark.webp';
+import ConnectEveryWhere from '../Supporting/Images/ConnectEverywhere.webp';
+import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.webp';
+---
 <div class="header_container">
   <div class="header-left">
-    <div class="title">ORM that lets you settle</div>
+    <div class="title">ORM for you to settle</div>
     <div class="tags">
       <div class="tag">
-        <div class="tag-check">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            width="20"
-            height="20"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-              clip-rule="evenodd"></path>
-          </svg>
+        <div class="tag-icon-container">
+          <div class="tag-icon js">
+            <JavaScriptIcon/>
+          </div>
         </div>
-        <div class="tag-text">TypeScript</div>
+        <div class="tag-text">JavaScript</div>
       </div>
       <div class="tag">
-        <div class="tag-check">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            width="20"
-            height="20"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-              clip-rule="evenodd"></path>
-          </svg>
+        <div class="tag-icon-container">
+          <div class="tag-icon ts" >
+            <TypeScriptIcon/>
+          </div>
         </div>
         <div class="tag-text">TypeScript</div>
       </div>
     </div>
+    <div class="header-middle">
+      <Image src={TopPick} alt="second pick" class="img_light" />
+      <Image src={TopPickDark} alt="second pick" class="img_dark" />
+      <Image style="align-self: start;" src={ConnectEveryWhere} alt="second pick" class="img_light" />
+      <Image style="align-self: start;" src={ConnectEveryWhereDark} alt="second pick" class="img_dark" />
+      <Image style="align-self: end" src={SecondPic} alt="second pick" class="img_light" />
+      <Image style="align-self: end" src={SecondPicDark} alt="second pick" class="img_dark" />
+    </div>
     <div class="buttons">
-      <a href="/docs/overview#why-sql-like" class="button">Why Drizzle</a>
-      <a href="/docs/overview" class="button">Read docs</a>
-      <div class="button button--search">
-        <div class="button-text">Search docs</div>
+      <a href="/docs/overview#why-sql-like" class="header-button">
+        <span>Why Drizzle?</span>
+      </a>
+      <a href="/docs/overview" class="header-button">
+        <span>Read Docs</span>
+      </a>
+      <div class="header-button button--search">
+        <div class="button-text"><span>Search Docs</span></div>
         <div id="docsearch"></div>
       </div>
-      <button id="inkeepButton" class="button">Ask docs</button>
+      <button id="inkeepButton" class="header-button">
+        <span>Ask Docs</span>
+      </button>
     </div>
   </div>
-  <div class="header-right"></div>
+  <div class="header-right">
+    <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: start">
+      <Image src={TopPick} alt="second pick" class="img_light second_pick" />
+      <Image src={TopPickDark} alt="second pick" class="img_dark second_pick" />
+      <Image style="align-self: start;" src={ConnectEveryWhere} alt="second pick" class="img_light" />
+      <Image style="align-self: start;" src={ConnectEveryWhereDark} alt="second pick" class="img_dark" />
+    </div>
+    <Image style="align-self: end" src={SecondPic} alt="second pick" class="img_light" />
+    <Image style="align-self: end" src={SecondPicDark} alt="second pick" class="img_dark" />
+  </div>
 </div>
 <script is:inline>
   docsearch({
@@ -148,9 +164,10 @@
 <style>
   .header_container {
     max-width: 910px;
-    margin: 0 auto;
+    margin: 144px auto 0;
     width: 100%;
     display: flex;
+      gap: 20px;
   }
 
   .header-left {
@@ -158,33 +175,83 @@
     flex-direction: column;
   }
 
+  .header-right {
+    display: flex;
+    justify-content: space-between;
+    width: 70%;
+  }
+
+  .header-middle {
+      justify-content: space-between;
+      width: 100%;
+      display: none;
+  }
+
+  .header-middle img {
+      height: 100px;
+      width: fit-content;
+      object-fit: contain;
+  }
+
+  .header-right img {
+    height: 130px;
+    width: fit-content;
+    object-fit: contain;
+  }
+
+  .header-right img {
+      height: 130px;
+      width: fit-content;
+      object-fit: contain;
+  }
+
+  .img_light {
+      display: block;
+  }
+
+  .img_dark {
+      display: none;
+  }
+
+  .img_dark {
+      display: block;
+  }
+
+  .img_light {
+      display: none;
+  }
+
   .buttons {
-    margin-top: 100px;
+    margin-top: 80px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    gap: 8px;
+    z-index: 0;
+      max-width: 400px;
   }
 
-  html.dark .button {
-    color: #282828;
-    background-color: rgb(226, 232, 240);
+  html.dark .header-button {
+      color: #cccccc;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  .button {
-    width: 212px;
-    border-radius: 3px;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1;
+  .header-button {
     height: 48px;
+    color: #282b3b;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 3px;
+    padding: 10px 20px;
     cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    border: none;
-    background-color: #282b3b;
+    border: 1px solid rgba(33, 39, 46, 0.12);
+    background-color: rgba(240, 241, 242, 0.27);
+    position: relative;
   }
 
   .button-text {
@@ -198,10 +265,6 @@
     bottom: 0;
   }
 
-  .button--search {
-    position: relative;
-  }
-
   #docsearch {
     position: absolute;
     top: 0;
@@ -211,46 +274,158 @@
   }
 
   .tags {
+    margin-top: 12px;
     display: flex;
-    gap: 16px;
+    gap: 8px;
   }
 
   .tag {
     display: flex;
     align-items: center;
-    gap: 8px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(33,39,46,.12);
+    background-color: hsla(210,7%,95%,.27);
   }
 
-  .tag-check {
+  .tag svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+  }
+
+  .tag-icon-container {
+    width: 28px;
+    height: 28px;
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: #4bb74a;
+  }
+
+  .tag-icon {
     width: 16px;
     height: 16px;
-    border-radius: 50%;
+    border-radius: 2px;
+    overflow: hidden;
+    color: #4b5563;
   }
 
-  html.dark .tag-check svg {
-    color: #111111;
+  html.dark .tag {
+      border: 1.5px solid #404040;
+      background-color: #282828;
   }
 
-  .tag-check svg {
-    width: 12px;
-    height: 12px;
-    stroke-width: 4;
-    color: #ffffff;
+  html.dark .tag .ts {
+      color: #3178C6;
+  }
+
+  html.dark .tag .js {
+      color: #F7DF1E;
+  }
+
+  html.dark .tag-text {
+      color: #FFFFFF;
   }
 
   .tag-text {
+    padding: 0 8px 0 0;
+    font-size: 14px;
     font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #4b5563;
   }
 
   .title {
-    margin-top: 48px;
     font-size: 40px;
     font-weight: 700;
     line-height: 48px;
+      white-space: nowrap;
+  }
+
+  .header-button-svg {
+      height: 18px;
+      width: 18px;
+      margin-left: -18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: margin-left 150ms ease-in-out, opacity 150ms ease-in-out;
+      opacity: 0;
+  }
+
+  .header-button:hover .header-button-svg {
+      margin-left: 6px;
+      opacity: 1;
+  }
+  .header-button-svg svg {
+      width: 14px;
+      height: 14px;
+  }
+
+  .second_pick {
+      align-self: start;
+      height: 120px;
+      margin-top: -80px;
+  }
+
+  @media (max-width: 900px) {
+      .header-right img {
+          height: 100px;
+      }
+
+      .second_pick {
+          margin-top: -56px;
+      }
+  }
+
+  @media (max-width: 700px) {
+      .header-right {
+          display: none;
+          margin-top: 64px;
+      }
+
+      .header-middle {
+          width: 100%;
+      }
+
+      .header_container {
+          flex-direction: column;
+          margin: 120px auto 0;
+          align-items: center;
+      }
+
+      .header-left {
+          max-width: 400px;
+          width: 100%;
+      }
+
+      .buttons {
+          justify-items: center;
+          align-self: center;
+          width: 100%;
+          margin-top: 4px;
+      }
+
+      .header-button {
+          font-size: 14px;
+          height: 40px;
+          width: 100%;
+      }
+
+      .tag-text {
+          font-size: 12px;
+      }
+
+      .header-middle {
+          margin-top: 64px;
+          display: flex;
+          align-self: center;
+      }
+
+      .title {
+          font-size: 26px;
+          line-height: 30px;
+      }
+
   }
 </style>
