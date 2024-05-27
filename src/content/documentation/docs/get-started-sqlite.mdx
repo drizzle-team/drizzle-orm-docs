@@ -227,13 +227,14 @@ config.resolver.sourceExts.push('sql'); // <--- add this
 module.exports = config;
 ```
 
-Make sure to have `driver: 'expo'` in Drizzle Kit config
+Make sure to have `dialect: 'sqlite'` and `driver: 'expo'` in Drizzle Kit config
 ```ts filename="drizzle.config.ts"
 import type { Config } from 'drizzle-kit';
 
 export default {
 	schema: './db/schema.ts',
 	out: './drizzle',
+  dialect: 'sqlite',
 	driver: 'expo', // <--- very important
 } satisfies Config;
 ```
@@ -342,13 +343,14 @@ config.resolver.sourceExts.push('sql');
 module.exports = config;
 ```
 
-Make sure to have `driver: 'expo'` in Drizzle Kit config
+Make sure to have `dialect: 'sqlite'` and `driver: 'expo'` in Drizzle Kit config
 ```ts filename="drizzle.config.ts"
 import type { Config } from 'drizzle-kit';
 
 export default {
 	schema: './db/schema.ts',
 	out: './drizzle',
+  dialect: 'sqlite',
 	driver: 'expo', // <--- very important
 } satisfies Config;
 ```
