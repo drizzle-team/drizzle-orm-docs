@@ -8,66 +8,103 @@ import Button from '@components/markdown/Button.astro';
 
 ## Generate migrations
 
-`drizzle-kit generate:{dialect}` lets you generate migrations based on you Drizzle schema.
+`drizzle-kit generate` lets you generate migrations based on you Drizzle schema.
 
 | param                                   | required | description                                                         |
 | :-------------------------------------- | :------- | :------------------------------------------------------------------ |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
 | **[`schema`](/kit-docs/conf#schema-files-paths)**    | yes      | path to typescript schema file or folder with multiple schema files |
 | **[`out`](/kit-docs/conf#migrations-folder)**       | no       | migrations folder, default=`./drizzle`                              |
 | `config`                                | no       | config file path, default=`drizzle.config.ts`                       |
 | `custom`                                | no       | generate empty SQL for custom migration                             |
+| `name`                                | no       | generate migration with custom name                             |
 | **[`breakpoints`](/kit-docs/conf#sql-breakpoints)** | no       | SQL statements breakpoints, default=`true`                          |
 
 <Section>
 ```shell
-$ drizzle-kit generate:pg
-```
-```shell
-$ drizzle-kit generate:mysql
-```
-```shell
-$ drizzle-kit generate:sqlite
+$ drizzle-kit generate
 ```
 ```ts
 // drizzle.config.ts
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
+  dialect: "postgresql", // "mysql" | "sqlite"
   schema: "./src/schema.ts",
   out: "./drizzle",
-} satisfies Config;
+});
+```
+</Section>
+
+If you want to use custom name for your migration 
+
+```shell
+$ drizzle-kit generate --name init_db
+```
+
+If you want to use custom named config file
+
+```shell
+$ drizzle-kit generate --config=custom.config.ts
+```
+
+If you want to have all params as CLI options
+
+```shell
+$ drizzle-kit generate --schema=./src/schema.ts --out=./drizzle
+```
+
+Generate an empty SQL migration file for custom migration.
+
+```shell
+$ drizzle-kit generate --custom
+```
+
+## Apply migrations
+
+`drizzle-kit migrate` lets you apply migrations stored in you migrations folder and outputed by `drizzle-kit generate`
+
+| param                                   | required | description                                                         |
+| :-------------------------------------- | :------- | :------------------------------------------------------------------ |
+| `config`                                | no       | config file path, default=`drizzle.config.ts`                       |
+
+<Section>
+```shell
+$ drizzle-kit migrate
+```
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql", // "mysql" | "sqlite"
+  out: "./drizzle",
+  migrations: {
+    table: 'migrations_custom', // default `__drizzle_migrations`,
+    schema: 'public', // used in PostgreSQL only and default to `drizzle`
+  }
+});
 ```
 </Section>
 
 If you want to use custom named config file
 
 ```shell
-$ drizzle-kit generate:pg --config=custom.config.ts
-```
-
-If you want to have all params as CLI options
-
-```shell
-$ drizzle-kit generate:pg --schema=./src/schema.ts --out=./drizzle
-```
-
-Generate an empty SQL migration file for custom migration.
-
-```shell
-$ drizzle-kit generate:pg --custom
+$ drizzle-kit migrate --config=custom.config.ts
 ```
 
 ## Introspect / Pull
 
-`drizzle-kit introspect:{dialect}` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
+`drizzle-kit introspect` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
 
-Either **[`connectionString`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are mandatory.
+Either **[`url`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are mandatory.
 
 | param                                 | required | description                                   |
 | :-----------------------------------  | :------- | :-------------------------------------------- |
-| driver                                | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
+| driver                                | no      | driver to use for querying (`aws-data-api`, `d1-http`, `turso`, `expo`)|
 | **[`out`](/kit-docs/conf#migrations-folder)**     | no       | migrations folder, default=`./drizzle`        |
-| `connectionString`                    | no       | database connection string                    |
+| `url`                    | no       | database connection string                    |
 | `user`                                | no       | database user                                 |
 | `password`                            | no       | database password                             |
 | `host`                                | no       | host                                          |
@@ -81,15 +118,7 @@ Either **[`connectionString`](/kit-docs/conf#push-and-pull)** or **[`user:passwo
 <Section>
 
 ```shell
-$ drizzle-kit introspect:pg
-```
-
-```shell
-$ drizzle-kit introspect:mysql
-```
-
-```shell
-$ drizzle-kit introspect:sqlite
+$ drizzle-kit introspect
 ```
 
 </Section>
@@ -97,26 +126,26 @@ $ drizzle-kit introspect:sqlite
 <Tabs items={["Example 1", "Example 2"]}>
 <Tab>
 ```ts {8}
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/schema/*",
   out: "./drizzle",
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: "postgresql://postgres:password@host:port/db",
+    url: "postgresql://postgres:password@host:port/db",
   }
-} satisfies Config;
+});
 ```
 </Tab>
 <Tab>
 ```ts {8-12}
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./src/schema/*",
   out: "./drizzle",
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
     user: "postgres",
     password: "password",
@@ -124,7 +153,7 @@ export default {
     port: 5432,
     database: "db",
   }
-} satisfies Config;
+});
 ```
 </Tab>
 </Tabs>
@@ -132,21 +161,21 @@ export default {
 If you want to use custom named config file
 
 ```shell
-$ drizzle-kit introspect:pg --config=custom.config.ts
+$ drizzle-kit introspect --config=custom.config.ts
 ```
 
 If you want to have all params as CLI options
 
 ```shell
-$ drizzle-kit introspect:pg --out=migrations/ --connectionString=postgresql://user:pass@host:port/db_name
-$ drizzle-kit introspect:pg --out=migrations/ --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
+$ drizzle-kit introspect --out=migrations/ --connectionString=postgresql://user:pass@host:port/db_name
+$ drizzle-kit introspect --out=migrations/ --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
 ```
 
 ![](@/assets/gifs/introspect_mysql.gif)
 
 ## Prototype / Push
 
-`drizzle-kit push:{dialect}` lets you push your schema changes directly to the
+`drizzle-kit push` lets you push your schema changes directly to the
 database and omit managing SQL migration files.
 
 This has proven to be very useful for rapid local development(prototyping) and when working with remote databases like
@@ -156,15 +185,16 @@ This has proven to be very useful for rapid local development(prototyping) and w
   Extended article on Turso and drizzle-kit push — **[read here.](https://driz.link/sqlite-push)**
 </Callout>
 
-Either **[`connectionString`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are **required**.
+Either **[`url`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are **required**.
 
 | param                                         | required | description                                                         |
 | :-------------------------------------------- | :------- | :------------------------------------------------------------------ |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
 | **[`schema`](/kit-docs/conf#schema-files-paths)**          | yes      | path to typescript schema file or folder with multiple schema files |
-| driver                                        | yes      | driver to use for querying (`mysql2`, `better-sqlite`, `libsql`, `turso`)|
+| driver                                | no      | driver to use for querying (`aws-data-api`, `d1-http`, `turso`, `expo`)|
 | **[`tablesFilter`](/kit-docs/conf#multi-project-schema)** | no       | table name filter                                                   |
 | **[`schemaFilter`](/kit-docs/config-reference#schemafilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
-| `connectionString`                            | no       | database connection string                                          |
+| `url`                            | no       | database connection string                                          |
 | `user`                                        | no       | database user                                                       |
 | `password`                                    | no       | database password                                                   |
 | `host`                                        | no       | host                                                                |
@@ -177,15 +207,7 @@ Either **[`connectionString`](/kit-docs/conf#push-and-pull)** or **[`user:passwo
 <Section>
 
 ```shell
-$ drizzle-kit push:mysql
-```
-
-```shell
-$ drizzle-kit push:sqlite
-```
-
-```shell
-$ drizzle-kit push:pg
+$ drizzle-kit push
 ```
 
 </Section>
@@ -193,14 +215,14 @@ $ drizzle-kit push:pg
 If you want to use custom named config file
 
 ```shell
-$ drizzle-kit push:mysql --config=custom.config.ts
+$ drizzle-kit push --config=custom.config.ts
 ```
 
 If you want to have all params as CLI options
 
 ```shell
-$ drizzle-kit push:mysql --schema=src/schema.ts --uri=postgresql://user:pass@host:port/db_name
-$ drizzle-kit push:mysql --schema=src/schema.ts --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
+$ drizzle-kit push --schema=src/schema.ts --url=postgresql://user:pass@host:port/db_name
+$ drizzle-kit push --schema=src/schema.ts --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
 ```
 
 ## Drop migration
@@ -238,86 +260,77 @@ $ drizzle-kit drop --out=drizzle
 
 ## Maintain stale metadata
 We're rapidly evolving Drizzle Kit APIs and from time to time there's a need to upgrade underlying metadata structure.  
-`drizzle-kit up:{dialect}` is a utility command to keep all metadata up to date.  
+`drizzle-kit up` is a utility command to keep all metadata up to date.  
 
 | param                             | required | description                                   |
 | :-------------------------------- | :------- | :-------------------------------------------- |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
 | **[`out`](/kit-docs/conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
 | `config`                          | no       | config file path, default=`drizzle.config.ts` |
 
 <Section>
 ```shell
-$ drizzle-kit up:pg
-```
-```shell
-$ drizzle-kit up:mysql
-```
-```shell
-$ drizzle-kit up:sqlite
+$ drizzle-kit up
 ```
 </Section>
 
 If you want to use custom named config file
 
 ```shell
-$ drizzle-kit up:pg --config=custom.config.ts
+$ drizzle-kit up --config=custom.config.ts
 ```
 
 If you want to have all params as CLI options
 
 ```shell
-$ drizzle-kit up:pg --out=drizzle
+$ drizzle-kit up --out=drizzle
 ```
 
 ![](@/assets/gifs/up_mysql.gif)
 
 
 ## Check
-`drizzle-kit check:{dialect}` is a very powerful tool for you to check consistency of your migrations.  
+`drizzle-kit check` is a very powerful tool for you to check consistency of your migrations.  
 That's extremely useful when you have multiple people on the project, altering database schema on different branches.  
 Drizzle Kit will check for all collisions and inconsistencies.
 
 | param                             | required | description                                   |
 | :-------------------------------- | :------- | :-------------------------------------------- |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
 | **[`out`](/kit-docs/conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
 | `config`                          | no       | config file path, default=`drizzle.config.ts` |
 
 <Section>
 ```shell
-$ drizzle-kit check:pg
-```
-```shell
-$ drizzle-kit check:mysql
-```
-```shell
-$ drizzle-kit check:sqlite
+$ drizzle-kit check
 ```
 </Section>
 
 If you want to use custom named config file
 
 ```shell
-$ drizzle-kit check:pg --config=custom.config.ts
+$ drizzle-kit check --config=custom.config.ts
 ```
 
 If you want to have all params as CLI options
 
 ```shell
-$ drizzle-kit check:pg --out=drizzle
+$ drizzle-kit check --out=drizzle
 ```
 
-## Drizzle Studio [NEW]
+## Drizzle Studio
 `drizzle-kit studio` lets you launch **[Drizzle Studio](/drizzle-studio/overview)** database browser locally from you config file.  
 
 | param     | required | description              |
 | :-------- | :------- | :----------------------- |
 | `port`    | no       | custom port              |
+| `host`    | no       | custom host for studio server              |
 | `verbose` | no       | log all sql statements   |
 
 ```bash
 drizzle-kit studio
 
-drizzle-kit studio --port 3000 --verbose
+drizzle-kit studio --port 3000 --host 0.0.0.0 --verbose
 ```
 
 <Button href={"https://demo.drizzle.studio"} value="🖥 Drizzle Studio Demo" />

@@ -46,16 +46,16 @@ In this snippet, we import functionality from **`@neondatabase/serverless`** and
 
 ```tsx copy filename="drizzle.config.ts"
 import "dotenv/config";
-import type {Config} from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+export default defineConfig({
   schema: "./db/schema.ts",
   out: "./drizzle",
-  driver: "pg",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.NEON_DATABASE_URL!,
+    url: process.env.NEON_DATABASE_URL!,
   },
-} satisfies Config;
+});
 ```
 
 This configuration file specifies the database schema location, path for generating migrations, and database connection through the connection string.
@@ -74,10 +74,10 @@ export const todo = pgTable("todo", {
 
 Here we define the **`todo`** table with fields **`id`**, **`text`**, and **`done`**, using data types from Drizzle ORM.
 
-Push your schema changes directly to the database without generating any migrations files using `drizzle-kit push:pg` command:
+Push your schema changes directly to the database without generating any migrations files using `drizzle-kit push` command:
 
 ```bash
-npx drizzle-kit push:pg
+npx drizzle-kit push
 ```
 
 **Now, we're ready to write queries** using Drizzle ORM.

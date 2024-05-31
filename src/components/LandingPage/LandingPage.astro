@@ -9,6 +9,8 @@ import Pricing from "./Pricing/Pricing.astro";
 import Twits from "./Twits/Twits.astro";
 import SponsorsLine from "./SponsorsLine/SponsorsLine.astro";
 import Benchmark from "./Benchmark/Benchmark";
+import NewHeader from "./NewHeader/NewHeader.astro";
+import Developers from "./Developers/Developers.astro";
 
 const runtimes: string[] = [
   "Cloudflare Workers",
@@ -38,7 +40,8 @@ const databases: string[] = [
 ];
 ---
 <div class="wrap">
-  <Header />
+  <NewHeader />
+  <Developers />
   <Advantages />
   <div id="performance"></div>
   <Benchmark client:load />
@@ -63,6 +66,7 @@ const databases: string[] = [
   <div id="pricing"></div>
   <Pricing />
   <Twits />
+  <Header />
 </div>
 
 <style>
@@ -70,7 +74,6 @@ const databases: string[] = [
     max-width: 1080px;
     width: 100%;
     margin: 0 auto;
-    padding: 20px 20px 32px 20px;
     display: flex;
     flex-direction: column;
     color: #222;
@@ -78,12 +81,6 @@ const databases: string[] = [
 
   html[class~="dark"] .wrap {
     color: rgb(226, 232, 240);
-  }
-
-  @media (max-width: 599px) {
-    .wrap {
-      padding: 20px 0 32px 0;
-    }
   }
 </style>
 <script>

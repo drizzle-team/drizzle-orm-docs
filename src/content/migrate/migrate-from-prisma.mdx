@@ -194,10 +194,10 @@ Create a `drizzle.config.ts` file in the root of your project and add the follow
 
 ```typescript copy filename="drizzle.config.ts"
 import 'dotenv/config'; // make sure to install dotenv package
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
-  driver: 'pg',
+export default defineConfig({
+  dialect: 'postgresql',
   out: './src/drizzle',
   schema: './src/drizzle/schema.ts',
   dbCredentials: {
@@ -211,7 +211,7 @@ export default {
   verbose: true,
   // Always ask for confirmation
   strict: true,
-} satisfies Config;
+});
 ```
 
 #### Introspect your database

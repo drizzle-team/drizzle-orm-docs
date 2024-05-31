@@ -109,31 +109,6 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/neon",
-      name: "Prisma",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2023-11-16T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "brightness(0.3)",
-      background:
-        'url("/svg/prisma-dark.svg") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      filter: "invert(0.6)",
-      background: 'url("/svg/prisma.svg") 0% 0% / cover no-repeat content-box',
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
       login: "driz.link/nuxt",
       name: "Nuxt",
       avatarUrl:
@@ -152,6 +127,22 @@ export const sponsorsData: ISponsor[] = [
       background:
         'url("/svg/nuxt-green.svg") 0% 0% / cover no-repeat content-box',
     },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/gold",
+      name: "Become a Gold Sponsor",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2023-11-16T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
   },
 ];
 

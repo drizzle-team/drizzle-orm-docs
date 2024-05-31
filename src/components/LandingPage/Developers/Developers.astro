@@ -1,0 +1,359 @@
+---
+import {Image} from "astro:assets";
+import blokh from './Images/team/blokh.png'
+import sherman from './Images/team/sherman.png'
+import bloberenober from './Images/team/bloberenober.png'
+import angelelz from './Images/contributors/angelelz.png'
+import intelligently from './Images/contributors/intelligently.png'
+import mario564 from './Images/contributors/mario564.png'
+import rphlmr from './Images/contributors/rphlmr.png'
+import mike from './Images/team/mike.jpg'
+import roman from './Images/team/roman.jpg'
+import vlad from './Images/team/vlad.jpg'
+import reka from './Images/team/reka.png'
+import homenko from './Images/team/homenko.jpg'
+import artem from './Images/team/artem.jpg'
+import vitalii from './Images/team/vitalii.jpg'
+
+const drizzleTeam: { name: string, photo: string}[] = [
+  {
+    name: 'Andrew Sherman',
+    photo: sherman,
+  },
+  {
+    name: 'Dan Kochetov',
+    photo: bloberenober,
+  },
+  {
+    name: 'Alex Blokh',
+    photo: blokh,
+  },
+  {
+    name: 'Mike',
+    photo: mike,
+  },
+  {
+    name: 'Roman',
+    photo: roman,
+  },
+  {
+    name: 'Vlad',
+    photo: vlad,
+  },
+  {
+    name: 'Reka',
+    photo: reka,
+  },
+  {
+    name: 'Homenko',
+    photo: homenko,
+  },
+  {
+    name: 'Artem Longname',
+    photo: artem,
+  },
+  {
+    name: 'Vitalii Staryk',
+    photo: vitalii,
+  },
+];
+
+const contributors: { name: string, photo: string}[] = [
+  {
+    name: 'angelelz',
+    photo: angelelz,
+  },
+  {
+    name: 'rphlmr',
+    photo: rphlmr,
+  },
+  {
+    name: 'mario564',
+    photo: mario564,
+  },
+  {
+    name: 'intelligently',
+    photo: intelligently,
+  },
+];
+---
+<div class="developers_container">
+  <h2 class="title">Built by developers for developers</h2>
+  <div class="flex_container">
+    <div>
+      <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
+      <div class={"scroll"}>
+        <div class={"gradient-left"}></div>
+        <div class={"gradient-right"}></div>
+        <div class="core_team_container">
+          {[...drizzleTeam, ...contributors].map((dev, index) => (
+            <a
+              href=""
+              style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
+            >
+              <span>{dev.name}</span>
+              <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<script type="module">
+  document.querySelector('.drizzleWord').addEventListener('mouseover', () =>
+    document.querySelectorAll('.dev-img').forEach((e) => e.classList.add('colored') )
+  )
+  document.querySelector('.drizzleWord').addEventListener('mouseout', () =>
+    document.querySelectorAll('.dev-img').forEach((e) => e.classList.remove('colored') )
+  )
+
+  document.querySelector('.contributorWord').addEventListener('mouseover', () =>
+    document.querySelectorAll('.contributor-img').forEach((e) => e.classList.add('colored') )
+  )
+  document.querySelector('.contributorWord').addEventListener('mouseout', () =>
+    document.querySelectorAll('.contributor-img').forEach((e) => e.classList.remove('colored') )
+  )
+</script>
+<style>
+    .developers_container {
+        max-width: 910px;
+        margin: 160px auto 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .scroll {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflowX: hidden;
+        width: 100vw;
+        margin: 0 -24px;
+        position: relative;
+    }
+
+    .gradient-left,
+    .gradient-right {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 20px;
+        opacity: 0;
+        z-index: 40;
+    }
+
+    .gradient-left {
+        left: 0;
+        background: linear-gradient(
+                to left,
+                rgba(250, 250, 250, 0) 0%,
+                rgba(250, 250, 250, 0.7) 50%,
+                rgb(250, 250, 250) 100%
+        );
+    }
+
+    .gradient-right {
+        right: 0;
+        background: linear-gradient(
+                to right,
+                rgba(250, 250, 250, 0) 0%,
+                rgba(250, 250, 250, 0.7) 50%,
+                rgb(250, 250, 250) 100%
+        );
+    }
+
+    html.dark .gradient-right {
+        background: linear-gradient(
+                to right,
+                rgba(17, 16, 17, 0) 0%,
+                rgba(17, 17, 17, 0.7) 50%,
+                rgb(17, 17, 17) 100%
+        );
+    }
+
+    html.dark .gradient-left {
+        background: linear-gradient(
+                to left,
+                rgba(17, 17, 17, 0) 0%,
+                rgba(17, 17, 17, 0.7) 50%,
+                rgb(17, 17, 17) 100%
+        );
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .desc {
+        font-size: 20px;
+        font-weight: 500;
+        text-align: left;
+        color: #ffffffcc
+    }
+
+    .subtitle {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 8px;
+        text-align: center;
+    }
+
+
+    .subtitle span {
+        cursor: help;
+        text-decoration: underline;
+        text-decoration-color: #4bb74a;
+        text-decoration-style: dashed;
+    }
+
+    .subtitle span:hover {
+        text-decoration-style: solid;
+    }
+
+    .flex_container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 8px 0 0;
+        gap: 24px;
+    }
+
+    .contributors_subtitle {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 8px;
+        text-align: left;
+    }
+
+    .colored {
+        filter: grayscale(0) !important;
+    }
+
+    .core_team_container {
+        text-align: center;
+        padding-right: 12px;
+        position: relative;
+        width: 100%;
+    }
+
+    .core_team_container img {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+        object-position: center;
+        filter: grayscale(1);
+        transition: filter 0.2s;
+    }
+
+    .core_team_container a {
+        display: inline-block;
+        border-radius: 50%;
+        position: relative;
+        margin-right: -12px;
+    }
+
+    .core_team_container span {
+        position: absolute;
+        top: -35px;
+        white-space: nowrap;
+        left: 50%;
+        opacity: 0;
+        transform: translateX(-50%) translateZ(0);
+        pointer-events: none;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 4px 12px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 0 0 0 #fff, 0 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+    }
+
+    html.dark .core_team_container span {
+        background: #000;
+        box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 1px hsla(0, 0%, 100%, .2), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+    }
+
+    .core_team_container a:hover {
+        z-index: 20 !important;
+    }
+
+    .core_team_container a:hover img {
+        filter: grayscale(0);
+    }
+
+    .core_team_container a:hover span {
+       opacity: 1;
+    }
+
+    html.dark .core_team_container img {
+        border: 2px solid #111111;
+    }
+
+    .top_contributors_container {
+        text-align: left;
+        padding-right: 12px;
+    }
+
+    .top_contributors_container img {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+        object-position: center;
+    }
+
+
+    @media (max-width: 900px) {
+        .title {
+            font-size: 24px;
+        }
+
+        .flex_container {
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 599px) {
+        .title {
+            font-size: 20px;
+        }
+
+        .gradient-left, .gradient-right {
+            opacity: 1;
+        }
+
+        .core_team_container {
+            text-align: center;
+            white-space: nowrap;
+            overflow: scroll;
+            width: 100%;
+            padding: 0 24px;
+        }
+
+        .core_team_container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .core_team_container a:hover span {
+            opacity: 0;
+        }
+
+    }
+</style>

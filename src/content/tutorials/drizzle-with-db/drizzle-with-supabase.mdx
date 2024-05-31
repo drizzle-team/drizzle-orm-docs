@@ -19,6 +19,7 @@ drizzle-orm
 -D drizzle-kit
 </Npm>
 - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv).
+- You should have the latest version of [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli) installed. (Only if you want to use the CLI for migrations).
 </Prerequisites>
 
 Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to database with Drizzle ORM.
@@ -97,29 +98,29 @@ Create a `drizzle.config.ts` file in the root of your project and add the follow
 
 ```typescript copy filename="drizzle.config.ts"
 import 'dotenv/config';
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
+export default defineConfig({
   schema: './src/db/schema.ts',
-  out: './migrations',
-  driver: 'pg',
+  out: './supabase/migrations',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL!,
   },
-} satisfies Config;
+});
 ```
 
 #### Applying changes to the database
 
-You can generate migrations using `drizzle-kit generate:<DIALECT>` command and then run them using the `migrate()` function which is available for each driver.
+You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
 
 Generate migrations:
 
 ```bash
-npx drizzle-kit generate:pg
+npx drizzle-kit generate
 ```
 
-These migrations are stored in the `migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `supabase/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
 
 Example of a generated migration:
 
@@ -150,47 +151,48 @@ END $$;
 
 Run migrations:
 
-```typescript copy filename="src/db/migrate.ts"
-import { resolve } from 'node:path';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { db } from './db';
-
-(async () => {
-  try {
-    await migrate(db, { migrationsFolder: resolve(__dirname, '../../migrations') });
-    console.log('Migration successful');
-
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-
-    process.exit(1);
-  }
-})();
+```bash
+npx drizzle-kit migrate
 ```
 
-Learn more about [migration process](https://orm.drizzle.team/docs/migrations). Alternatively, you can push changes directly to the database using [push command](/kit-docs/overview#prototyping-with-db-push).
+Learn more about [migration process](https://orm.drizzle.team/docs/migrations). You can also apply migtations using [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started):
+
+To apply migrations using the Supabase CLI, initialize local Supabase project, link it to your remote project and push changes to the database:
+
+```bash
+supabase init
+supabase link
+supabase db push
+```
+
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
+
+```bash
+npx drizzle-kit push
+```
 
 <Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+
 </Steps>
 
 ## Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts` and schema definitions in `schema.ts`.
 
 ```plaintext
 📦 <project root>
  ├ 📂 src
  │   ├ 📂 db
  │   │  ├ 📜 db.ts
- |   |  ├ 📜 migrate.ts
  │   │  └ 📜 schema.ts
  │   └ 📜 index.ts
- ├ 📂 migrations
- │  ├ 📂 meta
- │  │  ├ 📜 _journal.json
- │  │  └ 📜 0000_snapshot.json
- │  └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📂 supabase
+ │   ├ 📂 migrations
+ │   │  ├ 📂 meta
+ │   │  │  ├ 📜 _journal.json
+ │   │  │  └ 📜 0000_snapshot.json
+ │   │  └ 📜 0000_watery_spencer_smythe.sql
+ │   └ 📜 config.toml
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
  └ 📜 tsconfig.json

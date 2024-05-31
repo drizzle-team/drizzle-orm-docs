@@ -73,7 +73,7 @@ Drizzle ORM migration package or any other way suitable for your business case o
 </CodeTabs>
 
 ## Schema updates
-Whenever you apply changes to the schema you just rerun `$ drizzle-kit generate...{:bash}` and 
+Whenever you apply changes to the schema you just rerun `$ drizzle-kit generate` and 
 it will generate SQL migration for you completely automatically in most of the cases.
 <CodeTabs items={["0001_absurd_toad.sql", "schema.ts"]}>
   ```sql
@@ -94,9 +94,21 @@ it will generate SQL migration for you completely automatically in most of the c
 </CodeTabs>
 
 ## Running migrations
-We're unopinionated on how you should run your migrations, you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle ORM**.
-  
-We provide you a useful way to run generated migrations with `migrate` function which we implement for each driver and dialect specifically.  
+We're unopinionated on how you should run your migrations, you can run them manually using SQL generated files, using external tools, etc. or use **Drizzle Kit** or **Drizzle ORM**.
+
+**Using Drizzle Kit**
+
+You can use the native migrate CLI command `drizzle-kit migrate`. It will gather all the needed information from the `drizzle.config.ts` file to run migrations.
+
+You can specify custom schema and migration table names in `drizzle.config.ts` . For more information, please check the migrate [documentation](/kit-docs/commands#apply-migrations).
+
+```bash
+drizzle-kit migrate
+```
+
+**Using Drizzle ORM**
+
+We also provide you a useful way to run generated migrations with `migrate` function which we implement for each driver and dialect specifically.  
 
 Drizzle will automatically keep track of applied migrations in your database.
 
@@ -161,9 +173,9 @@ import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
  schema: "./schema.ts",
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: process.env.DB_URL,
+    url: process.env.DB_URL,
   },
   verbose: true,
   strict: true,
@@ -175,9 +187,9 @@ export default defineConfig({
 /** @type { import("drizzle-kit").Config } */
 export default {
   schema: "./schema.ts",
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: process.env.DB_URL,
+    url: process.env.DB_URL,
   }
 };
 ```
@@ -185,6 +197,7 @@ export default {
 <CodeTab>
 ```json
 {
+  "dialect": "postgresql",
   "out": "./migrations-folder",
   "schema": "./src/db",
   "breakpoints": false
@@ -222,9 +235,7 @@ the "drizzle-schema" format as well.
 These statements ensure that the database is synchronized with the schemas defined in your code.
 
 ```bash
-$ drizzle-kit push:mysql
-
-$ drizzle-kit push:sqlite
+$ drizzle-kit push
 ```
 For extended `push` examples **[see here.](/kit-docs/commands#prototype--push)**
 
@@ -233,7 +244,7 @@ Drizzle Kit lets you pull DDL from existing database and prints a TypeScript sch
 
 <Section>
 ```bash
-$ drizzle-kit introspect:mysql ...
+$ drizzle-kit introspect
 ```
 ```plaintext {6}
 📦 <project root>
@@ -261,7 +272,7 @@ $ drizzle-kit introspect:mysql ...
 </Section>
 For extended `introspect` examples — **[see here.](/kit-docs/commands/#introspect--pull)**
 
-## Drizzle Studio [NEW]
+## Drizzle Studio
 Drizzle Kit comes with bundled **[Drizzle Studio](/drizzle-studio/overview)**
 database browser and lets you launch it locally with one command.  
 
@@ -272,6 +283,7 @@ Studio requires drizzle config file with `schema` and `dbCredentials` provided.
 drizzle-kit studio
 
 drizzle-kit studio --port 3000 ## custom port
+drizzle-kit studio --host 0.0.0.0 ## custom host for studio server
 drizzle-kit studio --verbose   ## log all sql statements
 ```
 
