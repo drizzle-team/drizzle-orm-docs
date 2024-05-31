@@ -7,12 +7,14 @@ import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from '@components/markdown/CodeTabs.astro';
 import CodeTab from '@components/markdown/CodeTab.astro';
+import Callout from '@components/markdown/Callout.astro';
 
 <Prerequisites>
 - Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
 - [Indexes](/docs/indexes-constraints#indexes)
 - [Insert statement](/docs/insert) and [Select method](/docs/select)
 - [sql operator](/docs/sql)
+- You should have `drizzle-orm@0.31.0` and `drizzle-kit@0.22.0` or higher.
 </Prerequisites>
 
 ### PostgreSQL
@@ -97,14 +99,14 @@ Drizzle has simple and flexible API, which lets you easily create such an index 
       email: varchar('email', { length: 255 }).notNull(),
     },
     (table) => ({
-   // emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
+   // emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(sql`(lower(${table.email}))`),
       emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(lower(table.email)),
     }),
   );
 
   // custom lower function
   export function lower(email: AnyMySqlColumn): SQL {
-    return sql`lower(${email})`;
+    return sql`(lower(${email}))`;
   }
   ```
   </CodeTab>
@@ -118,6 +120,10 @@ Drizzle has simple and flexible API, which lets you easily create such an index 
   );
   ```
 </CodeTabs>
+
+<Callout type="warning">
+Functional indexes are supported in MySQL starting from version `8.0.13`. For the correct syntax, the expression should be enclosed in parentheses, for example, `(lower(column))`.
+</Callout>
 
 This is how you can select user by `email` with `lower` function:
 
