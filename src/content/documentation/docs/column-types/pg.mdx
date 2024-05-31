@@ -620,6 +620,62 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+### point
+`point`  
+Geometric point type
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-geometric.html#DATATYPE-GEOMETRIC-POINTS)** 
+
+Type `point` has 2 modes for mappings from the database: `tuple` and `xy`.
+
+- `tuple` will be accepted for insert and mapped on select to a tuple. So, the database Point(1,2) will be typed as [1,2] with drizzle.
+
+- `xy` will be accepted for insert and mapped on select to an object with x, y coordinates. So, the database Point(1,2) will be typed as `{ x: 1, y: 2 }` with drizzle
+
+<Section>
+```typescript
+const items = pgTable('items', {
+ point: point('point'),
+ pointObj: point('point_xy', { mode: 'xy' }),
+});
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS "items" (
+	"point" point,
+	"point_xy" point,
+);
+```
+</Section>
+
+### line
+`line`  
+Geometric line type
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-geometric.html#DATATYPE-LINE)** 
+
+Type `line` has 2 modes for mappings from the database: `tuple` and `abc`.
+
+- `tuple` will be accepted for insert and mapped on select to a tuple. So, the database Line{1,2,3} will be typed as [1,2,3] with drizzle.
+
+- `abc` will be accepted for insert and mapped on select to an object with a, b, and c constants from the equation `Ax + By + C = 0`. So, the database Line{1,2,3} will be typed as `{ a: 1, b: 2, c: 3 }` with drizzle.
+
+<Section>
+```typescript
+const items = pgTable('items', {
+ line: line('line'),
+ lineObj: point('line_abc', { mode: 'abc' }),
+});
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS "items" (
+	"line" line,
+	"line_abc" line,
+);
+```
+</Section>
+
 ### enum 
 `enum` `enumerated types`  
 Enumerated (enum) types are data types that comprise a static, ordered set of values. 

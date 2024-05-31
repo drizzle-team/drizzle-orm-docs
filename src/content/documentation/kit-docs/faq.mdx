@@ -2,7 +2,7 @@ import Callout from '@/components/markdown/Callout.astro';
 
 # FAQ & Troubleshooting
 
-### **Should I use `generate` or `push`?**
+## **Should I use `generate` or `push`?**
 
 Those are logically 2 different commands. `generate` is used to create an sql file together with additional
 information needed for `drizzle-kit` (or any other migration tool).
@@ -14,16 +14,35 @@ On the other hand, `push` doesn't need any migrations to be generated. It will
 simply sync your schema with the database schema. Please be careful when using it;
 we recommend it only for local development and local databases. To read more about it, check out **[`drizzle-kit push`](/kit-docs/overview#prototyping-with-db-push)**
 
+## How `push` and `generate` works for PostgreSQL indexes
 
-## Troubleshooting
+### Limitations
 
-### **Why aren't my CLI options being read by drizzle-kit?**
+1. **You should specify a name for your index manually if you have an index on at least one expression**
 
-Drizzle Kit has a current set of priorities for reading config options:
+Example
 
-1. If there is a `drizzle.config` file, read from it.
-2. If there is no `drizzle.config` file, check for the `--config` option in the CLI.
-3. If no `--config` option was found, use CLI options; otherwise, read from a defined config.
+```ts
+index().on(table.id, table.email) // will work well and name will be autogeneretaed
+index('my_name').on(table.id, table.email) // will work well
 
-If you specify both config parameters and CLI options, an error will be thrown, and you should use 
-either CLI options or have a config file defined in your project.
+// but
+
+index().on(sql`lower(${table.email})`) // error
+index('my_name').on(sql`lower(${table.email})`) // will work well
+```
+
+2. **Push won't generate statements if these fields(list below) were changed in an existing index:**
+
+- expressions inside `.on()` and `.using()`
+- `.where()` statements
+- operator classes `.op()` on columns
+
+If you are using `push` workflows and want to change these fields in the index, you would need to:
+
+1. Comment out the index
+2. Push
+3. Uncomment the index and change those fields
+4. Push again
+
+For the `generate` command, `drizzle-kit` will be triggered by any changes in the index for any property in the new drizzle indexes API, so there are no limitations here.
