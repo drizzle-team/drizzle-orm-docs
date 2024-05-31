@@ -2,12 +2,9 @@
 import { Image } from "astro:assets";
 import JavaScriptIcon from "../../Icons/JavaScriptIcon.astro";
 import TypeScriptIcon from "../../Icons/TypeScriptIcon.astro";
-import SecondPic from "../Header/Images/SecondPic.webp";
-import SecondPicDark from "../Header/Images/SecondPic_dark.webp";
-import TopPick from './Images/LiveOnTheEdge.webp';
-import TopPickDark from './Images/LiveOnTheEdgeDark.webp';
-import ConnectEveryWhere from '../Supporting/Images/ConnectEverywhere.webp';
-import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.webp';
+import WithDBImage from './Images/WithDB.png'
+import FrontImage from './Images/Front.png'
+import BackImage from './Images/Back.png'
 ---
 <div class="header_container">
   <div class="header-left">
@@ -31,16 +28,20 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
       </div>
     </div>
     <div class="header-middle">
-      <Image style="align-self: start;" src={ConnectEveryWhere} alt="second pick" class="img_light" />
-      <Image style="align-self: start;" src={ConnectEveryWhereDark} alt="second pick" class="img_dark" />
-      <Image style="align-self: end" src={SecondPic} alt="second pick" class="img_light" />
-      <Image style="align-self: end" src={SecondPicDark} alt="second pick" class="img_dark" />
+      <div style="display: flex; justify-content: flex-start; align-items: end">
+        <Image src={WithDBImage} alt="with db" class="img_light" />
+        <Image src={WithDBImage} alt="with db" class="img_dark" />
+        <Image src={FrontImage} alt="front" class="img_light" />
+        <Image src={FrontImage} alt="front" class="img_dark" />
+      </div>
+      <Image src={BackImage} alt="back" class="img_light" />
+      <Image src={BackImage} alt="back" class="img_dark" />
     </div>
     <div class="buttons">
       <a href="/docs/overview#why-sql-like" class="header-button">
         <div class="header-button-image">
           <div class="header-button-image-learn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c-4.714 0-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22" opacity="0.5"/><path fill="currentColor" d="M12 7.75c-.621 0-1.125.504-1.125 1.125a.75.75 0 0 1-1.5 0a2.625 2.625 0 1 1 4.508 1.829c-.092.095-.18.183-.264.267a6.666 6.666 0 0 0-.571.617c-.22.282-.298.489-.298.662V13a.75.75 0 0 1-1.5 0v-.75c0-.655.305-1.186.614-1.583c.229-.294.516-.58.75-.814c.07-.07.136-.135.193-.194A1.125 1.125 0 0 0 12 7.75M12 17a1 1 0 1 0 0-2a1 1 0 0 0 0 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M21 15.998v-6c0-2.828 0-4.242-.879-5.121C19.353 4.109 18.175 4.012 16 4H8c-2.175.012-3.353.109-4.121.877C3 5.756 3 7.17 3 9.998v6c0 2.829 0 4.243.879 5.122c.878.878 2.293.878 5.121.878h6c2.828 0 4.243 0 5.121-.878c.879-.88.879-2.293.879-5.122" opacity="0.5"/><path fill="currentColor" d="M8 3.5A1.5 1.5 0 0 1 9.5 2h5A1.5 1.5 0 0 1 16 3.5v1A1.5 1.5 0 0 1 14.5 6h-5A1.5 1.5 0 0 1 8 4.5z"/><path fill="currentColor" fill-rule="evenodd" d="M15.548 10.488a.75.75 0 0 1-.036 1.06l-4.286 4a.75.75 0 0 1-1.024 0l-1.714-1.6a.75.75 0 1 1 1.024-1.096l1.202 1.122l3.774-3.522a.75.75 0 0 1 1.06.036" clip-rule="evenodd"/></svg>
           </div>
         </div>
         <div class="header-button-text"><span>Why Drizzle?</span></div>
@@ -137,12 +138,14 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
     </div>
   </div>
   <div class="header-right">
-    <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: start">
-      <Image style="align-self: start;" src={ConnectEveryWhere} alt="second pick" class="img_light" />
-      <Image style="align-self: start;" src={ConnectEveryWhereDark} alt="second pick" class="img_dark" />
+    <div style="display: flex; justify-content: flex-start; align-items: end">
+      <Image src={WithDBImage} alt="with db" class="img_light" />
+      <Image src={WithDBImage} alt="with db" class="img_dark" />
+      <Image src={FrontImage} alt="front" class="img_light" />
+      <Image src={FrontImage} alt="front" class="img_dark" />
     </div>
-    <Image style="align-self: end" src={SecondPic} alt="second pick" class="img_light" />
-    <Image style="align-self: end" src={SecondPicDark} alt="second pick" class="img_dark" />
+    <Image src={BackImage} alt="back" class="img_light" />
+    <Image src={BackImage} alt="back" class="img_dark" />
   </div>
 </div>
 <script is:inline>
@@ -258,6 +261,7 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
   .header-right {
     display: flex;
     justify-content: space-between;
+    align-items: end;
     width: 70%;
   }
 
@@ -347,13 +351,13 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
   }
 
   .header-button:hover .header-button-image svg {
-      color: #000;
+      color: #404040;
   }
 
   .header-button-text {
       font-size: 14px;
       color: #000;
-      font-weight: 400;
+      font-weight: 600;
       transition: color 0.2s ease-in-out;
   }
 
@@ -362,7 +366,6 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
       align-items: center;
       justify-content: center;
       aspect-ratio: 1 / 1;
-      filter: grayscale(1);
       border-top-left-radius: 4px;
       border-bottom-left-radius: 4px;
       margin: 12px 8px 12px 12px;
@@ -376,7 +379,7 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
   }
 
   html.dark .header-button-image svg {
-      color: #4d4d4d;
+      color: #707070;
   }
 
   .header-button-image-learn {
@@ -405,6 +408,10 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
   }
 
   html.dark .header-button .header-button-text {
+      color: #e1e3e6;
+  }
+
+  html.dark .header-button:hover .header-button-text {
       color: #fff;
   }
 
@@ -458,8 +465,7 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
   }
 
   html.dark .tag {
-      border: 1.5px solid #404040;
-      background-color: #282828;
+      background-color: #1c1c1c;
   }
 
   html.dark .tag .ts {
@@ -471,7 +477,7 @@ import ConnectEveryWhereDark from '../Supporting/Images/ConnectEverywhereDark.we
   }
 
   html.dark .tag-text {
-      color: #FFFFFF;
+      color: #e1e3e6;
   }
 
   .tag-text {
