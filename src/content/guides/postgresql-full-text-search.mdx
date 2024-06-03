@@ -206,7 +206,8 @@ await db
 
 ```sql
 select * from posts
-  where to_tsvector('english', title) @@ websearch_to_tsquery('english', 'family or first trip Europe or Asia');
+  where to_tsvector('english', title)
+  @@ websearch_to_tsquery('english', 'family or first trip Europe or Asia');
 ```
 
 ```plaintext
@@ -234,7 +235,7 @@ To implement full-text search on multiple columns, you can create index on multi
       description: text('description').notNull(),
     },
     (table) => ({
-      titleSearchIndex: index('title_search_index').using(
+      searchIndex: index('search_index').using(
         'gin',
         sql`(
             setweight(to_tsvector('english', ${table.title}), 'A') ||
@@ -253,7 +254,7 @@ To implement full-text search on multiple columns, you can create index on multi
         "description" text NOT NULL
   );
 
-  CREATE INDEX IF NOT EXISTS "title_search_index" ON "posts"
+  CREATE INDEX IF NOT EXISTS "search_index" ON "posts"
     USING gin ((setweight(to_tsvector('english', "title"), 'A') ||
     setweight(to_tsvector('english', "description"), 'B')));
   ```
