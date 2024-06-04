@@ -3,8 +3,11 @@ import { Image } from "astro:assets";
 import JavaScriptIcon from "../../Icons/JavaScriptIcon.astro";
 import TypeScriptIcon from "../../Icons/TypeScriptIcon.astro";
 import WithDBImage from './Images/WithDB.png'
+import WithDBDarkImage from './Images/WithDBDark.png'
 import FrontImage from './Images/Front.png'
+import FrontImageDark from './Images/FrontDark.png'
 import BackImage from './Images/Back.png'
+import BackImageDark from './Images/BackDark.png'
 ---
 <div class="header_container">
   <div class="header-left">
@@ -26,16 +29,6 @@ import BackImage from './Images/Back.png'
         </div>
         <div class="tag-text">TypeScript</div>
       </div>
-    </div>
-    <div class="header-middle">
-      <div style="display: flex; justify-content: flex-start; align-items: end">
-        <Image src={WithDBImage} alt="with db" class="img_light" />
-        <Image src={WithDBImage} alt="with db" class="img_dark" />
-        <Image src={FrontImage} alt="front" class="img_light" />
-        <Image src={FrontImage} alt="front" class="img_dark" />
-      </div>
-      <Image src={BackImage} alt="back" class="img_light" />
-      <Image src={BackImage} alt="back" class="img_dark" />
     </div>
     <div class="buttons">
       <a href="/docs/overview#why-sql-like" class="header-button">
@@ -137,15 +130,25 @@ import BackImage from './Images/Back.png'
       </button>
     </div>
   </div>
+  <div class="header-middle">
+    <div style="display: flex; justify-content: flex-start; align-items: end">
+      <Image src={WithDBImage} alt="with db" class="img_light" />
+      <Image src={WithDBDarkImage} alt="with db" class="img_dark" />
+      <Image src={FrontImage} alt="front" class="img_light" />
+      <Image src={FrontImageDark} alt="front" class="img_dark" />
+    </div>
+    <Image src={BackImage} alt="back" class="img_light" />
+    <Image src={BackImageDark} alt="back" class="img_dark" />
+  </div>
   <div class="header-right">
     <div style="display: flex; justify-content: flex-start; align-items: end">
       <Image src={WithDBImage} alt="with db" class="img_light" />
-      <Image src={WithDBImage} alt="with db" class="img_dark" />
+      <Image src={WithDBDarkImage} alt="with db" class="img_dark" />
       <Image src={FrontImage} alt="front" class="img_light" />
-      <Image src={FrontImage} alt="front" class="img_dark" />
+      <Image src={FrontImageDark} alt="front" class="img_dark" />
     </div>
     <Image src={BackImage} alt="back" class="img_light" />
-    <Image src={BackImage} alt="back" class="img_dark" />
+    <Image src={BackImageDark} alt="back" class="img_dark" />
   </div>
 </div>
 <script is:inline>
@@ -268,6 +271,7 @@ import BackImage from './Images/Back.png'
   .header-middle {
       justify-content: space-between;
       width: 100%;
+      max-width: 400px;
       display: none;
   }
 
@@ -539,12 +543,15 @@ import BackImage from './Images/Back.png'
 
       .header-middle {
           width: 100%;
+          display: flex;
+          align-self: center;
       }
 
       .header_container {
           flex-direction: column;
           margin: 120px auto 0;
           align-items: center;
+          gap: 24px;
       }
 
       .header-left {
@@ -556,13 +563,17 @@ import BackImage from './Images/Back.png'
           justify-items: center;
           align-self: center;
           width: 100%;
-          margin-top: 4px;
+          margin-top: 80px;
       }
 
       .header-button {
           font-size: 14px;
           height: 40px;
           width: 100%;
+      }
+
+      .header-button-arrow {
+          display: none;
       }
 
       .header-button:hover .header-button-arrow {
@@ -580,12 +591,6 @@ import BackImage from './Images/Back.png'
 
       .tag-text {
           font-size: 12px;
-      }
-
-      .header-middle {
-          margin-top: 64px;
-          display: flex;
-          align-self: center;
       }
 
       .title {
