@@ -1,0 +1,410 @@
+---
+title: PostgreSQL full-text search
+slug: postgresql-full-text-search
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- [Select statement](/docs/select)
+- [Indexes](/docs/indexes-constraints#indexes)
+- [sql operator](/docs/sql)
+- You should have `drizzle-orm@0.31.0` and `drizzle-kit@0.22.0` or higher.  
+</Prerequisites>
+
+This guide demonstrates how to implement full-text search in PostgreSQL with Drizzle ORM. Full-text search is a technique used to search for text within a document or a set of documents. A document is the unit of searching in a full text search system. PostgreSQL provides a set of functions to work with full-text search, such as `to_tsvector` and `to_tsquery`:
+
+The `to_tsvector` function parses a textual document into tokens, reduces the tokens to lexemes, and returns a `tsvector` which lists the lexemes together with their positions in the document:
+
+<Section>
+```ts copy {4}
+const db = drizzle(...);
+
+await db.execute(
+  sql`select to_tsvector('english', 'Guide to PostgreSQL full-text search with Drizzle ORM')`,
+);
+```
+
+```plaintext
+[
+  {
+    to_tsvector: "'drizzl':9 'full':5 'full-text':4
+    'guid':1 'orm':10 'postgresql':3 'search':7 'text':6"
+  }
+]
+```
+</Section>
+
+The `to_tsquery` function converts a keyword to normalized tokens and returns a `tsquery` that matches the lexemes in a `tsvector`. The `@@` operator is used for direct matches:
+
+<Section>
+```ts copy {2, 3}
+await db.execute(
+  sql`select to_tsvector('english', 'Guide to PostgreSQL full-text search with Drizzle ORM')
+    @@ to_tsquery('english', 'Drizzle') as match`,
+);
+```
+
+```plaintext
+[ { match: true } ]
+```
+</Section>
+
+As for now, Drizzle doesn't support `tsvector` type natively, so you need to convert your data in the `text` column on the fly. To enhance the performance, you can create a `GIN` index on your column like this:
+
+<CodeTabs items={["schema.ts", "migration.sql", "db_data"]}>
+  <CodeTab>
+  ```ts copy {11, 12}
+  import { sql } from 'drizzle-orm';
+  import { index, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable(
+    'posts',
+    {
+      id: serial('id').primaryKey(),
+      title: text('title').notNull(),
+    },
+    (table) => ({
+      titleSearchIndex: index('title_search_index')
+      .using('gin', sql`to_tsvector('english', ${table.title})`),
+    }),
+  );
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "posts" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "title" text NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS "title_search_index" ON "posts"
+    USING gin (to_tsvector('english', "title"));
+  ```
+  </CodeTab>
+  ```plaintext
+  [
+    { id: 1, title: 'Planning Your First Trip to Europe' },
+    { id: 2, title: "Cultural Insights: Exploring Asia's Heritage" },
+    { id: 3, title: 'Top 5 Destinations for a Family Trip' },
+    { id: 4, title: 'Essential Hiking Gear for Mountain Enthusiasts' },
+    { id: 5, title: 'Trip Planning: Choosing Your Next Destination' },
+    { id: 6, title: 'Discovering Hidden Culinary Gems in Italy' },
+    { id: 7, title: 'The Ultimate Road Trip Guide for Explorers' },
+  ];
+  ```
+</CodeTabs>
+
+To implement full-text search in PostgreSQL with Drizzle ORM, you can use the `to_tsvector` and `to_tsquery` functions with `sql` operator:
+
+<Section>
+```ts copy {9}
+import { sql } from 'drizzle-orm';
+import { posts } from './schema';
+
+const title = 'trip';
+
+await db
+  .select()
+  .from(posts)
+  .where(sql`to_tsvector('english', ${posts.title}) @@ to_tsquery('english', ${title})`);
+```
+
+```plaintext
+[
+  { id: 1, title: 'Planning Your First Trip to Europe' },
+  { id: 3, title: 'Top 5 Destinations for a Family Trip' },
+  { id: 5, title: 'Trip Planning: Choosing Your Next Destination' },
+  { id: 7, title: 'The Ultimate Road Trip Guide for Explorers' }
+]
+```
+</Section>
+
+To match by any of the keywords, you can use the `|` operator:
+
+<Section>
+```ts copy {6}
+const title = 'Europe | Asia';
+
+await db
+  .select()
+  .from(posts)
+  .where(sql`to_tsvector('english', ${posts.title}) @@ to_tsquery('english', ${title})`);
+```
+
+```plaintext
+[
+  { id: 1, title: 'Planning Your First Trip to Europe' },
+  { id: 2, title: "Cultural Insights: Exploring Asia's Heritage" }
+]
+```
+</Section>
+
+To match multiple keywords, you can use the `plainto_tsquery` function:
+
+<Section>
+```ts copy {7}
+// 'discover & Italy'
+const title = 'discover Italy';
+
+await db
+  .select()
+  .from(posts)
+  .where(sql`to_tsvector('english', ${posts.title}) @@ plainto_tsquery('english', ${title})`);
+```
+
+```sql
+select * from posts
+  where to_tsvector('english', title) @@ plainto_tsquery('english', 'discover Italy');
+```
+
+```plaintext
+[ { id: 6, title: 'Discovering Hidden Culinary Gems in Italy' } ]
+```
+</Section>
+
+To match a phrase, you can use the `phraseto_tsquery` function:
+
+<Section>
+```ts copy {8}
+// if you query by "trip family", it will not return any result
+// 'family <-> trip'
+const title = 'family trip';
+
+await db
+  .select()
+  .from(posts)
+  .where(sql`to_tsvector('english', ${posts.title}) @@ phraseto_tsquery('english', ${title})`);
+```
+
+```sql
+select * from posts
+  where to_tsvector('english', title) @@ phraseto_tsquery('english', 'family trip');
+```
+
+```plaintext
+[ { id: 3, title: 'Top 5 Destinations for a Family Trip' } ]
+```
+</Section>
+
+You can also use `websearch_to_tsquery` function which is a simplified version of `to_tsquery` with an alternative syntax, similar to the one used by web search engines:
+
+<Section>
+```ts copy {7}
+// 'family | first & trip & europ | asia'
+const title = 'family or first trip Europe or Asia';
+
+await db
+  .select()
+  .from(posts)
+  .where(sql`to_tsvector('english', ${posts.title}) @@ websearch_to_tsquery('english', ${title})`);
+```
+
+```sql
+select * from posts
+  where to_tsvector('english', title)
+  @@ websearch_to_tsquery('english', 'family or first trip Europe or Asia');
+```
+
+```plaintext
+[
+  { id: 1, title: 'Planning Your First Trip to Europe' },
+  { id: 2, title: "Cultural Insights: Exploring Asia's Heritage" },
+  { id: 3, title: 'Top 5 Destinations for a Family Trip' }
+]
+```
+</Section>
+
+To implement full-text search on multiple columns, you can create index on multiple columns and concatenate the columns with `to_tsvector` function:
+
+<CodeTabs items={["schema.ts", "migration.sql", "db_data"]}>
+  <CodeTab>
+  ```ts copy {12-17}
+  import { sql } from 'drizzle-orm';
+  import { index, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const posts = pgTable(
+    'posts',
+    {
+      id: serial('id').primaryKey(),
+      title: text('title').notNull(),
+      description: text('description').notNull(),
+    },
+    (table) => ({
+      searchIndex: index('search_index').using(
+        'gin',
+        sql`(
+            setweight(to_tsvector('english', ${table.title}), 'A') ||
+            setweight(to_tsvector('english', ${table.description}), 'B')
+        )`,
+      ),
+    }),
+  );
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "posts" (
+        "id" serial PRIMARY KEY NOT NULL,
+        "title" text NOT NULL,
+        "description" text NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS "search_index" ON "posts"
+    USING gin ((setweight(to_tsvector('english', "title"), 'A') ||
+    setweight(to_tsvector('english', "description"), 'B')));
+  ```
+  </CodeTab>
+  ```plaintext
+  [
+    {
+      id: 1,
+      title: 'Planning Your First Trip to Europe',
+      description:
+        'Get essential tips on budgeting, sightseeing, and cultural etiquette for your inaugural European adventure.',
+    },
+    {
+      id: 2,
+      title: "Cultural Insights: Exploring Asia's Heritage",
+      description:
+        'Dive deep into the rich history and traditions of Asia through immersive experiences and local interactions.',
+    },
+    {
+      id: 3,
+      title: 'Top 5 Destinations for a Family Trip',
+      description:
+        'Discover family-friendly destinations that offer fun, education, and relaxation for all ages.',
+    },
+    {
+      id: 4,
+      title: 'Essential Hiking Gear for Mountain Enthusiasts',
+      description:
+        'Equip yourself with the latest and most reliable gear for your next mountain hiking expedition.',
+    },
+    {
+      id: 5,
+      title: 'Trip Planning: Choosing Your Next Destination',
+      description:
+        'Learn how to select destinations that align with your travel goals, whether for leisure, adventure, or cultural exploration.',
+    },
+    {
+      id: 6,
+      title: 'Discovering Hidden Culinary Gems in Italy',
+      description:
+        "Unearth Italy's lesser-known eateries and food markets that offer authentic and traditional flavors.",
+    },
+    {
+      id: 7,
+      title: 'The Ultimate Road Trip Guide for Explorers',
+      description:
+        'Plan your next great road trip with tips on route planning, packing, and discovering off-the-beaten-path attractions.',
+    },
+  ];
+  ```
+</CodeTabs>
+
+The `setweight` function is used to label the entries of a tsvector with a given weight, where a weight is one of the letters A, B, C, or D. This is typically used to mark entries coming from different parts of a document, such as title versus body.
+
+This is how you can query on multiple columns:
+
+<Section>
+```ts copy {5-7}
+const title = 'plan';
+
+await db.select().from(posts)
+  .where(sql`(
+      setweight(to_tsvector('english', ${posts.title}), 'A') ||
+      setweight(to_tsvector('english', ${posts.description}), 'B'))
+      @@ to_tsquery('english', ${title}
+    )`
+  );
+```
+
+```plaintext
+[
+  {
+    id: 1,
+    title: 'Planning Your First Trip to Europe',
+    description: 'Get essential tips on budgeting, sightseeing, and cultural etiquette for your inaugural European adventure.'
+  },
+  {
+    id: 5,
+    title: 'Trip Planning: Choosing Your Next Destination',
+    description: 'Learn how to select destinations that align with your travel goals, whether for leisure, adventure, or cultural exploration.'
+  },
+  {
+    id: 7,
+    title: 'The Ultimate Road Trip Guide for Explorers',
+    description: 'Plan your next great road trip with tips on route planning, packing, and discovering off-the-beaten-path attractions.'
+  }
+]
+```
+</Section>
+
+To rank the search results, you can use the `ts_rank` or `ts_rank_cd` functions and `orderBy` method:
+
+<Section>
+```ts copy {6,7,12,13,18-20}
+import { desc, getTableColumns, sql } from 'drizzle-orm';
+
+const search = 'culture | Europe | Italy | adventure';
+
+const matchQuery = sql`(
+  setweight(to_tsvector('english', ${posts.title}), 'A') ||
+  setweight(to_tsvector('english', ${posts.description}), 'B')), to_tsquery('english', ${search})`;
+
+await db
+  .select({
+    ...getTableColumns(posts),
+    rank: sql`ts_rank(${matchQuery})`,
+    rankCd: sql`ts_rank_cd(${matchQuery})`,
+  })
+  .from(posts)
+  .where(
+    sql`(
+      setweight(to_tsvector('english', ${posts.title}), 'A') ||
+      setweight(to_tsvector('english', ${posts.description}), 'B')
+      ) @@ to_tsquery('english', ${search})`,
+  )
+  .orderBy((t) => desc(t.rank));
+```
+
+```plaintext
+[
+  {
+    id: 1,
+    title: 'Planning Your First Trip to Europe',
+    description: 'Get essential tips on budgeting, sightseeing, and cultural etiquette for your inaugural European adventure.',
+    rank: 0.2735672,
+    rankCd: 1.8
+  },
+  {
+    id: 6,
+    title: 'Discovering Hidden Culinary Gems in Italy',
+    description: "Unearth Italy's lesser-known eateries and food markets that offer authentic and traditional flavors.",
+    rank: 0.16717994,
+    rankCd: 1.4
+  },
+  {
+    id: 2,
+    title: "Cultural Insights: Exploring Asia's Heritage",
+    description: 'Dive deep into the rich history and traditions of Asia through immersive experiences and local interactions.',
+    rank: 0.15198177,
+    rankCd: 1
+  },
+  {
+    id: 5,
+    title: 'Trip Planning: Choosing Your Next Destination',
+    description: 'Learn how to select destinations that align with your travel goals, whether for leisure, adventure, or cultural exploration.',
+    rank: 0.12158542,
+    rankCd: 0.8
+  }
+]
+```
+</Section>
+
+The `ts_rank` function focuses on the frequency of query terms throughout the document. The `ts_rank_cd` function focuses on the proximity of query terms within the document.
