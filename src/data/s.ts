@@ -215,11 +215,20 @@ export const sponsorsData: ISponsor[] = [
       __typename: "Organization",
       login: "driz.link/hydraso",
       name: "Hydra",
-      avatarUrl: "/images/hydra.png",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
     createdAt: "2024-06-07T13:32:16Z",
     isActive: true,
-    imageType: ImageType.IMAGE,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      background:
+        'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      background:
+        'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
+    },
   },
 ];
 
