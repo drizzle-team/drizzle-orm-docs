@@ -5,8 +5,9 @@ import Tab from '@components/markdown/Tab.astro';
 import AnchorCards from '@components/markdown/AnchorCards.astro';
 
 <AnchorCards cards={{
-  "Planetscale": "#planetscale",
-  "MySQL 2": "#mysql-2",
+  "PlanetScale": "#planetscale",
+  "mysql2": "#mysql-2",
+  "TiDB Serverless": "#tidb-serverless",
   "HTTP proxy": "#http-proxy"
 }} />
 
@@ -48,7 +49,7 @@ Please note that you will receive a warning to switch from `connect()` to `new C
 Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
 we think they're outstanding 🙌
 
-## MySQL 2
+## mysql2
 
 According to the **[official website](https://github.com/sidorares/node-mysql2)**, 
 `mysql2` is a MySQL client for Node.js with focus on performance.  
@@ -101,6 +102,30 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
 
   For querying purposes feel free to use either `client` or `pool` based on your business demands.
 </Callout>
+
+## TiDB Serverless
+
+According to the **[official website](https://www.pingcap.com/tidb-serverless/)**, 
+TiDB Serverless is a fully-managed, autonomous DBaaS with split-second cluster provisioning and consumption-based pricing.
+
+<Callout type="info" emoji="ℹ️">
+TiDB Serverless is compatible with MySQL, so you can use [`drizzle-orm/mysql2`](#mysql2) to connect to it.
+</Callout>
+
+TiDB Serverless provides an [HTTP driver](https://docs.pingcap.com/tidbcloud/serverless-driver) for edge environments. It is natively supported by Drizzle ORM via `drizzle-orm/tidb-serverless` package.
+
+<Npm>
+drizzle-orm @tidb-serverless/database
+-D drizzle-kit
+</Npm>
+
+```typescript copy filename="index.ts"
+import { connect } from '@tidbcloud/serverless';
+import { drizzle } from 'drizzle-orm/tidb-serverless';
+
+const client = connect({ url: '...' });
+const db = drizzle(client);
+```
 
 ## HTTP proxy
 
