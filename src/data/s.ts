@@ -206,6 +206,21 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
   },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/hydraso",
+      name: "Hydra",
+      avatarUrl: "/images/hydra.png",
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];
 
 export default sponsorsData;
