@@ -204,7 +204,7 @@ import { openDatabaseSync } from 'expo-sqlite/next';
 import { Text } from 'react-native';
 import * as schema from './schema';
 
-const expo = openDatabaseSync('db.db');
+const expo = openDatabaseSync('db.db', { enableChangeListener: true }); // <-- enable change listeners
 const db = drizzle(expo);
 
 const App = () => {
