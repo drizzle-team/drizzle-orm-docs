@@ -9,15 +9,16 @@ interface Props {
   slug?: string;
   tree: TreeNode[];
   filteredHeadings: IHeading[];
+  forLanding?: boolean;
 }
 
-const { slug, tree, filteredHeadings } = Astro.props;
+const { slug, tree, filteredHeadings, forLanding } = Astro.props;
 ---
 <div class="nav_sticky">
   <!-- <NavDropdown /> -->
   <ToggleSections />
 </div>
-<AsideAstro tree={tree} headings={filteredHeadings} slug={slug!}/>
+<AsideAstro tree={tree} headings={filteredHeadings} slug={slug!} forLanding={forLanding} />
 <style>
 
 html[class~="dark"] .nav_sticky {

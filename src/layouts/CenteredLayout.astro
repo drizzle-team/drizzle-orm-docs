@@ -9,6 +9,7 @@ import Footer from "../components/layout/Footer.astro";
 import getContentTree from "@/utils/getContentTree";
 import type { IHeading } from "@/types/astro";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
+import DocsSidebar from "../components/layout/DocsSidebar.astro";
 
 interface Props {
   customTitle?: string;
@@ -19,7 +20,7 @@ interface Props {
 
 const { customTitle, headings, description, isStudio } = Astro.props;
 const { slug } = Astro.params;
-const { title } = await getContentTree({
+const { title, tree  } = await getContentTree({
   headings,
   slug,
 });
@@ -36,6 +37,9 @@ const { title } = await getContentTree({
     <MDXStyles />
     <Banner />
     <NavigationAstro />
+    <div class="aside-wrap">
+      <DocsSidebar tree={tree} headings={[]} forLanding={true} />
+    </div>
     <main class:list={["documentation-container scrollbar", isStudio && "relative"]}>
       <div class="documentation-content">
         <slot />
@@ -49,10 +53,20 @@ const { title } = await getContentTree({
         position: relative;
       }
 
+      .aside-wrap {
+          display: none;
+      }
+
       @media screen and (max-width: 1024px) {
         .right-aside-container {
           display: none;
         }
+      }
+
+      @media screen and (max-width: 768px) {
+          .aside-wrap {
+              display: block;
+          }
       }
     </style>
     <style is:global>
