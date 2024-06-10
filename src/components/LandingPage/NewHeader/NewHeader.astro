@@ -8,10 +8,15 @@ import FrontImage from './Images/Front.png'
 import FrontImageDark from './Images/FrontDark.png'
 import BackImage from './Images/Back.png'
 import BackImageDark from './Images/BackDark.png'
+import WoodBorderImage from './Images/WoodBorder.png'
+import LoveImage from './Images/Love.png'
+import CrossOutImage from "./Images/CrossOut.png";
 ---
 <div class="header_container">
   <div class="header-left">
-    <div class="title">ORM for you to settle</div>
+    <div class="title">
+      ORM for you to <span class="settle">settle<Image src={CrossOutImage} alt="cross-out" class="cross-out"/><span class="ship">ship products</span></span>
+    </div>
     <div class="tags">
       <div class="tag">
         <div class="tag-icon-container">
@@ -149,17 +154,73 @@ import BackImageDark from './Images/BackDark.png'
     </div>
   </div>
   <div class="header-right">
-    <div style="display: flex; justify-content: flex-start; align-items: end">
-      <Image src={WithDBImage} alt="with db" class="img_light" />
-      <Image src={WithDBDarkImage} alt="with db" class="img_dark" />
-      <Image src={FrontImage} alt="front" class="img_light" />
-      <Image src={FrontImageDark} alt="front" class="img_dark" />
+    <div class="board">
+      <Image src={WoodBorderImage} alt="board"/>
+      <div class="team">
+        <div class="id">id</div>
+        <div>name</div>
+        <div>𝕏_handle</div>
+        <div></div>
+        <div class="id">1</div>
+        <div>Dan</div>
+        <a
+          class="handle"
+          href="https://twitter.com/bloberenober"
+          target="_blank"
+          data-text="@bloberenober"
+          rel="noreferrer"
+        >
+          @bloberenober
+        </a>
+        <div></div>
+        <div class="id">2</div>
+        <div>Andrew</div>
+        <a
+          class="handle"
+          href="https://twitter.com/andrii_sherman"
+          target="_blank"
+          data-text="@andrii_sherman"
+          rel="noreferrer"
+        >
+          @andrii_sherman
+        </a>
+        <div></div>
+        <div class="id">3</div>
+        <div>Alex</div>
+        <a
+          class="handle"
+          href="https://twitter.com/_alexblokh"
+          target="_blank"
+          data-text="@_alexblokh"
+          rel="noreferrer"
+        >
+          @_alexblokh
+        </a>
+        <div></div>
+      </div>
     </div>
-    <Image src={BackImage} alt="back" class="img_light" />
-    <Image src={BackImageDark} alt="back" class="img_dark" />
+    <div class="images" style="display: flex; justify-content: space-between; width: 100%">
+      <div style="display: flex; justify-content: flex-start; align-items: end; min-width: 144px">
+        <Image src={WithDBImage} alt="with db" class="img_light" />
+        <Image src={WithDBDarkImage} alt="with db" class="img_dark" />
+        <Image src={FrontImage} alt="front" class="img_light front" />
+        <Image src={FrontImageDark} alt="front" class="img_dark front" />
+      </div>
+      <div style="position: relative; flex-shrink: 0; z-index: 3;">
+        <Image src={BackImage} alt="back" class="img_light" />
+        <Image src={BackImageDark} alt="back" class="img_dark" />
+        <Image src={LoveImage} alt="love" class="love" />
+      </div>
+    </div>
   </div>
 </div>
 <script is:inline>
+  if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+      document.querySelector('.team').classList.add('safari-team');
+      document.querySelector('.front').classList.add('safari-front');
+      document.querySelector('.love').classList.add('safari-love');
+  }
+
   docsearch({
     container: "#docsearch",
     appId: "MXZNUT59HV",
@@ -270,9 +331,10 @@ import BackImageDark from './Images/BackDark.png'
   }
 
   .header-right {
+    position: relative;
     display: flex;
-    justify-content: space-between;
-    align-items: end;
+    flex-direction: column;
+    justify-content: flex-end;
     width: 70%;
   }
 
@@ -300,12 +362,107 @@ import BackImageDark from './Images/BackDark.png'
     height: 130px;
     width: fit-content;
     object-fit: contain;
+    flex-shrink: 0;
+      z-index: 2;
   }
 
-  .header-right img {
-      height: 130px;
-      width: fit-content;
-      object-fit: contain;
+  .board {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      max-width: 300px;
+      height: 160px;
+      margin-right: clamp(0px, calc(30px + (100vw - 910px)), 30px);
+      right: 0;
+      z-index: 1;
+      overflow: hidden;
+  }
+
+  .board img {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      object-fit: unset;
+      z-index: 2;
+      pointer-events: none;
+  }
+
+  .board::before {
+      content: "";
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      right: 4px;
+      left: 4px;
+      display: block;
+      background: white;
+      z-index: 1;
+  }
+
+  .header-right .love {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      top: 3px;
+      right: 65px;
+      opacity: 0;
+      transition: opacity 0.3s;
+  }
+
+  .team {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      font-weight: bold;
+      text-shadow: 0 0 0.5px black;
+      display: inline-grid;
+      grid-template-columns: 0.5fr 1.5fr 2.5fr 1fr;
+      grid-auto-rows: 1fr;
+      border-bottom: 1.5px solid black;
+      border-left: 1.5px solid black;
+      border-radius: 0;
+      align-self: center;
+      z-index: 1;
+      right: 3px;
+  }
+
+  .team > * {
+      border-top: 1.5px solid black;
+      border-right: 1.5px solid black;
+      border-radius: 0;
+      font-family: 'FirstTimeWriting';
+      font-size: 16px;
+      padding: 0 8px;
+      text-align: center;
+      text-decoration: none;
+      position: relative;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 26px;
+  }
+
+
+  .team a.handle:hover:after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: -2px;
+      right: 0;
+      bottom: 0;
+      color: transparent;
+      text-shadow: none;
+      white-space: nowrap;
+      text-decoration: underline;
+      text-decoration-style: wavy;
+      text-underline-offset: 3px;
+      text-decoration-color: rgb(75, 183, 74);
+  }
+
+  .safari-team > *{
+      letter-spacing: -1px;
+      padding: 0 6px;
   }
 
   .img_light {
@@ -345,6 +502,33 @@ import BackImageDark from './Images/BackDark.png'
     transition: background-color 0.2s ease-in-out;
     position: relative;
     z-index: 2;
+  }
+
+  .settle {
+      position: relative;
+      display: inline-block;
+  }
+
+  .settle .cross-out {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      left: 0;
+      width: 95%;
+      height: 75%;
+      display: block;
+  }
+
+  .settle .ship {
+      position: absolute;
+      font-family: FirstTimeWriting;
+      font-weight: 600;
+      bottom: calc(100% - 10px);
+      left: 50%;
+      font-size: 30px;
+      color: #3e7ff0;
+      text-shadow: 1px 0.5px 0.3px #3e7ff0;
+      transform: translateX(-50%) rotate(-4deg);
   }
 
 
@@ -551,23 +735,34 @@ import BackImageDark from './Images/BackDark.png'
       height: 14px;
   }
 
-  .second_pick {
-      align-self: start;
-      height: 120px;
-      margin-top: -80px;
-  }
 
   @media (max-width: 900px) {
-      .header-right img {
-          height: 100px;
-      }
-
-      .second_pick {
-          margin-top: -56px;
+      .front {
+          margin-left: calc(900px - 100vw);
       }
   }
 
-  @media (max-width: 700px) {
+  @media (max-width: 803px) {
+      .front {
+          margin-left: clamp(0px, calc(97px + (100vw - 803px)), 97px);
+      }
+
+      .header-right .love {
+          opacity: 1;
+      }
+  }
+
+  @media (max-width: 809px) {
+      .safari-front {
+          margin-left: clamp(0px, calc(90px + (100vw - 808px)), 90px);
+      }
+
+      .header-right .safari-love {
+          opacity: 1;
+      }
+  }
+
+  @media (max-width: 690px) {
       .header-right {
           display: none;
           margin-top: 64px;
@@ -638,5 +833,12 @@ import BackImageDark from './Images/BackDark.png'
           line-height: 30px;
       }
 
+      .settle .ship {
+          bottom: calc(100% - 5px);
+          left: 50%;
+          font-size: 20px;
+          color: #3e7ff0;
+          text-shadow: 0.5px 0.5px 0.3px #3e7ff0;
+      }
   }
 </style>
