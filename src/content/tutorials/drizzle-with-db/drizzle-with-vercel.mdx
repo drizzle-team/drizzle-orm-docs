@@ -50,8 +50,12 @@ Create a `index.ts` file in the `src/db` directory and set up your database conf
 ```typescript copy filename="src/db/index.ts"
 import { sql } from '@vercel/postgres';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 
 export const db = drizzle(sql);
+
 ```
 
 #### Create tables
@@ -102,10 +106,10 @@ config({ path: '.env.local' });
 
 export default defineConfig({
   schema: './src/db/schema.ts',
-  out: './drizzle/migrations',
+  out: './migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.POSTGRES_URL!,
   },
 });
 ```
@@ -181,8 +185,8 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │   │  ├ 📜 _journal.json
  │   │  └ 📜 0000_snapshot.json
  │   └ 📜 0000_watery_spencer_smythe.sql
- ├ 📜 drizzle.config.ts
  ├ 📜 .env.local
+ ├ 📜 drizzle.config.ts
  ├ 📜 package.json
  └ 📜 tsconfig.json
 ```
