@@ -1,0 +1,50 @@
+---
+const { progress = 0 } = Astro.props;
+const strokeWidth = 14;
+const maxProgress = 100;
+const width = (progress / maxProgress) * 100 * 3.16;
+---
+<div class="progress-bar">
+  <div class="label">v1.0</div>
+  <svg width="100%" height="26px" viewBox="0 0 318 26" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible">
+    <path class="background-line" d="M7 13.8506C9.9064 13.982 12.642 15.1371 15.5549 15.4315C19.4019 15.8202 23.0881 15.9585 26.9727 15.9585C34.3788 15.9585 40.5608 12.742 47.8316 11.7427C57.1988 10.4553 67.3029 10.0194 76.8023 10.8059C85.6396 11.5375 94.2645 13.8506 103.183 13.8506C109.931 13.8506 116.88 14.261 123.564 13.4407C132.465 12.3485 140.234 14.5823 148.718 16.2219C159.38 18.2826 169.208 18.5933 180.04 18.5933C187.828 18.5933 195.243 19.6646 203.012 18.3298C211.244 16.9157 218.705 13.7189 227.041 12.6795C233.347 11.8932 239.037 11.2157 245.446 11.2157C254.944 11.2157 263.861 10.775 273.258 9.75195C277.89 9.24755 282.537 8.73656 287.095 8.02466C289.467 7.65422 291.853 7 294.253 7C298.802 7 302.719 9.10787 307 9.10787" stroke-width={strokeWidth} stroke-linecap="round"/>
+    <path class="progress-line" style={`stroke-dasharray: ${width} 9999px`} d="M7 13.8506C9.9064 13.982 12.642 15.1371 15.5549 15.4315C19.4019 15.8202 23.0881 15.9585 26.9727 15.9585C34.3788 15.9585 40.5608 12.742 47.8316 11.7427C57.1988 10.4553 67.3029 10.0194 76.8023 10.8059C85.6396 11.5375 94.2645 13.8506 103.183 13.8506C109.931 13.8506 116.88 14.261 123.564 13.4407C132.465 12.3485 140.234 14.5823 148.718 16.2219C159.38 18.2826 169.208 18.5933 180.04 18.5933C187.828 18.5933 195.243 19.6646 203.012 18.3298C211.244 16.9157 218.705 13.7189 227.041 12.6795C233.347 11.8932 239.037 11.2157 245.446 11.2157C254.944 11.2157 263.861 10.775 273.258 9.75195C277.89 9.24755 282.537 8.73656 287.095 8.02466C289.467 7.65422 291.853 7 294.253 7C298.802 7 302.719 9.10787 307 9.10787" stroke-width={strokeWidth} stroke-linecap="round"/>
+  </svg>
+  <div class="progress-label" style=`left: ${progress * 3}px`>{progress}%</div>
+</div>
+<style>
+    .progress-bar {
+        position: relative;
+        width: 100%;
+    }
+    .progress-bar svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .background-line {
+        stroke: white;
+        filter: drop-shadow(2px 0px 0px black) drop-shadow(-1.5px 0px 0px black) drop-shadow(0px 2px 0px black) drop-shadow(0px -1.5px 0px black);
+    }
+    .progress-line {
+        stroke: #c9dbf6;
+    }
+
+    .label {
+        position: absolute;
+        top: -24px;
+        right: 0;
+        font-size: 18px;
+        font-family: FirstTimeWriting;
+        filter: drop-shadow(0.5px 0px 0px black) drop-shadow(-0.5px 0px 0px black) drop-shadow(0px -0.5px 0px black) drop-shadow(0px 0.5px 0px black);
+    }
+
+    .progress-label {
+        position: absolute;
+        bottom: -48px;
+        font-size: 16px;
+        font-family: FirstTimeWriting;
+        filter: drop-shadow(0.5px 0px 0px black) drop-shadow(-0.5px 0px 0px black) drop-shadow(0px -0.5px 0px black) drop-shadow(0px 0.5px 0px black);
+    }
+</style>
+
