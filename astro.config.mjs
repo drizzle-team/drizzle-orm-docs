@@ -9,12 +9,16 @@ import {
   codeSnippetAutoImport,
 } from "./integration/astro-code-snippets";
 import sitemap from "@astrojs/sitemap";
+import yaml from '@rollup/plugin-yaml';
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://orm.drizzle.team",
   build: {
     format: "file", // mandatory due to CloudFlare Pages trailing slash problem
+  },
+  vite: {
+    plugins: [yaml()]
   },
   image: {
     domains: ["img.youtube.com"],
