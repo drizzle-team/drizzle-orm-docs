@@ -18,11 +18,11 @@ This tutorial demonstrates how to use Drizzle ORM with [Supabase Database](https
 drizzle-orm
 -D drizzle-kit
 </Npm>
-- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv).
-- You should have the latest version of [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli) installed. (Only if you want to use the CLI for migrations).
+- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+- You should have the latest version of [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli) installed (Only if you want to use the CLI for migrations)
 </Prerequisites>
 
-Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to database with Drizzle ORM.
+Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to the database with Drizzle ORM.
 
 ## Setup Supabase and Drizzle ORM
 
@@ -38,19 +38,21 @@ Navigate to [Database Settings](https://supabase.com/dashboard/project/_/setting
 Add `DATABASE_URL` variable to your `.env` file:
 
 ```plaintext
-DATABASE_URL=<CONNECTION_STRING>
+DATABASE_URL=<YOUR_DATABASE_URL>
 ```
 
 Read more about Connection Pooler and pooling modes in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
 
 #### Connect Drizzle ORM to your database
 
-Create a `db.ts` file in the `src/db` directory and set up your database configuration:
+Create a `index.ts` file in the `src/db` directory and set up your database configuration:
 
-```typescript copy filename="src/db/db.ts"
-import 'dotenv/config';
+```typescript copy filename="src/db/index.ts"
+import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+
+config({ path: '.env' });
 
 const client = postgres(process.env.DATABASE_URL!);
 export const db = drizzle(client);
@@ -97,8 +99,10 @@ export type SelectPost = typeof postsTable.$inferSelect;
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
+
+config({ path: '.env' });
 
 export default defineConfig({
   schema: './src/db/schema.ts',
@@ -183,9 +187,9 @@ This is the basic file structure of the project. In the `src/db` directory, we h
 📦 <project root>
  ├ 📂 src
  │   ├ 📂 db
- │   │  ├ 📜 db.ts
+ │   │  ├ 📜 index.ts
+ │   │  ├ 📜 queries.ts
  │   │  └ 📜 schema.ts
- │   └ 📜 index.ts
  ├ 📂 supabase
  │   ├ 📂 migrations
  │   │  ├ 📂 meta
@@ -193,6 +197,7 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │   │  │  └ 📜 0000_snapshot.json
  │   │  └ 📜 0000_watery_spencer_smythe.sql
  │   └ 📜 config.toml
+ ├ 📜 .env
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
  └ 📜 tsconfig.json
