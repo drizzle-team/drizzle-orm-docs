@@ -17,7 +17,6 @@ import vitalii from './Images/team/vitalii.jpg'
 import shippingData from '../../../data/shipping.yaml';
 import getWeekLabel from "../../../utils/getWeekLabel";
 import fillWeeksGaps from "../../../utils/fillWeeksGaps";
-import ProgressBar from "./ProgressBar.astro";
 
 const drizzleTeam: { name: string, photo: string}[] = [
   {
@@ -86,8 +85,6 @@ const shipping = fillWeeksGaps(shippingData);
 <div class="developers_container">
   <h2 class="title">We ship decently fast</h2>
   <div class="flex_container">
-    <div style="display: flex; justify-content: space-between; align-items: end">
-      <div>
         <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
         <div class={"scroll"}>
           <div class={"gradient-left"}></div>
@@ -104,8 +101,6 @@ const shipping = fillWeeksGaps(shippingData);
             ))}
           </div>
         </div>
-      </div>
-      <div style="flex-shrink: 0; width: 300px; margin-bottom: 15px; height: 30px"><ProgressBar progress={67}/></div>
     </div>
     <div class={"scroll board-scroll"}>
       <div class={"gradient-left board-gradient"}></div>
@@ -169,7 +164,6 @@ const shipping = fillWeeksGaps(shippingData);
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow-x: hidden;
         margin: 0 -24px;
         position: relative;
     }
@@ -300,7 +294,7 @@ const shipping = fillWeeksGaps(shippingData);
         white-space: nowrap;
         left: 50%;
         opacity: 0;
-        transform: translateX(-50%) translateZ(0);
+        transform: translateX(-50%);
         pointer-events: none;
         font-size: 14px;
         font-weight: 400;
@@ -308,6 +302,11 @@ const shipping = fillWeeksGaps(shippingData);
         background: white;
         border-radius: 4px;
         box-shadow: 0 0 0 0 #fff, 0 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+    }
+
+    .core_team_container a:first-child span {
+        left: 0;
+        transform: none;
     }
 
     html.dark .core_team_container span {
