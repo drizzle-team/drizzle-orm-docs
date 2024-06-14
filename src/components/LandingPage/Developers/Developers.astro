@@ -85,22 +85,21 @@ const shipping = fillWeeksGaps(shippingData);
 <div class="developers_container">
   <h2 class="title">We ship decently fast</h2>
   <div class="flex_container">
-        <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
-        <div class={"scroll"}>
-          <div class={"gradient-left"}></div>
-          <div class={"gradient-right"}></div>
-          <div class="core_team_container">
-            {[...drizzleTeam, ...contributors].map((dev, index) => (
-              <a
-                href=""
-                style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
-              >
-                <span>{dev.name}</span>
-                <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
-              </a>
-            ))}
-          </div>
-        </div>
+    <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
+    <div class={"scroll"}>
+      <div class={"gradient-left"}></div>
+      <div class={"gradient-right"}></div>
+      <div class="core_team_container">
+        {[...drizzleTeam, ...contributors].map((dev, index) => (
+          <a
+            href=""
+            style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
+          >
+            <span>{dev.name}</span>
+            <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
+          </a>
+        ))}
+      </div>
     </div>
     <div class={"scroll board-scroll"}>
       <div class={"gradient-left board-gradient"}></div>
