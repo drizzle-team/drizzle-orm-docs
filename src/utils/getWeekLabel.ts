@@ -17,8 +17,8 @@ export default (startDate: string): string => {
   if (diffWeeks === 0) {
     return "this week";
   } else if (diffWeeks === 1) {
-    return "previous week";
+    return "last week";
   } else {
-    return `${diffWeeks} weeks ago`;
+    return `${diffWeeks}w ago`;
   }
 };
