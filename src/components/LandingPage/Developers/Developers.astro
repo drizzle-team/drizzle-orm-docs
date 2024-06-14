@@ -17,6 +17,7 @@ import vitalii from './Images/team/vitalii.jpg'
 import shippingData from '../../../data/shipping.yaml';
 import getWeekLabel from "../../../utils/getWeekLabel";
 import fillWeeksGaps from "../../../utils/fillWeeksGaps";
+import {list} from "postcss";
 
 const drizzleTeam: { name: string, photo: string}[] = [
   {
@@ -80,7 +81,7 @@ const contributors: { name: string, photo: string}[] = [
   },
 ];
 
-const shipping = fillWeeksGaps(shippingData);
+const shipping = shippingData;
 ---
 <div class="developers_container">
   <h2 class="title">We ship decently fast</h2>
@@ -104,27 +105,28 @@ const shipping = fillWeeksGaps(shippingData);
     <div class={"scroll board-scroll"}>
       <div class={"gradient-left board-gradient"}></div>
       <div class={"gradient-right board-gradient"}></div>
-        <div class="shipping-board">
-          {shipping.weeks
-            .filter(({date}) => {
-              const weekDate = new Date(date.start);
-              const currentDate = new Date();
-              return weekDate.getTime() < currentDate.getTime()
-            })
-            .map(({date, details}) => (
+      <div class="shipping-board">
+        {shipping.weeks
+          .filter(({date}) => {
+            const weekDate = new Date(date.start);
+            const currentDate = new Date();
+            return weekDate.getTime() < currentDate.getTime()
+          })
+          .map(({date, details}) => (
             <div class="week">
               <div class="week-title">
                 {getWeekLabel(date.start)}
               </div>
-              <div class="divider"/>
               <ul class="week-details">
                 {details.map((string) => (
-                  <li class="week-text" set:html={string}/>
+                  <li class="week-text">
+                    <div set:html={string}/>
+                  </li>
                 ))}
               </ul>
             </div>
           ))}
-        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -151,6 +153,7 @@ const shipping = fillWeeksGaps(shippingData);
 </style>
 <style>
     .developers_container {
+        position: relative;
         max-width: 910px;
         margin: 160px auto 0;
         display: flex;
@@ -159,11 +162,23 @@ const shipping = fillWeeksGaps(shippingData);
         width: 100%;
     }
 
+    .background {
+        position: absolute;
+        width: 200vw;
+        background: #f8f8f8;
+        top: -20px;
+        bottom: -36px;
+        left: -50%;
+    }
+
+    html.dark .background {
+        background: #1c1c1c;
+    }
+
     .scroll {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100vw;
         margin: 0 -24px;
         position: relative;
     }
@@ -189,8 +204,8 @@ const shipping = fillWeeksGaps(shippingData);
         background: linear-gradient(
                 to left,
                 rgba(250, 250, 250, 0) 0%,
-                #ffffffb2 70%,
-                #fff 100%
+                rgba(255, 255, 255, 0.58) 90%,
+                #ffffff 100%
         );
     }
 
@@ -199,8 +214,8 @@ const shipping = fillWeeksGaps(shippingData);
         background: linear-gradient(
                 to right,
                 rgba(250, 250, 250, 0) 0%,
-                #ffffffb2 70%,
-                #fff 100%
+                rgba(255, 255, 255, 0.58) 90%,
+                #ffffff 100%
         );
     }
 
@@ -208,8 +223,8 @@ const shipping = fillWeeksGaps(shippingData);
         background: linear-gradient(
                 to right,
                 rgba(17, 16, 17, 0) 0%,
-                rgba(17, 17, 17, 0.7) 70%,
-                rgb(17, 17, 17) 100%
+                rgba(17, 17, 17, 0.96) 90%,
+                #111 100%
         );
     }
 
@@ -217,8 +232,8 @@ const shipping = fillWeeksGaps(shippingData);
         background: linear-gradient(
                 to left,
                 rgba(17, 17, 17, 0) 0%,
-                rgba(17, 17, 17, 0.7) 70%,
-                rgb(17, 17, 17) 100%
+                rgba(17, 17, 17, 0.96) 90%,
+                #111 100%
         );
     }
 
@@ -227,12 +242,14 @@ const shipping = fillWeeksGaps(shippingData);
     }
 
     .title {
+        z-index: 1;
         font-size: 32px;
         font-weight: 600;
         text-align: left;
     }
 
     .subtitle {
+        z-index: 1;
         font-size: 14px;
         font-weight: 600;
         margin: 0 0 8px;
@@ -241,6 +258,7 @@ const shipping = fillWeeksGaps(shippingData);
 
 
     .subtitle span {
+        z-index: 1;
         cursor: help;
         text-decoration: underline;
         text-decoration-color: #4bb74a;
@@ -252,6 +270,7 @@ const shipping = fillWeeksGaps(shippingData);
     }
 
     .flex_container {
+        position: relative;
         flex-direction: column;
         margin-top: 4px;
         gap: 24px;
@@ -274,7 +293,7 @@ const shipping = fillWeeksGaps(shippingData);
         height: 40px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #fff;
+        border: 2px solid #f8f8f8;
         object-position: center;
         filter: grayscale(1);
         transition: filter 0.2s;
@@ -294,7 +313,7 @@ const shipping = fillWeeksGaps(shippingData);
         white-space: nowrap;
         left: 50%;
         opacity: 0;
-        transform: translateX(-50%) translateZ(0);
+        transform: translateX(-50%);
         pointer-events: none;
         font-size: 14px;
         font-weight: 400;
@@ -303,6 +322,7 @@ const shipping = fillWeeksGaps(shippingData);
         border-radius: 4px;
         box-shadow: 0 0 0 0 #fff, 0 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
     }
+
 
     html.dark .core_team_container span {
         background: #000;
@@ -318,11 +338,11 @@ const shipping = fillWeeksGaps(shippingData);
     }
 
     .core_team_container a:hover span {
-       opacity: 1;
+        opacity: 1;
     }
 
     html.dark .core_team_container img {
-        border: 2px solid #111111;
+        border: 2px solid #1c1c1c;
     }
 
     .shipping-board::-webkit-scrollbar {
@@ -331,44 +351,29 @@ const shipping = fillWeeksGaps(shippingData);
 
     .shipping-board {
         margin-top: 20px;
-        gap: 8px;
+        gap: 12px;
         width: 100%;
         overflow-x: auto;
         display: flex;
         padding: 0 12px;
+        align-items: stretch;
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
 
     .week {
-        padding: 12px 8px;
+        height: 100%;
         width: 280px;
-        background: #f8f8f8;
         flex-shrink: 0;
-        min-height: 280px;
-        border: 1px solid rgba(33, 39, 46, .12);
-        border-radius: 4px;
+        min-height: 320px;
     }
 
-    html.dark .week {
-        background: #1c1c1c;
-        border: 1px solid #404040;
-    }
-
-    html.dark .week .divider {
-        background: #404040;
-    }
-
-    .week .divider {
-        height: 1px;
-        width: calc(100% + 16px);
-        background: rgba(33, 39, 46, .12);
-        margin: 8px -8px;
-    }
 
     .week-title {
         font-size: 12px;
+        margin-bottom: 2px;
         font-weight: 600;
+        margin-left: 8px;
     }
 
     .week-title:first-letter {
@@ -379,27 +384,32 @@ const shipping = fillWeeksGaps(shippingData);
         display: flex;
         flex-direction: column;
         gap: 6px;
+        padding: 8px;
+        background: #f6f6f7;
+        height: 440px;
+        border-radius: 8px;
     }
 
-     .week-text {
-         padding-left: 12px;
-         font-size: 14px;
-         font-weight: 500;
-         line-height: 18px;
-         position: relative;
+    html.dark .week-details {
+        background: #1c1c1c;
     }
 
-    .week-text::before {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        top: 6px;
-        left: 0px;
-        border-radius: 100%;
-        background: #4bb74a;
+    .week-text {
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #e8e8e8;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 18px;
+        position: relative;
+        border-radius: 8px;
     }
+
+    html.dark .week-text {
+        background: #282828;
+        border: 1px solid #111;
+    }
+
 
     @media (max-width: 960px) {
         .board-scroll {
@@ -444,3 +454,4 @@ const shipping = fillWeeksGaps(shippingData);
         }
     }
 </style>
+

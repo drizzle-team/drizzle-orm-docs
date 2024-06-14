@@ -219,6 +219,7 @@ import CrossOutImage from "./Images/CrossOut.png";
       document.querySelector('.team').classList.add('safari-team');
       document.querySelector('.front').classList.add('safari-front');
       document.querySelector('.love').classList.add('safari-love');
+      document.querySelector('.board').classList.add('safari-board');
   }
 
   docsearch({
@@ -378,6 +379,10 @@ import CrossOutImage from "./Images/CrossOut.png";
       overflow: hidden;
   }
 
+  .safari-board {
+      margin-right: clamp(0px, calc(30px + (100vw - 796px)), 30px);
+  }
+
   .board img {
       position: relative;
       width: 100%;
@@ -527,7 +532,7 @@ import CrossOutImage from "./Images/CrossOut.png";
       left: 50%;
       font-size: 30px;
       color: #3e7ff0;
-      text-shadow: 1px 0.5px 0.3px #3e7ff0;
+      text-shadow: 0.5px 0 0 #3e7ff0, -0.5px 0 0 #3e7ff0, 0 0.5px 0 #3e7ff0, 0 -0.5px 0 #3e7ff0;
       transform: translateX(-50%) rotate(-4deg);
   }
 
