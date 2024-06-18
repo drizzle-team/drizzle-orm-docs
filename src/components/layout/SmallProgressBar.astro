@@ -2,31 +2,41 @@
 const { progress = 0 } = Astro.props;
 ---
 <div class="progress-bar">
-  <div class="title">v1.0 release<div class="label">{progress}%</div></div>
   <div style="display: flex; gap: 8px; align-items: center">
+    <div class="title">v1.0</div>
     <div class="progress-line">
       <div class="progress-line-inner" style=`right: calc(${100-progress}% - 1px)` />
     </div>
+    <div class="label">{progress}%</div>
   </div>
 </div>
 <style>
     .progress-bar {
+        cursor: pointer;
         font-family: Monospace;
         display: flex;
         flex-direction: column;
-        padding: 8px 10px;
+        padding: 8px 12px;
+        justify-content: center;
         gap: 4px;
         width: 100%;
         font-size: 12px;
         font-weight: 700;
         background: #f6f6f7;
-        border-radius: 8px;
+        border-radius: 4px;
         transition: background-color 0.2s;
-        cursor: pointer;
+    }
+
+    .progress-bar:hover {
+        background: #eff0f3;
     }
 
     html.dark .progress-bar {
         background: #1c1c1c;
+    }
+
+    html.dark .progress-bar:hover {
+        background: #282828;
     }
 
     .title {
@@ -37,7 +47,6 @@ const { progress = 0 } = Astro.props;
     }
 
     .label {
-
         font-family: Monospace;
     }
 
@@ -67,13 +76,6 @@ const { progress = 0 } = Astro.props;
 
     html.dark .progress-line-inner {
         border-color: #1e4a1d;
-    }
-
-    .progress-bar:hover {
-        background: #eff0f3;
-    }
-    html.dark .progress-bar:hover {
-        background: #282828;
     }
 </style>
 

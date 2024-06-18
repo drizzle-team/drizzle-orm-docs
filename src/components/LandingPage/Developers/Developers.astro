@@ -16,10 +16,9 @@ import artem from './Images/team/artem.jpg'
 import vitalii from './Images/team/vitalii.jpg'
 import shippingData from '../../../data/shipping.yaml';
 import getWeekLabel from "../../../utils/getWeekLabel";
-import fillWeeksGaps from "../../../utils/fillWeeksGaps";
-import {list} from "postcss";
+import ProgressBar from "./ProgressBar.astro";
 
-const drizzleTeam: { name: string, photo: string}[] = [
+const drizzleTeam: { name: string, photo: string, url?: string}[] = [
   {
     name: 'Andrew Sherman',
     photo: sherman,
@@ -84,49 +83,54 @@ const contributors: { name: string, photo: string}[] = [
 const shipping = shippingData;
 ---
 <div class="developers_container">
-  <h2 class="title">We ship decently fast</h2>
-  <div class="flex_container">
-    <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
-    <div class={"scroll"}>
-      <div class={"gradient-left"}></div>
-      <div class={"gradient-right"}></div>
-      <div class="core_team_container">
-        {[...drizzleTeam, ...contributors].map((dev, index) => (
-          <a
-            href=""
-            style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
-          >
-            <span>{dev.name}</span>
-            <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
-          </a>
-        ))}
+  <div class="flex-container">
+    <div class="developers-left">
+      <h2 class="title">We ship decently fast</h2>
+      <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
+      <div class={"scroll"}>
+        <div class={"gradient-left"}></div>
+        <div class={"gradient-right"}></div>
+        <div class="core_team_container">
+          {[...drizzleTeam, ...contributors].map((dev, index) => (
+            <a
+              href=""
+              style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
+            >
+              <span>{dev.name}</span>
+              <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
+            </a>
+          ))}
+        </div>
       </div>
     </div>
-    <div class={"scroll board-scroll"}>
-      <div class={"gradient-left board-gradient"}></div>
-      <div class={"gradient-right board-gradient"}></div>
-      <div class="shipping-board">
-        {shipping.weeks
-          .filter(({date}) => {
-            const weekDate = new Date(date.start);
-            const currentDate = new Date();
-            return weekDate.getTime() < currentDate.getTime()
-          })
-          .map(({date, details}) => (
-            <div class="week">
-              <div class="week-title">
-                {getWeekLabel(date.start)}
-              </div>
-              <ul class="week-details">
-                {details.map((string) => (
-                  <li class="week-text">
-                    <div set:html={string}/>
-                  </li>
-                ))}
-              </ul>
+    <div class="developers-right">
+      <ProgressBar progress={shippingData.progress} />
+    </div>
+  </div>
+  <div class={"scroll board-scroll"}>
+    <div class={"gradient-left board-gradient"}></div>
+    <div class={"gradient-right board-gradient"}></div>
+    <div class="shipping-board">
+      {shipping.weeks
+        .filter(({date}) => {
+          const weekDate = new Date(date.start);
+          const currentDate = new Date();
+          return weekDate.getTime() < currentDate.getTime()
+        })
+        .map(({date, details}) => (
+          <div class="week">
+            <div class="week-title">
+              {getWeekLabel(date.start)}
             </div>
-          ))}
-      </div>
+            <ul class="week-details">
+              {details.map((string) => (
+                <li class="week-text">
+                  <div set:html={string}/>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
     </div>
   </div>
 </div>
@@ -160,6 +164,25 @@ const shipping = shippingData;
         flex-direction: column;
         justify-content: flex-start;
         width: 100%;
+    }
+
+    .flex-container {
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 40px;
+        margin-bottom: 32px;
+    }
+
+    .developers-left {
+        flex-shrink: 0;
+    }
+
+    .developers-right {
+        max-width: 280px;
+        width: 100%;
+        margin-top: 6px;
     }
 
     .background {
@@ -252,7 +275,7 @@ const shipping = shippingData;
         z-index: 1;
         font-size: 14px;
         font-weight: 600;
-        margin: 0 0 8px;
+        margin: 4px 0 8px;
         text-align: left;
     }
 
@@ -267,13 +290,6 @@ const shipping = shippingData;
 
     .subtitle span:hover {
         text-decoration-style: solid;
-    }
-
-    .flex_container {
-        position: relative;
-        flex-direction: column;
-        margin-top: 4px;
-        gap: 24px;
     }
 
     .colored {
@@ -350,7 +366,6 @@ const shipping = shippingData;
     }
 
     .shipping-board {
-        margin-top: 20px;
         gap: 12px;
         width: 100%;
         overflow-x: auto;
@@ -433,6 +448,16 @@ const shipping = shippingData;
         .flex_container {
             flex-direction: column;
             gap: 8px;
+        }
+    }
+
+    @media (max-width: 690px) {
+        .developers-right {
+            display: none;
+        }
+
+        .developers-left {
+            flex-shrink: unset;
         }
     }
 
