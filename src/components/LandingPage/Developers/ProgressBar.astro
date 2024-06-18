@@ -1,14 +1,14 @@
 ---
 const { progress = 0 } = Astro.props;
 ---
-<div class="progress-bar">
+<a class="progress-bar" href="/roadmap">
   <div class="title">v1.0 release<div class="label">{progress}%</div></div>
   <div style="display: flex; gap: 8px; align-items: center">
     <div class="progress-line">
       <div class="progress-line-inner" style=`right: calc(${100-progress}% - 1px)` />
     </div>
   </div>
-</div>
+</a>
 <style>
     .progress-bar {
         font-family: Monospace;

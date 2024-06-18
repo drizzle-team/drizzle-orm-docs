@@ -17,6 +17,7 @@ import vitalii from './Images/team/vitalii.jpg'
 import shippingData from '../../../data/shipping.yaml';
 import getWeekLabel from "../../../utils/getWeekLabel";
 import ProgressBar from "./ProgressBar.astro";
+import fillWeeksGaps from "../../../utils/fillWeeksGaps";
 
 const drizzleTeam: { name: string, photo: string, url?: string}[] = [
   {
@@ -80,7 +81,7 @@ const contributors: { name: string, photo: string}[] = [
   },
 ];
 
-const shipping = shippingData;
+const shipping = fillWeeksGaps(shippingData);
 ---
 <div class="developers_container">
   <div class="flex-container">
@@ -301,6 +302,7 @@ const shipping = shippingData;
         padding: 0 24px;
         position: relative;
         width: 100%;
+        white-space: nowrap;
     }
 
     .core_team_container img {
@@ -413,14 +415,16 @@ const shipping = shippingData;
         padding: 8px 12px;
         background: white;
         border: 1px solid #e8e8e8;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 18px;
+        font-size: 12px;
+        color: #444;
+        font-weight: 700;
+        line-height: 17px;
         position: relative;
         border-radius: 8px;
     }
 
     html.dark .week-text {
+        color: #e2e8f0;
         background: #282828;
         border: 1px solid #111;
     }
