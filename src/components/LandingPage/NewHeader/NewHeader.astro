@@ -11,6 +11,45 @@ import BackImageDark from './Images/BackDark.png'
 import WoodBorderImage from './Images/WoodBorder.webp'
 import LoveImage from './Images/Love.png'
 import CrossOutImage from "./Images/CrossOut.png";
+import DBImage from "./Images/DB.png";
+
+const drizzleCoordinates = [
+  {x: 45, y: 99},
+  {x: 54, y: 99},
+  {x: 54, y: 90},
+  {x: 63, y: 90},
+  {x: 63, y: 81},
+  {x: 72, y: 81},
+  {x: 72, y: 72},
+  {x: 81, y: 72},
+
+  {x: 108, y: 72},
+  {x: 117, y: 72},
+  {x: 117, y: 63},
+  {x: 126, y: 63},
+  {x: 126, y: 54},
+  {x: 135, y: 54},
+  {x: 135, y: 45},
+  {x: 144, y: 45},
+
+  {x: 135, y: 99},
+  {x: 144, y: 99},
+  {x: 144, y: 90},
+  {x: 153, y: 90},
+  {x: 153, y: 81},
+  {x: 162, y: 81},
+  {x: 162, y: 72},
+  {x: 171, y: 72},
+
+  {x: 198, y: 72},
+  {x: 207, y: 72},
+  {x: 207, y: 63},
+  {x: 216, y: 63},
+  {x: 216, y: 54},
+  {x: 225, y: 54},
+  {x: 225, y: 45},
+  {x: 234, y: 45}
+]
 ---
 <div class="header_container">
   <div class="header-left">
@@ -274,23 +313,43 @@ import CrossOutImage from "./Images/CrossOut.png";
   window.inkeepWidget = inkeepWidget;
 </script>
 
-<script is:inline>
+<script is:inline define:vars={{drizzleCoordinates, DBImage}}>
   class SnakeGame {
       constructor() {
-      this.userActivity = false;
+      this.drizzleCoordinates = [...drizzleCoordinates]
+      this.isInitialized = false;
+      this.initializationCount = 0;
       this.isPaused = false;
       this.canvas = document.getElementById('gameCanvas');
       this.ctx = this.canvas.getContext('2d');
       this.tileSize = 9;
-      this.snake = this.createInitialSnake(10);
+      this.snake = [
+        {x: 45, y: 45},
+        {x: 45, y: 54},
+        {x: 45, y: 63},
+        {x: 45, y: 72},
+        {x: 45, y: 81},
+        {x: 45, y: 90},
+        {x: 45, y: 99},
+      ];
+
+      this.foodImage = new Image();
+      this.foodImage.obje
+      this.foodImage.src = '/images/db1.png';
+      this.foodImage.onload = () => {
+        this.redraw();
+      };
+
       this.direction = 'RIGHT';
       this.scale = window.devicePixelRatio || 1;
-      this.food = this.generateFood();
+      this.food = {x: 234, y: 45};
       this.resizeCanvas();
+      this.drawDrizzle();
+      this.drawGrid();
+      document.querySelector('#gameArea').addEventListener('click', this.startGame.bind(this))
       window.addEventListener('resize', this.resizeCanvas.bind(this));
       document.addEventListener('keydown', this.changeDirection.bind(this));
       this.gameLoop();
-      this.autoPlay();
     }
 
     createInitialSnake(length) {
@@ -301,18 +360,42 @@ import CrossOutImage from "./Images/CrossOut.png";
       return initialSnake;
     }
 
+    startGame() {
+      const minXValue = this.drizzleCoordinates[0].x;
+
+      setTimeout(() => {
+        this.drizzleCoordinates = this.drizzleCoordinates.map((segment, index) => {
+          if (this.drizzleCoordinates.length === index + 1) {
+            return segment
+          } else {
+            return  {x: segment.x - 9 < minXValue ? minXValue : segment.x - 9, y: segment.y}
+          }
+        })
+
+        this.initializationCount = this.initializationCount + 1;
+
+        this.redraw();
+
+        if (this.initializationCount < 21) {
+          this.startGame();
+        } else {
+            this.isInitialized = true;
+        }
+      }, 50);
+    }
+
     drawGrid() {
-      this.ctx.strokeStyle = '#21272e';
+      this.ctx.strokeStyle = 'white';
       this.ctx.lineWidth = 0.5;
 
-      for (let x = 0; x <= this.canvas.width / this.scale; x += this.tileSize) {
+      for (let x = 0; x <= this.canvas.width / this.scale; x += this.tileSize / 2) {
         this.ctx.beginPath();
         this.ctx.moveTo(x, 0);
         this.ctx.lineTo(x, this.canvas.height / this.scale);
         this.ctx.stroke();
       }
 
-      for (let y = 0; y <= this.canvas.height / this.scale; y += this.tileSize) {
+      for (let y = 0; y <= this.canvas.height / this.scale; y += this.tileSize / 2) {
         this.ctx.beginPath();
         this.ctx.moveTo(0, y);
         this.ctx.lineTo(this.canvas.width / this.scale, y);
@@ -344,9 +427,24 @@ import CrossOutImage from "./Images/CrossOut.png";
 
     redraw() {
       this.clearCanvas();
-      this.drawFood();
-      this.drawSnake();
-      this.drawGrid();
+      if (this.isInitialized) {
+        this.drawSnake();
+        this.drawGrid();
+        this.drawFood();
+
+      } else {
+        this.drawDrizzle();
+        this.drawGrid();
+      }
+
+    }
+
+    drawDrizzle() {
+      this.ctx.fillStyle = '#777';
+
+      this.drizzleCoordinates.forEach(segment => {
+        this.ctx.fillRect(segment.x, segment.y, this.tileSize, this.tileSize);
+      });
     }
 
     generateFood() {
@@ -384,7 +482,6 @@ import CrossOutImage from "./Images/CrossOut.png";
     }
 
     changeDirection(event) {
-      this.userActivity = true;
       const key = event.keyCode;
       if (key === 37 && this.direction !== 'RIGHT') {
         this.direction = 'LEFT';
@@ -397,31 +494,10 @@ import CrossOutImage from "./Images/CrossOut.png";
       }
     }
 
-    autoPlay() {
-      setTimeout(() => {
-        this.direction = this.getRandomDirection()
-        if (!this.userActivity) this.autoPlay();
-      }, 500);
-    }
-
-    getRandomDirection() {
-      const directions = ['LEFT', 'RIGHT', 'UP', 'DOWN'];
-      const oppositeDirections = {
-        'LEFT': 'RIGHT',
-        'RIGHT': 'LEFT',
-        'UP': 'DOWN',
-        'DOWN': 'UP'
-      };
-
-      const randomIndex = Math.floor(Math.random() * directions.length);
-
-      return oppositeDirections[this.direction] !== directions[randomIndex] ? directions[randomIndex] : this.direction;
-    }
-
 
     gameLoop() {
       setTimeout(() => {
-        if (!this.isPaused) {
+        if (!this.isPaused && this.isInitialized) {
           this.moveSnake();
           this.redraw();
           this.checkGameOver();
@@ -437,8 +513,9 @@ import CrossOutImage from "./Images/CrossOut.png";
     }
 
     drawFood() {
-      this.ctx.fillStyle = '#555';
-      this.ctx.fillRect(this.food.x, this.food.y, this.tileSize, this.tileSize);
+      const foodSize = 12;
+      const offset = (foodSize - this.tileSize) / 2;
+      this.ctx.drawImage(this.foodImage, this.food.x - offset, this.food.y - offset, foodSize, foodSize);
     }
 
     moveSnake() {
@@ -463,7 +540,7 @@ import CrossOutImage from "./Images/CrossOut.png";
     }
 
     drawSnake() {
-      this.ctx.fillStyle = '#999';
+      this.ctx.fillStyle = '#777';
       this.snake.forEach(segment => {
         this.ctx.fillRect(segment.x, segment.y, this.tileSize, this.tileSize);
       });
@@ -474,22 +551,19 @@ import CrossOutImage from "./Images/CrossOut.png";
 
       for (let i = 1; i < this.snake.length; i++) {
         if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
-          // alert('Game Over');
           this.resetGame();
         }
       }
     }
 
     resetGame() {
-      this.snake = this.createInitialSnake(10);
+      this.snake = this.createInitialSnake(7);
       this.direction = 'RIGHT';
       this.food = this.generateFood();
     }
   }
 
-  window.onload = () => {
-    new SnakeGame();
-  };
+  new SnakeGame();
 </script>
 
 <style is:inline>
@@ -616,6 +690,7 @@ import CrossOutImage from "./Images/CrossOut.png";
       border-radius: 0;
       align-self: center;
       z-index: 1;
+      cursor: pointer;
   }
 
 
