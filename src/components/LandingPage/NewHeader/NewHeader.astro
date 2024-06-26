@@ -11,6 +11,7 @@ import BackImageDark from './Images/BackDark.png'
 import WoodBorderImage from './Images/WoodBorder.webp'
 import LoveImage from './Images/Love.png'
 import CrossOutImage from "./Images/CrossOut.png";
+import {SnakeGame} from "./snake/SnakeGame";
 ---
 <div class="header_container">
   <div class="header-left">
@@ -156,55 +157,16 @@ import CrossOutImage from "./Images/CrossOut.png";
   <div class="header-right">
     <div class="board">
       <Image src={WoodBorderImage} alt="board"/>
-      <div class="team">
-        <div class="id">id</div>
-        <div>name</div>
-        <div>𝕏_handle</div>
-        <div></div>
-        <div class="id">1</div>
-        <div>Dan</div>
-        <a
-          class="handle"
-          href="https://twitter.com/bloberenober"
-          target="_blank"
-          data-text="@bloberenober"
-          rel="noreferrer"
-        >
-          @bloberenober
-        </a>
-        <div></div>
-        <div class="id">2</div>
-        <div>Andrew</div>
-        <a
-          class="handle"
-          href="https://twitter.com/andrii_sherman"
-          target="_blank"
-          data-text="@andrii_sherman"
-          rel="noreferrer"
-        >
-          @andrii_sherman
-        </a>
-        <div></div>
-        <div class="id">3</div>
-        <div>Alex</div>
-        <a
-          class="handle"
-          href="https://twitter.com/_alexblokh"
-          target="_blank"
-          data-text="@_alexblokh"
-          rel="noreferrer"
-        >
-          @_alexblokh
-        </a>
-        <div></div>
+      <div class="team" id="gameArea">
+        <canvas id="gameCanvas"></canvas>
       </div>
     </div>
     <div class="images" style="display: flex; justify-content: space-between; width: 100%">
       <div style="display: flex; justify-content: flex-start; align-items: end; min-width: 144px">
         <Image src={WithDBImage} alt="with db" class="img_light" />
         <Image src={WithDBDarkImage} alt="with db" class="img_dark" />
-        <Image src={FrontImage} alt="front" class="img_light front" />
-        <Image src={FrontImageDark} alt="front" class="img_dark front" />
+        <Image src={FrontImage} alt="front" class="front img_light" />
+        <Image src={FrontImageDark} alt="front" class="front img_dark" />
       </div>
       <div style="position: relative; flex-shrink: 0; z-index: 3;">
         <Image src={BackImage} alt="back" class="img_light" />
@@ -217,10 +179,18 @@ import CrossOutImage from "./Images/CrossOut.png";
 <script is:inline>
   if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
       document.querySelector('.team').classList.add('safari-team');
-      document.querySelector('.front').classList.add('safari-front');
+      document.querySelectorAll('.front').forEach((element) => {
+        element.classList.add('safari-front')
+      });
       document.querySelector('.love').classList.add('safari-love');
       document.querySelector('.board').classList.add('safari-board');
   }
+
+  window.addEventListener("keydown", function(e) {
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+      e.preventDefault();
+    }
+  }, false);
 
   docsearch({
     container: "#docsearch",
@@ -231,7 +201,6 @@ import CrossOutImage from "./Images/CrossOut.png";
   });
 </script>
 <script type="module">
-
   const inkeepButton = document.getElementById("inkeepButton");
 
   // Create a new div element to hold the Inkeep modal and set its id and position
@@ -305,6 +274,9 @@ import CrossOutImage from "./Images/CrossOut.png";
   inkeepButton.addEventListener("click", handleOpen);
   window.inkeepWidget = inkeepWidget;
 </script>
+
+<script src="./snake/index.ts"></script>
+
 <style is:inline>
   .DocSearch-Button {
     opacity: 0;
@@ -370,9 +342,8 @@ import CrossOutImage from "./Images/CrossOut.png";
   .board {
       position: absolute;
       top: 20px;
-      width: 100%;
-      max-width: 300px;
-      height: 160px;
+      width: 315px;
+      height: 170px;
       margin-right: clamp(0px, calc(30px + (100vw - 785px)), 30px);
       right: 0;
       z-index: 1;
@@ -386,22 +357,10 @@ import CrossOutImage from "./Images/CrossOut.png";
   .board img {
       position: relative;
       width: 100%;
-      height: 160px;
+      height: 100%;
       object-fit: unset;
       z-index: 2;
       pointer-events: none;
-  }
-
-  .board::before {
-      content: "";
-      position: absolute;
-      top: 4px;
-      bottom: 4px;
-      right: 4px;
-      left: 4px;
-      display: block;
-      background: white;
-      z-index: 1;
   }
 
   .header-right .love {
@@ -414,10 +373,12 @@ import CrossOutImage from "./Images/CrossOut.png";
       transition: opacity 0.3s;
   }
 
-  .team {
+  #gameArea {
       position: absolute;
-      top: 3px;
-      left: 3px;
+      top: 5px;
+      left: 4px;
+      width: 304px;
+      height: 160px;
       font-weight: bold;
       text-shadow: 0 0 0.5px black;
       display: inline-grid;
@@ -428,46 +389,7 @@ import CrossOutImage from "./Images/CrossOut.png";
       border-radius: 0;
       align-self: center;
       z-index: 1;
-      right: 3px;
-  }
-
-  .team > * {
-      border-top: 1.5px solid black;
-      border-right: 1.5px solid black;
-      border-radius: 0;
-      font-family: 'FirstTimeWriting';
-      font-size: 16px;
-      padding: 0 8px;
-      text-align: center;
-      text-decoration: none;
-      position: relative;
-      color: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 26px;
-  }
-
-
-  .team a.handle:hover:after {
-      content: attr(data-text);
-      position: absolute;
-      left: 0;
-      top: -2px;
-      right: 0;
-      bottom: 0;
-      color: transparent;
-      text-shadow: none;
-      white-space: nowrap;
-      text-decoration: underline;
-      text-decoration-style: wavy;
-      text-underline-offset: 3px;
-      text-decoration-color: rgb(75, 183, 74);
-  }
-
-  .safari-team > *{
-      letter-spacing: -1px;
-      padding: 0 6px;
+      cursor: pointer;
   }
 
   .img_light {
@@ -759,7 +681,7 @@ import CrossOutImage from "./Images/CrossOut.png";
 
   @media (max-width: 809px) {
       .safari-front {
-          margin-left: clamp(0px, calc(90px + (100vw - 808px)), 90px);
+          margin-left: clamp(0px, calc(90px + (100vw - 809px)), 90px);
       }
 
       .header-right .safari-love {
@@ -767,7 +689,7 @@ import CrossOutImage from "./Images/CrossOut.png";
       }
   }
 
-  @media (max-width: 690px) {
+  @media (max-width: 770px) {
       .header-right {
           display: none;
           margin-top: 64px;
