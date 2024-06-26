@@ -11,45 +11,7 @@ import BackImageDark from './Images/BackDark.png'
 import WoodBorderImage from './Images/WoodBorder.webp'
 import LoveImage from './Images/Love.png'
 import CrossOutImage from "./Images/CrossOut.png";
-import DBImage from "./Images/DB.png";
-
-const drizzleCoordinates = [
-  {x: 45, y: 99},
-  {x: 54, y: 99},
-  {x: 54, y: 90},
-  {x: 63, y: 90},
-  {x: 63, y: 81},
-  {x: 72, y: 81},
-  {x: 72, y: 72},
-  {x: 81, y: 72},
-
-  {x: 108, y: 72},
-  {x: 117, y: 72},
-  {x: 117, y: 63},
-  {x: 126, y: 63},
-  {x: 126, y: 54},
-  {x: 135, y: 54},
-  {x: 135, y: 45},
-  {x: 144, y: 45},
-
-  {x: 135, y: 99},
-  {x: 144, y: 99},
-  {x: 144, y: 90},
-  {x: 153, y: 90},
-  {x: 153, y: 81},
-  {x: 162, y: 81},
-  {x: 162, y: 72},
-  {x: 171, y: 72},
-
-  {x: 198, y: 72},
-  {x: 207, y: 72},
-  {x: 207, y: 63},
-  {x: 216, y: 63},
-  {x: 216, y: 54},
-  {x: 225, y: 54},
-  {x: 225, y: 45},
-  {x: 234, y: 45}
-]
+import {SnakeGame} from "./snake/SnakeGame";
 ---
 <div class="header_container">
   <div class="header-left">
@@ -313,258 +275,7 @@ const drizzleCoordinates = [
   window.inkeepWidget = inkeepWidget;
 </script>
 
-<script is:inline define:vars={{drizzleCoordinates, DBImage}}>
-  class SnakeGame {
-      constructor() {
-      this.drizzleCoordinates = [...drizzleCoordinates]
-      this.isInitialized = false;
-      this.initializationCount = 0;
-      this.isPaused = false;
-      this.canvas = document.getElementById('gameCanvas');
-      this.ctx = this.canvas.getContext('2d');
-      this.tileSize = 9;
-      this.snake = [
-        {x: 45, y: 45},
-        {x: 45, y: 54},
-        {x: 45, y: 63},
-        {x: 45, y: 72},
-        {x: 45, y: 81},
-        {x: 45, y: 90},
-        {x: 45, y: 99},
-      ];
-
-      this.foodImage = new Image();
-      this.foodImage.obje
-      this.foodImage.src = '/images/db1.png';
-      this.foodImage.onload = () => {
-        this.redraw();
-      };
-
-      this.direction = 'RIGHT';
-      this.scale = window.devicePixelRatio || 1;
-      this.food = {x: 234, y: 45};
-      this.resizeCanvas();
-      this.drawDrizzle();
-      this.drawGrid();
-      document.querySelector('#gameArea').addEventListener('click', this.startGame.bind(this))
-      window.addEventListener('resize', this.resizeCanvas.bind(this));
-      document.addEventListener('keydown', this.changeDirection.bind(this));
-      this.gameLoop();
-    }
-
-    createInitialSnake(length) {
-      const initialSnake = [];
-      for (let i = 0; i < length; i++) {
-        initialSnake.push({ x: 63 - i * this.tileSize, y: 63 });
-      }
-      return initialSnake;
-    }
-
-    startGame() {
-      const minXValue = this.drizzleCoordinates[0].x;
-
-      setTimeout(() => {
-        this.drizzleCoordinates = this.drizzleCoordinates.map((segment, index) => {
-          if (this.drizzleCoordinates.length === index + 1) {
-            return segment
-          } else {
-            return  {x: segment.x - 9 < minXValue ? minXValue : segment.x - 9, y: segment.y}
-          }
-        })
-
-        this.initializationCount = this.initializationCount + 1;
-
-        this.redraw();
-
-        if (this.initializationCount < 21) {
-          this.startGame();
-        } else {
-            this.isInitialized = true;
-        }
-      }, 50);
-    }
-
-    drawGrid() {
-      this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = 0.5;
-
-      for (let x = 0; x <= this.canvas.width / this.scale; x += this.tileSize / 2) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(x, 0);
-        this.ctx.lineTo(x, this.canvas.height / this.scale);
-        this.ctx.stroke();
-      }
-
-      for (let y = 0; y <= this.canvas.height / this.scale; y += this.tileSize / 2) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, y);
-        this.ctx.lineTo(this.canvas.width / this.scale, y);
-        this.ctx.stroke();
-      }
-    }
-
-    resizeCanvas() {
-      const headerRight = document.querySelector('.header-right');
-      const gameArea = document.getElementById('gameArea');
-
-      if (window.getComputedStyle(headerRight).display === "none") {
-        this.isPaused = true;
-      } else {
-        this.isPaused = false;
-      }
-
-      if (gameArea) {
-        const rect = gameArea.getBoundingClientRect();
-        this.canvas.width = rect.width * this.scale;
-        this.canvas.height = rect.height * this.scale;
-        this.canvas.style.width = `${rect.width}px`;
-        this.canvas.style.height = `${rect.height}px`;
-
-        this.ctx.scale(this.scale, this.scale);
-        this.redraw();
-      }
-    }
-
-    redraw() {
-      this.clearCanvas();
-      if (this.isInitialized) {
-        this.drawSnake();
-        this.drawGrid();
-        this.drawFood();
-
-      } else {
-        this.drawDrizzle();
-        this.drawGrid();
-      }
-
-    }
-
-    drawDrizzle() {
-      this.ctx.fillStyle = '#777';
-
-      this.drizzleCoordinates.forEach(segment => {
-        this.ctx.fillRect(segment.x, segment.y, this.tileSize, this.tileSize);
-      });
-    }
-
-    generateFood() {
-      let foodPosition;
-      let isFoodOnSnake;
-      let isInBottom;
-      const snakeBodySet = new Set(this.snake.map(segment => `${segment.x},${segment.y}`));
-      if (window.document.body.offsetWidth <= 955) {
-        do {
-          let x = Math.floor(Math.random() * (this.canvas.width / this.scale / this.tileSize)) * this.tileSize;
-          let y = Math.floor(Math.random() * (this.canvas.height / this.scale / this.tileSize)) * this.tileSize;
-
-          foodPosition = { x, y };
-
-          isFoodOnSnake = this.snake.some(segment => segment.x === foodPosition.x && segment.y === foodPosition.y);
-
-          isInBottom = foodPosition.y >= (this.canvas.height / this.scale) - 50;
-
-        } while (snakeBodySet.has(`${foodPosition.x},${foodPosition.y}`) || isFoodOnSnake || isInBottom);
-      } else {
-        do {
-          let x = Math.floor(Math.random() * (this.canvas.width / this.scale / this.tileSize)) * this.tileSize;
-          let y = Math.floor(Math.random() * (this.canvas.height / this.scale / this.tileSize)) * this.tileSize;
-
-          foodPosition = { x, y };
-
-          isFoodOnSnake = this.snake.some(segment => segment.x === foodPosition.x && segment.y === foodPosition.y);
-
-          isInBottom = (foodPosition.x >= (this.canvas.width / this.scale) - 50 && foodPosition.y >= (this.canvas.height / this.scale) - 50);
-
-        } while (snakeBodySet.has(`${foodPosition.x},${foodPosition.y}`) || isFoodOnSnake || isInBottom);
-      }
-
-      return foodPosition;
-    }
-
-    changeDirection(event) {
-      const key = event.keyCode;
-      if (key === 37 && this.direction !== 'RIGHT') {
-        this.direction = 'LEFT';
-      } else if (key === 38 && this.direction !== 'DOWN') {
-        this.direction = 'UP';
-      } else if (key === 39 && this.direction !== 'LEFT') {
-        this.direction = 'RIGHT';
-      } else if (key === 40 && this.direction !== 'UP') {
-        this.direction = 'DOWN';
-      }
-    }
-
-
-    gameLoop() {
-      setTimeout(() => {
-        if (!this.isPaused && this.isInitialized) {
-          this.moveSnake();
-          this.redraw();
-          this.checkGameOver();
-        }
-        this.gameLoop();
-      }, 100);
-    }
-
-    clearCanvas() {
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillRect(0, 0, this.canvas.width / this.scale, this.canvas.height / this.scale);
-
-    }
-
-    drawFood() {
-      const foodSize = 12;
-      const offset = (foodSize - this.tileSize) / 2;
-      this.ctx.drawImage(this.foodImage, this.food.x - offset, this.food.y - offset, foodSize, foodSize);
-    }
-
-    moveSnake() {
-      let head = { x: this.snake[0].x, y: this.snake[0].y };
-      if (this.direction === 'RIGHT') head.x += this.tileSize;
-      else if (this.direction === 'LEFT') head.x -= this.tileSize;
-      else if (this.direction === 'UP') head.y -= this.tileSize;
-      else if (this.direction === 'DOWN') head.y += this.tileSize;
-
-      if (head.x >= this.canvas.width / this.scale) head.x = 0;
-      else if (head.x < 0) head.x = (this.canvas.width / this.scale) - this.tileSize;
-      if (head.y >= this.canvas.height / this.scale) head.y = 0;
-      else if (head.y < 0) head.y = (this.canvas.height / this.scale) - this.tileSize;
-
-      this.snake.unshift(head);
-
-      if (head.x === this.food.x && head.y === this.food.y) {
-        this.food = this.generateFood();
-      } else {
-        this.snake.pop();
-      }
-    }
-
-    drawSnake() {
-      this.ctx.fillStyle = '#777';
-      this.snake.forEach(segment => {
-        this.ctx.fillRect(segment.x, segment.y, this.tileSize, this.tileSize);
-      });
-    }
-
-    checkGameOver() {
-      let head = this.snake[0];
-
-      for (let i = 1; i < this.snake.length; i++) {
-        if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
-          this.resetGame();
-        }
-      }
-    }
-
-    resetGame() {
-      this.snake = this.createInitialSnake(7);
-      this.direction = 'RIGHT';
-      this.food = this.generateFood();
-    }
-  }
-
-  new SnakeGame();
-</script>
+<script src="./snake/index.ts"></script>
 
 <style is:inline>
   .DocSearch-Button {
@@ -631,8 +342,8 @@ const drizzleCoordinates = [
   .board {
       position: absolute;
       top: 20px;
-      width: 307px;
-      height: 163px;
+      width: 315px;
+      height: 170px;
       margin-right: clamp(0px, calc(30px + (100vw - 785px)), 30px);
       right: 0;
       z-index: 1;
@@ -646,22 +357,10 @@ const drizzleCoordinates = [
   .board img {
       position: relative;
       width: 100%;
-      height: 163px;
+      height: 100%;
       object-fit: unset;
       z-index: 2;
       pointer-events: none;
-  }
-
-  .board::before {
-      content: "";
-      position: absolute;
-      top: 4px;
-      bottom: 4px;
-      right: 4px;
-      left: 4px;
-      display: block;
-      background: white;
-      z-index: 1;
   }
 
   .header-right .love {
@@ -678,8 +377,8 @@ const drizzleCoordinates = [
       position: absolute;
       top: 5px;
       left: 4px;
-      width: 297px;
-      height: 153px;
+      width: 304px;
+      height: 160px;
       font-weight: bold;
       text-shadow: 0 0 0.5px black;
       display: inline-grid;
@@ -692,8 +391,6 @@ const drizzleCoordinates = [
       z-index: 1;
       cursor: pointer;
   }
-
-
 
   .img_light {
       display: block;
