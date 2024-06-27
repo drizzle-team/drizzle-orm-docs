@@ -1,5 +1,21 @@
 import { mapSnake, gameSegments } from "./mapSnake";
 
+export const difficulties = {
+  1: { speed: 208, multiplier: 3 },
+  2: { speed: 104, multiplier: 6 },
+  3: { speed: 104, multiplier: 9 },
+};
+
+const generateGridCoordinates = (gridWidth: number, gridHeight: number) => {
+  const coordinates = [];
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      coordinates.push({ x: x, y: y });
+    }
+  }
+  return coordinates;
+};
+
 export class SnakeGame {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -13,9 +29,16 @@ export class SnakeGame {
   eatenFood: { x: number; y: number }[];
   gameOver: boolean;
   directionQueue: string[];
+  score: number;
+  difficulty: keyof typeof difficulties;
+  gridCoordinates: { x: number; y: number }[];
+  superFoodImage: HTMLImageElement;
+  superFood: { x: number; y: number } | null;
+  superFoodCount: number;
+  eatenFoodCount: number;
 
   constructor() {
-    this.isPaused = false;
+    this.isPaused = true;
     this.canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d")!;
     this.tileSize = 16;
@@ -25,13 +48,31 @@ export class SnakeGame {
     this.directionQueue = ["RIGHT"];
     this.scale = window.devicePixelRatio * 2;
     this.food = { x: 4, y: 4 };
+    this.eatenFoodCount = 0;
+    this.superFood = null;
+    this.superFoodCount = 0;
     this.eatenFood = [];
-    this.gameOver = false;
+    this.score = 0;
+    this.gameOver = true;
+    this.difficulty = 2;
+    this.gridCoordinates = generateGridCoordinates(
+      this.gridWidth,
+      this.gridHeight,
+    );
+    this.superFoodImage = new Image();
+    this.superFoodImage.src = "/images/db.svg";
     this.resizeCanvas();
+    window.addEventListener("resize", this.resizeCanvas.bind(this));
+    document.addEventListener("keydown", this.changeDirection.bind(this));
+  }
+
+  startGame() {
+    this.changeScore(0);
+    this.gameOver = false;
     this.clearCanvas();
     this.drawSnake();
     this.drawFood();
-    document.addEventListener("keydown", this.changeDirection.bind(this));
+    this.gameLoop();
   }
 
   createInitialSnake(length: number) {
@@ -45,8 +86,12 @@ export class SnakeGame {
   resizeCanvas() {
     const headerRight = document.querySelector(".header-right")!;
     const gameArea = document.getElementById("gameArea");
+    const oldIsPaused = this.isPaused;
 
     this.isPaused = window.getComputedStyle(headerRight).display === "none";
+    if (oldIsPaused && !this.isPaused) {
+      this.gameLoop();
+    }
 
     if (gameArea) {
       const rect = gameArea.getBoundingClientRect();
@@ -56,6 +101,7 @@ export class SnakeGame {
       this.canvas.style.height = `${rect.height}px`;
 
       this.ctx.scale(this.scale, this.scale);
+      this.redraw();
     }
   }
 
@@ -66,24 +112,41 @@ export class SnakeGame {
   }
 
   generateFood() {
-    let foodPosition: { x: number; y: number };
-    let isFoodOnSnake;
+    const snakeSet = new Set(
+      this.snake.map((segment) => `${segment.x},${segment.y}`),
+    );
+    let freeSegments = this.gridCoordinates.filter(
+      (segment) => !snakeSet.has(`${segment.x},${segment.y}`),
+    );
 
-    do {
-      foodPosition = {
-        x: Math.floor(Math.random() * this.gridWidth),
-        y: Math.floor(Math.random() * this.gridHeight),
-      };
+    if (freeSegments.length === 1) {
+      this.gameOver = true;
+      this.blinkFood();
+    }
 
-      isFoodOnSnake = this.snake.some(
-        ({ x, y }) => x === foodPosition.x && y === foodPosition.y,
+    const foodPosition =
+      freeSegments[Math.floor(Math.random() * freeSegments.length)];
+    this.food = foodPosition;
+
+    if (this.eatenFoodCount === 5) {
+      freeSegments = freeSegments.filter(
+        (segment) =>
+          segment.x !== foodPosition.x && segment.y !== foodPosition.y,
       );
-    } while (isFoodOnSnake);
-
-    return foodPosition;
+      this.superFood =
+        freeSegments[Math.floor(Math.random() * freeSegments.length)];
+      this.superFoodCount = 20;
+      this.eatenFoodCount = 0;
+    }
   }
 
   changeDirection(event: KeyboardEvent) {
+    if (this.isPaused || this.gameOver) return;
+
+    document.getElementById("right-image")!.classList.add("right-image-moved");
+    document.querySelector(".board")!.classList.add("board-moved");
+    document.querySelector("#score")!.classList.remove("hidden");
+
     const key = event.keyCode;
     const lastDirection = this.directionQueue[this.directionQueue.length - 1];
 
@@ -106,17 +169,30 @@ export class SnakeGame {
 
   gameLoop() {
     setTimeout(() => {
-      if (!this.isPaused && !this.gameOver) {
-        this.moveSnake();
-        this.redraw();
-        this.checkGameOver();
-      }
-      this.gameLoop();
-    }, 120);
+      this.moveSnake();
+      this.countdownSuperFood();
+      this.redraw();
+      this.checkGameOver();
+      if (!this.isPaused && !this.gameOver) this.gameLoop();
+    }, difficulties[this.difficulty].speed);
+  }
+
+  countdownSuperFood() {
+    if (!this.superFoodCount) {
+      this.superFood = null;
+      document.querySelector(".countdown")!.classList.add("hidden");
+      return;
+    }
+
+    document.getElementById("countdown")!.innerText =
+      this.superFoodCount.toString();
+    document.querySelector(".countdown")!.classList.remove("hidden");
+
+    this.superFoodCount--;
   }
 
   clearCanvas() {
-    this.ctx.fillStyle = "white";
+    this.ctx.fillStyle = "#f0f0f0";
     this.ctx.fillRect(
       0,
       0,
@@ -126,6 +202,15 @@ export class SnakeGame {
   }
 
   drawFood() {
+    if (this.superFood) {
+      this.ctx.drawImage(
+        this.superFoodImage,
+        this.superFood.x * this.tileSize,
+        this.superFood.y * this.tileSize,
+        this.tileSize,
+        this.tileSize,
+      );
+    }
     this.drawSegment("food", { ...this.food });
   }
 
@@ -159,7 +244,21 @@ export class SnakeGame {
 
     if (head.x === this.food.x && head.y === this.food.y) {
       this.eatenFood.unshift({ ...this.food });
-      this.food = this.generateFood();
+      this.eatenFoodCount++;
+      this.generateFood();
+      this.changeScore(this.score + difficulties[this.difficulty].multiplier);
+    } else if (
+      this.superFood &&
+      head.x === this.superFood.x &&
+      head.y === this.superFood.y
+    ) {
+      this.eatenFood.unshift({ ...this.superFood });
+      this.eatenFoodCount = 0;
+      this.superFood = null;
+      this.superFoodCount = 0;
+      this.changeScore(
+        this.score + 5 * difficulties[this.difficulty].multiplier,
+      );
     } else {
       this.snake.pop();
     }
@@ -169,6 +268,13 @@ export class SnakeGame {
     }
   }
 
+  changeScore(score: number) {
+    document.getElementById("score")!.innerText = score
+      .toString()
+      .padStart(4, "0");
+    this.score = score;
+  }
+
   drawSnake() {
     mapSnake({
       snake: this.snake,
@@ -176,6 +282,7 @@ export class SnakeGame {
       gridWidth: this.gridWidth,
       food: this.food,
       eatenFood: this.eatenFood,
+      superFood: this.superFood || undefined,
     }).forEach(({ x, y, type }) => {
       this.drawSegment(type, { x, y });
     });
@@ -186,13 +293,13 @@ export class SnakeGame {
     segment: { x: number; y: number },
   ) {
     const smallSquareCount = 4;
-    const gapSize = 0.5;
-    const borderSize = 0.25;
+    const gapSize = 0.33;
+    const borderSize = gapSize / 2;
     const smallSquareSize =
       (this.tileSize - (smallSquareCount - 1) * gapSize - 2 * borderSize) /
       smallSquareCount;
 
-    this.ctx.fillStyle = "white";
+    this.ctx.fillStyle = "#f0f0f0";
     this.ctx.fillRect(
       segment.x * 16,
       segment.y * 16,
@@ -200,7 +307,7 @@ export class SnakeGame {
       this.tileSize,
     );
 
-    this.ctx.fillStyle = "#777";
+    this.ctx.fillStyle = "#000";
     for (let i = 0; i < smallSquareCount; i++) {
       for (let j = 0; j < smallSquareCount; j++) {
         if (gameSegments[gameSegment][i][j]) {
@@ -242,11 +349,32 @@ export class SnakeGame {
     }, 200);
   }
 
+  blinkFood() {
+    let blinkCount = 0;
+    const blinkInterval = setInterval(() => {
+      if (blinkCount < 10) {
+        this.clearCanvas();
+        this.drawSnake();
+        if (blinkCount % 2 === 0) {
+          this.drawFood();
+        }
+        blinkCount++;
+      } else {
+        clearInterval(blinkInterval);
+        this.resetGame();
+      }
+    }, 200);
+  }
+
   resetGame() {
+    document.querySelector(".game-start-screen")!.classList.remove("hidden");
+    document.querySelector(".countdown")!.classList.add("hidden");
     this.snake = this.createInitialSnake(5);
     this.directionQueue = ["RIGHT"];
     this.eatenFood = [];
-    this.food = this.generateFood();
-    this.gameOver = false;
+    this.eatenFoodCount = 0;
+    this.superFood = null;
+    this.superFoodCount = 0;
+    this.generateFood();
   }
 }

@@ -11,7 +11,8 @@ import BackImageDark from './Images/BackDark.png'
 import WoodBorderImage from './Images/WoodBorder.webp'
 import LoveImage from './Images/Love.png'
 import CrossOutImage from "./Images/CrossOut.png";
-import {SnakeGame} from "./snake/SnakeGame";
+import DBImageDark from "./Images/dbDark.svg"
+import DBImage from "./Images/dbLight.svg"
 ---
 <div class="header_container">
   <div class="header-left">
@@ -157,6 +158,20 @@ import {SnakeGame} from "./snake/SnakeGame";
   <div class="header-right">
     <div class="board">
       <Image src={WoodBorderImage} alt="board"/>
+      <div id="score" class="hidden">0000</div>
+      <div class="countdown hidden">
+        <Image src={DBImage} class="img_light" alt="sooper-food-image" />
+        <Image src={DBImageDark} class="img_dark" alt="sooper-food-image" />
+        <div id="countdown">23</div>
+      </div>
+      <div class="game-start-screen">
+        <div style="display: flex; height: 35px; align-items: flex-end; cursor: pointer">
+          <div style="width: 85px;" id="change-difficulty" class="game-button"><span style="width: 85px; padding: 4px 0px; text-align: center" id="game-difficulty">Normal</span></div>
+        </div>
+        <div style="display: flex; height: 35px; align-items: flex-end; cursor: pointer">
+          <div id="start-game" class="game-button"><span>Play game</span></div>
+        </div>
+      </div>
       <div class="team" id="gameArea">
         <canvas id="gameCanvas"></canvas>
       </div>
@@ -168,7 +183,7 @@ import {SnakeGame} from "./snake/SnakeGame";
         <Image src={FrontImage} alt="front" class="front img_light" />
         <Image src={FrontImageDark} alt="front" class="front img_dark" />
       </div>
-      <div style="position: relative; flex-shrink: 0; z-index: 3;">
+      <div id="right-image" style="position: relative; flex-shrink: 0; z-index: 3">
         <Image src={BackImage} alt="back" class="img_light" />
         <Image src={BackImageDark} alt="back" class="img_dark" />
         <Image src={LoveImage} alt="love" class="love" />
@@ -185,12 +200,6 @@ import {SnakeGame} from "./snake/SnakeGame";
       document.querySelector('.love').classList.add('safari-love');
       document.querySelector('.board').classList.add('safari-board');
   }
-
-  window.addEventListener("keydown", function(e) {
-    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
-      e.preventDefault();
-    }
-  }, false);
 
   docsearch({
     container: "#docsearch",
@@ -344,14 +353,18 @@ import {SnakeGame} from "./snake/SnakeGame";
       top: 20px;
       width: 315px;
       height: 170px;
-      margin-right: clamp(0px, calc(30px + (100vw - 785px)), 30px);
+      margin-right: clamp(0px, calc(30px + (100vw - 801px)), 30px);
       right: 0;
       z-index: 1;
-      overflow: hidden;
+      transition: margin-right 0.3s;
+  }
+
+  #right-image {
+      transition: margin-right 0.3s;
   }
 
   .safari-board {
-      margin-right: clamp(0px, calc(30px + (100vw - 796px)), 30px);
+      margin-right: clamp(0px, calc(30px + (100vw - 813px)), 30px);
   }
 
   .board img {
@@ -361,6 +374,18 @@ import {SnakeGame} from "./snake/SnakeGame";
       object-fit: unset;
       z-index: 2;
       pointer-events: none;
+  }
+
+  .board::before {
+      content: "";
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      right: 4px;
+      left: 4px;
+      display: block;
+      background: #f0f0f0;
+      z-index: 1;
   }
 
   .header-right .love {
@@ -389,7 +414,110 @@ import {SnakeGame} from "./snake/SnakeGame";
       border-radius: 0;
       align-self: center;
       z-index: 1;
-      cursor: pointer;
+  }
+
+  .game-start-screen {
+      position: absolute;
+      z-index: 2;
+      top: 6px;
+      left: 6px;
+      bottom: 6px;
+      right: 6px;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-weight: 600;
+      font-family: FirstTimeWriting;
+      text-shadow: 0.2px 0 0 #000, -0.2px 0 0 #000, 0 0.2px 0 #000, 0 -0.2px 0 #000;
+      color: #000
+  }
+
+  .board-moved {
+      margin-right: clamp(0px, calc(30px + (100vw - 801px)), 8px);
+  }
+
+  .right-image-moved {
+      margin-right: -70px;
+  }
+
+  #score {
+      position: absolute;
+      font-size: 20px;
+      font-weight: 700;
+      top: -29px;
+      font-family: FirstTimeWriting;
+      text-shadow: 0.4px 0 0 #222, -0.4px 0 0 #222, 0 0.4px 0 #222, 0 -0.4px 0 #222;
+  }
+
+  html.dark #score {
+      text-shadow: 0.4px 0 0 #e2e8f0, -0.4px 0 0 #e2e8f0, 0 0.4px 0 #e2e8f0, 0 -0.4px 0 #e2e8f0;
+  }
+
+  .hidden {
+      opacity: 0 !important;
+      pointer-events: none;
+      cursor: default;
+  }
+
+  .countdown {
+      position: absolute;
+      top: -29px;
+      right: 0;
+      font-family: FirstTimeWriting;
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      text-shadow: 0.4px 0 0 #222, -0.4px 0 0 #222, 0 0.4px 0 #222, 0 -0.4px 0 #222;
+      gap: 4px
+  }
+
+  html.dark .countdown {
+      text-shadow: 0.4px 0 0 #e2e8f0, -0.4px 0 0 #e2e8f0, 0 0.4px 0 #e2e8f0, 0 -0.4px 0 #e2e8f0;
+  }
+
+  .countdown img{
+      width: 24px;
+      height: 24px;
+  }
+
+  .game-button {
+      border: 1px solid #000;
+      border-radius: 6px;
+      padding-bottom: 2px;
+      background: #c5c5c5;
+      font-size: 14px;
+  }
+
+  .game-button:hover {
+      padding-bottom: 4px;
+  }
+
+  .game-button:hover span {
+      padding-bottom: 4px;
+      box-shadow: 0 4px 3px -4px black;
+  }
+
+  .game-button:active {
+      padding-bottom: 0px;
+  }
+
+  .game-button:active span {
+      box-shadow: inset 0 4px 3px -4px black;
+  }
+
+  .game-button span {
+      display: block;
+      border: 1px solid #000;
+      margin: -1px;
+      border-radius: 6px;
+      padding: 4px 20px;
+      background: #f0f0f0;
+      user-select: none;
   }
 
   .img_light {
@@ -662,8 +790,24 @@ import {SnakeGame} from "./snake/SnakeGame";
       height: 14px;
   }
 
+  @media (max-width: 1024px) {
+      .board-moved {
+          margin-right: clamp(0px, calc(30px + (100vw - 801px)), 30px);
+      }
+
+      .right-image-moved {
+          margin-right: 0px;
+      }
+  }
+
 
   @media (max-width: 900px) {
+      .board {
+          transition: none;
+      }
+      #right-image {
+          transition: none;
+      }
       .front {
           margin-left: calc(900px - 100vw);
       }
@@ -689,7 +833,7 @@ import {SnakeGame} from "./snake/SnakeGame";
       }
   }
 
-  @media (max-width: 770px) {
+  @media (max-width: 783px) {
       .header-right {
           display: none;
           margin-top: 64px;

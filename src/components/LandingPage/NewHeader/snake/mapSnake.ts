@@ -144,10 +144,10 @@ export const gameSegments = {
     [0, 1, 1, 1],
   ],
   food: [
+    [0, 1, 0, 0],
+    [1, 0, 1, 0],
+    [0, 1, 0, 0],
     [0, 0, 0, 0],
-    [0, 0, 1, 0],
-    [0, 1, 0, 1],
-    [0, 0, 1, 0],
   ],
 };
 
@@ -157,11 +157,13 @@ export const mapSnake = ({
   gridHeight,
   food,
   eatenFood,
+  superFood,
 }: {
   snake: { x: number; y: number }[];
   gridWidth: number;
   gridHeight: number;
   food: { x: number; y: number };
+  superFood?: { x: number; y: number };
   eatenFood: { x: number; y: number }[];
 }): { x: number; y: number; type: keyof typeof gameSegments }[] => {
   return snake.map((segment, index, array) => {
@@ -177,7 +179,10 @@ export const mapSnake = ({
           segment.y - previousSegment.y === -1 ||
           (segment.y === gridHeight - 1 && previousSegment.y === 0)
         ) {
-          if (food.x === segment.x && food.y - segment.y === -1) {
+          if (
+            (food.x === segment.x && food.y - segment.y === -1) ||
+            (superFood?.x === segment.x && superFood?.y - segment.y === -1)
+          ) {
             return { ...segment, type: "headUpFood" };
           }
           return { ...segment, type: "headUp" };
@@ -186,7 +191,10 @@ export const mapSnake = ({
           segment.y - previousSegment.y === 1 ||
           (segment.y === 0 && previousSegment.y === gridHeight - 1)
         ) {
-          if (food.x === segment.x && food.y - segment.y === 1) {
+          if (
+            (food.x === segment.x && food.y - segment.y === 1) ||
+            (superFood?.x === segment.x && superFood?.y - segment.y === 1)
+          ) {
             return { ...segment, type: "headDownFood" };
           }
           return { ...segment, type: "headDown" };
@@ -197,7 +205,10 @@ export const mapSnake = ({
           segment.x - previousSegment.x === -1 ||
           (segment.x === gridWidth - 1 && previousSegment.x === 0)
         ) {
-          if (food.y === segment.y && food.x - segment.x === -1) {
+          if (
+            (food.y === segment.y && food.x - segment.x === -1) ||
+            (superFood?.y === segment.y && superFood?.x - segment.x === -1)
+          ) {
             return { ...segment, type: "headLeftFood" };
           }
           return { ...segment, type: "headLeft" };
@@ -206,7 +217,10 @@ export const mapSnake = ({
           segment.x - previousSegment.x === 1 ||
           (segment.x === 0 && previousSegment.x === gridWidth - 1)
         ) {
-          if (food.y === segment.y && food.x - segment.x === 1) {
+          if (
+            (food.y === segment.y && food.x - segment.x === 1) ||
+            (superFood?.y === segment.y && superFood?.x - segment.x === 1)
+          ) {
             return { ...segment, type: "headRightFood" };
           }
           return { ...segment, type: "headRight" };
