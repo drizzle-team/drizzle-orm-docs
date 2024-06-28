@@ -1,9 +1,10 @@
 import { mapSnake, gameSegments } from "./mapSnake";
+import { preventControlButtons } from "@components/LandingPage/NewHeader/snake/index";
 
 export const difficulties = {
   1: { speed: 208, multiplier: 3 },
   2: { speed: 104, multiplier: 6 },
-  3: { speed: 104, multiplier: 9 },
+  3: { speed: 72, multiplier: 9 },
 };
 
 const generateGridCoordinates = (gridWidth: number, gridHeight: number) => {
@@ -36,6 +37,8 @@ export class SnakeGame {
   superFood: { x: number; y: number } | null;
   superFoodCount: number;
   eatenFoodCount: number;
+  smallSquareCount: number;
+  smallSquareSize: number;
 
   constructor() {
     this.isPaused = true;
@@ -47,7 +50,7 @@ export class SnakeGame {
     this.snake = this.createInitialSnake(5);
     this.directionQueue = ["RIGHT"];
     this.scale = window.devicePixelRatio * 2;
-    this.food = { x: 4, y: 4 };
+    this.food = { x: 16, y: 2 };
     this.eatenFoodCount = 0;
     this.superFood = null;
     this.superFoodCount = 0;
@@ -55,6 +58,8 @@ export class SnakeGame {
     this.score = 0;
     this.gameOver = true;
     this.difficulty = 2;
+    this.smallSquareCount = 4;
+    this.smallSquareSize = 4;
     this.gridCoordinates = generateGridCoordinates(
       this.gridWidth,
       this.gridHeight,
@@ -62,6 +67,7 @@ export class SnakeGame {
     this.superFoodImage = new Image();
     this.superFoodImage.src = "/images/db.svg";
     this.resizeCanvas();
+    this.redraw();
     window.addEventListener("resize", this.resizeCanvas.bind(this));
     document.addEventListener("keydown", this.changeDirection.bind(this));
   }
@@ -69,16 +75,13 @@ export class SnakeGame {
   startGame() {
     this.changeScore(0);
     this.gameOver = false;
-    this.clearCanvas();
-    this.drawSnake();
-    this.drawFood();
     this.gameLoop();
   }
 
   createInitialSnake(length: number) {
     const initialSnake = [];
     for (let i = 0; i < length; i++) {
-      initialSnake.push({ x: length - i, y: 3 });
+      initialSnake.push({ x: length - i, y: 2 });
     }
     return initialSnake;
   }
@@ -109,6 +112,8 @@ export class SnakeGame {
     this.clearCanvas();
     this.drawSnake();
     this.drawFood();
+    this.drawGrid();
+    this.drawSuperFood();
   }
 
   generateFood() {
@@ -143,6 +148,7 @@ export class SnakeGame {
   changeDirection(event: KeyboardEvent) {
     if (this.isPaused || this.gameOver) return;
 
+    window.addEventListener("keydown", preventControlButtons, false);
     document.getElementById("right-image")!.classList.add("right-image-moved");
     document.querySelector(".board")!.classList.add("board-moved");
     document.querySelector("#score")!.classList.remove("hidden");
@@ -169,11 +175,13 @@ export class SnakeGame {
 
   gameLoop() {
     setTimeout(() => {
-      this.moveSnake();
-      this.countdownSuperFood();
-      this.redraw();
-      this.checkGameOver();
-      if (!this.isPaused && !this.gameOver) this.gameLoop();
+      if (!this.isPaused && !this.gameOver) {
+        this.moveSnake();
+        this.countdownSuperFood();
+        this.redraw();
+        this.checkGameOver();
+        this.gameLoop();
+      }
     }, difficulties[this.difficulty].speed);
   }
 
@@ -201,7 +209,7 @@ export class SnakeGame {
     );
   }
 
-  drawFood() {
+  drawSuperFood() {
     if (this.superFood) {
       this.ctx.drawImage(
         this.superFoodImage,
@@ -211,7 +219,10 @@ export class SnakeGame {
         this.tileSize,
       );
     }
-    this.drawSegment("food", { ...this.food });
+  }
+
+  drawFood() {
+    this.drawSegment(gameSegments.food, { ...this.food });
   }
 
   moveSnake() {
@@ -283,22 +294,48 @@ export class SnakeGame {
       food: this.food,
       eatenFood: this.eatenFood,
       superFood: this.superFood || undefined,
-    }).forEach(({ x, y, type }) => {
-      this.drawSegment(type, { x, y });
+    }).forEach(({ x, y, segment }) => {
+      this.drawSegment(segment, { x, y });
     });
   }
 
-  drawSegment(
-    gameSegment: keyof typeof gameSegments,
-    segment: { x: number; y: number },
-  ) {
-    const smallSquareCount = 4;
-    const gapSize = 0.33;
-    const borderSize = gapSize / 2;
-    const smallSquareSize =
-      (this.tileSize - (smallSquareCount - 1) * gapSize - 2 * borderSize) /
-      smallSquareCount;
+  drawDebugGrid() {
+    this.ctx.strokeStyle = "#000";
+    this.ctx.lineWidth = 1;
+    for (let i = 1; i < this.gridWidth; i++) {
+      this.ctx.moveTo(i * this.tileSize, 0);
+      this.ctx.lineTo(i * this.tileSize, this.gridHeight * this.tileSize);
+      this.ctx.stroke();
+    }
+    for (let i = 1; i < this.gridHeight; i++) {
+      this.ctx.moveTo(0, i * this.tileSize);
+      this.ctx.lineTo(this.gridWidth * this.tileSize, i * this.tileSize);
+      this.ctx.stroke();
+    }
+  }
 
+  drawGrid() {
+    this.ctx.strokeStyle = "#f0f0f0";
+    this.ctx.lineWidth = 0.33;
+
+    for (let i = 1; i < this.gridWidth * this.smallSquareCount; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(i * this.smallSquareSize, 0);
+      this.ctx.lineTo(
+        i * this.smallSquareSize,
+        this.gridHeight * this.tileSize,
+      );
+      this.ctx.stroke();
+    }
+    for (let i = 1; i < this.gridHeight * this.smallSquareCount; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, i * this.smallSquareSize);
+      this.ctx.lineTo(this.gridWidth * this.tileSize, i * this.smallSquareSize);
+      this.ctx.stroke();
+    }
+  }
+
+  drawSegment(gameSegment: number[][], segment: { x: number; y: number }) {
     this.ctx.fillStyle = "#f0f0f0";
     this.ctx.fillRect(
       segment.x * 16,
@@ -307,15 +344,16 @@ export class SnakeGame {
       this.tileSize,
     );
 
+    const topLeftCornerX = segment.x * 16;
+    const topLeftCornerY = segment.y * 16;
+
     this.ctx.fillStyle = "#000";
-    for (let i = 0; i < smallSquareCount; i++) {
-      for (let j = 0; j < smallSquareCount; j++) {
-        if (gameSegments[gameSegment][i][j]) {
-          const x =
-            segment.x * 16 + borderSize + i * (smallSquareSize + gapSize);
-          const y =
-            segment.y * 16 + borderSize + j * (smallSquareSize + gapSize);
-          this.ctx.fillRect(x, y, smallSquareSize, smallSquareSize);
+    for (let i = 0; i < this.smallSquareCount; i++) {
+      for (let j = 0; j < this.smallSquareCount; j++) {
+        if (gameSegment[i][j]) {
+          const x = topLeftCornerX + j * this.smallSquareSize;
+          const y = topLeftCornerY + i * this.smallSquareSize;
+          this.ctx.fillRect(x, y, this.smallSquareSize, this.smallSquareSize);
         }
       }
     }
@@ -341,6 +379,8 @@ export class SnakeGame {
         if (blinkCount % 2 === 0) {
           this.drawSnake();
         }
+        this.drawGrid();
+        this.drawSuperFood();
         blinkCount++;
       } else {
         clearInterval(blinkInterval);
@@ -358,6 +398,7 @@ export class SnakeGame {
         if (blinkCount % 2 === 0) {
           this.drawFood();
         }
+        this.drawGrid();
         blinkCount++;
       } else {
         clearInterval(blinkInterval);
@@ -375,6 +416,7 @@ export class SnakeGame {
     this.eatenFoodCount = 0;
     this.superFood = null;
     this.superFoodCount = 0;
-    this.generateFood();
+    this.food = { x: 16, y: 2 };
+    this.redraw();
   }
 }

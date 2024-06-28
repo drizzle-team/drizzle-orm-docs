@@ -1,99 +1,99 @@
 export const gameSegments = {
-  bodyHorizontal: [
+  bodyVertical: [
     [0, 1, 1, 0],
     [0, 0, 1, 0],
     [0, 1, 0, 0],
     [0, 1, 1, 0],
   ],
-  bodyHorizontalWithFood: [
-    [0, 1, 1, 0],
-    [1, 0, 1, 1],
-    [1, 1, 0, 1],
-    [0, 1, 1, 0],
-  ],
-  bodyVertical: [
-    [0, 0, 0, 0],
-    [1, 1, 0, 1],
-    [1, 0, 1, 1],
-    [0, 0, 0, 0],
-  ],
   bodyVerticalWithFood: [
+    [0, 1, 1, 0],
+    [1, 0, 1, 1],
+    [1, 1, 0, 1],
+    [0, 1, 1, 0],
+  ],
+  bodyHorizontal: [
+    [0, 0, 0, 0],
+    [1, 1, 0, 1],
+    [1, 0, 1, 1],
+    [0, 0, 0, 0],
+  ],
+  bodyHorizontalWithFood: [
     [0, 1, 1, 0],
     [1, 1, 0, 1],
     [1, 0, 1, 1],
     [0, 1, 1, 0],
   ],
   tailLeft: [
-    [0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 1, 0],
-  ],
-  tailRight: [
-    [0, 0, 1, 0],
-    [0, 0, 1, 0],
-    [0, 1, 1, 0],
-    [0, 1, 1, 0],
-  ],
-  tailUp: [
     [0, 0, 0, 0],
     [1, 1, 0, 0],
     [1, 1, 1, 1],
     [0, 0, 0, 0],
   ],
-  tailDown: [
+  tailRight: [
     [0, 0, 0, 0],
     [0, 0, 1, 1],
     [1, 1, 1, 1],
     [0, 0, 0, 0],
   ],
+  tailUp: [
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 0],
+  ],
+  tailDown: [
+    [0, 0, 1, 0],
+    [0, 0, 1, 0],
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+  ],
   headLeft: [
-    [0, 1, 1, 0],
-    [0, 1, 1, 0],
-    [1, 0, 1, 0],
-    [0, 1, 1, 0],
-  ],
-  headLeftFood: [
-    [1, 0, 0, 1],
-    [0, 1, 1, 0],
-    [1, 0, 1, 0],
-    [0, 1, 1, 0],
-  ],
-  headRight: [
-    [0, 1, 1, 0],
-    [1, 0, 1, 0],
-    [0, 1, 1, 0],
-    [0, 1, 1, 0],
-  ],
-  headRightFood: [
-    [0, 1, 1, 0],
-    [1, 0, 1, 0],
-    [0, 1, 1, 0],
-    [1, 0, 0, 1],
-  ],
-  headUp: [
     [0, 0, 1, 0],
     [1, 1, 0, 1],
     [1, 1, 1, 1],
     [0, 0, 0, 0],
   ],
-  headUpFood: [
+  headLeftFood: [
     [1, 0, 1, 0],
     [0, 1, 0, 1],
     [0, 1, 1, 1],
     [1, 0, 0, 0],
   ],
-  headDown: [
+  headRight: [
     [0, 1, 0, 0],
     [1, 0, 1, 1],
     [1, 1, 1, 1],
     [0, 0, 0, 0],
   ],
-  headDownFood: [
+  headRightFood: [
     [0, 1, 0, 1],
     [1, 0, 1, 0],
     [1, 1, 1, 0],
     [0, 0, 0, 1],
+  ],
+  headUp: [
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+    [1, 0, 1, 0],
+    [0, 1, 1, 0],
+  ],
+  headUpFood: [
+    [1, 0, 0, 1],
+    [0, 1, 1, 0],
+    [1, 0, 1, 0],
+    [0, 1, 1, 0],
+  ],
+  headDown: [
+    [0, 1, 1, 0],
+    [1, 0, 1, 0],
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+  ],
+  headDownFood: [
+    [0, 1, 1, 0],
+    [1, 0, 1, 0],
+    [0, 1, 1, 0],
+    [1, 0, 0, 1],
   ],
   turnBottomRight: [
     [0, 1, 1, 0],
@@ -108,28 +108,28 @@ export const gameSegments = {
     [0, 0, 0, 0],
   ],
   turnTopRight: [
-    [0, 1, 1, 0],
-    [0, 1, 0, 1],
-    [0, 0, 1, 1],
-    [0, 0, 0, 0],
-  ],
-  turnTopRightWithFood: [
-    [0, 1, 1, 1],
-    [0, 1, 0, 1],
-    [0, 0, 1, 1],
-    [0, 0, 0, 0],
-  ],
-  turnBottomLeft: [
     [0, 0, 0, 0],
     [1, 1, 0, 0],
     [1, 0, 1, 0],
     [0, 1, 1, 0],
   ],
-  turnBottomLeftWithFood: [
+  turnTopRightWithFood: [
     [0, 0, 0, 0],
     [1, 1, 0, 0],
     [1, 0, 1, 0],
     [1, 1, 1, 0],
+  ],
+  turnBottomLeft: [
+    [0, 1, 1, 0],
+    [0, 1, 0, 1],
+    [0, 0, 1, 1],
+    [0, 0, 0, 0],
+  ],
+  turnBottomLeftWithFood: [
+    [0, 1, 1, 1],
+    [0, 1, 0, 1],
+    [0, 0, 1, 1],
+    [0, 0, 0, 0],
   ],
   turnTopLeft: [
     [0, 0, 0, 0],
@@ -165,7 +165,7 @@ export const mapSnake = ({
   food: { x: number; y: number };
   superFood?: { x: number; y: number };
   eatenFood: { x: number; y: number }[];
-}): { x: number; y: number; type: keyof typeof gameSegments }[] => {
+}): { x: number; y: number; segment: number[][] }[] => {
   return snake.map((segment, index, array) => {
     const previousSegment = array[index + 1];
     const nextSegment = array[index - 1];
@@ -183,9 +183,9 @@ export const mapSnake = ({
             (food.x === segment.x && food.y - segment.y === -1) ||
             (superFood?.x === segment.x && superFood?.y - segment.y === -1)
           ) {
-            return { ...segment, type: "headUpFood" };
+            return { ...segment, segment: gameSegments.headUpFood };
           }
-          return { ...segment, type: "headUp" };
+          return { ...segment, segment: gameSegments.headUp };
         }
         if (
           segment.y - previousSegment.y === 1 ||
@@ -195,9 +195,9 @@ export const mapSnake = ({
             (food.x === segment.x && food.y - segment.y === 1) ||
             (superFood?.x === segment.x && superFood?.y - segment.y === 1)
           ) {
-            return { ...segment, type: "headDownFood" };
+            return { ...segment, segment: gameSegments.headDownFood };
           }
-          return { ...segment, type: "headDown" };
+          return { ...segment, segment: gameSegments.headDown };
         }
       }
       if (segment.y === previousSegment.y) {
@@ -209,9 +209,9 @@ export const mapSnake = ({
             (food.y === segment.y && food.x - segment.x === -1) ||
             (superFood?.y === segment.y && superFood?.x - segment.x === -1)
           ) {
-            return { ...segment, type: "headLeftFood" };
+            return { ...segment, segment: gameSegments.headLeftFood };
           }
-          return { ...segment, type: "headLeft" };
+          return { ...segment, segment: gameSegments.headLeft };
         }
         if (
           segment.x - previousSegment.x === 1 ||
@@ -221,9 +221,9 @@ export const mapSnake = ({
             (food.y === segment.y && food.x - segment.x === 1) ||
             (superFood?.y === segment.y && superFood?.x - segment.x === 1)
           ) {
-            return { ...segment, type: "headRightFood" };
+            return { ...segment, segment: gameSegments.headRightFood };
           }
-          return { ...segment, type: "headRight" };
+          return { ...segment, segment: gameSegments.headRight };
         }
       }
     }
@@ -234,13 +234,13 @@ export const mapSnake = ({
           segment.y - nextSegment.y === -1 ||
           (segment.y === gridHeight - 1 && nextSegment.y === 0)
         ) {
-          return { ...segment, type: "tailDown" };
+          return { ...segment, segment: gameSegments.tailDown };
         }
         if (
           segment.y - nextSegment.y === 1 ||
           (segment.y === 0 && nextSegment.y === gridHeight - 1)
         ) {
-          return { ...segment, type: "tailUp" };
+          return { ...segment, segment: gameSegments.tailUp };
         }
       }
       if (segment.y === nextSegment.y) {
@@ -248,13 +248,13 @@ export const mapSnake = ({
           segment.x - nextSegment.x === -1 ||
           (segment.x === gridWidth - 1 && nextSegment.x === 0)
         ) {
-          return { ...segment, type: "tailRight" };
+          return { ...segment, segment: gameSegments.tailRight };
         }
         if (
           segment.x - nextSegment.x === 1 ||
           (segment.x === 0 && nextSegment.x === gridWidth - 1)
         ) {
-          return { ...segment, type: "tailLeft" };
+          return { ...segment, segment: gameSegments.tailLeft };
         }
       }
     }
@@ -262,14 +262,18 @@ export const mapSnake = ({
     if (segment.x === previousSegment.x && segment.x === nextSegment.x) {
       return {
         ...segment,
-        type: withFood ? "bodyVerticalWithFood" : "bodyVertical",
+        segment: withFood
+          ? gameSegments.bodyVerticalWithFood
+          : gameSegments.bodyVertical,
       };
     }
 
     if (segment.y === previousSegment.y && segment.y === nextSegment.y) {
       return {
         ...segment,
-        type: withFood ? "bodyHorizontalWithFood" : "bodyHorizontal",
+        segment: withFood
+          ? gameSegments.bodyHorizontalWithFood
+          : gameSegments.bodyHorizontal,
       };
     }
 
@@ -284,7 +288,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnTopRightWithFood" : "turnTopRight",
+          segment: withFood
+            ? gameSegments.turnTopRightWithFood
+            : gameSegments.turnTopRight,
         };
       if (
         nextSegment.y - segment.y === -1 ||
@@ -292,7 +298,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnBottomRightWithFood" : "turnBottomRight",
+          segment: withFood
+            ? gameSegments.turnBottomRightWithFood
+            : gameSegments.turnBottomRight,
         };
     }
 
@@ -307,7 +315,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnTopLeftWithFood" : "turnTopLeft",
+          segment: withFood
+            ? gameSegments.turnTopLeftWithFood
+            : gameSegments.turnTopLeft,
         };
       if (
         nextSegment.y - segment.y === -1 ||
@@ -315,7 +325,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnBottomLeftWithFood" : "turnBottomLeft",
+          segment: withFood
+            ? gameSegments.turnBottomLeftWithFood
+            : gameSegments.turnBottomLeft,
         };
     }
 
@@ -330,7 +342,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnBottomLeftWithFood" : "turnBottomLeft",
+          segment: withFood
+            ? gameSegments.turnBottomLeftWithFood
+            : gameSegments.turnBottomLeft,
         };
       if (
         nextSegment.x - segment.x === -1 ||
@@ -338,7 +352,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnBottomRightWithFood" : "turnBottomRight",
+          segment: withFood
+            ? gameSegments.turnBottomRightWithFood
+            : gameSegments.turnBottomRight,
         };
     }
 
@@ -353,7 +369,9 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnTopLeftWithFood" : "turnTopLeft",
+          segment: withFood
+            ? gameSegments.turnTopLeftWithFood
+            : gameSegments.turnTopLeft,
         };
       if (
         nextSegment.x - segment.x === -1 ||
@@ -361,10 +379,12 @@ export const mapSnake = ({
       )
         return {
           ...segment,
-          type: withFood ? "turnTopRightWithFood" : "turnTopRight",
+          segment: withFood
+            ? gameSegments.turnTopRightWithFood
+            : gameSegments.turnTopRight,
         };
     }
 
-    return { ...segment, type: "bodyVertical" };
+    return { ...segment, segment: gameSegments.bodyVertical };
   });
 };

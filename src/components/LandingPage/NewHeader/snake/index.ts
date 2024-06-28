@@ -1,7 +1,4 @@
-import {
-  difficulties,
-  SnakeGame,
-} from "@components/LandingPage/NewHeader/snake/SnakeGame";
+import { SnakeGame } from "@components/LandingPage/NewHeader/snake/SnakeGame";
 
 const snakeGame = new SnakeGame();
 
@@ -21,23 +18,44 @@ const changeDifficulty = () => {
       break;
   }
 };
+
+export const preventControlButtons = (e: KeyboardEvent) => {
+  if (
+    ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(
+      e.code,
+    ) > -1
+  ) {
+    e.preventDefault();
+  }
+};
+
 const startGame = () => {
   document.querySelector(".game-start-screen")!.classList.add("hidden");
   document.getElementById("right-image")!.classList.add("right-image-moved");
   document.getElementById("score")!.classList.remove("hidden");
   document.querySelector(".board")!.classList.add("board-moved");
+
+  window.addEventListener("keydown", preventControlButtons, false);
   snakeGame.startGame();
 };
 
 window.addEventListener(
   "keydown",
   (e) => {
-    if (
-      ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(
-        e.code,
-      ) > -1
-    ) {
+    if (e.code === "Escape") {
       e.preventDefault();
+      snakeGame.gameOver = true;
+      snakeGame.resetGame();
+      window.removeEventListener("keydown", preventControlButtons, false);
+      const rightImage = document.getElementById("right-image")!;
+      const board = document.querySelector(".board")!;
+      const score = document.querySelector("#score")!;
+      const countdown = document.querySelector(".countdown")!;
+
+      board.classList.remove("board-moved");
+      rightImage.classList.remove("right-image-moved");
+      score.classList.add("hidden");
+      countdown.classList.add("hidden");
     }
   },
   false,

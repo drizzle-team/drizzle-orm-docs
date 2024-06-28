@@ -165,11 +165,11 @@ import DBImage from "./Images/dbLight.svg"
         <div id="countdown">23</div>
       </div>
       <div class="game-start-screen">
-        <div style="display: flex; height: 35px; align-items: flex-end; cursor: pointer">
-          <div style="width: 85px;" id="change-difficulty" class="game-button"><span style="width: 85px; padding: 4px 0px; text-align: center" id="game-difficulty">Normal</span></div>
+        <div style="display: flex; height: 31px; align-items: flex-end; cursor: pointer">
+          <div id="start-game" class="game-button"><span>Play</span></div>
         </div>
-        <div style="display: flex; height: 35px; align-items: flex-end; cursor: pointer">
-          <div id="start-game" class="game-button"><span>Play game</span></div>
+        <div style="display: flex; height: 31px; align-items: flex-end; cursor: pointer">
+          <div id="change-difficulty" class="game-button"><span id="game-difficulty">Normal</span></div>
         </div>
       </div>
       <div class="team" id="gameArea">
@@ -419,16 +419,15 @@ import DBImage from "./Images/dbLight.svg"
   .game-start-screen {
       position: absolute;
       z-index: 2;
-      top: 6px;
+      top: 60px;
       left: 6px;
       bottom: 6px;
       right: 6px;
-      background: #f0f0f0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 4px;
       font-weight: 600;
       font-family: FirstTimeWriting;
       text-shadow: 0.2px 0 0 #000, -0.2px 0 0 #000, 0 0.2px 0 #000, 0 -0.2px 0 #000;
@@ -491,6 +490,7 @@ import DBImage from "./Images/dbLight.svg"
       padding-bottom: 2px;
       background: #c5c5c5;
       font-size: 14px;
+      width: 90px;
   }
 
   .game-button:hover {
@@ -498,7 +498,6 @@ import DBImage from "./Images/dbLight.svg"
   }
 
   .game-button:hover span {
-      padding-bottom: 4px;
       box-shadow: 0 4px 3px -4px black;
   }
 
@@ -511,12 +510,16 @@ import DBImage from "./Images/dbLight.svg"
   }
 
   .game-button span {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border: 1px solid #000;
       margin: -1px;
+      height: 27px;
+      flex-shrink: 0;
       border-radius: 6px;
-      padding: 4px 20px;
-      background: #f0f0f0;
+      background: white;
+      text-align: center;
       user-select: none;
   }
 
