@@ -1,7 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import { describe, expect, test } from "vitest";
-import { mapSnake } from "../components/LandingPage/NewHeader/snake/mapSnake";
+import {
+  gameSegments,
+  mapSnake,
+} from "../components/LandingPage/NewHeader/snake/mapSnake";
 
 const gridHeight = 10;
 const gridWidth = 19;
@@ -21,10 +24,10 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 0, type: "headLeft" },
-      { x: 1, y: 0, type: "bodyHorizontal" },
-      { x: 2, y: 0, type: "bodyHorizontal" },
-      { x: 3, y: 0, type: "tailLeft" },
+      { x: 0, y: 0, segment: gameSegments.headLeft },
+      { x: 1, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 2, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 3, y: 0, segment: gameSegments.tailLeft },
     ]);
   });
   test("Straight body right", () => {
@@ -42,10 +45,10 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 3, y: 0, type: "headRight" },
-      { x: 2, y: 0, type: "bodyHorizontal" },
-      { x: 1, y: 0, type: "bodyHorizontal" },
-      { x: 0, y: 0, type: "tailRight" },
+      { x: 3, y: 0, segment: gameSegments.headRight },
+      { x: 2, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 1, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 0, y: 0, segment: gameSegments.tailRight },
     ]);
   });
   test("Straight body up", () => {
@@ -63,10 +66,10 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 0, type: "headUp" },
-      { x: 0, y: 1, type: "bodyVertical" },
-      { x: 0, y: 2, type: "bodyVertical" },
-      { x: 0, y: 3, type: "tailUp" },
+      { x: 0, y: 0, segment: gameSegments.headUp },
+      { x: 0, y: 1, segment: gameSegments.bodyVertical },
+      { x: 0, y: 2, segment: gameSegments.bodyVertical },
+      { x: 0, y: 3, segment: gameSegments.tailUp },
     ]);
   });
   test("Straight body down", () => {
@@ -84,10 +87,10 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 3, type: "headDown" },
-      { x: 0, y: 2, type: "bodyVertical" },
-      { x: 0, y: 1, type: "bodyVertical" },
-      { x: 0, y: 0, type: "tailDown" },
+      { x: 0, y: 3, segment: gameSegments.headDown },
+      { x: 0, y: 2, segment: gameSegments.bodyVertical },
+      { x: 0, y: 1, segment: gameSegments.bodyVertical },
+      { x: 0, y: 0, segment: gameSegments.tailDown },
     ]);
   });
   test("Head bottom transfer", () => {
@@ -104,9 +107,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 0, type: "headDown" },
-      { x: 0, y: 9, type: "bodyVertical" },
-      { x: 0, y: 8, type: "tailDown" },
+      { x: 0, y: 0, segment: gameSegments.headDown },
+      { x: 0, y: 9, segment: gameSegments.bodyVertical },
+      { x: 0, y: 8, segment: gameSegments.tailDown },
     ]);
   });
   test("Head top transfer", () => {
@@ -123,9 +126,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 9, type: "headUp" },
-      { x: 0, y: 0, type: "bodyVertical" },
-      { x: 0, y: 1, type: "tailUp" },
+      { x: 0, y: 9, segment: gameSegments.headUp },
+      { x: 0, y: 0, segment: gameSegments.bodyVertical },
+      { x: 0, y: 1, segment: gameSegments.tailUp },
     ]);
   });
   test("Head left transfer", () => {
@@ -142,9 +145,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 18, y: 0, type: "headLeft" },
-      { x: 0, y: 0, type: "bodyHorizontal" },
-      { x: 1, y: 0, type: "tailLeft" },
+      { x: 18, y: 0, segment: gameSegments.headLeft },
+      { x: 0, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 1, y: 0, segment: gameSegments.tailLeft },
     ]);
   });
   test("Head right transfer", () => {
@@ -161,9 +164,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 0, type: "headRight" },
-      { x: 18, y: 0, type: "bodyHorizontal" },
-      { x: 17, y: 0, type: "tailRight" },
+      { x: 0, y: 0, segment: gameSegments.headRight },
+      { x: 18, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 17, y: 0, segment: gameSegments.tailRight },
     ]);
   });
   test("Turns", () => {
@@ -190,19 +193,19 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 0, type: "headLeft" },
-      { x: 1, y: 0, type: "turnTopRight" },
-      { x: 1, y: 1, type: "bodyVertical" },
-      { x: 1, y: 2, type: "turnBottomLeft" },
-      { x: 2, y: 2, type: "bodyHorizontal" },
-      { x: 3, y: 2, type: "turnBottomRight" },
-      { x: 3, y: 1, type: "turnTopLeft" },
-      { x: 4, y: 1, type: "turnTopRight" },
-      { x: 4, y: 2, type: "bodyVertical" },
-      { x: 4, y: 3, type: "turnBottomRight" },
-      { x: 3, y: 3, type: "bodyHorizontal" },
-      { x: 2, y: 3, type: "turnTopLeft" },
-      { x: 2, y: 4, type: "tailUp" },
+      { x: 0, y: 0, segment: gameSegments.headLeft },
+      { x: 1, y: 0, segment: gameSegments.turnTopRight },
+      { x: 1, y: 1, segment: gameSegments.bodyVertical },
+      { x: 1, y: 2, segment: gameSegments.turnBottomLeft },
+      { x: 2, y: 2, segment: gameSegments.bodyHorizontal },
+      { x: 3, y: 2, segment: gameSegments.turnBottomRight },
+      { x: 3, y: 1, segment: gameSegments.turnTopLeft },
+      { x: 4, y: 1, segment: gameSegments.turnTopRight },
+      { x: 4, y: 2, segment: gameSegments.bodyVertical },
+      { x: 4, y: 3, segment: gameSegments.turnBottomRight },
+      { x: 3, y: 3, segment: gameSegments.bodyHorizontal },
+      { x: 2, y: 3, segment: gameSegments.turnTopLeft },
+      { x: 2, y: 4, segment: gameSegments.tailUp },
     ]);
   });
   test("Turns with transfers", () => {
@@ -237,27 +240,27 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 15, y: 2, type: "headDown" },
-      { x: 15, y: 1, type: "bodyVertical" },
-      { x: 15, y: 0, type: "turnTopLeft" },
-      { x: 16, y: 0, type: "bodyHorizontal" },
-      { x: 17, y: 0, type: "bodyHorizontal" },
-      { x: 18, y: 0, type: "bodyHorizontal" },
-      { x: 0, y: 0, type: "bodyHorizontal" },
-      { x: 1, y: 0, type: "turnBottomRight" },
-      { x: 1, y: 9, type: "turnTopLeft" },
-      { x: 2, y: 9, type: "turnTopRight" },
-      { x: 2, y: 0, type: "bodyVertical" },
-      { x: 2, y: 1, type: "turnBottomRight" },
-      { x: 1, y: 1, type: "bodyHorizontal" },
-      { x: 0, y: 1, type: "turnTopLeft" },
-      { x: 0, y: 2, type: "turnBottomRight" },
-      { x: 18, y: 2, type: "turnTopLeft" },
-      { x: 18, y: 3, type: "turnBottomRight" },
-      { x: 17, y: 3, type: "turnTopLeft" },
-      { x: 17, y: 4, type: "turnBottomLeft" },
-      { x: 18, y: 4, type: "bodyHorizontal" },
-      { x: 0, y: 4, type: "tailLeft" },
+      { x: 15, y: 2, segment: gameSegments.headDown },
+      { x: 15, y: 1, segment: gameSegments.bodyVertical },
+      { x: 15, y: 0, segment: gameSegments.turnTopLeft },
+      { x: 16, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 17, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 18, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 0, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 1, y: 0, segment: gameSegments.turnBottomRight },
+      { x: 1, y: 9, segment: gameSegments.turnTopLeft },
+      { x: 2, y: 9, segment: gameSegments.turnTopRight },
+      { x: 2, y: 0, segment: gameSegments.bodyVertical },
+      { x: 2, y: 1, segment: gameSegments.turnBottomRight },
+      { x: 1, y: 1, segment: gameSegments.bodyHorizontal },
+      { x: 0, y: 1, segment: gameSegments.turnTopLeft },
+      { x: 0, y: 2, segment: gameSegments.turnBottomRight },
+      { x: 18, y: 2, segment: gameSegments.turnTopLeft },
+      { x: 18, y: 3, segment: gameSegments.turnBottomRight },
+      { x: 17, y: 3, segment: gameSegments.turnTopLeft },
+      { x: 17, y: 4, segment: gameSegments.turnBottomLeft },
+      { x: 18, y: 4, segment: gameSegments.bodyHorizontal },
+      { x: 0, y: 4, segment: gameSegments.tailLeft },
     ]);
   });
   test("Head up next to food", () => {
@@ -274,9 +277,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 1, type: "headUpFood" },
-      { x: 0, y: 2, type: "bodyVertical" },
-      { x: 0, y: 3, type: "tailUp" },
+      { x: 0, y: 1, segment: gameSegments.headUpFood },
+      { x: 0, y: 2, segment: gameSegments.bodyVertical },
+      { x: 0, y: 3, segment: gameSegments.tailUp },
     ]);
   });
   test("Head down next to food", () => {
@@ -293,9 +296,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 0, y: 2, type: "headDownFood" },
-      { x: 0, y: 1, type: "bodyVertical" },
-      { x: 0, y: 0, type: "tailDown" },
+      { x: 0, y: 2, segment: gameSegments.headDownFood },
+      { x: 0, y: 1, segment: gameSegments.bodyVertical },
+      { x: 0, y: 0, segment: gameSegments.tailDown },
     ]);
   });
   test("Head left next to food", () => {
@@ -312,9 +315,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 1, y: 0, type: "headLeftFood" },
-      { x: 2, y: 0, type: "bodyHorizontal" },
-      { x: 3, y: 0, type: "tailLeft" },
+      { x: 1, y: 0, segment: gameSegments.headLeftFood },
+      { x: 2, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 3, y: 0, segment: gameSegments.tailLeft },
     ]);
   });
   test("Head right next to food", () => {
@@ -331,9 +334,9 @@ describe("Test snake body mapper", () => {
         eatenFood: [],
       }),
     ).toStrictEqual([
-      { x: 2, y: 0, type: "headRightFood" },
-      { x: 1, y: 0, type: "bodyHorizontal" },
-      { x: 0, y: 0, type: "tailRight" },
+      { x: 2, y: 0, segment: gameSegments.headRightFood },
+      { x: 1, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 0, y: 0, segment: gameSegments.tailRight },
     ]);
   });
   test("Turns with transfers and food", () => {
@@ -376,27 +379,27 @@ describe("Test snake body mapper", () => {
         ],
       }),
     ).toStrictEqual([
-      { x: 15, y: 2, type: "headDownFood" },
-      { x: 15, y: 1, type: "bodyVertical" },
-      { x: 15, y: 0, type: "turnTopLeftWithFood" },
-      { x: 16, y: 0, type: "bodyHorizontal" },
-      { x: 17, y: 0, type: "bodyHorizontal" },
-      { x: 18, y: 0, type: "bodyHorizontalWithFood" },
-      { x: 0, y: 0, type: "bodyHorizontal" },
-      { x: 1, y: 0, type: "turnBottomRight" },
-      { x: 1, y: 9, type: "turnTopLeftWithFood" },
-      { x: 2, y: 9, type: "turnTopRight" },
-      { x: 2, y: 0, type: "bodyVerticalWithFood" },
-      { x: 2, y: 1, type: "turnBottomRight" },
-      { x: 1, y: 1, type: "bodyHorizontal" },
-      { x: 0, y: 1, type: "turnTopLeft" },
-      { x: 0, y: 2, type: "turnBottomRightWithFood" },
-      { x: 18, y: 2, type: "turnTopLeft" },
-      { x: 18, y: 3, type: "turnBottomRight" },
-      { x: 17, y: 3, type: "turnTopLeft" },
-      { x: 17, y: 4, type: "turnBottomLeft" },
-      { x: 18, y: 4, type: "bodyHorizontalWithFood" },
-      { x: 0, y: 4, type: "tailLeft" },
+      { x: 15, y: 2, segment: gameSegments.headDownFood },
+      { x: 15, y: 1, segment: gameSegments.bodyVertical },
+      { x: 15, y: 0, segment: gameSegments.turnTopLeftWithFood },
+      { x: 16, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 17, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 18, y: 0, segment: gameSegments.bodyHorizontalWithFood },
+      { x: 0, y: 0, segment: gameSegments.bodyHorizontal },
+      { x: 1, y: 0, segment: gameSegments.turnBottomRight },
+      { x: 1, y: 9, segment: gameSegments.turnTopLeftWithFood },
+      { x: 2, y: 9, segment: gameSegments.turnTopRight },
+      { x: 2, y: 0, segment: gameSegments.bodyVerticalWithFood },
+      { x: 2, y: 1, segment: gameSegments.turnBottomRight },
+      { x: 1, y: 1, segment: gameSegments.bodyHorizontal },
+      { x: 0, y: 1, segment: gameSegments.turnTopLeft },
+      { x: 0, y: 2, segment: gameSegments.turnBottomRightWithFood },
+      { x: 18, y: 2, segment: gameSegments.turnTopLeft },
+      { x: 18, y: 3, segment: gameSegments.turnBottomRight },
+      { x: 17, y: 3, segment: gameSegments.turnTopLeft },
+      { x: 17, y: 4, segment: gameSegments.turnBottomLeft },
+      { x: 18, y: 4, segment: gameSegments.bodyHorizontalWithFood },
+      { x: 0, y: 4, segment: gameSegments.tailLeft },
     ]);
   });
 });
