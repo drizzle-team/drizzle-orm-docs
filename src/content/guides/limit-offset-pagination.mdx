@@ -179,7 +179,7 @@ You can improve perfomance of `limit/offset` pagination by using `deferred join`
 To implement it you can do like this:
 
 ```ts copy {10}
-const getUsets = async (page = 1, pageSize = 10) => {
+const getUsers = async (page = 1, pageSize = 10) => {
    const sq = db
     .select({ id: users.id })
     .from(users)
