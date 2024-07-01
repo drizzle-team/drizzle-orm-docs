@@ -760,11 +760,11 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       userLastName: text("user_last_name"),
     }, (table) => {
       return {
-        userReference: foreignKey(() => ({
+        userReference: foreignKey({
           columns: [table.userFirstName, table.userLastName],
           foreignColumns: [user.firstName, user.lastName],
           name: "custom_name"
-        }))
+        })
       }
     });
     ```
