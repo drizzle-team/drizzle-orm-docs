@@ -957,7 +957,7 @@ const prepared = db.query.users.findMany({
 	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
+			where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 		},
 	},
 }).prepare('query_name');
@@ -973,7 +973,7 @@ const prepared = db.query.users.findMany({
 	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
+			where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 		},
 	},
 }).prepare();
@@ -989,7 +989,7 @@ const prepared = db.query.users.findMany({
 	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
+			where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 		},
 	},
 }).prepare();
