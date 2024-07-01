@@ -22,6 +22,8 @@ The `to_tsvector` function parses a textual document into tokens, reduces the to
 
 <Section>
 ```ts copy {4}
+import { sql } from 'drizzle-orm';
+
 const db = drizzle(...);
 
 await db.execute(
@@ -59,7 +61,6 @@ As for now, Drizzle doesn't support `tsvector` type natively, so you need to con
 <CodeTabs items={["schema.ts", "migration.sql", "db_data"]}>
   <CodeTab>
   ```ts copy {11, 12}
-  import { sql } from 'drizzle-orm';
   import { index, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
   export const posts = pgTable(
