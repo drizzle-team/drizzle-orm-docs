@@ -41,6 +41,14 @@ await db.insert(users).values({ name: "Dan" }).returning();
 await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
+### Getting the inserted id
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': true }} />
+After inserting a row, you can get the id of the new entry like this:
+```typescript copy
+const insertResult = await db.insert(users).values({ name: "Dan" }).returning();
+const newUserId = insertResult.insertId
+```
+
 ## Insert multiple rows
 ```typescript copy
 await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
