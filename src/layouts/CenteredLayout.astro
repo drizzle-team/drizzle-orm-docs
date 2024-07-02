@@ -6,10 +6,11 @@ import Banner from "@components/layout/Banner.astro";
 import InitComponentsScripts from "@components/layout/InitComponentsScripts.astro";
 import BaseHead from "@components/baseHead/BaseHead.astro";
 import Footer from "../components/layout/Footer.astro";
-import getContentTree from "@/utils/getContentTree";
 import type { IHeading } from "@/types/astro";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
 import DocsSidebar from "../components/layout/DocsSidebar.astro";
+import getContentTree from '@/utils/getContentTree';
+import type { IHeading } from '@/types/astro';
 
 interface Props {
   customTitle?: string;
@@ -44,7 +45,7 @@ const { title, tree  } = await getContentTree({
       <div class="documentation-content">
         <slot />
         <EndOfContent />
-        <Footer />
+        <Footer isCenteredLayout />
       </div>
     </main>
     <InitComponentsScripts />
