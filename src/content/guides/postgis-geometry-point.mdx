@@ -1,0 +1,142 @@
+---
+title: PostGIS geometry point
+slug: postgis-geometry-point
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- [Postgis extension](/docs/extensions/pg#postgis)
+- [Indexes](/docs/indexes-constraints#indexes)
+- [Filtering in select statement](/docs/select#filtering)
+- [sql operator](/docs/sql)
+</Prerequisites>
+
+`PostGIS` extends the capabilities of the PostgreSQL relational database by adding support for storing, indexing, and querying geospatial data. 
+
+As for now, Drizzle doesn't create extension automatically, so you need to create it manually. Create an empty migration file and add SQL query:
+
+<Section>
+```bash
+npx drizzle-kit generate --custom
+```
+
+```sql
+CREATE EXTENSION postgis;
+```
+</Section>
+
+This is how you can create table with `geometry` datatype and spatial index in Drizzle:
+
+<CodeTabs items={["schema.ts", "migration.sql"]}>
+  <CodeTab>
+  ```ts copy {8, 11}
+  import { geometry, index, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const stores = pgTable(
+    'stores',
+    {
+      id: serial('id').primaryKey(),
+      name: text('name').notNull(),
+      location: geometry('location', { type: 'point', mode: 'xy', srid: 4326 }).notNull(),
+    },
+    (t) => ({
+      spatialIndex: index('spatial_index').using('gist', t.location),
+    }),
+  );
+  ```
+  </CodeTab>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "stores" (
+	  "id" serial PRIMARY KEY NOT NULL,
+	  "name" text NOT NULL,
+	  "location" geometry(point) NOT NULL
+  );
+  --> statement-breakpoint
+  CREATE INDEX IF NOT EXISTS "spatial_index" ON "stores" USING gist ("location");
+  ```
+</CodeTabs>
+ 
+This is how you can insert `geometry` data into the table in Drizzle. `ST_MakePoint()` in PostGIS creates a geometric object of type `point` using the specified coordinates.
+`ST_SetSRID()` sets the `SRID` (unique identifier associated with a specific coordinate system, tolerance, and resolution) on a geometry to a particular integer value:
+
+```ts {4, 10, 16}
+// mode: 'xy'
+await db.insert(stores).values({
+  name: 'Test',
+  location: { x: -90.9, y: 18.7 },
+});
+
+// mode: 'tuple'
+await db.insert(stores).values({
+  name: 'Test',
+  location: [-90.9, 18.7],
+});
+
+// sql raw
+await db.insert(stores).values({
+  name: 'Test',
+  location: sql`ST_SetSRID(ST_MakePoint(-90.9, 18.7), 4326)`,
+});
+```
+
+To compute the distance between the objects you can use `<->` operator and `ST_Distance()` function, which for `geometry types` returns the minimum planar distance between two geometries. This is how you can query for the nearest location by coordinates in Drizzle with PostGIS:
+
+<Section>
+```ts copy {9, 14, 17}
+import { getTableColumns, sql } from 'drizzle-orm';
+import { stores } from './schema';
+
+const point = {
+  x: -73.935_242,
+  y: 40.730_61,
+};
+
+const sqlPoint = sql`ST_SetSRID(ST_MakePoint(${point.x}, ${point.y}), 4326)`;
+
+await db
+  .select({
+    ...getTableColumns(stores),
+    distance: sql`ST_Distance(${stores.location}, ${sqlPoint})`,
+  })
+  .from(stores)
+  .orderBy(sql`${stores.location} <-> ${sqlPoint}`)
+  .limit(1);
+```
+
+```sql
+select *, ST_Distance(location, ST_SetSRID(ST_MakePoint(-73.935_242, 40.730_61), 4326))
+from stores order by location <-> ST_SetSRID(ST_MakePoint(-73.935_242, 40.730_61), 4326)
+limit 1;
+```
+</Section>
+
+To filter stores located within a specified rectangular area, you can use `ST_MakeEnvelope()` and `ST_Within()` functions. `ST_MakeEnvelope()` creates a rectangular Polygon from the minimum and maximum values for X and Y. `ST_Within()` Returns TRUE if geometry A is within geometry B.
+
+<Section>
+```ts copy {13}
+const point = {
+  x1: -88,
+  x2: -73,
+  y1: 40,
+  y2: 43,
+};
+
+await db
+  .select()
+  .from(stores)
+  .where(
+    sql`ST_Within(
+      ${stores.location}, ST_MakeEnvelope(${point.x1}, ${point.y1}, ${point.x2}, ${point.y2}, 4326)
+    )`,
+  );
+```
+
+```sql
+select * from stores where ST_Within(location, ST_MakeEnvelope(-88, 40, -73, 43, 4326));
+```
+</Section>
