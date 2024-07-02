@@ -150,7 +150,7 @@ export const usersRelations = relations(users, ({ one }) => ({
 
 Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
-```typescript copy {9-17}
+```typescript copy {9-24}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -168,6 +168,13 @@ export const profileInfo = pgTable('profile_info', {
 	userId: integer('user_id').references(() => users.id),
 	metadata: jsonb('metadata'),
 });
+
+export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
+	user: one(users, {
+		fields: [profileInfo.userId],
+		references: [users.id],
+	}),
+}));
 
 const user = await queryUserWithProfileInfo();
 //____^? type { id: number, profileInfo: { ... } | null  }
