@@ -1,5 +1,4 @@
 export default (startDate: string): string => {
-  console.log(startDate);
   const start = new Date(startDate);
   const now = new Date();
 
