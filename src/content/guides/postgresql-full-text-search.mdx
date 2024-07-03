@@ -21,7 +21,7 @@ This guide demonstrates how to implement full-text search in PostgreSQL with Dri
 The `to_tsvector` function parses a textual document into tokens, reduces the tokens to lexemes, and returns a `tsvector` which lists the lexemes together with their positions in the document:
 
 <Section>
-```ts copy {4}
+```ts copy {6}
 import { sql } from 'drizzle-orm';
 
 const db = drizzle(...);
@@ -60,7 +60,7 @@ As for now, Drizzle doesn't support `tsvector` type natively, so you need to con
 
 <CodeTabs items={["schema.ts", "migration.sql", "db_data"]}>
   <CodeTab>
-  ```ts copy {11, 12}
+  ```ts copy {10, 11}
   import { index, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
   export const posts = pgTable(
