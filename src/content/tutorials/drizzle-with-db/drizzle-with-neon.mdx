@@ -1,68 +1,78 @@
 ---
-title: "Drizzle with Supabase Database"
-date: "2024-05-07"
-svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="25" viewBox="0 0 24 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.3501 21.1611C12.9303 21.6898 12.079 21.4002 12.0689 20.7251L11.921 10.8511H18.5603C19.7628 10.8511 20.4335 12.24 19.6857 13.1818L13.3501 21.1611Z" /><path d="M10.6499 5.27307C11.0697 4.7443 11.921 5.03403 11.9311 5.70913L11.996 15.5831H5.43981C4.23723 15.5831 3.56652 14.1942 4.31432 13.2524L10.6499 5.27307Z"/></svg>]
+title: "Drizzle with Neon Postgres"
+date: "2024-05-10"
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>',<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 6.75867C4 6.02702 4.29064 5.32535 4.80799 4.80799C5.32535 4.29064 6.02702 4 6.75867 4H17.2413C17.973 4 18.6747 4.29064 19.192 4.80799C19.7094 5.32535 20 6.02702 20 6.75867V15.6742C20 17.2502 18.0053 17.9342 17.0382 16.6902L14.0138 12.7996V17.5173C14.0138 18.1758 13.7522 18.8073 13.2866 19.2728C12.821 19.7384 12.1896 20 11.5311 20H6.75867C6.02702 20 5.32535 19.7094 4.80799 19.192C4.29064 18.6747 4 17.973 4 17.2413V6.75867ZM6.75867 6.20711C6.45378 6.20711 6.20711 6.45378 6.20711 6.75822V17.2413C6.20711 17.5462 6.45378 17.7933 6.75822 17.7933H11.6138C11.7662 17.7933 11.8067 17.6698 11.8067 17.5173V11.1911C11.8067 9.61467 13.8013 8.93067 14.7689 10.1751L17.7933 14.0653V6.75867C17.7933 6.45378 17.8218 6.20711 17.5173 6.20711H6.75867Z" /></svg>]
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
-import Npm from '@mdx/Npm.astro';
-import Steps from '@mdx/Steps.astro';
+import Npm from "@mdx/Npm.astro";
+import Steps from "@mdx/Steps.astro";
 import Section from "@mdx/Section.astro";
-import Callout from '@mdx/Callout.astro';
+import Callout from "@mdx/Callout.astro";
 
-This tutorial demonstrates how to use Drizzle ORM with [Supabase Database](https://supabase.com/docs/guides/database/overview). Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database.
+This tutorial demonstrates how to use Drizzle ORM with [Neon Postgres](https://neon.tech/) database. If you do not have an existing Neon account, sign up [here](https://neon.tech). 
 
-<Prerequisites>
-- You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
-<Npm>
-drizzle-orm
--D drizzle-kit
-</Npm>
-- You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
-- You should have the latest version of [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli) installed (Only if you want to use the CLI for migrations)
+<Prerequisites>  
+  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
+  <Npm>
+    drizzle-orm 
+    -D drizzle-kit
+  </Npm>
+
+  - You should also install the [Neon serverless driver](https://neon.tech/docs/serverless/serverless-driver). 
+  <Npm>
+    @neondatabase/serverless
+  </Npm>
+  
+  - You should have installed the `dotenv` package for managing environment variables. 
+  <Npm>
+    dotenv
+  </Npm>  
 </Prerequisites>
 
-Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to the database with Drizzle ORM.
-
-## Setup Supabase and Drizzle ORM
+## Setup Neon and Drizzle ORM
 
 <Steps>
-#### Create a new Supabase project
+#### Create a new Neon project
 
-You can create new Supabase project in the [dashboard](https://supabase.com/dashboard) or by following this [link](https://database.new/).
+Log in to the [Neon Console](https://console.neon.tech/app/projects) and navigate to the Projects section. Select a project or click the `New Project` button to create a new one. 
+
+Your Neon projects come with a ready-to-use Postgres database named `neondb`. We'll use it in this tutorial.
 
 #### Setup connection string variable
 
-Navigate to [Database Settings](https://supabase.com/dashboard/project/_/settings/database) and copy the URI from the `Connection String` section. Make sure to use `connection pooling`. Remember to replace the password placeholder with your actual database password.
+Navigate to the **Connection Details** section in the project console to find your database connection string. It should look similar to this:
 
-Add `DATABASE_URL` variable to your `.env` file:
-
-```plaintext
-DATABASE_URL=<YOUR_DATABASE_URL>
+```bash
+postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb
 ```
 
-Read more about Connection Pooler and pooling modes in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
+Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to the Neon database.
 
-#### Connect Drizzle ORM to your database
+```bash
+DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
+```
 
-Create a `index.ts` file in the `src/db` directory and set up your database configuration:
+#### Connect Drizzle ORM to your database 
 
-```typescript copy filename="src/db/index.ts"
-import { config } from 'dotenv';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+Create a `db.ts` file and set up your database configuration:
 
-config({ path: '.env' });
+```typescript copy filename="src/db.ts"
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { config } from "dotenv";
 
-const client = postgres(process.env.DATABASE_URL!);
-export const db = drizzle(client);
+config({ path: ".env" });
+
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql);
 ```
 
 #### Create tables
 
-Create a `schema.ts` file in the `src/db` directory and declare your tables:
+Create a `schema.ts` file and declare your tables:
 
-```typescript copy filename="src/db/schema.ts"
+```typescript copy filename="src/schema.ts"
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users_table', {
@@ -100,14 +110,14 @@ Create a `drizzle.config.ts` file in the root of your project and add the follow
 
 ```typescript copy filename="drizzle.config.ts"
 import { config } from 'dotenv';
-import { defineConfig } from 'drizzle-kit';
+import { defineConfig } from "drizzle-kit";
 
 config({ path: '.env' });
 
 export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './supabase/migrations',
-  dialect: 'postgresql',
+  schema: "./src/schema.ts",
+  out: "./migrations",
+  dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
@@ -124,7 +134,7 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `supabase/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
 
 Example of a generated migration:
 
@@ -147,7 +157,7 @@ CREATE TABLE IF NOT EXISTS "users_table" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "users_table"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -157,16 +167,6 @@ Run migrations:
 
 ```bash
 npx drizzle-kit migrate
-```
-
-Learn more about [migration process](https://orm.drizzle.team/docs/migrations). You can also apply migtations using [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started):
-
-To apply migrations using the Supabase CLI, initialize local Supabase project, link it to your remote project and push changes to the database:
-
-```bash
-supabase init
-supabase link
-supabase db push
 ```
 
 Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
@@ -179,24 +179,21 @@ npx drizzle-kit push
 
 </Steps>
 
-## Basic file structure
+### Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts` and schema definitions in `schema.ts`.
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
 
 ```plaintext
 📦 <project root>
  ├ 📂 src
- │   ├ 📂 db
- │   │  ├ 📜 index.ts
- │   │  ├ 📜 queries.ts
- │   │  └ 📜 schema.ts
- ├ 📂 supabase
- │   ├ 📂 migrations
- │   │  ├ 📂 meta
- │   │  │  ├ 📜 _journal.json
- │   │  │  └ 📜 0000_snapshot.json
- │   │  └ 📜 0000_watery_spencer_smythe.sql
- │   └ 📜 config.toml
+ │  ├ 📜 db.ts
+ │  └ 📜 schema.ts
+ │  └ 📜 queries.ts
+ ├ 📂 migrations
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json
+ │  │  └ 📜 0000_snapshot.json
+ │  └ 📜 0000_dry_richard_fisk.sql
  ├ 📜 .env
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
@@ -205,13 +202,13 @@ This is the basic file structure of the project. In the `src/db` directory, we h
 
 ## Query examples
 
-For instance, we create `src/db/queries.ts` file with the following queries.
+For instance, we create `src/queries.ts` file with the following queries.
 
 #### Insert data
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/db/queries.ts" {4}
+```typescript copy filename="src/queries.ts" {4}
 import { db } from './db';
 import { InsertUser, usersTable } from './schema';
 
@@ -224,7 +221,7 @@ export async function createUser(data: InsertUser) {
 
 Read more about select query in the [documentation](/docs/select).
 
-```typescript copy filename="src/db/queries.ts" {5, 16, 41}
+```typescript copy filename="src/queries.ts" {5, 16, 41}
 import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
 import { db } from './db';
 import { InsertUser, SelectUser, postsTable, usersTable } from './schema';
@@ -293,7 +290,7 @@ Alternatively, you can use [relational query syntax](/docs/rqb).
 
 Read more about update query in the [documentation](/docs/update).
 
-```typescript copy filename="src/db/queries.ts" {3}
+```typescript copy filename="src/queries.ts" {3}
 // imports
 
 export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
@@ -305,7 +302,7 @@ export async function updatePost(id: SelectPost['id'], data: Partial<Omit<Select
 
 Read more about delete query in the [documentation](/docs/delete).
 
-```typescript copy filename="src/db/queries.ts" {3}
+```typescript copy filename="src/queries.ts" {3}
 // imports
 
 export async function deleteUser(id: SelectUser['id']) {

@@ -116,6 +116,16 @@ const Databases: {
       width: 28,
     },
   },
+  TiDB: {
+    imageSrc: "/public/svg/tidb.svg",
+    lightStyle: {
+      width: 28,
+    },
+    darkStyle: {
+      width: 28,
+    },
+    sponsorUrl: "https://driz.link/silver-sponsor-tidb",
+  },
 };
 
 export default Databases;

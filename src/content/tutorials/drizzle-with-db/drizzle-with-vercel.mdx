@@ -1,7 +1,7 @@
 ---
-title: "Drizzle with Supabase Database"
-date: "2024-05-07"
-svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="25" viewBox="0 0 24 25" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.3501 21.1611C12.9303 21.6898 12.079 21.4002 12.0689 20.7251L11.921 10.8511H18.5603C19.7628 10.8511 20.4335 12.24 19.6857 13.1818L13.3501 21.1611Z" /><path d="M10.6499 5.27307C11.0697 4.7443 11.921 5.03403 11.9311 5.70913L11.996 15.5831H5.43981C4.23723 15.5831 3.56652 14.1942 4.31432 13.2524L10.6499 5.27307Z"/></svg>]
+title: "Drizzle with Vercel Postgres"
+date: "2024-06-09"
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 5L4 19H20L12 5Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>]
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -10,7 +10,7 @@ import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
 import Callout from '@mdx/Callout.astro';
 
-This tutorial demonstrates how to use Drizzle ORM with [Supabase Database](https://supabase.com/docs/guides/database/overview). Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database.
+This tutorial demonstrates how to use Drizzle ORM with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres). Vercel Postgres is a serverless SQL database designed to integrate with Vercel Functions and your frontend framework.
 
 <Prerequisites>
 - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
@@ -19,43 +19,43 @@ drizzle-orm
 -D drizzle-kit
 </Npm>
 - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
-- You should have the latest version of [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#installing-the-supabase-cli) installed (Only if you want to use the CLI for migrations)
+- You should have installed `@vercel/postgres` package. Read more about this package [here](https://www.npmjs.com/package/@vercel/postgres)
 </Prerequisites>
 
-Check [Supabase documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle) to learn how to connect to the database with Drizzle ORM.
+Check [Vercel documentation](https://vercel.com/docs/storage/vercel-postgres/using-an-orm#drizzle) to learn how to connect to the database with Drizzle ORM.
 
-## Setup Supabase and Drizzle ORM
+## Setup Vercel Postgres and Drizzle ORM
 
 <Steps>
-#### Create a new Supabase project
+#### Create a new Vercel Postgres database
 
-You can create new Supabase project in the [dashboard](https://supabase.com/dashboard) or by following this [link](https://database.new/).
+You can create new Vercel Postgres database in the [dashboard](https://vercel.com/dashboard).
+
+Read Vercel Postgres [documentation](https://vercel.com/docs/storage/vercel-postgres/quickstart) to learn how to create a new database.
 
 #### Setup connection string variable
 
-Navigate to [Database Settings](https://supabase.com/dashboard/project/_/settings/database) and copy the URI from the `Connection String` section. Make sure to use `connection pooling`. Remember to replace the password placeholder with your actual database password.
+Navigate to your Vercel Postgres database and copy `POSTGRES_URL` from `.env.local` section.
 
-Add `DATABASE_URL` variable to your `.env` file:
+Add `POSTGRES_URL` to your `.env` or `.env.local` file.
 
 ```plaintext
-DATABASE_URL=<YOUR_DATABASE_URL>
+POSTGRES_URL=<YOUR_DATABASE_URL>
 ```
-
-Read more about Connection Pooler and pooling modes in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
 
 #### Connect Drizzle ORM to your database
 
 Create a `index.ts` file in the `src/db` directory and set up your database configuration:
 
 ```typescript copy filename="src/db/index.ts"
+import { sql } from '@vercel/postgres';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { config } from 'dotenv';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
 
-config({ path: '.env' });
+config({ path: '.env.local' });
 
-const client = postgres(process.env.DATABASE_URL!);
-export const db = drizzle(client);
+export const db = drizzle(sql);
+
 ```
 
 #### Create tables
@@ -102,14 +102,14 @@ Create a `drizzle.config.ts` file in the root of your project and add the follow
 import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
-config({ path: '.env' });
+config({ path: '.env.local' });
 
 export default defineConfig({
   schema: './src/db/schema.ts',
-  out: './supabase/migrations',
+  out: './migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.POSTGRES_URL!,
   },
 });
 ```
@@ -124,7 +124,7 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `supabase/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
 
 Example of a generated migration:
 
@@ -159,16 +159,6 @@ Run migrations:
 npx drizzle-kit migrate
 ```
 
-Learn more about [migration process](https://orm.drizzle.team/docs/migrations). You can also apply migtations using [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started):
-
-To apply migrations using the Supabase CLI, initialize local Supabase project, link it to your remote project and push changes to the database:
-
-```bash
-supabase init
-supabase link
-supabase db push
-```
-
 Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
 
 ```bash
@@ -190,14 +180,12 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │   │  ├ 📜 index.ts
  │   │  ├ 📜 queries.ts
  │   │  └ 📜 schema.ts
- ├ 📂 supabase
- │   ├ 📂 migrations
- │   │  ├ 📂 meta
- │   │  │  ├ 📜 _journal.json
- │   │  │  └ 📜 0000_snapshot.json
- │   │  └ 📜 0000_watery_spencer_smythe.sql
- │   └ 📜 config.toml
- ├ 📜 .env
+ ├ 📂 migrations
+ │   ├ 📂 meta
+ │   │  ├ 📜 _journal.json
+ │   │  └ 📜 0000_snapshot.json
+ │   └ 📜 0000_watery_spencer_smythe.sql
+ ├ 📜 .env.local
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
  └ 📜 tsconfig.json

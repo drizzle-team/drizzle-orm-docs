@@ -135,15 +135,41 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/gold",
-      name: "Become a Gold Sponsor",
+      login: "driz.link/hydraso",
+      name: "Hydra",
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
-    createdAt: "2023-11-16T13:32:16Z",
+    createdAt: "2024-06-07T13:32:16Z",
     isActive: true,
     imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "brightness(0.5) grayscale(1)",
+      background:
+        'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
+    },
   },
+  // {
+  //   tier: {
+  //     name: "$1000 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/gold",
+  //     name: "Become a Gold Sponsor",
+  //     avatarUrl:
+  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+  //   },
+  //   createdAt: "2023-11-16T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  // },
 ];
 
 export default sponsorsData;
