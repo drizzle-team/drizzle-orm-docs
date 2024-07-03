@@ -1,16 +1,7 @@
-export type Week = {
-  date: {
-    start: string;
-  };
-  details: string[];
-};
+export type Weeks = Record<string, string[]>;
 
-export type WeeksArray = {
-  weeks: Week[];
-};
-
-export default (weeksArray: WeeksArray): WeeksArray => {
-  const weeks = weeksArray.weeks;
+export default (weeksObject: Weeks): Weeks => {
+  const weeks = { ...weeksObject };
 
   const getWeekStart = (date: Date): Date => {
     const day = date.getDay();
@@ -35,45 +26,35 @@ export default (weeksArray: WeeksArray): WeeksArray => {
   };
 
   // Get the start of the first week
-  let currentWeekStart = getWeekStart(parseDate(weeks[0].date.start));
+  let currentWeekStart = getWeekStart(parseDate(Object.keys(weeks)[0]));
 
   // Get the start of the current week
   const now = new Date();
   const currentWeek = getWeekStart(now);
 
-  const filledWeeks: Week[] = [];
+  let filledWeeks: Weeks = {};
 
   // Fill missing weeks until the current week
-  for (let i = 0; i < weeks.length; i++) {
-    const week = weeks[i];
-    const weekStart = getWeekStart(parseDate(week.date.start));
+  for (const key in weeks) {
+    const week = weeks[key];
+    const weekStart = getWeekStart(parseDate(key));
 
     // Add empty weeks until we reach the week of the current item
     while (currentWeekStart.getTime() < weekStart.getTime()) {
-      filledWeeks.push({
-        date: {
-          start: formatDate(currentWeekStart),
-        },
-        details: [],
-      });
+      filledWeeks = { ...filledWeeks, [formatDate(currentWeekStart)]: [] };
       currentWeekStart = addDays(currentWeekStart, 7);
     }
 
     // Add the current week from the input
-    filledWeeks.push(week);
+    filledWeeks = { ...filledWeeks, [key]: week };
     currentWeekStart = addDays(currentWeekStart, 7);
   }
 
   // Fill missing weeks until the current week
   while (currentWeekStart.getTime() <= currentWeek.getTime()) {
-    filledWeeks.push({
-      date: {
-        start: formatDate(currentWeekStart),
-      },
-      details: [],
-    });
+    filledWeeks = { ...filledWeeks, [formatDate(currentWeekStart)]: [] };
     currentWeekStart = addDays(currentWeekStart, 7);
   }
 
-  return { weeks: filledWeeks };
+  return filledWeeks;
 };

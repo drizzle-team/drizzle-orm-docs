@@ -18,6 +18,7 @@ import shippingData from '../../../data/shipping.yaml';
 import getWeekLabel from "../../../utils/getWeekLabel";
 import ProgressBar from "./ProgressBar.astro";
 import fillWeeksGaps from "../../../utils/fillWeeksGaps";
+import progress from "../../../data/progress";
 
 const drizzleTeam: { name: string, photo: string, url?: string}[] = [
   {
@@ -105,26 +106,21 @@ const shipping = fillWeeksGaps(shippingData);
       </div>
     </div>
     <div class="developers-right">
-      <ProgressBar progress={shippingData.progress} />
+      <ProgressBar progress={progress} />
     </div>
   </div>
   <div class={"scroll board-scroll"}>
     <div class={"gradient-left board-gradient"}></div>
     <div class={"gradient-right board-gradient"}></div>
     <div class="shipping-board">
-      {shipping.weeks
-        .filter(({date}) => {
-          const weekDate = new Date(date.start);
-          const currentDate = new Date();
-          return weekDate.getTime() < currentDate.getTime()
-        })
-        .map(({date, details}) => (
+      {Object.entries(shipping)
+        .map(([key, value]) => (
           <div class="week">
             <div class="week-title">
-              {getWeekLabel(date.start)}
+              {getWeekLabel(key)}
             </div>
             <ul class="week-details">
-              {details.map((string) => (
+              {value.map((string) => (
                 <li class="week-text">
                   <div set:html={string}/>
                 </li>
