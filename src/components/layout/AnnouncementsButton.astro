@@ -30,8 +30,7 @@ const newestPost = posts.reduce(
   }
 </script>
 
-<style>
-
+<style is:global>
   html.dark .announcements_button_wrap:hover {
     color: #e1e3e6;
     background-color: rgba(255, 255, 255, 0.05);
@@ -56,6 +55,7 @@ const newestPost = posts.reduce(
     padding: 8px;
     border-radius: 8px;
     height: 36px;
+    width: 36px;
     background-color: hsla(210, 7%, 95%, .27);
     border: 1px solid rgba(33, 39, 46, .12);
     color: #909090;
@@ -90,15 +90,13 @@ const newestPost = posts.reduce(
       display: none;
   }
 
+  .announcements_button_wrap svg {
+      width: 20px;
+  }
+
   @media screen and (max-width: 768px) {
       .announcements_button_wrap {
           display: none;
       }
-  }
-
-</style>
-<style is:global>
-  .announcements_button_wrap svg {
-    width: 20px;
   }
 </style>
