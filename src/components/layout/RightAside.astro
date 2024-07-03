@@ -3,15 +3,13 @@ import AsideArticle from "./AsidePosts.astro";
 import AsideSponsors from "./AsideSponsors.astro";
 import CarbonCard from "./CarbonCard.astro";
 import SmallProgressBar from "./SmallProgressBar.astro";
-import shippingData from '../../data/shipping.yaml';
-
-const shipping = shippingData;
+import progress from "../../data/progress";
 ---
 
 <div class="aside-right">
   <div class="aside-right__content">
     <div style="margin-bottom: 4px; width: 100%">
-      <SmallProgressBar  progress={shipping.progress} />
+      <SmallProgressBar  progress={progress} />
     </div>
     <AsideArticle />
     <AsideSponsors />
