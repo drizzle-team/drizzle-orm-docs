@@ -1,46 +1,4 @@
----
-const posts = await Astro.glob('../../data/announcements/*.md');
-
-const newestPost = posts.reduce(
-  (acc, curr) => {
-    if (!acc) return curr;
-    const date = curr.frontmatter.date;
-    if (!date) throw new Error('Notification must have a date');
-    return date > curr.frontmatter.date.date ? curr : acc;
-  },
-  null as (typeof posts)[0] | null
-);
----
-
 <div class="aside-posts__container">
-  <a href="/announcements" class="aside-posts__wrap">
-    <div class="aside-posts__image">
-      <div class="indicator invisible-indicator"/>
-      <div class="aside-posts__image--learn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12" opacity="0.5"/>
-          <path fill="currentColor" d="M7 16.75a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zm0-3.5a.75.75 0 0 0 0 1.5h9a.75.75 0 0 0 0-1.5zM22 0 0 0"/>
-        </svg>
-      </div>
-    </div>
-    <div class="aside-posts__text">Announcements</div>
-    <div class="aside-posts__arrow-right">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="feather feather-arrow-right"
-      ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-        points="12 5 19 12 12 19"></polyline></svg
-      >
-    </div>
-  </a>
   <a href="/benchmarks" class="aside-posts__wrap">
     <div class="aside-posts__image">
       <div class="aside-posts__image--learn">
@@ -203,13 +161,6 @@ const newestPost = posts.reduce(
     </div>
   </a>
 </div>
-<script define:vars={{newestPost}}>
-  const lastSeenPost = localStorage.getItem('drizzle-last-seen-announcement');
-
-  if (!lastSeenPost || (newestPost && new Date(newestPost.frontmatter.date) > new Date(+lastSeenPost))) {
-    document.querySelector('.indicator').classList.remove('invisible-indicator')
-  }
-</script>
 <style>
   .aside-posts__container {
     display: flex;
@@ -333,20 +284,6 @@ const newestPost = posts.reduce(
     height: 16px;
     width: 16px;
     color: #000;
-  }
-
-  .indicator {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      top: 0;
-      right: 0;
-      border-radius: 100%;
-      background: #ef4444;
-  }
-
-  .invisible-indicator {
-      display: none;
   }
 </style>
 

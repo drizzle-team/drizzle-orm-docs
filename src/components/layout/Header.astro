@@ -3,6 +3,9 @@ import CenteredSearchWithAI from "./CenteredSearchWithAI.astro";
 import ThemeSelector from "./ThemeSelector.astro";
 import Logo from "./Logo.astro";
 import GithubStars from "./GithubStars.astro";
+import progress from "../../data/progress";
+import SmallProgressBar from "./SmallProgressBar.astro";
+import AnnouncementsButton from "./AnnouncementsButton.astro";
 ---
 
 <div class="header" id="header">
@@ -12,7 +15,11 @@ import GithubStars from "./GithubStars.astro";
     </div>
     <CenteredSearchWithAI />
     <div class="header_nav">
+      <div class="progress-wrap">
+        <SmallProgressBar  progress={progress} />
+      </div>
       <GithubStars />
+      <AnnouncementsButton />
       <ThemeSelector />
       <div class="burger" data-nav-burger-btn>
         <svg
@@ -78,6 +85,7 @@ import GithubStars from "./GithubStars.astro";
     margin: 0 auto;
     max-width: 1440px;
     width: 100%;
+    gap: 12px;
   }
 
   .header__logo {
@@ -121,6 +129,16 @@ import GithubStars from "./GithubStars.astro";
 
   .header_nav__link:hover {
     color: rgb(31, 41, 55);
+  }
+
+  .progress-wrap {
+      width: 200px;
+  }
+
+  @media screen and (max-width: 1260px) {
+      .progress-wrap {
+          display: none;
+      }
   }
 
   @media screen and (max-width: 768px) {
