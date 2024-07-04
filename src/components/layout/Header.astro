@@ -13,7 +13,7 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
     <div class="header__logo">
       <Logo />
     </div>
-    <CenteredSearchWithAI />
+    <CenteredSearchWithAI/>
     <div class="header_nav">
       <div class="progress-wrap">
         <SmallProgressBar  progress={progress} />
@@ -153,72 +153,23 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
   }
 </style>
 <script>
-  const burgerBtn = document.querySelector("[data-nav-burger-btn]");
-  const navContainer = document.getElementById("header");
-  const aside = document.getElementById("aside");
+  document.addEventListener("astro:page-load", () => {
+    const burgerBtn = document.querySelector("[data-nav-burger-btn]");
+    const navContainer = document.getElementById("header");
+    const aside = document.getElementById("aside");
 
-  if (burgerBtn && navContainer && aside) {
-    burgerBtn.addEventListener("click", () => {
-      navContainer.classList.toggle("nav_container_open");
-      aside.classList.toggle("invisible");
-      document.body.style.overflow = navContainer.classList.contains(
-        "nav_container_open",
-      )
-        ? "hidden"
-        : "auto";
-    });
-  }
-</script>
-
-<script is:inline>
-  docsearch({
-    container: '#docsearch',
-    appId: "MXZNUT59HV",
-    apiKey: "7c390e262ac8858df0b6624d01d9dfef",
-    indexName: "orm-drizzle",
-    placeholder: "Search documentation...",
-  });
-</script>
-<script type="module">
-  let themeName = localStorage.getItem('theme');
-    if(themeName === 'system') {
-      themeName = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    if (burgerBtn && navContainer && aside) {
+      burgerBtn.addEventListener("click", () => {
+        navContainer.classList.toggle("nav_container_open");
+        aside.classList.toggle("invisible");
+        document.body.style.overflow = navContainer.classList.contains(
+          "nav_container_open",
+        )
+          ? "hidden"
+          : "auto";
+      });
     }
-
-const properties = {
-  stylesheetUrls: ['/inkeep-styles.css'],
-  chatButtonType: 'ICON_TEXT',
-  isPositionFixed: false,
-  baseSettings: {
-    apiKey: '4f4da4a5733032ef8ff23e3b7906954877fd0ee54d58d1e0',
-    integrationId: 'clpbm8p9y002ns601vbbswj5i',
-    organizationId: 'clog94xy50001s601yapu7swn',
-    organizationDisplayName: 'Drizzle ORM',
-    primaryBrandColor: '#FFFFFF',
-    theme: {
-      colorMode: {
-        forcedColorMode: themeName,
-      },
-    },
-  },
-  modalSettings: {
-    areOpenHotKeysDisabled: true,
-  },
-  aiChatSettings: {
-    botAvatarSrcUrl: '/svg/drizzle.svg',
-  }
-}
-
-//@ts-ignore
-const inkeepWidget = Inkeep().embed({
-  componentType: "ChatButton",
-  targetElement: document.getElementById("custom-button"),
-  properties,
-});
-
-window.inkeepWidget = inkeepWidget;
+  })
 </script>
 
 <style>

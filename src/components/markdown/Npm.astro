@@ -40,40 +40,42 @@ const wrapCodeBlocks = () =>
 </div>
 
 <script>
-  const packageManagers: string[] = ['npm', 'yarn', 'pnpm', 'bun'];
-  let packageManager: string = localStorage.getItem('package-manager') || 'npm';
-  let packageManagerIndex: number = packageManagers.indexOf(packageManager);
+  document.addEventListener("astro:page-load", () => {
+    const packageManagers: string[] = ['npm', 'yarn', 'pnpm', 'bun'];
+    let packageManager: string = localStorage.getItem('package-manager') || 'npm';
+    let packageManagerIndex: number = packageManagers.indexOf(packageManager);
 
-  const updateUI = (index: number): void => {
-    npmContent.forEach((element) => {
-      Array.from((element as HTMLElement).children).forEach((child, i) => {
-        child.classList.toggle('hidden', i !== index);
+    const updateUI = (index: number): void => {
+      npmContent.forEach((element) => {
+        Array.from((element as HTMLElement).children).forEach((child, i) => {
+          child.classList.toggle('hidden', i !== index);
+        });
+      });
+      npmTabs.forEach((element) => {
+        Array.from((element as HTMLElement).children).forEach((child, i) => {
+          child.classList.toggle('npm__tab--active', i === index);
+        });
+      });
+    };
+
+    const npmContent: NodeList = document.querySelectorAll('.npm__content');
+    const npmTabs: NodeList = document.querySelectorAll('.npm__tabs');
+
+    npmContent.forEach((content) => {
+      Array.from((content as HTMLElement).children).forEach((child, index) => {
+        child.classList.toggle('hidden', index !== packageManagerIndex);
       });
     });
-    npmTabs.forEach((element) => {
-      Array.from((element as HTMLElement).children).forEach((child, i) => {
-        child.classList.toggle('npm__tab--active', i === index);
+
+    npmTabs.forEach((tab) => {
+      Array.from((tab as HTMLElement).children).forEach((child, index) => {
+        child.classList.toggle('npm__tab--active', index === packageManagerIndex);
+        child.addEventListener('click', () => {
+          packageManager = packageManagers[index];
+          localStorage.setItem('package-manager', packageManager);
+          updateUI(index);
+        });
       });
     });
-  };
-
-  const npmContent: NodeList = document.querySelectorAll('.npm__content');
-  const npmTabs: NodeList = document.querySelectorAll('.npm__tabs');
-
-  npmContent.forEach((content) => {
-    Array.from((content as HTMLElement).children).forEach((child, index) => {
-      child.classList.toggle('hidden', index !== packageManagerIndex);
-    });
-  });
-
-  npmTabs.forEach((tab) => {
-    Array.from((tab as HTMLElement).children).forEach((child, index) => {
-      child.classList.toggle('npm__tab--active', index === packageManagerIndex);
-      child.addEventListener('click', () => {
-        packageManager = packageManagers[index];
-        localStorage.setItem('package-manager', packageManager);
-        updateUI(index);
-      });
-    });
-  });
+  })
 </script>

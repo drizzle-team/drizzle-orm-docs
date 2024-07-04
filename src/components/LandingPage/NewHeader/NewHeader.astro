@@ -191,7 +191,7 @@ import DBImage from "./Images/dbLight.svg"
     </div>
   </div>
 </div>
-<script is:inline>
+<script is:inline data-astro-rerun>
   if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
       document.querySelector('.team').classList.add('safari-team');
       document.querySelectorAll('.front').forEach((element) => {
@@ -209,7 +209,7 @@ import DBImage from "./Images/dbLight.svg"
     placeholder: "Search documentation...",
   });
 </script>
-<script type="module">
+<script type="module" is:inline data-astro-rerun>
   const inkeepButton = document.getElementById("inkeepButton");
 
   // Create a new div element to hold the Inkeep modal and set its id and position
@@ -244,7 +244,6 @@ import DBImage from "./Images/dbLight.svg"
         },
       },
     });
-    
   };
   const config = {
     stylesheetUrls: ["/inkeep-styles.css"],
