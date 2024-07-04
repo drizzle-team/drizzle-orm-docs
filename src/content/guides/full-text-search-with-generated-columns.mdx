@@ -1,0 +1,164 @@
+---
+title: Full-text search with Generated Columns
+slug: full-text-search-with-generated-columns
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- [Select statement](/docs/select)
+- [Indexes](/docs/indexes-constraints#indexes)
+- [sql operator](/docs/sql) 
+- [Full-text search](/learn/guides/postgresql-full-text-search)
+</Prerequisites>
+
+This guide demonstrates how to implement full-text search in PostgreSQL with Drizzle and generated columns. A generated column is a special column that is always computed from other columns. It is useful because you don't have to compute the value of the column every time you query the table:
+
+<CodeTabs items={["schema.ts", "migration.sql"]}>
+  <CodeTab>
+  ```ts copy {8, 17,18,19}
+  import { SQL, sql } from 'drizzle-orm';
+  import { index, pgTable, serial, text, customType } from 'drizzle-orm/pg-core';
+
+  export const tsvector = customType<{
+    data: string;
+  }>({
+    dataType() {
+      return `tsvector`;
+    },
+  });
+
+  export const posts = pgTable(
+    'posts',
+    {
+      id: serial('id').primaryKey(),
+      title: text('title').notNull(),
+      titleSearch: tsvector('title_search')
+        .notNull()
+        .generatedAlwaysAs((): SQL => sql`to_tsvector('english', ${posts.title})`),
+    },
+    (t) => ({
+      idx: index('idx_title_search').using('gin', t.titleSearch),
+    }),
+  );
+  ```
+  </CodeTab>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "posts" (
+	  "id" serial PRIMARY KEY NOT NULL,
+	  "title" text NOT NULL,
+	  "title_search" "tsvector" NOT NULL 
+    GENERATED ALWAYS AS (to_tsvector('english', "posts"."title")) STORED
+  );
+  --> statement-breakpoint
+  CREATE INDEX IF NOT EXISTS "idx_title_search" ON "posts" USING gin ("title_search");
+  ```
+</CodeTabs>
+
+When you insert a row into a table, the value of a generated column is computed from an expression that you provide when you create the column:
+
+<Section>
+```ts 
+import { posts } from './schema';
+
+const db = drizzle(...);
+
+await db.insert(posts).values({
+  title: 'Hello, World!',
+});
+```
+
+```json
+[
+  { id: 1, title: 'Hello, World!', titleSearch: "'hello':1 'world':2" }
+]
+```
+</Section>
+
+This is how you can implement full-text search with generated columns in PostgreSQL with Drizzle ORM.  The `@@` operator is used for direct matches:
+
+<Section>
+```ts copy {4}
+await db
+  .select()
+  .from(posts)
+  .where(sql`${posts.titleSearch} @@ to_tsquery('english', ${title})`);
+```
+
+```sql
+select * from posts where title_search @@ to_tsquery('english', 'trip');
+```
+</Section>
+
+This is more advanced schema with a generated column. The `search` column is generated from the `title` and `body` columns and `setweight()` function is used to assign different weights to the columns for full-text search:
+
+<CodeTabs items={["schema.ts", "migration.sql"]}>
+  <CodeTab>
+  ```ts copy {8, 18-25}
+  import { SQL, sql } from 'drizzle-orm';
+  import { index, pgTable, serial, text, customType } from 'drizzle-orm/pg-core';
+
+  export const tsvector = customType<{
+    data: string;
+  }>({
+    dataType() {
+      return `tsvector`;
+    },
+  });
+
+  export const posts = pgTable(
+   'posts',
+   {
+     id: serial('id').primaryKey(),
+     title: text('title').notNull(),
+     body: text('body').notNull(),
+     search: tsvector('search')
+       .notNull()
+       .generatedAlwaysAs(
+          (): SQL =>
+           sql`setweight(to_tsvector('english', ${posts.title}), 'A')
+            ||
+            setweight(to_tsvector('english', ${posts.body}), 'B')`,
+       ),
+    },
+    (t) => ({
+      idx: index('idx_search').using('gin', t.search),
+    }),
+  );
+  ```
+  </CodeTab>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "posts" (
+	  "id" serial PRIMARY KEY NOT NULL,
+	  "title" text NOT NULL,
+	  "body" text NOT NULL,
+	  "search" "tsvector" NOT NULL 
+      GENERATED ALWAYS AS (setweight(to_tsvector('english', "posts"."title"), 'A')
+      ||
+      setweight(to_tsvector('english', "posts"."body"), 'B')) STORED
+  );
+  --> statement-breakpoint
+  CREATE INDEX IF NOT EXISTS "idx_search" ON "posts" USING gin ("search");
+  ```
+</CodeTabs>
+
+This is how you can query the table with full-text search:
+
+<Section>
+```ts copy {6}
+const search = 'travel';
+
+await db
+  .select()
+  .from(posts)
+  .where(sql`${posts.search} @@ to_tsquery('english', ${search})`);
+```
+
+```sql
+select * from posts where search @@ to_tsquery('english', 'travel');
+```
+</Section>
