@@ -58,257 +58,259 @@
   import { ImageType } from "@/types/Sponsors";
   import type { CSSProperties } from "react";
 
-  const sponsorLinks = {
-    unkeyed: "unkey.dev",
-    wakatime: "wakatime.com",
-    nodecraft: "nodecraft.com",
-    devhuset: "devhuset.no",
-    un: "driz.link/silver-sponsor-uninbox",
-    encoredev: "driz.link/silver-sponsor-encore"
-  };
+  document.addEventListener('astro:page-load', async () => {
+    const sponsorLinks = {
+      unkeyed: "unkey.dev",
+      wakatime: "wakatime.com",
+      nodecraft: "nodecraft.com",
+      devhuset: "devhuset.no",
+      un: "driz.link/silver-sponsor-uninbox",
+      encoredev: "driz.link/silver-sponsor-encore"
+    };
 
-  const customName = {
-    un: "Uninbox"
-  }
+    const customName = {
+      un: "Uninbox"
+    }
 
-  const getStyleString = (style: CSSProperties) => {
-    return Object.keys(style).reduce((acc, key) => {
-      return acc + `${key}: ${style[key as keyof CSSProperties]};`;
-    }, "");
-  };
-  const sponsors = await sponsorsHandler();
-  const sponsorsScroll = document.querySelector("#sponsors-scroll");
-  const getImgLink = (link: string, size: number) => {
-    return link.split("?")[0] + "?size=" + size * 2;
-  };
-  //templates
-  const sponsorCardsTemplate = document.querySelector(
-    "#sponsor-cards",
-  ) as HTMLTemplateElement;
-  const sponsorCardWithNameTemplate = document.querySelector(
-    "#sponsor-card-with-name",
-  ) as HTMLTemplateElement;
-  const sponsorCardWithoutNameTemplate = document.querySelector(
-    "#sponsor-card-without-name",
-  ) as HTMLTemplateElement;
-  if (
-    sponsorCardsTemplate &&
-    sponsorCardWithNameTemplate &&
-    sponsorCardWithoutNameTemplate &&
-    sponsorsScroll
-  ) {
-    sponsors.forEach((type) => {
-      if (type.items.length) {
-        const cards = sponsorCardsTemplate.content.cloneNode(
-          true,
-        ) as HTMLElement;
-        const headerName = cards.querySelector("#header-text")!;
-        headerName.textContent = `${sponsorTypes[type.name].header} sponsors`;
-        const emoji = cards.querySelector("#emoji")!;
-        emoji.textContent = sponsorTypes[type.name].emoji;
-        const cardsBlock = cards.querySelector("#cards-block")!;
-        cardsBlock.className = `${type.name} cards`;
-        type.items.forEach((item) => {
-          if (sponsorTypes[type.name].hasName) {
-            //WITH NAME
-            const card = sponsorCardWithNameTemplate.content.cloneNode(
-              true,
-            ) as HTMLDivElement;
+    const getStyleString = (style: CSSProperties) => {
+      return Object.keys(style).reduce((acc, key) => {
+        return acc + `${key}: ${style[key as keyof CSSProperties]};`;
+      }, "");
+    };
+    const sponsors = await sponsorsHandler();
+    const sponsorsScroll = document.querySelector("#sponsors-scroll");
+    const getImgLink = (link: string, size: number) => {
+      return link.split("?")[0] + "?size=" + size * 2;
+    };
+    //templates
+    const sponsorCardsTemplate = document.querySelector(
+      "#sponsor-cards",
+    ) as HTMLTemplateElement;
+    const sponsorCardWithNameTemplate = document.querySelector(
+      "#sponsor-card-with-name",
+    ) as HTMLTemplateElement;
+    const sponsorCardWithoutNameTemplate = document.querySelector(
+      "#sponsor-card-without-name",
+    ) as HTMLTemplateElement;
+    if (
+      sponsorCardsTemplate &&
+      sponsorCardWithNameTemplate &&
+      sponsorCardWithoutNameTemplate &&
+      sponsorsScroll
+    ) {
+      sponsors.forEach((type) => {
+        if (type.items.length) {
+          const cards = sponsorCardsTemplate.content.cloneNode(
+            true,
+          ) as HTMLElement;
+          const headerName = cards.querySelector("#header-text")!;
+          headerName.textContent = `${sponsorTypes[type.name].header} sponsors`;
+          const emoji = cards.querySelector("#emoji")!;
+          emoji.textContent = sponsorTypes[type.name].emoji;
+          const cardsBlock = cards.querySelector("#cards-block")!;
+          cardsBlock.className = `${type.name} cards`;
+          type.items.forEach((item) => {
+            if (sponsorTypes[type.name].hasName) {
+              //WITH NAME
+              const card = sponsorCardWithNameTemplate.content.cloneNode(
+                true,
+              ) as HTMLDivElement;
 
-            //dark image
-            const imgDark = card.querySelector(
-              "#avatar-dark",
-            )! as HTMLImageElement;
-            if (item.imageType === ImageType.IMAGE) {
-              imgDark.src = item.sponsorEntity.avatarUrl;
-            }
-            if (item.imageType === ImageType.SVG) {
-              imgDark.src =
-                "data:image/svg+xml;base64," +
-                btoa(item.sponsorEntity.avatarUrl);
-            }
-            if (!item.imageType) {
-              imgDark.src = getImgLink(
-                item.sponsorEntity.avatarUrl,
-                sponsorTypes[type.name].size,
-              );
-            }
-            imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
-            const roundPercentages =
-              item.sponsorEntity.__typename === "User" ? 50 : 20;
-            imgDark.setAttribute(
-              "style",
-              `border-radius: ${roundPercentages}%; ${getStyleString(
-                item.darkStyle || {},
-              )}`,
-            );
-
-            //light image
-
-            const imgLight = card.querySelector(
-              "#avatar-light",
-            )! as HTMLImageElement;
-            if (item.imageType === ImageType.IMAGE) {
-              imgLight.src = item.sponsorEntity.avatarUrl;
-            }
-            if (item.imageType === ImageType.SVG) {
-              imgLight.src =
-                "data:image/svg+xml;base64," +
-                btoa(item.sponsorEntity.avatarUrl);
-            }
-            if (!item.imageType) {
-              imgLight.src = getImgLink(
-                item.sponsorEntity.avatarUrl,
-                sponsorTypes[type.name].size,
-              );
-            }
-            imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
-            imgLight.setAttribute(
-              "style",
-              `border-radius: ${roundPercentages}%; ${getStyleString(
-                item.lightStyle || {},
-              )}`,
-            );
-
-            const imgWrapper = card.querySelector(
-              "#img-wrapper",
-            )! as HTMLDivElement;
-            imgWrapper.setAttribute(
-              "style",
-              `width: ${sponsorTypes[type.name].size}px; height: ${
-                sponsorTypes[type.name].size
-              }px`,
-            );
-            const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
-            if (item.imageType) {
-              gitLink.href = `https://${item.sponsorEntity.login}`;
-            } else {
-              if (sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]) {
-                gitLink.href = `https://${
-                  sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]
-                }`;
-              } else {
-                gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
+              //dark image
+              const imgDark = card.querySelector(
+                "#avatar-dark",
+              )! as HTMLImageElement;
+              if (item.imageType === ImageType.IMAGE) {
+                imgDark.src = item.sponsorEntity.avatarUrl;
               }
-            }
-            gitLink.rel = "nofollow";
-            const cardName = card.querySelector(
-              "#card-name",
-            )! as HTMLDivElement;
-            if (item.sponsorEntity.name) {
-              cardName.textContent = customName[item.sponsorEntity.login as keyof typeof customName] 
-              || item.sponsorEntity.name;
-            } else {
-              cardName.textContent =
-                item.sponsorEntity.__typename === "User"
-                  ? "@"
-                  : "" + item.sponsorEntity.login;
-            }
-            const cardWrapper = card.querySelector(
-              "#card-wrapper",
-            )! as HTMLDivElement;
-            cardWrapper.classList.add("with_name");
-            if (sponsorTypes[type.name].hasCard) {
-              cardWrapper.classList.add("styled_card");
-            }
-            cardsBlock.append(card);
-          } else {
-            //WITHOUT NAME
-            const card = sponsorCardWithoutNameTemplate.content.cloneNode(
-              true,
-            ) as HTMLDivElement;
-
-            //dark image
-            const imgDark = card.querySelector(
-              "#avatar-dark",
-            )! as HTMLImageElement;
-            const roundPercentages =
-              item.sponsorEntity.__typename === "User" ? 50 : 20;
-            imgDark.setAttribute(
-              "style",
-              `border-radius: ${roundPercentages}%`,
-            );
-            imgDark.setAttribute(
-              "style",
-              `border-radius: ${roundPercentages}%; ${getStyleString(
-                item.darkStyle || {},
-              )}`,
-            );
-            if (item.imageType === ImageType.IMAGE) {
-              imgDark.src = item.sponsorEntity.avatarUrl;
-            }
-            if (item.imageType === ImageType.SVG) {
-              imgDark.src =
-                "data:image/svg+xml;base64," +
-                btoa(item.sponsorEntity.avatarUrl);
-            }
-            if (!item.imageType) {
-              imgDark.src = getImgLink(
-                item.sponsorEntity.avatarUrl,
-                sponsorTypes[type.name].size,
-              );
-            }
-            imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
-
-            //light image
-            const imgLight = card.querySelector(
-              "#avatar-light",
-            )! as HTMLImageElement;
-            imgLight.setAttribute(
-              "style",
-              `border-radius: ${roundPercentages}%`,
-            );
-            imgLight.setAttribute(
-              "style",
-              `border-radius: ${roundPercentages}%; ${getStyleString(
-                item.lightStyle || {},
-              )}`,
-            );
-            if (item.imageType === ImageType.IMAGE) {
-              imgLight.src = item.sponsorEntity.avatarUrl;
-            }
-            if (item.imageType === ImageType.SVG) {
-              imgLight.src =
-                "data:image/svg+xml;base64," +
-                btoa(item.sponsorEntity.avatarUrl);
-            }
-            if (!item.imageType) {
-              imgLight.src = getImgLink(
-                item.sponsorEntity.avatarUrl,
-                sponsorTypes[type.name].size,
-              );
-            }
-            imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
-
-            const imgWrapper = card.querySelector(
-              "#img-wrapper",
-            )! as HTMLDivElement;
-            imgWrapper.setAttribute(
-              "style",
-              `width: ${sponsorTypes[type.name].size}px; height: ${
-                sponsorTypes[type.name].size
-              }px`,
-            );
-            const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
-            if (item.imageType) {
-              gitLink.href = `https://${item.sponsorEntity.login}`;
-            } else {
-              if (sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]) {
-                gitLink.href = `https://${
-                  sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]
-                }`;
-              } else {
-                gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
+              if (item.imageType === ImageType.SVG) {
+                imgDark.src =
+                  "data:image/svg+xml;base64," +
+                  btoa(item.sponsorEntity.avatarUrl);
               }
+              if (!item.imageType) {
+                imgDark.src = getImgLink(
+                  item.sponsorEntity.avatarUrl,
+                  sponsorTypes[type.name].size,
+                );
+              }
+              imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+              const roundPercentages =
+                item.sponsorEntity.__typename === "User" ? 50 : 20;
+              imgDark.setAttribute(
+                "style",
+                `border-radius: ${roundPercentages}%; ${getStyleString(
+                  item.darkStyle || {},
+                )}`,
+              );
+
+              //light image
+
+              const imgLight = card.querySelector(
+                "#avatar-light",
+              )! as HTMLImageElement;
+              if (item.imageType === ImageType.IMAGE) {
+                imgLight.src = item.sponsorEntity.avatarUrl;
+              }
+              if (item.imageType === ImageType.SVG) {
+                imgLight.src =
+                  "data:image/svg+xml;base64," +
+                  btoa(item.sponsorEntity.avatarUrl);
+              }
+              if (!item.imageType) {
+                imgLight.src = getImgLink(
+                  item.sponsorEntity.avatarUrl,
+                  sponsorTypes[type.name].size,
+                );
+              }
+              imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+              imgLight.setAttribute(
+                "style",
+                `border-radius: ${roundPercentages}%; ${getStyleString(
+                  item.lightStyle || {},
+                )}`,
+              );
+
+              const imgWrapper = card.querySelector(
+                "#img-wrapper",
+              )! as HTMLDivElement;
+              imgWrapper.setAttribute(
+                "style",
+                `width: ${sponsorTypes[type.name].size}px; height: ${
+                  sponsorTypes[type.name].size
+                }px`,
+              );
+              const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
+              if (item.imageType) {
+                gitLink.href = `https://${item.sponsorEntity.login}`;
+              } else {
+                if (sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]) {
+                  gitLink.href = `https://${
+                    sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]
+                  }`;
+                } else {
+                  gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
+                }
+              }
+              gitLink.rel = "nofollow";
+              const cardName = card.querySelector(
+                "#card-name",
+              )! as HTMLDivElement;
+              if (item.sponsorEntity.name) {
+                cardName.textContent = customName[item.sponsorEntity.login as keyof typeof customName]
+                  || item.sponsorEntity.name;
+              } else {
+                cardName.textContent =
+                  item.sponsorEntity.__typename === "User"
+                    ? "@"
+                    : "" + item.sponsorEntity.login;
+              }
+              const cardWrapper = card.querySelector(
+                "#card-wrapper",
+              )! as HTMLDivElement;
+              cardWrapper.classList.add("with_name");
+              if (sponsorTypes[type.name].hasCard) {
+                cardWrapper.classList.add("styled_card");
+              }
+              cardsBlock.append(card);
+            } else {
+              //WITHOUT NAME
+              const card = sponsorCardWithoutNameTemplate.content.cloneNode(
+                true,
+              ) as HTMLDivElement;
+
+              //dark image
+              const imgDark = card.querySelector(
+                "#avatar-dark",
+              )! as HTMLImageElement;
+              const roundPercentages =
+                item.sponsorEntity.__typename === "User" ? 50 : 20;
+              imgDark.setAttribute(
+                "style",
+                `border-radius: ${roundPercentages}%`,
+              );
+              imgDark.setAttribute(
+                "style",
+                `border-radius: ${roundPercentages}%; ${getStyleString(
+                  item.darkStyle || {},
+                )}`,
+              );
+              if (item.imageType === ImageType.IMAGE) {
+                imgDark.src = item.sponsorEntity.avatarUrl;
+              }
+              if (item.imageType === ImageType.SVG) {
+                imgDark.src =
+                  "data:image/svg+xml;base64," +
+                  btoa(item.sponsorEntity.avatarUrl);
+              }
+              if (!item.imageType) {
+                imgDark.src = getImgLink(
+                  item.sponsorEntity.avatarUrl,
+                  sponsorTypes[type.name].size,
+                );
+              }
+              imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+
+              //light image
+              const imgLight = card.querySelector(
+                "#avatar-light",
+              )! as HTMLImageElement;
+              imgLight.setAttribute(
+                "style",
+                `border-radius: ${roundPercentages}%`,
+              );
+              imgLight.setAttribute(
+                "style",
+                `border-radius: ${roundPercentages}%; ${getStyleString(
+                  item.lightStyle || {},
+                )}`,
+              );
+              if (item.imageType === ImageType.IMAGE) {
+                imgLight.src = item.sponsorEntity.avatarUrl;
+              }
+              if (item.imageType === ImageType.SVG) {
+                imgLight.src =
+                  "data:image/svg+xml;base64," +
+                  btoa(item.sponsorEntity.avatarUrl);
+              }
+              if (!item.imageType) {
+                imgLight.src = getImgLink(
+                  item.sponsorEntity.avatarUrl,
+                  sponsorTypes[type.name].size,
+                );
+              }
+              imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+
+              const imgWrapper = card.querySelector(
+                "#img-wrapper",
+              )! as HTMLDivElement;
+              imgWrapper.setAttribute(
+                "style",
+                `width: ${sponsorTypes[type.name].size}px; height: ${
+                  sponsorTypes[type.name].size
+                }px`,
+              );
+              const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
+              if (item.imageType) {
+                gitLink.href = `https://${item.sponsorEntity.login}`;
+              } else {
+                if (sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]) {
+                  gitLink.href = `https://${
+                    sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]
+                  }`;
+                } else {
+                  gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
+                }
+              }
+              gitLink.rel = "nofollow";
+              cardsBlock.append(card);
             }
-            gitLink.rel = "nofollow";
-            cardsBlock.append(card);
-          }
-        });
-        sponsorsScroll.append(cards);
-      }
-    });
-  }
+          });
+          sponsorsScroll.append(cards);
+        }
+      });
+    }
+  })
 </script>
 <style></style>
 <style is:global>

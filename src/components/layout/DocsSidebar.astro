@@ -22,36 +22,41 @@ const { tree, headings, forLanding } = Astro.props;
     <AsideSocials />
   </div>
 </div>
-<script is:inline>
-  const leftSidebar = document.querySelector(".aside-scroll");
-  const navItems = document.querySelectorAll("[data-nav-index]");
-  const headingsContainer = document.querySelector("[data-headings]");
-  const headingsContainerHeight = headingsContainer?.clientHeight;
-  let itemIndex = 0;
+<script>
+  const mainScript = () => {
+    const leftSidebar = document.querySelector(".aside-scroll");
+    const navItems = document.querySelectorAll("[data-nav-index]");
+    const headingsContainer = document.querySelector("[data-headings]");
+    const headingsContainerHeight = headingsContainer?.clientHeight;
+    let itemIndex = 0;
 
-  const activeNavItem = Array.from(navItems).find((item) => {
-    return item.classList.contains("nav-item--active");
-  });
-
-  if (activeNavItem) {
-    itemIndex = +(activeNavItem.getAttribute("data-nav-index") || 0);
-  }
-  if (headingsContainerHeight && navItems && leftSidebar) {
-    navItems.forEach((item) => {
-      item.addEventListener("click", () => {
-        const nextIndex = +item.getAttribute("data-nav-index");
-        const scrollTop =
-          leftSidebar.scrollTop -
-          (nextIndex > itemIndex ? headingsContainerHeight : 0);
-        localStorage.setItem("sidebar-scroll", scrollTop.toString());
-      });
+    const activeNavItem = Array.from(navItems).find((item) => {
+      return item.classList.contains("nav-item--active");
     });
 
-    const leftSidebarScroll = localStorage.getItem("sidebar-scroll");
-    if (leftSidebarScroll !== null) {
-      leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
+    if (activeNavItem) {
+      itemIndex = +(activeNavItem.getAttribute("data-nav-index") || 0);
+    }
+    if (headingsContainerHeight && navItems && leftSidebar) {
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const nextIndex = +item.getAttribute("data-nav-index");
+          const scrollTop =
+            leftSidebar.scrollTop -
+            (nextIndex > itemIndex ? headingsContainerHeight : 0);
+          localStorage.setItem("sidebar-scroll", scrollTop.toString());
+        });
+      });
+
+      const leftSidebarScroll = localStorage.getItem("sidebar-scroll");
+      if (leftSidebarScroll !== null) {
+        leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
+      }
     }
   }
+
+  mainScript();
+  document.addEventListener("astro:after-swap", mainScript)
 </script>
 <style is:global>
   html[class~="dark"] .aside {

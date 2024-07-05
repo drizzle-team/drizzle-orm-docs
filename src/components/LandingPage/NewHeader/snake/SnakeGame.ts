@@ -66,10 +66,20 @@ export class SnakeGame {
     );
     this.superFoodImage = new Image();
     this.superFoodImage.src = "/images/db.svg";
-    this.resizeCanvas();
-    this.redraw();
     window.addEventListener("resize", this.resizeCanvas.bind(this));
     document.addEventListener("keydown", this.changeDirection.bind(this));
+    document.addEventListener("astro:page-load", () => {
+      if (document.getElementById("gameCanvas")) {
+        this.canvas = document.getElementById(
+          "gameCanvas",
+        ) as HTMLCanvasElement;
+        this.ctx = this.canvas.getContext("2d")!;
+        this.resizeCanvas();
+        this.redraw();
+        this.gameOver = true;
+        this.resetGame();
+      }
+    });
   }
 
   startGame() {
@@ -188,7 +198,7 @@ export class SnakeGame {
   countdownSuperFood() {
     if (!this.superFoodCount) {
       this.superFood = null;
-      document.querySelector(".countdown")!.classList.add("hidden");
+      document.querySelector(".countdown")?.classList?.add("hidden");
       return;
     }
 

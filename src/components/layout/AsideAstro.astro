@@ -114,35 +114,37 @@ const isActive = (path: string) => {
   import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
   import updateDialectLinks from "@/utils/updateDialectLinks";
 
-  const container = document.querySelector(".documentation-content-wrap")!;
-  const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
-  const links = document.querySelectorAll<HTMLElement>("[data-slug]");
+  document.addEventListener("astro:page-load", () => {
+    const container = document.querySelector(".documentation-content-wrap")!;
+    const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
+    const links = document.querySelectorAll<HTMLElement>("[data-slug]");
 
-  const updateLinks = () => {
-    const activeAnchors = handleAnchorHighlighting({
-      viewportHeight: window.innerHeight,
-      anchors: [...anchors].map((anchor) => ({
-        id: anchor.id,
-        offsetTop: anchor.offsetTop,
-      })),
-      scrollTop: container.scrollTop,
-    });
+    const updateLinks = () => {
+      const activeAnchors = handleAnchorHighlighting({
+        viewportHeight: window.innerHeight,
+        anchors: [...anchors].map((anchor) => ({
+          id: anchor.id,
+          offsetTop: anchor.offsetTop,
+        })),
+        scrollTop: container.scrollTop,
+      });
 
-    links.forEach((link) => {
-      const slug = link.dataset.slug;
-      if (!slug) return;
-      link.classList.toggle(
-        "nav-toc-item--active",
-        activeAnchors.includes(slug),
-      );
-      link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
-    });
-  };
+      links.forEach((link) => {
+        const slug = link.dataset.slug;
+        if (!slug) return;
+        link.classList.toggle(
+          "nav-toc-item--active",
+          activeAnchors.includes(slug),
+        );
+        link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
+      });
+    };
 
-  if (container && links) {
-    container.addEventListener("scroll", throttle(updateLinks, 80));
-    updateLinks();
-  }
+    if (container && links) {
+      container.addEventListener("scroll", throttle(updateLinks, 80));
+      updateLinks();
+    }
 
-  updateDialectLinks();
+    updateDialectLinks();
+  });
 </script>

@@ -24,7 +24,7 @@ const newestPost = posts.reduce(
 
 <script define:vars={{newestPost, pathname}}>
   const lastSeenPost = localStorage.getItem('drizzle-last-seen-announcement');
-  if ((!lastSeenPost || (newestPost && new Date(newestPost.frontmatter.date) > new Date(+lastSeenPost))) && pathname !== '/announcements') {
+  if ((!lastSeenPost || (newestPost && new Date(newestPost.frontmatter.date) > new Date(+lastSeenPost))) && !pathname.includes('/announcements')) {
     document.querySelector('.indicator').classList.remove('invisible-indicator')
   }
 </script>
