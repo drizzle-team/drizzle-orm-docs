@@ -54,26 +54,27 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
 
     const setPreference = (themeName) => {
       const transitions = transitionManager();
-      transitions.disable();
-      localStorage.setItem("theme", themeName);
-      if (!document.firstElementChild) return;
-      if (themeName === "system") {
-        themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
-      }
-      document.firstElementChild.classList.toggle("dark", themeName === "dark");
-      document.firstElementChild.classList.toggle(
-        "light",
-        themeName !== "dark",
-      );
-      document.firstElementChild.setAttribute(
-        "style",
-        themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
-      );
+      // transitions.disable();
 
-      window.getComputedStyle(transitions.style).opacity;
-      transitions.enable();
+        localStorage.setItem("theme", themeName);
+        if (!document.firstElementChild) return;
+        if (themeName === "system") {
+          themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.firstElementChild.classList.toggle("dark", themeName === "dark");
+        document.firstElementChild.classList.toggle(
+          "light",
+          themeName !== "dark",
+        );
+        document.firstElementChild.setAttribute(
+          "style",
+          themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
+        );
+
+      // window.getComputedStyle(transitions.style).opacity;
+      // transitions.enable();
     };
 
     const getColorPreference = () => {

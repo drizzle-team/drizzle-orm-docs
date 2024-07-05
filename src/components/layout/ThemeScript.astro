@@ -71,11 +71,13 @@
     if (themeItems) {
       themeItems.forEach((element) => {
         element.addEventListener("click", () => {
-          const theme = element.dataset.themeValue;
-          if (!theme) return;
-          setPreference(theme);
-          updateIcon();
-          dropdownItems.classList.remove("d-flex");
+          document.startViewTransition(() => {
+            const theme = element.dataset.themeValue;
+            if (!theme) return;
+            setPreference(theme);
+            updateIcon();
+            dropdownItems.classList.remove("d-flex");
+          })
         });
       });
     }

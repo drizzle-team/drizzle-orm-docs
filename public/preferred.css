@@ -9,3 +9,32 @@
     background-color: #111111;
   }
 }
+
+::view-transition-group(root) {
+  animation-timing-function: var(--expo-in);
+}
+
+::view-transition-new(root) {
+  mask: url('/Ricardo.webp') center / 0 no-repeat;
+  animation: scale 3.8s;
+}
+
+::view-transition-old(root),
+.dark::view-transition-old(root) {
+  animation: scale 3.8s;
+}
+
+@keyframes scale {
+  0% {
+    mask-size: 0;
+  }
+  10% {
+    mask-size: 50vmax;
+  }
+  90% {
+    mask-size: 50vmax;
+  }
+  100% {
+    mask-size: 2000vmax;
+  }
+}
