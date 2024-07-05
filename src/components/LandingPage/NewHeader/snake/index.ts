@@ -74,15 +74,15 @@ document.addEventListener("astro:page-load", () => {
   document.querySelector("main")!.addEventListener(
     "scroll",
     () => {
-      const rightImage = document.getElementById("right-image")!;
-      const board = document.querySelector(".board")!;
-      const score = document.querySelector("#score")!;
-      const countdown = document.querySelector(".countdown")!;
+      const rightImage = document.getElementById("right-image");
+      const board = document.querySelector(".board");
+      const score = document.querySelector("#score");
+      const countdown = document.querySelector(".countdown");
 
-      board.classList.remove("board-moved");
-      rightImage.classList.remove("right-image-moved");
-      score.classList.add("hidden");
-      countdown.classList.add("hidden");
+      board?.classList.remove("board-moved");
+      rightImage?.classList.remove("right-image-moved");
+      score?.classList.add("hidden");
+      countdown?.classList.add("hidden");
     },
     false,
   );
