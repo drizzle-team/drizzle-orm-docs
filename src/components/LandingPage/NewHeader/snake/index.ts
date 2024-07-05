@@ -64,6 +64,12 @@ window.addEventListener(
   false,
 );
 
+document.addEventListener("astro:before-swap", () => {
+  snakeGame.gameOver = true;
+  snakeGame.resetGame();
+  window.removeEventListener("keydown", preventControlButtons, false);
+});
+
 document.addEventListener("astro:page-load", () => {
   document.querySelector("main")!.addEventListener(
     "scroll",

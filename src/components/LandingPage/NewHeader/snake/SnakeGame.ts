@@ -159,9 +159,9 @@ export class SnakeGame {
     if (this.isPaused || this.gameOver) return;
 
     window.addEventListener("keydown", preventControlButtons, false);
-    document.getElementById("right-image")!.classList.add("right-image-moved");
-    document.querySelector(".board")!.classList.add("board-moved");
-    document.querySelector("#score")!.classList.remove("hidden");
+    document.getElementById("right-image")?.classList.add("right-image-moved");
+    document.querySelector(".board")?.classList.add("board-moved");
+    document.querySelector("#score")?.classList.remove("hidden");
 
     const key = event.keyCode;
     const lastDirection = this.directionQueue[this.directionQueue.length - 1];
@@ -418,8 +418,8 @@ export class SnakeGame {
   }
 
   resetGame() {
-    document.querySelector(".game-start-screen")!.classList.remove("hidden");
-    document.querySelector(".countdown")!.classList.add("hidden");
+    document.querySelector(".game-start-screen")?.classList.remove("hidden");
+    document.querySelector(".countdown")?.classList.add("hidden");
     this.snake = this.createInitialSnake(5);
     this.directionQueue = ["RIGHT"];
     this.eatenFood = [];
