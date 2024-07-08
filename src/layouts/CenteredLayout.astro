@@ -3,7 +3,6 @@ import EndOfContent from "@components/layout/EndOfContent.astro";
 import GlobalStyles from "@components/layout/GlobalStyles.astro";
 import MDXStyles from "@components/layout/MDXStyles.astro";
 import Banner from "@components/layout/Banner.astro";
-import InitComponentsScripts from "@components/layout/InitComponentsScripts.astro";
 import BaseHead from "@components/baseHead/BaseHead.astro";
 import Footer from "../components/layout/Footer.astro";
 import type { IHeading } from "@/types/astro";
@@ -48,7 +47,6 @@ const { title, tree  } = await getContentTree({
         <Footer isCenteredLayout />
       </div>
     </main>
-    <InitComponentsScripts />
     <style>
       .right-aside-container {
         position: relative;

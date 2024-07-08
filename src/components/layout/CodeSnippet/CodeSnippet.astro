@@ -43,6 +43,9 @@ const titleHtml = decodeURIComponent(title).replace(/([\\/])/g, "$1<wbr/>");
 // as processed by Astro's Shiki integration
 let codeSnippetHtml = await Astro.slots.render("default");
 
+//Remove last empty line
+codeSnippetHtml = codeSnippetHtml.replace(/\n<span class="line">(?:\s*<span>\s*<\/span>)*\s*<\/span>\s*<\/code><\/pre>$/, '</code></pre>');
+
 // Mark lines and expressions (if requested)
 codeSnippetHtml = applyMarkings(codeSnippetHtml, lineMarkings, inlineMarkings);
 
@@ -168,9 +171,11 @@ function parseMarkingDefinition(
   <Fragment set:html={codeSnippetHtml} />
   {
     collapsable && (
+    <div class="expand-button-wrap">
       <div data-expand-button class="expand-button">
         Expand
       </div>
+    </div>
     )
   }
 </figure>

@@ -132,28 +132,30 @@ const { forTitle } = Astro.props;
   }
 </style>
 <script>
-  const collapseButton = document.querySelectorAll(
-    "[data-collapse-btn]",
-  ) as NodeListOf<HTMLElement>;
-  collapseButton.forEach((n) => {
-    const isForTitle = n.dataset.forTitle === "true";
-    n.addEventListener("click", () => {
-      const parent = n.closest(".code-snippet");
-      if (parent) {
-        parent.classList.toggle("collapsable");
-      }
+  document.addEventListener('astro:page-load', () => {
+    const collapseButton = document.querySelectorAll(
+      "[data-collapse-btn]",
+    ) as NodeListOf<HTMLElement>;
+    collapseButton.forEach((n) => {
+      const isForTitle = n.dataset.forTitle === "true";
+      n.addEventListener("click", () => {
+        const parent = n.closest(".code-snippet");
+        if (parent) {
+          parent.classList.toggle("collapsable");
+        }
+      });
     });
-  });
-  const expandButton = document.querySelectorAll(
-    "[data-expand-button]",
-  ) as NodeListOf<HTMLElement>;
-  expandButton.forEach((n) => {
-    const isForTitle = n.dataset.forTitle === "true";
-    n.addEventListener("click", () => {
-      const parent = n.closest(".code-snippet");
-      if (parent) {
-        parent.classList.toggle("collapsable");
-      }
+    const expandButton = document.querySelectorAll(
+      "[data-expand-button]",
+    ) as NodeListOf<HTMLElement>;
+    expandButton.forEach((n) => {
+      const isForTitle = n.dataset.forTitle === "true";
+      n.addEventListener("click", () => {
+        const parent = n.closest(".code-snippet");
+        if (parent) {
+          parent.classList.toggle("collapsable");
+        }
+      });
     });
-  });
+  })
 </script>

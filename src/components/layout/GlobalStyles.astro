@@ -832,6 +832,11 @@
 <style lang="scss" is:global>
   .code-snippet {
     margin-top: 1.5rem;
+      height: auto;
+      max-height: 500vh;
+    border-radius: 0 0 0.75rem 0.75rem;
+      transition: max-height 0.3s ease-in-out;
+    overflow-y: hidden;
     .header {
     }
     pre {
@@ -899,8 +904,10 @@
     }
 
     &.collapsable {
-      height: 300px;
+      max-height: 300px;
       overflow: hidden;
+      padding-bottom: 1rem;
+      border-radius: 0 0 0.75rem 0.75rem;
 
       .expand-icon {
         display: block;
@@ -914,13 +921,28 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(to top, #f4f7fc, transparent);
         position: absolute;
-        bottom: 1px;
-        left: 1px;
-        right: 1px;
-        height: 30px;
-        text-transform: uppercase;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 13px;
+        background-color: #ebf0f9;
+        border: 1px solid rgba(0, 0, 0, .05);
+        border-radius: .375rem;
+        color: #111827;
+        cursor: pointer;
+        padding: 4px 12px;
+        transition-duration: .15s;
+        transition-property: all;
+      }
+
+      .expand-button-wrap {
+          background: linear-gradient(to top, #f4f7fc, transparent);
+          position: absolute;
+          bottom: 0px;
+          left: 0px;
+          right: 0px;
+          height: 50px;
       }
     }
 
