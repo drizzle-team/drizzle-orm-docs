@@ -292,6 +292,29 @@ export default defineConfig({
 });
 ```
 
+### migrations.prefix
+
+- **Type**: `index` | `supabase` | `timestamp` | `unix` | `none`
+- **Commands**: `generate`
+
+1. `index` is the default type and will result in `0001_name.sql` file names;
+2. `supabase` and `timestamp` are equal and will result in `20240627123900_name.sql` file names;
+3. `unix` will result in unix seconds prefixes `1719481298_name.sql` file names;
+4. `none` will omit the prefix completely;
+
+You can specify a custom shape for migration file names, using different prefixes
+
+```ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  migrations: {
+    prefix: 'supabase'
+  }
+});
+```
+
 ### breakpoints
 
 - **Type**: `boolean`
