@@ -76,6 +76,12 @@ You can also configure the prefixes for migrations, so they can be in a format t
 
 You can check all the prefix options [here](/kit-docs/config-reference#migrationsprefix)
 
+<Callout type="warning">
+You can use prefixes only if you don't have any migration history already. The kit won't work properly if you mix prefix formats within the same migration folder. Please ensure you use only one prefix format throughout the project.
+
+We are working on making it possible to migrate from one prefix format to another and to ensure interoperability
+</Callout>
+
 <CodeTabs items={["drizzle.config.ts"]}>
 ```ts
 import { defineConfig } from 'drizzle-kit'
