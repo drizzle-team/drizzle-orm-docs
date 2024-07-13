@@ -299,7 +299,7 @@ SELECT * FROM table WHERE EXISTS (SELECT * from table2)
 
 <Section>
 ```typescript
-import { exists } from "drizzle-orm";
+import { notExists } from "drizzle-orm";
 
 const query = db.select().from(table2)
 db.select().from(table).where(notExists(query));
