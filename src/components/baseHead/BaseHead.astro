@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from "astro:transitions";
 interface Props {
   title: string;
   description?: string;
@@ -12,6 +13,7 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
   <meta charset="UTF-8" />
   <meta name="robots" content="index,follow" />
   <link rel="sitemap" href="/sitemap-index.xml" />
+  <ViewTransitions />
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -34,7 +36,25 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
     content={defaultDescription || description}
   />
   <script is:inline>
+
+    const transitionManager = () => {
+      const style = document.createElement("style");
+      const css = document.createTextNode(`* {
+     -webkit-transition: none !important;
+     -moz-transition: none !important;
+     -o-transition: none !important;
+     -ms-transition: none !important;
+     transition: none !important;
+  }`);
+      style.appendChild(css);
+      const enable = () => document.head.removeChild(style);
+      const disable = () => document.head.appendChild(style);
+      return {enable, disable, style};
+    };
+
     const setPreference = (themeName) => {
+      const transitions = transitionManager();
+      transitions.disable();
       localStorage.setItem("theme", themeName);
       if (!document.firstElementChild) return;
       if (themeName === "system") {
@@ -51,6 +71,9 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
         "style",
         themeName === "dark" ? "color-scheme: dark" : "color-scheme: light",
       );
+
+      window.getComputedStyle(transitions.style).opacity;
+      transitions.enable();
     };
 
     const getColorPreference = () => {
@@ -68,6 +91,8 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
     };
 
     setPreference(getColorPreference());
+    document.addEventListener('astro:page-load', () => setPreference(getColorPreference()))
+    document.addEventListener('astro:after-swap', () => setPreference(getColorPreference()))
   </script>
   <script
     type="module"

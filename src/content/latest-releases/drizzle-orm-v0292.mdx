@@ -95,6 +95,7 @@ import type { Config } from 'drizzle-kit';
 export default {
 	schema: './db/schema.ts',
 	out: './drizzle',
+    dialect: 'sqlite',
 	driver: 'expo',
 } satisfies Config;
 ```
@@ -102,7 +103,7 @@ export default {
 After creating schema file and drizzle.config.ts file, you can generate migrations like this:
 
 ```bash copy
-npx drizzle-kit generate:sqlite
+npx drizzle-kit generate
 ```
 
 Then you need to import `migrations.js` file in your `App.tsx` file from `./drizzle` folder and use hook `useMigrations` or `migrate` function.

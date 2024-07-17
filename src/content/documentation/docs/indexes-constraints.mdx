@@ -803,21 +803,28 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     ```
     </Section>
     <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param.
+      For versions before `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` `drizzle-kit` only supports index `name` and `on()` param.
+
+      After versions `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` all fields are supported in drizzle-kit!
     </Callout>
 
-    Drizzle ORM provides set of all params for index creation:
 
-    ```typescript
-    // Index declaration reference
-    index('name')
-      .on(table.column1, table.column2, ...) or .onOnly(table.column1, table.column2, ...)
-      .concurrently()
-      .using(sql``) // sql expression
-      .asc() or .desc()
-      .nullsFirst() or .nullsLast()
-      .where(sql``) // sql expression
-    ```
+    Starting from 0.31.0 a new index api for Drizzle ORM provides set of all params for index creation:
+
+```ts
+// First example, with `.on()`
+index('name')
+  .on(table.column1.asc(), table.column2.nullsFirst(), ...) or .onOnly(table.column1.desc().nullsLast(), table.column2, ...)
+  .concurrently()
+  .where(sql``)
+  .with({ fillfactor: '70' })
+
+// Second Example, with `.using()`
+index('name')
+  .using('btree', table.column1.asc(), sql`lower(${table.column2})`, table.column1.op('text_ops'))
+  .where(sql``) // sql expression
+  .with({ fillfactor: '70' })
+```
 
   </Tab>
   <Tab>
@@ -885,9 +892,6 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
-    <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param.
-    </Callout>
 
      Drizzle ORM provides set of all params for index creation:
      

@@ -16,6 +16,7 @@ import saltyAomTwit from "@/assets/images/twits/saltyAomTwit.jpg";
 import EddyVinckk from "@/assets/images/twits/EddyVinckk.jpg";
 import chribjel from "@/assets/images/twits/chribjel.jpg";
 import chribjelTwit from "@/assets/images/twits/chribjelTwit.png";
+import hisbvdis from "@/assets/images/twits/hisbvdis.jpg";
 
 // Twit images
 
@@ -137,6 +138,13 @@ const Comments: IComment[] = [
     text: `How many times has this little shit snuck into your dependencies?`,
     href: "https://x.com/chribjel/status/1778851727954837727",
     twitImage: chribjelTwit,
+  },
+  {
+    avatar: hisbvdis,
+    name: "Roma Zvarych",
+    login: "hisbvdis",
+    text: `I have finally switched from @prisma to @DrizzleORM.\nIt was not easy.\nDear Drizzle Team, you have created an awesome orm with awfull documentation.\nAnyway, good for you, thanks and good luck.`,
+    href: "https://x.com/hisbvdis/status/1807783878515400977",
   },
 ];
 
