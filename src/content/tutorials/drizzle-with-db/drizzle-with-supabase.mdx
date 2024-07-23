@@ -160,6 +160,7 @@ npx drizzle-kit migrate
 ```
 
 Learn more about [migration process](https://orm.drizzle.team/docs/migrations). You can also apply migrations using [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started):
+- For tables that already exist, manually review the generated migration files from `npx drizzle-kit generate` and comment out or adjust any unsafe pure create statements (e.g., `CREATE SCHEMA "auth";`) while ensuring safe conditional creates (e.g., `CREATE TABLE IF NOT EXISTS "auth"."users"`) are properly handled.
 
 To apply migrations using the Supabase CLI, initialize local Supabase project, link it to your remote project and push changes to the database:
 
