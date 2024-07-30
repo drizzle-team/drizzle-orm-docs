@@ -112,14 +112,13 @@ const shipping = fillWeeksGaps(shippingData);
     <div class={"gradient-left board-gradient"}></div>
     <div class={"gradient-right board-gradient"}></div>
     <div class="shipping-board">
-      {Object.entries(shipping)
-        .map(([key, value]) => (
+      {Object.entries(shipping).map(([key, value]) => (
           <div class="week">
             <div class="week-title">
               {getWeekLabel(key)}
             </div>
             <ul class="week-details">
-              {value.map((string) => (
+              {value?.map((string) => (
                 <li class="week-text">
                   <div set:html={string}/>
                 </li>
