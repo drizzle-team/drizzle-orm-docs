@@ -1,0 +1,100 @@
+import { SnakeGame } from "@components/LandingPage/NewHeader/snake/SnakeGame";
+
+const snakeGame = new SnakeGame();
+
+const changeDifficulty = () => {
+  switch (snakeGame.difficulty) {
+    case 1:
+      document.getElementById("game-difficulty")!.innerText = `Normal`;
+      snakeGame.difficulty = 2;
+      break;
+    case 2:
+      document.getElementById("game-difficulty")!.innerText = `Hard`;
+      snakeGame.difficulty = 3;
+      break;
+    case 3:
+      document.getElementById("game-difficulty")!.innerText = `Easy`;
+      snakeGame.difficulty = 1;
+      break;
+  }
+};
+
+export const preventControlButtons = (e: KeyboardEvent) => {
+  if (
+    ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(
+      e.code,
+    ) > -1
+  ) {
+    e.preventDefault();
+  }
+};
+
+const startGame = () => {
+  document.querySelector(".game-start-screen")!.classList.add("hidden");
+  document.getElementById("right-image")!.classList.add("right-image-moved");
+  document.getElementById("score")!.classList.remove("hidden");
+  document.querySelector(".board")!.classList.add("board-moved");
+  document.querySelector(".powered")!.classList.remove("powered-hidden");
+
+  window.addEventListener("keydown", preventControlButtons, false);
+  snakeGame.startGame();
+};
+
+window.addEventListener(
+  "keydown",
+  (e) => {
+    if (e.code === "Escape") {
+      const rightImage = document.getElementById("right-image");
+      const board = document.querySelector(".board");
+      const score = document.querySelector("#score");
+      const countdown = document.querySelector(".countdown");
+      const powered = document.querySelector(".powered");
+
+      if (board && rightImage && score && countdown && powered) {
+        e.preventDefault();
+        snakeGame.gameOver = true;
+        snakeGame.resetGame();
+        window.removeEventListener("keydown", preventControlButtons, false);
+
+        board.classList.remove("board-moved");
+        rightImage.classList.remove("right-image-moved");
+        score.classList.add("hidden");
+        countdown.classList.add("hidden");
+        powered.classList.add("powered-hidden");
+      }
+    }
+  },
+  false,
+);
+
+document.addEventListener("astro:before-swap", () => {
+  snakeGame.gameOver = true;
+  snakeGame.resetGame();
+  window.removeEventListener("keydown", preventControlButtons, false);
+});
+
+document.addEventListener("astro:page-load", () => {
+  document.querySelector("main")!.addEventListener(
+    "scroll",
+    () => {
+      const rightImage = document.getElementById("right-image");
+      const board = document.querySelector(".board");
+      const score = document.querySelector("#score");
+      const countdown = document.querySelector(".countdown");
+      const powered = document.querySelector(".powered");
+
+      board?.classList.remove("board-moved");
+      rightImage?.classList.remove("right-image-moved");
+      score?.classList.add("hidden");
+      countdown?.classList.add("hidden");
+      powered?.classList.add("powered-hidden");
+    },
+    false,
+  );
+
+  document.getElementById("start-game")?.addEventListener("click", startGame);
+
+  document
+    .getElementById("change-difficulty")
+    ?.addEventListener("click", changeDifficulty);
+});

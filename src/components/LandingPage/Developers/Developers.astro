@@ -1,0 +1,489 @@
+---
+import {Image} from "astro:assets";
+import blokh from './Images/team/blokh.png'
+import sherman from './Images/team/sherman.png'
+import bloberenober from './Images/team/bloberenober.png'
+import angelelz from './Images/contributors/angelelz.png'
+import intelligently from './Images/contributors/intelligently.png'
+import mario564 from './Images/contributors/mario564.png'
+import rphlmr from './Images/contributors/rphlmr.png'
+import mike from './Images/team/mike.jpg'
+import roman from './Images/team/roman.jpg'
+import vlad from './Images/team/vlad.jpg'
+import reka from './Images/team/reka.png'
+import homenko from './Images/team/homenko.jpg'
+import artem from './Images/team/artem.jpg'
+import vitalii from './Images/team/vitalii.jpg'
+import shippingData from '../../../data/shipping.yaml';
+import getWeekLabel from "../../../utils/getWeekLabel";
+import ProgressBar from "./ProgressBar.astro";
+import fillWeeksGaps from "../../../utils/fillWeeksGaps";
+import progress from "../../../data/progress";
+
+const drizzleTeam: { name: string, photo: string, url?: string}[] = [
+  {
+    name: 'Andrew Sherman',
+    photo: sherman,
+  },
+  {
+    name: 'Dan Kochetov',
+    photo: bloberenober,
+  },
+  {
+    name: 'Alex Blokh',
+    photo: blokh,
+  },
+  {
+    name: 'Mykhailo Stratovych',
+    photo: mike,
+  },
+  {
+    name: 'Roman Nabukhotnyi',
+    photo: roman,
+  },
+  {
+    name: 'Vladislav Stohnii',
+    photo: vlad,
+  },
+  {
+    name: 'Serhii Reka',
+    photo: reka,
+  },
+  {
+    name: 'Oleksii Khomenko',
+    photo: homenko,
+  },
+  {
+    name: 'Artem Odiiko',
+    photo: artem,
+  },
+  {
+    name: 'Vitalii Staryk',
+    photo: vitalii,
+  },
+];
+
+const contributors: { name: string, photo: string}[] = [
+  {
+    name: 'angelelz',
+    photo: angelelz,
+  },
+  {
+    name: 'rphlmr',
+    photo: rphlmr,
+  },
+  {
+    name: 'mario564',
+    photo: mario564,
+  },
+  {
+    name: 'intelligently',
+    photo: intelligently,
+  },
+];
+
+const shipping = fillWeeksGaps(shippingData);
+---
+<div class="developers_container">
+  <div class="flex-container">
+    <div class="developers-left">
+      <h2 class="title">We ship decently fast</h2>
+      <h3 class="subtitle"><span class="drizzleWord">Drizzle Team</span> and <span class="contributorWord">Active Contributors</span></h3>
+      <div class={"scroll"}>
+        <div class={"gradient-left"}></div>
+        <div class={"gradient-right"}></div>
+        <div class="core_team_container">
+          {[...drizzleTeam, ...contributors].map((dev, index) => (
+            <div
+              style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
+            >
+              <span>{dev.name}</span>
+              <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div class="developers-right">
+      <ProgressBar progress={progress} />
+    </div>
+  </div>
+  <div class={"scroll board-scroll"}>
+    <div class={"gradient-left board-gradient"}></div>
+    <div class={"gradient-right board-gradient"}></div>
+    <div class="shipping-board">
+      {Object.entries(shipping)
+        .map(([key, value]) => (
+          <div class="week">
+            <div class="week-title">
+              {getWeekLabel(key)}
+            </div>
+            <ul class="week-details">
+              {value.map((string) => (
+                <li class="week-text">
+                  <div set:html={string}/>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+    </div>
+  </div>
+</div>
+<script is:inline data-astro-rerun>
+  document.querySelector('.drizzleWord').addEventListener('mouseover', () =>
+    document.querySelectorAll('.dev-img').forEach((e) => e.classList.add('colored') )
+  )
+  document.querySelector('.drizzleWord').addEventListener('mouseout', () =>
+    document.querySelectorAll('.dev-img').forEach((e) => e.classList.remove('colored') )
+  )
+
+  document.querySelector('.contributorWord').addEventListener('mouseover', () =>
+    document.querySelectorAll('.contributor-img').forEach((e) => e.classList.add('colored') )
+  )
+  document.querySelector('.contributorWord').addEventListener('mouseout', () =>
+    document.querySelectorAll('.contributor-img').forEach((e) => e.classList.remove('colored') )
+  )
+  document.querySelector('.shipping-board').scrollTo({left: document.querySelector('.shipping-board').scrollWidth})
+</script>
+<style is:global>
+    .week-text a {
+        text-decoration: underline;
+    }
+</style>
+<style>
+    .developers_container {
+        position: relative;
+        max-width: 910px;
+        margin: 160px auto 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .flex-container {
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 40px;
+        margin-bottom: 32px;
+    }
+
+    .developers-left {
+        flex-shrink: 0;
+    }
+
+    .developers-right {
+        max-width: 280px;
+        width: 100%;
+        margin-top: 6px;
+    }
+
+    .background {
+        position: absolute;
+        width: 200vw;
+        background: #f8f8f8;
+        top: -20px;
+        bottom: -36px;
+        left: -50%;
+    }
+
+    html.dark .background {
+        background: #1c1c1c;
+    }
+
+    .scroll {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 -24px;
+        position: relative;
+    }
+
+    .board-scroll {
+        width: 934px;
+        margin: 0 -12px;
+    }
+
+    .gradient-left,
+    .gradient-right {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 20px;
+        opacity: 0;
+        z-index: 40;
+    }
+
+    .gradient-left {
+        left: 0;
+        background: linear-gradient(
+                to left,
+                rgba(250, 250, 250, 0) 0%,
+                rgba(255, 255, 255, 0.58) 90%,
+                #ffffff 100%
+        );
+    }
+
+    .gradient-right {
+        right: 0;
+        background: linear-gradient(
+                to right,
+                rgba(250, 250, 250, 0) 0%,
+                rgba(255, 255, 255, 0.58) 90%,
+                #ffffff 100%
+        );
+    }
+
+    html.dark .gradient-right {
+        background: linear-gradient(
+                to right,
+                rgba(17, 16, 17, 0) 0%,
+                rgba(17, 17, 17, 0.96) 90%,
+                #111 100%
+        );
+    }
+
+    html.dark .gradient-left {
+        background: linear-gradient(
+                to left,
+                rgba(17, 17, 17, 0) 0%,
+                rgba(17, 17, 17, 0.96) 90%,
+                #111 100%
+        );
+    }
+
+    .board-gradient {
+        opacity: 1;
+    }
+
+    .title {
+        z-index: 1;
+        font-size: 32px;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .subtitle {
+        z-index: 1;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 4px 0 8px;
+        text-align: left;
+    }
+
+
+    .subtitle span {
+        z-index: 1;
+        cursor: help;
+        text-decoration: underline;
+        text-decoration-color: #4bb74a;
+        text-decoration-style: dashed;
+    }
+
+    .subtitle span:hover {
+        text-decoration-style: solid;
+    }
+
+    .colored {
+        filter: grayscale(0) !important;
+    }
+
+    .core_team_container {
+        text-align: left;
+        padding: 0 24px;
+        position: relative;
+        width: 100%;
+        white-space: nowrap;
+    }
+
+    .core_team_container img {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+        object-position: center;
+        filter: grayscale(1);
+        transition: filter 0.2s;
+        background: grey;
+    }
+
+    .core_team_container div {
+        display: inline-block;
+        border-radius: 50%;
+        position: relative;
+        margin-right: -12px;
+    }
+
+    .core_team_container span {
+        position: absolute;
+        top: -35px;
+        white-space: nowrap;
+        left: 50%;
+        opacity: 0;
+        transform: translateX(-50%);
+        pointer-events: none;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 4px 12px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 0 0 0 #fff, 0 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+    }
+
+
+    html.dark .core_team_container span {
+        background: #000;
+        box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 1px hsla(0, 0%, 100%, .2), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+    }
+
+    .core_team_container div:hover {
+        z-index: 20 !important;
+    }
+
+    .core_team_container div:hover img {
+        filter: grayscale(0);
+    }
+
+    .core_team_container div:hover span {
+        opacity: 1;
+    }
+
+    html.dark .core_team_container img {
+        border: 2px solid #111;
+    }
+
+    .shipping-board::-webkit-scrollbar {
+        display: none;
+    }
+
+    .shipping-board {
+        gap: 12px;
+        width: 100%;
+        overflow-x: auto;
+        display: flex;
+        padding: 0 12px;
+        align-items: stretch;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .week {
+        height: 100%;
+        width: 280px;
+        flex-shrink: 0;
+        min-height: 320px;
+    }
+
+
+    .week-title {
+        font-size: 12px;
+        margin-bottom: 2px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .week-title:first-letter {
+        text-transform: uppercase;
+    }
+
+    .week-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        background: #f6f6f7;
+        height: 440px;
+        border-radius: 8px;
+    }
+
+    html.dark .week-details {
+        background: #1c1c1c;
+    }
+
+    .week-text {
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #e8e8e8;
+        font-size: 12px;
+        color: #444;
+        font-weight: 700;
+        line-height: 17px;
+        position: relative;
+        border-radius: 8px;
+    }
+
+    html.dark .week-text {
+        color: #e2e8f0;
+        background: #282828;
+        border: 1px solid #111;
+    }
+
+    @media (max-width: 1024px) {
+        .core_team_container div:first-child span {
+            left: -16px;
+            transform: none;
+        }
+    }
+
+
+    @media (max-width: 960px) {
+        .board-scroll {
+            width: calc(100vw - 24px);
+        }
+    }
+
+
+    @media (max-width: 900px) {
+        .title {
+            font-size: 20px;
+        }
+
+        .flex_container {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+
+    @media (max-width: 770px) {
+        .developers-right {
+            display: none;
+        }
+
+        .developers-left {
+            width: 100%;
+            flex-shrink: unset;
+        }
+    }
+
+    @media (max-width: 599px) {
+        .title {
+            font-size: 20px;
+        }
+
+        .gradient-left, .gradient-right {
+            opacity: 1;
+        }
+
+        .core_team_container {
+            text-align: left;
+            white-space: nowrap;
+            overflow: scroll;
+            width: 100%;
+        }
+
+        .core_team_container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .core_team_container div:hover span {
+            opacity: 0;
+        }
+    }
+</style>
+

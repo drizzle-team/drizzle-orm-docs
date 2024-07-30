@@ -101,41 +101,43 @@ const { forTitle } = Astro.props;
   }
 </style>
 <script>
-  const copyBtn = document.querySelectorAll(
-    "[data-copy-btn]",
-  ) as NodeListOf<HTMLElement>;
-  copyBtn.forEach((n) => {
-    n.addEventListener("click", () => {
-      let timeouts: NodeJS.Timeout[] = [];
-      const isForTitle = n.dataset.forTitle === "true";
-      const parentSnippet = n.closest(".code-snippet");
-      if (!parentSnippet) return;
-      const { textContent } = parentSnippet.querySelector(".btn-container")!
-        .nextElementSibling as HTMLElement;
-      if (!textContent) return;
-      navigator.clipboard.writeText(textContent);
-      if (timeouts.length) {
-        timeouts.forEach((id) => {
-          clearTimeout(id);
-        });
-      }
+  document.addEventListener("astro:page-load", () => {
+    const copyBtn = document.querySelectorAll(
+      "[data-copy-btn]",
+    ) as NodeListOf<HTMLElement>;
+    copyBtn.forEach((n) => {
+      n.addEventListener("click", () => {
+        let timeouts: NodeJS.Timeout[] = [];
+        const isForTitle = n.dataset.forTitle === "true";
+        const parentSnippet = n.closest(".code-snippet");
+        if (!parentSnippet) return;
+        const { textContent } = parentSnippet.querySelector(".btn-container")!
+          .nextElementSibling as HTMLElement;
+        if (!textContent) return;
+        navigator.clipboard.writeText(textContent);
+        if (timeouts.length) {
+          timeouts.forEach((id) => {
+            clearTimeout(id);
+          });
+        }
 
-      n.style.opacity = "1";
-      n.children[0].classList.remove("hidden");
-      n.children[1].classList.add("hidden");
+        n.style.opacity = "1";
+        n.children[0].classList.remove("hidden");
+        n.children[1].classList.add("hidden");
 
-      timeouts.push(
-        setTimeout(() => {
-          n.style.opacity = "";
-        }, 1500),
-      );
+        timeouts.push(
+          setTimeout(() => {
+            n.style.opacity = "";
+          }, 1500),
+        );
 
-      timeouts.push(
-        setTimeout(() => {
-          n.children[0].classList.add("hidden");
-          n.children[1].classList.remove("hidden");
-        }, 2000),
-      );
+        timeouts.push(
+          setTimeout(() => {
+            n.children[0].classList.add("hidden");
+            n.children[1].classList.remove("hidden");
+          }, 2000),
+        );
+      });
     });
-  });
+  })
 </script>

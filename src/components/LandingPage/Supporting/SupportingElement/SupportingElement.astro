@@ -74,7 +74,7 @@ const darkStylesSVGString = svgCodeDark.replace(/<svg/, `<svg ${getParamsString(
 {!item.sponsorUrl && (
   <div class="item">
     <div class="icon supporting__icon">
-      <div class={"img_light"}  
+      <div class={"img_light"}
         style={{
           width: lightStyle?.width + 'px',
           height: lightStyle?.width + 'px',
@@ -95,10 +95,20 @@ const darkStylesSVGString = svgCodeDark.replace(/<svg/, `<svg ${getParamsString(
   </div>
 )}
 
-<style is:global>
+<style is:global define:vars={{widthLight: `${lightStyle.width}px`, widthDark: `${darkStyle.width}px`}}>
   .supporting__icon svg, .supporting__icon img {
     height: 100%;
     width: 100%;
+  }
+
+  .item .supporting__icon .img_light svg {
+      width: var(--widthLight);
+      height: var(--widthLight);
+  }
+
+  .item .supporting__icon .img_dark svg {
+      width: var(--widthDark);
+      height: var(--widthDark);
   }
 </style>
 <style>

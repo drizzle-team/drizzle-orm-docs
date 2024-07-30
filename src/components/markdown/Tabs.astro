@@ -25,30 +25,32 @@ const { items } = Astro.props;
 </div>
 
 <script>
-  const tabsContent = document.querySelectorAll('.tabs__content');
-  tabsContent.forEach((tabContent) => {
-    Array.from(tabContent.children).forEach((child, index) => {
-      child.classList.toggle('hidden', index !== 0);
-    });
-  });
-
-  document.querySelectorAll('[data-change-tab-btn]').forEach((button) => {
-  button.addEventListener('click', (e) => {
-    const target = e.target as Element;
-    const parent = target.parentElement as Element;
-    const index = Array.from(parent?.children || []).indexOf(target);
-    const code = parent.nextElementSibling as Element;
-    
-    if (code) {
-      Array.from(code.children).forEach((child, codeIndex) => {
-        child.classList.toggle('hidden', codeIndex !== index);
+  document.addEventListener("astro:page-load", () => {
+    const tabsContent = document.querySelectorAll('.tabs__content');
+    tabsContent.forEach((tabContent) => {
+      Array.from(tabContent.children).forEach((child, index) => {
+        child.classList.toggle('hidden', index !== 0);
       });
-    }
-    Array.from(parent.children).forEach((child, codeIndex) => {
-        child.classList.toggle('tabs__button', codeIndex !== index);
-        child.classList.toggle('tabs__button--active', codeIndex === index);
     });
-  });
-});
+
+    document.querySelectorAll('[data-change-tab-btn]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as Element;
+        const parent = target.parentElement as Element;
+        const index = Array.from(parent?.children || []).indexOf(target);
+        const code = parent.nextElementSibling as Element;
+
+        if (code) {
+          Array.from(code.children).forEach((child, codeIndex) => {
+            child.classList.toggle('hidden', codeIndex !== index);
+          });
+        }
+        Array.from(parent.children).forEach((child, codeIndex) => {
+          child.classList.toggle('tabs__button', codeIndex !== index);
+          child.classList.toggle('tabs__button--active', codeIndex === index);
+        });
+      });
+    });
+  })
 
 </script>

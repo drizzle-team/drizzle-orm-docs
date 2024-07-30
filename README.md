@@ -1,12 +1,46 @@
 ## 🚀 Project Structure
 
-MDX files are located in this folder
+MDX files are located in this folder:
 
 ```text
 ├── src/
 │   ├── content/
 │   │   └── documentation
 ```
+
+Announcements markdown files:
+
+```text
+├── src/
+│   ├──data/
+│   │   └── announcements
+```
+
+Roadmap markdown file:
+
+```text
+├── src/
+│   ├──data/
+│   │   └── roadmap.md
+```
+
+Shipping section yaml file:
+
+```text
+├── src/
+│   ├──data/
+│   │   └── shipping.yaml
+```
+
+```
+progress: number
+weeks:
+  - date:
+      start: "YYYY-MM-DD"
+    details:
+      - string
+```
+
 
 ## 🧞 Commands
 
