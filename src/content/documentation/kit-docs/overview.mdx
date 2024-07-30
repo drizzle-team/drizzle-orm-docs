@@ -72,6 +72,30 @@ Drizzle ORM migration package or any other way suitable for your business case o
   ```
 </CodeTabs>
 
+You can also configure the prefixes for migrations, so they can be in a format that is compliant with the migration tool you are using or for your own convenience, for example Supabase would need `20240710095007_*.sql` format and drizzle has `0000_*.sql` be default
+
+You can check all the prefix options [here](/kit-docs/config-reference#migrationsprefix)
+
+<Callout type="warning">
+You can use prefixes only if you don't have any migration history already. The kit won't work properly if you mix prefix formats within the same migration folder. Please ensure you use only one prefix format throughout the project.
+
+We are working on making it possible to migrate from one prefix format to another and to ensure interoperability
+</Callout>
+
+<CodeTabs items={["drizzle.config.ts"]}>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  schema: "./schema.ts",
+  dialect: 'postgresql',
+  migrations: {
+    prefix: 'supabase'
+  }
+})
+```
+</CodeTabs>
+
 ## Schema updates
 Whenever you apply changes to the schema you just rerun `$ drizzle-kit generate` and 
 it will generate SQL migration for you completely automatically in most of the cases.
@@ -172,7 +196,7 @@ You can have autocomplete experience and a very convenient environment variables
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
- schema: "./schema.ts",
+  schema: "./schema.ts",
   dialect: 'postgresql',
   dbCredentials: {
     url: process.env.DB_URL,
