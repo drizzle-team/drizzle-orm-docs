@@ -3,15 +3,14 @@
   <div id="custom-button" class="nav_ai-btn"></div>
 </div>
 <script type="module" is:inline data-astro-rerun>
-    docsearch({
-      container: '#docsearch',
-      appId: "MXZNUT59HV",
-      apiKey: "7c390e262ac8858df0b6624d01d9dfef",
-      indexName: "orm-drizzle",
-      placeholder: "Search documentation...",
-    });
-</script>
-<script type="module" is:inline data-astro-rerun>
+  docsearch({
+    container: '#docsearch',
+    appId: "MXZNUT59HV",
+    apiKey: "7c390e262ac8858df0b6624d01d9dfef",
+    indexName: "orm-drizzle",
+    placeholder: "Search documentation...",
+  });
+
   let themeName = localStorage.getItem('theme');
   if(themeName === 'system') {
     themeName = window.matchMedia('(prefers-color-scheme: dark)').matches
