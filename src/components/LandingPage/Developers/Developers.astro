@@ -34,27 +34,27 @@ const drizzleTeam: { name: string, photo: string, url?: string}[] = [
     photo: blokh,
   },
   {
-    name: 'Mike',
+    name: 'Mykhailo Stratovych',
     photo: mike,
   },
   {
-    name: 'Roman',
+    name: 'Roman Nabukhotnyi',
     photo: roman,
   },
   {
-    name: 'Vlad',
+    name: 'Vladislav Stohnii',
     photo: vlad,
   },
   {
-    name: 'Reka',
+    name: 'Serhii Reka',
     photo: reka,
   },
   {
-    name: 'Homenko',
+    name: 'Oleksii Khomenko',
     photo: homenko,
   },
   {
-    name: 'Artem Longname',
+    name: 'Artem Odiiko',
     photo: artem,
   },
   {
@@ -94,13 +94,12 @@ const shipping = fillWeeksGaps(shippingData);
         <div class={"gradient-right"}></div>
         <div class="core_team_container">
           {[...drizzleTeam, ...contributors].map((dev, index) => (
-            <a
-              href=""
+            <div
               style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
             >
               <span>{dev.name}</span>
               <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
-            </a>
+            </div>
           ))}
         </div>
       </div>
@@ -314,7 +313,7 @@ const shipping = fillWeeksGaps(shippingData);
         background: grey;
     }
 
-    .core_team_container a {
+    .core_team_container div {
         display: inline-block;
         border-radius: 50%;
         position: relative;
@@ -343,15 +342,15 @@ const shipping = fillWeeksGaps(shippingData);
         box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 1px hsla(0, 0%, 100%, .2), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
     }
 
-    .core_team_container a:hover {
+    .core_team_container div:hover {
         z-index: 20 !important;
     }
 
-    .core_team_container a:hover img {
+    .core_team_container div:hover img {
         filter: grayscale(0);
     }
 
-    .core_team_container a:hover span {
+    .core_team_container div:hover span {
         opacity: 1;
     }
 
@@ -426,7 +425,7 @@ const shipping = fillWeeksGaps(shippingData);
     }
 
     @media (max-width: 1024px) {
-        .core_team_container a:first-child span {
+        .core_team_container div:first-child span {
             left: -16px;
             transform: none;
         }
@@ -482,7 +481,7 @@ const shipping = fillWeeksGaps(shippingData);
             display: none;
         }
 
-        .core_team_container a:hover span {
+        .core_team_container div:hover span {
             opacity: 0;
         }
     }
