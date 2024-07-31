@@ -25,7 +25,7 @@
 - [ ] PostgreSQL RLS support
 - [ ] Relational Querie V2 API
 - [ ] `import { table } from 'drizzle-orm/common'` common driver to lower the entrance learning curve
-- [ ] `drizzle('pg', ...)` driver instantiation to lover the entrance learning curve
+- [ ] `drizzle('pg', ...)` driver instantiation to lower the entrance learning curve
 - [ ] CockroachDB support (supported with strict SQL migrations)
 - [ ] Native seeding
 - [ ] fixes: [#2575](https://github.com/drizzle-team/drizzle-orm/issues/2575), [#2572](https://github.com/drizzle-team/drizzle-orm/issues/2572), [#2571](https://github.com/drizzle-team/drizzle-orm/issues/2571),
