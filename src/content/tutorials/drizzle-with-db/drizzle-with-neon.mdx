@@ -188,7 +188,6 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  ├ 📂 src
  │  ├ 📜 db.ts
  │  └ 📜 schema.ts
- │  └ 📜 queries.ts
  ├ 📂 migrations
  │  ├ 📂 meta
  │  │  ├ 📜 _journal.json
@@ -202,15 +201,15 @@ This is the basic file structure of the project. In the `src/db` directory, we h
 
 ## Query examples
 
-For instance, we create `src/queries.ts` file with the following queries.
+For instance, we create `src/queries` folder and separate files for each operation: insert, select, update, delete.
 
 #### Insert data
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/queries.ts" {4}
-import { db } from './db';
-import { InsertUser, usersTable } from './schema';
+```typescript copy filename="src/queries/insert.ts" {4}
+import { db } from '../db';
+import { InsertUser, usersTable } from '../schema';
 
 export async function createUser(data: InsertUser) {
   await db.insert(usersTable).values(data);
@@ -221,10 +220,10 @@ export async function createUser(data: InsertUser) {
 
 Read more about select query in the [documentation](/docs/select).
 
-```typescript copy filename="src/queries.ts" {5, 16, 41}
+```typescript copy filename="src/queries/select.ts" {5, 16, 41}
 import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
-import { db } from './db';
-import { InsertUser, SelectUser, postsTable, usersTable } from './schema';
+import { db } from '../db';
+import { SelectUser, usersTable, postsTable } from '../schema';
 
 export async function getUserById(id: SelectUser['id']): Promise<
   Array<{
@@ -290,8 +289,10 @@ Alternatively, you can use [relational query syntax](/docs/rqb).
 
 Read more about update query in the [documentation](/docs/update).
 
-```typescript copy filename="src/queries.ts" {3}
-// imports
+```typescript copy filename="src/queries/update.ts" {5}
+import { eq } from 'drizzle-orm';
+import { db } from '../db';
+import { SelectPost, postsTable } from '../schema';
 
 export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
   await db.update(postsTable).set(data).where(eq(postsTable.id, id));
@@ -302,8 +303,10 @@ export async function updatePost(id: SelectPost['id'], data: Partial<Omit<Select
 
 Read more about delete query in the [documentation](/docs/delete).
 
-```typescript copy filename="src/queries.ts" {3}
-// imports
+```typescript copy filename="src/queries/delete.ts" {5}
+import { db } from '../db';
+import { eq } from 'drizzle-orm';
+import { SelectUser, usersTable } from '../schema';
 
 export async function deleteUser(id: SelectUser['id']) {
   await db.delete(usersTable).where(eq(usersTable.id, id));
