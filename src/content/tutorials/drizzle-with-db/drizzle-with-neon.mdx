@@ -49,7 +49,7 @@ postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neo
 
 Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to the Neon database.
 
-```bash
+```text copy
 DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
 ```
 
@@ -130,7 +130,7 @@ You can generate migrations using `drizzle-kit generate` command and then run th
 
 Generate migrations:
 
-```bash
+```bash copy
 npx drizzle-kit generate
 ```
 
@@ -165,13 +165,13 @@ END $$;
 
 Run migrations:
 
-```bash
+```bash copy
 npx drizzle-kit migrate
 ```
 
 Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
 
-```bash
+```bash copy
 npx drizzle-kit push
 ```
 
@@ -207,12 +207,16 @@ For instance, we create `src/queries` folder and separate files for each operati
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/queries/insert.ts" {4}
+```typescript copy filename="src/queries/insert.ts" {4, 8}
 import { db } from '../db';
-import { InsertUser, usersTable } from '../schema';
+import { InsertPost, InsertUser, postsTable, usersTable } from '../schema';
 
 export async function createUser(data: InsertUser) {
   await db.insert(usersTable).values(data);
+}
+
+export async function createPost(data: InsertPost) {
+  await db.insert(postsTable).values(data);
 }
 ```
 

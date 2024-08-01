@@ -47,7 +47,7 @@ Navigate to your Vercel Postgres database and copy `POSTGRES_URL` from `.env.loc
 
 Add `POSTGRES_URL` to your `.env.local` or `.env` file.
 
-```plaintext
+```plaintext copy
 POSTGRES_URL=<YOUR_DATABASE_URL>
 ```
 
@@ -128,7 +128,7 @@ You can generate migrations using `drizzle-kit generate` command and then run th
 
 Generate migrations:
 
-```bash
+```bash copy
 npx drizzle-kit generate
 ```
 
@@ -163,13 +163,13 @@ END $$;
 
 Run migrations:
 
-```bash
+```bash copy
 npx drizzle-kit migrate
 ```
 
 Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
 
-```bash
+```bash copy
 npx drizzle-kit push
 ```
 
@@ -206,12 +206,16 @@ For instance, we create `src/db/queries` folder and separate files for each oper
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/db/queries/insert.ts" {4}
+```typescript copy filename="src/db/queries/insert.ts" {4, 8}
 import { db } from '../index';
-import { InsertUser, usersTable } from '../schema';
+import { InsertPost, InsertUser, postsTable, usersTable } from '../schema';
 
 export async function createUser(data: InsertUser) {
   await db.insert(usersTable).values(data);
+}
+
+export async function createPost(data: InsertPost) {
+  await db.insert(postsTable).values(data);
 }
 ```
 
