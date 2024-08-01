@@ -78,7 +78,7 @@ Learn more about this command and its options in the [documentation](https://doc
 
 #### Update environment variables
 
-Update your `.env` file with connection url and authentication token.
+Update your `.env` or `.env.local` file with connection url and authentication token.
 
 ```text copy
 TURSO_CONNECTION_URL=
@@ -94,7 +94,7 @@ import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 
-config({ path: '.env' });
+config({ path: '.env' }); // or .env.local
 
 const client = createClient({
   url: process.env.TURSO_CONNECTION_URL!,
