@@ -17,6 +17,11 @@ import Callout from "@mdx/Callout.astro";
 This tutorial demonstrates how to build `Todo app` using **Drizzle ORM** with **Neon database** and **Next.js**.
 
 <Prerequisites>  
+  - You should have an existing Next.js project or create a new one using the following command:
+  ```bash
+  npx create-next-app@latest --typescript
+  ```
+
   - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
   <Npm>
     drizzle-orm 
@@ -27,11 +32,6 @@ This tutorial demonstrates how to build `Todo app` using **Drizzle ORM** with **
   <Npm>
     @neondatabase/serverless
   </Npm>
-  
-  - You should have an existing Next.js project or create a new one using the following command:
-    ```bash
-    npx create-next-app@latest --typescript
-    ```
 
   - You should have installed the `dotenv` package for managing environment variables. 
   <Npm>
@@ -62,7 +62,7 @@ Navigate to the **Connection Details** section in the project console to find yo
 postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb
 ```
 
-Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to the Neon database.
+Add the `DATABASE_URL` environment variable to your `.env` or `.env.local` file, which you'll use to connect to the Neon database.
 
 ```bash
 DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
@@ -77,7 +77,7 @@ import { config } from "dotenv";
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 
-config({ path: ".env" });
+config({ path: ".env" }); // or .env.local
 
 const sql = neon(process.env.DATABASE_URL!);
 
