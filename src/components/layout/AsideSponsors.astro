@@ -1,6 +1,7 @@
 ---
 import type { CSSProperties } from "react";
 import s from "@/data/asideS";
+import {safeParseFrontmatter} from "astro/dist/content/utils";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
@@ -25,7 +26,7 @@ for (let i = 0; i < s.length; i += 2) {
             class="aside-sponsors__sponsor"
             href={`https://${sponsor.sponsorEntity.login}`}
             target="_blank"
-            rel="nofollow noreferrer"
+            rel={sponsor.followLink ? "" : "nofollow"}
           >
             <div
               class="aside-sponsors__sponsor-image"
