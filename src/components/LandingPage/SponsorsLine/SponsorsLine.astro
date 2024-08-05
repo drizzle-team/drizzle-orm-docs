@@ -192,7 +192,7 @@
                   gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
                 }
               }
-              gitLink.rel = "nofollow";
+              gitLink.rel = item.followLink ? "" : "nofollow";
               const cardName = card.querySelector(
                 "#card-name",
               )! as HTMLDivElement;
@@ -302,7 +302,7 @@
                   gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
                 }
               }
-              gitLink.rel = "nofollow";
+              gitLink.rel = item.followLink ? "" : "nofollow";
               cardsBlock.append(card);
             }
           });

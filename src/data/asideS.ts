@@ -116,6 +116,7 @@ export const sponsorsData: ISponsor[] = [
     },
     createdAt: "2023-06-11T13:32:16Z",
     isActive: true,
+    followLink: true,
     imageType: ImageType.SVG,
     darkStyle: {
       filter: "brightness(0.4) grayscale(1)",
