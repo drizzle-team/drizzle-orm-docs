@@ -25,8 +25,13 @@ export default (weeksObject: Weeks): Weeks => {
     return date.toISOString().split("T")[0];
   };
 
+  // Sort the keys (dates) in ascending order
+  const sortedKeys = Object.keys(weeks).sort(
+    (a, b) => parseDate(a).getTime() - parseDate(b).getTime(),
+  );
+
   // Get the start of the first week
-  let currentWeekStart = getWeekStart(parseDate(Object.keys(weeks)[0]));
+  let currentWeekStart = getWeekStart(parseDate(sortedKeys[0]));
 
   // Get the start of the current week
   const now = new Date();
@@ -35,7 +40,7 @@ export default (weeksObject: Weeks): Weeks => {
   let filledWeeks: Weeks = {};
 
   // Fill missing weeks until the current week
-  for (const key in weeks) {
+  for (const key of sortedKeys) {
     const week = weeks[key];
     const weekStart = getWeekStart(parseDate(key));
 
