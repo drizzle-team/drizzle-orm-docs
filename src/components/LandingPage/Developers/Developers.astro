@@ -127,7 +127,7 @@ const shipping = fillWeeksGaps(shippingData);
               <ul class="week-details">
                 {value?.map((string) => (
                   <li class="week-text">
-                    <div set:html={string}/>
+                    <div set:html={string.replaceAll('</ul>\n', '</ul>')}/>
                   </li>
                 ))}
               </ul>
@@ -156,6 +156,12 @@ const shipping = fillWeeksGaps(shippingData);
 <style is:global>
     .week-text a {
         text-decoration: underline;
+    }
+
+    .week-text ul {
+        white-space: normal;
+        list-style: disc;
+        padding-left: 12px;
     }
 </style>
 <style>
