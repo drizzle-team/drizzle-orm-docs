@@ -19,6 +19,7 @@ import getWeekLabel from "../../../utils/getWeekLabel";
 import ProgressBar from "./ProgressBar.astro";
 import fillWeeksGaps from "../../../utils/fillWeeksGaps";
 import progress from "../../../data/progress";
+import addNofollowToExternalLinks from "../../../utils/addNofollowToExternalLinks";
 
 const drizzleTeam: { name: string, photo: string, url?: string}[] = [
   {
@@ -127,7 +128,7 @@ const shipping = fillWeeksGaps(shippingData);
               <ul class="week-details">
                 {value?.map((string) => (
                   <li class="week-text">
-                    <div set:html={string.replaceAll('</ul>\n', '</ul>')}/>
+                    <div set:html={addNofollowToExternalLinks(string.replaceAll('</ul>\n', '</ul>'))}/>
                   </li>
                 ))}
               </ul>
