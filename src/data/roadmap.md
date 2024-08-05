@@ -16,7 +16,7 @@
 
 ### Drizzle ORM V1
 - [x] `generated` columns support [beta branch]
-- [ ] MySQL `.$returningIds()` 
+- [x] MySQL `.$returningIds()` 
 - [ ] `NODE_ENV` support for embedded `.env` consumer
 - [ ] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`
 - [ ] Table declarations with `(t) => ` callback to optionally omit column type imports
