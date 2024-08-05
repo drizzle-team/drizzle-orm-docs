@@ -162,6 +162,7 @@ export const sponsorsData: ISponsor[] = [
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
+    followLink: true,
     createdAt: "2023-11-16T13:32:16Z",
     isActive: true,
     imageType: ImageType.SVG,
