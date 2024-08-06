@@ -19,6 +19,7 @@ import getWeekLabel from "../../../utils/getWeekLabel";
 import ProgressBar from "./ProgressBar.astro";
 import fillWeeksGaps from "../../../utils/fillWeeksGaps";
 import progress from "../../../data/progress";
+import addNofollowToExternalLinks from "../../../utils/addNofollowToExternalLinks";
 
 const drizzleTeam: { name: string, photo: string, url?: string}[] = [
   {
@@ -98,7 +99,13 @@ const shipping = fillWeeksGaps(shippingData);
               style={`z-index: ${[...drizzleTeam, ...contributors].length - index}`}
             >
               <span>{dev.name}</span>
-              <Image class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'} src={dev.photo} alt={dev.name} />
+              <Image
+                class={drizzleTeam.includes(dev) ? 'dev-img' : 'contributor-img'}
+                src={dev.photo}
+                alt={dev.name}
+                width="70"
+                height="70"
+              />
             </div>
           ))}
         </div>
@@ -113,18 +120,21 @@ const shipping = fillWeeksGaps(shippingData);
     <div class={"gradient-right board-gradient"}></div>
     <div class="shipping-board">
       {Object.entries(shipping)
+        .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
         .map(([key, value]) => (
           <div class="week">
             <div class="week-title">
               {getWeekLabel(key)}
             </div>
-            <ul class="week-details">
-              {value.map((string) => (
-                <li class="week-text">
-                  <div set:html={string}/>
-                </li>
-              ))}
-            </ul>
+            <div class="week-details-wrap">
+              <ul class="week-details">
+                {value?.map((string) => (
+                  <li class="week-text">
+                    <div set:html={addNofollowToExternalLinks(string.replaceAll('</ul>\n', '</ul>'))}/>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         ))}
     </div>
@@ -149,6 +159,16 @@ const shipping = fillWeeksGaps(shippingData);
 <style is:global>
     .week-text a {
         text-decoration: underline;
+    }
+
+    .week-text ul {
+        white-space: normal;
+        list-style-type: "• ";
+        padding-left: 9px;
+    }
+
+    .week-text b {
+        font-weight: 700;
     }
 </style>
 <style>
@@ -400,10 +420,57 @@ const shipping = fillWeeksGaps(shippingData);
         background: #f6f6f7;
         height: 440px;
         border-radius: 8px;
+        overflow-y: scroll;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .week-details::-webkit-scrollbar {
+        display: none;
+    }
+
+    .week-details-wrap {
+        position: relative;
+    }
+
+    .week-details-wrap::before {
+        content: '';
+        display: block;
+        height: 10px;
+        position: absolute;
+        background: linear-gradient(to bottom, #f6f6f7 , 80%, transparent);
+        flex-shrink: 0;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .week-details-wrap::after {
+        content: '';
+        display: block;
+        height: 10px;
+        position: absolute;
+        background: linear-gradient(to top, #f6f6f7, 80%, transparent);
+        flex-shrink: 0;
+        z-index: 1;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0 0 8px 8px;
     }
 
     html.dark .week-details {
         background: #1c1c1c;
+    }
+
+    html.dark .week-details-wrap::before {
+        background: linear-gradient(to bottom, #1c1c1c, 70%, transparent);
+    }
+
+    html.dark .week-details-wrap::after {
+        background: linear-gradient(to top, #1c1c1c, 70%, transparent);
     }
 
     .week-text {
@@ -412,10 +479,11 @@ const shipping = fillWeeksGaps(shippingData);
         border: 1px solid #e8e8e8;
         font-size: 12px;
         color: #444;
-        font-weight: 700;
+        font-weight: 500;
         line-height: 17px;
         position: relative;
         border-radius: 8px;
+        white-space: pre-line;
     }
 
     html.dark .week-text {

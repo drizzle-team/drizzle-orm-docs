@@ -18,8 +18,16 @@ This tutorial demonstrates how to use Drizzle ORM with [Vercel Postgres](https:/
 drizzle-orm
 -D drizzle-kit
 </Npm>
+
 - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+<Npm>
+  dotenv
+</Npm>
+
 - You should have installed `@vercel/postgres` package. Read more about this package [here](https://www.npmjs.com/package/@vercel/postgres)
+<Npm>
+  @vercel/postgres
+</Npm>  
 </Prerequisites>
 
 Check [Vercel documentation](https://vercel.com/docs/storage/vercel-postgres/using-an-orm#drizzle) to learn how to connect to the database with Drizzle ORM.
@@ -37,9 +45,9 @@ Read Vercel Postgres [documentation](https://vercel.com/docs/storage/vercel-post
 
 Navigate to your Vercel Postgres database and copy `POSTGRES_URL` from `.env.local` section.
 
-Add `POSTGRES_URL` to your `.env` or `.env.local` file.
+Add `POSTGRES_URL` to your `.env.local` or `.env` file.
 
-```plaintext
+```plaintext copy
 POSTGRES_URL=<YOUR_DATABASE_URL>
 ```
 
@@ -52,7 +60,7 @@ import { sql } from '@vercel/postgres';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { config } from 'dotenv';
 
-config({ path: '.env.local' });
+config({ path: '.env.local' }); // or .env
 
 export const db = drizzle(sql);
 
@@ -120,7 +128,7 @@ You can generate migrations using `drizzle-kit generate` command and then run th
 
 Generate migrations:
 
-```bash
+```bash copy
 npx drizzle-kit generate
 ```
 
@@ -155,13 +163,13 @@ END $$;
 
 Run migrations:
 
-```bash
+```bash copy
 npx drizzle-kit migrate
 ```
 
 Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
 
-```bash
+```bash copy
 npx drizzle-kit push
 ```
 
@@ -178,7 +186,6 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  ├ 📂 src
  │   ├ 📂 db
  │   │  ├ 📜 index.ts
- │   │  ├ 📜 queries.ts
  │   │  └ 📜 schema.ts
  ├ 📂 migrations
  │   ├ 📂 meta
@@ -193,18 +200,22 @@ This is the basic file structure of the project. In the `src/db` directory, we h
 
 ## Query examples
 
-For instance, we create `src/db/queries.ts` file with the following queries.
+For instance, we create `src/db/queries` folder and separate files for each operation: insert, select, update, delete.
 
 #### Insert data
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/db/queries.ts" {4}
-import { db } from './db';
-import { InsertUser, usersTable } from './schema';
+```typescript copy filename="src/db/queries/insert.ts" {4, 8}
+import { db } from '../index';
+import { InsertPost, InsertUser, postsTable, usersTable } from '../schema';
 
 export async function createUser(data: InsertUser) {
   await db.insert(usersTable).values(data);
+}
+
+export async function createPost(data: InsertPost) {
+  await db.insert(postsTable).values(data);
 }
 ```
 
@@ -212,10 +223,10 @@ export async function createUser(data: InsertUser) {
 
 Read more about select query in the [documentation](/docs/select).
 
-```typescript copy filename="src/db/queries.ts" {5, 16, 41}
+```typescript copy filename="src/db/queries/select.ts" {5, 16, 41}
 import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
-import { db } from './db';
-import { InsertUser, SelectUser, postsTable, usersTable } from './schema';
+import { db } from '../index';
+import { InsertUser, SelectUser, postsTable, usersTable } from '../schema';
 
 export async function getUserById(id: SelectUser['id']): Promise<
   Array<{
@@ -281,8 +292,10 @@ Alternatively, you can use [relational query syntax](/docs/rqb).
 
 Read more about update query in the [documentation](/docs/update).
 
-```typescript copy filename="src/db/queries.ts" {3}
-// imports
+```typescript copy filename="src/db/queries/update.ts" {5}
+import { eq } from 'drizzle-orm';
+import { db } from '../index';
+import { SelectPost, postsTable } from '../schema';
 
 export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
   await db.update(postsTable).set(data).where(eq(postsTable.id, id));
@@ -293,8 +306,10 @@ export async function updatePost(id: SelectPost['id'], data: Partial<Omit<Select
 
 Read more about delete query in the [documentation](/docs/delete).
 
-```typescript copy filename="src/db/queries.ts" {3}
-// imports
+```typescript copy filename="src/db/queries/delete.ts" {5}
+import { eq } from 'drizzle-orm';
+import { db } from '../index';
+import { SelectUser, usersTable } from '../schema';
 
 export async function deleteUser(id: SelectUser['id']) {
   await db.delete(usersTable).where(eq(usersTable.id, id));

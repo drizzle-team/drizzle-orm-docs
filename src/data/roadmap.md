@@ -2,21 +2,21 @@
 
 
 ### Drizzle Kit V1
-- [ ] `generated` columns support [beta branch]
-- [ ] Brocli integration to Drizzle Kit
+- [x] `generated` columns support [beta branch]
+- [x] Brocli integration to Drizzle Kit
 - [ ] Generated SQL migration strict mode without `try catches` and `if not exists`
-- [ ] Drizzle Kit goes OSS steam 🎉
+- [x] Drizzle Kit goes OSS steam 🎉
 - [ ] PostgreSQL enums alternations improvements
 - [ ] Drizzle Studio `mkcert` fixes for dockerised environments
 - [ ] PostgreSQL RLS support
 - [ ] `check` constraint support in Drizzle Kit
-- [ ] Exposed API for programmatic access in Drizzle Kit
+- [x] Exposed API for programmatic access in Drizzle Kit
 - [ ] `materialised views` support in Drizzle Kit
 - [ ] Drizzle Kit support for consuming schemas and migrations from Prisma, TypeORM and Sequelise to enrich ->Drizzle migration process
 
 ### Drizzle ORM V1
-- [ ] `generated` columns support [beta branch]
-- [ ] MySQL `.$returningIds()` 
+- [x] `generated` columns support [beta branch]
+- [x] MySQL `.$returningIds()` 
 - [ ] `NODE_ENV` support for embedded `.env` consumer
 - [ ] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`
 - [ ] Table declarations with `(t) => ` callback to optionally omit column type imports
