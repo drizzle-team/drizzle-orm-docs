@@ -65,6 +65,8 @@ export const sponsorsData: ISponsor[] = [
     createdAt: "2023-12-21T15:51:27Z",
     isActive: true,
     imageType: ImageType.SVG,
+    popover:
+      "🚀 Drizzle is giving you 10% off Turso Scaler and Pro for 1 Year 🚀",
     darkStyle: {
       background:
         'url("/svg/new-turso-light.svg") 0% 0% / cover no-repeat content-box',
