@@ -12,6 +12,7 @@ export interface ISponsor {
     avatarUrl: string;
   };
   followLink?: boolean;
+  popover?: string;
   createdAt: string;
   isActive: boolean;
   imageType?: ImageType;
