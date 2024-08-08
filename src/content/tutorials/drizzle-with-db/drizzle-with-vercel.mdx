@@ -179,7 +179,7 @@ npx drizzle-kit push
 
 ## Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts` and schema definitions in `schema.ts`.
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and schema definitions in `schema.ts`.
 
 ```plaintext
 📦 <project root>
@@ -226,7 +226,7 @@ Read more about select query in the [documentation](/docs/select).
 ```typescript copy filename="src/db/queries/select.ts" {5, 16, 41}
 import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
 import { db } from '../index';
-import { InsertUser, SelectUser, postsTable, usersTable } from '../schema';
+import { SelectUser, postsTable, usersTable } from '../schema';
 
 export async function getUserById(id: SelectUser['id']): Promise<
   Array<{
