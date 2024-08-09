@@ -169,6 +169,10 @@ export const profileInfo = pgTable('profile_info', {
 	metadata: jsonb('metadata'),
 });
 
+export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
+	user: one(users, { fields: [profileInfo.userId], references: [users.id] }),
+}));
+
 const user = await queryUserWithProfileInfo();
 //____^? type { id: number, profileInfo: { ... } | null  }
 ```
