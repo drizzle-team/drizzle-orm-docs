@@ -23,12 +23,13 @@ Make sure your `drizzle-orm` version is at least `0.30.9`, and update if needed:
 ```ts copy {1, 10}
 import { buildSchema } from 'drizzle-graphql';
 import { drizzle } from 'drizzle-orm/...';
+import client from './db';
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 
 import * as dbSchema from './schema';
 
-const db = drizzle({ schema: dbSchema });
+const db = drizzle(client, { schema: dbSchema });
 
 const { schema } = buildSchema(db);
 
