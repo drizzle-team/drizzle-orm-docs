@@ -3,11 +3,72 @@
     <a href='https://x.com/DrizzleORM/status/1820462321942036749'><b>Drizzle Gateway</b></a> closed alpha release 🎉
   - |
     <a href='https://github.com/drizzle-team/brocli'><b>Brocli</b></a> - our new open-source library 👀
-    
+
   - | 
     <a href='https://3310snake.com/'>Snake Game</a> released 🎉
     have some fun
     we've had a lot of fun
+
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.24.0'>v0.24.0</a> release</b>
+    
+    <strong>Breaking changes:</strong>
+    <ul>
+    <li>Fixed <a href='https://github.com/drizzle-team/drizzle-kit-mirror/issues/342'>Composite primary key order is not consistent</a> by removing `sort` in SQLite</li>
+    </ul>
+    
+    <strong>Bug fixes:</strong>
+    <ul>
+    <li><a href='https://github.com/drizzle-team/drizzle-kit-mirror/issues/403'>[BUG] When using double type columns, import is not inserted</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-kit-mirror/issues/404'>[BUG] A number value is specified as the default for a column of type char</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2621'>[BUG]: Array default in migrations are wrong</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2709'>[FEATURE]: Simpler default array fields</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2432'>[BUG]: drizzle-kit generate succeeds but generates invalid SQL for default([]) - Postgres</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2334'>[BUG]: Incorrect type for array column default value</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2224'>[BUG]: error: column is of type integer[] but default expression is of type integer</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/1003'>[BUG]: Default value in array generating wrong migration file</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/1564'>[BUG]: enum as array, not possible?</a></li>
+    </ul>
+
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.33.0'>v0.33.0</a> release</b>
+
+    <strong>Breaking changes:</strong>
+    <ul>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/724'>[BUG]: jsonb always inserted as a json string when using postgres-js</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/1511'>[BUG]: jsonb type on postgres implement incorrectly</a></li>
+    </ul>
+    
+    <strong>Bug fixes:</strong>
+    <ul>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2568'>[BUG]: boolean mode not working with prepared statements (bettersqlite)</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2672'>[BUG]: isTable helper function is not working</a></li>
+    <li><a href='https://github.com/drizzle-team/drizzle-orm/issues/2690'>[BUG]: Documentation is outdated on inArray and notInArray Methods</a></li>
+    </ul>
+  
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.23.2'>v0.23.2</a> release</b>
+
+    <ul>
+    <li>fixed a bug in PostgreSQL with push and introspect where the <code><strong>schemaFilter</strong></code> object was passed. It was detecting enums even in schemas that were not defined in the <strong><code>schemaFilter</strong></code>.</li>
+    <li>fixed the <code><strong>drizzle-kit up</strong></code> command to work as expected, starting from the sequences release</li>
+    </ul>
+
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.32.2'>v0.32.2</a> release</b>
+
+    <ul>
+    <li>fix AWS Data API type hints bugs in RQB</li>
+    <li>fix set transactions in MySQL bug</li>
+    <li>add forwaring dependencies within useLiveQuery, fixes <a href='https://github.com/drizzle-team/drizzle-orm/issues/2651'>#2651</a></li>
+    <li>export additional types from SQLite package, like <code>AnySQLiteUpdate</code></li>
+    </ul>
+
+  - |
+    <b>Updated tutorials:</b>
+
+    • <a href='https://orm.drizzle.team/learn/tutorials/drizzle-with-supabase'>Drizzle with Supabase Database</a>
+    • <a href='https://orm.drizzle.team/learn/tutorials/drizzle-with-vercel-edge-functions'>Drizzle with Vercel Edge Functions</a>
 2024-07-29:
   - |
     <b>Drizzle Kit goes open-source 🎉</b>

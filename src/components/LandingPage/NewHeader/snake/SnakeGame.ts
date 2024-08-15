@@ -100,8 +100,9 @@ export class SnakeGame {
     const headerRight = document.querySelector(".header-right")!;
     const gameArea = document.getElementById("gameArea");
     const oldIsPaused = this.isPaused;
-
-    this.isPaused = window.getComputedStyle(headerRight).display === "none";
+    this.isPaused = headerRight
+      ? window.getComputedStyle(headerRight).display === "none"
+      : true;
     if (oldIsPaused && !this.isPaused) {
       this.gameLoop();
     }

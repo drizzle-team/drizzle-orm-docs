@@ -38,6 +38,7 @@
         <img id="avatar-light" loading="lazy" />
       </div>
       <div id="card-name" class={"card_name"}></div>
+      <div class="popover"></div>
     </div>
   </a>
 </template>
@@ -210,6 +211,10 @@
               )! as HTMLDivElement;
               cardWrapper.classList.add("with_name");
               if (sponsorTypes[type.name].hasCard) {
+                if (item.popover) {
+                  cardWrapper.classList.add("styled_card_with_popover")
+                  cardWrapper.querySelector('.popover').innerHTML = item.popover
+                }
                 cardWrapper.classList.add("styled_card");
               }
               cardsBlock.append(card);
@@ -312,7 +317,39 @@
     }
   })
 </script>
-<style></style>
+<script lang="ts" type="module">
+  import {computePosition, shift, offset} from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.8/+esm';
+
+  const computePopovers = () => {
+    const cards = document.querySelectorAll('.styled_card_with_popover');
+
+    cards.forEach((card) => {
+      const cardPopover = card.querySelector('.popover');
+
+      if (!cardPopover)  return;
+
+      computePosition(card, cardPopover, {
+        placement: 'top',
+        middleware: [shift({padding: 20}), offset(6)]
+      }).then(({x, y}) => {
+        Object.assign(cardPopover.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+        });
+      });
+    })
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    computePopovers();
+
+    window.removeEventListener('resize', computePopovers, false);
+    document.querySelector('.landing-wrap')?.removeEventListener('scroll', computePopovers, false);
+
+    document.querySelector('.landing-wrap')?.addEventListener('scroll', computePopovers);
+    window.addEventListener('resize', computePopovers);
+  })
+</script>
 <style is:global>
   .card_image {
     width: 66px;
@@ -521,6 +558,37 @@
     border-radius: 4px;
     background-color: #ffffff;
     border: 1px solid #e8e8e8;
+  }
+
+  .styled_card_with_popover {
+      position: relative;
+  }
+
+   .popover {
+      position: fixed;
+      top: 0;
+      white-space: nowrap;
+      left: 0;
+      width: max-content;
+      opacity: 0;
+      pointer-events: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 4px 12px;
+      background: white;
+      border-radius: 4px;
+      z-index: 999;
+      box-shadow: 0 0 0 0 #fff, 0 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+      transition: opacity 0.3s;
+  }
+
+  html.dark .styled_card_with_popover .popover {
+      background: #000;
+      box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 1px hsla(0, 0%, 100%, .2), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+  }
+
+  .styled_card_with_popover:hover .popover{
+      opacity: 1;
   }
 
   .round-20 {
