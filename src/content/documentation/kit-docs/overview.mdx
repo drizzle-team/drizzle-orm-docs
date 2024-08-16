@@ -122,11 +122,12 @@ We're unopinionated on how you should run your migrations, you can run them manu
 
 **Using Drizzle Kit**
 
-You can use the native migrate CLI command `drizzle-kit migrate`. It will gather all the needed information from the `drizzle.config.ts` file to run migrations.
+You can use the native migrate CLI command `drizzle-kit migrate`. It will gather all the needed information from the `drizzle.config.ts` file to run migrations, provided that `drizzle-kit generate` has been run before.
 
 You can specify custom schema and migration table names in `drizzle.config.ts` . For more information, please check the migrate [documentation](/kit-docs/commands#apply-migrations).
 
 ```bash
+# You need to have run `drizzle-kit generate` before calling this
 drizzle-kit migrate
 ```
 
