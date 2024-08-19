@@ -8,6 +8,7 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import Npm from '@mdx/Npm.astro';
 import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
+import Callout from '@mdx/Callout.astro';
 
 This tutorial demonstrates how to use Drizzle ORM with [Supabase Edge Functions](https://supabase.com/docs/guides/functions).
 
@@ -21,64 +22,14 @@ drizzle-orm
 - You should have installed Docker Desktop. It is a prerequisite for local development. Follow the official [docs](https://docs.docker.com/desktop) to install.
 </Prerequisites>
 
-
 To learn how to create a basic Edge Function on your local machine and then deploy it, see the [Edge Functions Quickstart](https://supabase.com/docs/guides/functions/quickstart).
 
 <Steps>
-#### Initialize a new Supabase project
-
-Create a new Supabase project in a folder on your local machine:
-
-```bash copy
-supabase init
-```
-
-It will create `supabase` folder with `config.toml` file:
-
-```text
-└── supabase
-    └── config.toml
-```
-
-If you are using Visual Studio Code, follow the [Supabase documentation](https://supabase.com/docs/guides/functions/local-development#deno-with-visual-studio-code) to setup settings for Deno.
-
-#### Create a new Edge Function
-
-Run the `supabase functions new [FUNCTION_NAME]` command to create a new Edge Function:
-
-```bash copy
-supabase functions new drizzle-tutorial
-```
-
-It will create a new folder with the function name in the `supabase/functions` directory:
-
-```text
-└── supabase
-    └── functions
-    │   └── drizzle-tutorial
-    │   │   └── index.ts ## Your function code
-```
-
-#### Setup imports
-
-Create a `import_map.json` file in the `supabase/functions` directory and add import for Drizzle ORM:
-
-```json copy filename="supabase/functions/import_map.json"
-{
-  "imports": {
-    "drizzle-orm": "npm:drizzle-orm@0.30.10",
-    "drizzle-orm/": "npm:/drizzle-orm@0.30.10/"
-  }
-}
-```
-
-Learn more in the [documentation](https://supabase.com/docs/guides/functions/import-maps).
-
 #### Create a table
 
-Create a `schema.ts` file in the `supabase/functions/common` directory and declare a table schema:
+Create a `schema.ts` file in your `src` directory and declare a table schema:
 
-```typescript copy filename="supabase/functions/common/schema.ts"
+```typescript copy filename="src/schema.ts"
 import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable('users_table', {
@@ -99,13 +50,30 @@ Create a `drizzle.config.ts` file in the root of your project and add the follow
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./supabase/functions/common/schema.ts",
+  schema: "./src/schema.ts",
   out: "./supabase/migrations",
   dialect: "postgresql",
 });
 ```
 
 In this tutorial we will use Drizzle kit to generate migrations for our schema.
+
+#### Initialize a new Supabase project
+
+Create a new Supabase project in a folder on your local machine:
+
+```bash copy
+supabase init
+```
+
+It will create `supabase` folder with `config.toml` file:
+
+```text
+└── supabase
+    └── config.toml
+```
+
+If you are using Visual Studio Code, follow the [Supabase documentation](https://supabase.com/docs/guides/functions/local-development#deno-with-visual-studio-code) to setup settings for Deno.
 
 #### Generate migrations
 
@@ -125,15 +93,49 @@ To apply migrations and start the Supabase local development stack, run the foll
 supabase start
 ```
 
-Alternatively, you can apply migrations using the `migrate()` helper, available for every supported driver. Learn more about this migration process in the [documentation](https://orm.drizzle.team/docs/migrations).
+<Callout type="warning">Don't forget to run Docker</Callout>
+
+Alternatively, you can apply migrations using the `drizzle-kit migrate` command. Learn more about this migration process in the [documentation](https://orm.drizzle.team/docs/migrations).
+
+#### Create a new Edge Function
+
+Run the `supabase functions new [FUNCTION_NAME]` command to create a new Edge Function:
+
+```bash copy
+supabase functions new drizzle-tutorial
+```
+
+It will create a new folder with the function name in the `supabase/functions` directory:
+
+```text
+└── supabase
+    └── functions
+    │   └── drizzle-tutorial
+    │   │   └── index.ts ## Your function code
+```
+
+#### Copy your schema to the functions directory
+
+Copy the `schema.ts` file to the `supabase/functions/shared` directory and update the import:
+
+```typescript copy filename="supabase/functions/shared/schema.ts"
+import { pgTable, serial, text, integer } from "npm:drizzle-orm/pg-core";
+
+export const usersTable = pgTable('users_table', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age').notNull(),
+  email: text('email').notNull().unique(),
+})
+```
 
 #### Connect Drizzle ORM to your database
 
-Create a `db.ts` file in the `supabase/common` directory and set up your database configuration:
+Create a `db.ts` file in the `supabase/functions/shared` directory and set up your database configuration:
 
-```typescript copy filename="supabase/functions/common/db.ts"
+```typescript copy filename="supabase/functions/shared/db.ts"
 import postgres from "npm:postgres";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle } from "npm:drizzle-orm/postgres-js";
 
 const connectionString = Deno.env.get("SUPABASE_DB_URL")!;
 
@@ -146,11 +148,13 @@ export const db = drizzle(client);
 
 #### Test your code locally
 
-```typescript copy filename="supabase/functions/drizzle-tutorial/index.ts"
-import { db } from "../common/db.ts";
-import { usersTable } from "../common/schema.ts";
+Update your `index.ts` file in the `supabase/functions/drizzle-tutorial` directory with the following code:
 
-Deno.serve(async (req) => {
+```typescript copy filename="supabase/functions/drizzle-tutorial/index.ts"
+import { db } from "../shared/db.ts";
+import { usersTable } from "../shared/schema.ts";
+
+Deno.serve(async () => {
   await db.insert(usersTable).values({
     name: "Alice",
     email: "email",
@@ -188,10 +192,10 @@ Navigate to the route `(e.g. /drizzle-tutorial)` in your browser:
 
 You can create new Supabase project in the [dashboard](https://supabase.com/dashboard) or by following this [link](https://database.new/).
 
-Copy the `Reference ID` and use it to link your local development project to a hosted Supabase project by running the following command:
+Copy the `Reference ID` from project settings and use it to link your local development project to a hosted Supabase project by running the following command:
 
 ```bash copy
-supabase link --project-ref <REFERENCE_ID>
+supabase link --project-ref=<REFERENCE_ID>
 ```
 
 Push your schema changes to the hosted Supabase project by running the following command:
@@ -212,9 +216,9 @@ Run the following command to set the environment variable:
 supabase secrets set DATABASE_URL=<CONNECTION_STRING>
 ```
 
-Update the `db.ts` file in the `supabase/functions/common` directory to use the `DATABASE_URL` environment variable:
+Update the `db.ts` file in the `supabase/functions/shared` directory to use the `DATABASE_URL` environment variable:
 
-```typescript copy filename="supabase/functions/common/db.ts"
+```typescript copy filename="supabase/functions/shared/db.ts"
 // imports
 
 const connectionString = Deno.env.get("DATABASE_URL")!;
