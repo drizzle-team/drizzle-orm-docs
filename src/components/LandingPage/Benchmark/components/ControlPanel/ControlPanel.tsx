@@ -28,6 +28,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   } = useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
   const [isBlurred, setIsBlurred] = useState<boolean>(true);
+  const [isSmall, setIsSmall] = useState<boolean>(false);
   const [isShaking, setIsShaking] = useState<boolean>(false);
 
   const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
@@ -40,6 +41,15 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     }
     return 0;
   }, [drizzleData, compareData]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.innerWidth > minWidth) {
+      setIsBlurred(false);
+    } else {
+      setIsSmall(true);
+    }
+  }, [typeof window]);
 
   const openConfigModal = () => {
     setIsConfigOpen((prev) => !prev);
@@ -317,13 +327,15 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
                   Only available on Desktop 🖥️
                 </div>
               )}
-              <button
-                onClick={start}
-                type="button"
-                className={isShaking ? styles["start-shaked"] : styles.start}
-              >
-                Launch your DevOps experience 🚀
-              </button>
+              {isSmall && (
+                <button
+                  onClick={start}
+                  type="button"
+                  className={isShaking ? styles["start-shaked"] : styles.start}
+                >
+                  Launch your DevOps experience 🚀
+                </button>
+              )}
             </div>
           )}
         </div>

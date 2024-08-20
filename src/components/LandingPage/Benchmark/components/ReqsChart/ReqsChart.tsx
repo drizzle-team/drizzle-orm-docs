@@ -152,8 +152,6 @@ const CustomBarChart: FC<IProps> = ({
     }
   }, [selectedItemIndex]);
 
-  console.log(totalRequestsFail);
-
   return (
     <div>
       <div className={styles.header}>
