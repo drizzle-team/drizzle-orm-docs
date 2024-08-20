@@ -12,6 +12,7 @@ import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
 import configurationData from "../../configurationData";
 import RuntimeSelector from "@components/LandingPage/Benchmark/components/RuntimeSelector/RuntimeSelector.tsx";
+import JoinsSelector from "@components/LandingPage/Benchmark/components/JoinsSelector/JoinsSelector.tsx";
 
 interface Props {
   selectedItems: IParams;
@@ -108,6 +109,28 @@ const Performance: FC<Props> = ({
     setMaxRequests(maxRequestsTemp);
   }, [index]);
 
+  const peakReqs = useMemo((): number => {
+    if (!data) return 0;
+
+    return (
+      [...data]
+        .sort((a, b) => b.reqs - a.reqs)
+        .slice(0, 100)
+        .reduce((prev, cur) => prev + cur.reqs, 0) / 100
+    );
+  }, [data]);
+
+  const copmarePeakReqs = useMemo((): number => {
+    if (!compareData) return 0;
+
+    return (
+      [...compareData]
+        .sort((a, b) => b.reqs - a.reqs)
+        .slice(0, 100)
+        .reduce((prev, cur) => prev + cur.reqs, 0) / 100
+    );
+  }, [compareData]);
+
   return (
     <div className={isConfigOpen ? styles["wrap-hide"] : styles.wrap}>
       <div className={styles["compare-item-container"]}>
@@ -136,7 +159,10 @@ const Performance: FC<Props> = ({
             </div>
           </div>
         </div>
-        <RuntimeSelector />
+        <div style={{ display: "flex", gap: "12px" }}>
+          <RuntimeSelector />
+          <JoinsSelector />
+        </div>
       </div>
       <div className={styles.block}>
         <LatencyChart
@@ -184,6 +210,8 @@ const Performance: FC<Props> = ({
           max={maxRequests}
           isCompleted={index === maxDataLength}
           showTooltip
+          peakReqs={peakReqs}
+          totalRequestsFail={data ? data[index].totalFailReqs : 0}
         />
       </div>
       <div className={styles.block}>
@@ -198,6 +226,8 @@ const Performance: FC<Props> = ({
           maxDataLength={maxElements}
           max={maxRequests}
           isCompleted={index === maxDataLength}
+          peakReqs={copmarePeakReqs}
+          totalRequestsFail={compareData ? compareData[index].totalFailReqs : 0}
         />
       </div>
       <div className={styles.block}>

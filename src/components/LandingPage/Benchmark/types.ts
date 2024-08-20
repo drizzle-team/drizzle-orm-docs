@@ -13,6 +13,8 @@ export interface IData {
     cpus: number;
   };
   reqs: number;
+  failReqs: number;
+  totalFailReqs: number;
   totalReqs: number;
   avg: {
     p95: number;
