@@ -205,7 +205,10 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           )}
           {!isConfigOpen && (
             <div className={styles.rangeContainer}>
-              <div className={styles.rangeStep}>
+              <div
+                className={styles.rangeStep}
+                style={{ width: `${350 / (360 / 100)}px` }}
+              >
                 0
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -224,7 +227,10 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
                 </svg>
                 1k
               </div>
-              <div className={styles.rangeStep}>
+              <div
+                className={styles.rangeStep}
+                style={{ width: `${350 / (360 / 100)}px` }}
+              >
                 1k
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -243,7 +249,10 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
                 </svg>
                 2k
               </div>
-              <div className={styles.rangeStep} style={{ borderRight: "none" }}>
+              <div
+                className={styles.rangeStep}
+                style={{ width: `${350 / (360 / 100)}px` }}
+              >
                 2k
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -260,6 +269,12 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
                   <path d="M5 12h14" />
                   <path d="m12 5 7 7-7 7" />
                 </svg>
+                3k
+              </div>
+              <div
+                className={styles.rangeStep}
+                style={{ borderRight: "none", width: `${350 / (360 / 60)}px` }}
+              >
                 3k
               </div>
               <input
