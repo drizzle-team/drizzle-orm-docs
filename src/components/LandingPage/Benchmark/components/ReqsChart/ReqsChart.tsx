@@ -2,7 +2,7 @@ import { type FC, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./ReqsChart.module.css";
 
-import { CheckIcon } from "@/components/Icons/Icons";
+import { CheckIcon, XIcon } from "@/components/Icons/Icons";
 import { SVGViewBoxHeight, SVGViewBoxWidth } from "../../constants";
 import type { IData } from "../../types";
 import fixedHelper from "../../utils/fixedHelper";
@@ -21,6 +21,7 @@ interface IProps {
   totalRequestsCompare: number;
   showTooltip?: boolean;
   peakReqs: number;
+  totalRequestsFail: number;
 }
 
 const CustomBarChart: FC<IProps> = ({
@@ -36,6 +37,7 @@ const CustomBarChart: FC<IProps> = ({
   totalRequestsCompare,
   showTooltip,
   peakReqs,
+  totalRequestsFail,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
     x: 0,
@@ -150,6 +152,8 @@ const CustomBarChart: FC<IProps> = ({
     }
   }, [selectedItemIndex]);
 
+  console.log(totalRequestsFail);
+
   return (
     <div>
       <div className={styles.header}>
@@ -165,6 +169,24 @@ const CustomBarChart: FC<IProps> = ({
           <div></div>
         )}
         <div className={styles["info-wrap"]}>
+          <div
+            className={
+              isCompleted && !!totalRequestsFail
+                ? styles["tooltip-wrap-underline"]
+                : styles["tooltip-wrap"]
+            }
+          >
+            <div className={styles.tooltip}>Failed requests</div>
+            {pathArray.length > 0 && isCompleted && !!totalRequestsFail && (
+              <>
+                <div className={styles["success-icon-wrap"]}>
+                  <XIcon />
+                </div>
+                {roundToThousand(totalRequestsFail)}
+              </>
+            )}
+          </div>
+          {pathArray.length > 0 && isCompleted && !!totalRequestsFail && " | "}
           <div
             className={
               isCompleted && showTooltip

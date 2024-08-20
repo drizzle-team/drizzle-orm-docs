@@ -211,6 +211,7 @@ const Performance: FC<Props> = ({
           isCompleted={index === maxDataLength}
           showTooltip
           peakReqs={peakReqs}
+          totalRequestsFail={data ? data[index].totalFailReqs : 0}
         />
       </div>
       <div className={styles.block}>
@@ -226,6 +227,7 @@ const Performance: FC<Props> = ({
           max={maxRequests}
           isCompleted={index === maxDataLength}
           peakReqs={copmarePeakReqs}
+          totalRequestsFail={compareData ? compareData[index].totalFailReqs : 0}
         />
       </div>
       <div className={styles.block}>

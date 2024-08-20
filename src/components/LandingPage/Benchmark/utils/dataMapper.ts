@@ -20,7 +20,9 @@ export default (data: IJSONData[]): IData[] => {
         cpus: (item.core1 + item.core2 + item.core3 + item.core4) / 4,
       },
       reqs: item.reqs_per_sec,
+      failReqs: item.fail_reqs_per_sec,
       totalReqs: null,
+      totalFail: null,
       avg: null,
       max: null,
     }))
@@ -38,6 +40,10 @@ export default (data: IJSONData[]): IData[] => {
       const reqs =
         sliced.reduce((prev, next) => prev + next.reqs, 0) / sliced.length;
       const totalReqs = sliced.reduce((prev, next) => prev + next.reqs, 0);
+      const totalFailReqs = sliced.reduce(
+        (prev, next) => prev + next.failReqs,
+        0,
+      );
       const maxReqs = Math.max(...sliced.map(({ reqs }) => reqs));
       const maxLatency = Math.max(
         ...sliced.map(({ latency }) => Math.max(...Object.values(latency))),
@@ -46,6 +52,7 @@ export default (data: IJSONData[]): IData[] => {
       return {
         ...newItem,
         totalReqs,
+        totalFailReqs,
         avg: {
           p95,
           cpus,
