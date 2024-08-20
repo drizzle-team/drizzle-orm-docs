@@ -45,7 +45,7 @@ const LatencyChart: FC<IProps> = ({
   const svgWidth = SVGViewBoxWidth;
   const statsRef = useRef<HTMLDivElement>(null!);
   const lineRef = useRef<SVGLineElement>(null!);
-  const params: Array<keyof IData["latency"]> = ["p99", "p95", "p90", "avg"];
+  const params: Array<keyof IData["latency"]> = ["p95", "p90", "avg"];
   const itemSize = svgWidth / (maxDataLength - 1);
 
   const calculatePath = (arr: IData[], param: keyof IData["latency"]) => {
@@ -226,7 +226,7 @@ const LatencyChart: FC<IProps> = ({
             avg latency: {formatMs(averageLatency)}
           </div>
         ) : selectedItemIndex === null ? (
-          <div className={styles.label}>latency: {formatMs(latency)}</div>
+          <div className={styles.label}>avg latency: {formatMs(latency)}</div>
         ) : (
           <div style={{ height: "12px" }}></div>
         )}
@@ -270,7 +270,7 @@ const LatencyChart: FC<IProps> = ({
                   +averageP99Compare.toFixed() / +averageP99.toFixed(),
                   1,
                 )}{" "}
-                times better p99 latency
+                times better p95 latency
               </div>
               x
               {fixedHelper(
@@ -334,13 +334,6 @@ const LatencyChart: FC<IProps> = ({
               p95:
               <div className={styles["accent-text"]}>
                 {formatMs(pathArray[selectedItemIndex].latency.p95)}
-              </div>
-            </div>
-            <div className={styles["stats-item"]}>
-              <div className={`${styles.circle} ${styles["stats-p99"]}`} />
-              p99:
-              <div className={styles["accent-text"]}>
-                {formatMs(pathArray[selectedItemIndex].latency.p99)}
               </div>
             </div>
           </div>

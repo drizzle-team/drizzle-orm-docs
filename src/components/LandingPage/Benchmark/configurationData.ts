@@ -19,8 +19,8 @@ const configurationData: {
       prisma: {
         value: "Drizzle vs Prisma",
         config_info: "Drizzle vs Prisma",
-        drizzle_version: "v0.28.1",
-        compare_version: "v5.1.1",
+        drizzle_version: "v0.33.0",
+        compare_version: "v5.18.0",
       },
       typeorm: {
         value: "Drizzle vs TypeORM",

@@ -4,7 +4,6 @@ export interface IData {
     avg: number;
     p90: number;
     p95: number;
-    p99: number;
   };
   cpus: {
     cpu1: number;
@@ -16,7 +15,7 @@ export interface IData {
   reqs: number;
   totalReqs: number;
   avg: {
-    p99: number;
+    p95: number;
     cpus: number;
     latency: number;
     reqs: number;
@@ -46,6 +45,8 @@ export interface IParams {
   dbSize: string;
   projectType: string;
   database: string;
+  runtime: "node-22" | "node-18" | "bun";
+  joins: boolean;
 }
 
 export interface IModalInputData {

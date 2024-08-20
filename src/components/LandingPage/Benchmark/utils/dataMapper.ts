@@ -11,7 +11,6 @@ export default (data: IJSONData[]): IData[] => {
         avg: item.latency_average,
         p90: item.latency_90,
         p95: item.latency_95,
-        p99: item.latency_99,
       },
       cpus: {
         cpu1: item.core1,
@@ -28,8 +27,8 @@ export default (data: IJSONData[]): IData[] => {
     .map((newItem, index, self) => {
       const sliced = self.slice(0, index + 1);
 
-      const p99 =
-        sliced.reduce((prev, next) => prev + next.latency.p99, 0) /
+      const p95 =
+        sliced.reduce((prev, next) => prev + next.latency.p95, 0) /
         sliced.length;
       const cpus =
         sliced.reduce((prev, next) => prev + next.cpus.cpus, 0) / sliced.length;
@@ -48,7 +47,7 @@ export default (data: IJSONData[]): IData[] => {
         ...newItem,
         totalReqs,
         avg: {
-          p99,
+          p95,
           cpus,
           latency,
           reqs,

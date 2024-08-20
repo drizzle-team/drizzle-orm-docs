@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, type FC } from "react";
 
 import styles from "./ControlPanel.module.css";
-import type { IData, IParams } from "../../types";
+import type { IData } from "../../types";
 
 import SpeedSelector from "../SpeedSelector/SpeedSelector";
 import Configuration from "../Configuration/Configuration";
@@ -17,17 +17,18 @@ interface Props {
 }
 
 const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
-  const { setIsTimerActive, isTimerActive, time, setTime, intervalId } =
-    useBenchmarkContext();
+  const {
+    setIsTimerActive,
+    isTimerActive,
+    time,
+    setTime,
+    intervalId,
+    selectedItems,
+    setSelectedItems,
+  } = useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
   const [isBlurred, setIsBlurred] = useState<boolean>(true);
   const [isShaking, setIsShaking] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<IParams>({
-    orm: "prisma",
-    dbSize: "micro",
-    projectType: "ecommerce",
-    database: "postgres",
-  });
 
   const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
   const [compareData, setCompareData] = useState<IData[] | null>(null);
