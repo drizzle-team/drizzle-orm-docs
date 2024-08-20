@@ -73,16 +73,6 @@ const Performance: FC<Props> = ({
 
   useEffect(() => {
     if (!data || !compareData) return;
-    const maxLatency = Math.max(
-      data[maxDataLength].max.latency,
-      compareData[maxDataLength].max.latency,
-    );
-    setMax(maxLatency);
-    const maxRequestsTemp = Math.max(
-      data[maxDataLength].max.reqs,
-      compareData[maxDataLength].max.reqs,
-    );
-    setMaxRequests(maxRequestsTemp);
     setSelectedItemIndex(null);
     setIsTimerActive(true);
     setConcatedDataDrizzle(data.slice(0, 1));
@@ -104,6 +94,17 @@ const Performance: FC<Props> = ({
     }
     setConcatedDataDrizzle(getSubArray(data, index, maxElements));
     setConcatedDataCompare(getSubArray(compareData, index, maxElements));
+
+    const maxLatency = Math.max(
+      data[index].max.latency,
+      compareData[index].max.latency,
+    );
+    setMax(maxLatency);
+    const maxRequestsTemp = Math.max(
+      data[index].max.reqs,
+      compareData[index].max.reqs,
+    );
+    setMaxRequests(maxRequestsTemp);
   }, [index]);
 
   return (

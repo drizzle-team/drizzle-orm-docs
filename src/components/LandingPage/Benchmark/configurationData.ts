@@ -29,47 +29,6 @@ const configurationData: {
       },
     },
   },
-  traffic: {
-    value: "Traffic size",
-    items: {
-      your_startup: {
-        value: "Your startup",
-        description: "0 users and 0 requests",
-        config_info: "Your startup(0 users)",
-      },
-      micro: {
-        value: "Micro",
-        description: "200VUs, 240k reqs",
-        config_info: "Micro traffic size(200VUs)",
-      },
-      small: {
-        value: "Small",
-        description: "500VUs, 600k reqs",
-        config_info: "Small traffic size(500VUs)",
-      },
-      medium: {
-        value: "Medium",
-        description: "1k VUs, 1M reqs",
-        config_info: "Medium traffic size(1000VUs)",
-      },
-      high: {
-        value: "High",
-        disabled: true,
-      },
-      huge: {
-        value: "Huge",
-        disabled: true,
-      },
-      extreme: {
-        value: "Extreme",
-        disabled: true,
-      },
-      blackFriday: {
-        value: "Black Friday",
-        disabled: true,
-      },
-    },
-  },
   dbSize: {
     value: "Database size",
     items: {

@@ -127,7 +127,7 @@ await db.select({
 }).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
-select "users"."id", "pets","id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
+select "users"."id", "pets"."id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
 ```
 ```typescript
 // result type

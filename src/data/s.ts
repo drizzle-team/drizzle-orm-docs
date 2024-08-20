@@ -1,4 +1,4 @@
-import { type ISponsor, ImageType } from "@/types/Sponsors";
+import { ImageType, type ISponsor } from "@/types/Sponsors";
 
 export const sponsorsData: ISponsor[] = [
   {
@@ -159,7 +159,7 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/nuxt",
+      login: "https://hub.nuxt.com/?utm_source=drizzle-docs",
       name: "Nuxt",
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
@@ -254,6 +254,21 @@ export const sponsorsData: ISponsor[] = [
     lightStyle: {
       padding: "6px",
     },
+  },
+  {
+    tier: {
+      name: "$250 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/usemotion",
+      name: "Motion",
+      avatarUrl: "/images/motion.png",
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
   },
 ];
 

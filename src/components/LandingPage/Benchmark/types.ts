@@ -27,8 +27,18 @@ export interface IData {
   };
 }
 
-export interface IInputData {
-  data: IData[];
+export interface IJSONData {
+  time: string;
+  core1: number;
+  core2: number;
+  core3: number;
+  core4: number;
+  reqs_per_sec: number;
+  fail_reqs_per_sec: number;
+  latency_95: number;
+  latency_90: number;
+  latency_99: number;
+  latency_average: number;
 }
 
 export interface IParams {
@@ -36,7 +46,6 @@ export interface IParams {
   dbSize: string;
   projectType: string;
   database: string;
-  traffic: string;
 }
 
 export interface IModalInputData {
