@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState, type FC } from "react";
+import React, { useEffect, useMemo, useState, type FC } from "react";
 
 import styles from "./ControlPanel.module.css";
-import type { IData, IInputData, IParams } from "../../types";
-import Timer from "../Timer/Timer";
+import type { IData, IParams } from "../../types";
 
 import SpeedSelector from "../SpeedSelector/SpeedSelector";
 import Configuration from "../Configuration/Configuration";
@@ -10,22 +9,45 @@ import Performance from "../Performance/Performance";
 import { useBenchmarkContext } from "../../context/useBenchmarkContext";
 import OptionsIcon from "@/components/Icons/OptionsIcon";
 import BenchmarkConifg from "../BenchmarkConfig/BenchmarkConfig";
-import getBenchmarkPaths from "../../utils/getBenchmarkPaths";
 import ArrowRight from "@/components/Icons/ArrowRight";
+import formatNumber from "@components/LandingPage/Benchmark/utils/formatNumber.ts";
+import getBenchmarkData from "../../utils/getBenchmarkData.ts";
 
 interface Props {
   minWidth?: number;
 }
 
+const usersSteps = [
+  { duration: 20, target: 200 },
+  { duration: 20, target: 400 },
+  { duration: 20, target: 800 },
+  { duration: 20, target: 1000 },
+  { duration: 20, target: 1200 },
+  { duration: 20, target: 1400 },
+  { duration: 20, target: 1600 },
+  { duration: 20, target: 1800 },
+  { duration: 20, target: 2000 },
+  { duration: 20, target: 2200 },
+  { duration: 20, target: 2400 },
+  { duration: 20, target: 2600 },
+  { duration: 20, target: 2800 },
+  { duration: 20, target: 3000 },
+  { duration: 55, target: 3200 },
+];
+
+const totalDuration = usersSteps.reduce(
+  (prev, next) => (prev += next.duration),
+  0,
+);
+
 const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   const { setIsTimerActive, isTimerActive, time, setTime, intervalId } =
     useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
-  const [isBlurred, setIsBlurred] = useState<boolean>(true);
+  const [isBlurred, setIsBlurred] = useState<boolean>(false);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<IParams>({
     orm: "prisma",
-    traffic: "medium",
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
@@ -42,32 +64,6 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     return 0;
   }, [drizzleData, compareData]);
 
-  const getFile = async (): Promise<{
-    drizzleData: IData[] | null;
-    compareData: IData[] | null;
-  }> => {
-    const paths = getBenchmarkPaths(selectedItems);
-    if (!paths) {
-      return {
-        drizzleData: null,
-        compareData: null,
-      };
-    }
-    let d: IInputData | null = null;
-    let c: IInputData | null = null;
-    [d, c] = await Promise.all([
-      import(`../../data/${paths.drizzleFileName}.json`),
-      import(`../../data/${paths.compareFileName}.json`),
-    ]);
-    if (d && c) {
-      return { drizzleData: d.data, compareData: c.data };
-    }
-    return {
-      drizzleData: null,
-      compareData: null,
-    };
-  };
-
   const openConfigModal = () => {
     setIsConfigOpen((prev) => !prev);
     setIsTimerActive((prev) => !prev);
@@ -79,10 +75,28 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     setTime(maxDataLength * 100);
   };
 
+  const pause = () => {
+    if (!drizzleData || !compareData) return;
+    clearInterval(intervalId.current);
+    setIsTimerActive(false);
+  };
+
   const rerun = () => {
     if (!drizzleData || !compareData) return;
     setTime(0);
     setIsTimerActive(true);
+  };
+
+  const resume = () => {
+    if (!drizzleData || !compareData) return;
+    setIsTimerActive(true);
+  };
+
+  const rewind = (e: any) => {
+    if (!drizzleData || !compareData) return;
+    setTime(Number(e.target.value));
+    setIsTimerActive(false);
+    clearInterval(intervalId.current);
   };
 
   const start = () => {
@@ -101,14 +115,11 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   };
 
   useEffect(() => {
-    getFile()
-      .then((data) => {
-        if (!data.drizzleData || !data.compareData) return;
-        setDrizzleData(data.drizzleData);
-        setCompareData(data.compareData);
-        rerun();
-      })
-      .catch(() => {});
+    const data = getBenchmarkData(selectedItems);
+    if (data) {
+      setDrizzleData(data.drizzleData);
+      setCompareData(data.compareData);
+    }
     return () => {
       setDrizzleData(null);
       setCompareData(null);
@@ -125,26 +136,117 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     <div className={styles.content}>
       <div className={styles.control}>
         <div className={styles.time}>
-          <Timer time={time} />
           <SpeedSelector speed={speed} setSpeed={setSpeed} />
-          <div className={styles.divider} />
+          {!isTimerActive &&
+            !isConfigOpen &&
+            (time === maxDataLength * 100 || time === 0) && (
+              <>
+                <div className={styles.divider}></div>
+                <button
+                  type="button"
+                  className={styles["play-wrap"]}
+                  onClick={rerun}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-play"
+                  >
+                    <polygon points="6 3 20 12 6 21 6 3" />
+                  </svg>
+                  Run
+                </button>
+                <div className={styles.divider}></div>
+              </>
+            )}
+          {!isTimerActive &&
+            !isConfigOpen &&
+            time !== maxDataLength * 100 &&
+            time !== 0 && (
+              <>
+                <div className={styles.divider}></div>
+                <button
+                  type="button"
+                  className={styles["play-wrap"]}
+                  onClick={resume}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-play"
+                  >
+                    <polygon points="6 3 20 12 6 21 6 3" />
+                  </svg>
+                  Resume
+                </button>
+                <div className={styles.divider}></div>
+              </>
+            )}
           {isTimerActive && !isConfigOpen && (
-            <button
-              type="button"
-              className={styles["play-wrap"]}
-              onClick={skipToResults}
-            >
-              Skip to results
-            </button>
+            <>
+              <div className={styles.divider}></div>
+              <button
+                type="button"
+                className={styles["play-wrap"]}
+                onClick={pause}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-pause"
+                >
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                </svg>
+                Pause
+              </button>
+              <div className={styles.divider}></div>
+            </>
           )}
-          {!isTimerActive && !isConfigOpen && (
-            <button
-              type="button"
-              className={styles["play-wrap"]}
-              onClick={rerun}
-            >
-              Rerun
-            </button>
+          {!isConfigOpen && (
+            <div className={styles.rangeContainer}>
+              {usersSteps.map((step) => (
+                <div
+                  key={step.target}
+                  className={styles.rangeStep}
+                  style={{
+                    width: `${400 / (totalDuration / step.duration)}px`,
+                  }}
+                >
+                  {formatNumber(step.target)}
+                </div>
+              ))}
+              <input
+                className={styles["rewind-input"]}
+                type="range"
+                min={0}
+                max={maxDataLength * 100}
+                value={time}
+                onChange={rewind}
+                step={1}
+              />
+            </div>
           )}
         </div>
         <div className={styles.config}>
@@ -199,18 +301,6 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           selectedItems={selectedItems}
           setSelectedItems={setSelectedItems}
         />
-        {!isConfigOpen && selectedItems.traffic === "your_startup" && (
-          <div className={styles["sticker-wrap"]}>
-            <div className={styles.congrats}>
-              <div className={styles["congrats-text"]}>
-                At least you have great Lighthouse score!
-              </div>
-            </div>
-            <div className={styles.sticker}>
-              <img src="/images/sticker.webp" alt="sticker" />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
