@@ -109,6 +109,28 @@ const Performance: FC<Props> = ({
     setMaxRequests(maxRequestsTemp);
   }, [index]);
 
+  const peakReqs = useMemo((): number => {
+    if (!data) return 0;
+
+    return (
+      [...data]
+        .sort((a, b) => b.reqs - a.reqs)
+        .slice(0, 100)
+        .reduce((prev, cur) => prev + cur.reqs, 0) / 100
+    );
+  }, [data]);
+
+  const copmarePeakReqs = useMemo((): number => {
+    if (!compareData) return 0;
+
+    return (
+      [...compareData]
+        .sort((a, b) => b.reqs - a.reqs)
+        .slice(0, 100)
+        .reduce((prev, cur) => prev + cur.reqs, 0) / 100
+    );
+  }, [compareData]);
+
   return (
     <div className={isConfigOpen ? styles["wrap-hide"] : styles.wrap}>
       <div className={styles["compare-item-container"]}>
@@ -188,6 +210,7 @@ const Performance: FC<Props> = ({
           max={maxRequests}
           isCompleted={index === maxDataLength}
           showTooltip
+          peakReqs={peakReqs}
         />
       </div>
       <div className={styles.block}>
@@ -202,6 +225,7 @@ const Performance: FC<Props> = ({
           maxDataLength={maxElements}
           max={maxRequests}
           isCompleted={index === maxDataLength}
+          peakReqs={copmarePeakReqs}
         />
       </div>
       <div className={styles.block}>
