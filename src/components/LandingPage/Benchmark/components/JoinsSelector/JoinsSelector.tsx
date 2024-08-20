@@ -1,26 +1,25 @@
 import React, { type FC } from "react";
 
-import styles from "./RuntimeSelector.module.css";
+import styles from "./JoinsSelector.module.css";
 import { useBenchmarkContext } from "@components/LandingPage/Benchmark/context/useBenchmarkContext.tsx";
 
 interface Item {
-  value: "node-22" | "node-18" | "bun";
+  value: boolean;
   name: string;
 }
 
-const RuntimeSelector: FC = () => {
+const JoinsSelector: FC = () => {
   const { selectedItems, setSelectedItems } = useBenchmarkContext();
 
   const items: Item[] = [
-    { value: "bun", name: "Bun" },
-    { value: "node-22", name: "Node 22" },
-    { value: "node-18", name: "Node 18" },
+    { value: false, name: "Queries" },
+    { value: true, name: "Joins" },
   ];
 
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     setSelectedItems({
       ...selectedItems,
-      runtime: e.target.value as "node-22" | "node-18" | "bun",
+      joins: e.target.value === "true",
     });
   };
 
@@ -28,9 +27,9 @@ const RuntimeSelector: FC = () => {
     <select className={styles.button} onChange={handleChange}>
       {items.map((item) => (
         <option
-          key={item.value}
-          value={item.value}
-          selected={selectedItems.runtime === item.value}
+          key={item.name}
+          value={String(item.value)}
+          selected={selectedItems.joins === item.value}
         >
           {item.name}
         </option>
@@ -39,4 +38,4 @@ const RuntimeSelector: FC = () => {
   );
 };
 
-export default RuntimeSelector;
+export default JoinsSelector;

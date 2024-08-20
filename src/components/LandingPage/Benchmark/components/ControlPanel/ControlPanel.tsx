@@ -106,6 +106,8 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   useEffect(() => {
     if (isBlurred) {
       skipToResults();
+    } else {
+      rerun();
     }
   }, [drizzleData, compareData]);
 

@@ -12,6 +12,7 @@ import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
 import configurationData from "../../configurationData";
 import RuntimeSelector from "@components/LandingPage/Benchmark/components/RuntimeSelector/RuntimeSelector.tsx";
+import JoinsSelector from "@components/LandingPage/Benchmark/components/JoinsSelector/JoinsSelector.tsx";
 
 interface Props {
   selectedItems: IParams;
@@ -136,7 +137,10 @@ const Performance: FC<Props> = ({
             </div>
           </div>
         </div>
-        <RuntimeSelector />
+        <div style={{ display: "flex", gap: "12px" }}>
+          <RuntimeSelector />
+          <JoinsSelector />
+        </div>
       </div>
       <div className={styles.block}>
         <LatencyChart
