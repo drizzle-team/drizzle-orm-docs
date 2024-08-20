@@ -5,7 +5,7 @@ import type {
 
 export default (data: IJSONData[]): IData[] => {
   return data
-    .map((item, index) => ({
+    .map((item) => ({
       time: new Date(item.time).getMilliseconds(),
       latency: {
         avg: item.latency_average,

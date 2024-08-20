@@ -15,6 +15,7 @@ interface IProps {
   maxDataLength: number;
   max: number;
   isCompleted: boolean;
+  avgRequests: number;
   requests: number;
   totalRequests: number;
   totalRequestsCompare: number;
@@ -28,6 +29,7 @@ const CustomBarChart: FC<IProps> = ({
   max,
   maxDataLength,
   isCompleted,
+  avgRequests,
   requests,
   totalRequests,
   totalRequestsCompare,
@@ -149,9 +151,17 @@ const CustomBarChart: FC<IProps> = ({
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.label}>
-          avg: {roundToThousand(requests)} req/sec
-        </div>
+        {isCompleted ? (
+          <div className={styles.label}>
+            avg: {roundToThousand(avgRequests)} req/sec
+          </div>
+        ) : selectedItemIndex === null ? (
+          <div className={styles.label}>
+            {roundToThousand(requests)} req/sec
+          </div>
+        ) : (
+          <div></div>
+        )}
         <div className={styles["info-wrap"]}>
           <div
             className={
