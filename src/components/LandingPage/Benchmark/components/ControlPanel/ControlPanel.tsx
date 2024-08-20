@@ -10,35 +10,11 @@ import { useBenchmarkContext } from "../../context/useBenchmarkContext";
 import OptionsIcon from "@/components/Icons/OptionsIcon";
 import BenchmarkConifg from "../BenchmarkConfig/BenchmarkConfig";
 import ArrowRight from "@/components/Icons/ArrowRight";
-import formatNumber from "@components/LandingPage/Benchmark/utils/formatNumber.ts";
 import getBenchmarkData from "../../utils/getBenchmarkData.ts";
 
 interface Props {
   minWidth?: number;
 }
-
-const usersSteps = [
-  { duration: 20, target: 200 },
-  { duration: 20, target: 400 },
-  { duration: 20, target: 800 },
-  { duration: 20, target: 1000 },
-  { duration: 20, target: 1200 },
-  { duration: 20, target: 1400 },
-  { duration: 20, target: 1600 },
-  { duration: 20, target: 1800 },
-  { duration: 20, target: 2000 },
-  { duration: 20, target: 2200 },
-  { duration: 20, target: 2400 },
-  { duration: 20, target: 2600 },
-  { duration: 20, target: 2800 },
-  { duration: 20, target: 3000 },
-  { duration: 55, target: 3200 },
-];
-
-const totalDuration = usersSteps.reduce(
-  (prev, next) => (prev += next.duration),
-  0,
-);
 
 const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   const { setIsTimerActive, isTimerActive, time, setTime, intervalId } =
@@ -226,17 +202,63 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           )}
           {!isConfigOpen && (
             <div className={styles.rangeContainer}>
-              {usersSteps.map((step) => (
-                <div
-                  key={step.target}
-                  className={styles.rangeStep}
-                  style={{
-                    width: `${400 / (totalDuration / step.duration)}px`,
-                  }}
+              <div className={styles.rangeStep}>
+                0
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-arrow-right"
                 >
-                  {formatNumber(step.target)}
-                </div>
-              ))}
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                1k
+              </div>
+              <div className={styles.rangeStep}>
+                1k
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-arrow-right"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                2k
+              </div>
+              <div className={styles.rangeStep} style={{ borderRight: "none" }}>
+                2k
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-arrow-right"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                3k
+              </div>
               <input
                 className={styles["rewind-input"]}
                 type="range"
