@@ -1,0 +1,114 @@
+html[class~=dark] .wrap {
+	color: #f0f0f0;
+}
+
+.wrap {
+	position: relative;
+	color: #222222;
+}
+
+html[class~=dark] .button {
+	border: 1px solid #414141;
+	background-color: #111111;
+}
+
+.button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 400;
+	height: 32px;
+	padding: 0px 12px;
+	width: 77px;
+  	font-size: 12px;
+	line-height: 14px;
+	border: 1px solid rgb(225, 225, 225);
+	border-radius: 8px;
+	background-color: #ffffff;
+	cursor: pointer;
+	font-family:
+			ui-monospace,
+			SFMono-Regular,
+			Menlo,
+			Monaco,
+			Consolas,
+			Liberation Mono,
+			Courier New,
+			monospace;
+}
+
+html[class~=dark] .items-wrap {
+	color: #f0f0f0;
+	background-color: rgb(17, 17, 17);
+	box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px, rgba(0, 0, 0, 0.075) 0px 2px 4px 0px;
+}
+
+.items-wrap {
+	position: absolute;
+	border-radius: 8px;
+	background-color: #ffffff;
+	padding: 16px;
+	top: calc(100% + 8px);
+	z-index: 100;
+	right: 0;
+	cursor: pointer;
+	box-shadow:
+		rgb(255, 255, 255) 0px 0px 0px 0px,
+		rgba(161, 161, 161, 0.15) 0px 0px 0px 1px,
+		rgba(0, 0, 0, 0.08) 0px 1px 2px -1px,
+		rgba(0, 0, 0, 0.07) 0px 2px 3px 0px,
+		rgba(0, 0, 0, 0.06) 0px 3px 5px 0px,
+		rgba(0, 0, 0, 0.05) 0px 4px 8px 0px,
+		rgba(0, 0, 0, 0.04) 0px 5px 16px 0px;
+}
+
+.block {
+  text-align: left;
+}
+
+
+.items {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+
+html[class~=dark] .item {
+	background-color: transparent;
+	border: 1px solid #414141;
+}
+
+html[class~=dark] .active-item {
+	background-color: rgba(71, 183, 248, 0.1);
+	border: 1px solid #47b7f8;
+}
+
+.item, .active-item {
+	display: flex;
+	font-size: 12px;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	white-space: nowrap;
+	user-select: none;
+	height: 32px;
+	padding: 8px 20px;
+	line-height: 12px;
+	border-radius: 4px;
+  border: 1px solid #f0f0f0;
+	background-color: #fff;	
+}
+
+.active-item {
+	font-weight: 600;
+  border: 1px solid #0b6ec5;
+  background-color: #e2f1fd;
+}
+
+
+.text {
+	display: flex;
+	flex-direction: column;
+  font-size: 12px;
+}

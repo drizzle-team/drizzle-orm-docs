@@ -11,6 +11,7 @@ import ReqsChart from "../ReqsChart/ReqsChart";
 import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
 import configurationData from "../../configurationData";
+import RuntimeSelector from "@components/LandingPage/Benchmark/components/RuntimeSelector/RuntimeSelector.tsx";
 
 interface Props {
   selectedItems: IParams;
@@ -23,7 +24,6 @@ interface Props {
 }
 
 const Performance: FC<Props> = ({
-  selectedItems,
   isConfigOpen,
   maxElements,
   data,
@@ -41,6 +41,7 @@ const Performance: FC<Props> = ({
     setConcatedDataDrizzle,
     concatedDataCompare,
     setConcatedDataCompare,
+    selectedItems,
   } = useBenchmarkContext();
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null,
@@ -109,27 +110,33 @@ const Performance: FC<Props> = ({
 
   return (
     <div className={isConfigOpen ? styles["wrap-hide"] : styles.wrap}>
-      <div className={styles["compare-item"]}>
-        <div className={styles["compare-icon-wrap"]}>
-          <Logo logo="drizzle" />
-        </div>
-        <div>
-          <div className={styles.name}>Drizzle</div>
-          <div className={styles.version}>
-            {configurationData.orm.items[selectedItems.orm].drizzle_version}
+      <div className={styles["compare-item-container"]}>
+        <div className={styles["compare-item"]}>
+          <div className={styles["compare-icon-wrap"]}>
+            <Logo logo="drizzle" />
+          </div>
+          <div>
+            <div className={styles.name}>Drizzle</div>
+            <div className={styles.version}>
+              {configurationData.orm.items[selectedItems.orm].drizzle_version}
+            </div>
           </div>
         </div>
+        <RuntimeSelector />
       </div>
-      <div className={styles["compare-item"]}>
-        <div className={styles["compare-icon-wrap"]}>
-          <Logo logo={selectedItems.orm} />
-        </div>
-        <div>
-          <div className={styles.name}>{selectedItems.orm}</div>
-          <div className={styles.version}>
-            {configurationData.orm.items[selectedItems.orm].compare_version}
+      <div className={styles["compare-item-container"]}>
+        <div className={styles["compare-item"]}>
+          <div className={styles["compare-icon-wrap"]}>
+            <Logo logo={selectedItems.orm} />
+          </div>
+          <div>
+            <div className={styles.name}>{selectedItems.orm}</div>
+            <div className={styles.version}>
+              {configurationData.orm.items[selectedItems.orm].compare_version}
+            </div>
           </div>
         </div>
+        <RuntimeSelector />
       </div>
       <div className={styles.block}>
         <LatencyChart
@@ -142,8 +149,8 @@ const Performance: FC<Props> = ({
           averageLatencyCompare={
             compareData ? compareData[index].avg.latency : 0
           }
-          averageP99={data ? data[index].avg.p99 : 0}
-          averageP99Compare={compareData ? compareData[index].avg.p99 : 0}
+          averageP99={data ? data[index].avg.p95 : 0}
+          averageP99Compare={compareData ? compareData[index].avg.p95 : 0}
           showTooltip
           isCompleted={index === maxDataLength}
           latency={data ? data[index].latency.avg : 0}
@@ -158,8 +165,8 @@ const Performance: FC<Props> = ({
           maxDataLength={maxElements}
           averageLatency={compareData ? compareData[index].avg.latency : 0}
           averageLatencyCompare={data ? data[index].avg.latency : 0}
-          averageP99={compareData ? compareData[index].avg.p99 : 0}
-          averageP99Compare={data ? data[index].avg.p99 : 0}
+          averageP99={compareData ? compareData[index].avg.p95 : 0}
+          averageP99Compare={data ? data[index].avg.p95 : 0}
           isCompleted={index === maxDataLength}
           latency={compareData ? compareData[index].latency.avg : 0}
         />

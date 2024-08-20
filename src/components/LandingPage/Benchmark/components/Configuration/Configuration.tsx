@@ -54,16 +54,20 @@ const Configuration: FC<IProps> = ({
   return (
     <div className={isOpened ? styles["wrap-opened"] : styles.wrap}>
       <div className={styles.tabs}>
-        {Object.keys(selectedItems).map((item) => (
-          <button
-            type="button"
-            className={currentTab === item ? styles["active-tab"] : styles.tab}
-            key={item}
-            onClick={() => changeTab(item)}
-          >
-            {data[item].value}
-          </button>
-        ))}
+        {Object.keys(selectedItems)
+          .filter((k) => k !== "runtime" && k !== "joins")
+          .map((item) => (
+            <button
+              type="button"
+              className={
+                currentTab === item ? styles["active-tab"] : styles.tab
+              }
+              key={item}
+              onClick={() => changeTab(item)}
+            >
+              {data[item].value}
+            </button>
+          ))}
       </div>
       <div className={styles.options}>
         {params &&

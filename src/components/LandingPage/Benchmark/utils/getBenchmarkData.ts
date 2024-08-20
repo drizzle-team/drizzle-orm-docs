@@ -8,6 +8,8 @@ const variants = [
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
+    runtime: "node-22",
+    joins: false,
     drizzleData: data["drizzle-node-22"],
     compareData: data["prisma-node-22"],
   },
@@ -16,37 +18,65 @@ const variants = [
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
-    drizzleData: data["drizzle-node-22"],
-    compareData: data["prisma-node-22"],
+    runtime: "node-18",
+    joins: false,
+    drizzleData: data["drizzle-node-18"],
+    compareData: data["prisma-node-18"],
   },
   {
     orm: "prisma",
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
-    drizzleData: data["drizzle-node-22"],
-    compareData: data["prisma-node-22"],
+    runtime: "bun",
+    joins: false,
+    drizzleData: data["drizzle-bun"],
+    compareData: data["prisma-bun"],
   },
   {
     orm: "prisma",
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
+    runtime: "node-22",
+    joins: true,
     drizzleData: data["drizzle-node-22"],
-    compareData: data["prisma-node-22"],
+    compareData: data["prisma-joins-node-22"],
+  },
+  {
+    orm: "prisma",
+    dbSize: "micro",
+    projectType: "ecommerce",
+    database: "postgres",
+    runtime: "node-18",
+    joins: true,
+    drizzleData: data["drizzle-node-18"],
+    compareData: data["prisma-joins-node-18"],
+  },
+  {
+    orm: "prisma",
+    dbSize: "micro",
+    projectType: "ecommerce",
+    database: "postgres",
+    runtime: "bun",
+    joins: true,
+    drizzleData: data["drizzle-bun"],
+    compareData: data["prisma-joins-bun"],
   },
 ];
 
 const getBenchmarkData = (
   params: IParams,
 ): null | { drizzleData: IData[]; compareData: IData[] } => {
-  const { orm, dbSize, projectType, database } = params;
+  const { orm, dbSize, projectType, database, runtime, joins } = params;
   const foundVariants = variants.find(
     (path) =>
       path.orm === orm &&
       path.dbSize === dbSize &&
       path.projectType === projectType &&
-      path.database === database,
+      path.database === database &&
+      path.joins === joins &&
+      path.runtime === runtime,
   );
   if (!foundVariants) {
     return null;
