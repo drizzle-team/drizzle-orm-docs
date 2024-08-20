@@ -44,7 +44,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   const { setIsTimerActive, isTimerActive, time, setTime, intervalId } =
     useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
-  const [isBlurred, setIsBlurred] = useState<boolean>(false);
+  const [isBlurred, setIsBlurred] = useState<boolean>(true);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<IParams>({
     orm: "prisma",
