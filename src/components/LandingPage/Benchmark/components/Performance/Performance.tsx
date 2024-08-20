@@ -146,6 +146,7 @@ const Performance: FC<Props> = ({
           averageP99Compare={compareData ? compareData[index].avg.p99 : 0}
           showTooltip
           isCompleted={index === maxDataLength}
+          latency={data ? data[index].latency.avg : 0}
         />
       </div>
       <div className={styles.block}>
@@ -160,11 +161,13 @@ const Performance: FC<Props> = ({
           averageP99={compareData ? compareData[index].avg.p99 : 0}
           averageP99Compare={data ? data[index].avg.p99 : 0}
           isCompleted={index === maxDataLength}
+          latency={compareData ? compareData[index].latency.avg : 0}
         />
       </div>
       <div className={styles.block}>
         <ReqsChart
-          requests={data ? data[index].avg.reqs : 0}
+          avgRequests={data ? data[index].avg.reqs : 0}
+          requests={data ? data[index].reqs : 0}
           totalRequests={data ? data[index].totalReqs : 0}
           totalRequestsCompare={compareData ? compareData[index].totalReqs : 0}
           setSelectedItemIndex={setSelectedItemIndex}
@@ -178,7 +181,8 @@ const Performance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          requests={compareData ? compareData[index].avg.reqs : 0}
+          avgRequests={compareData ? compareData[index].avg.reqs : 0}
+          requests={compareData ? compareData[index].reqs : 0}
           totalRequests={compareData ? compareData[index].totalReqs : 0}
           totalRequestsCompare={data ? data[index].totalReqs : 0}
           setSelectedItemIndex={setSelectedItemIndex}
@@ -200,6 +204,7 @@ const Performance: FC<Props> = ({
           average={data ? data[index].avg.cpus : 0}
           averageCompare={compareData ? compareData[index].avg.cpus : 0}
           isCompleted={index === maxDataLength}
+          currentLoad={data ? data[index].cpus.cpus : 0}
         />
       </div>
       <div className={styles.block}>
@@ -212,6 +217,7 @@ const Performance: FC<Props> = ({
           average={compareData ? compareData[index].avg.cpus : 0}
           averageCompare={data ? data[index].avg.cpus : 0}
           isCompleted={index === maxDataLength}
+          currentLoad={compareData ? compareData[index].cpus.cpus : 0}
         />
       </div>
     </div>

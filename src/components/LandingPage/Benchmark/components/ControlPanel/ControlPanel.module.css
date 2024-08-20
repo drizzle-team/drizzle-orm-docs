@@ -284,7 +284,7 @@ html[class~=dark] .congrats-text {
 .rangeContainer {
 	position: relative;
 	height: 30px;
-	width: 400px;
+	width: 350px;
 	border-radius: 8px;
 	overflow: hidden;
 	border: 1px solid #e1e1e1;
@@ -294,10 +294,27 @@ html[class~=dark] .congrats-text {
 .rangeStep {
 	display: flex;
 	align-items: center;
-	font-size: 8px;
+	gap: 4px;
+	font-size: 10px;
 	justify-content: center;
-	flex-shrink: 0;
+	flex: 1;
 	border-right: 1px solid #f0f0f0;
+	z-index: 2;
+	user-select: none;
+	pointer-events: none;
+}
+
+html[class~=dark] .rangeContainer {
+	border: 1px solid #414141;
+}
+
+html[class~=dark] .rangeStep {
+	border-right: 1px solid #414141;
+}
+
+.rangeStep svg {
+	width: 10px;
+	height: 10px;
 }
 
 .rewind-input {
@@ -308,6 +325,7 @@ html[class~=dark] .congrats-text {
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: none;
+	z-index: 1;
 	background: transparent;
 }
 
@@ -323,8 +341,12 @@ html[class~=dark] .congrats-text {
 
 .rewind-input::-webkit-slider-thumb {
 	appearance: none;
-	background-color: rgba(0, 0, 0, 0.07);
+	background-color: #f6f6f7;
 	height: 32px;
 	width: 23px;
 	border-radius: 0;
+}
+
+html[class~=dark] .rewind-input::-webkit-slider-thumb {
+	background-color: #1c1c1c;
 }

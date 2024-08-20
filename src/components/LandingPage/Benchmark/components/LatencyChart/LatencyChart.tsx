@@ -20,6 +20,7 @@ interface IProps {
   averageP99Compare: number;
   isCompleted: boolean;
   showTooltip?: boolean;
+  latency: number;
 }
 
 const LatencyChart: FC<IProps> = ({
@@ -34,6 +35,7 @@ const LatencyChart: FC<IProps> = ({
   averageP99,
   averageP99Compare,
   showTooltip,
+  latency,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
     x: 0,
@@ -219,9 +221,15 @@ const LatencyChart: FC<IProps> = ({
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.label}>
-          avg latency: {formatMs(averageLatency)}
-        </div>
+        {isCompleted ? (
+          <div className={styles.label}>
+            avg latency: {formatMs(averageLatency)}
+          </div>
+        ) : selectedItemIndex === null ? (
+          <div className={styles.label}>latency: {formatMs(latency)}</div>
+        ) : (
+          <div style={{ height: "12px" }}></div>
+        )}
         {pathArray.length > 0 && isCompleted && showTooltip && (
           <div className={styles["success-values"]}>
             <div
