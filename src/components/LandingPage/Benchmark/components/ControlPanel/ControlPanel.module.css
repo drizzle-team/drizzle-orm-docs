@@ -103,7 +103,7 @@ html[class~=dark] .start, html[class~=dark] .start-shaked {
 .time {
 	display: flex;
 	align-items: center;
-	gap: 16px;
+	gap: 12px;
 }
 
 html[class~=dark] .divider {
@@ -174,7 +174,7 @@ html[class~=dark] .config-button {
 	height: 38px;
 	text-transform: capitalize;
 	border: 1px solid rgb(225, 225, 225);
-	border-radius: 8px;
+	border-radius: 2px;
 	font-size: 12px;
 	background-color: #ffffff;
 	cursor: pointer;
@@ -279,73 +279,4 @@ html[class~=dark] .congrats-text {
 	font-size: 14px;
 	font-weight: 500;
 	font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
-}
-
-.rangeContainer {
-	position: relative;
-	height: 30px;
-	width: 350px;
-	border-radius: 8px;
-	overflow: hidden;
-	border: 1px solid #e1e1e1;
-	display: flex;
-}
-
-.rangeStep {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	font-size: 10px;
-	justify-content: center;
-	border-right: 1px solid #f0f0f0;
-	z-index: 2;
-	user-select: none;
-	pointer-events: none;
-}
-
-html[class~=dark] .rangeContainer {
-	border: 1px solid #414141;
-}
-
-html[class~=dark] .rangeStep {
-	border-right: 1px solid #414141;
-}
-
-.rangeStep svg {
-	width: 10px;
-	height: 10px;
-}
-
-.rewind-input {
-	display: block;
-	position: absolute;
-	left: 0;
-	right: 0;
-	cursor: pointer;
-	-webkit-appearance: none;
-	appearance: none;
-	z-index: 1;
-	background: transparent;
-}
-
-.rewind-input::-webkit-slider-runnable-track {
-	background: transparent;
-	height: 32px;
-}
-
-.rewind-input::-moz-range-track {
-	background: transparent;
-	height: 32px;
-}
-
-.rewind-input::-webkit-slider-thumb {
-	appearance: none;
-	background-color: #f6f6f7;
-	height: 32px;
-	width: 23px;
-	border-radius: 0;
-}
-
-html[class~=dark] .rewind-input::-webkit-slider-thumb {
-	background-color: #1c1c1c;
 }
