@@ -63,6 +63,26 @@ const variants = [
     drizzleData: data["drizzle-bun"],
     compareData: data["prisma-joins-bun"],
   },
+  {
+    orm: "prisma",
+    dbSize: "micro",
+    projectType: "ecommerce",
+    database: "postgres",
+    runtime: "node-20",
+    joins: false,
+    drizzleData: data["drizzle-node-20"],
+    compareData: data["prisma-node-20"],
+  },
+  {
+    orm: "prisma",
+    dbSize: "micro",
+    projectType: "ecommerce",
+    database: "postgres",
+    runtime: "node-20",
+    joins: true,
+    drizzleData: data["drizzle-node-20"],
+    compareData: data["prisma-joins-node-20"],
+  },
 ];
 
 const getBenchmarkData = (

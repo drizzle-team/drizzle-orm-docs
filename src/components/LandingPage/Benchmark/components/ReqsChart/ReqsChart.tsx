@@ -20,7 +20,6 @@ interface IProps {
   totalRequests: number;
   totalRequestsCompare: number;
   showTooltip?: boolean;
-  peakReqs: number;
   totalRequestsFail: number;
 }
 
@@ -36,7 +35,6 @@ const CustomBarChart: FC<IProps> = ({
   totalRequests,
   totalRequestsCompare,
   showTooltip,
-  peakReqs,
   totalRequestsFail,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
@@ -207,19 +205,6 @@ const CustomBarChart: FC<IProps> = ({
             )}
           </div>
           {pathArray.length > 0 && isCompleted && showTooltip && " | "}
-          <div
-            className={
-              isCompleted
-                ? styles["tooltip-wrap-underline"]
-                : styles["tooltip-wrap"]
-            }
-          >
-            <div className={styles.tooltip}>Peak requests per second</div>
-            {pathArray.length > 0 && isCompleted && (
-              <>{roundToThousand(peakReqs)}</>
-            )}
-          </div>
-          {pathArray.length > 0 && isCompleted && " | "}
           {roundToThousand(totalRequests)}
         </div>
       </div>

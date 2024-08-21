@@ -74,15 +74,13 @@ const Rewind: FC<Props> = ({ maxDataLength, time, rewind }) => {
     return steps[steps.length - 1].target;
   }, [time]);
 
-  console.log(progress);
-
   return (
     <div className={styles.wrap}>
       <div
         className={styles.tooltip}
         style={{ left: `${350 / (100 / progress)}px` }}
       >
-        {currentUsers} Vus
+        {currentUsers} VUs
       </div>
       <div className={styles.rangeContainer}>
         <div

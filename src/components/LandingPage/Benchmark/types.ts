@@ -47,7 +47,7 @@ export interface IParams {
   dbSize: string;
   projectType: string;
   database: string;
-  runtime: "node-22" | "node-18" | "bun";
+  runtime: "node-22" | "node-20" | "node-18" | "bun";
   joins: boolean;
 }
 
