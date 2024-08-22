@@ -1,66 +1,107 @@
 import styles from "./Benchmark.module.css";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import DemoPerformance from "@components/LandingPage/Benchmark/components/DemoPerformance/DemoPerformance.tsx";
+import { type IData } from "@components/LandingPage/Benchmark/types.ts";
+import getDemoBenchmarkData from "@components/LandingPage/Benchmark/utils/getDemoBenchmarkData.ts";
+import { BenchmarkProvider } from "@components/LandingPage/Benchmark/context/useBenchmarkContext.tsx";
 
 const Benchmark = () => {
   const [isShaking, setIsShaking] = useState<boolean>(false);
+  const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
+  const [compareData, setCompareData] = useState<IData[] | null>(null);
 
-  const start = (e: any) => {
-    if (window.innerWidth < 1190 && !isShaking) {
-      e.preventDefault();
-      setIsShaking(true);
-      setTimeout(() => {
-        setIsShaking(false);
-      }, 2000);
-      return;
+  const maxDataLength = useMemo(() => {
+    if (drizzleData && compareData) {
+      return Math.min(drizzleData.length - 1, compareData.length - 1);
     }
-    if (isShaking) {
-      e.preventDefault();
-      return;
+    return 0;
+  }, [drizzleData, compareData]);
+
+  useEffect(() => {
+    const data = getDemoBenchmarkData();
+    if (data) {
+      setDrizzleData(data.drizzleData);
+      setCompareData(data.compareData);
     }
-  };
+    return () => {
+      setDrizzleData(null);
+      setCompareData(null);
+    };
+  }, []);
 
   return (
-    <div className={styles.wrap}>
-      <div className={styles.header}>Performance</div>
-      <div className={styles.description}>
-        <div className={styles.description__line}>
-          Drizzle has always been fast, we just wanted you to have proper
-          benchmarks experience
-        </div>
-        <div>
-          Well, actually it&apos;s not that Drizzle is fast, Drizzle just
-          doesn&apos;t slow you down
-        </div>
-      </div>
-      <div className={styles.charts}>
-        <div className={styles.blurred}>
-          <div className={styles["blur-content"]}>
-            {isShaking && (
-              <div className={styles["only-desktop"]}>
-                Only available on Desktop 🖥️
-              </div>
-            )}
-            <a
-              href={"/benchmarks"}
-              onClick={start}
-              className={isShaking ? styles["start-shaked"] : styles.start}
-            >
-              Launch your DevOps experience 🚀
-            </a>
+    <BenchmarkProvider>
+      <div className={styles.wrap}>
+        <div className={styles.header}>Performance</div>
+        <div className={styles.description}>
+          <div className={styles.description__line}>
+            Drizzle has always been fast, we just wanted you to have proper
+            benchmarks experience
+          </div>
+          <div>
+            Well, actually it&apos;s not that Drizzle is fast, Drizzle just
+            doesn&apos;t slow you down
           </div>
         </div>
-        <img
-          className={styles["image-light"]}
-          src="/images/benchmarks/light.png"
-          alt="benchmarks"
-        />
-        <img
-          className={styles["image-dark"]}
-          src="/images/benchmarks/dark.png"
-          alt="benchmarks"
-        />
+        <div className={styles.container}>
+          <a href={"/benchmarks"} className={styles["wrap-link"]}></a>
+          <div className={styles.blurred}>
+            <div className={styles["blur-content"]}>
+              {isShaking && (
+                <div className={styles["only-desktop"]}>
+                  Only available on Desktop 🖥️
+                </div>
+              )}
+              <a
+                href={"/benchmarks"}
+                className={isShaking ? styles["start-shaked"] : styles.start}
+              >
+                Go to benchmark results
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="feather feather-arrow-right"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <DemoPerformance
+            maxElements={81}
+            data={drizzleData}
+            compareData={compareData}
+            maxDataLength={maxDataLength}
+          />
+        </div>
+        <a href={"/benchmarks"} className={styles.benchmark_link}>
+          Go to benchmark results
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="feather feather-arrow-right"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
       </div>
-    </div>
+    </BenchmarkProvider>
   );
 };
 

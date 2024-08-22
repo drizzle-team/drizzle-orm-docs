@@ -47,8 +47,8 @@ const Performance: FC<Props> = ({
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null,
   );
-  const [max, setMax] = useState<number>(0);
-  const [maxRequests, setMaxRequests] = useState<number>(0);
+  const [max, setMax] = useState<number>(1);
+  const [maxRequests, setMaxRequests] = useState<number>(1);
 
   useEffect(() => {
     if (!data || !compareData) return;
