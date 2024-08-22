@@ -27,6 +27,29 @@ html[class~=dark] .description {
 
 .charts {
   margin-top: 24px;
+  position: relative;
+}
+
+.image-dark, .image-light {
+  width: 910px;
+  min-width: 910px;
+  flex-shrink: 0;
+}
+
+.image-dark {
+  display: none;
+}
+
+.image-light {
+  display: block;
+}
+
+html[class~=dark] .image-light {
+  display: none;
+}
+
+html[class~=dark] .image-dark {
+  display: block;
 }
 
 html[class~=dark] .bottom {
@@ -46,6 +69,88 @@ html[class~=dark] .bottom {
 .how-it-works:hover, .github:hover {
   text-decoration: underline;
   text-decoration-style: dashed;
+}
+
+.blurred, .hide-blur {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  backdrop-filter: blur(3px);
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.hide-blur {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.blur-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+html[class~=dark] .only-desktop {
+  color: #f0f0f0;
+  background-color: rgb(17, 17, 17);
+  box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.2) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px, rgba(0, 0, 0, 0.075) 0px 2px 4px 0px;
+}
+
+.only-desktop {
+  transform: translateY(-14px);
+  font-size: 14px;
+  margin-top: -30px;
+  line-height: 14px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 1px 2px 0px, rgba(0, 0, 0, 0.075) 0px 2px 4px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+}
+
+html[class~=dark] .start, html[class~=dark] .start-shaked {
+  color: #282828;
+  background-color: rgb(226, 232, 240);
+}
+
+.start, .start-shaked {
+  padding: 16px 32px;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #282b3b;
+}
+
+.start-shaked {
+  animation: horizontal-shaking 0.3s ease-in-out;
+}
+
+@keyframes horizontal-shaking {
+  0% { transform: translateX(0) }
+  25% { transform: translateX(5px) }
+  50% { transform: translateX(-5px) }
+  75% { transform: translateX(5px) }
+  100% { transform: translateX(0) }
 }
 
 @media (max-width: 900px) {
