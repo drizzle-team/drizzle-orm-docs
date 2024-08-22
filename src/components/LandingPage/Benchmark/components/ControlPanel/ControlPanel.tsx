@@ -11,6 +11,7 @@ import OptionsIcon from "@/components/Icons/OptionsIcon";
 import BenchmarkConifg from "../BenchmarkConfig/BenchmarkConfig";
 import ArrowRight from "@/components/Icons/ArrowRight";
 import getBenchmarkData from "../../utils/getBenchmarkData.ts";
+import Rewind from "@components/LandingPage/Benchmark/components/Rewind/Rewind.tsx";
 
 interface Props {
   minWidth?: number;
@@ -125,7 +126,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     <div className={styles.content}>
       <div className={styles.control}>
         <div className={styles.time}>
-          <SpeedSelector speed={speed} setSpeed={setSpeed} />
+          {!isConfigOpen && <SpeedSelector speed={speed} setSpeed={setSpeed} />}
           {!isTimerActive &&
             !isConfigOpen &&
             (time === maxDataLength * 100 || time === 0) && (
@@ -214,89 +215,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
             </>
           )}
           {!isConfigOpen && (
-            <div className={styles.rangeContainer}>
-              <div
-                className={styles.rangeStep}
-                style={{ width: `${350 / (360 / 100)}px` }}
-              >
-                0
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-arrow-right"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-                1k
-              </div>
-              <div
-                className={styles.rangeStep}
-                style={{ width: `${350 / (360 / 100)}px` }}
-              >
-                1k
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-arrow-right"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-                2k
-              </div>
-              <div
-                className={styles.rangeStep}
-                style={{ width: `${350 / (360 / 100)}px` }}
-              >
-                2k
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-arrow-right"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-                3k
-              </div>
-              <div
-                className={styles.rangeStep}
-                style={{ borderRight: "none", width: `${350 / (360 / 60)}px` }}
-              >
-                3k
-              </div>
-              <input
-                className={styles["rewind-input"]}
-                type="range"
-                min={0}
-                max={maxDataLength * 100}
-                value={time}
-                onChange={rewind}
-                step={1}
-              />
-            </div>
+            <Rewind maxDataLength={maxDataLength} time={time} rewind={rewind} />
           )}
         </div>
         <div className={styles.config}>

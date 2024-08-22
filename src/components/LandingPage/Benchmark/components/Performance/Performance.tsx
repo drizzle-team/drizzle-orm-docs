@@ -109,28 +109,6 @@ const Performance: FC<Props> = ({
     setMaxRequests(maxRequestsTemp);
   }, [index]);
 
-  const peakReqs = useMemo((): number => {
-    if (!data) return 0;
-
-    return (
-      [...data]
-        .sort((a, b) => b.reqs - a.reqs)
-        .slice(0, 100)
-        .reduce((prev, cur) => prev + cur.reqs, 0) / 100
-    );
-  }, [data]);
-
-  const copmarePeakReqs = useMemo((): number => {
-    if (!compareData) return 0;
-
-    return (
-      [...compareData]
-        .sort((a, b) => b.reqs - a.reqs)
-        .slice(0, 100)
-        .reduce((prev, cur) => prev + cur.reqs, 0) / 100
-    );
-  }, [compareData]);
-
   return (
     <div className={isConfigOpen ? styles["wrap-hide"] : styles.wrap}>
       <div className={styles["compare-item-container"]}>
@@ -210,7 +188,6 @@ const Performance: FC<Props> = ({
           max={maxRequests}
           isCompleted={index === maxDataLength}
           showTooltip
-          peakReqs={peakReqs}
           totalRequestsFail={data ? data[index].totalFailReqs : 0}
         />
       </div>
@@ -226,7 +203,6 @@ const Performance: FC<Props> = ({
           maxDataLength={maxElements}
           max={maxRequests}
           isCompleted={index === maxDataLength}
-          peakReqs={copmarePeakReqs}
           totalRequestsFail={compareData ? compareData[index].totalFailReqs : 0}
         />
       </div>
@@ -237,7 +213,6 @@ const Performance: FC<Props> = ({
           pathArray={concatedDataDrizzle}
           max={100}
           maxDataLength={maxElements}
-          showTooltip
           average={data ? data[index].avg.cpus : 0}
           averageCompare={compareData ? compareData[index].avg.cpus : 0}
           isCompleted={index === maxDataLength}
