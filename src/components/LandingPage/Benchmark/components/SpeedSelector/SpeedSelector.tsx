@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useRef, useState } from "react";
+import React, { type FC } from "react";
 
 import styles from "./SpeedSelector.module.css";
 
@@ -15,9 +15,13 @@ const SpeedSelector: FC<IProps> = ({ speed, setSpeed }) => {
   };
 
   return (
-    <select className={styles.button} onChange={handleChange}>
+    <select
+      className={styles.button}
+      defaultValue={speed}
+      onChange={handleChange}
+    >
       {items.map((item) => (
-        <option key={item} value={item} selected={speed === item}>
+        <option key={item} value={item}>
           {item}x
         </option>
       ))}
