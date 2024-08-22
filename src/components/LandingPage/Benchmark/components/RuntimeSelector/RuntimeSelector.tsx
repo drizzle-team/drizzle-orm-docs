@@ -57,6 +57,7 @@ const RuntimeSelector: FC = () => {
         <select
           className={styles.button}
           onChange={handleChange}
+          defaultValue={selectedItems.runtime}
           style={{
             width: resizerRef.current
               ? `${resizerRef.current.offsetWidth}px`

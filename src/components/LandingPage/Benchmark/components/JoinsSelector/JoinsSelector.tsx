@@ -24,7 +24,11 @@ const JoinsSelector: FC = () => {
   };
 
   return (
-    <select className={styles.button} onChange={handleChange}>
+    <select
+      className={styles.button}
+      onChange={handleChange}
+      defaultValue={String(selectedItems.joins)}
+    >
       {items.map((item) => (
         <option
           key={item.name}

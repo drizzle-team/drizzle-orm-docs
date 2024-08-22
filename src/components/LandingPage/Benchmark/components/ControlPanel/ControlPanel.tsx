@@ -25,7 +25,6 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     setTime,
     intervalId,
     selectedItems,
-    setSelectedItems,
   } = useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
   const [isBlurred, setIsBlurred] = useState<boolean>(true);
@@ -52,9 +51,9 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     }
   }, [typeof window]);
 
-  const openConfigModal = () => {
+  const toggleConfigModal = () => {
+    if (!isConfigOpen) pause();
     setIsConfigOpen((prev) => !prev);
-    setIsTimerActive((prev) => !prev);
   };
 
   const skipToResults = () => {
@@ -231,7 +230,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           <button
             type="button"
             className={styles["config-button"]}
-            onClick={openConfigModal}
+            onClick={toggleConfigModal}
           >
             <OptionsIcon />
           </button>
@@ -267,11 +266,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           maxElements={81}
           maxDataLength={maxDataLength}
         />
-        <Configuration
-          isOpened={isConfigOpen}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-        />
+        <Configuration isOpened={isConfigOpen} />
       </div>
     </div>
   );
