@@ -11,6 +11,8 @@ import ReqsChart from "../ReqsChart/ReqsChart";
 import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
 import configurationData from "../../configurationData";
+import RuntimeSelector from "@components/LandingPage/Benchmark/components/RuntimeSelector/RuntimeSelector.tsx";
+import JoinsSelector from "@components/LandingPage/Benchmark/components/JoinsSelector/JoinsSelector.tsx";
 
 interface Props {
   selectedItems: IParams;
@@ -23,7 +25,6 @@ interface Props {
 }
 
 const Performance: FC<Props> = ({
-  selectedItems,
   isConfigOpen,
   maxElements,
   data,
@@ -41,12 +42,13 @@ const Performance: FC<Props> = ({
     setConcatedDataDrizzle,
     concatedDataCompare,
     setConcatedDataCompare,
+    selectedItems,
   } = useBenchmarkContext();
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null,
   );
-  const [max, setMax] = useState<number>(0);
-  const [maxRequests, setMaxRequests] = useState<number>(0);
+  const [max, setMax] = useState<number>(1);
+  const [maxRequests, setMaxRequests] = useState<number>(1);
 
   useEffect(() => {
     if (!data || !compareData) return;
@@ -73,16 +75,6 @@ const Performance: FC<Props> = ({
 
   useEffect(() => {
     if (!data || !compareData) return;
-    const maxLatency = Math.max(
-      data[maxDataLength].max.latency,
-      compareData[maxDataLength].max.latency,
-    );
-    setMax(maxLatency);
-    const maxRequestsTemp = Math.max(
-      data[maxDataLength].max.reqs,
-      compareData[maxDataLength].max.reqs,
-    );
-    setMaxRequests(maxRequestsTemp);
     setSelectedItemIndex(null);
     setIsTimerActive(true);
     setConcatedDataDrizzle(data.slice(0, 1));
@@ -104,30 +96,50 @@ const Performance: FC<Props> = ({
     }
     setConcatedDataDrizzle(getSubArray(data, index, maxElements));
     setConcatedDataCompare(getSubArray(compareData, index, maxElements));
+
+    const maxLatency = Math.max(
+      data[index].max.latency,
+      compareData[index].max.latency,
+    );
+    setMax(maxLatency);
+    const maxRequestsTemp = Math.max(
+      data[index].max.reqs,
+      compareData[index].max.reqs,
+    );
+    setMaxRequests(maxRequestsTemp);
   }, [index]);
 
   return (
     <div className={isConfigOpen ? styles["wrap-hide"] : styles.wrap}>
-      <div className={styles["compare-item"]}>
-        <div className={styles["compare-icon-wrap"]}>
-          <Logo logo="drizzle" />
-        </div>
-        <div>
-          <div className={styles.name}>Drizzle</div>
-          <div className={styles.version}>
-            {configurationData.orm.items[selectedItems.orm].drizzle_version}
+      <div className={styles["compare-item-container"]}>
+        <div className={styles["compare-item"]}>
+          <div className={styles["compare-icon-wrap"]}>
+            <Logo logo="drizzle" />
+          </div>
+          <div>
+            <div className={styles.name}>Drizzle</div>
+            <div className={styles.version}>
+              {configurationData.orm.items[selectedItems.orm].drizzle_version}
+            </div>
           </div>
         </div>
+        <RuntimeSelector />
       </div>
-      <div className={styles["compare-item"]}>
-        <div className={styles["compare-icon-wrap"]}>
-          <Logo logo={selectedItems.orm} />
-        </div>
-        <div>
-          <div className={styles.name}>{selectedItems.orm}</div>
-          <div className={styles.version}>
-            {configurationData.orm.items[selectedItems.orm].compare_version}
+      <div className={styles["compare-item-container"]}>
+        <div className={styles["compare-item"]}>
+          <div className={styles["compare-icon-wrap"]}>
+            <Logo logo={selectedItems.orm} />
           </div>
+          <div>
+            <div className={styles.name}>{selectedItems.orm}</div>
+            <div className={styles.version}>
+              {configurationData.orm.items[selectedItems.orm].compare_version}
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <RuntimeSelector />
+          <JoinsSelector />
         </div>
       </div>
       <div className={styles.block}>
@@ -141,10 +153,11 @@ const Performance: FC<Props> = ({
           averageLatencyCompare={
             compareData ? compareData[index].avg.latency : 0
           }
-          averageP99={data ? data[index].avg.p99 : 0}
-          averageP99Compare={compareData ? compareData[index].avg.p99 : 0}
+          averageP99={data ? data[index].avg.p95 : 0}
+          averageP99Compare={compareData ? compareData[index].avg.p95 : 0}
           showTooltip
           isCompleted={index === maxDataLength}
+          latency={data ? data[index].latency.avg : 0}
         />
       </div>
       <div className={styles.block}>
@@ -156,14 +169,16 @@ const Performance: FC<Props> = ({
           maxDataLength={maxElements}
           averageLatency={compareData ? compareData[index].avg.latency : 0}
           averageLatencyCompare={data ? data[index].avg.latency : 0}
-          averageP99={compareData ? compareData[index].avg.p99 : 0}
-          averageP99Compare={data ? data[index].avg.p99 : 0}
+          averageP99={compareData ? compareData[index].avg.p95 : 0}
+          averageP99Compare={data ? data[index].avg.p95 : 0}
           isCompleted={index === maxDataLength}
+          latency={compareData ? compareData[index].latency.avg : 0}
         />
       </div>
       <div className={styles.block}>
         <ReqsChart
-          requests={data ? data[index].avg.reqs : 0}
+          avgRequests={data ? data[index].avg.reqs : 0}
+          requests={data ? data[index].reqs : 0}
           totalRequests={data ? data[index].totalReqs : 0}
           totalRequestsCompare={compareData ? compareData[index].totalReqs : 0}
           setSelectedItemIndex={setSelectedItemIndex}
@@ -173,11 +188,13 @@ const Performance: FC<Props> = ({
           max={maxRequests}
           isCompleted={index === maxDataLength}
           showTooltip
+          totalRequestsFail={data ? data[index].totalFailReqs : 0}
         />
       </div>
       <div className={styles.block}>
         <ReqsChart
-          requests={compareData ? compareData[index].avg.reqs : 0}
+          avgRequests={compareData ? compareData[index].avg.reqs : 0}
+          requests={compareData ? compareData[index].reqs : 0}
           totalRequests={compareData ? compareData[index].totalReqs : 0}
           totalRequestsCompare={data ? data[index].totalReqs : 0}
           setSelectedItemIndex={setSelectedItemIndex}
@@ -186,6 +203,7 @@ const Performance: FC<Props> = ({
           maxDataLength={maxElements}
           max={maxRequests}
           isCompleted={index === maxDataLength}
+          totalRequestsFail={compareData ? compareData[index].totalFailReqs : 0}
         />
       </div>
       <div className={styles.block}>
@@ -195,10 +213,10 @@ const Performance: FC<Props> = ({
           pathArray={concatedDataDrizzle}
           max={100}
           maxDataLength={maxElements}
-          showTooltip
           average={data ? data[index].avg.cpus : 0}
           averageCompare={compareData ? compareData[index].avg.cpus : 0}
           isCompleted={index === maxDataLength}
+          currentLoad={data ? data[index].cpus.cpus : 0}
         />
       </div>
       <div className={styles.block}>
@@ -211,6 +229,7 @@ const Performance: FC<Props> = ({
           average={compareData ? compareData[index].avg.cpus : 0}
           averageCompare={data ? data[index].avg.cpus : 0}
           isCompleted={index === maxDataLength}
+          currentLoad={compareData ? compareData[index].cpus.cpus : 0}
         />
       </div>
     </div>

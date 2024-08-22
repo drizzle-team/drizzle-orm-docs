@@ -4,7 +4,6 @@ export interface IData {
     avg: number;
     p90: number;
     p95: number;
-    p99: number;
   };
   cpus: {
     cpu1: number;
@@ -14,9 +13,11 @@ export interface IData {
     cpus: number;
   };
   reqs: number;
+  failReqs: number;
+  totalFailReqs: number;
   totalReqs: number;
   avg: {
-    p99: number;
+    p95: number;
     cpus: number;
     latency: number;
     reqs: number;
@@ -27,8 +28,18 @@ export interface IData {
   };
 }
 
-export interface IInputData {
-  data: IData[];
+export interface IJSONData {
+  time: string;
+  core1: number;
+  core2: number;
+  core3: number;
+  core4: number;
+  reqs_per_sec: number;
+  fail_reqs_per_sec: number;
+  latency_95: number;
+  latency_90: number;
+  latency_99: number;
+  latency_average: number;
 }
 
 export interface IParams {
@@ -36,7 +47,8 @@ export interface IParams {
   dbSize: string;
   projectType: string;
   database: string;
-  traffic: string;
+  runtime: "node-22" | "node-20" | "node-18" | "bun";
+  joins: boolean;
 }
 
 export interface IModalInputData {
