@@ -17,10 +17,11 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 To pass a conditional filter in query you can use `.where()` method and logical operator like below:
 
 <Section>
-```ts copy {9}
+```ts copy {10}
 import { ilike } from 'drizzle-orm';
+import { posts } from './schema';
 
-const db = drizzle(...)
+const db = drizzle(...);
 
 const searchPosts = async (term?: string) => {
   await db
@@ -43,8 +44,11 @@ select * from posts where title ilike 'AI';
 To combine conditional filters you can use `and()` or `or()` operators like below:
 
 <Section>
-```ts copy {7,8,9,10,11,12,13}
+```ts copy {10,11,12,13,14,15,16}
 import { and, gt, ilike, inArray } from 'drizzle-orm';
+import { posts } from './schema';
+
+const db = drizzle(...);
 
 const searchPosts = async (term?: string, categories: string[] = [], views = 0) => {
   await db
@@ -76,8 +80,11 @@ select * from posts
 
 If you need to combine conditional filters in different part of the project you can create a variable, push filters and then use it in `.where()` method with `and()` or `or()` operators like below:
 
-```ts copy {7,10}
-import { SQL, ... } from 'drizzle-orm';
+```ts copy {10,13}
+import { and, gt, ilike, inArray, SQL, } from 'drizzle-orm';
+import { posts } from './schema';
+
+const db = drizzle(...);
 
 const searchPosts = async (filters: SQL[]) => {
   await db
@@ -98,8 +105,11 @@ Drizzle has useful and flexible API, which lets you create your custom solutions
 
 <Section>
 
-```ts copy {5,14}
-import { AnyColumn, ... } from 'drizzle-orm';
+```ts copy {7,17}
+import { and, AnyColumn, gt, sql } from 'drizzle-orm';
+import { posts } from './schema';
+
+const db = drizzle(...);
 
 // length less than
 const lenlt = (column: AnyColumn, value: number) => {

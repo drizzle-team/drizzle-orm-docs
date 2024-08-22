@@ -61,7 +61,12 @@ To count all rows in table you can use `count()` function or `sql` operator like
 To count rows where the specified column contains non-NULL values you can use `count()` function with a column:
 
 <Section>
-```ts copy {1}
+```ts copy {6}
+import { count } from "drizzle-orm";
+import { products } from './schema';
+
+const db = drizzle(...);
+
 await db.select({ count: count(products.discount) }).from(products);
 ```
 
@@ -80,8 +85,11 @@ select count("discount") from products;
 Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL and MySQL `count()` function returns bigint, which is interpreted as string by their drivers, so it should be casted to integer:
 
 <Section>
-```ts copy {5,7,11,12}
+```ts copy {8,10,14,15}
 import { AnyColumn, sql } from 'drizzle-orm';
+import { products } from './schema';
+
+const db = drizzle(...);
 
 const customCount = (column?: AnyColumn) => {
   if (column) {
@@ -104,8 +112,11 @@ select cast(count("discount") as integer) from products;
 In SQLite, `count()` result returns as integer.
 
 <Section>
-```ts copy {3,4}
+```ts copy {6,7}
 import { sql } from 'drizzle-orm';
+import { products } from './schema';
+
+const db = drizzle(...);
 
 await db.select({ count: sql<number>`count(*)` }).from(products);
 await db.select({ count: sql<number>`count(${products.discount})` }).from(products);
@@ -128,8 +139,11 @@ If you need to apply runtime transformations to the returned value, you can use 
 To count rows that match a condition you can use `.where()` method:
 
 <Section>
-```ts copy {4,6}
+```ts copy {7,9}
 import { count, gt } from 'drizzle-orm';
+import { products } from './schema';
+
+const db = drizzle(...);
 
 await db
   .select({ count: count() })
@@ -146,9 +160,11 @@ This is how you can use `count()` function with joins and aggregations:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
 	<CodeTab>
-    ```ts copy {8,11,12,13}
+    ```ts copy {10,13,14,15}
     import { count, eq } from 'drizzle-orm';
     import { countries, cities } from './schema';
+    
+    const db = drizzle(...);
 
     // Count cities in each country
     await db

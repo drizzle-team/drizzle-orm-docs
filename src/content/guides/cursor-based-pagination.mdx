@@ -110,7 +110,12 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
 
 If you need dynamic order by you can do like below:
 
-```ts copy {6,8}
+```ts copy {11,13}
+import { gt, lt, asc, desc } from "drizzle-orm";
+import { users } from './schema';
+
+const db = drizzle(...);
+
 const nextUserPage = async (order: 'asc' | 'desc' = 'asc', cursor?: number, pageSize = 3) => {
   await db
     .select()
@@ -133,8 +138,11 @@ The main idea of this pagination is to use cursor as a pointer to a specific row
 If you need to order by a non-unique and non-sequential column, you can use multiple columns for cursor. This is how you can do it:
 
 <Section>
-```ts copy {14,15,16,17,18,19,22}
+```ts copy {16-23, 25}
 import { and, asc, eq, gt, or } from 'drizzle-orm';
+import { users } from './schema';
+
+const db = drizzle(...);
 
 const nextUserPage = async (
   cursor?: {
@@ -199,21 +207,22 @@ select * from users
 Make sure to create indices for the columns that you use for cursor to make query efficient.
 
 <Section>
-```ts copy {7,8}
-import { index, ...imports } from 'drizzle-orm/pg-core';
+```ts copy {9,10}
+import { index, pgTable, serial, text} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
-// columns declaration
+  id: serial('id').primaryKey(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
 },
 (t) => ({
-  firstNameIndex: index('first_name_index').on(t.firstName).asc(),
-  firstNameAndIdIndex: index('first_name_and_id_index').on(t.firstName, t.id).asc(),
+  firstNameIndex: index('first_name_index').on(t.firstName.asc()),
+  firstNameAndIdIndex: index('first_name_and_id_index').on(t.firstName.asc(), t.id.asc()),
 }),
 );
 ```
 
 ```sql
--- As of now drizzle-kit only supports index name and on() param, so you have to add order manually
 CREATE INDEX IF NOT EXISTS "first_name_index" ON "users" ("first_name" ASC);
 CREATE INDEX IF NOT EXISTS "first_name_and_id_index" ON "users" ("first_name" ASC,"id" ASC);
 ```
@@ -223,7 +232,11 @@ If you are using primary key which is not sequential (e.g. `UUIDv4`), you should
 This is how you can do it:
 
 <Section>
-```ts copy {12,13,14,15,16,17,18,21}
+```ts copy {16-24,26}
+import { or, gt, and, eq, asc } from "drizzle-orm";
+import { users } from "./schema";
+
+const db = drizzle(...);
 
 const nextUserPage = async (
   cursor?: {
@@ -259,7 +272,7 @@ await nextUserPage({
 Drizzle has useful relational queries API, that lets you easily implement `cursor-based` pagination:
 
 ```ts copy {7,8,9}
-import * as schema from './db/schema';
+import * as schema from './schema';
 
 const db = drizzle(..., { schema });
 

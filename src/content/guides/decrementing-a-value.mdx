@@ -2,6 +2,7 @@
 title: SQL Decrement value
 slug: decrementing-a-value
 ---
+
 import Section from "@mdx/Section.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -17,10 +18,11 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 To decrement a column value you can use `update().set()` method like below:
 
 <Section>
-```ts copy {8}
+```ts copy {9}
 import { eq, sql } from 'drizzle-orm';
+import { table } from './schema';
 
-const db = drizzle(...)
+const db = drizzle(...);
   
 await db
   .update(table)
@@ -37,8 +39,11 @@ update "table" set "counter" = "counter" - 1 where "id" = 1;
 
 Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom decrement function:
 
-```ts copy {4,10,11}
-import { AnyColumn } from 'drizzle-orm';
+```ts copy {6,13,14}
+import { AnyColumn, eq, sql } from 'drizzle-orm';
+import { table } from './schema';
+
+const db = drizzle(...);
 
 const decrement = (column: AnyColumn, value = 1) => {
   return sql`${column} - ${value}`;

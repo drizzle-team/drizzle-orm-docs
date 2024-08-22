@@ -44,7 +44,11 @@ await db.execute(
 The `to_tsquery` function converts a keyword to normalized tokens and returns a `tsquery` that matches the lexemes in a `tsvector`. The `@@` operator is used for direct matches:
 
 <Section>
-```ts copy {2, 3}
+```ts copy {6, 7}
+import { sql } from 'drizzle-orm';
+
+const db = drizzle(...);
+
 await db.execute(
   sql`select to_tsvector('english', 'Guide to PostgreSQL full-text search with Drizzle ORM')
     @@ to_tsquery('english', 'Drizzle') as match`,
@@ -103,9 +107,11 @@ As for now, Drizzle doesn't support `tsvector` type natively, so you need to con
 To implement full-text search in PostgreSQL with Drizzle ORM, you can use the `to_tsvector` and `to_tsquery` functions with `sql` operator:
 
 <Section>
-```ts copy {9}
+```ts copy {11}
 import { sql } from 'drizzle-orm';
 import { posts } from './schema';
+
+const db = drizzle(...);
 
 const title = 'trip';
 
@@ -128,7 +134,12 @@ await db
 To match by any of the keywords, you can use the `|` operator:
 
 <Section>
-```ts copy {6}
+```ts copy {11}
+import { sql } from "drizzle-orm";
+import { posts } from "./schema";
+
+const db = drizzle(...);
+
 const title = 'Europe | Asia';
 
 await db
@@ -148,7 +159,12 @@ await db
 To match multiple keywords, you can use the `plainto_tsquery` function:
 
 <Section>
-```ts copy {7}
+```ts copy {12}
+import { sql } from "drizzle-orm";
+import { posts } from "./schema";
+
+const db = drizzle(...);
+
 // 'discover & Italy'
 const title = 'discover Italy';
 
@@ -171,7 +187,12 @@ select * from posts
 To match a phrase, you can use the `phraseto_tsquery` function:
 
 <Section>
-```ts copy {8}
+```ts copy {13}
+import { sql } from "drizzle-orm";
+import { posts } from "./schema";
+
+const db = drizzle(...);
+
 // if you query by "trip family", it will not return any result
 // 'family <-> trip'
 const title = 'family trip';
@@ -195,7 +216,12 @@ select * from posts
 You can also use `websearch_to_tsquery` function which is a simplified version of `to_tsquery` with an alternative syntax, similar to the one used by web search engines:
 
 <Section>
-```ts copy {7}
+```ts copy {12}
+import { sql } from "drizzle-orm";
+import { posts } from "./schema";
+
+const db = drizzle(...);
+
 // 'family | first & trip & europ | asia'
 const title = 'family or first trip Europe or Asia';
 
@@ -313,7 +339,12 @@ The `setweight` function is used to label the entries of a tsvector with a given
 This is how you can query on multiple columns:
 
 <Section>
-```ts copy {5-7}
+```ts copy {10-12}
+import { sql } from "drizzle-orm";
+import { posts } from "./schema";
+
+const db = drizzle(...);
+
 const title = 'plan';
 
 await db.select().from(posts)
@@ -349,8 +380,11 @@ await db.select().from(posts)
 To rank the search results, you can use the `ts_rank` or `ts_rank_cd` functions and `orderBy` method:
 
 <Section>
-```ts copy {6,7,12,13,18-20}
+```ts copy {9,10,15,16,21-23, 25}
 import { desc, getTableColumns, sql } from 'drizzle-orm';
+import { posts } from "./schema";
+
+const db = drizzle(...);
 
 const search = 'culture | Europe | Italy | adventure';
 

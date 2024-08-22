@@ -64,7 +64,11 @@ This is how you can create table with `geometry` datatype and spatial index in D
 This is how you can insert `geometry` data into the table in Drizzle. `ST_MakePoint()` in PostGIS creates a geometric object of type `point` using the specified coordinates.
 `ST_SetSRID()` sets the `SRID` (unique identifier associated with a specific coordinate system, tolerance, and resolution) on a geometry to a particular integer value:
 
-```ts {4, 10, 16}
+```ts {8, 14, 20}
+import { stores } from './schema';
+
+const db = drizzle(...);
+
 // mode: 'xy'
 await db.insert(stores).values({
   name: 'Test',
@@ -87,9 +91,11 @@ await db.insert(stores).values({
 To compute the distance between the objects you can use `<->` operator and `ST_Distance()` function, which for `geometry types` returns the minimum planar distance between two geometries. This is how you can query for the nearest location by coordinates in Drizzle with PostGIS:
 
 <Section>
-```ts copy {9, 14, 17}
+```ts copy {11, 16, 19}
 import { getTableColumns, sql } from 'drizzle-orm';
 import { stores } from './schema';
+
+const db = drizzle(...);
 
 const point = {
   x: -73.935_242,
@@ -118,7 +124,12 @@ limit 1;
 To filter stores located within a specified rectangular area, you can use `ST_MakeEnvelope()` and `ST_Within()` functions. `ST_MakeEnvelope()` creates a rectangular Polygon from the minimum and maximum values for X and Y. `ST_Within()` Returns TRUE if geometry A is within geometry B.
 
 <Section>
-```ts copy {13}
+```ts copy {18}
+import { sql } from "drizzle-orm";
+import { stores } from "./schema";
+
+const db = drizzle(...);
+
 const point = {
   x1: -88,
   x2: -73,

@@ -82,7 +82,7 @@ To select parent rows with at least one related child row and retrieve child dat
       post: posts,
     })
     .from(users)
-    .innerJoin(posts, eq(users.id, posts.userId));
+    .innerJoin(posts, eq(users.id, posts.userId))
     .orderBy(users.id);
   ```
 
@@ -129,8 +129,11 @@ To select parent rows with at least one related child row and retrieve child dat
 To only select parent rows with at least one related child row you can use subquery with `exists()` function like this:
 
 <Section>
-```ts copy {8}
+```ts copy {11}
 import { eq, exists, sql } from 'drizzle-orm';
+import { users, posts } from './schema';
+
+const db = drizzle(...);
 
 const sq = db
   .select({ id: sql`1` })
