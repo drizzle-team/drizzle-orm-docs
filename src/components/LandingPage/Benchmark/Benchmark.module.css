@@ -25,7 +25,17 @@ html[class~=dark] .description {
   margin-bottom: 4px;
 }
 
-.charts {
+html[class~=dark] .container {
+  border: 1px solid #2b2b2b;
+  background-color: #1a1a1a;
+}
+
+.container {
+  background-color: #fafafa;
+  border: 1px solid rgb(235, 235, 235);
+  border-radius: 8px;
+  padding: 16px;
+  display: grid;
   margin-top: 24px;
   position: relative;
 }
@@ -71,9 +81,9 @@ html[class~=dark] .bottom {
   text-decoration-style: dashed;
 }
 
-.blurred, .hide-blur {
+.blurred {
   position: absolute;
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   top: -10px;
@@ -82,13 +92,6 @@ html[class~=dark] .bottom {
   bottom: -10px;
   backdrop-filter: blur(3px);
   z-index: 10;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.hide-blur {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .blur-content {
@@ -124,6 +127,11 @@ html[class~=dark] .start, html[class~=dark] .start-shaked {
   background-color: rgb(226, 232, 240);
 }
 
+html[class~=dark] .benchmark_link {
+  color: #282828;
+  background-color: rgb(226, 232, 240);
+}
+
 .start, .start-shaked {
   padding: 16px 32px;
   border-radius: 4px;
@@ -138,7 +146,52 @@ html[class~=dark] .start, html[class~=dark] .start-shaked {
   align-items: center;
   justify-content: center;
   border: none;
+  gap: 8px;
   background-color: #282b3b;
+}
+
+.benchmark_link {
+  padding: 16px 32px;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  height: 48px;
+  cursor: pointer;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  gap: 8px;
+  background-color: #282b3b;
+  margin-top: 24px;
+  display: flex;
+}
+
+.wrap-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.benchmark_link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.start svg {
+  width: 18px;
+  height: 18px;
+}
+
+.start-shaked svg {
+  width: 18px;
+  height: 18px;
 }
 
 .start-shaked {
@@ -151,6 +204,16 @@ html[class~=dark] .start, html[class~=dark] .start-shaked {
   50% { transform: translateX(-5px) }
   75% { transform: translateX(5px) }
   100% { transform: translateX(0) }
+}
+
+@media (max-width: 1190px) {
+  .blurred {
+    display: flex;
+  }
+
+  .benchmark_link {
+    display: none;
+  }
 }
 
 @media (max-width: 900px) {
