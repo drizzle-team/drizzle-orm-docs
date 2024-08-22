@@ -30,7 +30,11 @@ const JoinsSelector: FC = () => {
       defaultValue={String(selectedItems.joins)}
     >
       {items.map((item) => (
-        <option key={item.name} value={String(item.value)}>
+        <option
+          key={item.name}
+          value={String(item.value)}
+          selected={selectedItems.joins === item.value}
+        >
           {item.name}
         </option>
       ))}

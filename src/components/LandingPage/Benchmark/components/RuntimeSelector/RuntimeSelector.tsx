@@ -65,7 +65,11 @@ const RuntimeSelector: FC = () => {
           }}
         >
           {items.map((item) => (
-            <option key={item.value} value={item.value}>
+            <option
+              key={item.value}
+              value={item.value}
+              selected={selectedItems.runtime === item.value}
+            >
               {item.name}
             </option>
           ))}
