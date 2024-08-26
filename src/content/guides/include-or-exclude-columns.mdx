@@ -58,7 +58,11 @@ Drizzle has flexible API for including or excluding columns in queries. To inclu
 To include specific columns you can use `.select()` method like this:
 
 <Section>
-  ```ts copy {1}
+  ```ts copy {5}
+  import { posts } from './schema';
+
+  const db = drizzle(...);
+
   await db.select({ title: posts.title }).from(posts);
   ```
 
@@ -73,8 +77,11 @@ To include specific columns you can use `.select()` method like this:
 To include all columns with extra columns you can use `getTableColumns()` utility function like this:
 
 <Section>
-  ```ts copy {5,6}
+  ```ts copy {8,9}
   import { getTableColumns, sql } from 'drizzle-orm';
+  import { posts } from './schema';
+
+  const db = drizzle(...);
 
   await db
     .select({
@@ -99,9 +106,12 @@ To include all columns with extra columns you can use `getTableColumns()` utilit
 To exclude columns you can use `getTableColumns()` utility function like this:
 
 <Section>
-  ```ts copy {3,5}
+  ```ts copy {6,8}
   import { getTableColumns } from 'drizzle-orm';
+  import { posts } from './schema';
 
+  const db = drizzle(...);
+  
   const { content, ...rest } = getTableColumns(posts); // exclude "content" column
 
   await db.select({ ...rest }).from(posts); // select all other columns
@@ -121,9 +131,11 @@ This is how you can include or exclude columns with joins:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {5,9,10,11}
+    ```ts copy {7,11,12,13}
     import { eq, getTableColumns } from 'drizzle-orm';
-    import { comments, posts, users } from './db/schema';
+    import { comments, posts, users } from './schema';
+
+    const db = drizzle(...);
 
     // exclude "userId" and "postId" columns from "comments"
     const { userId, postId, ...rest } = getTableColumns(comments);
@@ -222,7 +234,11 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
 This is how you can include specific columns using relational queries:
 
 <Section>
-  ```ts copy {2,3,4}
+  ```ts copy {6,7,8}
+  import * as schema from './schema';
+
+  const db = drizzle(..., { schema });
+
   await db.query.posts.findMany({
     columns: {
       title: true,
@@ -241,8 +257,11 @@ This is how you can include specific columns using relational queries:
 This is how you can include all columns with extra columns using relational queries:
 
 <Section>
-  ```ts copy {4,5,6}
+  ```ts copy {7,8,9}
   import { sql } from 'drizzle-orm';
+  import * as schema from './schema';
+
+  const db = drizzle(..., { schema });
 
   await db.query.posts.findMany({
     extras: {
@@ -266,7 +285,11 @@ This is how you can include all columns with extra columns using relational quer
 This is how you can exclude columns using relational queries:
 
 <Section>
-  ```ts copy {2,3,4}
+  ```ts copy {6,7,8}
+  import * as schema from './schema';
+
+  const db = drizzle(..., { schema });
+
   await db.query.posts.findMany({
     columns: {
       content: false,
@@ -374,8 +397,10 @@ This is how you can create custom solution for conditional select:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {7}
+    ```ts copy {9}
     import { posts } from './schema';
+
+    const db = drizzle(...);
 
     const searchPosts = async (withTitle = false) => {
       await db

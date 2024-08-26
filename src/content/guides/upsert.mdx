@@ -49,9 +49,11 @@ This is how you can do it:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {21,24}
+    ```ts copy {23,26}
     import { sql } from 'drizzle-orm';
     import { users } from './schema';
+
+    const db = drizzle(...);
 
     const values = [
       {
@@ -100,11 +102,13 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {43,46}
+    ```ts copy {45,48}
     import { SQL, getTableColumns, sql } from 'drizzle-orm';
     import { PgTable } from 'drizzle-orm/pg-core';
     import { SQLiteTable } from 'drizzle-orm/sqlite-core';
     import { users } from './schema';
+
+    const db = drizzle(...);
 
     const buildConflictUpdateColumns = <
       T extends PgTable | SQLiteTable,
@@ -173,9 +177,11 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 This is how you can implement an upsert query with multiple targets in PostgreSQL and SQLite:
 
 <Section>
-```ts copy {8}
+```ts copy {10}
 import { sql } from 'drizzle-orm';
 import { inventory } from './schema';
+
+const db = drizzle(...);
 
 await db
   .insert(inventory)
@@ -196,9 +202,11 @@ If you want to implement upsert query with `where` clause for `update` statement
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-  ```ts copy {25,26,27,28}
+  ```ts copy {27,28,29,30}
   import { or, sql } from 'drizzle-orm';
   import { products } from './schema';
+
+  const db = drizzle(...);
 
   const data = {
     id: 1,
@@ -254,9 +262,11 @@ If you want to implement upsert query with `where` clause for `update` statement
 If you want to update all columns except of specific one, you can leave the previous value like this:
 
 <Section>
-```ts copy {16}
+```ts copy {18}
 import { sql } from 'drizzle-orm';
 import { users } from './schema';
+
+const db = drizzle(...);
 
 const data = {
   id: 1,
@@ -287,7 +297,11 @@ To implement an upsert query in MySQL with Drizzle you can use `.onDuplicateKeyU
 This is how you can do it:
 
 <Section>
-```ts copy {4}
+```ts copy {8}
+import { users } from './schema';
+
+const db = drizzle(...);
+
 await db
   .insert(users)
   .values({ id: 1, name: 'John' })
@@ -304,9 +318,11 @@ To upsert multiple rows in one query in MySQL you can use `sql operator` and `va
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {21,24}
+    ```ts copy {23,26}
     import { sql } from 'drizzle-orm';
     import { users } from './schema';
+
+    const db = drizzle(...);
 
     const values = [
       {
@@ -356,10 +372,12 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {36,38}
+    ```ts copy {38,40}
     import { SQL, getTableColumns, sql } from 'drizzle-orm';
     import { MySqlTable } from 'drizzle-orm/mysql-core';
     import { users } from './schema';
+
+    const db = drizzle(...);
 
     const buildConflictUpdateColumns = <T extends MySqlTable, Q extends keyof T['_']['columns']>(
       table: T,
@@ -421,9 +439,11 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 If you want to update all columns except of specific one, you can leave the previous value like this:
 
 <Section>
-```ts copy {15}
+```ts copy {17}
 import { sql } from 'drizzle-orm';
 import { users } from './schema';
+
+const db = drizzle(...);
 
 const data = {
   id: 1,

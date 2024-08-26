@@ -76,7 +76,7 @@ To perform similarity search, you need to create a table with a vector column an
 The `embedding` column is used to store vector embeddings of the guide descriptions. Vector embedding is just a representation of some data. It converts different types of data into a common format (vectors) that language models can process. This allows us to perform mathematical operations, such as measuring the distance between two vectors, to determine how similar or different two data items are.
 
 In this example we will use `OpenAI` model to generate [embeddings](https://platform.openai.com/docs/guides/embeddings) for the description:
-```ts copy
+```ts copy filename="embedding.ts"
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -98,7 +98,7 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
 To search for similar guides by embedding, you can use `gt` and `sql` operators with `cosineDistance` function to calculate the similarity between the `embedding` column and the generated embedding:
 
 <Section>
-```ts copy {10,15,16}
+```ts copy {10,15,16} filename="index.ts"
 import { cosineDistance, desc, gt, sql } from 'drizzle-orm';
 import { generateEmbedding } from './embedding';
 import { guides } from './schema';

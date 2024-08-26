@@ -6,6 +6,8 @@ slug: update-many-with-different-value
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
 
 <IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
 
@@ -17,8 +19,9 @@ import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
 To implement update many with different values for each row within 1 request you can use `sql` operator with `case` statement and `.update().set()` methods like this:
 
-<Section>
-```ts {26, 29, 32, 36, 38, 40}
+<CodeTabs items={["index.ts", "schema.ts",]}>
+  <CodeTab>
+```ts copy {26, 29, 32, 36, 38, 40}
 import { SQL, inArray, sql } from 'drizzle-orm';
 import { users } from './schema';
 
@@ -66,4 +69,13 @@ update users set "city" =
   (case when id = 1 then 'New York' when id = 2 then 'Los Angeles' when id = 3 then 'Chicago' end)
 where id in (1, 2, 3)
 ```
-</Section>
+  </CodeTab>
+  ```ts copy
+  import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+  export const users = pgTable('users', {
+    id: serial('id').primaryKey(),
+    city: text('city').notNull(),
+  });
+  ```
+</CodeTabs>

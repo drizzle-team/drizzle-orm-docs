@@ -40,7 +40,7 @@ await db.execute(
 
 This is how you can create table with `point` datatype in Drizzle:
 
-```ts {6}
+```ts copy {6}
 import { pgTable, point, serial, text } from 'drizzle-orm/pg-core';
 
 export const stores = pgTable('stores', {
@@ -52,7 +52,11 @@ export const stores = pgTable('stores', {
 
 This is how you can insert point data into the table in Drizzle:
 
-```ts {4, 10, 16}
+```ts {8, 14, 20}
+import { stores } from './schema';
+
+const db = drizzle(...);
+
 // mode: 'xy'
 await db.insert(stores).values({
   name: 'Test',
@@ -75,9 +79,11 @@ await db.insert(stores).values({
 To compute the distance between the objects you can use `<->` operator. This is how you can query for the nearest location by coordinates in Drizzle:
 
 <Section>
-```ts {9, 14, 17}
+```ts copy {11, 16, 19}
 import { getTableColumns, sql } from 'drizzle-orm';
 import { stores } from './schema';
+
+const db = drizzle(...);
 
 const point = {
   x: -73.935_242,
@@ -106,7 +112,12 @@ limit 1;
 To filter rows to include only those where a `point` type `location` falls within a specified rectangular boundary defined by two diagonal points you can user `<@` operator. It checks if the first object is contained in or on the second object:
 
 <Section>
-```ts {12}
+```ts copy {17}
+import { sql } from "drizzle-orm";
+import { stores } from "./schema";
+
+const db = drizzle(...);
+
 const point = {
   x1: -88,
   x2: -73,
