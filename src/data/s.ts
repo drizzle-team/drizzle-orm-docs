@@ -270,6 +270,21 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.IMAGE,
   },
+  {
+    tier: {
+      name: "$250 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/dbos",
+      name: "DBOS",
+      avatarUrl: "/images/dbos.png",
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];
 
 export default sponsorsData;
