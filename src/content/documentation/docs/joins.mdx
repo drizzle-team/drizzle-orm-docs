@@ -208,10 +208,10 @@ const parent = aliasedTable(user, "parent")
 const result = db
   .select()
   .from(user)
-  .leftJoin(parent, eq(parent.id, user.id));
+  .leftJoin(parent, eq(parent.id, user.parentId));
 ```
 ```sql
-select ... from "user" left join "user" "parent" on "parent"."id" = "user"."id"
+select ... from "user" left join "user" "parent" on "parent"."id" = "user"."parent_id"
 ```
 ```typescript
 // result type
