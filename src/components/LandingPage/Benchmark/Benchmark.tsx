@@ -35,12 +35,7 @@ const Benchmark = () => {
         <div className={styles.header}>Performance</div>
         <div className={styles.description}>
           <div className={styles.description__line}>
-            Drizzle has always been fast, we just wanted you to have proper
-            benchmarks experience
-          </div>
-          <div>
-            Well, actually it&apos;s not that Drizzle is fast, Drizzle just
-            doesn&apos;t slow you down
+            Drizzle doesn&apos;t slow you down
           </div>
         </div>
         <div className={styles.container}>
