@@ -403,7 +403,7 @@ export const posts = pgTable('posts', {
 });
 ```
 
-For constrains specified with the `foreignKey` operator, foreign key actions are defined with the syntax:
+For constraints specified with the `foreignKey` operator, foreign key actions are defined with the syntax:
 
 ```typescript {18-19}
 import { foreignKey, pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
@@ -421,7 +421,7 @@ export const posts = pgTable('posts', {
 	fk: foreignKey({
 		name: "author_fk",
 		columns: [table.author],
-		references: [users.id],
+		foreignColumns: [users.id],
 	})
 		.onDelete('cascade')
 		.onUpdate('cascade')
