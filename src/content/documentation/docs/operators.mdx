@@ -27,7 +27,7 @@ SELECT * FROM table WHERE table.column = 5
 
 
 <Section>
-```typescript
+```typescript copy
 import { eq } from "drizzle-orm";
 
 db.select().from(table).where(eq(table.column1, table.column2));
@@ -45,7 +45,7 @@ SELECT * FROM table WHERE table.column1 = table.column2
   
 Value is not equal to `n`  
 <Section>
-```typescript
+```typescript copy
 import { ne } from "drizzle-orm";
 
 db.select().from(table).where(ne(table.column, 5));
@@ -58,7 +58,7 @@ SELECT * FROM table WHERE table.column <> 5
 
 
 <Section>
-```typescript
+```typescript copy
 import { ne } from "drizzle-orm";
 
 db.select().from(table).where(ne(table.column1, table.column2));
@@ -75,7 +75,7 @@ SELECT * FROM table WHERE table.column1 <> table.column2
   
 Value is greater than `n`
 <Section>
-```typescript
+```typescript copy
 import { gt } from "drizzle-orm";
 
 db.select().from(table).where(gt(table.column, 5));
@@ -88,7 +88,7 @@ SELECT * FROM table WHERE table.column > 5
 
 
 <Section>
-```typescript
+```typescript copy
 import { gt } from "drizzle-orm";
 
 db.select().from(table).where(gt(table.column1, table.column2));
@@ -104,7 +104,7 @@ SELECT * FROM table WHERE table.column1 > table.column2
   
 Value is greater than or equal to `n`
 <Section>
-```typescript
+```typescript copy
 import { gte } from "drizzle-orm";
 
 db.select().from(table).where(gte(table.column, 5));
@@ -117,7 +117,7 @@ SELECT * FROM table WHERE table.column >= 5
 
 
 <Section>
-```typescript
+```typescript copy
 import { gte } from "drizzle-orm";
 
 db.select().from(table).where(gte(table.column1, table.column2));
@@ -133,7 +133,7 @@ SELECT * FROM table WHERE table.column1 >= table.column2
   
 Value is less than `n`
 <Section>
-```typescript
+```typescript copy
 import { lt } from "drizzle-orm";
 
 db.select().from(table).where(lt(table.column, 5));
@@ -146,7 +146,7 @@ SELECT * FROM table WHERE table.column < 5
 
 
 <Section>
-```typescript
+```typescript copy
 import { lt } from "drizzle-orm";
 
 db.select().from(table).where(lt(table.column1, table.column2));
@@ -163,7 +163,7 @@ SELECT * FROM table WHERE table.column1 < table.column2
 Value is less than or equal to `n`.
 
 <Section>
-```typescript
+```typescript copy
 import { lte } from "drizzle-orm";
 
 db.select().from(table).where(lte(table.column, 5));
@@ -175,7 +175,7 @@ SELECT * FROM table WHERE table.column <= 5
 </Section>
 
 <Section>
-```typescript
+```typescript copy
 import { lte } from "drizzle-orm";
 
 db.select().from(table).where(lte(table.column1, table.column2));
@@ -192,7 +192,7 @@ SELECT * FROM table WHERE table.column1 <= table.column2
   
 Value is `null`
 <Section>
-```typescript
+```typescript copy
 import { isNull } from "drizzle-orm";
 
 db.select().from(table).where(isNull(table.column));
@@ -209,7 +209,7 @@ SELECT * FROM table WHERE table.column IS NULL
   
 Value is not `null`
 <Section>
-```typescript
+```typescript copy
 import { isNotNull } from "drizzle-orm";
 
 db.select().from(table).where(isNotNull(table.column));
@@ -225,7 +225,7 @@ SELECT * FROM table WHERE table.column IS NOT NULL
   
 Value is in array of values
 <Section>
-```typescript
+```typescript copy
 import { inArray } from "drizzle-orm";
 
 db.select().from(table).where(inArray(table.column, [1, 2, 3, 4]));
@@ -237,7 +237,7 @@ SELECT * FROM table WHERE table.column in (1, 2, 3, 4)
 </Section>
 
 <Section>
-```typescript
+```typescript copy
 import { inArray } from "drizzle-orm";
 
 const query = db.select({ data: table2.column }).from(table2);
@@ -254,7 +254,7 @@ SELECT * FROM table WHERE table.column IN (SELECT table2.column FROM table2)
   
 Value is not in array of values
 <Section>
-```typescript
+```typescript copy
 import { notInArray } from "drizzle-orm";
 
 db.select().from(table).where(notInArray(table.column, [1, 2, 3, 4]));
@@ -266,7 +266,7 @@ SELECT * FROM table WHERE table.column NOT in (1, 2, 3, 4)
 </Section>
 
 <Section>
-```typescript
+```typescript copy
 import { notInArray } from "drizzle-orm";
 
 const query = db.select({ data: table2.column }).from(table2);
@@ -283,7 +283,7 @@ SELECT * FROM table WHERE table.column NOT IN (SELECT table2.column FROM table2)
   
 Value exists
 <Section>
-```typescript
+```typescript copy
 import { exists } from "drizzle-orm";
 
 const query = db.select().from(table2)
@@ -296,6 +296,8 @@ SELECT * FROM table WHERE EXISTS (SELECT * from table2)
 </Section>
 
 ### notExists
+
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
 
 <Section>
 ```typescript
@@ -315,7 +317,7 @@ SELECT * FROM table WHERE NOT EXISTS (SELECT * from table2)
   
 Value is between two values
 <Section>
-```typescript
+```typescript copy
 import { between } from "drizzle-orm";
 
 db.select().from(table).where(between(table.column, 2, 7));
@@ -331,7 +333,7 @@ SELECT * FROM table WHERE table.column BETWEEN 2 AND 7
   
 Value is not between two value
 <Section>
-```typescript
+```typescript copy
 import { notBetween } from "drizzle-orm";
 
 db.select().from(table).where(notBetween(table.column, 2, 7));
@@ -347,7 +349,7 @@ SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7
   
 Value is like other value, case sensitive
 <Section>
-```typescript
+```typescript copy
 import { like } from "drizzle-orm";
 
 db.select().from(table).where(like(table.column, "%llo wor%"));
@@ -363,7 +365,7 @@ SELECT * FROM table  WHERE table.column LIKE '%llo wor%'
   
 Value is like some other value, case insensitive
 <Section>
-```typescript
+```typescript copy
 import { ilike } from "drizzle-orm";
 
 db.select().from(table).where(ilike(table.column, "%llo wor%"));
@@ -379,7 +381,7 @@ SELECT * FROM table WHERE table.column ILIKE '%llo wor%'
   
 Value is not like some other value, case insensitive
 <Section>
-```typescript
+```typescript copy
 import { notIlike } from "drizzle-orm";
 
 db.select().from(table).where(notIlike(table.column, "%llo wor%"));
@@ -396,7 +398,7 @@ SELECT * FROM table WHERE table.column NOT ILIKE '%llo wor%'
 All conditions must return `false`.
 
 <Section>
-```typescript
+```typescript copy
 import { eq, not } from "drizzle-orm";
 
 db.select().from(table).where(not(eq(table.column, 5)));
@@ -413,7 +415,7 @@ SELECT * FROM table WHERE NOT (table.column = 5)
 All conditions must return `true`.
 
 <Section>
-```typescript
+```typescript copy
 import { gt, lt, and } from "drizzle-orm";
 
 db.select().from(table).where(and(gt(table.column, 5), lt(table.column, 7)));
@@ -430,7 +432,7 @@ SELECT * FROM table WHERE (table.column > 5 AND table.column < 7)
 One or more conditions must return `true`.
 
 <Section>
-```typescript
+```typescript copy
 import { gt, lt, or } from "drizzle-orm";
 
 db.select().from(table).where(or(gt(table.column, 5), lt(table.column, 7)));
@@ -447,7 +449,7 @@ SELECT * FROM table WHERE (table.column > 5 OR table.column < 7)
 Test that a column or expression contains all elements of the list passed as the second argument
 
 <Section>
-```typescript
+```typescript copy
 import { arrayContains } from "drizzle-orm";
 
 const contains = await db.select({ id: posts.id }).from(posts)
@@ -472,7 +474,7 @@ select "id" from "posts" where "posts"."tags" @> (select "tags" from "posts" whe
 Test that the list passed as the second argument contains all elements of a column or expression
 
 <Section>
-```typescript
+```typescript copy
 import { arrayContained } from "drizzle-orm";
 
 const contained = await db.select({ id: posts.id }).from(posts)
@@ -490,7 +492,7 @@ select "id" from "posts" where "posts"."tags" <@ {Typescript,ORM};
 Test that a column or expression contains any elements of the list passed as the second argument.
 
 <Section>
-```typescript
+```typescript copy
 import { arrayOverlaps } from "drizzle-orm";
 
 const overlaps = await db.select({ id: posts.id }).from(posts)
