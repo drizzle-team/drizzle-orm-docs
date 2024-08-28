@@ -5,9 +5,10 @@ interface Props {
   headings?: IHeading[];
   tree: TreeNode[];
   slug: string;
+  forLanding?: boolean;
 }
 
-const { headings, slug = "", tree } = Astro.props;
+const { headings, slug = "", tree, forLanding = false } = Astro.props;
 const isActive = (path: string) => {
   const pathArray = path.split("/");
   const slugArray = slug.split("/");
@@ -18,7 +19,7 @@ const isActive = (path: string) => {
 <div class="nav-items">
   {
     tree
-      .filter((t) => isActive(t.name))
+      .filter((t) => forLanding || isActive(t.name))
       .map((t) =>
         t.children?.map((n, index) => (
           <Fragment key={n.name}>
@@ -113,35 +114,37 @@ const isActive = (path: string) => {
   import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
   import updateDialectLinks from "@/utils/updateDialectLinks";
 
-  const container = document.querySelector(".documentation-content-wrap")!;
-  const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
-  const links = document.querySelectorAll<HTMLElement>("[data-slug]");
+  document.addEventListener("astro:page-load", () => {
+    const container = document.querySelector(".documentation-content-wrap")!;
+    const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
+    const links = document.querySelectorAll<HTMLElement>("[data-slug]");
 
-  const updateLinks = () => {
-    const activeAnchors = handleAnchorHighlighting({
-      viewportHeight: window.innerHeight,
-      anchors: [...anchors].map((anchor) => ({
-        id: anchor.id,
-        offsetTop: anchor.offsetTop,
-      })),
-      scrollTop: container.scrollTop,
-    });
+    const updateLinks = () => {
+      const activeAnchors = handleAnchorHighlighting({
+        viewportHeight: window.innerHeight,
+        anchors: [...anchors].map((anchor) => ({
+          id: anchor.id,
+          offsetTop: anchor.offsetTop,
+        })),
+        scrollTop: container.scrollTop,
+      });
 
-    links.forEach((link) => {
-      const slug = link.dataset.slug;
-      if (!slug) return;
-      link.classList.toggle(
-        "nav-toc-item--active",
-        activeAnchors.includes(slug),
-      );
-      link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
-    });
-  };
+      links.forEach((link) => {
+        const slug = link.dataset.slug;
+        if (!slug) return;
+        link.classList.toggle(
+          "nav-toc-item--active",
+          activeAnchors.includes(slug),
+        );
+        link.classList.toggle("nav-toc-item", !activeAnchors.includes(slug));
+      });
+    };
 
-  if (container && links) {
-    container.addEventListener("scroll", throttle(updateLinks, 80));
-    updateLinks();
-  }
+    if (container && links) {
+      container.addEventListener("scroll", throttle(updateLinks, 80));
+      updateLinks();
+    }
 
-  updateDialectLinks();
+    updateDialectLinks();
+  });
 </script>

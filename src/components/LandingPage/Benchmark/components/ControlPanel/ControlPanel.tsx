@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState, type FC } from "react";
+import React, { useEffect, useMemo, useState, type FC } from "react";
 
 import styles from "./ControlPanel.module.css";
-import type { IData, IInputData, IParams } from "../../types";
-import Timer from "../Timer/Timer";
+import type { IData } from "../../types";
 
 import SpeedSelector from "../SpeedSelector/SpeedSelector";
 import Configuration from "../Configuration/Configuration";
@@ -10,26 +9,27 @@ import Performance from "../Performance/Performance";
 import { useBenchmarkContext } from "../../context/useBenchmarkContext";
 import OptionsIcon from "@/components/Icons/OptionsIcon";
 import BenchmarkConifg from "../BenchmarkConfig/BenchmarkConfig";
-import getBenchmarkPaths from "../../utils/getBenchmarkPaths";
 import ArrowRight from "@/components/Icons/ArrowRight";
+import getBenchmarkData from "../../utils/getBenchmarkData.ts";
+import Rewind from "@components/LandingPage/Benchmark/components/Rewind/Rewind.tsx";
 
 interface Props {
   minWidth?: number;
 }
 
 const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
-  const { setIsTimerActive, isTimerActive, time, setTime, intervalId } =
-    useBenchmarkContext();
+  const {
+    setIsTimerActive,
+    isTimerActive,
+    time,
+    setTime,
+    intervalId,
+    selectedItems,
+  } = useBenchmarkContext();
   const [speed, setSpeed] = useState<number>(2);
   const [isBlurred, setIsBlurred] = useState<boolean>(true);
+  const [isSmall, setIsSmall] = useState<boolean>(false);
   const [isShaking, setIsShaking] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<IParams>({
-    orm: "prisma",
-    traffic: "medium",
-    dbSize: "micro",
-    projectType: "ecommerce",
-    database: "postgres",
-  });
 
   const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
   const [compareData, setCompareData] = useState<IData[] | null>(null);
@@ -42,35 +42,18 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     return 0;
   }, [drizzleData, compareData]);
 
-  const getFile = async (): Promise<{
-    drizzleData: IData[] | null;
-    compareData: IData[] | null;
-  }> => {
-    const paths = getBenchmarkPaths(selectedItems);
-    if (!paths) {
-      return {
-        drizzleData: null,
-        compareData: null,
-      };
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.innerWidth > minWidth) {
+      setIsBlurred(false);
+    } else {
+      setIsSmall(true);
     }
-    let d: IInputData | null = null;
-    let c: IInputData | null = null;
-    [d, c] = await Promise.all([
-      import(`../../data/${paths.drizzleFileName}.json`),
-      import(`../../data/${paths.compareFileName}.json`),
-    ]);
-    if (d && c) {
-      return { drizzleData: d.data, compareData: c.data };
-    }
-    return {
-      drizzleData: null,
-      compareData: null,
-    };
-  };
+  }, [typeof window]);
 
-  const openConfigModal = () => {
+  const toggleConfigModal = () => {
+    if (!isConfigOpen) pause();
     setIsConfigOpen((prev) => !prev);
-    setIsTimerActive((prev) => !prev);
   };
 
   const skipToResults = () => {
@@ -79,10 +62,28 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     setTime(maxDataLength * 100);
   };
 
+  const pause = () => {
+    if (!drizzleData || !compareData) return;
+    clearInterval(intervalId.current);
+    setIsTimerActive(false);
+  };
+
   const rerun = () => {
     if (!drizzleData || !compareData) return;
     setTime(0);
     setIsTimerActive(true);
+  };
+
+  const resume = () => {
+    if (!drizzleData || !compareData) return;
+    setIsTimerActive(true);
+  };
+
+  const rewind = (e: any) => {
+    if (!drizzleData || !compareData) return;
+    setTime(Number(e.target.value));
+    setIsTimerActive(false);
+    clearInterval(intervalId.current);
   };
 
   const start = () => {
@@ -101,14 +102,11 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   };
 
   useEffect(() => {
-    getFile()
-      .then((data) => {
-        if (!data.drizzleData || !data.compareData) return;
-        setDrizzleData(data.drizzleData);
-        setCompareData(data.compareData);
-        rerun();
-      })
-      .catch(() => {});
+    const data = getBenchmarkData(selectedItems);
+    if (data) {
+      setDrizzleData(data.drizzleData);
+      setCompareData(data.compareData);
+    }
     return () => {
       setDrizzleData(null);
       setCompareData(null);
@@ -118,6 +116,8 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
   useEffect(() => {
     if (isBlurred) {
       skipToResults();
+    } else {
+      rerun();
     }
   }, [drizzleData, compareData]);
 
@@ -125,26 +125,96 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     <div className={styles.content}>
       <div className={styles.control}>
         <div className={styles.time}>
-          <Timer time={time} />
-          <SpeedSelector speed={speed} setSpeed={setSpeed} />
-          <div className={styles.divider} />
+          {!isConfigOpen && <SpeedSelector speed={speed} setSpeed={setSpeed} />}
+          {!isTimerActive &&
+            !isConfigOpen &&
+            (time === maxDataLength * 100 || time === 0) && (
+              <>
+                <div className={styles.divider}></div>
+                <button
+                  type="button"
+                  className={styles["play-wrap"]}
+                  onClick={rerun}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-play"
+                  >
+                    <polygon points="6 3 20 12 6 21 6 3" />
+                  </svg>
+                  Run
+                </button>
+                <div className={styles.divider}></div>
+              </>
+            )}
+          {!isTimerActive &&
+            !isConfigOpen &&
+            time !== maxDataLength * 100 &&
+            time !== 0 && (
+              <>
+                <div className={styles.divider}></div>
+                <button
+                  type="button"
+                  className={styles["play-wrap"]}
+                  onClick={resume}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-play"
+                  >
+                    <polygon points="6 3 20 12 6 21 6 3" />
+                  </svg>
+                  Resume
+                </button>
+                <div className={styles.divider}></div>
+              </>
+            )}
           {isTimerActive && !isConfigOpen && (
-            <button
-              type="button"
-              className={styles["play-wrap"]}
-              onClick={skipToResults}
-            >
-              Skip to results
-            </button>
+            <>
+              <div className={styles.divider}></div>
+              <button
+                type="button"
+                className={styles["play-wrap"]}
+                onClick={pause}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-pause"
+                >
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                </svg>
+                Pause
+              </button>
+              <div className={styles.divider}></div>
+            </>
           )}
-          {!isTimerActive && !isConfigOpen && (
-            <button
-              type="button"
-              className={styles["play-wrap"]}
-              onClick={rerun}
-            >
-              Rerun
-            </button>
+          {!isConfigOpen && (
+            <Rewind maxDataLength={maxDataLength} time={time} rewind={rewind} />
           )}
         </div>
         <div className={styles.config}>
@@ -160,7 +230,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           <button
             type="button"
             className={styles["config-button"]}
-            onClick={openConfigModal}
+            onClick={toggleConfigModal}
           >
             <OptionsIcon />
           </button>
@@ -175,13 +245,15 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
                   Only available on Desktop 🖥️
                 </div>
               )}
-              <button
-                onClick={start}
-                type="button"
-                className={isShaking ? styles["start-shaked"] : styles.start}
-              >
-                Launch your DevOps experience 🚀
-              </button>
+              {isSmall && (
+                <button
+                  onClick={start}
+                  type="button"
+                  className={isShaking ? styles["start-shaked"] : styles.start}
+                >
+                  Launch your DevOps experience 🚀
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -194,23 +266,7 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
           maxElements={81}
           maxDataLength={maxDataLength}
         />
-        <Configuration
-          isOpened={isConfigOpen}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-        />
-        {!isConfigOpen && selectedItems.traffic === "your_startup" && (
-          <div className={styles["sticker-wrap"]}>
-            <div className={styles.congrats}>
-              <div className={styles["congrats-text"]}>
-                At least you have great Lighthouse score!
-              </div>
-            </div>
-            <div className={styles.sticker}>
-              <img src="/images/sticker.webp" alt="sticker" />
-            </div>
-          </div>
-        )}
+        <Configuration isOpened={isConfigOpen} />
       </div>
     </div>
   );

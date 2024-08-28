@@ -5,7 +5,7 @@ import {
   type ReactNode,
   useRef,
 } from "react";
-import { type IData } from "../types";
+import { type IData, type IParams } from "../types";
 
 // Define the shape of your treatment context
 interface BenchmarkContextProps {
@@ -18,6 +18,8 @@ interface BenchmarkContextProps {
   setConcatedDataCompare: React.Dispatch<React.SetStateAction<IData[]>>;
   isTimerActive: boolean;
   setIsTimerActive: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedItems: IParams;
+  setSelectedItems: React.Dispatch<React.SetStateAction<IParams>>;
 }
 
 // Create the BenchmarkContext
@@ -47,6 +49,14 @@ export function BenchmarkProvider({ children }: BenchmarkProviderProps) {
   const [concatedDataDrizzle, setConcatedDataDrizzle] = useState<IData[]>([]);
   const [concatedDataCompare, setConcatedDataCompare] = useState<IData[]>([]);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(true);
+  const [selectedItems, setSelectedItems] = useState<IParams>({
+    orm: "prisma",
+    dbSize: "micro",
+    projectType: "ecommerce",
+    database: "postgres",
+    joins: false,
+    runtime: "bun",
+  });
 
   const contextValue: BenchmarkContextProps = {
     isTimerActive,
@@ -58,6 +68,8 @@ export function BenchmarkProvider({ children }: BenchmarkProviderProps) {
     setConcatedDataDrizzle,
     concatedDataCompare,
     setConcatedDataCompare,
+    selectedItems,
+    setSelectedItems,
   };
 
   return (

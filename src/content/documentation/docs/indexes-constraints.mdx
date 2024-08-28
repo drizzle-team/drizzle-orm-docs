@@ -596,7 +596,7 @@ You can declare them in a column declaration statement:
 </Tabs>
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
-set return type for reference callback or user a standalone `foreignKey` operator.
+set return type for reference callback or use a standalone `foreignKey` operator.
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
   <Tab>
@@ -760,11 +760,11 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       userLastName: text("user_last_name"),
     }, (table) => {
       return {
-        userReference: foreignKey(() => ({
+        userReference: foreignKey({
           columns: [table.userFirstName, table.userLastName],
           foreignColumns: [user.firstName, user.lastName],
           name: "custom_name"
-        }))
+        })
       }
     });
     ```

@@ -17,9 +17,6 @@ const BenchmarkConfig: FC<Props> = ({ selectedItems }) => (
     <br />
     <div className={styles["main-items"]}>
       <div className={styles["main-info"]}>
-        {configurationData.traffic.items[selectedItems.traffic].config_info}
-      </div>
-      <div className={styles["main-info"]}>
         {configurationData.dbSize.items[selectedItems.dbSize].config_info}
       </div>
       <div className={styles["main-info"]}>

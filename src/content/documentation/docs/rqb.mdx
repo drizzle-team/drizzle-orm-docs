@@ -169,6 +169,10 @@ export const profileInfo = pgTable('profile_info', {
 	metadata: jsonb('metadata'),
 });
 
+export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
+	user: one(users, { fields: [profileInfo.userId], references: [users.id] }),
+}));
+
 const user = await queryUserWithProfileInfo();
 //____^? type { id: number, profileInfo: { ... } | null  }
 ```
@@ -354,7 +358,7 @@ export const profileInfo = pgTable('profile_info', {
 
 ### Foreign key actions
 
-for more information check [posrgres foreign keys docs](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)
+for more information check [postgres foreign keys docs](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)
 
 You can specify actions that should occur when the referenced data in the parent table is modified. These actions are known as "foreign key actions." PostgreSQL provides several options for these actions.
 

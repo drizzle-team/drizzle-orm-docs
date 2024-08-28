@@ -55,6 +55,17 @@ const db = drizzle(pool)
 
 const result = await db.select().from(...);
 ```
+<Callout type="warning" emoji="⚙️">
+  Additional configuration is required to use WebSockets in environments where the `WebSocket` global is not defined, such as Node.js.
+  
+  Add the `ws` and `bufferutil` packages to your project's dependencies, and set the `webSocketConstructor` config prior to creating a `Client` or `Pool` instance.
+
+  ```typescript
+  import { Pool, neonConfig } from '@neondatabase/serverless';
+  import ws from 'ws';
+  neonConfig.webSocketConstructor = ws;
+  ```
+</Callout>
 </Tab>
 </Tabs>
 

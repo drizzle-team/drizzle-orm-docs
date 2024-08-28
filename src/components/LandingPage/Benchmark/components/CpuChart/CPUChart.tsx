@@ -17,6 +17,7 @@ interface IProps {
   average: number;
   averageCompare: number;
   showTooltip?: boolean;
+  currentLoad: number;
 }
 
 const CPUChart: FC<IProps> = ({
@@ -29,6 +30,7 @@ const CPUChart: FC<IProps> = ({
   average,
   averageCompare,
   showTooltip,
+  currentLoad,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
     x: 0,
@@ -219,7 +221,17 @@ const CPUChart: FC<IProps> = ({
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.label}>avg CPU load: {formatCpu(average)}%</div>
+        {isCompleted ? (
+          <div className={styles.label}>
+            avg CPU load: {formatCpu(average)}%
+          </div>
+        ) : selectedItemIndex === null ? (
+          <div className={styles.label}>
+            CPU load: {formatCpu(currentLoad)}%
+          </div>
+        ) : (
+          <div style={{ height: "12px" }}></div>
+        )}
         {pathArray.length > 0 && isCompleted && showTooltip && (
           <div
             className={

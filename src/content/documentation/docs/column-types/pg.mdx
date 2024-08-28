@@ -267,7 +267,7 @@ import { varchar, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
   varchar1: varchar('varchar1'),
-  varchar1: varchar('varchar2', { length: 256 }),
+  varchar2: varchar('varchar2', { length: 256 }),
 });
 
 // will be inferred as text: "value1" | "value2" | null
@@ -825,8 +825,8 @@ import { integer, timestamp, text, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	updateCounter: integer('update_counter').default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
-    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
-    alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
+	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
+    	alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
 });
 ```
 
@@ -856,7 +856,7 @@ A primary key constraint indicates that a column, or group of columns, can be us
 This requires that the values be both unique and not null.
 <Section>
 ```typescript
-import { integer, pgTable } from "drizzle-orm/pg-core";
+import { serial, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
 	id: serial('id').primaryKey(),
@@ -865,7 +865,7 @@ const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"integer" serial PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 );
 ```
 </Section>

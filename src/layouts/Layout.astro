@@ -1,16 +1,18 @@
 ---
+import getContentTree from "../utils/getContentTree";
 import GlobalStyles from "@components/layout/GlobalStyles.astro";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
 import Footer from "@components/layout/Footer.astro";
 import BaseHead from "@components/baseHead/BaseHead.astro";
 import Banner from "@components/layout/Banner.astro";
-import InitComponentsScripts from "@components/layout/InitComponentsScripts.astro";
+import DocsSidebar from "../components/layout/DocsSidebar/DocsSidebar.astro";
 
 interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
+const { tree } = await getContentTree({});
 ---
 
 <!doctype html>
@@ -22,12 +24,14 @@ const { title } = Astro.props;
     <NavigationAstro />
     <main class="landing-wrap scrollbar">
       <div class="landing-content">
+        <div class="aside-wrap">
+          <DocsSidebar tree={tree} headings={[]} forLanding={true} />
+        </div>
         <slot />
       </div>
       <div class="bottom-margin"></div>
       <Footer />
     </main>
-    <InitComponentsScripts />
     <style>
       body[class~="banner-shown"] .landing-wrap {
         max-height: calc(100dvh - 104px);
@@ -47,8 +51,18 @@ const { title } = Astro.props;
         margin: 0 auto;
       }
 
+      .aside-wrap {
+          display: none;
+      }
+
       .bottom-margin {
         margin-bottom: 4rem;
+      }
+
+      @media screen and (max-width: 768px) {
+          .aside-wrap {
+              display: block;
+          }
       }
     </style>
   </body>

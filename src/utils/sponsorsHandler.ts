@@ -15,7 +15,10 @@ const sponsorsHandler = async () => {
     const isWithinOneMonth =
       currentDate.getTime() - new Date(item.createdAt).getTime() <
       oneMonthInMilliseconds;
-    if (isWithinOneMonth || item.isActive) {
+    if (
+      (isWithinOneMonth || item.isActive) &&
+      item.sponsorEntity.name !== "usemotion"
+    ) {
       return true;
     }
     if (!isWithinOneMonth || !item.isActive) {

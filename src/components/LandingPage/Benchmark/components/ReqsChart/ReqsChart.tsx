@@ -2,7 +2,7 @@ import { type FC, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./ReqsChart.module.css";
 
-import { CheckIcon } from "@/components/Icons/Icons";
+import { CheckIcon, XIcon } from "@/components/Icons/Icons";
 import { SVGViewBoxHeight, SVGViewBoxWidth } from "../../constants";
 import type { IData } from "../../types";
 import fixedHelper from "../../utils/fixedHelper";
@@ -15,10 +15,12 @@ interface IProps {
   maxDataLength: number;
   max: number;
   isCompleted: boolean;
+  avgRequests: number;
   requests: number;
   totalRequests: number;
   totalRequestsCompare: number;
   showTooltip?: boolean;
+  totalRequestsFail: number;
 }
 
 const CustomBarChart: FC<IProps> = ({
@@ -28,10 +30,12 @@ const CustomBarChart: FC<IProps> = ({
   max,
   maxDataLength,
   isCompleted,
+  avgRequests,
   requests,
   totalRequests,
   totalRequestsCompare,
   showTooltip,
+  totalRequestsFail,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
     x: 0,
@@ -149,10 +153,36 @@ const CustomBarChart: FC<IProps> = ({
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.label}>
-          avg: {roundToThousand(requests)} req/sec
-        </div>
+        {isCompleted ? (
+          <div className={styles.label}>
+            avg: {roundToThousand(avgRequests)} req/sec
+          </div>
+        ) : selectedItemIndex === null ? (
+          <div className={styles.label}>
+            {roundToThousand(requests)} req/sec
+          </div>
+        ) : (
+          <div></div>
+        )}
         <div className={styles["info-wrap"]}>
+          <div
+            className={
+              isCompleted && !!totalRequestsFail
+                ? styles["tooltip-wrap-underline"]
+                : styles["tooltip-wrap"]
+            }
+          >
+            <div className={styles.tooltip}>Failed requests</div>
+            {pathArray.length > 0 && isCompleted && !!totalRequestsFail && (
+              <>
+                <div className={styles["success-icon-wrap"]}>
+                  <XIcon />
+                </div>
+                {roundToThousand(totalRequestsFail)}
+              </>
+            )}
+          </div>
+          {pathArray.length > 0 && isCompleted && !!totalRequestsFail && " | "}
           <div
             className={
               isCompleted && showTooltip

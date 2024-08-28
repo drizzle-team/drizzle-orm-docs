@@ -20,6 +20,7 @@ interface IProps {
   averageP99Compare: number;
   isCompleted: boolean;
   showTooltip?: boolean;
+  latency: number;
 }
 
 const LatencyChart: FC<IProps> = ({
@@ -34,6 +35,7 @@ const LatencyChart: FC<IProps> = ({
   averageP99,
   averageP99Compare,
   showTooltip,
+  latency,
 }) => {
   const [tipPosition, setTipPosition] = useState<{ x: number; y: number }>({
     x: 0,
@@ -43,7 +45,7 @@ const LatencyChart: FC<IProps> = ({
   const svgWidth = SVGViewBoxWidth;
   const statsRef = useRef<HTMLDivElement>(null!);
   const lineRef = useRef<SVGLineElement>(null!);
-  const params: Array<keyof IData["latency"]> = ["p99", "p95", "p90", "avg"];
+  const params: Array<keyof IData["latency"]> = ["p95", "p90", "avg"];
   const itemSize = svgWidth / (maxDataLength - 1);
 
   const calculatePath = (arr: IData[], param: keyof IData["latency"]) => {
@@ -219,9 +221,15 @@ const LatencyChart: FC<IProps> = ({
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.label}>
-          avg latency: {formatMs(averageLatency)}
-        </div>
+        {isCompleted ? (
+          <div className={styles.label}>
+            avg latency: {formatMs(averageLatency)}
+          </div>
+        ) : selectedItemIndex === null ? (
+          <div className={styles.label}>avg latency: {formatMs(latency)}</div>
+        ) : (
+          <div style={{ height: "12px" }}></div>
+        )}
         {pathArray.length > 0 && isCompleted && showTooltip && (
           <div className={styles["success-values"]}>
             <div
@@ -262,7 +270,7 @@ const LatencyChart: FC<IProps> = ({
                   +averageP99Compare.toFixed() / +averageP99.toFixed(),
                   1,
                 )}{" "}
-                times better p99 latency
+                times better p95 latency
               </div>
               x
               {fixedHelper(
@@ -326,13 +334,6 @@ const LatencyChart: FC<IProps> = ({
               p95:
               <div className={styles["accent-text"]}>
                 {formatMs(pathArray[selectedItemIndex].latency.p95)}
-              </div>
-            </div>
-            <div className={styles["stats-item"]}>
-              <div className={`${styles.circle} ${styles["stats-p99"]}`} />
-              p99:
-              <div className={styles["accent-text"]}>
-                {formatMs(pathArray[selectedItemIndex].latency.p99)}
               </div>
             </div>
           </div>

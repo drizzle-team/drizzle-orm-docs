@@ -127,7 +127,7 @@ await db.select({
 }).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
-select "users"."id", "pets","id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
+select "users"."id", "pets"."id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
 ```
 ```typescript
 // result type
@@ -204,14 +204,14 @@ Lets say you need to fetch users with their parents:
 ```typescript copy
 import { user } from "./schema";
 
-const parent = alias(user, "parent")
+const parent = aliasedTable(user, "parent")
 const result = db
   .select()
   .from(user)
-  .leftJoin(parent, eq(parent.id, user.id));
+  .leftJoin(parent, eq(parent.id, user.parentId));
 ```
 ```sql
-select ... from "user" left join "user" "parent" on "parent"."id" = "user"."id"
+select ... from "user" left join "user" "parent" on "parent"."id" = "user"."parent_id"
 ```
 ```typescript
 // result type
@@ -245,8 +245,8 @@ Drizzle ORM delivers name-mapped results from the driver without changing the st
 
 You're free to operate with results the way you want, here's an example of mapping many-one relational data:
 ```typescript
-type User = typeof usersTable.$inferSelect;
-type Pet = typeof usersTable.$inferSelect;
+type User = typeof users.$inferSelect;
+type Pet = typeof pets.$inferSelect;
 
 const rows = db.select({
     user: users,
@@ -296,7 +296,7 @@ const users = sqliteTable('users', {
 
 const db = drizzle(sqlite);
 
-const result = db.select().from(cities).leftJoin(users, eq(cities2.id, users2.cityId)).all();
+const result = db.select().from(cities).leftJoin(users, eq(cities.id, users.cityId)).all();
 ```
 ## Many-to-many example
 ```typescript
