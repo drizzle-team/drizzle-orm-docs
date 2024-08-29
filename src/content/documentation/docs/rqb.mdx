@@ -417,7 +417,7 @@ export const posts = pgTable('posts', {
 	id: serial('id').primaryKey(),
 	name: text('name'),
 	author: integer('author').notNull(),
-}, (table) => {
+}, (table) => ({
 	fk: foreignKey({
 		name: "author_fk",
 		columns: [table.author],
@@ -425,7 +425,7 @@ export const posts = pgTable('posts', {
 	})
 		.onDelete('cascade')
 		.onUpdate('cascade')
-});
+}));
 ```
 
 ### Disambiguating relations
