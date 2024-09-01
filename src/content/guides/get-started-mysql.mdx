@@ -1,0 +1,328 @@
+---
+title: "Get started with Drizzle and MySQL"
+slug: "get-started-mysql"
+---
+
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Npm from "@mdx/Npm.astro";
+import Section from "@mdx/Section.astro";
+import CodeTabs from '@components/markdown/CodeTabs.astro';
+import CodeTab from '@components/markdown/CodeTab.astro';
+import Steps from "@mdx/Steps.astro";
+import Callout from "@mdx/Callout.astro";
+
+<Prerequisites>  
+  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
+  <Npm>
+    drizzle-orm 
+    -D drizzle-kit
+  </Npm>
+
+  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+  <Npm>
+    dotenv
+  </Npm>
+</Prerequisites>
+
+## Drivers
+
+A database driver is a software component that allows applications to interact with a specific DBMS (Database Management System). It acts as a bridge between an application and a database, simplifying and standardizing the communication and data exchange. Driver can be connected using either a connection URL or connection options.
+
+As of now, you can connect to MySQL using Drizzle ORM with the following drivers: `mysql2`, `@planetscale/database` and `@tidbcloud/serverless`. If Drizzle ORM doesn't support your driver, you can use *MySQL Proxy Driver* which was designed to easily define custom drivers, https clients, rpc and much more.
+
+## Connection to the database
+
+You can use connection options or connection url to connect to the database:
+
+### Connection options
+
+1. **host** - The server address where the database is hosted (e.g., `localhost`).
+2. **username** - The user account for database access.
+3. **password** - The password for the user account.
+4. **database** - The name of the database to connect to.
+5. **port** - The port number to connect to the database (e.g., `3306`).
+
+You can also specify additional options such as `connectTimeout` and `serverTimezone`:
+
+### Connection URL
+
+This is the generic format of the connection URL:
+
+```plaintext
+protocol//[hosts][/database][?properties]
+```
+
+1. **protocol** - The protocol to use. For MySQL, it's `mysql`.
+2. **hosts** - The host to connect to.  Hosts consist of username, password, and host separated by `@` and port separated by `:`. For example, `username:password@localhost:3306`, where `3306` is the default port for MySQL.
+3. **database** - The database to connect to, specified by its name (e.g., `mysqldb`).
+4. **properties** - Additional properties for the connection that apply to all hosts, preceded by `?` and written as `key=value` pairs separated by the symbol `&` (e.g. `?connectTimeout=5000&serverTimezone=UTC`).
+
+This is an example of a base connection URL with properties:
+
+```plaintext
+mysql://username:password@localhost:3306/mysqldb?connectTimeout=5000&serverTimezone=UTC
+```
+
+### PlanetScale
+
+According to the **[official website](https://planetscale.com/)**, 
+PlanetScale is the world's most advanced serverless MySQL platform.
+
+With Drizzle ORM you can access PlanetScale over http
+through their official **[`database-js`](https://github.com/planetscale/database-js)**
+driver from serverless and serverfull environments with our `drizzle-orm/planetscale-serverless` package.
+
+You can also access PlanetScale through TCP with `mysql2` driver — **[see here.](/docs/get-started-mysql#mysql-2)**
+
+<Steps>
+#### Install the `@planetscale/database` package
+
+<Npm>
+@planetscale/database
+</Npm>
+
+#### Setup connection variables
+
+Create a `.env` file in the root of your project and add connection url or connection options:
+
+```plaintext copy
+DATABASE_URL=<YOUR_CONNECTION_URL>
+
+// or your connection options
+```
+
+#### Connect Drizzle ORM to the database
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+```typescript copy filename="src/db/index.ts" {9}
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { Client } from '@planetscale/database';
+
+const client = new Client({
+  url: process.env.DATABASE_URL!,
+});
+
+export const db = drizzle(client);
+```
+
+<Callout type="warning" emoji="⚠️">
+Previously, we were suggesting the use of the `connect()` function from the `database-js` driver. However, after receiving a suggestion from the PlanetScale Team and the authors of database-js, we are now enforcing the use of the `Client` instance to handle connections to PlanetScale.
+
+Please note that you will receive a warning to switch from `connect()` to `new Client()`, and starting from version `0.30.0`, you will encounter an error and be required to use the `Client` connection. Make sure to migrate from `connect()` to `Client`
+</Callout>
+
+Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
+we think they're outstanding 🙌
+</Steps>
+
+Navigate to the [**`Basic file structure`**](#basic-file-structure) section and [**`Basic usage`**](#basic-usage) section to see how to create a table, apply changes to the database, and query the database.
+
+## mysql2
+
+According to the **[official website](https://github.com/sidorares/node-mysql2)**, 
+`mysql2` is a MySQL client for Node.js with focus on performance.  
+
+Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
+
+<Steps>
+#### Install the `mysql2` package
+
+<Npm>
+mysql2
+</Npm>
+
+#### Setup connection variables
+
+Create a `.env` file in the root of your project and add connection url or connection options:
+
+```plaintext copy
+DATABASE_URL=<YOUR_CONNECTION_URL>
+
+// or your connection options
+```
+
+#### Connect Drizzle ORM to the database
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+```typescript copy filename="src/db/index.ts" {9}
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2';
+
+const connection = mysql.createConnection({
+  uri: process.env.DATABASE_URL!,
+});
+
+export const db = drizzle(connection);
+```
+</Steps>
+
+Navigate to the [**`Basic file structure`**](#basic-file-structure) section and [**`Basic usage`**](#basic-usage) section to see how to create a table, apply changes to the database, and query the database.
+
+## TiDB Serverless
+
+According to the **[official website](https://www.pingcap.com/tidb-serverless/)**, 
+TiDB Serverless is a fully-managed, autonomous DBaaS with split-second cluster provisioning and consumption-based pricing.
+
+<Callout type="info" emoji="ℹ️">
+TiDB Serverless is compatible with MySQL, so you can use [`drizzle-orm/mysql2`](#mysql2) to connect to it.
+</Callout>
+
+TiDB Serverless provides an [HTTP driver](https://docs.pingcap.com/tidbcloud/serverless-driver) for edge environments. It is natively supported by Drizzle ORM via `drizzle-orm/tidb-serverless` package.
+
+<Steps>
+#### Install the `@tidbcloud/serverless` package
+
+<Npm>
+@tidbcloud/serverless
+</Npm>
+
+#### Setup connection variables
+
+Create a `.env` file in the root of your project and add connection url or connection options:
+
+```plaintext copy
+DATABASE_URL=<YOUR_CONNECTION_URL>
+
+// or your connection options
+```
+
+#### Connect Drizzle ORM to the database
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+```typescript copy filename="src/db/index.ts" {7}
+import 'dotenv/config';
+import { connect } from '@tidbcloud/serverless';
+import { drizzle } from 'drizzle-orm/tidb-serverless';
+
+const client = connect({ url: process.env.DATABASE_URL! });
+
+export const db = drizzle(client);
+```
+</Steps>
+
+## Basic file structure
+
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and schema definitions in `schema.ts`.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │   ├ 📂 db
+ │   │  ├ 📜 index.ts
+ │   │  └ 📜 schema.ts
+ │   └ 📜 index.ts
+ ├ 📜 .env
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+## Basic usage
+
+<Steps>
+
+#### Create a table
+
+Create a `schema.ts` file in the `src/db` directory and declare your table:
+
+```typescript copy filename="src/db/schema.ts"
+import { int, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
+
+export const usersTable = mysqlTable('users_table', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  age: int('age').notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+});
+```
+
+#### Setup Drizzle config file
+
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
+
+Create a `drizzle.config.ts` file in the root of your project and add the following content:
+
+```typescript copy filename="drizzle.config.ts"
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  out: './drizzle',
+  schema: './src/db/schema.ts',
+  dialect: 'mysql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+
+#### Applying changes to the database
+
+You can directly apply changes to your database using the `drizzle-kit push` command. This is a convenient method for quickly testing new schema designs or modifications in a local development environment, allowing for rapid iterations without the need to manage migration files:
+
+```bash copy
+npx drizzle-kit push
+```
+
+Read more about the push command in [documentation](/kit-docs/overview#prototyping-with-db-push).
+
+Alternatively, you can generate migrations using the `drizzle-kit generate` command and then apply them using the `drizzle-kit migrate` command:
+
+Generate migrations:
+
+```bash copy
+npx drizzle-kit generate
+```
+
+Apply migrations:
+
+```bash copy
+npx drizzle-kit migrate
+```
+
+Read more about migration process in [documentation](/kit-docs/overview#schema-updates).
+
+#### Query the database
+
+In `src/index.ts` file you can perform CRUD operations:
+
+```typescript copy filename="src/index.ts"
+import { eq } from 'drizzle-orm';
+import { db } from './db';
+import { usersTable } from './db/schema';
+
+(async () => {
+  const user: typeof usersTable.$inferInsert = {
+    name: 'John',
+    age: 30,
+    email: 'john@example.com',
+  };
+
+  await db.insert(usersTable).values(user);
+
+  const users = await db.select().from(usersTable);
+  /*
+  const users: {
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }[]
+  */
+
+  await db
+    .update(usersTable)
+    .set({
+      age: 31,
+    })
+    .where(eq(usersTable.email, user.email));
+
+  await db.delete(usersTable).where(eq(usersTable.email, user.email));
+})();
+```
+</Steps>
