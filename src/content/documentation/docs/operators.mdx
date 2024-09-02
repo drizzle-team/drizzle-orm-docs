@@ -345,7 +345,7 @@ SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7
 ### like
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
-Value is like other value, case sensitive
+Value is like other value, case sensitive (in SQLite - [case insensitive for ASCII characters](https://www.sqlite.org/lang_expr.html#the_like_glob_regexp_match_and_extract_operators))
 <Section>
 ```typescript
 import { like } from "drizzle-orm";
