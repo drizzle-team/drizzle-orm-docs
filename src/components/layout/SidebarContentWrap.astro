@@ -148,6 +148,41 @@ html[class~="dark"] .nav_sticky {
     font-variant: all-petite-caps;
   }
 
+  .dot-separator {
+      height: 12px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: -1;
+  }
+
+  .dot-separator::after {
+      content: '';
+      display: block;
+      width: 1px;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background: #e5e7eb;
+  }
+
+  .dot-separator::before {
+      content: '';
+      display: block;
+      margin-left: 10px;
+      width: 100%;
+      border-bottom: 1px dashed #e5e7eb;
+  }
+
+  html.dark .dot-separator::after {
+      background: #303030;
+  }
+
+  html.dark .dot-separator::before {
+      border-color: #303030;
+  }
+
   .nav-separator:not(:first-child) {
     padding-top: 32px;
   }

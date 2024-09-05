@@ -26,6 +26,9 @@ const isActive = (path: string) => {
             {n.type === "separator" && (
               <div class="nav-separator">{n.title}</div>
             )}
+            {n.type === "dot-separator" && (
+              <div class="dot-separator"></div>
+            )}
             {n.type === "mdx" && (
               <a
                 data-nav-index={index}
