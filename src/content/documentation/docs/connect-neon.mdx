@@ -1,0 +1,57 @@
+import Tab from '@components/markdown/Tab.astro';
+import Tabs from '@components/markdown/Tabs.astro';
+import Npm from "@components/markdown/Npm.astro";
+import Callout from '@components/markdown/Callout.astro';
+import Steps from '@components/markdown/Steps.astro';
+import AnchorCards from '@components/markdown/AnchorCards.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+# Drizzle \<\> Neon Postgres
+According to their **[official website](https://neon.tech)**, Neon is a fully managed serverless Postgres.  
+Drizzle natively supports Neon [serverless drivers](https://github.com/neondatabase/serverless) via `neon-http` and `neon-serverless`.  
+
+<Npm>
+drizzle-orm @neondatabase/serverless
+-D drizzle-kit
+</Npm>
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm';
+
+const db = await drizzle("neon-http", { conneciton: process.env.DATABASE_URL });
+
+const result = await db.select().from(...);
+```
+
+
+```typescript copy filename="index.ts"
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+
+const pool = new Pool({ connectionString: env.DATABASE_URL });
+const db = drizzle(pool)
+
+const result = await db.select().from(...);
+```
+<Callout type="warning" emoji="⚙️">
+  Additional configuration is required to use WebSockets in environments where the `WebSocket` global is not defined, such as Node.js.
+  
+  Add the `ws` and `bufferutil` packages to your project's dependencies, and set the `webSocketConstructor` config prior to creating a `Client` or `Pool` instance.
+
+  ```typescript
+  import { Pool, neonConfig } from '@neondatabase/serverless';
+  import ws from 'ws';
+  neonConfig.webSocketConstructor = ws;
+  ```
+</Callout>
+
+
+With the `neon-http` and `neon-serverless` drivers you can access a Neon database from serverless environments over HTTP or WebSockets instead of TCP.  
+Querying over HTTP is faster for single, non-interactive transactions.  
+
+If you need session, interactive transaction support or a fully-compatible drop-in replacement for the `pg` driver - you can use websockets based `neon-serverless` driver.
+You connect to Neon database directly using either [postgres](/docs/get-started-postgresql#postgresjs) or [node-postgres](/docs/get-started-postgresql/#node-postgres)
+
+For an example of using Drizzle ORM with the Neon Serverless driver in a Cloudflare Worker, **[see here.](http://driz.link/neon-cf-ex)**
+
+To use Neon from a serverfull environment, you can use the PostgresJS driver, as described in Neon's **[official nodejs docs](https://neon.tech/docs/guides/node)** — see **[docs](#postgresjs)**.
