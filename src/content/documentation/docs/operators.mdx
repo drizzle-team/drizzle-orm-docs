@@ -1,5 +1,6 @@
 import IsSupportedChipGroup from '@components/markdown/IsSupportedChipGroup.astro';
 import Section from '@components/markdown/Section.astro';
+import Callout from '@components/markdown/Callout.astro'
 
 # Filter and conditional operators
 We natively support all dialect specific filter and conditional operators.
@@ -236,6 +237,23 @@ SELECT * FROM table WHERE table.column in (1, 2, 3, 4)
 ```
 </Section>
 
+<Callout type="warning" emoji="⚠️">
+  When working with [prepared statements](/docs/perf-serverless), use an array of placeholders.
+
+  ```ts
+    const prepared = db.select().from(table)
+      .where(inArray(
+        table.column,
+        [sql.placeholder('value1'), sql.placeholder('value2')]
+      )).prepare();
+
+    await prepared.execute({
+      value1: 1,
+      value2: 2
+    });
+  ```
+</Callout>
+
 <Section>
 ```typescript
 import { inArray } from "drizzle-orm";
@@ -264,6 +282,23 @@ db.select().from(table).where(notInArray(table.column, [1, 2, 3, 4]));
 SELECT * FROM table WHERE table.column NOT in (1, 2, 3, 4)
 ```
 </Section>
+
+<Callout type="warning" emoji="⚠️">
+  When working with [prepared statements](/docs/perf-serverless), use an array of placeholders.
+
+  ```ts
+    const prepared = db.select().from(table)
+      .where(notInArray(
+        table.column,
+        [sql.placeholder('value1'), sql.placeholder('value2')]
+      )).prepare();
+
+    await prepared.execute({
+      value1: 1,
+      value2: 2
+    });
+  ```
+</Callout>
 
 <Section>
 ```typescript
