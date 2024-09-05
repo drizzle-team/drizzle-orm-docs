@@ -14,12 +14,12 @@ export async function getStaticPaths() {
     const {default: parsed} = await metaFiles[meta]() as any;
 
     const metaSlug = meta.match(regex);
-    if(metaSlug) {
+    if (metaSlug) {
       const extractedText = metaSlug[1];
-      const parsedKeys = Object.keys(parsed);
-      parsedKeys.forEach((key) => {
-        if(typeof parsed[key] === 'string') {
-          slugs.push(`${extractedText}/${key}`);
+
+      parsed.forEach((key) => {
+        if(Array.isArray(key)) {
+          slugs.push(`${extractedText}/${key[0]}`);
         }
       })
     }
