@@ -145,5 +145,47 @@ const { tree, filteredHeadings, title } = await getContentTree({
         }
       }
     </script>
+    <script is:inline>
+      const changeNpmTab = () => {
+        const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'];
+
+        let packageManagerIndex = packageManagers.indexOf(packageManager);
+
+        const updateUI = (index) => {
+          npmContent.forEach((element) => {
+            Array.from(element.children).forEach((child, i) => {
+              child.classList.toggle('hidden', i !== index);
+            });
+          });
+          npmTabs.forEach((element) => {
+            Array.from(element.children).forEach((child, i) => {
+              child.classList.toggle('npm__tab--active', i === index);
+            });
+          });
+        };
+
+        const npmContent = document.querySelectorAll('.npm__content');
+        const npmTabs = document.querySelectorAll('.npm__tabs');
+
+        npmContent.forEach((content) => {
+          Array.from(content.children).forEach((child, index) => {
+            child.classList.toggle('hidden', index !== packageManagerIndex);
+          });
+        });
+
+        npmTabs.forEach((tab) => {
+          Array.from(tab.children).forEach((child, index) => {
+            child.classList.toggle('npm__tab--active', index === packageManagerIndex);
+            child.addEventListener('click', () => {
+              packageManager = packageManagers[index];
+              localStorage.setItem('package-manager', packageManager);
+              updateUI(index);
+            });
+          });
+        });
+      }
+
+      changeNpmTab();
+    </script>
   </body>
 </html>

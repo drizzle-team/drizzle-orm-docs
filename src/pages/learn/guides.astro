@@ -9,8 +9,8 @@ const guides = await getCollection('guides');
 
 const sortedGuides: typeof guides = [];
 
-Object.keys(guideMap).forEach(key => {
-  const item = guides.find(g => g.data.slug === key);
+guideMap.forEach(key => {
+  const item = guides.find(g => g.data.slug === key[0]);
   if(item) sortedGuides.push(item);
 })
 ---

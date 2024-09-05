@@ -40,7 +40,7 @@ const wrapCodeBlocks = () =>
 </div>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
+  document.addEventListener("astro:after-swap", () => {
     const packageManagers: string[] = ['npm', 'yarn', 'pnpm', 'bun'];
     let packageManager: string = localStorage.getItem('package-manager') || 'npm';
     let packageManagerIndex: number = packageManagers.indexOf(packageManager);
