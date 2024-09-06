@@ -1,8 +1,6 @@
 ---
 import type { IHeading, TreeNode } from '@/types/astro';
 import AsideAstro from './AsideAstro.astro';
-import Logo from './Logo.astro';
-import NavDropdown from './NavDropdown.astro';
 import ToggleSections from './ToggleSections.astro';
 
 interface Props {
@@ -24,6 +22,7 @@ const { slug, tree, filteredHeadings, forLanding } = Astro.props;
 html[class~="dark"] .nav_sticky {
     background-color: #111111;
   }
+
   .nav_sticky {
     position: sticky;
     top: 0;
@@ -31,6 +30,7 @@ html[class~="dark"] .nav_sticky {
     flex-direction: column;
     background-color: #ffffff;
     padding-bottom: 16px;
+    z-index: 5;
   }
 
   html.dark .nav_sticky::after {
@@ -84,6 +84,121 @@ html[class~="dark"] .nav_sticky {
     flex-direction: column;
     margin-bottom: auto;
     padding: 16px 16px 16px 0;
+  }
+
+  .nav-items-collapsable {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: auto;
+      overflow: hidden;
+  }
+
+  .nav-items-collapsable:hover .section-collapse-button {
+      opacity: 1;
+      pointer-events: all;
+  }
+
+  .fade {
+      position: absolute;
+      display: block;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      height: 20px;
+      z-index: 2;
+      background: linear-gradient(0deg, #fff, transparent);
+  }
+
+  .expand-container {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      height: 50px;
+      z-index: 2;
+  }
+
+  .expand-container button {
+      background-color: #fcfcfc;
+      border: 1px solid rgba(33, 39, 46, .12);
+      border-radius: 4px;
+      color: #909090;
+      font-size: 12px;
+      width: 60%;
+      height: 24px;
+      transition: opacity 0.2s;
+      opacity: 0;
+      margin-bottom: 6px;
+  }
+
+  html.dark .expand-container button {
+      background-color: #111111;
+      border-color: #404040;
+      color: #7e868c;
+  }
+
+  .expand-container:hover button {
+      opacity: 1;
+  }
+
+  .expand-container button:hover {
+      border-color: #b8bfc8;
+      color: #000;
+  }
+
+  html.dark .expand-container button:hover {
+      border-color: #686868;
+      color: #e1e3e6;
+      background-color: #212121;
+  }
+
+  html.dark .fade {
+      background: linear-gradient(0deg, #111111, transparent);
+  }
+
+  .expanded .fade {
+      display: none;
+  }
+
+  .expanded .expand-container {
+      display: none;
+  }
+
+  .expanded-permanent {
+      max-height: 100% !important;
+  }
+
+  .expanded-permanent .expand-container {
+      display: none;
+  }
+
+  .section-collapse-button {
+      opacity: 0;
+      pointer-events: none;
+  }
+
+  .expanded-permanent .section-collapse-button {
+      display: none;
+  }
+
+  .expanded-permanent .fade {
+      display: none;
+  }
+
+  .expanded {
+      max-height: 100% !important;
+  }
+
+  .expanded .expand-icon {
+      display: none;
+  }
+
+  .expanded .collapse-icon {
+      display: block;
   }
 
   .nav-item--active {
@@ -146,6 +261,19 @@ html[class~="dark"] .nav_sticky {
     color: #111827;
     font-weight: 600;
     font-variant: all-petite-caps;
+    display: flex;
+  }
+
+  .nav-separator-collapsable {
+      white-space: nowrap;
+      padding: 32px 0px 8px;
+      font-size: 14px;
+      color: #111827;
+      font-weight: 600;
+      font-variant: all-petite-caps;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
   }
 
   .dot-separator {
@@ -154,6 +282,7 @@ html[class~="dark"] .nav_sticky {
       align-items: center;
       position: relative;
       z-index: -1;
+      flex-shrink: 0;
   }
 
   .dot-separator::after {
@@ -214,6 +343,22 @@ html[class~="dark"] .nav_sticky {
   @media screen and (max-width: 768px) {
     .aside {
       display: none;
+    }
+
+    .fade {
+        display: none;
+    }
+
+    .nav-items-collapsable {
+        max-height: 100% !important;
+    }
+
+    .nav-items-collapsable .section-collapse-button  {
+        display: none;
+    }
+
+    .nav-items-collapsable .expand-container {
+        display: none;
     }
 
     .aside-content, body[class~=banner-shown] .aside-content {

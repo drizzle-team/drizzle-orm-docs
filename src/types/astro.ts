@@ -9,6 +9,7 @@ export interface TreeNode {
   type: string;
   title: string;
   children: TreeNode[];
+  items?: TreeNode[];
 }
 
 declare global {

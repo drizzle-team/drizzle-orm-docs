@@ -1,7 +1,13 @@
 import type { IHeading, TreeNode } from "@/types/astro";
 
 export interface SidebarItem {
-  type: "mdx" | "subDir" | "separator" | "empty" | "dot-separator";
+  type:
+    | "mdx"
+    | "subDir"
+    | "separator"
+    | "empty"
+    | "dot-separator"
+    | "collapsable";
   title: string;
   path: string;
 }
@@ -55,6 +61,12 @@ const getContentTree = async (props: Props) => {
               type: "dot-separator",
               title: "dot-separator",
               path: `${extractedText}/${key}${i}`,
+            });
+          } else if (key.includes("::")) {
+            navItems.push({
+              type: "collapsable",
+              title: key.replace("::", ""),
+              path: `${extractedText}/${key}`,
             });
           } else {
             navItems.push({

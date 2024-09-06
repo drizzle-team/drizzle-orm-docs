@@ -185,6 +185,17 @@ const { tree, filteredHeadings, title } = await getContentTree({
         });
       }
 
+      const updateCollapsedSections = () => {
+        if (!expandedSections || !expandedSections.length) {
+          document.querySelectorAll('.nav-items-collapsable').forEach(e => e.classList.remove('expanded'));
+        } else {
+          expandedSections.forEach((section) => {
+            document.getElementById(section).classList.toggle('expanded');
+          })
+        };
+      }
+
+      updateCollapsedSections();
       changeNpmTab();
     </script>
   </body>

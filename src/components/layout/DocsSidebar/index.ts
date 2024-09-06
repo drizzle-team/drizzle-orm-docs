@@ -5,6 +5,21 @@ const mainScript = () => {
   const headingsContainerHeight = headingsContainer?.clientHeight || 0;
   let itemIndex = 0;
 
+  const updateCollapsedSections = () => {
+    const expandedSections: string[] =
+      JSON.parse(localStorage.getItem("expandedSections") || "") || [];
+
+    document.querySelectorAll(".nav-items-collapsable").forEach((section) => {
+      if (expandedSections.find((v) => v === section.id)) {
+        section.classList.add("expanded");
+      } else {
+        section.classList.remove("expanded");
+      }
+    });
+  };
+
+  updateCollapsedSections();
+
   const activeNavItem = Array.from(navItems).find((item) => {
     return item.classList.contains("nav-item--active");
   });

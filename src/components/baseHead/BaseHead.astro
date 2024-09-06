@@ -91,6 +91,7 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
     };
 
     let packageManager = localStorage.getItem('package-manager') || 'npm';
+    let expandedSections = JSON.parse(localStorage.getItem('expandedSections'));
 
     setPreference(getColorPreference());
     document.addEventListener('astro:page-load', () => setPreference(getColorPreference()))
