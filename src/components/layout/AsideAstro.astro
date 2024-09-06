@@ -39,6 +39,7 @@ function modifyTree(tree: TreeNode[]): TreeNode[] {
 
 
 const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
+let i = 0;
 
 ---
 
@@ -47,7 +48,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
     groupedTree
       .filter((t) => forLanding || isActive(t.name))
       .map((t) =>
-        t.children?.map((n, index) => (
+        t.children?.map((n) => (
           <Fragment key={n.name}>
             {n.type === "separator" && (
               <div class="nav-separator">{n.title}</div>
@@ -69,7 +70,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
                     )}
                     {n.type === "mdx" && (
                       <a
-                        data-nav-index={index}
+                        data-nav-index={i++}
                         class:list={[
                           isActive(`${t.name}/${n.name}`)
                             ? "nav-item--active"
@@ -83,7 +84,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
                     )}
                     {n.type === "subDir" && (
                       <a
-                        data-nav-index={index}
+                        data-nav-index={i++}
                         class:list={[
                           isActive(`${t.name}/${n.name}`)
                             ? "nav-item--active"
@@ -97,7 +98,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
                     )}
                     {n.type === "withDialects" && (
                       <a
-                        data-nav-index={index}
+                        data-nav-index={i++}
                         data-href={`/${t.name}/${n.name}`}
                         class:list={[
                           isActive(`${t.name}/${n.name}`)
@@ -159,7 +160,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
             )}
             {n.type === "mdx" && (
               <a
-                data-nav-index={index}
+                data-nav-index={i++}
                 class:list={[
                   isActive(`${t.name}/${n.name}`)
                     ? "nav-item--active"
@@ -173,7 +174,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
             )}
             {n.type === "subDir" && (
               <a
-                data-nav-index={index}
+                data-nav-index={i++}
                 class:list={[
                   isActive(`${t.name}/${n.name}`)
                     ? "nav-item--active"
@@ -187,7 +188,7 @@ const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
             )}
             {n.type === "withDialects" && (
               <a
-                data-nav-index={index}
+                data-nav-index={i++}
                 data-href={`/${t.name}/${n.name}`}
                 class:list={[
                   isActive(`${t.name}/${n.name}`)
