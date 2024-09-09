@@ -1,30 +1,33 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "@/layouts/LearnLayout.astro";
 
-const tutorials = await getCollection("tutorials");
+const tutorials = await getCollection("documentation", ({ id }) => {
+  return id.startsWith("docs/tutorials/");
+});
 
-const formattedTutorials = tutorials.map((tutorial) => (
-  {
-    ...tutorial,
-    slug: tutorial.slug.split("/").at(-1),
-  }
-));
-
+const formattedTutorials = tutorials.map((tutorial) => ({
+  ...tutorial,
+  slug: tutorial.slug.split("/").at(-1),
+}));
 ---
 
-<Layout customTitle="Tutorials">
-  <div class="learn__title-block">
-    <div class="tutorials_title">Tutorials</div>
-  </div>
-  <div class="tutorials__items">
-    {formattedTutorials.map((tutorial) => (
-      <div class="tutorials__item"> <a class="tutorials__item_link" href={`/learn/tutorials/${tutorial.slug}`}>
+<div class="learn__title-block">
+  <div class="tutorials_title">Tutorials</div>
+</div>
+<div class="tutorials__items">
+  {
+    formattedTutorials.map((tutorial) => (
+      <div class="tutorials__item">
+        <a
+          class="tutorials__item_link"
+          href={`/docs/tutorials/${tutorial.slug}`}
+        >
           {tutorial.data.title}
-        </a></div>
-    ))}
-  </div>
-</MeshLayout>
+        </a>
+      </div>
+    ))
+  }
+</div>
 
 <style>
   .tutotials__section {
@@ -72,11 +75,11 @@ const formattedTutorials = tutorials.map((tutorial) => (
     border-bottom: 2px solid #efefef;
     border-top: 2px solid #efefef;
   }
-  
+
   html.dark .tutorials__item:not(:last-child) {
     border-bottom: 1px solid #262626;
   }
-  
+
   .tutorials__item:not(:last-child) {
     border-bottom: 1px solid #efefef;
   }

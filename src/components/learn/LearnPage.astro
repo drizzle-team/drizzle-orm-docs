@@ -2,47 +2,46 @@
 import LatestUpdates from "@components/layout/LatestUpdates.astro";
 import LearnMigrateFromCards from "@components/layout/LearnMigrateFromCards.astro";
 import LearnTutorialCards from '@components/layout/LearnTutorialCards.astro';
-import Layout from "@/layouts/LearnLayout.astro";
 ---
 
-<Layout customTitle="Learn">
-  <div class="frame__wrap">
-    <div class="frame__column">
-      <div class="learn__title-block">
-        <div class="learn__title">Learn with Drizzle</div>
-        <div class="learn__description">
-          Unlock the power of Drizzle ORM with concise tutorials.<br /> Master
-          efficient database interactions for streamlined development.
-        </div>
-        <div class="learn__buttons">
-          <a href="/learn/guides" class="learn__button--primary">Guides</a>
-          <a href="/learn/tutorials" class="learn__button--primary">
-            Tutorials</a
-          >
-          <a href="/learn/latest-releases" class="learn__button--primary">
-            Latest Releases</a
-          >
-        </div>
+
+<div class="frame__wrap">
+  <div class="frame__column">
+    <div class="learn__title-block">
+      <div class="learn__title">Learn with Drizzle</div>
+      <div class="learn__description">
+        Unlock the power of Drizzle ORM with concise tutorials.<br /> Master
+        efficient database interactions for streamlined development.
       </div>
-      <div class="frame__empty-cell"></div>
+      <div class="learn__buttons">
+        <a href="/learn/guides" class="learn__button--primary">Guides</a>
+        <a href="/learn/tutorials" class="learn__button--primary">
+          Tutorials</a
+        >
+        <a href="/learn/latest-releases" class="learn__button--primary">
+          Latest Releases</a
+        >
+      </div>
     </div>
-    <div class="frame__column--main-content">
-      <div class="frame__main-content-cell">
-        <div class="learn__migrate-from">
-          <div class="learn__section-title">Migrate to Drizzle</div>
-          <LearnMigrateFromCards />
-          <div class="learn__section-title">Tutorials</div>
-          <LearnTutorialCards />
-          <LatestUpdates />
-        </div>
+    <div class="frame__empty-cell"></div>
+  </div>
+  <div class="frame__column--main-content">
+    <div class="frame__main-content-cell">
+      <div class="learn__migrate-from">
+        <div class="learn__section-title">Migrate to Drizzle</div>
+        <LearnMigrateFromCards />
+        <div class="learn__section-title">Tutorials</div>
+        <LearnTutorialCards />
+        <LatestUpdates />
       </div>
-      <div class="frame__empty-cell_wrap">
-        <div class="frame__empty-cell--main-content"></div>
-        <div class="frame__empty-cell--main-content--auto"></div>
-      </div>
+    </div>
+    <div class="frame__empty-cell_wrap">
+      <div class="frame__empty-cell--main-content"></div>
+      <div class="frame__empty-cell--main-content--auto"></div>
     </div>
   </div>
-</Layout>
+</div>
+
 
 <style>
 

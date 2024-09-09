@@ -1,34 +1,39 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "@/layouts/LearnLayout.astro";
 
-import guideMap from '@/content/guides/_map.json';
+import guideMap from "@/content/documentation/docs/guides/_map.json";
 
-
-const guides = await getCollection('guides');
+const guides = await getCollection("documentation", ({ id }) => {
+  return id.startsWith('docs/guides');
+});
 
 const sortedGuides: typeof guides = [];
 
-guideMap.forEach(key => {
-  const item = guides.find(g => g.data.slug === key[0]);
-  if(item) sortedGuides.push(item);
-})
+guideMap.forEach((key) => {
+  const item = guides.find((g) => g.data.slug === key[0]);
+  if (item) sortedGuides.push(item);
+});
 ---
 
-<Layout customTitle="Guides">
-  <div class="guides_title">Guides</div>
-  <div class="guides_description">
-    Comprehensive collection of code samples and step-by-step walkthroughs for
-    common tasks
-  </div>
-  <div class="guides__items">
-    {sortedGuides.map(guide => {
-      return <div class="guides__item"> <a class="guides__item_link" href={`/learn/guides/${guide.slug}`}>
-          {guide.data.title}
-        </a></div>
-    })}
-  </div>
-</Layout>
+<div class="guides_title">Guides</div>
+<div class="guides_description">
+  Comprehensive collection of code samples and step-by-step walkthroughs for
+  common tasks
+</div>
+<div class="guides__items">
+  {
+    sortedGuides.map((guide) => {
+      return (
+        <div class="guides__item">
+          {" "}
+          <a class="guides__item_link" href={`/docs/guides/${guide.slug}`}>
+            {guide.data.title}
+          </a>
+        </div>
+      );
+    })
+  }
+</div>
 
 <style>
   html.dark .guides_title {
@@ -82,7 +87,7 @@ guideMap.forEach(key => {
   html.dark .guides__item:not(:last-child) {
     border-bottom: 1px solid #262626;
   }
-  
+
   .guides__item:not(:last-child) {
     border-bottom: 1px solid #efefef;
   }
@@ -159,6 +164,5 @@ guideMap.forEach(key => {
       opacity: 0.7;
       margin-bottom: 20px;
     }
-
   }
 </style>

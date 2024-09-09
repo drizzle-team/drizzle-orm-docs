@@ -1,33 +1,40 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "@/layouts/LearnLayout.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import Link from "@components/markdown/Link.astro";
 
 export async function getStaticPaths() {
-  const releasesEntries = await getCollection("latest-releases");
-  return releasesEntries.map((entry) => ({
+  const guides = await getCollection("documentation", ({ id }) => {
+    return id.startsWith("docs/guides");
+  });
+
+  const filteredEntries = guides.filter((entry) => !!entry.data.slug);
+
+  console.log(guides);
+  
+
+  const staticPaths = filteredEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));
+
+  return staticPaths;
 }
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
-const options: Intl.DateTimeFormatOptions = {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-};
 ---
 
-<Layout customTitle={entry.data.title}>
-  <div class="learn__title-block">
-    <div class="latest-release_title">{entry.data.title}</div>
+<DocsLayout
+  customTitle={entry.data.title}
+  customSlug={"docs/guides"}
+  headings={[]}
+>
+  <div class="guides__title">
+    Drizzle | {entry.data.title}
   </div>
-  <div class="latest-release_date">
-    {entry.data.pubDate.toLocaleDateString("en-US", options)}
-  </div>
-  <Content />
-</Layout>
+  <Content components={{ a: Link }} />
+</DocsLayout>
 
 <style>
   html.dark .latest-release_title {
@@ -44,18 +51,6 @@ const options: Intl.DateTimeFormatOptions = {
     margin-top: 8px;
   }
 
-  html.dark .latest-release_date {
-    color: #e6e6e6;
-  }
-
-  .latest-release_date {
-    color: rgba(30, 30, 30, 0.4);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 150%;
-    letter-spacing: -0.154px;
-  }
-
   .learn__title-block {
     display: flex;
     flex-direction: column;
@@ -63,10 +58,24 @@ const options: Intl.DateTimeFormatOptions = {
     flex-shrink: 0;
   }
 
+  html.dark .guides__title {
+    color: #e2e6f0;
+  }
+
+  .guides__title {
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.48px;
+    line-height: 48px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
   @media (max-width: 767px) {
     html.dark .learn__title-block {
-    border-left: none;
-  }
+      border-left: none;
+    }
     .latest-release_title {
       color: #0f172a;
       font-size: 24px;
@@ -85,6 +94,15 @@ const options: Intl.DateTimeFormatOptions = {
       padding: 0 16px 0;
       flex-shrink: 0;
       border: none;
+    }
+
+    .guides__title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+      margin-top: 8px;
     }
   }
 </style>

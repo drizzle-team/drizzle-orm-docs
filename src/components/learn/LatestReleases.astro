@@ -1,8 +1,10 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "@/layouts/LearnLayout.astro";
 
-const articles = await getCollection("latest-releases");
+const articles = await getCollection("documentation", ({ id }) => {
+  return id.startsWith('docs/latest-releases/');
+});
+
 const filteredArticles = articles.sort(
   (a, b) =>
     new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
@@ -13,34 +15,31 @@ const options: Intl.DateTimeFormatOptions = {
   month: "short",
   day: "numeric",
 };
+
 ---
 
-<Layout customTitle="Latest releases">
-  <div class="learn__title-block">
-    <div class="latest-releases_title">Latest Releases</div>
-  </div>
-  <div class="latest-updates__cards">
-    {
-      filteredArticles.map((update) => (
-        <a
-          href={`/learn/latest-releases/${update.slug}`}
-          class="latest-updates__card"
-        >
-          <div class="latest-updates__card_title">
-            {update.data.title}
-          </div>
-          <div class="latest-updates__card_date">
-            {update.data.pubDate.toLocaleDateString("en-US", options)}
-          </div>
-          <div class="latest-updates__card_description">
-            {update.data.description}
-          </div>
-          <div class="latest-updates__card_link">Read more</div>
-        </a>
-      ))
-    }
-  </div>
-</Layout>
+<div class="learn__title-block">
+  <div class="latest-releases_title">Latest Releases</div>
+</div>
+<div class="latest-updates__cards">
+  {
+    filteredArticles.map((update) => (
+      <a
+        href={`/${update.slug}`}
+        class="latest-updates__card"
+      >
+        <div class="latest-updates__card_title">{update.data.title}</div>
+        <div class="latest-updates__card_date">
+          {update.data.pubDate.toLocaleDateString("en-US", options)}
+        </div>
+        <div class="latest-updates__card_description">
+          {update.data.description}
+        </div>
+        <div class="latest-updates__card_link">Read more</div>
+      </a>
+    ))
+  }
+</div>
 
 <style>
   html.dark .latest-releases_title {

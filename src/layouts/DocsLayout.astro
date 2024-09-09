@@ -12,11 +12,12 @@ import type { IHeading } from '@/types/astro';
 
 interface Props {
   customTitle?: string;
+  customSlug?: string;
   description?: string;
   headings: IHeading[];
 }
 
-const { customTitle, headings, description } = Astro.props;
+const { customTitle, headings, description, customSlug } = Astro.props;
 const { slug } = Astro.params;
 const { tree, filteredHeadings, title } = await getContentTree({
   headings,
@@ -33,7 +34,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
     <Banner />
     <Header />
     <main class="documentation-container">
-      <DocsSidebar tree={tree} headings={filteredHeadings} />
+      <DocsSidebar tree={tree} customSlug={customSlug} headings={filteredHeadings} />
       <div class="documentation-content-wrap scrollbar">
         <div class="documentation-content">
           <slot />

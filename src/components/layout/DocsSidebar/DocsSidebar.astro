@@ -8,16 +8,17 @@ import ThemeSelectorMobile from "../ThemeSelectorMobile.astro";
 interface Props {
   tree: TreeNode[];
   headings: IHeading[];
-  forLanding?: boolean
+  forLanding?: boolean;
+  customSlug?: string;
 }
 
 const { slug } = Astro.params;
-const { tree, headings, forLanding } = Astro.props;
+const { tree, headings, forLanding, customSlug } = Astro.props;
 ---
 
 <div class="aside invisible" id="aside">
   <div class="aside-content aside-scroll scrollbar">
-    <SidebarContentWrap filteredHeadings={headings} slug={slug} tree={tree} forLanding={forLanding} />
+    <SidebarContentWrap filteredHeadings={headings} slug={customSlug || slug} tree={tree} forLanding={forLanding} />
     <ThemeSelectorMobile />
     <AsideSocials />
   </div>
