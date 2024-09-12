@@ -1,13 +1,5 @@
 ---
 import DocsIcon from "@components/Icons/DocsIcon.astro";
-import LearnIcon from "@components/Icons/LearnIcon.astro";
-const { pathname } = Astro.url;
-
-const isDocs = ["docs", "kit-docs", "drizzle-studio"].some((path) =>
-  pathname.startsWith(`/${path}`),
-);
-const isLearn = pathname.startsWith("/learn");
-const condition = isDocs ? "/docs/overview" : "/learn";
 ---
 
 <div class="logo__section__selector">
@@ -15,34 +7,138 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     <div class="docs-text">
       <div class="logo__section-icon">
         <span class="logo__section-icon--docs">
-          {isDocs && <DocsIcon />}
+          <DocsIcon />
         </span>
-        {isLearn && <LearnIcon />}
       </div>
       <div class="logo__section-text">
-        {isDocs && "Docs"}
-        {isLearn && "Learn"}
+        Docs
       </div>
-    </div>
-    <div class="logo__section__selector-current-num" data-current-section-num>
-      {isDocs && "1"}
-      {isLearn && "2"}
     </div>
   </button>
   <div class="logo__section__selector-items hidden">
-    <a class="logo__section__selector-item--docs" href="/docs/overview">
+    <a class="logo__section__selector-item" href="/docs/overview">
       <div class="logo__section__selector-item__icon">
-        <DocsIcon />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            d="M8.732 5.771L5.67 9.914c-1.285 1.739-1.928 2.608-1.574 3.291l.018.034c.375.673 1.485.673 3.704.673c1.233 0 1.85 0 2.236.363l.02.02l3.872-4.57l-.02-.02c-.379-.371-.379-.963-.379-2.148v-.31c0-3.285 0-4.927-.923-5.21c-.923-.283-1.913 1.056-3.892 3.734"
+            clip-rule="evenodd"></path>
+          <path
+            fill="currentColor"
+            d="M10.453 16.443v.31c0 3.284 0 4.927.923 5.21c.923.283 1.913-1.056 3.893-3.734l3.062-4.143c1.284-1.739 1.927-2.608 1.573-3.291a1.353 1.353 0 0 0-.018-.034c-.375-.673-1.485-.673-3.704-.673c-1.233 0-1.85 0-2.236-.363l-3.872 4.57c.379.371.379.963.379 2.148"
+            opacity=".5"></path>
+        </svg>
       </div>
-      <div>Docs</div>
-      <div class="logo__section__selector-current-num--dropdown">1</div>
+      <div>Benchmarks</div>
     </a>
-    <a class="logo__section__selector-item" href="/learn">
+    <a class="logo__section__selector-item" href="/docs/overview">
       <div class="logo__section__selector-item__icon">
-        <LearnIcon />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m20.83 10.715l-.518 1.932c-.605 2.255-.907 3.383-1.592 4.114a4 4 0 0 1-2.01 1.161c-.097.023-.195.04-.295.052c-.915.113-2.032-.186-4.064-.73c-2.255-.605-3.383-.907-4.114-1.592a4 4 0 0 1-1.161-2.011c-.228-.976.074-2.103.679-4.358l.517-1.932l.244-.905c.455-1.666.761-2.583 1.348-3.21a4 4 0 0 1 2.01-1.16c.976-.228 2.104.074 4.36.679c2.254.604 3.382.906 4.113 1.59a4 4 0 0 1 1.161 2.012c.228.976-.075 2.103-.679 4.358m-9.778-.91a.75.75 0 0 1 .919-.53l4.83 1.295a.75.75 0 1 1-.389 1.448l-4.83-1.294a.75.75 0 0 1-.53-.918m-.776 2.898a.75.75 0 0 1 .918-.53l2.898.777a.75.75 0 1 1-.388 1.448l-2.898-.776a.75.75 0 0 1-.53-.919" clip-rule="evenodd"/><path fill="currentColor" d="M16.415 17.975a4 4 0 0 1-1.068 1.677c-.731.685-1.859.987-4.114 1.591s-3.383.907-4.358.679a4 4 0 0 1-2.011-1.161c-.685-.731-.988-1.859-1.592-4.114l-.517-1.932c-.605-2.255-.907-3.383-.68-4.358a4 4 0 0 1 1.162-2.011c.731-.685 1.859-.987 4.114-1.592c.426-.114.813-.218 1.165-.309l-.244.906l-.517 1.932c-.605 2.255-.907 3.382-.68 4.358a4 4 0 0 0 1.162 2.011c.731.685 1.859.987 4.114 1.592c2.032.544 3.149.843 4.064.73" opacity="0.5"/></svg>
       </div>
-      <div>Learn</div>
-      <div class="logo__section__selector-current-num--dropdown">2</div>
+      <div>Extension</div>
+      <div class="external-link-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-square-arrow-out-up-right"
+        >
+          <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/>
+          <path d="m21 3-9 9"/>
+          <path d="M15 3h6v6"/>
+        </svg>
+      </div>
+    </a>
+    <a class="logo__section__selector-item" href="/docs/overview">
+      <div class="logo__section__selector-item__icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24px"
+          height="24px"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            d="M12 2c4.714 0 7.071 0 8.535 1.464c1.08 1.08 1.364 2.647 1.439 5.286L22 9.5H2.026v-.75c.075-2.64.358-4.205 1.438-5.286C4.93 2 7.286 2 12 2"
+            opacity="1"
+          />
+          <path
+            fill="white"
+            d="M13 6a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-3 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0M7 6a1 1 0 1 1-2 0a1 1 0 0 1 2 0"
+          />
+          <path
+            fill="currentColor"
+            d="M2 12c0 4.714 0 7.071 1.464 8.535c1.01 1.01 2.446 1.324 4.786 1.421L9 22V9.5H2.026l-.023.75Q2 11.066 2 12"
+            opacity="0.7"
+          />
+          <path
+            fill="currentColor"
+            d="M22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22c-.819 0-2.316 0-3-.008V9.5h13l-.003.75Q22 11.066 22 12"
+            opacity="0.3"
+          />
+        </svg>
+      </div>
+      <div>Studio</div>
+    </a>
+    <a class="logo__section__selector-item" href="/docs/overview">
+      <div class="logo__section__selector-item__icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            d="M8.422 20.618C10.178 21.54 11.056 22 12 22V12L2.638 7.073a3.196 3.196 0 0 0-.04.067C2 8.154 2 9.417 2 11.942v.117c0 2.524 0 3.787.597 4.801c.598 1.015 1.674 1.58 3.825 2.709z"
+          />
+          <path
+            fill="currentColor"
+            d="m17.577 4.432l-2-1.05C13.822 2.461 12.944 2 12 2c-.945 0-1.822.46-3.578 1.382l-2 1.05C4.318 5.536 3.242 6.1 2.638 7.072L12 12l9.362-4.927c-.606-.973-1.68-1.537-3.785-2.641"
+            opacity="0.7"
+          />
+          <path
+            fill="currentColor"
+            d="M21.403 7.14a3.153 3.153 0 0 0-.041-.067L12 12v10c.944 0 1.822-.46 3.578-1.382l2-1.05c2.151-1.129 3.227-1.693 3.825-2.708c.597-1.014.597-2.277.597-4.8v-.117c0-2.525 0-3.788-.597-4.802"
+            opacity="0.5"
+          />
+          <path
+            fill="currentColor"
+            d="m6.323 4.484l.1-.052l1.493-.784l9.1 5.005l4.025-2.011c.137.155.257.32.362.498c.15.254.262.524.346.825L17.75 9.964V13a.75.75 0 0 1-1.5 0v-2.286l-3.5 1.75v9.44A3.062 3.062 0 0 1 12 22c-.248 0-.493-.032-.75-.096v-9.44l-8.998-4.5c.084-.3.196-.57.346-.824a3.15 3.15 0 0 1 .362-.498l9.04 4.52l3.387-1.693z"
+          />
+        </svg>
+      </div>
+      <div>Studio Package</div>
+      <div class="external-link-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-square-arrow-out-up-right"
+        >
+          <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/>
+          <path d="m21 3-9 9"/>
+          <path d="M15 3h6v6"/>
+        </svg>
+      </div>
     </a>
   </div>
 </div>
@@ -52,13 +148,11 @@ const condition = isDocs ? "/docs/overview" : "/learn";
   <div class="logo__section__dropdown-content">
     <div class="logo__section-icon">
       <span class="logo__section-icon--docs">
-        {isDocs && <DocsIcon />}
+        <DocsIcon />
       </span>
-      {isLearn && <LearnIcon />}
     </div>
     <div class="logo__section-text">
-      {isDocs && "Docs"}
-      {isLearn && "Learn"}
+      Docs
     </div>
   </div>
   <select
@@ -67,8 +161,7 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     title="Select section"
     class="section__select"
   >
-    <option selected={isDocs} value="docs">Docs</option>
-    <option selected={isLearn} value="learn">Learn</option>
+    <option selected={true} value="docs">Docs</option>
   </select>
 </div>
 
@@ -86,10 +179,6 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     margin-right: 4px;
   }
 
-  html[class~="dark"] .logo-svg svg {
-    color: #c5f74f;
-  }
-
   html[class~="dark"] .logo__section-icon {
     background-color: rgb(16, 42, 76);
   }
@@ -101,8 +190,8 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     justify-content: center;
     background-color: rgb(225, 240, 255);
     border-radius: 4px;
-    height: 24px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
   }
 
   html.dark .logo__section-text {
@@ -112,6 +201,7 @@ const condition = isDocs ? "/docs/overview" : "/learn";
   .logo__section-text {
     color: #000;
     margin-right: 4px;
+      font-weight: 600;
   }
 
   .docs-text {
@@ -136,17 +226,13 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     position: relative;
     user-select: none;
     color: #7e868c;
-    background-color: hsla(210, 7%, 95%, .27);
-    border: 1px solid rgba(33, 39, 46, .12);
     border-radius: 4px;
   }
 
   .logo__section__dropdown-btn {
     display: flex;
     align-items: center;
-    height: 40px;
     cursor: pointer;
-    padding: 0 8px;
     border-radius: 4px;
     width: 100%;
     transition: background-color 0.2s ease-in-out;
@@ -158,11 +244,10 @@ const condition = isDocs ? "/docs/overview" : "/learn";
 
   .logo__section__selector-item__icon {
     display: flex;
-    height: 24px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
     align-items: center;
     justify-content: center;
-    background-color: #e1f0ff;
     margin-right: 8px;
     border-radius: 4px;
   }
@@ -221,7 +306,6 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     background: #fff;
     border: 1px solid #e4e4e5;
     box-shadow: 0 0 16px rgba(17, 17, 26, 0.1);
-    border-radius: 4px;
     flex-direction: column;
     gap: 2px;
     position: absolute;
@@ -229,24 +313,24 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     right: -1px;
     top: calc(100% + 4px);
     z-index: 99;
+    overflow: hidden;
   }
 
   .logo__section__selector-item,
   .logo__section__selector-item--docs {
     align-items: center;
-    border-radius: 2px;
     cursor: pointer;
     display: flex;
     justify-content: flex-start;
     width: 100%;
     height: 40px;
     color: #6b7280;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 400;
     transition-property: color, background-color;
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
-    padding: 0 8px;
+    padding: 0 8px 0 0;
   }
 
   html.dark .logo__section__selector-item:hover,
@@ -299,6 +383,26 @@ const condition = isDocs ? "/docs/overview" : "/learn";
     border-radius: 4px;
     background-color: hsla(210, 7%, 95%, .27);
     border: 1px solid rgba(33, 39, 46, .12);
+  }
+
+  .external-link-icon {
+      margin-left: auto;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+  }
+
+  .external-link-icon svg {
+      width: 14px;
+      height: 14px;
+      color: #000;
+  }
+
+  .logo__section__selector-item:hover .external-link-icon {
+      opacity: 1;
+  }
+
+  .logo__section__selector-item:focus .external-link-icon {
+      opacity: 1;
   }
 
   @media screen and (max-width: 768px) {
@@ -367,13 +471,6 @@ const condition = isDocs ? "/docs/overview" : "/learn";
         ) {
           sectionSelector.classList.add("logo__section__selector-item--active");
           sectionSelectorItems.classList.remove("hidden");
-        } else {
-          if (e.key === "1") {
-            window.location.href = "/docs/overview";
-          }
-          if (e.key === "2") {
-            window.location.href = "/learn";
-          }
         }
       }
     }
@@ -439,8 +536,8 @@ const condition = isDocs ? "/docs/overview" : "/learn";
   }
 
   .logo__section-icon svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     color: rgb(0, 106, 220);
     fill: rgb(150, 199, 242);
   }
@@ -451,12 +548,12 @@ const condition = isDocs ? "/docs/overview" : "/learn";
   }
   .logo__section__selector-item:hover svg,
   .logo__section__selector-item:focus svg {
-    color: #006adc;
+    color: #333;
   }
   .logo__section__selector-item svg,
   .logo__section__selector-item--docs svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     color: rgb(107, 114, 128);
     transition: all 0.2s ease-in-out;
   }

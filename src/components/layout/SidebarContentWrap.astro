@@ -1,7 +1,6 @@
 ---
 import type { IHeading, TreeNode } from '@/types/astro';
 import AsideAstro from './AsideAstro.astro';
-import ToggleSections from './ToggleSections.astro';
 
 interface Props {
   slug?: string;
@@ -12,10 +11,7 @@ interface Props {
 
 const { slug, tree, filteredHeadings, forLanding } = Astro.props;
 ---
-<div class="nav_sticky">
-  <!-- <NavDropdown /> -->
-  <ToggleSections />
-</div>
+<div class="nav_sticky"></div>
 <AsideAstro tree={tree} headings={filteredHeadings} slug={slug!} forLanding={forLanding} />
 <style>
 
@@ -29,7 +25,7 @@ html[class~="dark"] .nav_sticky {
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
-    padding-bottom: 16px;
+    padding: 0;
     z-index: 5;
   }
 
@@ -83,7 +79,7 @@ html[class~="dark"] .nav_sticky {
     display: flex;
     flex-direction: column;
     margin-bottom: auto;
-    padding: 16px 16px 16px 0;
+    padding: 24px 0 0;
   }
 
   .nav-items-collapsable {
