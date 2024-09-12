@@ -38,6 +38,18 @@ function modifyTree(tree: TreeNode[]): TreeNode[] {
   return modifiedTree;
 }
 
+const calculateMaxHeight = (items: TreeNode[]) => {
+  return items.reduce((acc, it) => {
+    if (acc.counter === 6) return acc;
+
+    if (it.type === 'dot-separator') {
+      return  {value: 12 + acc.value, counter: acc.counter}
+    } else {
+      return {value: 26.5 + acc.value, counter: acc.counter + 1}
+    }
+  }, {value: 0, counter: 0}).value + 61
+}
+
 
 const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
 let i = 0;
@@ -58,7 +70,7 @@ let i = 0;
               <div
                 class:list={["nav-items-collapsable", n.items.some(c => isActive(`${t.name}/${c.name}`)) ? 'expanded-permanent' : '']}
                 id={n.title}
-                style={`max-height: ${n.items.slice(0, 6).reduce((prev, cur) => cur.type === 'dot-separator' ? prev + 12 : prev + 26.5, 0) + 61}px`}
+                style={`max-height: ${calculateMaxHeight(n.items)}px`}
               >
                 <div class="nav-separator nav-separator-collapsable">
                   {n.title}
