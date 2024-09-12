@@ -68,8 +68,9 @@ let i = 0;
             )}
             {n.type === "collapsable" && (
               <div
-                class:list={["nav-items-collapsable", n.items.some(c => isActive(`${t.name}/${c.name}`)) ? 'expanded-permanent' : '']}
+                class={"nav-items-collapsable"}
                 id={n.title}
+                data-active-inner-item={n.items.some(c => isActive(`${t.name}/${c.name}`)) ? 1 : 0}
                 style={`max-height: ${calculateMaxHeight(n.items)}px`}
               >
                 <div class="nav-separator nav-separator-collapsable">
@@ -258,6 +259,26 @@ let i = 0;
   import throttle from "lodash.throttle";
   import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
   import updateDialectLinks from "@/utils/updateDialectLinks";
+
+  document.addEventListener("astro:after-swap", () => {
+    let expandedSections: string[] = JSON.parse(localStorage.getItem('expandedSections'));
+    const updateCollapsedSections = () => {
+      document.querySelectorAll('.nav-items-collapsable').forEach((section) => {
+        if (Number(section.getAttribute("data-active-inner-item")) && !expandedSections.find((v) => v === section.id)) {
+          expandedSections = [...expandedSections, section.id]
+        }
+        if (expandedSections.find((v) => v === section.id)) {
+          section.classList.add('expanded');
+        } else {
+          section.classList.remove('expanded');
+        }
+      })
+
+      localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
+    }
+
+    updateCollapsedSections()
+  })
 
   document.addEventListener("astro:page-load", () => {
     const container = document.querySelector(".documentation-content-wrap")!;

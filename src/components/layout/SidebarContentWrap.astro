@@ -114,17 +114,26 @@ html[class~="dark"] .nav_sticky {
       bottom: 0;
       right: 0;
       left: 0;
-      height: 50px;
+      height: 60px;
       z-index: 2;
+      opacity: 0;
+      transition: opacity 0.3s;
+      background: linear-gradient(0deg, #fff ,80%, transparent);
+  }
+
+  html.dark .expand-container {
+      background: linear-gradient(0deg, #111111 ,80%, transparent);
+  }
+
+  .expand-container:hover {
+      opacity: 1;
   }
 
   .expand-container button {
-      background-color: #fcfcfc;
-      border: 1px solid #b8bfc8;
-      border-radius: 4px;
       color: #000;
-      font-size: 12px;
-      width: 60%;
+      font-size: 14px;
+      width: fit-content;
+      font-weight: 600;
       height: 24px;
       transition: opacity 0.2s;
       opacity: 0;
@@ -132,9 +141,7 @@ html[class~="dark"] .nav_sticky {
   }
 
   html.dark .expand-container button {
-      border-color: #686868;
       color: #e1e3e6;
-      background-color: #212121;
   }
 
   .expand-container:hover button {
@@ -153,25 +160,9 @@ html[class~="dark"] .nav_sticky {
       display: none;
   }
 
-  .expanded-permanent {
-      max-height: 100% !important;
-  }
-
-  .expanded-permanent .expand-container {
-      display: none;
-  }
-
   .section-collapse-button {
       opacity: 0;
       pointer-events: none;
-  }
-
-  .expanded-permanent .section-collapse-button {
-      display: none;
-  }
-
-  .expanded-permanent .fade {
-      display: none;
   }
 
   .expanded {
