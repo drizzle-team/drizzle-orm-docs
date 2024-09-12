@@ -3,21 +3,21 @@ import CenteredSearchWithAI from "./CenteredSearchWithAI.astro";
 import ThemeSelector from "./ThemeSelector.astro";
 import Logo from "./Logo.astro";
 import GithubStars from "./GithubStars.astro";
-import progress from "../../data/progress";
-import SmallProgressBar from "./SmallProgressBar.astro";
 import AnnouncementsButton from "./AnnouncementsButton.astro";
+import DocsIcon from "../Icons/DocsIcon.astro";
 ---
 
 <div class="header" id="header">
   <div class="header_content">
     <div class="header__logo">
       <Logo />
+      <a class="docs-logo" href="/docs/overview">
+        <div class="docs-logo-icon"><DocsIcon/></div>
+        <span>Documentation</span>
+      </a>
     </div>
     <CenteredSearchWithAI/>
     <div class="header_nav">
-      <div class="progress-wrap">
-        <SmallProgressBar  progress={progress} />
-      </div>
       <GithubStars />
       <AnnouncementsButton />
       <ThemeSelector />
@@ -90,9 +90,36 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
 
   .header__logo {
     align-items: center;
+    justify-content: flex-start;
     display: flex;
     flex: 1;
     font-weight: 600;
+    gap: 10px;
+  }
+
+  .docs-logo {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 4px;
+      background-color: #f6f6f7;
+  }
+
+  html.dark .docs-logo {
+      background-color: #1c1c1c;
+  }
+
+  .docs-logo-icon {
+      color: #555;
+      fill: #cccccc;
+  }
+
+  html.dark .docs-logo-icon {
+      color: #949393;
+      fill: #ffffff;
   }
 
   .header_nav {
@@ -141,9 +168,24 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
       }
   }
 
+  @media screen and (max-width: 914px) {
+      .docs-logo  {
+          height: 33px;
+          padding: 6px 8px;
+      }
+
+      .docs-logo span {
+          display: none;
+      }
+  }
+
   @media screen and (max-width: 768px) {
     .header_nav__link {
       display: none;
+    }
+
+    .docs-logo  {
+        display: none;
     }
 
     .header_content {

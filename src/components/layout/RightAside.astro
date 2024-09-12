@@ -8,8 +8,11 @@ import progress from "../../data/progress";
 
 <div class="aside-right">
   <div class="aside-right__content">
-    <AsideArticle />
-    <AsideSponsors />
+      <div class="progress-wrap">
+        <SmallProgressBar  progress={progress} />
+      </div>
+      <AsideArticle />
+      <AsideSponsors />
   </div>
   <CarbonCard />
 </div>
@@ -20,7 +23,6 @@ import progress from "../../data/progress";
     top: 0;
     flex: 1;
     padding: 12px 12px 12px;
-    width: 100%;
     display: flex;
     max-width: 272px;
     flex-direction: column;
@@ -36,6 +38,11 @@ import progress from "../../data/progress";
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .progress-wrap {
+      width: 100%;
+      margin-bottom: 4px;
   }
 
   @media screen and (max-width: 1024px) {
