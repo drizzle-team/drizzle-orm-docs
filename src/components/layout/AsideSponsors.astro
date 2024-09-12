@@ -1,7 +1,6 @@
 ---
 import type { CSSProperties } from "react";
 import s from "@/data/asideS";
-import {safeParseFrontmatter} from "astro/dist/content/utils";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
@@ -11,7 +10,7 @@ const getStyleString = (style: CSSProperties) => {
 
 const slicedSponsors = [];
 
-for (let i = 0; i < s.length; i += 2) {
+for (let i = 0; i < s.length - 1; i += 2) {
   let items = s.slice(i, i + 2);
   slicedSponsors.push(items);
 }

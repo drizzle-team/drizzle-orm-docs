@@ -17,6 +17,7 @@ import EddyVinckk from "@/assets/images/twits/EddyVinckk.jpg";
 import chribjel from "@/assets/images/twits/chribjel.jpg";
 import chribjelTwit from "@/assets/images/twits/chribjelTwit.png";
 import hisbvdis from "@/assets/images/twits/hisbvdis.jpg";
+import aokijs from "@/assets/images/twits/aokijs.jpg";
 
 // Twit images
 
@@ -145,6 +146,13 @@ const Comments: IComment[] = [
     login: "hisbvdis",
     text: `I have finally switched from @prisma to @DrizzleORM.\nIt was not easy.\nDear Drizzle Team, you have created an awesome orm with awfull documentation.\nAnyway, good for you, thanks and good luck.`,
     href: "https://x.com/hisbvdis/status/1807783878515400977",
+  },
+  {
+    avatar: aokijs,
+    name: "Aoki",
+    login: "aokijs",
+    text: `Honestly, fuck the benchmarks. I don‘t care which one‘s faster. All I can say is that Drizzle made my life working with databases dramastically better and that‘s all that matters for me. Thanks for your hard work 🙏🏻`,
+    href: "https://x.com/aokijs/status/1833840766839325109",
   },
 ];
 
