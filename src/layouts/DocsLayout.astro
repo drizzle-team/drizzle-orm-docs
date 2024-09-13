@@ -204,5 +204,33 @@ const { tree, filteredHeadings, title } = await getContentTree({
       updateCollapsedSections();
       changeNpmTab();
     </script>
+    <script>
+      class RemElement extends HTMLElement {
+        constructor() {
+          super();
+        }
+      }
+
+      // Регистрация нового элемента
+      customElements.define('rem', RemElement);
+      customElements.define('rem025', RemElement);
+      customElements.define('rem05', RemElement);
+    </script>
+    <style is:global>
+      rem {
+          display: block;
+          height: 1rem;
+      }
+
+      rem025 {
+          display: block;
+          height: 0.25rem;
+      }
+
+      rem05 {
+          display: block;
+          height: 0.5rem;
+      }
+    </style>
   </body>
 </html>
