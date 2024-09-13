@@ -187,13 +187,18 @@ const { tree, filteredHeadings, title } = await getContentTree({
       }
 
       const updateCollapsedSections = () => {
-        if (!expandedSections || !expandedSections.length) {
-          document.querySelectorAll('.nav-items-collapsable').forEach(e => e.classList.remove('expanded'));
-        } else {
-          expandedSections.forEach((section) => {
-            document.getElementById(section).classList.toggle('expanded');
-          })
-        };
+        document.querySelectorAll('.nav-items-collapsable').forEach((section) => {
+          if (Number(section.getAttribute("data-active-inner-item")) && !expandedSections.find((v) => v === section.id)) {
+            expandedSections = [...expandedSections, section.id]
+          }
+          if (expandedSections.find((v) => v === section.id)) {
+            section.classList.add('expanded');
+          } else {
+            section.classList.remove('expanded');
+          }
+        })
+
+        localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
       }
 
       updateCollapsedSections();
