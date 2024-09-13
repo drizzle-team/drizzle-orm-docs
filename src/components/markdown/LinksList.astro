@@ -8,8 +8,8 @@ const { title, links } = Astro.props;
 ---
 
 <div class="list-container">
-  <h4>{title}</h4>
-  <div style="display: flex; flex-direction: column; margin-top: 8px; gap: 4px">
+  { title && <p style="margin-bottom: 0.25rem;"><b>{title}</b></p> }
+  <div style="display: flex; flex-direction: column; gap: 0.25rem">
     {links.map(([name, href]) => (
       <a href={href} class="link">
         <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
