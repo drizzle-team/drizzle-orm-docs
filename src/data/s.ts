@@ -251,11 +251,10 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      padding: "6px",
-      filter: "invert(0.1)",
+      padding: "8px",
     },
     lightStyle: {
-      padding: "6px",
+      padding: "8px",
     },
   },
   {
