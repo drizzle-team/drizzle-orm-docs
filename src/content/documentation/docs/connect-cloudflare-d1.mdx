@@ -2,9 +2,17 @@ import Npm from "@components/markdown/Npm.astro";
 import Callout from '@components/markdown/Callout.astro';
 import AnchorCards from '@components/markdown/AnchorCards.astro';
 import Steps from '@components/markdown/Steps.astro';
-
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
 
 # Drizzle \<\> Cloudflare D1
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- D1 Database - [website](https://docs.turso.tech/introduction)
+- D1 driver - [website](https://docs.turso.tech/sdk/ts/reference) & [GitHub](https://github.com/tursodatabase/libsql-client-ts)
+</Prerequisites>
 
 According to the **[official website](https://developers.cloudflare.com/d1/)**, 
 D1 is Cloudflare's first queryable relational database.  
@@ -15,9 +23,16 @@ SQLite-like `all`, `get`, `values` and `run` query methods syntax.
 
 To setup project for your Cloudflare D1 please refer to **[official docs.](https://developers.cloudflare.com/d1/)**
 
-```toml
-### your wrangler.toml will look something like this:
+#### Step 1 - Install packages
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
 
+#### Step 2 - Initialize the driver and make a query
+
+You would need to have a `wrangler.toml` file for D1 database and will look something like this:
+```toml
 name = "YOUR PROJECT NAME"
 main = "src/index.ts"
 compatibility_date = "2022-11-07"
@@ -29,19 +44,6 @@ database_name = "YOUR DB NAME"
 database_id = "YOUR DB ID"
 migrations_dir = "drizzle/migrations"
 ```
-
-Initialize local database and run server locally:
-```bash
-wrangler d1 migrations apply <DATABASE_NAME> --local
-wrangler dev ## on wrangler versions below 3.0.0, add the --local and --persist flags
-```
-
-Install Drizzle ORM:
-
-<Npm>
-drizzle-orm
--D drizzle-kit
-</Npm>
 
 Make your first D1 query:
 ```typescript copy
@@ -60,15 +62,6 @@ export default {
 };
 ```
 
-Unless you plan on writing every SQL query by hand, a table declaration is helpful:
-```typescript copy
-import { sql } from "drizzle-orm";
-import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+#### What's next?
 
-const users = sqliteTable('users', {
-  id: text('id'),
-  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
-  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
-});
-```
-For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
+<WhatsNextPostgres/>

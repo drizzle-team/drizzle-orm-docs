@@ -1,71 +1,48 @@
 import Npm from '@components/markdown/Npm.astro';
 import Callout from '@components/markdown/Callout.astro';
-import Tabs from '@components/markdown/Tabs.astro';
-import Tab from '@components/markdown/Tab.astro';
-import AnchorCards from '@components/markdown/AnchorCards.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 
-<AnchorCards cards={{
-  "PlanetScale": "#planetscale",
-  "mysql2": "#mysql-2",
-  "TiDB Serverless": "#tidb-serverless",
-  "HTTP proxy": "#http-proxy"
-}} />
+# Drizzle \<\> MySQL
 
-## PlanetScale
-
-According to the **[official website](https://planetscale.com/)**, 
-PlanetScale is the world's most advanced serverless MySQL platform.
-
-With Drizzle ORM you can access PlanetScale over http
-through their official **[`database-js`](https://github.com/planetscale/database-js)**
-driver from serverless and serverfull environments with our `drizzle-orm/planetscale-serverless` package.
-
-You can also access PlanetScale through TCP with `mysql2` driver — **[see here.](/docs/get-started-mysql#mysql-2)**
-
-<Npm>
-drizzle-orm @planetscale/database
--D drizzle-kit
-</Npm>
-
-```typescript copy filename="index.ts"
-import { drizzle } from "drizzle-orm/planetscale-serverless";
-import { Client } from "@planetscale/database";
-
-const client = new Client({
-  host: process.env["DATABASE_HOST"],
-  username: process.env["DATABASE_USERNAME"],
-  password: process.env["DATABASE_PASSWORD"],
-});
-
-const db = drizzle(client);
-```
-
-<Callout type="warning" emoji="⚠️">
-Previously, we were suggesting the use of the `connect()` function from the `database-js` driver. However, after receiving a suggestion from the PlanetScale Team and the authors of database-js, we are now enforcing the use of the `Client` instance to handle connections to PlanetScale.
-
-Please note that you will receive a warning to switch from `connect()` to `new Client()`, and starting from version `0.30.0`, you will encounter an error and be required to use the `Client` connection. Make sure to migrate from `connect()` to `Client`
-</Callout>
-
-Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
-we think they're outstanding 🙌
-
-## mysql2
+To use Drizzle with a MySQL database, you should use the `mysql2` driver
 
 According to the **[official website](https://github.com/sidorares/node-mysql2)**, 
 `mysql2` is a MySQL client for Node.js with focus on performance.  
 
 Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
 
+#### Step 1 - Install packages
 <Npm>
 drizzle-orm mysql2
 -D drizzle-kit
 </Npm>
 
+#### Step 2 - Initialize the driver and make a query
+<CodeTabs items={['mysql2', 'mysql with config']}>
+```typescript copy
+import { drizzle } from "drizzle-orm";
+
+const db = await drizzle("mysql2", process.env.DATABASE_URL);
+
+const response = await db.select().from(...)
+```
+```typescript copy
+import { drizzle } from "drizzle-orm";
+
+// You can specify any property from the mysql2 connection options
+const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});
+
+const response = await db.select().from(...)
+```
+</CodeTabs>
+
+If you need a synchronous connection, you can use our additional connection API, where you specify a driver connection and pass it to the Drizzle instance.
 There're two ways you can connect to the MySQL with `mysql2` driver, either single `client` connection or a `pool`.
 
-<Tabs items={['Client connection', 'Pool connection']}>
-  <Tab>
-  ```typescript copy filename="index.ts"
+<CodeTabs items={['Client connection', 'Pool connection']}>
+  ```typescript copy
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
@@ -78,10 +55,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
 
   const db = drizzle(connection);
   ```
-  </Tab>
-
-  <Tab>
-  ```typescript copy filename="index.ts"
+  ```typescript copy
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
@@ -94,8 +68,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
 
   const db = drizzle(poolConnection);
   ```
-  </Tab>
-</Tabs>
+</CodeTabs>
 
 <Callout type="warning" emoji="⚙️">
   For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.  
@@ -103,97 +76,6 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
   For querying purposes feel free to use either `client` or `pool` based on your business demands.
 </Callout>
 
-## TiDB Serverless
+#### What's next?
 
-According to the **[official website](https://www.pingcap.com/tidb-serverless/)**, 
-TiDB Serverless is a fully-managed, autonomous DBaaS with split-second cluster provisioning and consumption-based pricing.
-
-<Callout type="info" emoji="ℹ️">
-TiDB Serverless is compatible with MySQL, so you can use [`drizzle-orm/mysql2`](#mysql2) to connect to it.
-</Callout>
-
-TiDB Serverless provides an [HTTP driver](https://docs.pingcap.com/tidbcloud/serverless-driver) for edge environments. It is natively supported by Drizzle ORM via `drizzle-orm/tidb-serverless` package.
-
-<Npm>
-drizzle-orm @tidbcloud/serverless
--D drizzle-kit
-</Npm>
-
-```typescript copy filename="index.ts"
-import { connect } from '@tidbcloud/serverless';
-import { drizzle } from 'drizzle-orm/tidb-serverless';
-
-const client = connect({ url: '...' });
-const db = drizzle(client);
-```
-
-## HTTP proxy
-
-Example of driver implementation
-
-```typescript copy
-import { drizzle } from 'drizzle-orm/mysql-proxy';
-
-const db = drizzle(async (sql, params, method) => {
-  try {
-    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
-
-    return { rows: rows.data };
-  } catch (e: any) {
-    console.error('Error from mysql proxy server: ', e.response.data)
-    return { rows: [] };
-  }
-});
-```
-
-Example of server implementation
-
-```ts
-import * as mysql from 'mysql2/promise';
-import express from 'express';
-
-const app = express();
-
-app.use(express.json());
-const port = 3000;
-
-const main = async () => {
-    const connection = await mysql.createConnection('mysql://root:mysql@127.0.0.1:5432/drizzle');
-
-    app.post('/query', async (req, res) => {
-    	const { sql, params, method } = req.body;
-
-      // prevent multiple queries
-    	const sqlBody = sql.replace(/;/g, '');
-
-      try {
-            const result = await connection.query({
-                sql: sqlBody,
-                values: params,
-                rowsAsArray: method === 'all',
-                typeCast: function(field: any, next: any) {
-                    if (field.type === 'TIMESTAMP' || field.type === 'DATETIME' || field.type === 'DATE') {
-                        return field.string();
-                    }
-                    return next();
-                },
-            });
-    	} catch (e: any) {
-    		res.status(500).json({ error: e });
-    	}
-
-    	if (method === 'all') {
-    		res.send(result[0]);
-    	} else if (method === 'execute') {
-    		res.send(result);
-    	}
-    	res.status(500).json({ error: 'Unknown method value' });
-    });
-
-    app.listen(port, () => {
-    	console.log(`Example app listening on port ${port}`);
-    });
-}
-
-main();
-```
+<WhatsNextPostgres/>
