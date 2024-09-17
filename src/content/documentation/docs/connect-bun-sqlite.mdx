@@ -2,8 +2,17 @@ import Npm from "@components/markdown/Npm.astro";
 import Callout from '@components/markdown/Callout.astro';
 import AnchorCards from '@components/markdown/AnchorCards.astro';
 import Steps from '@components/markdown/Steps.astro';
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
 
 # Drizzle \<\> Bun SQLite
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- Bun - [website](https://bun.sh/docs)
+- Bun SQLite driver - [docs](https://bun.sh/docs/api/sqlite)
+</Prerequisites>
 
 According to the **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
 
@@ -13,10 +22,23 @@ We embraces SQL dialects and dialect specific drivers and syntax and unlike any 
 for synchronous drivers like `bun:sqlite` we have both **async** and **sync** APIs and we mirror most popular 
 SQLite-like `all`, `get`, `values` and `run` query methods syntax.
 
+#### Step 1 - Install packages
 <Npm>
 drizzle-orm
 -D drizzle-kit
 </Npm>
+
+#### Step 2 - Initialize the driver and make a query
+```typescript copy
+import { drizzle } from 'drizzle-orm';
+
+const db = drizzle("bun:sqlite");
+
+const result = await db.select().from(...);
+```
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
 
 ```typescript copy
 import { drizzle } from 'drizzle-orm/bun-sqlite';
@@ -25,21 +47,8 @@ import { Database } from 'bun:sqlite';
 const sqlite = new Database('sqlite.db');
 const db = drizzle(sqlite);
 
-const result = await db.select().from(users);
+const result = await db.select().from(...);
 ```
-
-Unless you plan on writing every SQL query by hand, a table declaration is helpful:
-```typescript copy
-import { sql } from "drizzle-orm";
-import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
-
-const users = sqliteTable('users', {
-  id: text('id'),
-  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
-  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
-});
-```
-For more details about column types, see the **[SQLite column types in Drizzle.](/docs/column-types/sqlite)**
 
 If you want to use **sync** APIs:
 ```typescript copy
@@ -54,4 +63,7 @@ const result = db.select().from(users).get();
 const result = db.select().from(users).values();
 const result = db.select().from(users).run();
 ```
-More on **sync** and **async** APIs for sqlite - read here.
+
+#### What's next?
+
+<WhatsNextPostgres/>
