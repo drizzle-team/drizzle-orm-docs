@@ -179,7 +179,7 @@ export const sponsorsData: ISponsor[] = [
       background: 'url("/images/deco.png") 0% 0% / cover no-repeat content-box',
     },
     lightStyle: {
-      filter: "grayscale(1) opacity(0.6)",
+      filter: "grayscale(1) opacity(0.5)",
       "border-radius": "20%",
       padding: "4px",
       background: 'url("/images/deco.png") 0% 0% / cover no-repeat content-box',
