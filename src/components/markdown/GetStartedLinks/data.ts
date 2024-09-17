@@ -25,7 +25,7 @@ export const getStartedItems: GetStartedItems = [
     items: [
       {
         name: "PostgreSQL",
-        path: { existing: "/", new: "/docs/overview" },
+        path: { existing: "/", new: "/docs/get-started/postgresql-new" },
         icon: {
           light: {
             path: "/public/svg/postgresql.svg",
