@@ -164,6 +164,34 @@ export const sponsorsData: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
+      login: "driz.li/decocx",
+      name: "Deco.cx",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "grayscale(1) opacity(0.3)",
+      "border-radius": "20%",
+      padding: "4px",
+      background: 'url("/images/deco.png") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      filter: "grayscale(1) opacity(0.6)",
+      "border-radius": "20%",
+      padding: "4px",
+      background: 'url("/images/deco.png") 0% 0% / cover no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
       login: "driz.link/gold",
       name: "Become a Gold Sponsor",
       avatarUrl:
