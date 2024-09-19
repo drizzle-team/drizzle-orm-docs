@@ -148,29 +148,31 @@ export const usersRelations = relations(users, ({ one }) => ({
 }));
 ```
 
-Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
-
-```typescript copy {9-17}
+In this scenario, the user's profile information is stored in a separate table, `profile_info`. Since the foreign key is located in the `profile_info` table, the `users` table does not include any fields or direct references to `profile_info`. This design indicates to TypeScript that `user.profileInfo` can be nullable. The `profileInfoRelations` object defines the relationship from the `profile_info` table back to the `users` table by linking the `userId` field in `profile_info` to the `id` field in `users`:
+```typescript copy {9-11, 19-24}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+  id: serial('id').primaryKey(),
+  name: text('name'),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
-	profileInfo: one(profileInfo),
+  profileInfo: one(profileInfo),
 }));
 
 export const profileInfo = pgTable('profile_info', {
-	id: serial('id').primaryKey(),
-	userId: integer('user_id').references(() => users.id),
-	metadata: jsonb('metadata'),
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  metadata: jsonb('metadata'),
 });
 
 export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
-	user: one(users, { fields: [profileInfo.userId], references: [users.id] }),
+  user: one(users, {
+    fields: [profileInfo.userId],
+    references: [users.id],
+  }),
 }));
 
 const user = await queryUserWithProfileInfo();
@@ -313,17 +315,20 @@ You can define `relations` without using foreign keys (and vice versa), which al
 The following two examples will work exactly the same in terms of querying the data using Drizzle relational queries.
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
-```ts {15}
+```ts copy {18}
+import { relations } from 'drizzle-orm';
+import { pgTable, integer, jsonb, text, serial } from 'drizzle-orm/pg-core';
+
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
 	name: text('name'),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
-	}),
+export const usersRelations = relations(users, ({ one }) => ({
+  profileInfo: one(profileInfo, {
+    fields: [users.id],
+    references: [profileInfo.userId],
+  }),
 }));
 
 export const profileInfo = pgTable('profile_info', {
@@ -334,17 +339,20 @@ export const profileInfo = pgTable('profile_info', {
 ```
 </CodeTab>
 <CodeTab>
-```ts {15}
+```ts copy {18}
+import { relations } from 'drizzle-orm';
+import { pgTable, integer, jsonb, text, serial } from 'drizzle-orm/pg-core';
+
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
 	name: text('name'),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
-	}),
+export const usersRelations = relations(users, ({ one }) => ({
+  profileInfo: one(profileInfo, {
+    fields: [users.id],
+    references: [profileInfo.userId],
+  }),
 }));
 
 export const profileInfo = pgTable('profile_info', {
@@ -392,7 +400,7 @@ actions?: {
 In the following example, adding `onDelete: 'cascade'` to the author field on the `posts` schema means that deleting the `user` will also delete all related Post records.
 
 
-```typescript {11}
+```typescript copy {11}
 import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -440,7 +448,7 @@ relations when you define multiple of them between the same two tables. For
 example, if you define a `posts` table that has the `author` and `reviewer`
 relations.
 
-```ts {9-12, 21-32}
+```typescript copy {9-12, 21-32}
 import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
  

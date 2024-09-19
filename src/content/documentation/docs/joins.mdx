@@ -201,11 +201,13 @@ Drizzle ORM supports table aliases which comes really handy when you need to do 
 Lets say you need to fetch users with their parents:
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
-```typescript copy
+```typescript copy {5,9}
+import { eq } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { user } from "./schema";
 
-const parent = aliasedTable(user, "parent")
-const result = db
+const parent = alias(user, "parent")
+const result = await db
   .select()
   .from(user)
   .leftJoin(parent, eq(parent.id, user.parentId));
@@ -219,22 +221,24 @@ const result: {
     user: {
         id: number;
         name: string;
-        parentId: number;
+        parentId: number | null;
     };
     parent: {
         id: number;
         name: string;
-        parentId: number;
+        parentId: number | null;
     } | null;
 }[];
 ```
 </CodeTab>
 
-```typescript
-export const user = pgTable("user", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  parentId: integer("parent_id").notNull().references((): AnyPgColumn => user.id)
+```typescript copy {6}
+import { pgTable, integer, text, AnyPgColumn } from 'drizzle-orm/pg-core';
+
+export const user = pgTable('user', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  parentId: integer('parent_id').references((): AnyPgColumn => user.id),
 });
 ```
 
