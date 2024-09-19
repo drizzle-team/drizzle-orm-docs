@@ -1,0 +1,142 @@
+---
+import {getStartedItems} from "./GetStartedLinks/data";
+
+const { slug } = Astro.params;
+
+const flatItems = getStartedItems.map((v) => v.items).flat(1)
+
+const currentItem = flatItems.find((item) => `/${slug}` === item.path.new || `/${slug}` === item.path.existing);
+
+const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
+---
+
+<div class="breadcrumbs-container">
+  <div
+    id="db-resizer"
+    class="select"
+    style={{
+      position: "absolute",
+      top: "-9999px",
+      left: "-9999px",
+      visibility: "hidden",
+      whiteSpace: "nowrap",
+    }}
+  >
+    {currentItem.name}
+  </div>
+  <div
+    id="db-type-resizer"
+    class="select"
+    style={{
+      position: "absolute",
+      top: "-9999px",
+      left: "-9999px",
+      visibility: "hidden",
+      whiteSpace: "nowrap",
+    }}
+  >
+    {databaseType === 'new' ? 'New database' : 'Existing database'}
+  </div>
+  <div>Meet Drizzle</div>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+  <a class="link" href="/docs/get-started">Get started</a>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+  <select id="db-type-select" class="select">
+    <option
+      value={currentItem.path.new}
+      selected={databaseType === 'new'}
+    >
+      New database
+    </option>
+    <option
+      value={currentItem.path.existing}
+      selected={databaseType === 'existing'}
+    >
+      Existing database
+    </option>
+  </select>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+  <select id="db-select" class="select">
+    {flatItems.map((item) => (
+      <option id={item.name} value={item.path[databaseType]} selected={item.name === currentItem.name}>
+        {item.name}
+      </option>
+    ))}
+  </select>
+</div>
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+
+  const resize = () => {
+    const dbSelect = document.getElementById('db-select');
+    const dbTypeSelect = document.getElementById('db-type-select');
+    const dbSelectResizer = document.getElementById('db-resizer');
+    const dbTypeSelectResizer = document.getElementById('db-type-resizer');
+
+    if (dbSelect && dbSelectResizer && dbTypeSelectResizer && dbTypeSelect) {
+      dbSelect.style.width = `${dbSelectResizer.offsetWidth}px`;
+      dbTypeSelect.style.width = `${dbTypeSelectResizer.offsetWidth}px`;
+    }
+  }
+
+  document.addEventListener('astro:after-swap', resize);
+  resize();
+
+  document.addEventListener('astro:page-load', () => {
+    const dbSelect = document.getElementById('db-select');
+    const dbTypeSelect = document.getElementById('db-type-select');
+
+    dbSelect?.addEventListener('change', (e) => {
+      navigate(e.target.value);
+    });
+    dbTypeSelect?.addEventListener('change', (e) => {
+      navigate(e.target.value);
+    });
+  })
+</script>
+
+<style>
+    .breadcrumbs-container {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #0f172a;
+    }
+
+    .breadcrumbs-container .link {
+        display: block;
+        text-decoration: none;
+        color: #0f172a;
+    }
+
+    .breadcrumbs-container .link:hover {
+        text-decoration: underline;
+    }
+
+
+    .breadcrumbs-container svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .select {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        height: 28px;
+        font-size: 14px;
+        border-radius: 4px;
+        background-color: #ffffff;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+    }
+
+    .select:hover {
+        text-decoration: underline;
+    }
+</style>

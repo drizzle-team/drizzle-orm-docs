@@ -25,7 +25,10 @@ export const getStartedItems: GetStartedItems = [
     items: [
       {
         name: "PostgreSQL",
-        path: { existing: "/", new: "/docs/get-started/postgresql-new" },
+        path: {
+          existing: "/docs/get-started/postgresql-existing",
+          new: "/docs/get-started/postgresql-new",
+        },
         icon: {
           light: {
             path: "/public/svg/postgresql.svg",
@@ -140,7 +143,7 @@ export const getStartedItems: GetStartedItems = [
     items: [
       {
         name: "MySQL",
-        path: { existing: "/", new: "/docs/overview" },
+        path: { existing: "/", new: "/docs/get-started/mysql-new" },
         icon: {
           light: {
             path: "/public/svg/mysql.svg",
