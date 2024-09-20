@@ -403,16 +403,16 @@
 
   /* CALLOUT */
 
-  html[class~="dark"] .info p {
+  html[class~="dark"] .info {
     color: #bfdbfe;
   }
 
-  .info p {
+  .info {
     color: #1e3a8a;
   }
 
   html[class~="dark"] .info {
-    background-color: rgba(30, 58, 138, 0.3);
+    background-color: rgb(21 31 59);
     border: 1px solid rgba(191, 219, 254, 0.3);
   }
 
@@ -421,44 +421,44 @@
     border: 1px solid #bfdbfe;
   }
 
-  html[class~="dark"] .default p {
-    color: #fdba74;
-  }
-
-  .default p {
-    color: #9a3412;
-  }
-
   html[class~="dark"] .default {
-    background-color: rgba(251, 146, 60, 0.2);
-    border: 1px solid rgba(251, 146, 60, 0.3);
+      color: #bfdbfe;
   }
 
   .default {
-    background-color: #fff7ed;
-    border: 1px solid #ffedd5;
+      color: #1e3a8a;
   }
 
-  html[class~="dark"] .warning p {
+  html[class~="dark"] .default {
+      background-color: rgb(21 31 59);
+      border: 1px solid rgba(191, 219, 254, 0.3);
+  }
+
+  .default {
+      background-color: #dbeafe;
+      border: 1px solid #bfdbfe;
+  }
+
+  html[class~="dark"] .warning {
     color: #fef08a;
   }
 
-  .warning p {
+  .warning {
     color: #713f12;
   }
 
   html[class~="dark"] .warning {
-    background-color: rgba(161, 98, 7, 0.3);
+    background-color: rgb(67 45 18);
     border: 1px solid hsla(53, 98%, 77%, 0.3);
   }
 
   .warning {
     background-color: #fefce8;
-    border: 1px solid #fef9c3;
+    border: 1px solid #f5d8be;
   }
 
   html[class~="dark"] .error {
-    background-color: rgba(127, 29, 29, 0.3);
+    background-color: rgb(55 22 21);
     border: 1px solid hsla(0, 96%, 89%, 0.3);
   }
 
@@ -467,34 +467,46 @@
     border: 1px solid #fecaca;
   }
 
-  html[class~="dark"] .error p {
+  html[class~="dark"] .error {
     color: #fecaca;
   }
 
-  .error p {
+  .error {
     color: #7f1d1d;
   }
 
-  .callout-wrap {
-    margin-top: 1.5rem;
-    display: flex;
-    overflow-x: auto;
-    border-radius: 0.5rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    padding-right: 1rem;
+  .callout-label {
+      margin-top: 1rem;
+      border-radius: 2px;
+      padding: 2px 4px;
+      width: fit-content;
+      margin-left: 8px;
+      margin-bottom: calc(-1.5rem - 6px);
+      z-index: 1;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      position: relative;
   }
 
-  .callout-emoji {
-    user-select: none;
-    font-size: 1.25rem;
-    padding-left: 0.75rem;
-    padding-right: 0.5rem;
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  .callout-wrap {
+    position: relative;
+    margin: 1.5rem 0 1.5rem;
+    display: flex;
+    overflow-x: auto;
+    border-radius: 2px;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    font-size: 14px;
+  }
+
+  html.dark .callout-wrap {
+      background: #282a36;
+      border: none;
   }
 
   .callout-content {
-    line-height: 1.75rem;
     min-width: 0;
     width: 100%;
   }
@@ -505,6 +517,10 @@
 
   .callout-content p:first-child {
     margin-top: 0;
+  }
+
+  .callout-content p:last-child {
+      margin-bottom: 0;
   }
 
   /* NPM */
