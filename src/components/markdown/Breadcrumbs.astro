@@ -102,6 +102,14 @@ const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
         color: #0f172a;
     }
 
+    html.dark .breadcrumbs-container {
+        color: #f1f5f9;
+    }
+
+    html.dark .breadcrumbs-container .link {
+        color: #f1f5f9;
+    }
+
     .breadcrumbs-container .link:hover {
         text-decoration: underline;
     }
@@ -120,7 +128,7 @@ const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
         height: 28px;
         font-size: 14px;
         border-radius: 4px;
-        background-color: #ffffff;
+        background-color: transparent;
         cursor: pointer;
         outline: none;
         appearance: none;
@@ -135,5 +143,9 @@ const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
         height: 4px;
         background: #0f172a;
         border-radius: 100%;
+    }
+
+    html.dark .dot {
+        background: #f1f5f9;
     }
 </style>
