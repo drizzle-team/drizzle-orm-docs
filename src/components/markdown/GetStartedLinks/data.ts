@@ -143,7 +143,10 @@ export const getStartedItems: GetStartedItems = [
     items: [
       {
         name: "MySQL",
-        path: { existing: "/", new: "/docs/get-started/mysql-new" },
+        path: {
+          existing: "/docs/get-started/mysql-existing",
+          new: "/docs/get-started/mysql-new",
+        },
         icon: {
           light: {
             path: "/public/svg/mysql.svg",
