@@ -1,16 +1,25 @@
 ---
 interface Props {
   type: 'default' | 'info' | 'warning' | 'error';
-  emoji: string;
+  title?: string;
+  icon?: string;
 }
 
-const { type = 'default', emoji = '💡' } = Astro.props;
+const { type = 'default', title, emoji = '💡' } = Astro.props;
 ---
-<div class:list={["callout-wrap", type]}>
-  <div class="callout-emoji">
-    {emoji}
-  </div>
-  <div class="callout-content">
-    <slot/>
+<div>
+  {type === 'warning' && !title && (
+    <div class:list={["callout-label", type]}>{"IMPORTANT"}</div>
+  )}
+  {type === 'error' && !title && (
+    <div class:list={["callout-label", type]}>{"WARNING"}</div>
+  )}
+  {!!title && (
+    <div class:list={["callout-label", type]}>{title}</div>
+  )}
+  <div class:list={["callout-wrap"]}>
+    <div class="callout-content">
+      <slot/>
+    </div>
   </div>
 </div>
