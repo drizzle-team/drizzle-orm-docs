@@ -89,10 +89,10 @@ import { sql } from 'drizzle-orm';
 export const usersTable = mysqlTable(
   'users_table',
   {
-    id: serial('id').notNull(),
-    name: varchar('name', { length: 255 }).notNull(),
-    age: int('age').notNull(),
-    email: varchar('email', { length: 255 }).notNull(),
+    id: serial().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    age: int().notNull(),
+    email: varchar({ length: 255 }).notNull(),
   },
   (table) => {
     return {

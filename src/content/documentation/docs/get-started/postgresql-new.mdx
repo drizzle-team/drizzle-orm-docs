@@ -104,10 +104,10 @@ Create a `schema.ts` file in the `src/db` directory and declare your table:
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar("name", { length: 255 }).notNull(),
-  age: integer("age").notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar({ length: 255 }).notNull(),
+  age: integer().notNull(),
+  email: varchar({ length: 255 }).notNull().unique(),
 });
 ```
 
