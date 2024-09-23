@@ -1,16 +1,13 @@
-import Tab from '@components/markdown/Tab.astro';
-import Tabs from '@components/markdown/Tabs.astro';
-import Npm from "@components/markdown/Npm.astro";
+import Npm from '@components/markdown/Npm.astro';
 import Callout from '@components/markdown/Callout.astro';
-import Steps from '@components/markdown/Steps.astro';
-import AnchorCards from '@components/markdown/AnchorCards.astro';
-import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 
 <Breadcrumbs/>
 
-# Get Started with Drizzle and PostgreSQL
+# Get Started with Drizzle and SQLite
 
 <Prerequisites>  
   - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
@@ -24,10 +21,10 @@ import CodeTabs from "@mdx/CodeTabs.astro";
   </Npm>
 </Prerequisites>
 
-Drizzle has native support for PostgreSQL connections with the `node-postgres` and `postgres.js` drivers.
+Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
 
-We will use `node-postgres` for this get started example. But if you want to find more ways to connect to postgresql check
-our [PostgreSQL Connection](/docs/get-started-postgresql) page 
+We will use `libsql` for this get started example. But if you want to find more ways to connect to SQLite check
+our [SQLite Connection](/docs/get-started-sqlite) page 
 
 #### Basic file structure
 
@@ -46,10 +43,9 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 1 - Install **node-postgres** package
+#### Step 1 - Install **libsql** package
 <Npm>
-pg
--D @types/pg
+@libsql/client
 </Npm>
 
 #### Step 2 - Setup connection variables
@@ -64,24 +60,26 @@ DATABASE_URL=
 
 Create a `index.ts` file in the `src/db` directory and initialize the connection:
 
-<CodeTabs items={["node-postgres", "node-postgres with config"]}>
+<CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
-const db = await drizzle("node-postgres", process.env.DATABASE_URL);
+const db = await drizzle("libsql", process.env.DATABASE_URL);
 ```
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
-// You can specify any property from the node-postgres connection options
-const db = await drizzle("node-postgres", { 
-  connection: { 
-    connectionString: process.env.DATABASE_URL,
-    ssl: true
-  }
-});
+// You can specify any property from the libsql connection options
+const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm';
+
+// You can specify any property from the libsql connection options
+const db = await drizzle("turso", { connection: { url:'', authToken: '' }});
 ```
 </CodeTabs>
 
@@ -90,14 +88,11 @@ where you specify a driver connection and pass it to the Drizzle instance.
 
 ```typescript copy
 import 'dotenv/config';
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-const db = drizzle(pool);
+const client = createClient({ url: process.env.DATABASE_URL, authToken: process.env.DATABASE_AUTH_TOKEN });
+const db = drizzle(client);
 ```
 
 #### Step 4 - Create a table
@@ -105,13 +100,13 @@ const db = drizzle(pool);
 Create a `schema.ts` file in the `src/db` directory and declare your table:
 
 ```typescript copy filename="src/db/schema.ts"
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  age: integer().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
+export const usersTable = sqliteTable("users_table", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: int().notNull(),
+  email: text().notNull().unique(),
 });
 ```
 
@@ -128,7 +123,7 @@ import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
   out: './drizzle',
   schema: './src/db/schema.ts',
-  dialect: 'postgresql',
+  dialect: 'sqlite',
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
@@ -198,3 +193,4 @@ import { usersTable } from './db/schema';
 
   await db.delete(usersTable).where(eq(usersTable.email, user.email));
 })();
+```
