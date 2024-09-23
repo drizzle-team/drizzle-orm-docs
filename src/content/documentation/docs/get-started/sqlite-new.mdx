@@ -7,7 +7,7 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 
 <Breadcrumbs/>
 
-# Get Started with Drizzle and MySQL
+# Get Started with Drizzle and SQLite
 
 <Prerequisites>  
   - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
@@ -17,83 +17,12 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
   </Npm>
 </Prerequisites>
 
-To use Drizzle with a MySQL database, you should use the `mysql2` driver
+Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
 
-According to the **[official website](https://github.com/sidorares/node-mysql2)**, 
-`mysql2` is a MySQL client for Node.js with focus on performance.  
+We will use `libsql` for this get started example. But if you want to find more ways to connect to SQLite check
+our [SQLite Connection](/docs/get-started-sqlite) page 
 
-Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
-
-#### Step 1 - Install **mysql2** package
-<Npm>
-mysql2
-</Npm>
-
-#### Step 2 - Setup connection variables
-
-Create a `.env` file in the root of your project and add connection url or connection options:
-
-```plaintext copy
-DATABASE_URL=
-```
-
-#### Step 3 - Connect Drizzle ORM to the database
-
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
-
-<CodeTabs items={['mysql2', 'mysql with config']}>
-```typescript copy
-import { drizzle } from "drizzle-orm";
-
-const db = await drizzle("mysql2", process.env.DATABASE_URL);
-```
-```typescript copy
-import { drizzle } from "drizzle-orm";
-
-// You can specify any property from the mysql2 connection options
-const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});
-```
-</CodeTabs>
-
-If you need a synchronous connection, you can use our additional connection API, where you specify a driver connection and pass it to the Drizzle instance.
-There're two ways you can connect to the MySQL with `mysql2` driver, either single `client` connection or a `pool`.
-
-<CodeTabs items={['Client connection', 'Pool connection']}>
-  ```typescript copy
-  import { drizzle } from "drizzle-orm/mysql2";
-  import mysql from "mysql2/promise";
-
-  const connection = await mysql.createConnection({
-    host: "host",
-    user: "user",
-    database: "database",
-    ...
-  });
-
-  const db = drizzle(connection);
-  ```
-  ```typescript copy
-  import { drizzle } from "drizzle-orm/mysql2";
-  import mysql from "mysql2/promise";
-
-  const poolConnection = mysql.createPool({
-    host: "host",
-    user: "user",
-    database: "database",
-    ...
-  });
-
-  const db = drizzle(poolConnection);
-  ```
-</CodeTabs>
-
-<Callout type="warning" emoji="⚙️">
-  For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.  
-
-  For querying purposes feel free to use either `client` or `pool` based on your business demands.
-</Callout>
-
-#### Step 4 - Basic file structure
+#### Basic file structure
 
 This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`.
 
@@ -110,22 +39,70 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 5 - Create a table
+#### Step 1 - Install **libsql** package
+<Npm>
+@libsql/client
+</Npm>
+
+#### Step 2 - Setup connection variables
+
+Create a `.env` file in the root of your project and add connection url or connection options:
+
+```plaintext copy
+DATABASE_URL=
+```
+
+#### Step 3 - Connect Drizzle ORM to the database
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+<CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
+```typescript copy
+import { drizzle } from 'drizzle-orm';
+
+const db = await drizzle("libsql", process.env.DATABASE_URL);
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm';
+
+// You can specify any property from the libsql connection options
+const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm';
+
+// You can specify any property from the libsql connection options
+const db = await drizzle("turso", { connection: { url:'', authToken: '' }});
+```
+</CodeTabs>
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
+
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
+
+const client = createClient({ url: process.env.DATABASE_URL, authToken: process.env.DATABASE_AUTH_TOKEN });
+const db = drizzle(client);
+```
+
+#### Step 4 - Create a table
 
 Create a `schema.ts` file in the `src/db` directory and declare your table:
 
 ```typescript copy filename="src/db/schema.ts"
-import { int, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
+import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const usersTable = mysqlTable('users_table', {
-  id: serial().primaryKey(),
-  name: varchar({ length: 255 }).notNull(),
+export const usersTable = sqliteTable("users_table", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
   age: int().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
+  email: text().notNull().unique(),
 });
 ```
 
-#### Step 6 - Setup Drizzle config file
+#### Step 5 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -138,14 +115,14 @@ import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
   out: './drizzle',
   schema: './src/db/schema.ts',
-  dialect: 'mysql',
+  dialect: 'sqlite',
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
 });
 ```
 
-#### Step 7 - Applying changes to the database
+#### Step 6 - Applying changes to the database
 
 You can directly apply changes to your database using the `drizzle-kit push` command. This is a convenient method for quickly testing new schema designs or modifications in a local development environment, allowing for rapid iterations without the need to manage migration files:
 
@@ -171,7 +148,7 @@ npx drizzle-kit migrate
 
 Read more about migration process in [documentation](/kit-docs/overview#schema-updates).
 
-#### Step 8 - Seed and Query the database
+#### Step 7 - Seed and Query the database
 
 In `src/index.ts` file you can perform CRUD operations:
 
