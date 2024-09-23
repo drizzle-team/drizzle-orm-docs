@@ -24,6 +24,23 @@ According to the **[official website](https://github.com/sidorares/node-mysql2)*
 
 Drizzle ORM natively supports `mysql2` with `drizzle-orm/mysql2` package.
 
+#### Basic file structure
+
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │   ├ 📂 db
+ │   │  ├ 📜 index.ts
+ │   │  └ 📜 schema.ts
+ │   └ 📜 index.ts
+ ├ 📜 .env
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
 #### Step 1 - Install **mysql2** package
 <Npm>
 mysql2
@@ -93,24 +110,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
   For querying purposes feel free to use either `client` or `pool` based on your business demands.
 </Callout>
 
-#### Step 4 - Basic file structure
-
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`.
-
-```plaintext
-📦 <project root>
- ├ 📂 src
- │   ├ 📂 db
- │   │  ├ 📜 index.ts
- │   │  └ 📜 schema.ts
- │   └ 📜 index.ts
- ├ 📜 .env
- ├ 📜 drizzle.config.ts
- ├ 📜 package.json
- └ 📜 tsconfig.json
-```
-
-#### Step 5 - Create a table
+#### Step 4 - Create a table
 
 Create a `schema.ts` file in the `src/db` directory and declare your table:
 
@@ -125,7 +125,7 @@ export const usersTable = mysqlTable('users_table', {
 });
 ```
 
-#### Step 6 - Setup Drizzle config file
+#### Step 5 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -145,7 +145,7 @@ export default defineConfig({
 });
 ```
 
-#### Step 7 - Applying changes to the database
+#### Step 6 - Applying changes to the database
 
 You can directly apply changes to your database using the `drizzle-kit push` command. This is a convenient method for quickly testing new schema designs or modifications in a local development environment, allowing for rapid iterations without the need to manage migration files:
 
@@ -171,7 +171,7 @@ npx drizzle-kit migrate
 
 Read more about migration process in [documentation](/kit-docs/overview#schema-updates).
 
-#### Step 8 - Seed and Query the database
+#### Step 7 - Seed and Query the database
 
 In `src/index.ts` file you can perform CRUD operations:
 

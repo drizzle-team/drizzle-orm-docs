@@ -19,7 +19,7 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 </Prerequisites>
 
 
-#### Step 1 - Basic file structure
+#### Basic file structure
 
 This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`. In `drizzle` folder there are sql migration file and snapshots.
 
@@ -37,7 +37,7 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 2 - Setup connection variables
+#### Step 1 - Setup connection variables
 
 Add connection url to your `.env` file:
 
@@ -45,7 +45,7 @@ Add connection url to your `.env` file:
 DATABASE_URL=<YOUR_CONNECTION_URL>
 ```
 
-#### Step 3 - Setup Drizzle config file
+#### Step 2 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -65,7 +65,7 @@ export default defineConfig({
 });
 ```
 
-#### Step 4 - Introspect your database
+#### Step 3 - Introspect your database
 
 Drizzle Kit provides a CLI command to introspect your database and generate a schema file with migrations. The schema file contains all the information about your database tables, columns, relations, and indices.
 
@@ -111,21 +111,21 @@ export const users = pgTable("users", {
 
 Learn more about introspection in the [documentation](/kit-docs/commands#introspect--pull).
 
-#### Step 5 - Transfer code to your actual schema file
+#### Step 4 - Transfer code to your actual schema file
 
 We recommend transferring the generated code from `drizzle/schema.ts` and `drizzle/relations.ts` to the actual schema file. In this guide we transferred code to `src/db/schema.ts`. Generated files for schema and relations can be deleted. This way you can manage your schema in a more structured way.
 
 <Callout type="warning">If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.</Callout>
 
 
-#### Step 6 - Install the `node-postgres` package
+#### Step 5 - Install the `node-postgres` package
 
 <Npm>
 pg
 -D @types/pg
 </Npm>
 
-#### Step 7 - Connect Drizzle ORM to the database
+#### Step 6 - Connect Drizzle ORM to the database
 
 Create a `index.ts` file in the `src/db` directory and initialize the connection:
 
@@ -165,7 +165,7 @@ const pool = new Pool({
 const db = drizzle(pool);
 ```
 
-# Step 8 - Query the database
+# Step 7 - Query the database
 
 In `src/index.ts` file you can perform CRUD operations:
 
