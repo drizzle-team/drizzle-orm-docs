@@ -5,7 +5,7 @@ import LinkComponent from "./LinkComponent.astro";
 const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
 ---
 
-<div style="margin: 1.5rem 0">
+<div style="margin: 24px 0">
   <div class="buttons">
     <button id="new" class="toggle-button selected">
       <svg
@@ -92,10 +92,10 @@ const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { 
       align-items: center;
       background-color: hsla(210, 7%, 95%, .27);
       border: 1px solid rgba(33, 39, 46, .12);
-      border-radius: 8px;
+      border-radius: 2px;
       color: #909090;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       height: 36px;
       padding: 8px;
       transition: all .2s;
@@ -149,8 +149,8 @@ const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { 
   .buttons {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
+      gap: 12px;
+      margin-bottom: 12px;
   }
 
   .title {
@@ -160,12 +160,12 @@ const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { 
   .blocks-container {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 10px;
   }
 
   .links {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, max-content));
-      gap: 0.75rem;
+      gap: 8px;
   }
 </style>

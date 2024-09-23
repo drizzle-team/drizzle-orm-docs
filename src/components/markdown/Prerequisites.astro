@@ -5,20 +5,42 @@
   </div>
   <slot />
 </div>
-<style>
+<style is:global>
 
-  html.dark {
-    .prerequisites_wrap {
+  html.dark .prerequisites_wrap {
       background-color: rgb(30, 30, 30);
-    }
   }
 
   .prerequisites_wrap {
     background-color: rgb(250, 250, 250);
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 2px;
     line-height: normal;
-    margin-top: 24px;
+    margin: 6px 0;
+  }
+
+  .prerequisites_wrap li {
+     font-size: 14px;
+  }
+
+  .prerequisites_wrap .code-snippet > pre {
+      background-color: white !important;
+  }
+
+  .prerequisites_wrap .npm__content:not(.hidden) figure {
+     margin-bottom: 0;
+  }
+
+  .prerequisites_wrap .npm__wrapper:last-child {
+      margin-bottom: 0;
+  }
+
+  .prerequisites_wrap .npm__tab--active{
+      background-color: white;
+  }
+
+  .prerequisites_wrap .codetabs_tab--active {
+      background-color: white;
   }
 
   .prerequisites_title {

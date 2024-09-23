@@ -1,26 +1,37 @@
 <style is:global lang="scss">
   .documentation-content {
-    color: #334155;
+    -webkit-font-smoothing: auto;
+    color: #37352f;
     h1 {
       font-size: 32px;
-      padding-top: 0.5rem;
-      padding-bottom: 1rem;
       font-weight: 700;
       letter-spacing: -0.015em;
       color: #0f172a;
+      padding: 4px 0 6px;
     }
 
     blockquote {
-      margin-top: 1.5rem;
-      font-style: italic;
-      color: #374151;
-      padding-left: 1.5rem;
-      border-left: 2px solid #d1d5db;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        padding: 6px 10px;
+        border-left: 4px solid #37352f;
+        background: #f3f4f6;
+        font-size: 14px;
+        margin: 6px 0;
     }
 
+  blockquote p:first-child {
+      margin-top: 0;
+  }
+
+  blockquote p:last-child {
+      margin-bottom: 0;
+  }
+
     p {
-      margin-bottom: 0.75rem;
-      line-height: 1.75rem;
+      padding: 6px 0;
+      line-height: 24px;
     }
 
     strong {
@@ -28,43 +39,45 @@
     }
 
     a {
-      text-decoration: inherit;
+      text-decoration: none;
       outline-offset: 2px;
       outline: 2px solid transparent;
       border-radius: 0.25rem;
       color: #006be6;
-      text-decoration-line: underline;
       text-decoration-thickness: from-font;
       text-underline-position: from-font;
     }
 
     h2 {
-      margin-top: 2.5rem;
-      padding-bottom: 0.25rem;
-      font-size: 1.875rem;
+      margin: 23px 0 0;
+      padding: 3px 0;
+      font-size: 24px;
       font-weight: 600;
       letter-spacing: -0.015em;
       color: #0f172a;
-      border-bottom: 1px solid rgba(230, 230, 230, 0.7);
     }
 
     h3 {
-      margin-top: 2rem;
-      font-size: 1.5rem;
+      font-size: 20px;
       font-weight: 600;
       letter-spacing: -0.015em;
+      padding: 3px 0;
+      margin-top: 16px;
+      margin-bottom: 1px;
     }
 
     h4 {
-      margin-top: 2rem;
-      font-size: 1.25rem;
+      font-size: 20px;
       font-weight: 600;
       letter-spacing: -0.015em;
+      padding: 3px 0;
+      margin-top: 16px;
+      margin-bottom: 1px;
       color: #0f172a;
     }
 
     h5 {
-      margin-top: 2rem;
+      margin-top: 16px;
       font-size: 1.125rem;
       font-weight: 600;
       letter-spacing: -0.015em;
@@ -72,7 +85,7 @@
     }
 
     h6 {
-      margin-top: 2rem;
+      margin-top: 16px;
       font-size: 1rem;
       font-weight: 600;
       letter-spacing: -0.015em;
@@ -83,14 +96,14 @@
       height: 0;
       color: inherit;
       border-top-width: 1px;
-      margin-top: 2rem;
-      margin-bottom: 2rem;
+      margin-top: 0;
+      margin-bottom: 0;
     }
 
     ul {
-      margin-left: 1.5rem;
+      margin-left: 1.2rem;
       list-style-type: disc;
-      margin-top: 1.5rem;
+      margin-top: 6px;
     }
 
     ol {
@@ -100,27 +113,37 @@
     }
 
     li {
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
+      padding: 2px 0;
+    }
+
+    li p {
+        padding: 0;
+    }
+
+    li ul {
+        margin-top: 0;
+    }
+
+    p code {
+        white-space: nowrap;
     }
 
     code {
       overflow-wrap: break-word;
-      border-radius: 0.375rem;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      background-color: rgba(0, 0, 0, 0.03);
-      padding-top: 0.125rem;
-      padding-bottom: 0.125rem;
-      padding-left: 0.25em;
-      padding-right: 0.25em;
-      font-size: 0.9em;
+      border-radius: 2px;
+      border: 1px solid #21272e1f;
+      background: #fafafa;
+      padding: 2px 3px;
+      font-size: 13px;
+      color: #0a0a0a;
+      line-height: normal;
     }
 
     table {
       text-indent: 0;
       border-color: inherit;
       border-collapse: collapse;
-      margin-top: 1.5rem;
+      margin-top: 0;
       display: block;
       overflow-x: scroll;
       scrollbar-gutter: stable;
@@ -212,8 +235,8 @@
   .dark .documentation-content {
     color: rgb(226, 232, 240);
     blockquote {
-      color: rgb(156, 163, 175);
-      border-left: 2px solid rgb(55, 65, 81);
+        background: #282a36;
+        border: none;
     }
     code {
       background-color: rgba(255, 255, 255, 0.1);
@@ -222,7 +245,6 @@
 
     h2 {
       color: #f1f5f9;
-      border-bottom: 1px solid rgba(224, 243, 255, 0.1);
     }
 
     h1,
