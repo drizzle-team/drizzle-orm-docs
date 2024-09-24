@@ -506,8 +506,8 @@
   }
 
   html.dark .callout-wrap {
-      background: #282a36;
-      border: none;
+      background: #222;
+      border-color: #444;
   }
 
   .callout-content {
@@ -521,6 +521,38 @@
 
   .callout-content p:last-child {
     padding-bottom: 0;
+  }
+
+  .callout-wrap .code-snippet > pre {
+      background-color: white !important;
+  }
+
+  html.dark .callout-wrap .code-snippet > pre {
+      background-color: #161616 !important;
+  }
+
+  .callout-wrap .npm__content:not(.hidden) figure {
+      margin-bottom: 0;
+  }
+
+  .callout-wrap .npm__wrapper:last-child {
+      margin-bottom: 0;
+  }
+
+  html.dark .callout-wrap .npm__tab--active {
+      background-color: #161616;
+  }
+
+  .callout-wrap .npm__tab--active {
+      background-color: white;
+  }
+
+  html.dark .callout-wrap .codetabs_tab--active {
+      background-color: #161616;
+  }
+
+  .callout-wrap .codetabs_tab--active {
+      background-color: white;
   }
 
   /* NPM */
@@ -537,11 +569,6 @@
 
   .npm__wrapper figure {
     margin-top: 0;
-  }
-
-  html[class~="dark"] .npm__tabs {
-    background-color: #28343c;
-    border-bottom: 1px solid #2e3e49;
   }
 
   .npm__tabs {
@@ -564,10 +591,23 @@
       border-top: 1px solid #e0e1e3;
   }
 
-  html[class~="dark"] .npm__tab {
-    background-color: #161e23;
-    color: #b0b6c2;
-    border: 1px solid #2c3c47;
+  html.dark .npm__tabs {
+      border-color: #444;
+      background-color: #222;
+  }
+
+  html.dark .npm__tabs::after {
+      border-color: #444;
+      background-color: #222;
+  }
+
+  html[class~="dark"] .npm__tab,
+  html[class~="dark"] .npm__tab--active {
+      background-color: #222;
+      color: #b0b6c2;
+      border-right: 1px solid #444;
+      border-bottom: 1px solid #444;
+      border-top: 1px solid #444;
   }
 
   .npm__tab,
@@ -603,9 +643,14 @@
   }
 
   html[class~="dark"] .npm__tab--active {
-    background-color: #161e23;
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      background: #1c1c1c;
+      border-bottom-color: transparent;
+      border-top-color: transparent;
+  }
+
+  html[class~="dark"] .npm__tab--active::after {
+      background: #999;
   }
 
   /* CODE TABS */
@@ -652,6 +697,16 @@
       border-left: 1px solid #e0e1e3;
   }
 
+  html.dark .codetabs_tabs {
+      border-color: #444;
+      background-color: #222;
+  }
+
+  html.dark .codetabs_tabs::after {
+      border-color: #444;
+      background-color: #222;
+  }
+
   .codetabs_tabs::after {
       content: "";
       display: flex;
@@ -662,9 +717,11 @@
 
   html[class~="dark"] .codetabs_tab,
   html[class~="dark"] .codetabs_tab--active {
-    background-color: #161e23;
+    background-color: #222;
     color: #b0b6c2;
-    border: 1px solid #2c3c47;
+    border-right: 1px solid #444;
+    border-bottom: 1px solid #444;
+    border-top: 1px solid #444;
   }
 
   .codetabs_tab,
@@ -682,8 +739,16 @@
       border-top: 1px solid #e0e1e3;
   }
 
+
   html[class~="dark"] .codetabs_tab--active {
     color: #ffffff;
+    background: #1c1c1c;
+    border-bottom-color: transparent;
+    border-top-color: transparent;
+  }
+
+  html.dark .codetabs_tab--active::after {
+      background-color: #999;
   }
 
   .codetabs_tab--active::after {
@@ -1089,25 +1154,27 @@
 
   .dark {
     .code-snippet pre {
-      background-color: #202830 !important;
+      background-color: #1c1c1c !important;
+      border-color: #444;
     }
 
     .code-snippet {
       &.collapsable {
         .expand-button {
-          background-color: #2c3945;
+          background-color: #222;
           border-color: hsla(0, 0%, 100%, 0.1);
           color: #f9fafb;
         }
 
         .expand-button-wrap {
-          background: linear-gradient(to top, #202830, 70%, transparent);
+          background: linear-gradient(to top, #1c1c1c, 70%, transparent);
+            border-color: #444;
         }
       }
       &.has-title {
         .header {
-          border-bottom: 1px solid #2e3e49;
-          background-color: #27353e;
+          border-color: #444;
+          background-color: #222;
           color: #e5e7eb;
         }
       }
