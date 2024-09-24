@@ -1,6 +1,7 @@
 const mainScript = () => {
-  const expandedSections: string[] =
-    JSON.parse(localStorage.getItem("expandedSections") || "") || [];
+  const expandedSections: string[] = localStorage.getItem("expandedSections")
+    ? JSON.parse(localStorage.getItem("expandedSections")!)
+    : [];
 
   document.querySelectorAll(".nav-items-collapsable").forEach((section) => {
     if (expandedSections.find((v) => v === section.id)) {
