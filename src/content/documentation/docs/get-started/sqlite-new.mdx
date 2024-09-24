@@ -15,6 +15,10 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
     drizzle-orm 
     -D drizzle-kit
   </Npm>
+  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+  <Npm>
+    dotenv
+  </Npm>
 </Prerequisites>
 
 Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
@@ -58,17 +62,20 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 
 <CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
 const db = await drizzle("libsql", process.env.DATABASE_URL);
 ```
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
 // You can specify any property from the libsql connection options
 const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
 ```
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
 // You can specify any property from the libsql connection options
@@ -80,6 +87,7 @@ If you need a synchronous connection, you can use our additional connection API,
 where you specify a driver connection and pass it to the Drizzle instance.
 
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 

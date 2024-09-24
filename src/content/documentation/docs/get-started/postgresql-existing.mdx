@@ -5,6 +5,8 @@ import Callout from '@components/markdown/Callout.astro';
 import Steps from '@components/markdown/Steps.astro';
 import AnchorCards from '@components/markdown/AnchorCards.astro';
 import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
 
 <Breadcrumbs/>
 
@@ -15,6 +17,11 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
   <Npm>
     drizzle-orm 
     -D drizzle-kit
+  </Npm>
+
+  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+  <Npm>
+    dotenv
   </Npm>
 </Prerequisites>
 
@@ -37,15 +44,23 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 1 - Setup connection variables
+#### Step 1 - Install the `node-postgres` package
+
+<Npm>
+pg
+-D @types/pg
+</Npm>
+
+
+#### Step 2 - Setup connection variables
 
 Add connection url to your `.env` file:
 
 ```plaintext copy
-DATABASE_URL=<YOUR_CONNECTION_URL>
+DATABASE_URL=
 ```
 
-#### Step 2 - Setup Drizzle config file
+#### Step 3 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -65,7 +80,7 @@ export default defineConfig({
 });
 ```
 
-#### Step 3 - Introspect your database
+#### Step 4 - Introspect your database
 
 Drizzle Kit provides a CLI command to introspect your database and generate a schema file with migrations. The schema file contains all the information about your database tables, columns, relations, and indices.
 
@@ -81,10 +96,10 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 ```
 
-Introspect your database:
+Pull your database schema:
 
 ```bash copy
-npx drizzle-kit introspect
+npx drizzle-kit pull
 ```
 
 The result of introspection will be a `schema.ts` file, `meta` folder with snapshots of your database schema, sql file with the migration and `relations.ts` file for [relational queries](/docs/rqb).
@@ -111,19 +126,27 @@ export const users = pgTable("users", {
 
 Learn more about introspection in the [documentation](/kit-docs/commands#introspect--pull).
 
-#### Step 4 - Transfer code to your actual schema file
+#### Step 5 - Transfer code to your actual schema file
 
 We recommend transferring the generated code from `drizzle/schema.ts` and `drizzle/relations.ts` to the actual schema file. In this guide we transferred code to `src/db/schema.ts`. Generated files for schema and relations can be deleted. This way you can manage your schema in a more structured way.
 
-<Callout type="warning">If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.</Callout>
+<Callout type="warning">
+If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.
 
+```typescript copy filename="drizzle.config.ts" {6}
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
 
-#### Step 5 - Install the `node-postgres` package
-
-<Npm>
-pg
--D @types/pg
-</Npm>
+export default defineConfig({
+  out: './drizzle',
+  schema: './drizzle/schema.ts',
+  dialect: 'postgresql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+</Callout>
 
 #### Step 6 - Connect Drizzle ORM to the database
 
@@ -131,13 +154,13 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 
 <CodeTabs items={["node-postgres", "node-postgres with config"]}>
 ```typescript copy
-// Make sure to install the 'pg' package 
+import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
 const db = await drizzle("node-postgres", process.env.DATABASE_URL);
 ```
 ```typescript copy
-// Make sure to install the 'pg' package 
+import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
 // You can specify any property from the node-postgres connection options
@@ -154,7 +177,7 @@ If you need a synchronous connection, you can use our additional connection API,
 where you specify a driver connection and pass it to the Drizzle instance.
 
 ```typescript copy
-// Make sure to install the 'pg' package 
+import 'dotenv/config';
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
@@ -166,6 +189,93 @@ const db = drizzle(pool);
 ```
 
 # Step 7 - Query the database
+
+In `src/index.ts` file you can perform CRUD operations:
+
+```typescript copy filename="src/index.ts"
+import { eq } from 'drizzle-orm';
+import { db } from './db';
+import { usersTable } from './db/schema';
+
+(async () => {
+  const user: typeof usersTable.$inferInsert = {
+    name: 'John',
+    age: 30,
+    email: 'john@example.com',
+  };
+
+  await db.insert(usersTable).values(user);
+
+  const users = await db.select().from(usersTable);
+  /*
+  const users: {
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }[]
+  */
+
+  await db
+    .update(usersTable)
+    .set({
+      age: 31,
+    })
+    .where(eq(usersTable.email, user.email));
+
+  await db.delete(usersTable).where(eq(usersTable.email, user.email));
+})();
+```
+
+#### Step 8 - Update your table schema (optional)
+
+If you want to update your table schema, you can do it in the `schema.ts` file. For example, let's add a new column `phone` to the `users_table`:
+
+```typescript copy filename="src/db/schema.ts" {9}
+import { pgTable, unique, integer, varchar } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
+
+export const users = pgTable("users", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "users_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
+	name: varchar({ length: 255 }).notNull(),
+	age: integer().notNull(),
+	email: varchar({ length: 255 }).notNull(),
+  phone: varchar(),
+},
+(table) => {
+	return {
+		usersEmailUnique: unique("users_email_unique").on(table.email),
+	}
+});
+```
+
+#### Step 9 - Applying changes to the database (optional)
+
+You can generate migrations using `drizzle-kit generate` command and then apply them using the `drizzle-kit migrate` command.
+Learn more about migration process in [documentation](/kit-docs/overview#schema-updates).
+
+Generate migrations:
+
+```bash copy
+npx drizzle-kit generate
+```
+
+Apply migrations:
+
+```bash copy
+npx drizzle-kit migrate
+```
+
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
+
+```bash copy
+npx drizzle-kit push
+```
+
+<Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+
+
+#### Step 10 - Query the database with a new field (optional)
 
 In `src/index.ts` file you can perform CRUD operations:
 

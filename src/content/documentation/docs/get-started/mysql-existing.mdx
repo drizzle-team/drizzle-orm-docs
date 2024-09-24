@@ -15,6 +15,10 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
     drizzle-orm 
     -D drizzle-kit
   </Npm>
+  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+  <Npm>
+    dotenv
+  </Npm>
 </Prerequisites>
 
 #### Basic file structure
@@ -35,15 +39,21 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 1 - Setup connection variables
+#### Step 1 - Install the `mysql2` package
+
+<Npm>
+mysql2
+</Npm>
+
+#### Step 2 - Setup connection variables
 
 Add connection url to your `.env` file:
 
 ```plaintext copy
-DATABASE_URL=<YOUR_CONNECTION_URL>
+DATABASE_URL=
 ```
 
-#### Step 2 - Setup Drizzle config file
+#### Step 3 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -63,7 +73,7 @@ export default defineConfig({
 });
 ```
 
-#### Step 3 - Introspect your database
+#### Step 4 - Introspect your database
 
 Drizzle Kit provides a CLI command to introspect your database and generate a schema file with migrations. The schema file contains all the information about your database tables, columns, relations, and indices.
 
@@ -80,10 +90,10 @@ CREATE TABLE `users_table` (
 );
 ```
 
-Introspect your database:
+Pull your database schema:
 
 ```bash copy
-npx drizzle-kit introspect
+npx drizzle-kit pull
 ```
 
 The result of introspection will be a `schema.ts` file, `meta` folder with snapshots of your database schema, sql file with the migration and `relations.ts` file for [relational queries](/docs/rqb).
@@ -124,17 +134,27 @@ export const usersTable = mysqlTable(
 
 Learn more about introspection in the [documentation](/kit-docs/commands#introspect--pull).
 
-#### Step 4 - Transfer code to your actual schema file
+#### Step 5 - Transfer code to your actual schema file
 
 We recommend transferring the generated code from `drizzle/schema.ts` and `drizzle/relations.ts` to the actual schema file. In this guide we transferred code to `src/db/schema.ts`. Generated files for schema and relations can be deleted. This way you can manage your schema in a more structured way.
 
-<Callout type="warning">If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.</Callout>
+<Callout type="warning">
+If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.
 
-#### Step 5 - Install the `mysql2` package
+```typescript copy filename="drizzle.config.ts" {6}
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
 
-<Npm>
-mysql2
-</Npm>
+export default defineConfig({
+  out: './drizzle',
+  schema: './drizzle/schema.ts',
+  dialect: 'mysql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+</Callout>
 
 #### Step 6 - Connect Drizzle ORM to the database
 
@@ -142,15 +162,17 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 
 <CodeTabs items={['mysql2', 'mysql with config']}>
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from "drizzle-orm";
 
 const db = await drizzle("mysql2", process.env.DATABASE_URL);
 ```
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from "drizzle-orm";
 
 // You can specify any property from the mysql2 connection options
-const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});
+const db = await drizzle("mysql2", { connection: { uri: process.env.DATABASE_URL }});
 ```
 </CodeTabs>
 
@@ -159,27 +181,23 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
 
 <CodeTabs items={['Client connection', 'Pool connection']}>
   ```typescript copy
+  import 'dotenv/config';
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
   const connection = await mysql.createConnection({
-    host: "host",
-    user: "user",
-    database: "database",
-    ...
+    uri: process.env.DATABASE_URL
   });
 
   const db = drizzle(connection);
   ```
   ```typescript copy
+  import 'dotenv/config';
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
   const poolConnection = mysql.createPool({
-    host: "host",
-    user: "user",
-    database: "database",
-    ...
+    uri: process.env.DATABASE_URL
   });
 
   const db = drizzle(poolConnection);
@@ -189,10 +207,49 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
 <Callout type="warning" emoji="⚙️">
   For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.  
 
-  For querying purposes feel free to use either `client` or `pool` based on your business demands.
+  For querying purposes feel free to use either `Client` or `Pool` based on your business demands.
 </Callout>
 
-#### Step 7 - Update your table schema (optional)
+#### Step 7 - Query the database
+
+In `src/index.ts` file you can perform CRUD operations:
+
+```typescript copy filename="src/index.ts"
+import { eq } from 'drizzle-orm';
+import { db } from './db';
+import { usersTable } from './db/schema';
+
+(async () => {
+  const user: typeof usersTable.$inferInsert = {
+    name: 'John',
+    age: 30,
+    email: 'john@example.com',
+  };
+
+  await db.insert(usersTable).values(user);
+
+  const users = await db.select().from(usersTable);
+  /*
+  const users: {
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }[]
+  */
+
+  await db
+    .update(usersTable)
+    .set({
+      age: 31,
+    })
+    .where(eq(usersTable.email, user.email));
+
+  await db.delete(usersTable).where(eq(usersTable.email, user.email));
+})();
+```
+
+#### Step 8 - Update your table schema (optional)
 
 If you want to update your table schema, you can do it in the `schema.ts` file. For example, let's add a new column `phone` to the `users_table`:
 
@@ -212,11 +269,11 @@ import { sql } from 'drizzle-orm';
 export const usersTable = mysqlTable(
   'users_table',
   {
-    id: serial('id').notNull(),
-    name: varchar('name', { length: 255 }).notNull(),
-    age: int('age').notNull(),
-    email: varchar('email', { length: 255 }).notNull(),
-    phone: varchar('phone', { length: 255 }),
+    id: serial().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    age: int().notNull(),
+    email: varchar({ length: 255 }).notNull(),
+    phone: varchar({ length: 255 }),
   },
   (table) => {
     return {
@@ -228,7 +285,7 @@ export const usersTable = mysqlTable(
 );
 ```
 
-#### Step 8 - Applying changes to the database
+#### Step 9 - Applying changes to the database (optional)
 
 You can generate migrations using `drizzle-kit generate` command and then apply them using the `drizzle-kit migrate` command.
 Learn more about migration process in [documentation](/kit-docs/overview#schema-updates).
@@ -253,7 +310,8 @@ npx drizzle-kit push
 
 <Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
 
-#### Step 9 - Query the database
+
+#### Step 10 - Query the database with a new field (optional)
 
 In `src/index.ts` file you can perform CRUD operations:
 

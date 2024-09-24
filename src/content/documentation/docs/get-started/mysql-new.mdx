@@ -15,6 +15,10 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
     drizzle-orm 
     -D drizzle-kit
   </Npm>
+  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
+  <Npm>
+    dotenv
+  </Npm>
 </Prerequisites>
 
 To use Drizzle with a MySQL database, you should use the `mysql2` driver
@@ -60,11 +64,13 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 
 <CodeTabs items={['mysql2', 'mysql with config']}>
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from "drizzle-orm";
 
 const db = await drizzle("mysql2", process.env.DATABASE_URL);
 ```
 ```typescript copy
+import 'dotenv/config';
 import { drizzle } from "drizzle-orm";
 
 // You can specify any property from the mysql2 connection options
@@ -77,6 +83,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
 
 <CodeTabs items={['Client connection', 'Pool connection']}>
   ```typescript copy
+  import 'dotenv/config';
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
@@ -90,6 +97,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
   const db = drizzle(connection);
   ```
   ```typescript copy
+  import 'dotenv/config';
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
