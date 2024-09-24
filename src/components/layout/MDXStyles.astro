@@ -14,24 +14,38 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        padding: 6px 10px;
-        border-left: 4px solid #37352f;
+        padding: 8px 12px;
         background: #f3f4f6;
         font-size: 14px;
         margin: 6px 0;
     }
 
+  blockquote::before {
+      display: block;
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+      background: #37352f;
+  }
+
   blockquote p:first-child {
-      margin-top: 0;
+      padding-top: 0;
   }
 
   blockquote p:last-child {
-      margin-bottom: 0;
+      padding-bottom: 0;
+  }
+
+  em {
+      font-style: italic;
   }
 
     p {
       padding: 6px 0;
-      line-height: 24px;
+      line-height: 1.5em;
     }
 
     strong {
@@ -160,6 +174,10 @@
     }
 
     p code {
+        white-space: nowrap;
+    }
+
+    li code {
         white-space: nowrap;
     }
 
