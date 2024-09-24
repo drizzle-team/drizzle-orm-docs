@@ -10,15 +10,8 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 # Get Started with Drizzle and SQLite
 
 <Prerequisites>  
-  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
-  <Npm>
-    drizzle-orm 
-    -D drizzle-kit
-  </Npm>
-  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
-  <Npm>
-    dotenv
-  </Npm>
+  - **dotenv** package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** package for running TypeScript files - [read here](https://tsx.is/)
 </Prerequisites>
 
 Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
@@ -27,7 +20,6 @@ We will use `libsql` for this get started example. But if you want to find more 
 our [SQLite Connection](/docs/get-started-sqlite) page 
 
 #### Basic file structure
-
 This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`.
 
 ```plaintext
@@ -42,9 +34,10 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 1 - Install **libsql** package
+#### Step 1 - Install required packages
 <Npm>
-@libsql/client
+  drizzle-orm @libsql/client dotenv
+  -D drizzle-kit tsx
 </Npm>
 
 #### Step 2 - Setup connection variables
