@@ -7,7 +7,7 @@ interface Props {
 
 const { type = 'default', title, emoji = '💡' } = Astro.props;
 ---
-<div>
+<>
   {type === 'warning' && !title && (
     <div class:list={["callout-label", type]}>{"IMPORTANT"}</div>
   )}
@@ -22,4 +22,4 @@ const { type = 'default', title, emoji = '💡' } = Astro.props;
       <slot/>
     </div>
   </div>
-</div>
+</>

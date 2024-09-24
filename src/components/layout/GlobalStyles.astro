@@ -747,6 +747,56 @@
       border-top: none;
   }
 
+  .documentation-content .section__wrap blockquote {
+      margin: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 2px;
+  }
+
+  .documentation-content .section__wrap blockquote:before {
+      left: -1px;
+      bottom: -1px;
+      top: -1px;
+      border-radius: 2px 0 0 2px;
+  }
+
+  .section__wrap .callout-wrap {
+      margin: 0;
+      border-radius: 0;
+  }
+
+  .documentation-content .section__wrap > blockquote:first-child {
+      border-radius: 2px 2px 0 0;
+  }
+
+  .documentation-content .section__wrap > blockquote:last-child {
+      border-radius: 0 0 2px 2px;
+  }
+
+  .documentation-content .section__wrap > blockquote:first-child::before {
+      border-radius: 2px 0 0 0;
+  }
+
+  .documentation-content .section__wrap > blockquote:last-child::before {
+      border-radius: 0 0 0 2px;
+  }
+
+  .section__wrap > .callout-wrap:first-child {
+      border-radius: 2px 2px 0 0;
+  }
+
+  .section__wrap > .callout-wrap:last-child {
+      border-radius: 0 0 2px 2px;
+  }
+
+  .section__wrap > .callout-wrap:not(:first-child) {
+      border-top: none;
+  }
+
+  .section__wrap > blockquote:not(:first-child) {
+      border-top: none;
+  }
+
   .section__wrap > figure > pre {
     border-radius: 0;
     margin-top: 0;
