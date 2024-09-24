@@ -1,6 +1,7 @@
 ---
 import {getStartedItems} from "./data";
 import LinkComponent from "./LinkComponent.astro";
+import Tag from "../Tag.astro";
 
 const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
 ---
@@ -47,7 +48,7 @@ const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { 
   <div class="blocks-container">
     {getStartedItems.map((block) => (
       <div>
-        <p class="title"><b>{block.title}</b></p>
+        <Tag>{block.title}</Tag>
         <div class="links">
           {block.items.map((link) => (
             <LinkComponent svgs={svgs} link={link} />
