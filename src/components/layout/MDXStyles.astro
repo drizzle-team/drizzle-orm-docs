@@ -291,10 +291,6 @@
         background: #282a36;
         border: none;
     }
-    code {
-      background-color: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
 
     h2 {
       color: #f1f5f9;
@@ -326,6 +322,20 @@
 
   html[class~="dark"] .autolink-header::after {
     color: rgb(64, 64, 64);
+  }
+
+  html.dark .documentation-content blockquote {
+    background: #222;
+  }
+
+  html.dark .documentation-content blockquote::before {
+      background: #999;
+  }
+
+  html.dark code {
+      background-color: #1c1c1c;
+      color: #e2e8f0;
+      border-color: #444;
   }
 
   @media screen and (max-width: 768px) {
