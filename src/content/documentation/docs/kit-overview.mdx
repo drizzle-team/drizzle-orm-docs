@@ -7,6 +7,62 @@ import Callout from '@components/markdown/Callout.astro';
 import Button from '@components/markdown/Button.astro';
 import Npm from '@components/markdown/Npm.astro';
 
+
+TypeScript schema first
+<Section>
+```typescript {6}
+import * as p from "drizzle-orm/pg-core";
+
+export const users = p.pgTable("users", {
+  id: p.serial().primaryKey(),
+  name: p.text(),
+  email: p.text().unique(), // <--- added column
+};
+```
+```
+Add column to `users` table                                                                          
+┌──────────────────────────┐                  
+│ + email: text().unique() │                  
+└─┬────────────────────────┘                  
+  │                                           
+  v                                           
+┌──────────────────────────┐                  
+│ ~ drizzle-kit push       │                  
+└─┬────────────────────────┘                  
+┌─┴────────────────────────────────────────┐         ┌──────────────────────────┐
+│ Pull current datatabase schema           │ ------> │                          │
+│ Generate alternations based on diff      │ <------ │                          │
+│                                          │         │         DATABASE         │
+│ Apply migrations to the database         │ ─┬────> │                          │
+└──────────────────────────────────────────┘  │      │                          │
+                                              │      └──────────────────────────┘
+                                              │
+  ┌───────────────────────────────────────────┴───────┐
+   ALTER TABLE `users` ADD COLUMN `email` TEXT UNIQUE; 
+```
+```
+Add column to `users` table                                                                          
+┌──────────────────────────┐                  
+│ + email: text().unique() │                  
+└──────────────────────────┘                  
+  │                                           
+  v                                           
+┌──────────────────────────┐                  
+│ ~ drizzle-kit push       │                  
+└──────────────────────────┘                  
+  │                                           ┌──────────────────────────┐
+  └ Pull current datatabase schema ---------> │                          │
+                                              │                          │
+  ┌ Generate alternations based on diff <---- │         DATABASE         │
+  │                                           │                          │
+  └ Apply migrations to the database -------> │                          │
+                                       │      └──────────────────────────┘
+                                       │
+  ┌───────────────────────────────────────────────────┐
+   ALTER TABLE `users` ADD COLUMN `email` TEXT UNIQUE; 
+```
+</Section>
+
 # Drizzle Kit
 Our most fundamental design principles of Drizzle ORM is to always stay explicit, 
 provide opt-in solutions and never interfere. Our migrations toolkit is not an exception.

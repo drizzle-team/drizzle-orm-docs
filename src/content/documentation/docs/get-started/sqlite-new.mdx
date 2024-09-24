@@ -1,4 +1,5 @@
 import Npm from '@components/markdown/Npm.astro';
+import Npx from '@components/markdown/Npx.astro';
 import Callout from '@components/markdown/Callout.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
@@ -10,15 +11,8 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 # Get Started with Drizzle and SQLite
 
 <Prerequisites>  
-  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
-  <Npm>
-    drizzle-orm 
-    -D drizzle-kit
-  </Npm>
-  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
-  <Npm>
-    dotenv
-  </Npm>
+  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
 </Prerequisites>
 
 Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
@@ -27,14 +21,12 @@ We will use `libsql` for this get started example. But if you want to find more 
 our [SQLite Connection](/docs/get-started-sqlite) page 
 
 #### Basic file structure
-
 This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`.
 
 ```plaintext
 📦 <project root>
  ├ 📂 src
  │   ├ 📂 db
- │   │  ├ 📜 index.ts
  │   │  └ 📜 schema.ts
  │   └ 📜 index.ts
  ├ 📜 .env
@@ -43,43 +35,64 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 1 - Install **libsql** package
+#### Step 1 - Install required packages
 <Npm>
-@libsql/client
+  drizzle-orm @libsql/client dotenv
+  -D drizzle-kit tsx
 </Npm>
 
 #### Step 2 - Setup connection variables
 
-Create a `.env` file in the root of your project and add connection url or connection options:
+Create a `.env` file in the root of your project and add you SQLite file connection string:
 
 ```plaintext copy
-DATABASE_URL=
+DB_FILE_NAME=
 ```
+
+<Callout type='info' title='important'>
+For example, if you want to create an SQLite database file in the root of your project for testing purposes, you need to use `file:` before the actual filename, as this is the format required by `LibSQL`, like this:
+```plaintext copy
+DB_FILE_NAME=file:local.db
+```
+You can check the **[LibSQL docs](https://docs.turso.tech/sdk/ts/reference#local-development)** for more info.
+</Callout>
 
 #### Step 3 - Connect Drizzle ORM to the database
 
-Create a `index.ts` file in the `src/db` directory and initialize the connection:
+Create a `index.ts` file in the `src` directory and initialize the connection:
 
 <CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
-const db = await drizzle("libsql", process.env.DATABASE_URL);
+async function main() {
+  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
+}
+
+main();
 ```
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
-// You can specify any property from the libsql connection options
-const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
+async function main() {
+  // You can specify any property from the libsql connection options
+  const db = await drizzle("libsql", { connection: { url: process.env.DB_FILE_NAME! }});
+}
+
+main();
 ```
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm';
 
-// You can specify any property from the libsql connection options
-const db = await drizzle("turso", { connection: { url:'', authToken: '' }});
+async function main() {
+  // You can specify any property from the libsql connection options
+  const db = await drizzle("turso", { connection: { url: DB_FILE_NAME! }});
+}
+
+main();
 ```
 </CodeTabs>
 
@@ -91,9 +104,16 @@ import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 
-const client = createClient({ url: process.env.DATABASE_URL, authToken: process.env.DATABASE_AUTH_TOKEN });
-const db = drizzle(client);
+async function main() {
+  const client = createClient({ url: DB_FILE_NAME! });
+  const db = drizzle(client);
+}
+
+main();
 ```
+
+If you don't want to manage drivers connections and want to let drizzle manage everything, you can use an async syntax, which will need you
+to either use top-level await or 
 
 #### Step 4 - Create a table
 
@@ -125,7 +145,7 @@ export default defineConfig({
   schema: './src/db/schema.ts',
   dialect: 'sqlite',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.DB_FILE_NAME!,
   },
 });
 ```
@@ -140,32 +160,34 @@ npx drizzle-kit push
 
 Read more about the push command in [documentation](/kit-docs/overview#prototyping-with-db-push).
 
+<Callout type='info' title='Tips' emoji='💡'>
 Alternatively, you can generate migrations using the `drizzle-kit generate` command and then apply them using the `drizzle-kit migrate` command:
 
 Generate migrations:
-
 ```bash copy
 npx drizzle-kit generate
 ```
 
 Apply migrations:
-
 ```bash copy
 npx drizzle-kit migrate
 ```
 
 Read more about migration process in [documentation](/kit-docs/overview#schema-updates).
+</Callout>
 
 #### Step 7 - Seed and Query the database
 
-In `src/index.ts` file you can perform CRUD operations:
+Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
 
 ```typescript copy filename="src/index.ts"
-import { eq } from 'drizzle-orm';
-import { db } from './db';
+import 'dotenv/config';
+import { drizzle, eq } from 'drizzle-orm';
 import { usersTable } from './db/schema';
 
-(async () => {
+async function main() {
+  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
+
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
     age: 30,
@@ -173,8 +195,10 @@ import { usersTable } from './db/schema';
   };
 
   await db.insert(usersTable).values(user);
+  console.log('New user created!')
 
   const users = await db.select().from(usersTable);
+  console.log('Getting all users from the database: ', users)
   /*
   const users: {
     id: number;
@@ -190,7 +214,33 @@ import { usersTable } from './db/schema';
       age: 31,
     })
     .where(eq(usersTable.email, user.email));
+  console.log('User info updated!')
 
   await db.delete(usersTable).where(eq(usersTable.email, user.email));
-})();
+  console.log('User deleted!')
+}
+
+main();
 ```
+
+#### Step 8 - Run index.ts file
+
+To run any TypeScript files, you have several options, but let's stick with one: using `tsx`
+
+You've already installed `tsx`, so we can run our queries now
+
+**Run `index.ts` script**
+<Npx>
+  tsx src/index.ts
+</Npx>
+
+<Callout title='tips'>
+  We suggest using `bun` to run TypeScript files. With `bun`, such scripts can be executed without issues or additional 
+  settings, regardless of whether your project is configured with CommonJS (CJS), ECMAScript Modules (ESM), or any other module format. 
+  To run a script with `bun`, use the following command:
+  ```bash copy
+  bun src/index.ts
+  ```
+
+  If you don't have bun installed, check the [Bun installation docs](https://bun.sh/docs/installation#installing)
+</Callout>
