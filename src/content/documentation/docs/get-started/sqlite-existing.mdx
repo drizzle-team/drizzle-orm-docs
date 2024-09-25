@@ -5,6 +5,7 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
+import FileStructure from '@mdx/FileStructure.mdx';
 
 <Breadcrumbs/>
 
@@ -15,22 +16,7 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
 </Prerequisites>
 
-#### Basic file structure
-
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and table definition in `schema.ts`. In `drizzle` folder there are sql migration file and snapshots.
-
-```plaintext
-📦 <project root>
- ├ 📂 drizzle
- ├ 📂 src
- │   ├ 📂 db
- │   │  └ 📜 schema.ts
- │   └ 📜 index.ts
- ├ 📜 .env
- ├ 📜 drizzle.config.ts
- ├ 📜 package.json
- └ 📜 tsconfig.json
-```
+<FileStructure lib="LibSQL 222000"/>
 
 #### Step 1 - Install required packages
 
@@ -96,7 +82,8 @@ Pull your database schema:
 npx drizzle-kit pull
 ```
 
-The result of introspection will be a `schema.ts` file, `meta` folder with snapshots of your database schema, sql file with the migration and `relations.ts` file for [relational queries](/docs/rqb).
+The result of introspection will be a `schema.ts` file, `meta` folder with snapshots of your database schema, 
+sql file with the migration and `relations.ts` file for [relational queries](/docs/rqb).
 
 Here is an example of the generated `schema.ts` file:
 
@@ -130,7 +117,19 @@ Learn more about introspection in the [documentation](/kit-docs/commands#introsp
 #### Step 5 - Transfer code to your actual schema file
 
 We recommend transferring the generated code from `drizzle/schema.ts` and `drizzle/relations.ts` to the actual schema file. In this guide we transferred code to `src/db/schema.ts`. Generated files for schema and relations can be deleted. This way you can manage your schema in a more structured way.
-
+```plaintext {4-5}
+ ├ 📂 drizzle
+ │ ├ 📂 meta
+ │ ├ 📜 migration.sql
+ │ ├ 📜 relations.ts ────────┐
+ │ └ 📜 schema.ts ───────────┤
+ ├ 📂 src                    │ 
+ │ ├ 📂 db                   │
+ │ │ ├ 📜 relations.ts <─────┤
+ │ │ └ 📜 schema.ts <────────┘
+ │ └ 📜 index.ts         
+ └ …
+```
 <Callout type="warning">
 If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.
 

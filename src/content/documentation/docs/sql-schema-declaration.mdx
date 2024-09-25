@@ -118,7 +118,7 @@ Drizzle schema consists of several model types from database you are using. With
 
 Let's go one by one and check how the schema should be defined with drizzle
 
-#### **Tables**, **columns**
+#### **Tables and columns declaration** 
 
 Table with Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
 there is no such thing as a commin table object in drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL or SQLite
@@ -148,10 +148,6 @@ export const users = sqliteTable('users', {
 });
 ```
 </CodeTabs>
-
-### TypeScript keys naming
-
-> This explanation applies to all dialects supported by Drizzle.
 
 By default, Drizzle will use the TypeScript key names for columns in database queries. 
 Therefore, the schema and query from the example will generate the SQL query shown below
@@ -204,7 +200,7 @@ SELECT "id", "first_name" from users;
 ```
 </Section>
 
-### Casing
+### Camel and Snake casing
 
 Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models. 
 This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically 
