@@ -1,4 +1,5 @@
 import Npm from '@components/markdown/Npm.astro';
+import Npx from '@components/markdown/Npx.astro';
 import Callout from '@components/markdown/Callout.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
@@ -10,15 +11,8 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 # Get Started with Drizzle and SQLite in existing project
 
 <Prerequisites>  
-  - You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
-  <Npm>
-    drizzle-orm 
-    -D drizzle-kit
-  </Npm>
-  - You should have installed `dotenv` package for managing environment variables. Read more about this package [here](https://www.npmjs.com/package/dotenv)
-  <Npm>
-    dotenv
-  </Npm>
+  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
 </Prerequisites>
 
 #### Basic file structure
@@ -38,10 +32,11 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  └ 📜 tsconfig.json
 ```
 
-#### Step 1 - Install the `@libsql/client` package
+#### Step 1 - Install required packages
 
 <Npm>
-@libsql/client
+  drizzle-orm @libsql/client dotenv
+  -D drizzle-kit tsx
 </Npm>
 
 #### Step 2 - Setup connection variables
@@ -211,14 +206,14 @@ main();
 
 # Step 7 - Query the database
 
-In `src/index.ts` file you can perform CRUD operations:
+Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
 
 <Callout type="warning">
 If you decided to continue working with generated `drizzle/schema.ts` file and you've updated your `drizzle.config.ts` with proper schema path, please use **schema in drizzle folder** tab
 </Callout>
 
 <CodeTabs items={['schema in "src" folder', 'schema in "drizzle" folder']}>
-```typescript copy filename="src/index.ts" {8-37}
+```typescript copy filename="src/index.ts"
 import 'dotenv/config';
 import { drizzle, eq } from 'drizzle-orm';
 import { usersTable } from './db/schema';
@@ -260,7 +255,7 @@ async function main() {
 
 main();
 ```
-```typescript copy filename="src/index.ts" {8-37}
+```typescript copy filename="src/index.ts"
 import 'dotenv/config';
 import { drizzle, eq } from 'drizzle-orm';
 import { usersTable } from '../drizzle/schema';
@@ -308,31 +303,12 @@ main();
 
 To run any TypeScript files, you have several options, but let's stick with one: using `tsx`
 
-**Install `tsx`**
-<CodeTabs items={['npm', 'yarn', 'pnpm']}>
-```bash copy
-npm i -D tsx
-```
-```bash copy
-yarn add -D tsx
-```
-```bash copy
-pnpm add -D tsx
-```
-</CodeTabs>
+You've already installed `tsx`, so we can run our queries now
 
 **Run `index.ts` script**
-<CodeTabs items={['npm', 'yarn', 'pnpm']}>
-```bash copy
-npm tsx src/index.ts
-```
-```bash copy
-yarn tsx src/index.ts
-```
-```bash copy
-pnpm tsx src/index.ts
-```
-</CodeTabs>
+<Npx>
+  tsx src/index.ts
+</Npx>
 
 <Callout title='tips'>
   We suggest using `bun` to run TypeScript files. With `bun`, such scripts can be executed without issues or additional 
