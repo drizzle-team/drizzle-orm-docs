@@ -166,7 +166,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "PlanetsScale",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/planetscale-existing",
+          new: "/docs/get-started/planetscale-new",
+        },
         icon: {
           light: {
             path: "/public/svg/planetscale.svg",
@@ -185,7 +188,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "TiDB",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/tidb-existing",
+          new: "/docs/get-started/tidb-new",
+        },
         icon: {
           light: {
             path: "/public/svg/tidb.svg",

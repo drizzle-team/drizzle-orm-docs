@@ -7,12 +7,11 @@ import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
 import FileStructure from '@mdx/get-started/FileStructure.mdx';
 import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
-import ConnectMySQL from '@mdx/get-started/mysql/ConnectMySQL.mdx';
+import ConnectPlanetScale from '@mdx/get-started/mysql/ConnectPlanetScale.mdx';
 import CreateTable from '@mdx/get-started/mysql/CreateTable.mdx';
 import UpdateSchema from '@mdx/get-started/mysql/UpdateSchema.mdx';
 import IntrospectMySQL from '@mdx/get-started/mysql/IntrospectMySQL.mdx';
-import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
-import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
+import QueryPlanetScale from '@mdx/get-started/mysql/QueryPlanetScale.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
@@ -25,14 +24,20 @@ import TransferCode from '@mdx/get-started/TransferCode.mdx';
 <Prerequisites>  
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **mysql2** - package for querying your MySQL database - [read here](https://github.com/sidorares/node-mysql2)
+  - **PlanetScale** - MySQL database platform - [read here](https://planetscale.com/)
+  - **database-js** - PlanetScale serverless driver - [read here](https://github.com/planetscale/database-js)
 </Prerequisites>
+
+<Callout title='important' type='warning'>
+For this tutorial, we will use the `database-js` driver to make **HTTP** calls to the PlanetScale database. If you need to
+connect to PlanetScale through TCP, you can refer to our [MySQL Get Started](/docs/get-started/mysql-new) page
+</Callout>
 
 <FileStructure/>
 
-#### Step 1 - Install the `mysql2` package
+#### Step 1 - Install **@planetscale/database** package
 
-<InstallPackages lib='mysql2'/>
+<InstallPackages lib='@planetscale/database'/>
 
 #### Step 2 - Setup connection variables
 
@@ -52,11 +57,11 @@ import TransferCode from '@mdx/get-started/TransferCode.mdx';
 
 #### Step 6 - Connect Drizzle ORM to the database
 
-<ConnectMySQL/>
+<ConnectPlanetScale/>
 
 #### Step 7 - Query the database
 
-<QueryDatabase dialect='mysql2' env_variable='DATABASE_URL'/>
+<QueryPlanetScale />
 
 #### Step 8 - Run index.ts file
 
@@ -72,4 +77,51 @@ import TransferCode from '@mdx/get-started/TransferCode.mdx';
 
 #### Step 11 - Query the database with a new field (optional)
 
-<QueryDatabaseUpdated dialect='mysql2' env_variable='DATABASE_URL' />
+```typescript copy filename="src/index.ts"
+import 'dotenv/config';
+import { drizzle, eq } from 'drizzle-orm';
+import { usersTable } from './db/schema';
+
+async function main() {
+  const db = await drizzle('planetscale', { connection: {
+      host: process.env.DATABASE_HOST!,
+      username: process.env.DATABASE_USERNAME!,
+      password: process.env.DATABASE_PASSWORD!,
+    }});
+
+  const user: typeof usersTable.$inferInsert = {
+    name: 'John',
+    age: 30,
+    email: 'john@example.com',
+    phone: '123-456-7890',
+  };
+
+  await db.insert(usersTable).values(user);
+  console.log('New user created!')
+
+  const users = await db.select().from(usersTable);
+  console.log('Getting all users from the database: ', users)
+  /*
+  const users: {
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+    phone: string | null;
+  }[]
+  */
+
+  await db
+    .update(usersTable)
+    .set({
+      age: 31,
+    })
+    .where(eq(usersTable.email, user.email));
+  console.log('User info updated!')
+
+  await db.delete(usersTable).where(eq(usersTable.email, user.email));
+  console.log('User deleted!')
+}
+
+main();
+```
