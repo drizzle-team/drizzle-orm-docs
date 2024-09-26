@@ -35,12 +35,34 @@ const mainScript = () => {
       });
     });
 
+    const findPreviousNavSeparator = (
+      element: Element | null,
+    ): HTMLElement | null => {
+      if (!element) return null;
+
+      let previousElement =
+        element.previousElementSibling as HTMLElement | null;
+
+      while (previousElement) {
+        if (previousElement.classList.contains("nav-separator")) {
+          return previousElement;
+        }
+        previousElement =
+          previousElement.previousElementSibling as HTMLElement | null;
+      }
+
+      return null;
+    };
+
     const leftSidebarScroll = localStorage.getItem("sidebar-scroll");
     if (leftSidebarScroll !== null) {
       leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
+    } else if (activeNavItem) {
+      findPreviousNavSeparator(activeNavItem)?.scrollIntoView({
+        block: "start",
+      });
     }
   }
 };
 
-mainScript();
 document.addEventListener("astro:after-swap", mainScript);
