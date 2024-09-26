@@ -1,0 +1,43 @@
+import CodeTabs from "@mdx/CodeTabs.astro";
+
+Create a `index.ts` file in the `src` directory and initialize the connection:
+
+<CodeTabs items={["libsql", "libsql with config"]}>
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm';
+
+async function main() {
+  const db = await drizzle("bun:sqlite", process.env.DB_FILE_NAME!);
+}
+
+main();
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm';
+
+async function main() {
+  // You can specify any property from the libsql connection options
+  const db = await drizzle("bun:sqlite", { connection: { source: process.env.DB_FILE_NAME! }});
+}
+
+main();
+```
+</CodeTabs>
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
+
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
+
+async function main() {
+  const sqlite = new Database(process.env.DB_FILE_NAME!);
+  const db = drizzle(sqlite);
+}
+
+main();
+```
