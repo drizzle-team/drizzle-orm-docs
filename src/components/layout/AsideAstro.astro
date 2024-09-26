@@ -93,7 +93,11 @@ let i = 0;
                         ]}
                         href={`/${t.name}/${n.name}`}
                       >
-                        {n.title}
+                        {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                          <code>{n.title.replaceAll('`', '')}</code>
+                        ) : (
+                          n.title
+                        )}
                       </a>
                     )}
                     {n.type === "subDir" && (
@@ -107,7 +111,11 @@ let i = 0;
                         ]}
                         href={`/${t.name}/${n.name}/${n.children?.[0].name}`}
                       >
-                        {n.title}
+                        {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                          <code>{n.title.replaceAll('`', '')}</code>
+                        ) : (
+                          n.title
+                        )}
                       </a>
                     )}
                     {n.type === "withDialects" && (
@@ -121,7 +129,11 @@ let i = 0;
                           "nav-item-1",
                         ]}
                       >
-                        {n.title}
+                        {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                          <code>{n.title.replaceAll('`', '')}</code>
+                        ) : (
+                          n.title
+                        )}
                       </a>
                     )}
                     {headings &&
@@ -183,7 +195,11 @@ let i = 0;
                 ]}
                 href={`/${t.name}/${n.name}`}
               >
-                {n.title}
+                {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                  <code>{n.title.replaceAll('`', '')}</code>
+                ) : (
+                  n.title
+                )}
               </a>
             )}
             {n.type === "subDir" && (
@@ -197,7 +213,11 @@ let i = 0;
                 ]}
                 href={`/${t.name}/${n.name}/${n.children?.[0].name}`}
               >
-                {n.title}
+                {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                  <code>{n.title.replaceAll('`', '')}</code>
+                ) : (
+                  n.title
+                )}
               </a>
             )}
             {n.type === "withDialects" && (
@@ -211,7 +231,11 @@ let i = 0;
                   "nav-item-1",
                 ]}
               >
-                {n.title}
+                {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                  <code>{n.title.replaceAll('`', '')}</code>
+                ) : (
+                  n.title
+                )}
               </a>
             )}
             {headings &&
