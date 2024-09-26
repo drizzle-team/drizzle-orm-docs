@@ -15,6 +15,7 @@ import RunFile from '@mdx/get-started/RunFile.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
+import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
 
 <Breadcrumbs/>
 
@@ -23,6 +24,7 @@ import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
 <Prerequisites>  
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
+  - **libsql** - a fork of SQLite optimized for low query latency, making it suitable for global applications - [read here](https://docs.turso.tech/libsql)
 </Prerequisites>
 
 Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
@@ -49,58 +51,7 @@ You can check the **[LibSQL docs](https://docs.turso.tech/sdk/ts/reference#local
 
 #### Step 3 - Connect Drizzle ORM to the database
 
-Create a `index.ts` file in the `src` directory and initialize the connection:
-
-<CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
-```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm';
-
-async function main() {
-  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
-}
-
-main();
-```
-```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm';
-
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("libsql", { connection: { url: process.env.DB_FILE_NAME! }});
-}
-
-main();
-```
-```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm';
-
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("turso", { connection: { url: DB_FILE_NAME! }});
-}
-
-main();
-```
-</CodeTabs>
-
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
-
-```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
-
-async function main() {
-  const client = createClient({ url: DB_FILE_NAME! });
-  const db = drizzle(client);
-}
-
-main();
-```
+<ConnectLibsql/>
 
 #### Step 4 - Create a table
 
