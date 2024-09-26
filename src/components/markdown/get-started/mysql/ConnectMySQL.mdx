@@ -8,14 +8,22 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 import 'dotenv/config';
 import { drizzle } from "drizzle-orm";
 
-const db = await drizzle("mysql2", process.env.DATABASE_URL);
+async function main() {
+  const db = await drizzle("mysql2", process.env.DATABASE_URL);
+}
+
+main();
 ```
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from "drizzle-orm";
 
-// You can specify any property from the mysql2 connection options
-const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});
+async function main() {
+  // You can specify any property from the mysql2 connection options
+  const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});
+}
+
+main();
 ```
 </CodeTabs>
 
@@ -28,28 +36,33 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
 
-  const connection = await mysql.createConnection({
-    host: "host",
-    user: "user",
-    database: "database",
-    ...
-  });
+  async function main() {
+    const connection = await mysql.createConnection({
+      host: "host",
+      user: "user",
+      database: "database",
+    });
 
-  const db = drizzle(connection);
+    const db = drizzle(connection);
+  }
+
+  main();
   ```
   ```typescript copy
   import 'dotenv/config';
   import { drizzle } from "drizzle-orm/mysql2";
   import mysql from "mysql2/promise";
+  async function main() {
+    const poolConnection = mysql.createPool({
+      host: "host",
+      user: "user",
+      database: "database",
+    });
 
-  const poolConnection = mysql.createPool({
-    host: "host",
-    user: "user",
-    database: "database",
-    ...
-  });
+    const db = drizzle(poolConnection);
+  }
 
-  const db = drizzle(poolConnection);
+  main();
   ```
 </CodeTabs>
 
