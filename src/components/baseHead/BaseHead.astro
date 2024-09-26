@@ -107,6 +107,8 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
 
     document.addEventListener('click', function(event) {
       const target = event.target.closest('a');
+      if (!target || !target.href) return;
+
       const isSideBarElement = target && target.href && (target.getAttribute("data-nav-index") || target.getAttribute("data-slug"));
 
       if (!isSideBarElement && target.hostname === window.location.hostname) {

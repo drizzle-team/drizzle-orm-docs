@@ -3,9 +3,10 @@ interface Props {
   type: 'default' | 'info' | 'warning' | 'error';
   title?: string;
   icon?: string;
+  collapsed?: string;
 }
 
-const { type = 'default', title, emoji = '💡' } = Astro.props;
+const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
 ---
 <>
   {type === 'warning' && !title && (
@@ -17,9 +18,102 @@ const { type = 'default', title, emoji = '💡' } = Astro.props;
   {!!title && (
     <div class:list={["callout-label", type]}>{title}</div>
   )}
-  <div class:list={["callout-wrap"]}>
+  <div class:list={["callout-wrap", !!collapsed && 'callout-wrap-collapsed']}>
     <div class="callout-content">
-      <slot/>
+      {!!collapsed && (
+        <div style="display: flex; align-items: center; gap: 4px">
+          <div class="expand-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8.67383 5.36887L12.0427 2L15.4116 5.36887"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+              <path
+                d="M15.4116 18.8443L12.0427 22.2132L8.67383 18.8443"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+              <path
+                d="M12.0426 2.00003V10.0853"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+              <path
+                d="M12.0426 22.2132V14.1279"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </div>
+          <p class="collapsed-label">{collapsed}</p>
+        </div>
+      )}
+      <div class="content">
+        <slot/>
+      </div>
     </div>
   </div>
 </>
+
+<style>
+  .expand-icon svg {
+      color: #909090;
+      width: 18px;
+      height: 18px;
+      transition: color 0.2s;
+  }
+
+  .collapsed-label {
+      display: none;
+      padding: 0 !important;
+  }
+
+  .callout-wrap .expand-icon {
+      display: none;
+  }
+
+  .callout-wrap .collapse-icon {
+      display: none;
+  }
+
+  .callout-wrap-collapsed .expand-icon {
+      display: block;
+  }
+
+
+  .callout-wrap-collapsed {
+      cursor: pointer;
+      transition: border-color 0.2s;
+  }
+
+  .callout-wrap-collapsed .content {
+      display: none;
+  }
+
+  .callout-wrap-collapsed:hover {
+      border-color: #c9cbcf;
+  }
+
+  .callout-wrap-collapsed:hover svg {
+      color: #111827;
+  }
+
+  .callout-wrap-collapsed .collapsed-label {
+      display: block;
+  }
+</style>
+<script is:inline>
+  document.querySelectorAll('.callout-wrap-collapsed').forEach((el) => el.addEventListener('click', (e) => {
+    e.target?.closest(".callout-wrap-collapsed")?.classList.remove('callout-wrap-collapsed');
+  }))
+</script>
