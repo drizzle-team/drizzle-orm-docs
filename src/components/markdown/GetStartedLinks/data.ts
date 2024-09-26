@@ -229,7 +229,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Turso",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/turso-existing",
+          new: "/docs/get-started/turso-new",
+        },
         icon: {
           light: {
             path: "/public/svg/new-turso.svg",
@@ -247,7 +250,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Cloudflare D1",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/d1-existing",
+          new: "/docs/get-started/d1-new",
+        },
         icon: {
           light: {
             path: "/public/svg/cloudflare.svg",
@@ -265,7 +271,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Bun SQLite",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/bun-sqlite-existing",
+          new: "/docs/get-started/bun-sqlite-new",
+        },
         icon: {
           light: {
             path: "/public/svg/bun.svg",

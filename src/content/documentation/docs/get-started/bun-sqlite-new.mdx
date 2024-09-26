@@ -15,43 +15,41 @@ import RunFile from '@mdx/get-started/RunFile.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
-import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
+import ConnectBun from '@mdx/get-started/sqlite/ConnectBun.mdx';
 
 <Breadcrumbs/>
 
-# Get Started with Drizzle and SQLite
+# Get Started with Drizzle and Bun:SQLite
 
 <Prerequisites>  
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **libsql** - a fork of SQLite optimized for low query latency, making it suitable for global applications - [read here](https://docs.turso.tech/libsql)
+  - **bun** - javaScript all-in-one toolkit - [read here](https://bun.sh/)
+  - **bun:sqlite** - native implementation of a high-performance SQLite3 driver - [read here](https://bun.sh/docs/api/sqlite)
 </Prerequisites>
-
-Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
-
-We will use `libsql` for this get started example. But if you want to find more ways to connect to SQLite check
-our [SQLite Connection](/docs/get-started-sqlite) page 
 
 <FileStructure />
 
 #### Step 1 - Install required packages
-<InstallPackages lib='@libsql/client'/>
+<Npm>
+  drizzle-orm dotenv
+  -D drizzle-kit tsx @types/bun
+</Npm>
 
 #### Step 2 - Setup connection variables
 
 <SetupEnv env_variable='DB_FILE_NAME' />
 
 <Callout type='info' title='important'>
-For example, if you want to create an SQLite database file in the root of your project for testing purposes, you need to use `file:` before the actual filename, as this is the format required by `LibSQL`, like this:
+For example, if you want to create an SQLite database file in the root of your project for testing purposes, you can use this example:
 ```plaintext copy
-DB_FILE_NAME=file:local.db
+DB_FILE_NAME=mydb.sqlite
 ```
-You can check the **[LibSQL docs](https://docs.turso.tech/sdk/ts/reference#local-development)** for more info.
 </Callout>
 
 #### Step 3 - Connect Drizzle ORM to the database
 
-<ConnectLibsql/>
+<ConnectBun/>
 
 #### Step 4 - Create a table
 
@@ -67,8 +65,11 @@ You can check the **[LibSQL docs](https://docs.turso.tech/sdk/ts/reference#local
 
 #### Step 7 - Seed and Query the database
 
-<QueryDatabase dialect='libsql' env_variable='DB_FILE_NAME'/>
+<QueryDatabase dialect='bun:sqlite' env_variable='DB_FILE_NAME'/>
 
 #### Step 8 - Run index.ts file
 
-<RunFile/>
+To run a script with `bun`, use the following command:
+```bash copy
+bun src/index.ts
+```
