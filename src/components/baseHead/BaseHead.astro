@@ -95,7 +95,20 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
 
     setPreference(getColorPreference());
     document.addEventListener('astro:page-load', () => setPreference(getColorPreference()))
-    document.addEventListener('astro:after-swap', () => setPreference(getColorPreference()))
+    document.addEventListener('astro:after-swap', () => setPreference(getColorPreference()));
+
+    if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
+      localStorage.removeItem("sidebar-scroll");
+    }
+
+    document.addEventListener('click', function(event) {
+      const target = event.target.closest('a');
+      const isSideBarElement = target && target.href && (target.getAttribute("data-nav-index") || target.getAttribute("data-slug"));
+
+      if (!isSideBarElement && target.hostname === window.location.hostname) {
+        localStorage.removeItem("sidebar-scroll");
+      }
+    });
   </script>
   <script
     type="module"
