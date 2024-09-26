@@ -5,7 +5,15 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
-import FileStructure from '@mdx/FileStructure.mdx';
+import FileStructure from '@mdx/get-started/FileStructure.mdx';
+import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
+import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
+import TransferCode from '@mdx/get-started/TransferCode.mdx';
+import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
+import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
+import RunFile from '@mdx/get-started/RunFile.mdx';
+import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
+import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 <Breadcrumbs/>
 
@@ -16,22 +24,15 @@ import FileStructure from '@mdx/FileStructure.mdx';
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
 </Prerequisites>
 
-<FileStructure lib="LibSQL 222000"/>
+<FileStructure />
 
 #### Step 1 - Install required packages
 
-<Npm>
-  drizzle-orm @libsql/client dotenv
-  -D drizzle-kit tsx
-</Npm>
+<InstallPackages lib='@libsql/client'/>
 
 #### Step 2 - Setup connection variables
 
-Create a `.env` file in the root of your project and add you SQLite file connection string:
-
-```plaintext copy
-DB_FILE_NAME=
-```
+<SetupEnv env_variable='DB_FILE_NAME' />
 
 <Callout type='info' title='important'>
 For example, if you want to create an SQLite database file in the root of your project for testing purposes, you need to use `file:` before the actual filename, as this is the format required by `LibSQL`, like this:
@@ -43,23 +44,7 @@ You can check the **[LibSQL docs](https://docs.turso.tech/sdk/ts/reference#local
 
 #### Step 3 - Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
-
-Create a `drizzle.config.ts` file in the root of your project and add the following content:
-
-```typescript copy filename="drizzle.config.ts"
-import 'dotenv/config';
-import { defineConfig } from 'drizzle-kit';
-
-export default defineConfig({
-  out: './drizzle',
-  schema: './src/db/schema.ts',
-  dialect: 'sqlite',
-  dbCredentials: {
-    url: process.env.DB_FILE_NAME!,
-  },
-});
-```
+<SetupConfig dialect='sqlite' env_variable='DB_FILE_NAME'/>
 
 #### Step 4 - Introspect your database
 
@@ -116,37 +101,7 @@ Learn more about introspection in the [documentation](/kit-docs/commands#introsp
 
 #### Step 5 - Transfer code to your actual schema file
 
-We recommend transferring the generated code from `drizzle/schema.ts` and `drizzle/relations.ts` to the actual schema file. In this guide we transferred code to `src/db/schema.ts`. Generated files for schema and relations can be deleted. This way you can manage your schema in a more structured way.
-```plaintext {4-5}
- ├ 📂 drizzle
- │ ├ 📂 meta
- │ ├ 📜 migration.sql
- │ ├ 📜 relations.ts ────────┐
- │ └ 📜 schema.ts ───────────┤
- ├ 📂 src                    │ 
- │ ├ 📂 db                   │
- │ │ ├ 📜 relations.ts <─────┤
- │ │ └ 📜 schema.ts <────────┘
- │ └ 📜 index.ts         
- └ …
-```
-<Callout type="warning">
-If you decided to continue working with generated `drizzle/schema.ts` file then you should update your `drizzle.config.ts` with proper schema path.
-
-```typescript copy filename="drizzle.config.ts" {6}
-import 'dotenv/config';
-import { defineConfig } from 'drizzle-kit';
-
-export default defineConfig({
-  out: './drizzle',
-  schema: './drizzle/schema.ts',
-  dialect: 'sqlite',
-  dbCredentials: {
-    url: process.env.DATABASE_URL!,
-  },
-});
-```
-</Callout>
+<TransferCode/>
 
 #### Step 6 - Connect Drizzle ORM to the database
 
@@ -203,122 +158,13 @@ async function main() {
 main();
 ```
 
-# Step 7 - Query the database
+#### Step 7 - Query the database
 
-Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
-
-<Callout type="warning">
-If you decided to continue working with generated `drizzle/schema.ts` file and you've updated your `drizzle.config.ts` with proper schema path, please use **schema in drizzle folder** tab
-</Callout>
-
-<CodeTabs items={['schema in "src" folder', 'schema in "drizzle" folder']}>
-```typescript copy filename="src/index.ts"
-import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
-import { usersTable } from './db/schema';
-
-async function main() {
-  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
-
-  const user: typeof usersTable.$inferInsert = {
-    name: 'John',
-    age: 30,
-    email: 'john@example.com',
-  };
-
-  await db.insert(usersTable).values(user);
-  console.log('New user created!')
-
-  const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
-  /*
-  const users: {
-    id: number;
-    name: string;
-    age: number;
-    email: string;
-  }[]
-  */
-
-  await db
-    .update(usersTable)
-    .set({
-      age: 31,
-    })
-    .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
-
-  await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
-}
-
-main();
-```
-```typescript copy filename="src/index.ts"
-import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
-import { usersTable } from '../drizzle/schema';
-
-async function main() {
-  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
-
-  const user: typeof usersTable.$inferInsert = {
-    name: 'John',
-    age: 30,
-    email: 'john@example.com',
-  };
-
-  await db.insert(usersTable).values(user);
-  console.log('New user created!')
-
-  const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
-  /*
-  const users: {
-    id: number;
-    name: string;
-    age: number;
-    email: string;
-  }[]
-  */
-
-  await db
-    .update(usersTable)
-    .set({
-      age: 31,
-    })
-    .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
-
-  await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
-}
-
-main();
-```
-</CodeTabs>
+<QueryDatabase dialect='libsql' env_variable='DB_FILE_NAME' />
 
 #### Step 8 - Run index.ts file
 
-To run any TypeScript files, you have several options, but let's stick with one: using `tsx`
-
-You've already installed `tsx`, so we can run our queries now
-
-**Run `index.ts` script**
-<Npx>
-  tsx src/index.ts
-</Npx>
-
-<Callout title='tips'>
-  We suggest using `bun` to run TypeScript files. With `bun`, such scripts can be executed without issues or additional 
-  settings, regardless of whether your project is configured with CommonJS (CJS), ECMAScript Modules (ESM), or any other module format. 
-  To run a script with `bun`, use the following command:
-  ```bash copy
-  bun src/index.ts
-  ```
-
-  If you don't have bun installed, check the [Bun installation docs](https://bun.sh/docs/installation#installing)
-</Callout>
+<RunFile/>
 
 #### Step 9 - Update your table schema (optional)
 
@@ -352,125 +198,8 @@ export const usersTable = sqliteTable(
 
 #### Step 9 - Applying changes to the database (optional)
 
-You can generate migrations using `drizzle-kit generate` command and then apply them using the `drizzle-kit migrate` command.
-Learn more about migration process in [documentation](/kit-docs/overview#schema-updates).
-
-Generate migrations:
-
-```bash copy
-npx drizzle-kit generate
-```
-
-Apply migrations:
-
-```bash copy
-npx drizzle-kit migrate
-```
-
-<Callout type="warning">
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
-
-```bash copy
-npx drizzle-kit push
-```
-
-Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.
-</Callout>
-
+<ApplyChanges/>
 
 #### Step 10 - Query the database with a new field (optional)
 
-<Callout type="warning">
-If you decided to continue working with generated `drizzle/schema.ts` file and you've updated your `drizzle.config.ts` with proper schema path, please use **schema in drizzle folder** tab
-</Callout>
-
-<CodeTabs items={['schema in "src" folder', 'schema in "drizzle" folder']}>
-```typescript copy filename="src/index.ts" {12, 26}
-import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
-import { usersTable } from './db/schema';
-
-async function main() {
-  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
-
-  const user: typeof usersTable.$inferInsert = {
-    name: 'John',
-    age: 30,
-    email: 'john@example.com',
-    phone: '123-456-7890',
-  };
-
-  await db.insert(usersTable).values(user);
-  console.log('New user created!')
-
-  const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
-  /*
-  const users: {
-    id: number;
-    name: string;
-    age: number;
-    email: string;
-    phone: string | null;
-  }[]
-  */
-
-  await db
-    .update(usersTable)
-    .set({
-      age: 31,
-    })
-    .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
-
-  await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
-}
-
-main();
-```
-```typescript copy filename="src/index.ts" {12, 26}
-import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
-import { usersTable } from '../drizzle/schema';
-
-async function main() {
-  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
-
-  const user: typeof usersTable.$inferInsert = {
-    name: 'John',
-    age: 30,
-    email: 'john@example.com',
-    phone: '123-456-7890',
-  };
-
-  await db.insert(usersTable).values(user);
-  console.log('New user created!')
-
-  const users = await db.select().from(usersTable);
-  console.log('Getting all users from the database: ', users)
-  /*
-  const users: {
-    id: number;
-    name: string;
-    age: number;
-    email: string;
-    phone: string | null;
-  }[]
-  */
-
-  await db
-    .update(usersTable)
-    .set({
-      age: 31,
-    })
-    .where(eq(usersTable.email, user.email));
-  console.log('User info updated!')
-
-  await db.delete(usersTable).where(eq(usersTable.email, user.email));
-  console.log('User deleted!')
-}
-
-main();
-```
-</CodeTabs>
+<QueryDatabaseUpdated dialect='libsql' env_variable='DB_FILE_NAME' />
