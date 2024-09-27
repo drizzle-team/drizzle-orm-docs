@@ -108,7 +108,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Xata",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/xata-existing",
+          new: "/docs/get-started/xata-new",
+        },
         icon: {
           light: {
             path: "/public/svg/xata.svg",
@@ -126,7 +129,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "PGLite",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/pglite-existing",
+          new: "/docs/get-started/pglite-new",
+        },
         icon: {
           light: {
             path: "/public/svg/pglite.svg",
