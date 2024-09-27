@@ -142,13 +142,17 @@ let i = 0;
                       slug === `${t.name}/${n.name}` && (
                         <div data-headings>
                           {headings.map((heading) => (
-                            <a
-                              data-slug={heading.slug}
-                              class:list={["nav-toc-item", "heading-2"]}
-                              href={`#${heading.slug}`}
-                            >
-                              {heading.text}
-                            </a>
+                            heading.text === '---' ? (
+                              <div class="dot-separator-secondary"></div>
+                            ) : (
+                              <a
+                                data-slug={heading.slug}
+                                class:list={["nav-toc-item", "heading-2"]}
+                                href={`#${heading.slug}`}
+                              >
+                                {heading.text}
+                              </a>
+                            )
                           ))}
                         </div>
                       )}
@@ -160,13 +164,17 @@ let i = 0;
                           slug === `${t.name}/${n.name}/${c.name}` && (
                             <div data-headings>
                               {headings.map((heading) => (
-                                <a
-                                  data-slug={heading.slug}
-                                  class:list={["nav-toc-item", "heading-2"]}
-                                  href={`#${heading.slug}`}
-                                >
-                                  {heading.text}
-                                </a>
+                                heading.text === '---' ? (
+                                  <div class="dot-separator-secondary"></div>
+                                ) : (
+                                  <a
+                                    data-slug={heading.slug}
+                                    class:list={["nav-toc-item", "heading-2"]}
+                                    href={`#${heading.slug}`}
+                                  >
+                                    {heading.text}
+                                  </a>
+                                )
                               ))}
                             </div>
                           )}
@@ -244,13 +252,17 @@ let i = 0;
               slug === `${t.name}/${n.name}` && (
                 <div data-headings>
                   {headings.map((heading) => (
-                    <a
-                      data-slug={heading.slug}
-                      class:list={["nav-toc-item", "heading-2"]}
-                      href={`#${heading.slug}`}
-                    >
-                      {heading.text}
-                    </a>
+                    heading.text === '---' ? (
+                        <div class="dot-separator-secondary"></div>
+                      ) : (
+                        <a
+                          data-slug={heading.slug}
+                          class:list={["nav-toc-item", "heading-2"]}
+                          href={`#${heading.slug}`}
+                        >
+                          {heading.text}
+                        </a>
+                      )
                   ))}
                 </div>
               )}
@@ -262,13 +274,17 @@ let i = 0;
                   slug === `${t.name}/${n.name}/${c.name}` && (
                     <div data-headings>
                       {headings.map((heading) => (
-                        <a
-                          data-slug={heading.slug}
-                          class:list={["nav-toc-item", "heading-2"]}
-                          href={`#${heading.slug}`}
-                        >
-                          {heading.text}
-                        </a>
+                        heading.text === '---' ? (
+                          <div class="dot-separator-secondary"></div>
+                        ) : (
+                          <a
+                            data-slug={heading.slug}
+                            class:list={["nav-toc-item", "heading-2"]}
+                            href={`#${heading.slug}`}
+                          >
+                            {heading.text}
+                          </a>
+                        )
                       ))}
                     </div>
                   )}
