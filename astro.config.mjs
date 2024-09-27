@@ -50,6 +50,7 @@ export default defineConfig({
             ariaHidden: true,
             tabIndex: -1,
           },
+          test: ['h2', 'h3', 'h4', 'h5'],
         },
       ],
     ],
