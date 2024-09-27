@@ -104,46 +104,8 @@ const result = await db.query.users.findMany({
 ```
 
 ## Serverless?
-<Callout type="info" emoji="🥳" collapsed={'asdasdasd'}>
+<Callout type="info" emoji="🥳">
   The best part is no part. **Drizzle has exactly 0 dependencies!**
-    <CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
-        ```typescript copy
-        // Access your data
-        await db
-        .select()
-        .from(countries)
-        .leftJoin(cities, eq(cities.countryId, countries.id))
-        .where(eq(countries.id, 10))
-        ```
-        ```typescript copy
-        // manage your schema
-        export const countries = pgTable('countries', {
-        id: serial('id').primaryKey(),
-        name: varchar('name', { length: 256 }),
-    });
-
-        export const cities = pgTable('cities', {
-        id: serial('id').primaryKey(),
-        name: varchar('name', { length: 256 }),
-        countryId: integer('country_id').references(() => countries.id),
-    });
-        ```
-        ```sql
-        -- generate migrations
-        CREATE TABLE IF NOT EXISTS "countries" (
-        "id" serial PRIMARY KEY NOT NULL,
-        "name" varchar(256)
-        );
-
-        CREATE TABLE IF NOT EXISTS "cities" (
-        "id" serial PRIMARY KEY NOT NULL,
-        "name" varchar(256),
-        "country_id" integer
-        );
-
-        ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN KEY ("country_id") REFERENCES "countries"("id") ON DELETE no action ON UPDATE no action;
-        ```
-    </CodeTabs>
 </Callout>
 
 
