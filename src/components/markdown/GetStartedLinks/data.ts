@@ -68,7 +68,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Vercel Postgres",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/vercel-existing",
+          new: "/docs/get-started/vercel-new",
+        },
         icon: {
           light: {
             path: "/public/svg/vercel.svg",
