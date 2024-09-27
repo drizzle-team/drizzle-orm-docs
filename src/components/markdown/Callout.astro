@@ -22,6 +22,47 @@ const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
     <div class="callout-content">
       {!!collapsed && (
         <div style="display: flex; align-items: center; gap: 4px">
+          <button
+            data-callout-collapse-btn
+            type="button"
+            class:list={["button-wrap"]}
+            aria-label="Copy"
+          >
+            <div class="collapse-icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.67383 17.3689L12.0427 14L15.4116 17.3689"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+                <path
+                  d="M15.4116 6.7164L12.0427 10.0853L8.67383 6.7164"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+                <path
+                  d="M12.0426 14V22.0853"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+                <path
+                  d="M12.0426 10.0853V1.99999"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </div>
+          </button>
           <div class="expand-icon">
             <svg
               width="24"
@@ -66,6 +107,14 @@ const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
 </>
 
 <style>
+  .callout-wrap {
+      position: relative;
+  }
+
+  .callout-wrap:hover .button-wrap{
+      opacity: 1;
+  }
+
   .expand-icon svg {
       color: #909090;
       width: 18px;
@@ -82,14 +131,13 @@ const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
       display: none;
   }
 
-  .callout-wrap .collapse-icon {
-      display: none;
-  }
-
   .callout-wrap-collapsed .expand-icon {
       display: block;
   }
 
+  .callout-wrap-collapsed .button-wrap {
+    display: none;
+  }
 
   .callout-wrap-collapsed {
       cursor: pointer;
@@ -100,8 +148,16 @@ const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
       display: none;
   }
 
+  html.dark .callout-wrap-collapsed:hover {
+      border-color: #404040;
+  }
+
   .callout-wrap-collapsed:hover {
       border-color: #c9cbcf;
+  }
+
+  html.dark .callout-wrap-collapsed:hover svg {
+      color: #c4c5c6;
   }
 
   .callout-wrap-collapsed:hover svg {
@@ -111,9 +167,73 @@ const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
   .callout-wrap-collapsed .collapsed-label {
       display: block;
   }
+
+  html[class~="dark"] .button-wrap:hover {
+      color: #c4c5c6;
+      border-color: #555;
+  }
+  html[class~="dark"] .button-wrap {
+      border-color: #292929;
+      background-color: #222;
+      color: #909090;
+  }
+  .button-wrap:hover {
+      color: #111827;
+  }
+
+  .button-wrap {
+      border: 1px solid rgba(33, 39, 46, .12);
+      border-radius: 2px;
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      text-transform: none;
+      font-size: 100%;
+      outline-offset: 2px;
+      outline: 2px solid transparent;
+      -webkit-transition-property: all;
+      -o-transition-property: all;
+      transition-property: all;
+      -webkit-transition-duration: 0.15s;
+      -o-transition-duration: 0.15s;
+      transition-duration: 0.15s;
+      -webkit-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      -o-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      height: 27px;
+      width: 27px;
+      background-color: #f5f5f5;
+      color: rgba(75, 85, 99, 0.6);
+      z-index: 99;
+      opacity: 0;
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .button-wrap svg {
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+  }
 </style>
 <script is:inline>
   document.querySelectorAll('.callout-wrap-collapsed').forEach((el) => el.addEventListener('click', (e) => {
     e.target?.closest(".callout-wrap-collapsed")?.classList.remove('callout-wrap-collapsed');
   }))
+
+  document.addEventListener('astro:page-load', () => {
+    const collapseButton = document.querySelectorAll("[data-callout-collapse-btn]");
+    collapseButton.forEach((n) => {
+      n.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const parent = n.closest(".callout-wrap");
+        if (parent) {
+          parent.classList.add("callout-wrap-collapsed");
+        }
+      });
+    });
+  })
 </script>
