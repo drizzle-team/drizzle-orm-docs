@@ -1,0 +1,30 @@
+import Callout from '@components/markdown/Callout.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Section from "@mdx/Section.astro";
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+```typescript
+import { drizzle } from 'drizzle-orm';
+
+async function main() {
+    const db = await drizzle("neon-http", process.env.DATABASE_URL);
+}
+
+main();
+```
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
+
+```typescript
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+
+async function main() {
+    const sql = neon(process.env.DATABASE_URL!);
+    const db = drizzle(sql);
+}
+
+main();
+```

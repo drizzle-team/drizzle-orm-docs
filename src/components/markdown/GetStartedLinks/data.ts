@@ -47,7 +47,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Neon",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/neon-existing",
+          new: "/docs/get-started/neon-new",
+        },
         icon: {
           light: {
             path: "/public/svg/neon-light.svg",
@@ -84,7 +87,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "Supabase",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/supabase-existing",
+          new: "/docs/get-started/supabase-new",
+        },
         icon: {
           light: {
             path: "/public/svg/supabase.svg",
