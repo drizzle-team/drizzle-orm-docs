@@ -15,7 +15,7 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import TransferCode from '@mdx/get-started/TransferCode.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
-import ConnectPostgreSQL from '@mdx/get-started/postgresql/ConnectPostgreSQL.mdx'
+import ConnectSupabase from '@mdx/get-started/postgresql/ConnectSupabase.mdx'
 import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
 import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
@@ -27,23 +27,17 @@ import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **node-postgres** - package for querying your PostgreSQL database - [read here](https://node-postgres.com/)
+  - **Supabase** - open source Firebase alternative - [read here](https://supabase.com/)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install **node-postgres** package
-<InstallPackages lib='pg' devlib=' @types/pg'/>
+#### Step 1 - Install **postgres** package
+<InstallPackages lib='postgres'/>
 
 #### Step 2 - Setup connection variables
 
 <SetupEnv env_variable='DATABASE_URL' />
-
-<Callout title='tips'>
-If you don't have a PostgreSQL database yet and want to create one for testing, you can use our guide on how to set up PostgreSQL in Docker.
-
-The PostgreSQL in Docker guide is available [here](/docs/guides/postgresql-local-setup). Go set it up, generate a database URL (explained in the guide), and come back for the next steps
-</Callout>
 
 #### Step 3 - Setup Drizzle config file
 
@@ -59,11 +53,11 @@ The PostgreSQL in Docker guide is available [here](/docs/guides/postgresql-local
 
 #### Step 6 - Connect Drizzle ORM to the database
 
-<ConnectPostgreSQL/>
+<ConnectSupabase/>
 
 #### Step 7 - Query the database
 
-<QueryDatabase dialect='node-postgres' env_variable='DATABASE_URL'/>
+<QueryDatabase dialect='postgres-js' env_variable='DATABASE_URL'/>
 
 #### Step 8 - Run index.ts file
 
@@ -79,4 +73,4 @@ The PostgreSQL in Docker guide is available [here](/docs/guides/postgresql-local
 
 #### Step 11 - Query the database with a new field (optional)
 
-<QueryDatabaseUpdated dialect='node-postgres' env_variable='DATABASE_URL' />
+<QueryDatabaseUpdated dialect='postgres-js' env_variable='DATABASE_URL' />

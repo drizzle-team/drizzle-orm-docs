@@ -1,0 +1,51 @@
+import CodeTabs from "@mdx/CodeTabs.astro";
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+<CodeTabs items={["node-postgres", "node-postgres with config"]}>
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm';
+
+async function main() {
+    const db = await drizzle("node-postgres", process.env.DATABASE_URL!);
+}
+
+main();
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm';
+
+async function main() {
+    // You can specify any property from the node-postgres connection options
+    const db = await drizzle("node-postgres", { 
+      connection: { 
+        connectionString: process.env.DATABASE_URL!,
+        ssl: true
+      }
+    });
+}
+
+main();
+```
+</CodeTabs>
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
+
+```typescript copy
+import 'dotenv/config';
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+async function main() {
+    const pool = new Pool({
+      connectionString: process.env.DATABASE_URL!,
+    });
+    const db = drizzle(pool);
+}
+
+main();
+```

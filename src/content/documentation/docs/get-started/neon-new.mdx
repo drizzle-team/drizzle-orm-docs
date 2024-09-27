@@ -9,7 +9,7 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import FileStructure from '@mdx/get-started/FileStructure.mdx';
 import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
-import ConnectPostgreSQL from '@mdx/get-started/postgresql/ConnectPostgreSQL.mdx'
+import ConnectNeon from '@mdx/get-started/postgresql/ConnectNeon.mdx'
 import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx'
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
@@ -24,32 +24,27 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **node-postgres** - package for querying your PostgreSQL database - [read here](https://node-postgres.com/)
+  - **Neon** - serverless Postgres platform - [read here](https://neon.tech/docs/introduction)
 </Prerequisites>
 
-Drizzle has native support for PostgreSQL connections with the `node-postgres` and `postgres.js` drivers.
-
-We will use `node-postgres` for this get started example. But if you want to find more ways to connect to postgresql check
-our [PostgreSQL Connection](/docs/get-started-postgresql) page 
+Drizzle has native support for Neon connections with the `neon-http` and `neon-websockets` drivers. These use the **neon-serverless** driver under the hood.  
+  
+With the `neon-http` and `neon-websockets` drivers, you can access a Neon database from serverless environments over HTTP or WebSockets instead of TCP. Querying over HTTP is faster for single, non-interactive transactions.  
+  
+If you need session or interactive transaction support, or a fully compatible drop-in replacement for the `pg` driver, you can use the WebSocket-based `neon-serverless` driver. You can connect to a Neon database directly using [Postgres](/docs/get-started/postgresql-new)
 
 <FileStructure/>
 
-#### Step 1 - Install **node-postgres** package
-<InstallPackages lib='pg' devlib=' @types/pg'/>
+#### Step 1 - Install **@neondatabase/serverless** package
+<InstallPackages lib='@neondatabase/serverless'/>
 
 #### Step 2 - Setup connection variables
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-<Callout title='tips'>
-If you don't have a PostgreSQL database yet and want to create one for testing, you can use our guide on how to set up PostgreSQL in Docker.
-
-The PostgreSQL in Docker guide is available [here](/docs/guides/postgresql-local-setup). Go set it up, generate a database URL (explained in the guide), and come back for the next steps
-</Callout>
-
 #### Step 3 - Connect Drizzle ORM to the database
 
-<ConnectPostgreSQL/>
+<ConnectNeon/>
 
 #### Step 4 - Create a table
 
@@ -65,7 +60,7 @@ The PostgreSQL in Docker guide is available [here](/docs/guides/postgresql-local
 
 #### Step 7 - Seed and Query the database
 
-<QueryDatabase dialect='node-postgres' env_variable='DATABASE_URL'/>
+<QueryDatabase dialect='neon-http' env_variable='DATABASE_URL'/>
 
 #### Step 8 - Run index.ts file
 

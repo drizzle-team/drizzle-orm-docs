@@ -101,7 +101,7 @@ html[class~="dark"] .nav_sticky {
       bottom: 0;
       right: 0;
       left: 0;
-      height: 20px;
+      height: 40px;
       z-index: 2;
       background: linear-gradient(0deg, #fff, transparent);
   }
@@ -280,8 +280,42 @@ html[class~="dark"] .nav_sticky {
       border-bottom: 1px dashed #e5e7eb;
   }
 
+  .dot-separator-secondary {
+      height: 10px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: -1;
+      flex-shrink: 0;
+      padding-left: 28px;
+      border-left: 1px solid #e5e7eb;
+  }
+
+  html.dark .dot-separator-secondary {
+      border-color: #303030;
+  }
+
+  html.dark .nav-toc-item--active + .dot-separator-secondary {
+      border-color: #c8c9ca;
+  }
+
+  .nav-toc-item--active + .dot-separator-secondary {
+      border-color: #9ca3af;
+  }
+
+  .dot-separator-secondary::before {
+      content: '';
+      display: block;
+      width: 100%;
+      border-bottom: 1px dashed #e5e7eb;
+  }
+
   html.dark .dot-separator::after {
       background: #303030;
+  }
+
+  html.dark .dot-separator-secondary::before {
+      border-color: #303030;
   }
 
   html.dark .dot-separator::before {
