@@ -9,7 +9,7 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import FileStructure from '@mdx/get-started/FileStructure.mdx';
 import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
-import ConnectSupabase from '@mdx/get-started/postgresql/ConnectSupabase.mdx'
+import ConnectPgLite from '@mdx/get-started/postgresql/ConnectPgLite.mdx'
 import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx'
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
@@ -19,18 +19,19 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 <Breadcrumbs/>
 
-# Get Started with Drizzle and Supabase
+# Get Started with Drizzle and PGlite
 
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Supabase** - open source Firebase alternative - [read here](https://supabase.com/)
+  - **ElectricSQL** - [website](https://electric-sql.com/)
+  - **pglite driver** - [docs](https://pglite.dev/) & [GitHub](https://github.com/electric-sql/pglite)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install **postgres** package
-<InstallPackages lib='postgres'/>
+#### Step 1 - Install all needed packages
+<InstallPackages lib='@electric-sql/pglite' />
 
 #### Step 2 - Setup connection variables
 
@@ -38,7 +39,7 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 #### Step 3 - Connect Drizzle ORM to the database
 
-<ConnectSupabase/>
+<ConnectPgLite/>
 
 #### Step 4 - Create a table
 
@@ -54,7 +55,7 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 #### Step 7 - Seed and Query the database
 
-<QueryDatabase dialect='postgres-js' env_variable='DATABASE_URL'/>
+<QueryDatabase dialect='pglite' env_variable='DATABASE_URL'/>
 
 #### Step 8 - Run index.ts file
 

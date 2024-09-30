@@ -15,25 +15,26 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import TransferCode from '@mdx/get-started/TransferCode.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
-import ConnectNeon from '@mdx/get-started/postgresql/ConnectNeon.mdx'
-import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
-import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
+import ConnectXata from '@mdx/get-started/postgresql/ConnectXata.mdx'
+import QueryXata from '@mdx/get-started/postgresql/QueryXata.mdx';
+import QueryXataUpdated from '@mdx/get-started/postgresql/QueryXataUpdated.mdx';
 import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
 <Breadcrumbs/>
 
-# Get Started with Drizzle and Neon in existing project
+# Get Started with Drizzle and Xata in existing project
 
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Neon** - serverless Postgres platform - [read here](https://neon.tech/docs/introduction)
+  - **Xata database** - [read here](https://xata.io/docs)
+  - **Xata driver** - [read here](https://xata.io/docs/sdk/typescript/overview) & [GitHub](https://github.com/xataio/client-ts)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install **@neondatabase/serverless** package
-<InstallPackages lib='@neondatabase/serverless'/>
+#### Step 1 - Install **@xata.io/client** package
+<InstallPackages lib='@xata.io/client'/>
 
 #### Step 2 - Setup connection variables
 
@@ -53,11 +54,11 @@ import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
 #### Step 6 - Connect Drizzle ORM to the database
 
-<ConnectNeon/>
+<ConnectXata/>
 
 #### Step 7 - Query the database
 
-<QueryDatabase dialect='neon-http' env_variable='DATABASE_URL'/>
+<QueryXata />
 
 #### Step 8 - Run index.ts file
 
@@ -73,4 +74,4 @@ import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
 #### Step 11 - Query the database with a new field (optional)
 
-<QueryDatabaseUpdated dialect='neon-http' env_variable='DATABASE_URL' />
+<QueryXataUpdated />
