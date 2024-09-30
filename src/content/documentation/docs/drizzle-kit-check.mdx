@@ -1,0 +1,35 @@
+import CodeTab from "@/components/markdown/CodeTab.astro";
+import CodeTabs from "@/components/markdown/CodeTabs.astro";
+import Section from "@/components/markdown/Section.astro";
+import Tab from "@/components/markdown/Tab.astro";
+import Tabs from "@/components/markdown/Tabs.astro";
+import Callout from "@/components/markdown/Callout.astro";
+
+# `drizzle-kit check`
+`drizzle-kit check` is a very powerful tool for you to check consistency of your migrations.  
+That's extremely useful when you have multiple people on the project, altering database schema on different branches.  
+Drizzle Kit will check for all collisions and inconsistencies.
+
+| param                             | required | description                                   |
+| :-------------------------------- | :------- | :-------------------------------------------- |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
+| **[`out`](/kit-docs/conf#migrations-folder)** | no       | migrations folder, default=`./drizzle`        |
+| `config`                          | no       | config file path, default=`drizzle.config.ts` |
+
+<Section>
+```shell
+$ drizzle-kit check
+```
+</Section>
+
+If you want to use custom named config file
+
+```shell
+$ drizzle-kit check --config=custom.config.ts
+```
+
+If you want to have all params as CLI options
+
+```shell
+$ drizzle-kit check --out=drizzle
+```

@@ -1,0 +1,87 @@
+import CodeTab from "@/components/markdown/CodeTab.astro";
+import CodeTabs from "@/components/markdown/CodeTabs.astro";
+import Section from "@/components/markdown/Section.astro";
+import Tab from "@/components/markdown/Tab.astro";
+import Tabs from "@/components/markdown/Tabs.astro";
+import Callout from "@/components/markdown/Callout.astro";
+
+# `drizzle-kit pull`
+
+`drizzle-kit introspect` command lets you pull DDL from existing database and generate `schema.ts` file in matter of seconds.  
+
+Either **[`url`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are mandatory.
+
+| param                                 | required | description                                   |
+| :-----------------------------------  | :------- | :-------------------------------------------- |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
+| driver                                | no      | driver to use for querying (`aws-data-api`, `d1-http`, `turso`, `expo`)|
+| **[`out`](/kit-docs/conf#migrations-folder)**     | no       | migrations folder, default=`./drizzle`        |
+| `url`                    | no       | database connection string                    |
+| `user`                                | no       | database user                                 |
+| `password`                            | no       | database password                             |
+| `host`                                | no       | host                                          |
+| `port`                                | no       | port                                          |
+| `database`                            | no       | database name                                 |
+| `config`                              | no       | config file path, default=`drizzle.config.ts` |
+| `introspect-casing`                   | no       | strategy for JS keys creation in columns, tables, etc. (`preserve`, `camel`) |
+| **[`schemaFilter`](/kit-docs/config-reference#schemaFilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
+| **[`extensionsFilters`](/kit-docs/config-reference#extensionsfilters)** | no       | Database extensions internal database filters                                                   |
+
+
+<Section>
+
+```shell
+$ drizzle-kit introspect
+```
+
+</Section>
+
+<Tabs items={["Example 1", "Example 2"]}>
+<Tab>
+```ts {8}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/schema/*",
+  out: "./drizzle",
+  dialect: 'postgresql',
+  dbCredentials: {
+    url: "postgresql://postgres:password@host:port/db",
+  }
+});
+```
+</Tab>
+<Tab>
+```ts {8-12}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/schema/*",
+  out: "./drizzle",
+  dialect: 'postgresql',
+  dbCredentials: {
+    user: "postgres",
+    password: "password",
+    host: "127.0.0.1",
+    port: 5432,
+    database: "db",
+  }
+});
+```
+</Tab>
+</Tabs>
+
+If you want to use custom named config file
+
+```shell
+$ drizzle-kit introspect --config=custom.config.ts
+```
+
+If you want to have all params as CLI options
+
+```shell
+$ drizzle-kit introspect --out=migrations/ --connectionString=postgresql://user:pass@host:port/db_name
+$ drizzle-kit introspect --out=migrations/ --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
+```
+
+![](@/assets/gifs/introspect_mysql.gif)

@@ -1,0 +1,67 @@
+import CodeTab from "@/components/markdown/CodeTab.astro";
+import CodeTabs from "@/components/markdown/CodeTabs.astro";
+import Section from "@/components/markdown/Section.astro";
+import Tab from "@/components/markdown/Tab.astro";
+import Tabs from "@/components/markdown/Tabs.astro";
+import Callout from "@/components/markdown/Callout.astro";
+
+# `drizzle-kit push`
+<Prerequisites>
+- Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
+- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
+- Database connection basics - [read here](/docs/connect-overview)
+- Drizzle migrations foundamentals - [read here](/docs/migrations)
+- Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
+</Prerequisites>
+
+`drizzle-kit push` literally lets you push your schema and subsequent schema changes directly to the
+database while omitting SQL files generation. 
+
+This has proven to be very useful for rapid local development(prototyping) and when working with remote databases like
+**[Planetscale](https://planetscale.com/)**, **[Neon](https://neon.tech/)**, **[Turso](https://turso.tech/drizzle)** and others.
+
+<Callout type="info">
+  Extended article on Turso and drizzle-kit push — **[read here.](https://driz.link/sqlite-push)**
+</Callout>
+
+Either **[`url`](/kit-docs/conf#push-and-pull)** or **[`user:password@host:port/db`](/kit-docs/conf#push-and-pull)** params are **required**.
+
+| param                                         | required | description                                                         |
+| :-------------------------------------------- | :------- | :------------------------------------------------------------------ |
+| **`dialect`**    | yes      | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
+| **[`schema`](/kit-docs/conf#schema-files-paths)**          | yes      | path to typescript schema file or folder with multiple schema files |
+| driver                                | no      | driver to use for querying (`aws-data-api`, `d1-http`, `turso`, `expo`)|
+| **[`tablesFilter`](/kit-docs/conf#multi-project-schema)** | no       | table name filter                                                   |
+| **[`schemaFilter`](/kit-docs/config-reference#schemafilter)**                                | no       | Schema name filter. Default: `["public"]`                  |
+| **[`extensionsFilters`](/kit-docs/config-reference#extensionsfilters)** | no       | Database extensions internal database filters                                                   |
+| `url`                            | no       | database connection string                                          |
+| `user`                                        | no       | database user                                                       |
+| `password`                                    | no       | database password                                                   |
+| `host`                                        | no       | host                                                                |
+| `port`                                        | no       | port                                                                |
+| `database`                                    | no       | database name                                                       |
+| `config`                                      | no       | config file path, default=`drizzle.config.ts`                       |
+| `verbose`                                     | no       | print all queries that will be executed                             |
+| `strict`                                      | no       | always ask for an approve before pushing the schema                 |
+| `force`                                       | no       | auto-accept all data-loss statements                 |
+
+<Section>
+
+```shell
+$ drizzle-kit push
+```
+
+</Section>
+
+If you want to use custom named config file
+
+```shell
+$ drizzle-kit push --config=custom.config.ts
+```
+
+If you want to have all params as CLI options
+
+```shell
+$ drizzle-kit push --schema=src/schema.ts --url=postgresql://user:pass@host:port/db_name
+$ drizzle-kit push --schema=src/schema.ts --host=0.0.0.0 --port=5432 --user=postgres --password=pass --database=db_name --ssl
+```

@@ -39,7 +39,6 @@ SELECT * FROM table WHERE table.column1 = table.column2
 </Section>
 
 
-
 ### ne
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
@@ -69,6 +68,7 @@ SELECT * FROM table WHERE table.column1 <> table.column2
 ```
 </Section>
 
+## ---
 
 ### gt
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} /> 
@@ -186,6 +186,7 @@ SELECT * FROM table WHERE table.column1 <= table.column2
 ```
 </Section>
 
+## ---
 
 ### isNull
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
@@ -219,6 +220,8 @@ db.select().from(table).where(isNotNull(table.column));
 SELECT * FROM table WHERE table.column IS NOT NULL
 ```
 </Section>
+
+## ---
 
 ### inArray
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
@@ -277,6 +280,8 @@ db.select().from(table).where(notInArray(table.column, query));
 SELECT * FROM table WHERE table.column NOT IN (SELECT table2.column FROM table2)
 ```
 </Section>
+
+## ---
 
 ### exists
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
