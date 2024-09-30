@@ -10,9 +10,6 @@ export async function getStaticPaths() {
 
   const filteredEntries = guides.filter((entry) => !!entry.data.slug);
 
-  console.log(guides);
-  
-
   const staticPaths = filteredEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },

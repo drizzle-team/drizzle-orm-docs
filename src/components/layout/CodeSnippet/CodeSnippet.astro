@@ -149,7 +149,8 @@ function parseMarkingDefinition(
     .filter((entry) => entry.groupValues.length);
 }
 
-const isOneLine = codeSnippetHtml.match(/<span class="line">/g).length === 1;
+// TODO: @vitalii-staryk need to fix
+const isOneLine = codeSnippetHtml.match(/<span class="line">/g)?.length === 1;
 ---
 
 <figure
