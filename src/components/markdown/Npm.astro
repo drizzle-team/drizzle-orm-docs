@@ -2,7 +2,7 @@
 const items = ["npm", "yarn", "pnpm", "bun"];
 const html = await Astro.slots.render("default");
 const installCommands = ["npm i", "yarn add", "pnpm add", "bun add"];
-const installLines = html.replaceAll(/<\/?p>/g, "").split("\n");
+const installLines = html.replaceAll(/<\/?p>/g, "").replaceAll('—', '--').split("\n");
 const getInstallCommands = (index: number) =>
   installLines
     .map(
