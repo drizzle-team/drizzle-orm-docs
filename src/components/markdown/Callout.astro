@@ -219,21 +219,19 @@ const { type = 'default', title, emoji = '💡', collapsed } = Astro.props;
       pointer-events: none;
   }
 </style>
-<script is:inline>
+<script is:inline data-astro-rerun>
   document.querySelectorAll('.callout-wrap-collapsed').forEach((el) => el.addEventListener('click', (e) => {
+      console.log('expand');
     e.target?.closest(".callout-wrap-collapsed")?.classList.remove('callout-wrap-collapsed');
   }))
 
-  document.addEventListener('astro:page-load', () => {
-    const collapseButton = document.querySelectorAll("[data-callout-collapse-btn]");
-    collapseButton.forEach((n) => {
-      n.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = n.closest(".callout-wrap");
-        if (parent) {
-          parent.classList.add("callout-wrap-collapsed");
-        }
-      });
+  document.querySelectorAll("[data-callout-collapse-btn]").forEach((n) => {
+    n.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const parent = n.closest(".callout-wrap");
+      if (parent) {
+        parent.classList.add("callout-wrap-collapsed");
+      }
     });
-  })
+  });
 </script>
