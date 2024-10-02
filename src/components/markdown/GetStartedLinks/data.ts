@@ -339,7 +339,10 @@ export const getStartedItems: GetStartedItems = [
       },
       {
         name: "OP SQLite",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/op-sqlite-existing",
+          new: "/docs/get-started/op-sqlite-new",
+        },
         icon: {
           light: {
             path: "/public/svg/opsqlite.png",

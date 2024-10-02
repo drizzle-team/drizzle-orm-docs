@@ -19,10 +19,10 @@ import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
 
 <Breadcrumbs/>
 
-# Get Started with Drizzle and Expo
+# Get Started with Drizzle and OP-SQLite
 
 <Prerequisites>  
-  - **Expo SQLite** - A library that provides access to a database that can be queried through a SQLite API - [read here](https://docs.expo.dev/versions/latest/sdk/sqlite/)
+  - **OP-SQLite** - SQLite library for react-native - [read here](https://github.com/OP-Engineering/op-sqlite)
 </Prerequisites>
 
 
@@ -53,28 +53,25 @@ After installing the template and adding the `db` folder, you'll find the follow
  └ 📜 tsconfig.json
 ```
 
-#### Step 2 - Install expo-sqlite package
-<Npx>
-expo install expo-sqlite
-</Npx>
-
-#### Step 3 - Install required packages
+#### Step 2 - Install required packages
 <Npm>
-  drizzle-orm
+  drizzle-orm @op-engineering/op-sqlite
   -D drizzle-kit
 </Npm>
 
-#### Step 4 - Connect Drizzle ORM to the database
+#### Step 3 - Connect Drizzle ORM to the database
 
 Create a `App.tsx` file in the root directory and initialize the connection:
 
 ```ts
-import * as SQLite from 'expo-sqlite';
+import { open } from '@op-engineering/op-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 
-const expo = SQLite.openDatabaseSync('db.db');
+const opsqliteDb = open({
+  name: 'db',
+});
 
-const db = drizzle(expo);
+const db = drizzle(opsqliteDb);
 ```
 
 #### Step 4 - Create a table
@@ -136,16 +133,18 @@ Let's **App.tsx** file with migrations and queries to create, read, update, and 
 
 ```ts copy
 import { Text, View } from 'react-native';
-import * as SQLite from 'expo-sqlite';
+import { open } from '@op-engineering/op-sqlite';
 import { useEffect, useState } from 'react';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { drizzle } from 'drizzle-orm/op-sqlite';
 import { usersTable } from './db/schema';
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import { useMigrations } from 'drizzle-orm/op-sqlite/migrator';
 import migrations from './drizzle/migrations';
 
-const expo = SQLite.openDatabaseSync('db.db');
+const opsqliteDb = open({
+  name: 'db',
+});
 
-const db = drizzle(expo);
+const db = drizzle(opsqliteDb);
 
 export default function App() {
   const { success, error } = useMigrations(db, migrations);
