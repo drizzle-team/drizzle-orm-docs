@@ -6,7 +6,7 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 <CodeTabs items={['mysql2', 'mysql2 with config']}>
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/connect";
 
 async function main() {
   const db = await drizzle("mysql2", process.env.DATABASE_URL);
@@ -16,7 +16,7 @@ main();
 ```
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/connect";
 
 async function main() {
   // You can specify any property from the mysql2 connection options

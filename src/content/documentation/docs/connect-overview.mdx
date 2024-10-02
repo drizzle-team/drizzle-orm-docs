@@ -17,7 +17,7 @@ Drizzle ORM runs SQL queries on your database via **database drivers**.
 
 <CodeTab>
 ```ts
-import { drizzle } from "drizzle-orm"
+import { drizzle } from "drizzle-orm/connect"
 import { users } from "./schema"
 
 const db = await drizzle("node-postgres", process.env.DATABASE_URL);
@@ -57,7 +57,7 @@ export const users = pgTable("users", {
 Under the hood Drizzle will create a **node-postgres** driver instance which you can access via `db.$client` if necessary
 <Section>
 ```ts
-import { drizzle } from "drizzle-orm"
+import { drizzle } from "drizzle-orm/connect"
 
 const db = await drizzle("node-postgres", process.env.DATABASE_URL);
 const pool = db.$client;
@@ -77,7 +77,7 @@ const db = drizzle(pool); // <--- sync
 The latter API is our original API which you can use when you need drizzle initialization to be synchronous.  
 Mostly every driver supports initialization via either **connection URL** or a set of **conneciton params**  
 ```ts
-import { drizzle } from "drizzle-orm"
+import { drizzle } from "drizzle-orm/connect"
 
 const db = await drizzle("node-postgres", "postgresql://users:password@127.0.0.1:5432/dbname");
 
@@ -95,7 +95,7 @@ const db = await drizzle("node-postgres", {
 
 Drizzle is by design natively compatible with every **edge** or **serverless** runtime, whenever you'd need access to a serverless database - we've got you covered
 ```ts
-import { drizzle } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/connect";
 
 const db = await drizzle("neon-http", process.env.DATABSE_URL);
 const db = await drizzle("neon-websocket", process.env.DATABSE_URL);
@@ -106,7 +106,7 @@ const db = await drizzle("d1", { connection: env.DB });
 And yes, we do support runtime specific drivers like [Bun SQLite](/docs/connect-bun-sqlite) or [Expo SQLite](/docs/connect-expo-sqlite):
 <Section>
 ```ts
-import { drizzle } from "drizzle-orm"
+import { drizzle } from "drizzle-orm/connect"
 
 const db = await drizzle("bun:sqlite"); // <--- will create inmemory db
 const db = await drizzle("bun:sqlite", "./sqlite.db");

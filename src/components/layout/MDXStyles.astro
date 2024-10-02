@@ -207,10 +207,11 @@
       text-indent: 0;
       border-color: inherit;
       border-collapse: collapse;
-      margin-top: 0;
       display: block;
       overflow-x: scroll;
       scrollbar-gutter: stable;
+      margin: -2px 0 6px;
+      width: 100%;
     }
 
     table::-webkit-scrollbar {
@@ -244,30 +245,46 @@
           transparent;
       }
     }
-    thead tr {
-      border-top: 1px solid rgb(209, 213, 219);
-    }
-    thead tr {
-      border-top: 1px solid rgb(209, 213, 219);
-    }
-    thead tr th {
-      border: 1px solid rgb(209, 213, 219);
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
+
+    tr th {
+      border-bottom: 1px solid #c9cbcf;
+      padding: 8px 12px;
       font-weight: 600;
     }
-    tbody tr:nth-child(2n) {
-      background-color: rgb(243, 244, 246);
+
+    tr th:first-child {
+        padding: 8px 12px 8px 0;
     }
 
-    tbody tr td {
-      border: 1px solid rgb(209, 213, 219);
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
+    tr th:last-child {
+        padding: 8px 0 8px 12px;
+    }
+
+    tr td code {
+        font-size: 0.8125em;
+    }
+
+    tr th code {
+        font-size: 0.8125em;
+    }
+
+    tr td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    tbody tr:last-child td {
+        border-color: #c9cbcf;
+    }
+
+    tr td:first-child {
+        padding: 8px 12px 8px 0;
+    }
+
+    tr td:last-child {
+        padding: 8px 0 8px 12px;
+        width: 100%;
     }
 
     h1 .autolink-header {
@@ -315,19 +332,16 @@
       color: #c8c9ca;
     }
 
-    thead tr th {
-      border: 1px solid rgb(75, 85, 99);
-    }
-    tbody tr:nth-child(2n) {
-      background-color: rgba(75, 85, 99, 0.2);
+    tr th {
+        border-color: #404040;
     }
 
-    tbody tr td {
-      border: 1px solid rgb(75, 85, 99);
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
+    tr td {
+        border-color: #292929;
+    }
+
+    tbody tr:last-child td {
+        border-color: #404040;
     }
   }
 
@@ -355,5 +369,14 @@
         font-size: 24px;
       }
     }
+  }
+
+  @media screen and (max-width: 600px) {
+      .documentation-content blockquote {
+          margin-left: -16px;
+          margin-right: -16px;
+          padding-left: 16px;
+          padding-right: 16px;
+      }
   }
 </style>

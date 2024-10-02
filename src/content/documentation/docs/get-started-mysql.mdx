@@ -22,14 +22,14 @@ drizzle-orm mysql2
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={['mysql2', 'mysql with config']}>
 ```typescript copy
-import { drizzle } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/connect";
 
 const db = await drizzle("mysql2", process.env.DATABASE_URL);
 
 const response = await db.select().from(...)
 ```
 ```typescript copy
-import { drizzle } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/connect";
 
 // You can specify any property from the mysql2 connection options
 const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});

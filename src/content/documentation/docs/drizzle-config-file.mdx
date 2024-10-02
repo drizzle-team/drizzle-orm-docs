@@ -4,6 +4,7 @@ import Section from "@/components/markdown/Section.astro";
 import Tab from "@/components/markdown/Tab.astro";
 import Tabs from "@/components/markdown/Tabs.astro";
 import Callout from "@/components/markdown/Callout.astro";
+import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx"
 
 # Configuration files
 Drizzle Kit lets you declare configurations in `TypeScript`, `JavaScript` or `JSON` configuration files.  
@@ -62,82 +63,7 @@ You can have as many separate schema files as you want and define paths to them 
 **[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
  or array of globs syntax.
 
-<Tabs items={["Example 1", "Example 2", "Example 3"]}>
-<Tab>
-<Section>
-```plaintext {7}
-📦 <project root>
- ├ ...
- ├ 📂 drizzle
- ├ 📂 src
- │ ├ ...
- │ ├ 📜 index.ts
- │ └ 📜 schema.ts 
- ├ 📜 drizzle.config.ts
- └ 📜 package.json
-```
-```ts
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  schema: "./src/schema.ts",
-});
-```
-</Section>
-</Tab>
-<Tab>
-<Section>
-```plaintext {7,10}
-📦 <project root>
- ├ ...
- ├ 📂 drizzle
- ├ 📂 src
- │ ├ 📂 user
- │ │ ├ 📜 handler.ts 
- │ │ └ 📜 schema.ts 
- │ ├ 📂 posts
- │ │ ├ 📜 handler.ts 
- │ │ └ 📜 schema.ts 
- │ └ 📜 index.ts
- ├ 📜 drizzle.config.ts
- └ 📜 package.json
-```
-```ts
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  schema: "./src/**/schema.ts",
-  //or
-  schema: ["./src/user/schema.ts", "./src/posts/schema.ts"]
-});
-```
-</Section>
-</Tab>
-<Tab>
-<Section>
-```plaintext {6-8}
-📦 <project root>
- ├ ...
- ├ 📂 drizzle
- ├ 📂 src
- │ ├ 📂 schema
- │ │ ├ 📜 user.ts 
- │ │ ├ 📜 post.ts 
- │ │ └ 📜 comment.ts 
- │ └ 📜 index.ts
- ├ 📜 drizzle.config.ts
- └ 📜 package.json
-```
-```ts
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  schema: "./src/schema/*",
-});
-```
-</Section>
-</Tab>
-</Tabs>
+<SchemaFilePaths />
 
 
 ## Migrations folder
