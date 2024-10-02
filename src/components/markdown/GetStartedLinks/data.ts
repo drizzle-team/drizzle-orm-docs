@@ -318,7 +318,10 @@ export const getStartedItems: GetStartedItems = [
     items: [
       {
         name: "Expo SQLite",
-        path: { existing: "/", new: "/docs/overview" },
+        path: {
+          existing: "/docs/get-started/expo-existing",
+          new: "/docs/get-started/expo-new",
+        },
         icon: {
           light: {
             path: "/public/svg/expo.svg",
