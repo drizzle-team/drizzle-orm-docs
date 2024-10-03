@@ -133,7 +133,7 @@ Drizzle Kit does not come with a pre-bundled database driver,
 it will automatically pick available database driver from your current project based on the `dialect` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
 
 Mostly all drivers of the same dialect share the same set of connection params, 
-as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have to explicitely specify `driver` param.
+as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have to explicitly specify `driver` param.
 
 <CodeTabs items={["AWS Data API", "PGLite", "Cloudflare D1 HTTP"]}>
 ```ts {6}
@@ -218,6 +218,7 @@ npx drizzle-kit push
 </Section>
 
 ### Extended list of configurations
+
 `drizzle-kit push` has a list of cli-only options
 
 <rem025/>
@@ -238,26 +239,26 @@ drizzle-kit push --strict --verbose --force
 We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/kit-config-file) file, 
 yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
 
-|                     |            |                                                                           |
-| :------------------ | :--------- | :------------------------------------------------------------------------ |
-| `dialect`           | `required` | Database dialect, one of <Dialects/>                                      |
-| `schema`            | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files |
-| `driver`            |            | Drivers exceptions <Drivers/>                                             |
-| `url`               |            | Database connection string                                                |
-| `user`              |            | Database user                                                             |
-| `password`          |            | Database password                                                         |
-| `host`              |            | Host                                                                      |
-| `port`              |            | Port                                                                      |
-| `database`          |            | Database name                                                             |
-| `config`            |            | Config file path, default=`drizzle.config.ts`                             |
-| `tablesFilter`      |            | Table name filter                                                         |
-| `schemaFilter`      |            | Schema name filter. Default: `["public"]`                                 |
-| `extensionsFilters` |            | Database extensions internal database filters                             |
+|                                                                       |            |                                                                         |
+| :------------------------------------------------------------------   | :-------   | :---------------------------------------------------------------------- |
+| `dialect`                                                             | `required` | Database dialect, one of <Dialects/> |
+| [`schema`](/kit-docs/conf#schema-files-paths)                         | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files     |
+| `driver`                                                              |            | Drivers exceptions <Drivers/> |
+| [`tablesFilter`](/kit-docs/conf#multi-project-schema)                 |            | Table name filter                                                       |
+| [`schemaFilter`](/kit-docs/config-reference#schemafilter)             |            | Schema name filter. Default: `["public"]`                               |
+| [`extensionsFilters`](/kit-docs/config-reference#extensionsfilters)   |            | Database extensions internal database filters                           |
+| `url`                                                                 |            | Database connection string                                              |
+| `user`                                                                |            | Database user                                                           |
+| `password`                                                            |            | Database password                                                       |
+| `host`                                                                |            | Host                                                                    |
+| `port`                                                                |            | Port                                                                    |
+| `database`                                                            |            | Database name                                                           |
+| `config`                                                              |            | Config file path, default=`drizzle.config.ts`                           |
 
 <Npx>
-drizzle-kit push --dialect=postgresql --schema=src/schema.ts --url=postgresql://user:password@host:port/dbname
-drizzle-kit push --dialect=postgresql --schema=src/schema.ts --driver=pglite url=database/
-drizzle-kit push --dialect=postgresql --schema=src/schema.ts --tablesFilter='user*' --extensionsFilters=postgis --url=postgresql://user:password@host:port/dbname
+drizzle-kit push dialect=postgresql schema=src/schema.ts url=postgresql://user:password@host:port/dbname
+drizzle-kit push dialect=postgresql schema=src/schema.ts driver=pglite url=database/
+drizzle-kit push dialect=postgresql schema=src/schema.ts --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
 </Npx>
 
 
