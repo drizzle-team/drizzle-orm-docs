@@ -321,7 +321,7 @@ let i = 0;
   })
 
   document.addEventListener("astro:page-load", () => {
-    const container = document.querySelector(".documentation-content-wrap")!;
+    const container = document.querySelector("html");
     const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
     const links = document.querySelectorAll<HTMLElement>("[data-slug]");
     let expandedSections: string[] = JSON.parse(localStorage.getItem('expandedSections'));
@@ -360,6 +360,7 @@ let i = 0;
     })
 
     const updateLinks = () => {
+      console.log(container.scrollTop)
       const activeAnchors = handleAnchorHighlighting({
         viewportHeight: window.innerHeight,
         anchors: [...anchors].map((anchor) => ({
@@ -381,7 +382,7 @@ let i = 0;
     };
 
     if (container && links) {
-      container.addEventListener("scroll", throttle(updateLinks, 80));
+      document.addEventListener("scroll", throttle(updateLinks, 80));
       updateLinks();
     }
 

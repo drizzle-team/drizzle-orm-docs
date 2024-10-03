@@ -29,7 +29,6 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
   }
 
   .aside {
-    height: 100%;
     border-right: 1px solid #efefef;
     display: flex;
     flex-direction: column;
@@ -39,6 +38,7 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
     position: sticky;
     width: 240px;
     flex-shrink: 0;
+    top: 104px;
     align-self: flex-start;
     box-shadow:
       rgba(0, 0, 0, 0) 0px 0px 0px 0px,
@@ -54,7 +54,9 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
   }
 
   .aside-scroll {
+    height: calc(100dvh - 104px);
     padding: 0;
+    overscroll-behavior: contain;
   }
 
   @media screen and (max-width: 768px) {

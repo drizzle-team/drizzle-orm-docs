@@ -41,9 +41,9 @@ const { tree, filteredHeadings, title } = await getContentTree({
           <EndOfContent />
           <!-- <Footer /> -->
         </div>
-        <div class="right-aside-container">
-          <RightAside />
-        </div>
+      </div>
+      <div class="right-aside-container">
+        <RightAside />
       </div>
     </main>
     <style>
@@ -52,19 +52,17 @@ const { tree, filteredHeadings, title } = await getContentTree({
       }
 
       @media screen and (max-width: 1024px) {
-        .documentation-content-wrap {
-          grid-template-columns: minmax(0, 1fr);
-        }
         .right-aside-container {
           display: none;
         }
       }
     </style>
     <style is:global>
+        body {
+            margin-top: 104px;
+        }
       .documentation-content-wrap {
-        display: grid;
         width: 100%;
-        grid-template-columns: minmax(0, 1fr) 240px;
         overflow-y: scroll;
         overflow-x: hidden;
       }
@@ -102,10 +100,6 @@ const { tree, filteredHeadings, title } = await getContentTree({
         margin: 0 auto;
         padding-left: 24px;
         padding-right: 22px;
-      }
-
-      body[class~='banner-shown'] .documentation-container {
-        height: calc(100dvh - 104px);
       }
 
       .documentation-content {
@@ -152,7 +146,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
       if (hash !== '') {
         const targetElement = document.querySelector(hash);
         if (targetElement) {
-          targetElement.scrollIntoView();
+          setTimeout(() => targetElement.scrollIntoView(), 10);
         }
       }
     </script>
@@ -268,9 +262,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
           if (leftSidebarScroll !== null) {
             leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
           } else if (activeNavItem) {
-            findPreviousNavSeparator(activeNavItem)?.scrollIntoView({
-              block: "start",
-            });
+            leftSidebar.scrollTop = findPreviousNavSeparator(activeNavItem).offsetTop;
           }
         }
       };

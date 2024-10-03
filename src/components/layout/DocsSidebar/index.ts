@@ -58,9 +58,8 @@ const mainScript = () => {
     if (leftSidebarScroll !== null) {
       leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
     } else if (activeNavItem) {
-      findPreviousNavSeparator(activeNavItem)?.scrollIntoView({
-        block: "start",
-      });
+      leftSidebar.scrollTop =
+        findPreviousNavSeparator(activeNavItem)!.offsetTop;
     }
   }
 };

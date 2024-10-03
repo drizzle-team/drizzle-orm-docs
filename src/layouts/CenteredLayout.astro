@@ -69,6 +69,9 @@ const { title, tree  } = await getContentTree({
       }
     </style>
     <style is:global>
+        body {
+            margin-top: 104px;
+        }
       .navigation_nav_container_blur {
         -webkit-backdrop-filter: blur(12px);
         backdrop-filter: blur(12px);
@@ -101,10 +104,6 @@ const { title, tree  } = await getContentTree({
         margin: 0 auto;
         overflow-y: scroll;
         overflow-x: hidden;
-      }
-
-      body[class~="banner-shown"] .documentation-container {
-        height: calc(100dvh - 104px);
       }
 
       .documentation-content {
