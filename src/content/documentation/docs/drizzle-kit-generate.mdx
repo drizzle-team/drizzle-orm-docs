@@ -7,6 +7,7 @@ import Callout from "@/components/markdown/Callout.astro";
 import Prerequisites from "@mdx/Prerequisites.astro"
 import Npx from "@mdx/Npx.astro";
 import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx"
+import Dialects from "@mdx/Dialects.mdx"
 
 # `drizzle-kit generate` 
 
@@ -93,14 +94,14 @@ npx drizzle-kit generate --dialect=postgresql --schema=./src/schema.ts
 ```
 </CodeTabs>
 
-#### Schema files path
+### Schema files path
 You can have a single `schema.ts` file or as many schema files as you want spread out across the project. 
 Drizzle Kit requires you to specify path(s) to them as a [glob](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) via `schema` configuration option.
 
 <SchemaFilePaths/>
 
 
-#### Custom migration file name
+### Custom migration file name
 You can set custom migration file names by providing `--name` CLI option
 ```shell
 npx drizzle-kit generate --name=init
@@ -114,7 +115,7 @@ npx drizzle-kit generate --name=init
  └ …
 ```
 
-#### Multiple configuration files in one project
+### Multiple configuration files in one project
 You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases or different databases on the same project:
 <Npx>
   drizzle-kit generate --config=drizzle-dev.config.ts
@@ -131,7 +132,7 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-#### Custom migrations
+### Custom migrations
 You can generate empty migration files to write your own custom SQL migrations 
 for DDL alternations currently not supported by Drizzle Kit or data seeding. Extended docs on custom migrations - [see here](/docs/kit-custom-migration)
 
@@ -157,18 +158,38 @@ INSERT INTO "users" ("name") VALUES('Dandrew');
 ```
 </Section>
 
-#### List of all avaialable options
-|               |          |                                                                            |
-| :------------ | :------- | :----------------------------------------------------------------------    |
-| `dialect`     | required | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite`    |
-| `schema`      | required | path to typescript schema file or folder with multiple schema files        |
-| `out`         |          | migrations folder, default is `./drizzle`                                  |
-| `config`      |          | config file path, default is `drizzle.config.ts`                           |
-| `custom`      |          | generate empty SQL for custom migration                                    |
-| `name`        |          | generate migration with custom name                                        |
-| `breakpoints` |          | SQL statements breakpoints, default is `true`                              |
+### Extended list of available configurations
+`drizzle-kit generate` has a list of cli-only options
 
-#### Extended example
+<rem025/>
+
+|               |                                                      |
+| :--------     | :--------------------------------------------------- |
+| `custom`      | generate empty SQL for custom migration              |
+| `name`        | generate migration with custom name                  |
+| `breakpoints` | SQL statements breakpoints, default is `true`        |
+
+<rem025/>
+
+<Npx>
+drizzle-kit push --strict --verbose --force
+</Npx>
+
+<br/>
+<hr/>
+<br/>
+We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/kit-config-file) file, 
+yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
+
+|               |            |                                                                            |
+| :------------ | :-------   | :----------------------------------------------------------------------    |
+| `dialect`     | `required` | Database dialect, one of <Dialects/>                                       |
+| `schema`      | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files  |
+| `out`         |            | Migrations output folder, default is `./drizzle`                           |
+| `config`      |            | Configuration file path, default is `drizzle.config.ts`                    |
+
+
+### Extended example
 Example of how to create a custom postgresql migration file named `0001_seed-users.sql` 
 with Drizzle schema located in `./src/schema.ts` and migrations folder named `./migrations` insted of default `./drizzle`.
 

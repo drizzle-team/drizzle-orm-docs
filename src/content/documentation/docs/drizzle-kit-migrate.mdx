@@ -80,7 +80,7 @@ npx drizzle-kit migrate --dialect=postgresql --url=postgresql://user:password@ho
 ```
 </CodeTabs>
 
-#### Applied migrations log in the database
+### Applied migrations log in the database
 Upon running migrations Drizzle Kit will persist records about successfully applied migrations in your database. 
 It will store them in migrations log table named `__drizzle_migrations`.
 
@@ -99,7 +99,7 @@ export default defineConfig({
 });
 ```
 
-#### Multiple configuration files in one project
+### Multiple configuration files in one project
 You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases on the same project:
 <Npx>
   drizzle-kit migrate --config=drizzle-dev.config.ts
@@ -116,7 +116,7 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-#### Extended example
+### Extended example
 Let's generate SQL migration and apply it to our database using `drizzle-kit generate` and `drizzle-kit migrate` commands
 
 ```plaintext
