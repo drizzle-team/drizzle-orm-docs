@@ -15,16 +15,15 @@ const { items } = Astro.props;
     <slot />
   </div>
 </div>
-
+<script is:inline data-astro-rerun>
+  document.querySelectorAll('.code').forEach((codeBlock) => {
+    Array.from(codeBlock.children).forEach((child, index) => {
+      child.classList.toggle('hidden', index !== 0);
+    });
+  });
+</script>
 <script>
   document.addEventListener("astro:page-load", () => {
-    const codeBlocks = document.querySelectorAll('.code');
-    codeBlocks.forEach((codeBlock) => {
-      Array.from(codeBlock.children).forEach((child, index) => {
-        child.classList.toggle('hidden', index !== 0);
-      });
-    });
-
     document.querySelectorAll('[data-change-code-tab-btn]').forEach((button) => {
       button.addEventListener('click', (e) => {
         const target = e.target as Element;
