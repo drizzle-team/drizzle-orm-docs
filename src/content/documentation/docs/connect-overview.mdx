@@ -75,7 +75,7 @@ const db = drizzle(pool); // <--- sync
 </Section>
 
 The latter API is our original API which you can use when you need drizzle initialization to be synchronous.  
-Mostly every driver supports initialization via either **connection URL** or a set of **conneciton params**  
+Mostly every driver supports initialization via either **connection URL** or a set of **connection params**  
 ```ts
 import { drizzle } from "drizzle-orm/connect"
 
@@ -83,7 +83,7 @@ const db = await drizzle("node-postgres", "postgresql://users:password@127.0.0.1
 
 // above is equivalent to
 const db = await drizzle("node-postgres", {
-  conneciton: {
+  connection: {
     user: "user",
     password: "password",
     host: "127.0.0.1",
@@ -97,10 +97,10 @@ Drizzle is by design natively compatible with every **edge** or **serverless** r
 ```ts
 import { drizzle } from "drizzle-orm/connect";
 
-const db = await drizzle("neon-http", process.env.DATABSE_URL);
-const db = await drizzle("neon-websocket", process.env.DATABSE_URL);
+const db = await drizzle("neon-http", process.env.DATABASE_URL);
+const db = await drizzle("neon-websocket", process.env.DATABASE_URL);
 const db = await drizzle("vercel-postgres");
-const db = await drizzle("planetscale", process.env.DATABSE_URL);
+const db = await drizzle("planetscale", process.env.DATABASE_URL);
 const db = await drizzle("d1", { connection: env.DB });
 ```
 And yes, we do support runtime specific drivers like [Bun SQLite](/docs/connect-bun-sqlite) or [Expo SQLite](/docs/connect-expo-sqlite):
@@ -121,7 +121,7 @@ const db = drizzle(expo);
 </Section>
 
 #### Database connection URL
-Just in case if you're not familiar with database connecion URL concept
+Just in case if you're not familiar with database connection URL concept
 ```
 postgresql://alex:AbC123dEf@ep-cool-darkness-123456.us-east-2.aws.neon.tech/dbname
              └──┘ └───────┘ └─────────────────────────────────────────────┘ └────┘
