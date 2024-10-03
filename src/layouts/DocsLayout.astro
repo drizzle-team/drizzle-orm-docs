@@ -118,8 +118,8 @@ const { tree, filteredHeadings, title } = await getContentTree({
 
       @media screen and (max-width: 1279px) {
         .documentation-content {
-          padding-left: 24px;
-          padding-right: 12px;
+          padding-left: 16px;
+          padding-right: 16px;
         }
       }
 
@@ -127,6 +127,11 @@ const { tree, filteredHeadings, title } = await getContentTree({
         .right-aside-container {
           display: none;
         }
+
+        .documentation-content {
+            padding-right: 0;
+        }
+
       }
 
       @media screen and (max-width: 768px) {
@@ -136,6 +141,10 @@ const { tree, filteredHeadings, title } = await getContentTree({
           padding-top: 1rem;
           width: 100%;
         }
+
+          .documentation-container {
+             padding: 0;
+          }
       }
     </style>
     <script>
