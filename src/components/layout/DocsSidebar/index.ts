@@ -58,8 +58,17 @@ const mainScript = () => {
     if (leftSidebarScroll !== null) {
       leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
     } else if (activeNavItem) {
-      leftSidebar.scrollTop =
-        findPreviousNavSeparator(activeNavItem)!.offsetTop;
+      if (
+        findPreviousNavSeparator(activeNavItem)?.classList.contains(
+          "nav-separator-collapsable",
+        )
+      ) {
+        leftSidebar.scrollTop =
+          findPreviousNavSeparator(activeNavItem)!.parentElement!.offsetTop;
+      } else {
+        leftSidebar.scrollTop =
+          findPreviousNavSeparator(activeNavItem)!.offsetTop;
+      }
     }
   }
 };
