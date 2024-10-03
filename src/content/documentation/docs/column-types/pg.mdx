@@ -7,6 +7,14 @@ import Callout from '@components/markdown/Callout.astro';
 
 We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](/docs/custom-types)**.
 
+<Callout title='important' type='warning'>
+All examples in this part of the documentation do not use database column name aliases, and column names are generated from TypeScript keys. 
+
+You can use database aliases in column names if you want, and you can also use the `casing` parameter to define a mapping strategy for Drizzle. 
+
+You can read more about it [here](http://localhost:4321/docs/sql-schema-declaration#shape-your-data-schema)
+</Callout>
+
 ### integer
 `integer` `int` `int4`  
 Signed 4-byte integer     
@@ -18,7 +26,7 @@ If you need `integer autoincrement` please refer to **[serial.](#serial)**
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	int: integer('int')
+	int: integer()
 });
 
 ```
@@ -36,8 +44,8 @@ import { sql } from "drizzle-orm";
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	int1: integer('int1').default(10)
-	int2: integer('int2').default(sql`'10'::int`)
+	int1: integer().default(10)
+	int2: integer().default(sql`'10'::int`)
 });
 
 ```
@@ -60,7 +68,7 @@ If you need `smallint autoincrement` please refer to **[smallserial.](#smallseri
 import { smallint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	smallint: smallint('smallint')
+	smallint: smallint()
 });
 ```
 
@@ -77,8 +85,8 @@ import { sql } from "drizzle-orm";
 import { smallint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	smallint1: smallint('smallint1').default(10)
-	smallint2: smallint('smallint2').default(sql`'10'::smallint`)
+	smallint1: smallint().default(10)
+	smallint2: smallint().default(sql`'10'::smallint`)
 });
 ```
 
@@ -102,14 +110,14 @@ If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'nu
 import { bigint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	bigint: bigint('bigint', { mode: 'number' })
+	bigint: bigint({ mode: 'number' })
 });
 
 // will be inferred as `number`
-bigint: bigint('bigint', { mode: 'number' })
+bigint: bigint({ mode: 'number' })
 
 // will be inferred as `bigint`
-bigint: bigint('bigint', { mode: 'bigint' })
+bigint: bigint({ mode: 'bigint' })
 ```
 
 ```sql
@@ -125,8 +133,8 @@ import { sql } from "drizzle-orm";
 import { bigint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	bigint1: bigint('bigint1').default(10)
-	bigint2: bigint('bigint2').default(sql`'10'::bigint`)
+	bigint1: bigint().default(10)
+	bigint2: bigint().default(sql`'10'::bigint`)
 });
 ```
 
@@ -148,7 +156,7 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { serial, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  serial: serial('serial'),
+  serial: serial(),
 });
 ```
 
@@ -169,7 +177,7 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { smallserial, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  smallserial: smallserial('smallserial'),
+  smallserial: smallserial(),
 });
 ```
 
@@ -192,7 +200,7 @@ If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'nu
 import { bigserial, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  bigserial: bigserial('bigserial', { mode: 'number' }),
+  bigserial: bigserial({ mode: 'number' }),
 });
 ```
 
@@ -214,7 +222,7 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { boolean, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	boolean: boolean('boolean')
+	boolean: boolean()
 });
 
 ```
@@ -238,11 +246,11 @@ You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `se
 import { text, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  text: text('text')
+  text: text()
 });
 
 // will be inferred as text: "value1" | "value2" | null
-text: text('text', { enum: ["value1", "value2"] })
+text: text({ enum: ["value1", "value2"] })
 ```
 
 ```sql
@@ -266,12 +274,12 @@ The `length` parameter is optional according to PostgreSQL docs.
 import { varchar, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  varchar1: varchar('varchar1'),
-  varchar2: varchar('varchar2', { length: 256 }),
+  varchar1: varchar(),
+  varchar2: varchar({ length: 256 }),
 });
 
 // will be inferred as text: "value1" | "value2" | null
-varchar: varchar('varchar', { enum: ["value1", "value2"] }),
+varchar: varchar({ enum: ["value1", "value2"] }),
 ```
 
 ```sql
@@ -296,12 +304,12 @@ The `length` parameter is optional according to PostgreSQL docs.
 import { char, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  char1: char('char1'),
-  char2: char('char2', { length: 256 }),
+  char1: char(),
+  char2: char({ length: 256 }),
 });
 
 // will be inferred as text: "value1" | "value2" | null
-char: char('char', { enum: ["value1", "value2"] }),
+char: char({ enum: ["value1", "value2"] }),
 ```
 
 ```sql
@@ -323,9 +331,9 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { numeric, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  numeric1: numeric('numeric1'),
-  numeric2: numeric('numeric2', { precision: 100 }),
-  numeric3: numeric('numeric3', { precision: 100, scale: 20 }),
+  numeric1: numeric(),
+  numeric2: numeric({ precision: 100 }),
+  numeric3: numeric({ precision: 100, scale: 20 }),
 });
 ```
 
@@ -353,9 +361,9 @@ import { sql } from "drizzle-orm";
 import { real, pgTable } from "drizzle-orm/pg-core";  
 
 const table = pgTable('table', {
-	real1: real('real1'),
-	real2: real('real2').default(10.10),
-	real2: real('real2').default(sql`'10.10'::real`),
+	real1: real(),
+	real2: real().default(10.10),
+	real2: real().default(sql`'10.10'::real`),
 });
 ```
 
@@ -380,9 +388,9 @@ import { sql } from "drizzle-orm";
 import { doublePrecision, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	double1: doublePrecision('double1'),
-	double2: doublePrecision('double2').default(10.10),
-	double3: doublePrecision('double3').default(sql`'10.10'::double precision`),
+	double1: doublePrecision(),
+	double2: doublePrecision().default(10.10),
+	double3: doublePrecision().default(sql`'10.10'::double precision`),
 });
 ```
 
@@ -406,9 +414,9 @@ import { sql } from "drizzle-orm";
 import { json, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	json1: json('json1'),
-	json2: json('json2').default({ foo: "bar" }),
-	json3: json('json3').default(sql`'{foo: "bar"}'::json`),
+	json1: json(),
+	json2: json().default({ foo: "bar" }),
+	json3: json().default(sql`'{foo: "bar"}'::json`),
 });
 ```
 
@@ -424,14 +432,14 @@ CREATE TABLE IF NOT EXISTS "table" (
 You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
 It provides compile time protection for default values, insert and select schemas.
 ```typescript
-// will be infered as { foo: string }
-json: json('json').$type<{ foo: string }>();
+// will be inferred as { foo: string }
+json: json().$type<{ foo: string }>();
 
-// will be infered as string[]
-json: json('json').$type<string[]>();
+// will be inferred as string[]
+json: json().$type<string[]>();
 
 // won't compile
-json: json('json').$type<string[]>().default({});
+json: json().$type<string[]>().default({});
 ```
 
 ### jsonb
@@ -444,9 +452,9 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { jsonb, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	jsonb1: jsonb('jsonb1'),
-	jsonb2: jsonb('jsonb2').default({ foo: "bar" }),
-	jsonb3: jsonb('jsonb3').default(sql`'{foo: "bar"}'::jsonb`),
+	jsonb1: jsonb(),
+	jsonb2: jsonb().default({ foo: "bar" }),
+	jsonb3: jsonb().default(sql`'{foo: "bar"}'::jsonb`),
 });
 ```
 ```sql
@@ -462,14 +470,14 @@ You can specify `.$type<..>()` for json object inference, it **won't** check run
 It provides compile time protection for default values, insert and select schemas.
 
 ```typescript
-// will be infered as { foo: string }
-jsonb: jsonb('jsonb').$type<{ foo: string }>();
+// will be inferred as { foo: string }
+jsonb: jsonb().$type<{ foo: string }>();
 
-// will be infered as string[]
-jsonb: jsonb('jsonb').$type<string[]>();
+// will be inferred as string[]
+jsonb: jsonb().$type<string[]>();
 
 // won't compile
-jsonb: jsonb('jsonb').$type<string[]>().default({});
+jsonb: jsonb().$type<string[]>().default({});
 ```
 
 ### time
@@ -483,10 +491,10 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { time, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-  time1: time('time1'),
-  time2: time('time2', { withTimezone: true }),
-  time3: time('time3', { precision: 6 }),
-	time4: time('time4', { precision: 6, withTimezone: true })
+  time1: time(),
+  time2: time({ withTimezone: true }),
+  time3: time({ precision: 6 }),
+	time4: time({ precision: 6, withTimezone: true })
 });
 ```
 
@@ -511,10 +519,10 @@ import { sql } from "drizzle-orm";
 import { timestamp, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-  timestamp1: timestamp('timestamp1'),
-	timestamp2: timestamp('timestamp2', { precision: 6, withTimezone: true }),
-	timestamp3: timestamp('timestamp3').defaultNow(),
-	timestamp4: timestamp('timestamp4').default(sql`now()`),
+  timestamp1: timestamp(),
+	timestamp2: timestamp({ precision: 6, withTimezone: true }),
+	timestamp3: timestamp().defaultNow(),
+	timestamp4: timestamp().default(sql`now()`),
 });
 ```
 ```sql
@@ -530,10 +538,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 You can specify either `date` or `string` infer modes:
 ```typescript
 // will infer as date
-timestamp: timestamp('timestamp', { mode: "date" }),
+timestamp: timestamp({ mode: "date" }),
 
 // will infer as string
-timestamp: timestamp('timestamp', { mode: "string" }),
+timestamp: timestamp({ mode: "string" }),
 ```
 
 > The `string` mode does not perform any mappings for you. This mode was added to Drizzle ORM to provide developers
@@ -575,7 +583,7 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { date, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	date: date('date'),
+	date: date(),
 });
 ```
 
@@ -588,10 +596,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 You can specify either `date` or `string` infer modes:
 ```typescript
 // will infer as date
-date: date('date', { mode: "date" }),
+date: date({ mode: "date" }),
 
 // will infer as string
-date: date('date', { mode: "string" }),
+date: date({ mode: "string" }),
 ```
 ### interval
 `interval`  
@@ -604,9 +612,9 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { interval, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	interval1: interval('interval1'),
-  interval2: interval('interval2', { fields: 'day' }),
-  interval3: interval('interval3', { fields: 'month' , precision: 6 }),
+	interval1: interval(),
+  interval2: interval({ fields: 'day' }),
+  interval3: interval({ fields: 'month' , precision: 6 }),
 });
 
 ```
@@ -635,15 +643,15 @@ Type `point` has 2 modes for mappings from the database: `tuple` and `xy`.
 <Section>
 ```typescript
 const items = pgTable('items', {
- point: point('point'),
- pointObj: point('point_xy', { mode: 'xy' }),
+ point: point(),
+ pointObj: point({ mode: 'xy' }),
 });
 ```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "items" (
 	"point" point,
-	"point_xy" point,
+	"pointObj" point,
 );
 ```
 </Section>
@@ -663,15 +671,15 @@ Type `line` has 2 modes for mappings from the database: `tuple` and `abc`.
 <Section>
 ```typescript
 const items = pgTable('items', {
- line: line('line'),
- lineObj: point('line_abc', { mode: 'abc' }),
+ line: line(),
+ lineObj: point({ mode: 'abc' }),
 });
 ```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "items" (
 	"line" line,
-	"line_abc" line,
+	"lineObj" line,
 );
 ```
 </Section>
@@ -690,7 +698,7 @@ import { pgEnum, pgTable } from "drizzle-orm/pg-core";
 export const moodEnum = pgEnum('mood', ['sad', 'ok', 'happy']);
 
 export const table = pgTable('table', {
-  mood: moodEnum('mood'),
+  mood: moodEnum(),
 });
 ```
 
@@ -715,8 +723,8 @@ type Data = {
 };
 
 const users = pgTable('users', {
-  id: serial('id').$type<UserId>().primaryKey(),
-  jsonField: json('json_field').$type<Data>(),
+  id: serial().$type<UserId>().primaryKey(),
+  jsonField: json().$type<Data>(),
 });
 ```
 
@@ -748,9 +756,9 @@ PostgreSQL supports identity columns as a way to automatically generate unique i
 import { pgTable, integer, text } from 'drizzle-orm/pg-core' 
 
 export const ingredients = pgTable("ingredients", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
-  name: text("name").notNull(),
-  description: text("description"),
+  id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
+  name: text().notNull(),
+  description: text(),
 });
 ```
 
@@ -773,10 +781,10 @@ import { sql } from "drizzle-orm";
 import { integer, pgTable, uuid } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	integer1: integer('integer1').default(42),
-	integer2: integer('integer2').default(sql`'42'::integer`),
-	uuid1: uuid('uuid1').defaultRandom(),
-	uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
+	integer1: integer().default(42),
+	integer2: integer().default(sql`'42'::integer`),
+	uuid1: uuid().defaultRandom(),
+	uuid2: uuid().default(sql`gen_random_uuid()`),
 });
 ```
 
@@ -804,7 +812,7 @@ import { text, pgTable } from "drizzle-orm/pg-core";
 import { createId } from '@paralleldrive/cuid2';
 
 const table = pgTable('table', {
-	id: text('id').$defaultFn(() => createId()),
+	id: text().$defaultFn(() => createId()),
 });
 ```
 
@@ -824,9 +832,9 @@ when the row is inserted as well, and the returned value will be used as the col
 import { integer, timestamp, text, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	updateCounter: integer('update_counter').default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
-	updatedAt: timestamp('updated_at', { mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
-    	alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
+	updateCounter: integer().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
+	updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
+    	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
 ```
 
@@ -839,7 +847,7 @@ const table = pgTable('table', {
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	integer: integer('integer').notNull(),
+	integer: integer().notNull(),
 });
 ```
 
@@ -859,7 +867,7 @@ This requires that the values be both unique and not null.
 import { serial, pgTable } from "drizzle-orm/pg-core";
 
 const table = pgTable('table', {
-	id: serial('id').primaryKey(),
+	id: serial().primaryKey(),
 });
 ```
 

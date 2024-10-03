@@ -139,7 +139,7 @@ Add column to `users` table
 
 <Tag style="font-size: 12px">**Option 3**</Tag>
 > I want to have database schema in my TypeScript codebase, 
-> I wan't Drizzle to generate SQL migration files for me and apply them to my database
+> I want Drizzle to generate SQL migration files for me and apply them to my database
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
@@ -202,14 +202,14 @@ CREATE TABLE "users" (
 
 <Tag style="font-size: 12px">**Option 4**</Tag>
 > I want to have database schema in my TypeScript codebase,
-> I wan't Drizzle to generate SQL migration files for me and I want Drizzle to apply them during runtime
+> I want Drizzle to generate SQL migration files for me and I want Drizzle to apply them during runtime
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
 Drizzle let's you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate) and then 
 you can apply them to the database during runtime of your application.
 
-This approach is widely used for **monolythic** applications when you apply database migrations 
+This approach is widely used for **monolithic** applications when you apply database migrations 
 during zero downtime deployment and rollback DDL changes if something fails. 
 This is also used in **serverless** deployments with migrations running in **custom resource** once during deployment process.
 
@@ -279,7 +279,7 @@ await migrate(db);
 
 <Tag style="font-size: 12px">**Option 5**</Tag>
 > I want to have database schema in my TypeScript codebase,
-> I wan't Drizzle to generate SQL migration files for me,
+> I want Drizzle to generate SQL migration files for me,
 > but I will apply them to my database myself or via external migration tools 
 
 <Callout collapsed="Expand details">

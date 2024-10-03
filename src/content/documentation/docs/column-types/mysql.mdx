@@ -6,6 +6,14 @@ import Callout from '@components/markdown/Callout.astro';
 
 We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](/docs/custom-types)**.
 
+<Callout title='important' type='warning'>
+All examples in this part of the documentation do not use database column name aliases, and column names are generated from TypeScript keys. 
+
+You can use database aliases in column names if you want, and you can also use the `casing` parameter to define a mapping strategy for Drizzle. 
+
+You can read more about it [here](http://localhost:4321/docs/sql-schema-declaration#shape-your-data-schema)
+</Callout>
+
 ### Integer
 
 A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
@@ -15,7 +23,7 @@ A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending
 import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	int: int('int')
+	int: int()
 });
 ```
 
@@ -33,7 +41,7 @@ CREATE TABLE `table` (
 import { tinyint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	tinyint: tinyint('tinyint')
+	tinyint: tinyint()
 });
 ```
 
@@ -51,7 +59,7 @@ CREATE TABLE `table` (
 import { smallint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	smallint: smallint('smallint')
+	smallint: smallint()
 });
 ```
 
@@ -69,7 +77,7 @@ CREATE TABLE `table` (
 import { mediumint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	mediumint: mediumint('mediumint')
+	mediumint: mediumint()
 });
 ```
 
@@ -87,8 +95,8 @@ CREATE TABLE `table` (
 import { bigint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	bigint: bigint('bigint', { mode: 'number' })
-	bigintUnsigned: bigint('bigintU', { mode: 'number', unsigned: true })
+	bigint: bigint({ mode: 'number' })
+	bigintUnsigned: bigint({ mode: 'number', unsigned: true })
 });
 
 bigint('...', { mode: 'number' | 'bigint' });
@@ -100,12 +108,12 @@ bigint('...', { mode: 'number' | 'bigint', unsigned: true })
 ```sql
 CREATE TABLE `table` (
 	`bigint` bigint,
-	`bigintU` bigint unsigned,
+	`bigintUnsigned` bigint unsigned,
 );
 ```
 </Section>
 
-We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type and 
+We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type 
 
 ### real
 
@@ -114,7 +122,7 @@ We've omitted config of `M` in `bigint(M)`, since it indicates the display width
 import { real, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	real: real('real')
+	real: real()
 });
 ```
 
@@ -130,15 +138,15 @@ CREATE TABLE `table` (
 import { real, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	realPrecision: real('real_precision', { precision: 1,}),
-	realPrecisionScale: real('real_precision_scale', { precision: 1, scale: 1,}),
+	realPrecision: real({ precision: 1,}),
+	realPrecisionScale: real({ precision: 1, scale: 1,}),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`real_precision` real(1),
-	`real_precision_scale` real(1, 1),
+	`realPrecision` real(1),
+	`realPrecisionScale` real(1, 1),
 );
 ```
 </Section>
@@ -150,7 +158,7 @@ CREATE TABLE `table` (
 import { decimal, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	decimal: decimal('decimal')
+	decimal: decimal()
 });
 ```
 
@@ -166,15 +174,15 @@ CREATE TABLE `table` (
 import { decimal, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	decimalPrecision: decimal('decimal_precision', { precision: 1,}),
-	decimalPrecisionScale: decimal('decimal_precision_scale', { precision: 1, scale: 1,}),
+	decimalPrecision: decimal({ precision: 1,}),
+	decimalPrecisionScale: decimal({ precision: 1, scale: 1,}),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`decimal_precision` decimal(1),
-	`decimal_precision_scale` decimal(1, 1),
+	`decimalPrecision` decimal(1),
+	`decimalPrecisionScale` decimal(1, 1),
 );
 ```
 </Section>
@@ -202,15 +210,15 @@ CREATE TABLE `table` (
 import { double, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	doublePrecision: double('double_precision', { precision: 1,}),
-	doublePrecisionScale: double('double_precision_scale', { precision: 1, scale: 1,}),
+	doublePrecision: double({ precision: 1,}),
+	doublePrecisionScale: double({ precision: 1, scale: 1,}),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`double_precision` double(1),
-	`double_precision_scale` double(1, 1),
+	`doublePrecision` double(1),
+	`doublePrecisionScale` double(1, 1),
 );
 ```
 </Section>
@@ -222,7 +230,7 @@ CREATE TABLE `table` (
 import { float, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	float: float('float')
+	float: float()
 });
 ```
 
@@ -243,7 +251,7 @@ CREATE TABLE `table` (
 import { serial, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	serial: serial('serial')
+	serial: serial()
 });
 ```
 
@@ -261,7 +269,7 @@ CREATE TABLE `table` (
 import { binary, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	binary: binary('binary')
+	binary: binary()
 });
 ```
 
@@ -279,7 +287,7 @@ CREATE TABLE `table` (
 import { varbinary, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	varbinary: varbinary('varbinary', { length: 2}),
+	varbinary: varbinary({ length: 2}),
 });
 ```
 
@@ -297,7 +305,7 @@ CREATE TABLE `table` (
 import { char, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	char: char('char'),
+	char: char(),
 });
 ```
 
@@ -315,11 +323,11 @@ You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `se
 import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	varchar: varchar('varchar', { length: 2 }),
+	varchar: varchar({ length: 2 }),
 });
 
 // will be inferred as text: "value1" | "value2" | null
-varchar: varchar('varchar', { length: 6, enum: ["value1", "value2"] })
+varchar: varchar({ length: 6, enum: ["value1", "value2"] })
 ```
 
 ```sql
@@ -338,11 +346,11 @@ You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `se
 import { text, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	text: text('text'),
+	text: text(),
 });
 
 // will be inferred as text: "value1" | "value2" | null
-text: text('text', { enum: ["value1", "value2"] });
+text: text({ enum: ["value1", "value2"] });
 ```
 
 ```sql
@@ -359,7 +367,7 @@ CREATE TABLE `table` (
 import { boolean, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	boolean: boolean('boolean'),
+	boolean: boolean(),
 });
 ```
 
@@ -377,7 +385,7 @@ CREATE TABLE `table` (
 import { boolean, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	date: date('date'),
+	date: date(),
 });
 ```
 
@@ -395,7 +403,7 @@ CREATE TABLE `table` (
 import { datetime, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	datetime: datetime('datetime'),
+	datetime: datetime(),
 });
 
 datetime('...', { mode: 'date' | "string"}),
@@ -414,7 +422,7 @@ CREATE TABLE `table` (
 import { datetime, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	datetime: datetime('datetime', { mode: 'date', fsp: 6 }),
+	datetime: datetime({ mode: 'date', fsp: 6 }),
 });
 ```
 
@@ -432,8 +440,8 @@ CREATE TABLE `table` (
 import { time, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	time: time('time'),
-	timefsp: time('time_fsp', { fsp: 6 }),
+	time: time(),
+	timefsp: time({ fsp: 6 }),
 });
 	
 time('...', { fsp: 0..6 }),
@@ -442,7 +450,7 @@ time('...', { fsp: 0..6 }),
 ```sql
 CREATE TABLE `table` (
 	`time` time,
-	`time_fsp` time(6),
+	`timefsp` time(6),
 );
 ```
 </Section>
@@ -454,7 +462,7 @@ CREATE TABLE `table` (
 import { year, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	year: year('year'),
+	year: year(),
 });
 ```
 
@@ -472,7 +480,7 @@ CREATE TABLE `table` (
 import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	timestamp: timestamp('timestamp'),
+	timestamp: timestamp(),
 });
 
 timestamp('...', { mode: 'date' | "string"}),
@@ -491,7 +499,7 @@ CREATE TABLE `table` (
 import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	timestamp: timestamp('timestamp', { mode: 'date', fsp: 6 }),
+	timestamp: timestamp({ mode: 'date', fsp: 6 }),
 });
 ```
 
@@ -507,7 +515,7 @@ CREATE TABLE `table` (
 import { timestamp, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	timestamp: timestamp('timestamp').defaultNow(),
+	timestamp: timestamp().defaultNow(),
 });
 ```
 
@@ -525,7 +533,7 @@ CREATE TABLE `table` (
 import { json, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	json: json('json'),
+	json: json(),
 });
 
 ```
@@ -540,14 +548,14 @@ CREATE TABLE `table` (
 You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
 It provides compile time protection for default values, insert and select schemas.
 ```typescript
-// will be infered as { foo: string }
-json: json('json').$type<{ foo: string }>();
+// will be inferred as { foo: string }
+json: json().$type<{ foo: string }>();
 
-// will be infered as string[]
-json: json('json').$type<string[]>();
+// will be inferred as string[]
+json: json().$type<string[]>();
 
 // won't compile
-json: json('json').$type<string[]>().default({});
+json: json().$type<string[]>().default({});
 ```
 
 ## enumColumn
@@ -557,7 +565,7 @@ json: json('json').$type<string[]>().default({});
 import { mysqlEnum, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	mysqlEnum: mysqlEnum('popularity', ['unknown', 'known', 'popular']),
+	mysqlEnum: mysqlEnum(['unknown', 'known', 'popular']),
 });
 ```
 
@@ -581,8 +589,8 @@ type Data = {
 };
 
 const users = mysqlTable('users', {
-  id: int('id').$type<UserId>().primaryKey(),
-  jsonField: json('json_field').$type<Data>(),
+  id: int().$type<UserId>().primaryKey(),
+  jsonField: json().$type<Data>(),
 });
 ```
 
@@ -595,7 +603,7 @@ const users = mysqlTable('users', {
 import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	int: int('int').notNull(),
+	int: int().notNull(),
 });
 ```
 
@@ -621,7 +629,7 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	int: int('int').default(3),
+	int: int().default(3),
 });
 ```
 
@@ -645,7 +653,7 @@ import { varchar, mysqlTable } from "drizzle-orm/mysql-core";
 import { createId } from '@paralleldrive/cuid2';
 
 const table = mysqlTable('table', {
-	id: varchar('id', { length: 128 }).$defaultFn(() => createId()),
+	id: varchar({ length: 128 }).$defaultFn(() => createId()),
 });
 ```
 
@@ -665,7 +673,7 @@ when the row is inserted as well, and the returned value will be used as the col
 import { text, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-    alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
+    alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
 ```
 
@@ -676,7 +684,7 @@ const table = mysqlTable('table', {
 import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	int: int('int').primaryKey(),
+	int: int().primaryKey(),
 });
 ```
 
@@ -694,7 +702,7 @@ CREATE TABLE `table` (
 import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	int: int('int').autoincrement(),
+	int: int().autoincrement(),
 });
 ```
 

@@ -11,6 +11,14 @@ has one of the following storage classes `NULL`, `INTEGER`, `REAL`, `TEXT` and `
 
 We have native support for all of them, yet if that's not enough for you, feel free to create **[custom types](/docs/custom-types)**.
 
+<Callout title='important' type='warning'>
+All examples in this part of the documentation do not use database column name aliases, and column names are generated from TypeScript keys. 
+
+You can use database aliases in column names if you want, and you can also use the `casing` parameter to define a mapping strategy for Drizzle. 
+
+You can read more about it [here](http://localhost:4321/docs/sql-schema-declaration#shape-your-data-schema)
+</Callout>
+
 ### Integer
 
 A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
@@ -20,14 +28,14 @@ A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	id: integer('id')
+	id: integer()
 });
 
 // you can customize integer mode to be number, boolean, timestamp, timestamp_ms
-integer('id', { mode: 'number' })
-integer('id', { mode: 'boolean' })
-integer('id', { mode: 'timestamp_ms' })
-integer('id', { mode: 'timestamp' }) // Date
+integer({ mode: 'number' })
+integer({ mode: 'boolean' })
+integer({ mode: 'timestamp_ms' })
+integer({ mode: 'timestamp' }) // Date
 
 ```
 
@@ -42,7 +50,7 @@ CREATE TABLE `table` (
 <Section>
 ```typescript
 // to make integer primary key auto increment
-integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true })
+integer({ mode: 'number' }).primaryKey({ autoIncrement: true })
 ```
 ```sql
 CREATE TABLE `table` (
@@ -60,7 +68,7 @@ A floating point value, stored as an `8-byte IEEE` floating point number.
 import { real, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	real: real('real')
+	real: real()
 });
 
 ```
@@ -86,13 +94,13 @@ A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-1
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	text: text('text')
+	text: text()
 });
 
 // will be inferred as text: "value1" | "value2" | null
-text('text', { enum: ["value1", "value2"] })
-text('text', { mode: 'json' })
-text('text', { mode: 'json' }).$type<{ foo: string }>()
+text({ enum: ["value1", "value2"] })
+text({ mode: 'json' })
+text({ mode: 'json' }).$type<{ foo: string }>()
 ```
 
 ```sql
@@ -122,15 +130,15 @@ A blob of data, stored exactly as it was input.
 import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	blob: blob('blob')
+	blob: blob()
 });
 
-blob('blob')
-blob('blob', { mode: 'buffer' })
-blob('blob', { mode: 'bigint' })
+blob()
+blob({ mode: 'buffer' })
+blob({ mode: 'bigint' })
 
-blob('blob', { mode: 'json' })
-blob('blob', { mode: 'json' }).$type<{ foo: string }>()
+blob({ mode: 'json' })
+blob({ mode: 'json' }).$type<{ foo: string }>()
 
 ```
 
@@ -144,14 +152,14 @@ You can specify `.$type<..>()` for blob inference, it **won't** check runtime va
 It provides compile time protection for default values, insert and select schemas.  
 
 ```typescript
-// will be infered as { foo: string }
-json: blob('json', { mode: 'json' }).$type<{ foo: string }>();
+// will be inferred as { foo: string }
+json: blob({ mode: 'json' }).$type<{ foo: string }>();
 
-// will be infered as string[]
-json: blob('json', { mode: 'json' }).$type<string[]>();
+// will be inferred as string[]
+json: blob({ mode: 'json' }).$type<string[]>();
 
 // won't compile
-json: blob('json', { mode: 'json' }).$type<string[]>().default({});
+json: blob({ mode: 'json' }).$type<string[]>().default({});
 ```
 
 </Section>
@@ -168,7 +176,7 @@ values in the database.
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	id: integer('id', { mode: 'boolean' })
+	id: integer({ mode: 'boolean' })
 });
 ```
 
@@ -191,7 +199,7 @@ This mode allows you to work with BigInt instances in your code, and Drizzle sto
 import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	id: blob('id', { mode: 'bigint' })
+	id: blob({ mode: 'bigint' })
 });
 
 ```
@@ -213,8 +221,8 @@ type Data = {
 };
 
 const users = sqliteTable('users', {
-  id: integer('id').$type<UserId>().primaryKey(),
-  jsonField: blob('json_field').$type<Data>(),
+  id: integer().$type<UserId>().primaryKey(),
+  jsonField: blob().$type<Data>(),
 });
 ```
 
@@ -224,7 +232,7 @@ const users = sqliteTable('users', {
 <Section>
 ```typescript
 const table = sqliteTable('table', { 
-	numInt: integer('numInt').notNull() 
+	numInt: integer().notNull() 
 });
 ```
 
@@ -251,8 +259,8 @@ import { sql } from "drizzle-orm";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-	int1: integer('int1').default(42),
-	int2: integer('int2').default(sql`(abs(42))`)
+	int1: integer().default(42),
+	int2: integer().default(sql`(abs(42))`)
 });
 
 ```
@@ -272,9 +280,9 @@ import { sql } from "drizzle-orm";
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable("table", {
-  time: text("time").default(sql`(CURRENT_TIME)`),
-  date: text("date").default(sql`(CURRENT_DATE)`),
-  timestamp: text("timestamp").default(sql`(CURRENT_TIMESTAMP)`),
+  time: text().default(sql`(CURRENT_TIME)`),
+  date: text().default(sql`(CURRENT_DATE)`),
+  timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
 });
 ```
 
@@ -300,7 +308,7 @@ import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 import { createId } from '@paralleldrive/cuid2';
 
 const table = sqliteTable('table', {
-	id: text('id').$defaultFn(() => createId()),
+	id: text().$defaultFn(() => createId()),
 });
 ```
 
@@ -320,6 +328,6 @@ when the row is inserted as well, and the returned value will be used as the col
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const table = sqliteTable('table', {
-    alwaysNull: text('always_null').$type<string | null>().$onUpdate(() => null),
+    alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
 ```

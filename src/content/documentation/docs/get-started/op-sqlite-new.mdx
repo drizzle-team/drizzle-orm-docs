@@ -118,7 +118,18 @@ config.resolver.sourceExts.push('sql');
 module.exports = config;
 ```
 
-#### Step 7 - Applying changes to the database
+#### Step 7 - Update `babel` config
+```js copy filename="metro.config.js"
+module.exports = function(api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [["inline-import", { "extensions": [".sql"] }]] // <-- add this
+  };
+};
+```
+
+#### Step 8 - Applying changes to the database
 
 With Expo, you would need to generate migrations using the `drizzle-kit generate` command and then apply them at runtime using the `drizzle-orm` `migrate()` function
 
@@ -127,7 +138,7 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-#### Step 8 - Apply migrations and query your db:
+#### Step 9 - Apply migrations and query your db:
 
 Let's **App.tsx** file with migrations and queries to create, read, update, and delete users
 
@@ -212,7 +223,7 @@ export default function App() {
 }
 ```
 
-#### Step 9 - Prebuild and run expo app
+#### Step 10 - Prebuild and run expo app
 
 <CodeTabs items={['npm', 'yarn', 'pnpm', 'bun']}>
 ```bash copy
