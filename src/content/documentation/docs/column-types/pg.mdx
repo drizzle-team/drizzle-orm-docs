@@ -424,10 +424,10 @@ CREATE TABLE IF NOT EXISTS "table" (
 You can specify `.$type<..>()` for json object inference, it **won't** check runtime values. 
 It provides compile time protection for default values, insert and select schemas.
 ```typescript
-// will be infered as { foo: string }
+// will be inferred as { foo: string }
 json: json('json').$type<{ foo: string }>();
 
-// will be infered as string[]
+// will be inferred as string[]
 json: json('json').$type<string[]>();
 
 // won't compile
@@ -462,10 +462,10 @@ You can specify `.$type<..>()` for json object inference, it **won't** check run
 It provides compile time protection for default values, insert and select schemas.
 
 ```typescript
-// will be infered as { foo: string }
+// will be inferred as { foo: string }
 jsonb: jsonb('jsonb').$type<{ foo: string }>();
 
-// will be infered as string[]
+// will be inferred as string[]
 jsonb: jsonb('jsonb').$type<string[]>();
 
 // won't compile

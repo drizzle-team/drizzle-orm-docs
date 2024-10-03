@@ -174,7 +174,7 @@ await withPagination(query.$dynamic(), asc(users.id));
 
 </Section>
 
-You can improve perfomance of `limit/offset` pagination by using `deferred join` technique. This method performs the pagination on a subset of the data instead of the entire table.
+You can improve performance of `limit/offset` pagination by using `deferred join` technique. This method performs the pagination on a subset of the data instead of the entire table.
 
 To implement it you can do like this:
 
@@ -270,6 +270,6 @@ await getUsers(2);
 ```
 </Section>
 
-So, if your database experiences frequently insert and delete operations in real time or you need high perfomance to paginate large tables, you should consider using [cursor-based](/learn/guides/cursor-based-pagination) pagination instead.
+So, if your database experiences frequently insert and delete operations in real time or you need high performance to paginate large tables, you should consider using [cursor-based](/learn/guides/cursor-based-pagination) pagination instead.
 
 To learn more about `deferred join` technique you should follow these guides: [Planetscale Pagination Guide](https://planetscale.com/blog/mysql-pagination) and [Efficient Pagination Guide by Aaron Francis](https://aaronfrancis.com/2022/efficient-pagination-using-deferred-joins).

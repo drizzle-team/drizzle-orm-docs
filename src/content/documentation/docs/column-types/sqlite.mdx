@@ -144,10 +144,10 @@ You can specify `.$type<..>()` for blob inference, it **won't** check runtime va
 It provides compile time protection for default values, insert and select schemas.  
 
 ```typescript
-// will be infered as { foo: string }
+// will be inferred as { foo: string }
 json: blob('json', { mode: 'json' }).$type<{ foo: string }>();
 
-// will be infered as string[]
+// will be inferred as string[]
 json: blob('json', { mode: 'json' }).$type<string[]>();
 
 // won't compile
