@@ -7,6 +7,8 @@ import Callout from "@/components/markdown/Callout.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import Npx from "@mdx/Npx.astro";
 import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx";
+import Drivers from "@mdx/Drivers.mdx"
+import Dialects from "@mdx/Dialects.mdx"
 
 # `drizzle-kit push`
 
@@ -123,17 +125,77 @@ You can have multiple config files in the project, it's very useful when you hav
 ```
 
 ### Specifying database driver
+<Callout type="warning">
+**Expo SQLite** and **OP SQLite** are on-device(per-user) databases, there's no way to `push` migrations there.<br/>
+For embedded databases Drizzle provides **embedded migrations** - check out our [get started](/docs/get-started/expo-new) guide.
+</Callout>
+Drizzle Kit does not come with a pre-bundled database driver, 
+it will automatically pick available database driver from your current project based on the `dialect` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
 
-### Including tebles, schemas and extensions
+Mostly all drivers of the same dialect share the same set of connection params, 
+as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have to explicitely specify `driver` param.
 
+<CodeTabs items={["AWS Data API", "PGLite", "Cloudflare D1 HTTP"]}>
+```ts {6}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/schema.ts",
+  driver: "aws-data-api",
+  dbCredentials: {
+    database: "database",
+    resourceArn: "resourceArn",
+    secretArn: "secretArn",
+  },
+};
+```
+```ts {6}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/schema.ts",
+  driver: "pglite",
+  dbCredentials: {
+    // inmemory
+    url: ":memory:"
+    
+    // or database folder
+    url: "./database/"
+  },
+};
+```
+```ts {6}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "sqlite",
+  schema: "./src/schema.ts",
+  driver: "d1-http",
+  dbCredentials: {
+    accountId: "accountId",
+    databaseId: "databaseId",
+    token: "token",
+  },
+};
+```
+</CodeTabs>
+
+### Including tables, schemas and extensions
 `drizzle-kit push` will by default manage all tables in `public` schema.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
-// table of params
+|                     |                                                                                               |
+| :------------------ | :-------------------------------------------------------------------------------------------- |
+| `tablesFilter`      | `glob` based table names filter, e.g. `["users", "user_info"]` or `"user*"`. Default is `"*"` |
+| `schemaFilter`      | Schema names filter, e.g. `["public", "drizzle"]`. Default is `["public"]`                    |
+| `extensionsFilters` | List of installed database extensions, e.g. `["postgis"]`. Default is `[]`                    |
+<br/>
 
 Let's configure drizzle-kit to only operate with **all tables** in **public** schema
 and let drizzle-kit know that there's a **postgis** extension installed, 
-which creates it's own tables in public schema, so it can ignore them.
+which creates it's own tables in public schema, so drizzle can ignore them.
 
 <Section>
 ```ts filename="drizzle.config.ts" {9-11}
@@ -155,22 +217,95 @@ npx drizzle-kit push
 ```
 </Section>
 
-### List of all available options
-|                                                                     |          |                                                                         |
-| :------------------------------------------------------------------ | :------- | :---------------------------------------------------------------------- |
-| `dialect`                                                           | required | Database dialect you are using. Can be `postgresql`,`mysql` or `sqlite` |
-| [`schema`](/kit-docs/conf#schema-files-paths)                       | required | path to typescript schema file or folder with multiple schema files     |
-| driver                                                              |          | driver to use for querying (`aws-data-api`, `d1-http`, `turso`, `expo`) |
-| [`tablesFilter`](/kit-docs/conf#multi-project-schema)               |          | table name filter                                                       |
-| [`schemaFilter`](/kit-docs/config-reference#schemafilter)           |          | Schema name filter. Default: `["public"]`                               |
-| [`extensionsFilters`](/kit-docs/config-reference#extensionsfilters) |          | Database extensions internal database filters                           |
-| `url`                                                               |          | database connection string                                              |
-| `user`                                                              |          | database user                                                           |
-| `password`                                                          |          | database password                                                       |
-| `host`                                                              |          | host                                                                    |
-| `port`                                                              |          | port                                                                    |
-| `database`                                                          |          | database name                                                           |
-| `config`                                                            |          | config file path, default=`drizzle.config.ts`                           |
-| `verbose`                                                           |          | print all queries that will be executed                                 |
-| `strict`                                                            |          | always ask for an approve before pushing the schema                     |
-| `force`                                                             |          | auto-accept all data-loss statements                                    |
+### Extended list of configurations
+
+`drizzle-kit push` has a list of cli-only options
+
+<rem025/>
+
+|           |                                                          |
+| :-------- | :---------------------------------------------------     |
+| `verbose` | print all SQL statements prior to execution              |
+| `strict`  | always ask for approval before executing SQL statements  |
+| `force`   | auto-accept all data-loss statements                     |
+<br/>
+<Npx>
+drizzle-kit push --strict --verbose --force
+</Npx>
+
+<br/>
+<hr/>
+<br/>
+We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/kit-config-file) file, 
+yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
+
+|                                                                       |            |                                                                         |
+| :------------------------------------------------------------------   | :-------   | :---------------------------------------------------------------------- |
+| `dialect`                                                             | `required` | Database dialect, one of <Dialects/> |
+| [`schema`](/kit-docs/conf#schema-files-paths)                         | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files     |
+| `driver`                                                              |            | Drivers exceptions <Drivers/> |
+| [`tablesFilter`](/kit-docs/conf#multi-project-schema)                 |            | Table name filter                                                       |
+| [`schemaFilter`](/kit-docs/config-reference#schemafilter)             |            | Schema name filter. Default: `["public"]`                               |
+| [`extensionsFilters`](/kit-docs/config-reference#extensionsfilters)   |            | Database extensions internal database filters                           |
+| `url`                                                                 |            | Database connection string                                              |
+| `user`                                                                |            | Database user                                                           |
+| `password`                                                            |            | Database password                                                       |
+| `host`                                                                |            | Host                                                                    |
+| `port`                                                                |            | Port                                                                    |
+| `database`                                                            |            | Database name                                                           |
+| `config`                                                              |            | Config file path, default=`drizzle.config.ts`                           |
+
+<Npx>
+drizzle-kit push dialect=postgresql schema=src/schema.ts url=postgresql://user:password@host:port/dbname
+drizzle-kit push dialect=postgresql schema=src/schema.ts driver=pglite url=database/
+drizzle-kit push dialect=postgresql schema=src/schema.ts --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
+</Npx>
+
+
+### Extended example
+Let's declare drizzle schema in the project and push it to the database via `drizzle-kit push` command
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │ ├ 📜 schema.ts
+ │ └ 📜 index.ts
+ ├ 📜 drizzle.config.ts
+ └ …
+```
+<CodeTabs items={["drizzle.config.ts", "src/schema.ts"]}>
+```ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/schema.ts",
+  dbCredentials: {
+    url: "postgresql://user:password@host:port/dbname"
+  },
+});
+```
+```ts 
+import * as p from "drizzle-orm/pg-core";
+
+export const users = p.pgTable("users", {
+  id: p.serial().primaryKey(),
+  name: p.text(),
+})
+```
+</CodeTabs>
+
+Now let's run
+```shell
+npx drizzle-kit push
+```
+
+it will pull existing(empty) schema from the database and generate SQL migration and apply it under the hood
+```sql
+CREATE TABLE "users"(
+  id serial primary key,
+  name text,
+)
+```
+
+DONE ✅
