@@ -219,9 +219,9 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | `extensionsFilters` |            | Database extensions internal database filters                             |
 
 <Npx>
-drizzle-kit pull dialect=postgresql schema=src/schema.ts url=postgresql://user:password@host:port/dbname
-drizzle-kit pull dialect=postgresql schema=src/schema.ts driver=pglite url=database/
-drizzle-kit pull dialect=postgresql schema=src/schema.ts --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
+drizzle-kit pull --dialect=postgresql --schema=src/schema.ts --url=postgresql://user:password@host:port/dbname
+drizzle-kit pull --dialect=postgresql --schema=src/schema.ts --driver=pglite url=database/
+drizzle-kit pull --dialect=postgresql --schema=src/schema.ts --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
 </Npx>
 
 ![](@/assets/gifs/introspect_mysql.gif)
