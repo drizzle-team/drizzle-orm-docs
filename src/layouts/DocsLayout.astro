@@ -1,3 +1,4 @@
+
 ---
 import EndOfContent from '@components/layout/EndOfContent.astro';
 import GlobalStyles from '@components/layout/GlobalStyles.astro';
@@ -9,6 +10,8 @@ import RightAside from '../components/layout/RightAside.astro';
 import DocsSidebar from '../components/layout/DocsSidebar/DocsSidebar.astro';
 import getContentTree from '@/utils/getContentTree';
 import type { IHeading } from '@/types/astro';
+import DialectTabs from "../components/layout/DialectTabs.astro";
+import {dialects} from "../data/dialects";
 
 interface Props {
   customTitle?: string;
@@ -23,6 +26,8 @@ const { tree, filteredHeadings, title } = await getContentTree({
   headings,
   slug,
 });
+
+const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!);
 ---
 
 <!doctype html>
@@ -37,6 +42,7 @@ const { tree, filteredHeadings, title } = await getContentTree({
       <DocsSidebar tree={tree} customSlug={customSlug} headings={filteredHeadings} />
       <div class="documentation-content-wrap scrollbar">
         <div class="documentation-content">
+          {pageHasDialects && <DialectTabs />}
           <slot />
           <EndOfContent />
           <!-- <Footer /> -->
@@ -63,8 +69,6 @@ const { tree, filteredHeadings, title } = await getContentTree({
         }
       .documentation-content-wrap {
         width: 100%;
-        overflow-y: scroll;
-        overflow-x: hidden;
       }
 
       .navigation_nav_container_blur {
@@ -107,7 +111,6 @@ const { tree, filteredHeadings, title } = await getContentTree({
         padding-right: 48px;
         padding-top: 1rem;
         width: 100%;
-        position: relative;
       }
 
       @media screen and (max-width: 1279px) {
