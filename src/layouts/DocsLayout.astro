@@ -293,14 +293,12 @@ const { tree, filteredHeadings, title } = await getContentTree({
       customElements.define('rem025', RemElement);
       customElements.define('rem05', RemElement);
     </script>
-    <script>
-      document.addEventListener('astro:page-load', () => {
+    <script is:inline data-astro-rerun>
         document.querySelectorAll("h2").forEach((el) => {
           if (el.innerText === '---') {
             el.classList.add('hidden-separator')
           }
         })
-      })
     </script>
     <style is:global>
       rem {
@@ -323,6 +321,8 @@ const { tree, filteredHeadings, title } = await getContentTree({
           height: 0;
           pointer-events: none;
           overflow: hidden;
+          margin: 0 !important;
+          padding: 0 !important;
       }
     </style>
   </body>
