@@ -167,12 +167,12 @@ INSERT INTO "users" ("name") VALUES('Dandrew');
 | :--------     | :--------------------------------------------------- |
 | `custom`      | generate empty SQL for custom migration              |
 | `name`        | generate migration with custom name                  |
-| `breakpoints` | SQL statements breakpoints, default is `true`        |
 
 <rem025/>
 
 <Npx>
-drizzle-kit push --strict --verbose --force
+drizzle-kit push --name=init
+drizzle-kit push --name=seed_users --custom
 </Npx>
 
 <br/>
@@ -187,6 +187,7 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | `schema`      | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files  |
 | `out`         |            | Migrations output folder, default is `./drizzle`                           |
 | `config`      |            | Configuration file path, default is `drizzle.config.ts`                    |
+| `breakpoints` |            | SQL statements breakpoints, default is `true`                              |
 
 
 ### Extended example

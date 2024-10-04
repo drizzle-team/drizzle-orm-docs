@@ -9,6 +9,7 @@ import Npx from "@mdx/Npx.astro";
 import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx";
 import Drivers from "@mdx/Drivers.mdx"
 import Dialects from "@mdx/Dialects.mdx"
+import DriversExamples from "@mdx/DriversExamples.mdx"
 
 # `drizzle-kit push`
 
@@ -135,52 +136,7 @@ it will automatically pick available database driver from your current project b
 Mostly all drivers of the same dialect share the same set of connection params, 
 as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have to explicitly specify `driver` param.
 
-<CodeTabs items={["AWS Data API", "PGLite", "Cloudflare D1 HTTP"]}>
-```ts {6}
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "postgresql",
-  schema: "./src/schema.ts",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-};
-```
-```ts {6}
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "postgresql",
-  schema: "./src/schema.ts",
-  driver: "pglite",
-  dbCredentials: {
-    // inmemory
-    url: ":memory:"
-    
-    // or database folder
-    url: "./database/"
-  },
-};
-```
-```ts {6}
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "sqlite",
-  schema: "./src/schema.ts",
-  driver: "d1-http",
-  dbCredentials: {
-    accountId: "accountId",
-    databaseId: "databaseId",
-    token: "token",
-  },
-};
-```
-</CodeTabs>
+<DriversExamples/>
 
 ### Including tables, schemas and extensions
 `drizzle-kit push` will by default manage all tables in `public` schema.
