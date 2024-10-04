@@ -14,7 +14,7 @@ You can use database aliases in column names if you want, and you can also use t
 You can read more about it [here](http://localhost:4321/docs/sql-schema-declaration#shape-your-data-schema)
 </Callout>
 
-### Integer
+### integer
 
 A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
 
@@ -114,6 +114,8 @@ CREATE TABLE `table` (
 </Section>
 
 We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type 
+
+## ---
 
 ### real
 
@@ -241,6 +243,8 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+## ---
+
 ### serial
 
 <Section>
@@ -261,6 +265,8 @@ CREATE TABLE `table` (
 );
 ```
 </Section>
+
+## ---
 
 ### binary
 
@@ -297,6 +303,8 @@ CREATE TABLE `table` (
 );
 ```
 </Section>
+
+## ---
 
 ### char
 
@@ -360,6 +368,8 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+## ---
+
 ### boolean
 
 <Section>
@@ -377,6 +387,8 @@ CREATE TABLE `table` (
 );
 ```
 </Section>
+
+## ---
 
 ### date
 
@@ -526,6 +538,8 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+## ---
+
 ### json
 
 <Section>
@@ -558,7 +572,9 @@ json: json().$type<string[]>();
 json: json().$type<string[]>().default({});
 ```
 
-## enumColumn
+## ---
+
+### enum
 
 <Section>
 ```typescript
@@ -576,8 +592,9 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+## ---
 
-## Customizing column data type
+### Customizing data type
 
 Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
 
@@ -594,7 +611,6 @@ const users = mysqlTable('users', {
 });
 ```
 
-## Columns constraints
 ### Not null
 `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 
