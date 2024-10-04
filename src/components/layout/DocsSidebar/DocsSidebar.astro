@@ -32,13 +32,9 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
     border-right: 1px solid #efefef;
     display: flex;
     flex-direction: column;
-    transition-property: all;
-    transition-duration: 0.15s;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    position: sticky;
+    position: static;
     width: 240px;
     flex-shrink: 0;
-    top: 104px;
     align-self: flex-start;
     box-shadow:
       rgba(0, 0, 0, 0) 0px 0px 0px 0px,
@@ -51,6 +47,7 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
       #000 calc(100% - 20px),
       transparent
     );
+      pointer-events: all;
   }
 
   .aside-scroll {
@@ -67,10 +64,11 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
 
     .aside {
       z-index: 100;
-      position: absolute;
+      position: fixed;
       top: 104px;
       height: calc(100% - 104px);
       left: 0;
+      right: 0;
       width: 100%;
       background: #fff;
       mask-image: none;

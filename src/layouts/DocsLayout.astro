@@ -38,38 +38,53 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
     <MDXStyles />
     <Banner />
     <Header />
-    <main class="documentation-container">
-      <DocsSidebar tree={tree} customSlug={customSlug} headings={filteredHeadings} />
-      <div class="documentation-content-wrap scrollbar">
-        <div class="documentation-content">
+    <div class="fixed-container">
+      <div class="fixed-elements">
+        <DocsSidebar tree={tree} customSlug={customSlug} headings={filteredHeadings} />
+        <div class="dialects-container">
           {pageHasDialects && <DialectTabs />}
-          <slot />
-          <EndOfContent />
-          <!-- <Footer /> -->
+        </div>
+        <div class="right-aside-container">
+          <RightAside />
         </div>
       </div>
-      <div class="right-aside-container">
-        <RightAside />
+    </div>
+    <main class="documentation-container">
+      <div class="documentation-content">
+        {pageHasDialects && <div style="height: 52px"></div>}
+        <slot />
+        <EndOfContent />
+        <!-- <Footer /> -->
       </div>
     </main>
-    <style>
-      .right-aside-container {
-        position: relative;
-      }
-
-      @media screen and (max-width: 1024px) {
-        .right-aside-container {
-          display: none;
-        }
-      }
-    </style>
     <style is:global>
         body {
             margin-top: 104px;
         }
-      .documentation-content-wrap {
-        width: 100%;
-      }
+
+        .fixed-container {
+            position: fixed;
+            top: 104px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        .fixed-elements {
+            max-width: 1440px;
+            width: 100%;
+            justify-content: space-between;
+            display: flex;
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 22px;
+        }
+
+        .right-aside-container {
+            pointer-events: all;
+        }
 
       .navigation_nav_container_blur {
         -webkit-backdrop-filter: blur(12px);
@@ -102,21 +117,35 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
         width: 100%;
         display: flex;
         margin: 0 auto;
-        padding-left: 24px;
-        padding-right: 22px;
+        padding-left: calc(240px + 24px);
+        padding-right: calc(240px + 24px);
       }
 
       .documentation-content {
         padding-left: 48px;
         padding-right: 48px;
         padding-top: 1rem;
+        overflow-x: hidden;
         width: 100%;
+      }
+
+      .dialects-container {
+          padding-left: 48px;
+          padding-right: 48px;
+          padding-top: 1rem;
+          overflow-x: hidden;
+          width: 100%;
       }
 
       @media screen and (max-width: 1279px) {
         .documentation-content {
           padding-left: 16px;
           padding-right: 16px;
+        }
+
+        .dialects-container {
+            padding-left: 16px;
+            padding-right: 16px;
         }
       }
 
@@ -125,9 +154,17 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
           display: none;
         }
 
+        .documentation-container {
+            padding-right: 24px;
+        }
+
         .documentation-content {
             padding-right: 0;
         }
+
+          .dialects-container {
+              padding-right: 0;
+          }
 
       }
 
@@ -139,10 +176,26 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
           width: 100%;
         }
 
+          .dialects-container {
+              padding-left: 16px;
+              padding-right: 16px;
+          }
+
           .documentation-container {
              padding: 0;
           }
+
+          .fixed-elements {
+              padding: 0;
+          }
       }
+    </style>
+    <style>
+        @media screen and (max-width: 1024px) {
+            .right-aside-container {
+                display: none;
+            }
+        }
     </style>
     <script>
       const hash = window.location.hash;

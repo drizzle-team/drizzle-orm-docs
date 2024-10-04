@@ -42,8 +42,7 @@ const getLinkWithDialect = (dialect: string) => {
   }
 
   .dialect-tabs__container {
-    position: sticky;
-    top: 104px;
+    position: relative;
     display: flex;
     align-items: center;
     padding-top: 16px;
@@ -88,6 +87,7 @@ const getLinkWithDialect = (dialect: string) => {
     box-shadow:
       rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset,
       rgb(255, 255, 255) 0px 0.5px 0px 1.5px inset;
+      pointer-events: all;
   }
 
   html.dark .dialect-tabs__tab {
@@ -143,17 +143,6 @@ const getLinkWithDialect = (dialect: string) => {
 
   .dialect-tabs__tab--active:hover {
     background-color: #fff;
-  }
-
-  @media screen and (max-width: 1279px) {
-    .dialect-tabs__container {
-    }
-  }
-
-  @media screen and (max-width: 768px) {
-    .dialect-tabs__container {
-      width: calc(100% + 32px);
-    }
   }
 </style>
 <script>
