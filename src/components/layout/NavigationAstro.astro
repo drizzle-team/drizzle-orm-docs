@@ -139,22 +139,22 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
         }
     }
 </style>
-<script>
-  const burgerBtn = document.querySelector("[data-nav-burger-btn]");
-  const navContainer = document.getElementById("header");
-  const aside = document.getElementById("aside");
+<script is:inline>
+  const toggleBurgerMenu = () => {
+    document.getElementById("header").classList.toggle("nav_container_open");
+    document.getElementById("aside").classList.toggle("invisible");
+    document.body.style.overflow = document.getElementById("header").classList.contains(
+      "nav_container_open",
+    )
+      ? "hidden"
+      : "auto";
+  };
 
-  if (burgerBtn && navContainer && aside) {
-    burgerBtn.addEventListener("click", () => {
-      navContainer.classList.toggle("nav_container_open");
-      aside.classList.toggle("invisible");
-      document.body.style.overflow = navContainer.classList.contains(
-        "nav_container_open",
-      )
-        ? "hidden"
-        : "auto";
-    });
-  }
+  document.addEventListener("astro:page-load", () => {
+    document.querySelector("[data-nav-burger-btn]").removeEventListener("click", toggleBurgerMenu, false)
+    if (document.querySelector("[data-nav-burger-btn]") && document.getElementById("header") && document.getElementById("aside")) {
+      document.querySelector("[data-nav-burger-btn]").addEventListener("click", toggleBurgerMenu)
+    }})
 </script>
 <style>
     .nav_container {
