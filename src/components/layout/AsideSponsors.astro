@@ -130,10 +130,11 @@ for (let i = 0; i < s.length - 1; i += 2) {
 
   document.addEventListener("astro:page-load", () => {
     computePopovers();
-
     window.removeEventListener('resize', computePopovers, false)
     window.addEventListener('resize', computePopovers)
   })
+
+    computePopovers();
 </script>
 
 <style>
