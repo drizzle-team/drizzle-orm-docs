@@ -1,31 +1,29 @@
 # v1 Roadmap
 
-
 ### Drizzle Kit V1
 - [x] `generated` columns support [beta branch]
 - [x] Brocli integration to Drizzle Kit
 - [ ] Generated SQL migration strict mode without `try catches` and `if not exists`
 - [x] Drizzle Kit goes OSS steam 🎉
 - [ ] PostgreSQL enums alternations improvements
-- [ ] Drizzle Studio `mkcert` fixes for dockerised environments
 - [ ] PostgreSQL RLS support
 - [ ] `check` constraint support in Drizzle Kit
 - [x] Exposed API for programmatic access in Drizzle Kit
 - [ ] `materialised views` support in Drizzle Kit
 - [ ] Drizzle Kit support for consuming schemas and migrations from Prisma, TypeORM and Sequelise to enrich ->Drizzle migration process
+- [ ] Drizzle Studio `mkcert` fixes for dockerised environments
 
 ### Drizzle ORM V1
 - [x] `generated` columns support [beta branch]
 - [x] MySQL `.$returningIds()` 
 - [ ] `NODE_ENV` support for embedded `.env` consumer
 - [ ] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`
-- [ ] Table declarations with `(t) => ` callback to optionally omit column type imports
+- [x] Table declarations with `(t) => ` callback to optionally omit column type imports
 - [ ] Down migrations, better rollbacks and improvements to `migrate` experience in Drizzle Kit
-- [ ] Optional database aliases for columns in table declarations -> `id: serial()`
+- [x] Optional database aliases for columns in table declarations -> `id: serial()`
 - [ ] PostgreSQL RLS support
 - [ ] Relational Querie V2 API
-- [ ] `import { table } from 'drizzle-orm/common'` common driver to lower the entrance learning curve
-- [ ] `drizzle('pg', ...)` driver instantiation to lower the entrance learning curve
+- [x] `drizzle('pg', ...)` driver instantiation to lower the entrance learning curve
 - [ ] CockroachDB support (supported with strict SQL migrations)
 - [ ] Native seeding
 - [ ] fixes: [#2575](https://github.com/drizzle-team/drizzle-orm/issues/2575), [#2572](https://github.com/drizzle-team/drizzle-orm/issues/2572), [#2571](https://github.com/drizzle-team/drizzle-orm/issues/2571),
