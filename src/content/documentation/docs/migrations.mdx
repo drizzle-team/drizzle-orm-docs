@@ -15,10 +15,10 @@ import Npm from '@components/markdown/Npm.astro';
 import Tag from '@mdx/Tag.astro'
 
 
-# Drizzle migrations foundamentals
+# Drizzle migrations fundamentals
 
 SQL databases require you to specify a **strict schema** of entities you're going to store upfront 
-and if(when) you need to change the shape of those entities - you will need to do it via **schema migrations**.
+and if (when) you need to change the shape of those entities - you will need to do it via **schema migrations**.
 
 There're multiple production grade ways of managing database migrations. 
 Drizzle is designed to perfectly suite all of them, regardless of you going **database first** or **codebase first**.
@@ -39,8 +39,8 @@ drizzle-kit pull
 ```
 It is designed to let you choose how to approach migrations based on your current business demands. 
 
-It fits in both database and codebase first approaches, it let's you **push schema** or **generate SQL migrations** files or **pull schema** from database. 
-It is perfect for you to work alone or in the team.
+It fits in both database and codebase first approaches, it lets you **push your schema** or **generate SQL migration** files or **pull the schema** from database. 
+It is perfect wether you work alone or in a team.
 <br/>
 
 <hr/>
@@ -50,8 +50,8 @@ It is perfect for you to work alone or in the team.
 <rem/>
 
 <Tag style="font-size: 12px">**Option 1**</Tag>
-> I manage database schema myself using external migration tools or running SQL migrations directly on my database.
-> From Drizzle I just need to fetch it from my database and save it as TypeScript schema
+> I manage database schema myself using external migration tools or by running SQL migrations directly on my database.
+> From Drizzle I just need to get current state of the schema from my database and save it as TypeScript schema file.
 
 <Callout collapsed="Expand details">
 That's a **database first** approach. You have your database schema as a **source of truth** and 
