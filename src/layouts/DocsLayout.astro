@@ -236,7 +236,6 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
         const npmTabs = document.querySelectorAll('.npm__tabs');
         const npxSelects = document.querySelectorAll('.npx-select');
         const npxSelectResizer = document.querySelector('.npx-select-resizer');
-        npxSelectResizer.querySelector('.line span').innerText = packageManagers[packageManagerIndex];
 
         npmContent.forEach((content) => {
           Array.from(content.children).forEach((child, index) => {
@@ -256,6 +255,7 @@ const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!)
         });
 
         npxSelects.forEach((element) => {
+          npxSelectResizer.querySelector('.line span').innerText = packageManagers[packageManagerIndex];
           element.value = packageManagerIndex;
           setTimeout(() => element.style.width = `${npxSelectResizer.offsetWidth}px`, 1);
           element.addEventListener('change', (e) => {
