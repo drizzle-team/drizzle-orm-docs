@@ -29,7 +29,7 @@ drizzle-orm @libsql/client
 
 #### Step 2 - Initialize the driver and make a query
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle('libsql', { connection: {
   url: process.env.DATABASE_URL, 

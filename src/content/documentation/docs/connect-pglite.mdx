@@ -32,21 +32,21 @@ drizzle-orm @electric-sql/pglite
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["In-Memory", "In directory", "With extra config options"]}>
 ```typescript copy"
-import { drizzle } from 'drizzle-orm/';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = drizzle('pglite');
 
 await db.select().from(...);
 ```
 ```typescript copy"
-import { drizzle } from 'drizzle-orm/';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = drizzle('pglite', 'path-to-dir');
 
 await db.select().from(...);
 ```
 ```typescript copy"
-import { drizzle } from 'drizzle-orm/';
+import { drizzle } from 'drizzle-orm/connect';
 
 // connection is a native PGLite configuration
 const db = drizzle('pglite', { connection: { dataDir: 'path-to-dir' }});

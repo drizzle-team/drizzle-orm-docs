@@ -28,14 +28,14 @@ drizzle-orm @libsql/client
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("libsql", process.env.DATABASE_URL);
  
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 // You can specify any property from the libsql connection options
 const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
@@ -43,7 +43,7 @@ const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 // You can specify any property from the libsql connection options
 const db = await drizzle("turso", { connection: { url:'', authToken: '' }});
@@ -75,14 +75,14 @@ drizzle-orm better-sqlite3
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["better-sqlite3", "better-sqlite3 with config"]}>
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("better-sqlite3", process.env.DATABASE_URL);
 
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 // You can specify any property from the better-sqlite3 connection options
 const db = await drizzle("better-sqlite3", { connection: { source: process.env.DATABASE_URL }});

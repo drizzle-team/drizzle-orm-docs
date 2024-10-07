@@ -1,7 +1,7 @@
 Create a `index.ts` file in the `src/db` directory and initialize the connection:
 
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 async function main() {
     const db = drizzle('pglite', process.env.DATABASE_URL!);
