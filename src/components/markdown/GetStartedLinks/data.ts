@@ -180,7 +180,7 @@ export const getStartedItems: GetStartedItems = [
         },
       },
       {
-        name: "PlanetsScale",
+        name: "PlanetScale",
         path: {
           existing: "/docs/get-started/planetscale-existing",
           new: "/docs/get-started/planetscale-new",

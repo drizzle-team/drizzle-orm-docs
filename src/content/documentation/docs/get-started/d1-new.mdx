@@ -51,42 +51,17 @@ migrations_dir = "drizzle"
 
 #### Step 3 - Connect Drizzle ORM to the database
 
-Create a `index.ts` file in the `src` directory and initialize the connection:
-
 ```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("turso", { 
-    connection: { 
-        url: process.env.TURSO_DATABASE_URL!, 
-        authToken: process.env.TURSO_AUTH_TOKEN!
-    }
-  });
+export interface Env {
+  <BINDING_NAME>: D1Database;
 }
-
-main();
-```
-
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
-
-```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
-
-async function main() {
-  const client = createClient({ 
-        url: process.env.TURSO_DATABASE_URL!, 
-        authToken: process.env.TURSO_AUTH_TOKEN!
-   });
-  const db = drizzle(client);
-}
-
-main();
+export default {
+  async fetch(request: Request, env: Env) {
+    const db = drizzle(env.<BINDING_NAME>);
+  },
+};
 ```
 
 #### Step 4 - Create a table
@@ -106,13 +81,18 @@ import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
   out: './drizzle',
   schema: './src/db/schema.ts',
-  dialect: 'turso',
+  dialect: 'sqlite',
+  driver: '',
   dbCredentials: {
-    url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.TURSO_AUTH_TOKEN,
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
+    databaseId: process.env.CLOUDFLARE_DATABASE_ID!,
+    token: process.env.CLOUDFLARE_D1_TOKEN!,
   },
 });
 ```
+<Callout title='tips'>
+You can check [our tutorial](/docs/guides/d1-http-with-drizzle-kit) on how to get env variables from CloudFlare
+</Callout>
 
 #### Step 6 - Applying changes to the database
 
@@ -120,7 +100,20 @@ export default defineConfig({
 
 #### Step 7 - Seed and Query the database
 
-<QueryTurso/>
+```typescript copy
+import { drizzle } from 'drizzle-orm/d1';
+
+export interface Env {
+  <BINDING_NAME>: D1Database;
+}
+export default {
+  async fetch(request: Request, env: Env) {
+    const db = drizzle(env.<BINDING_NAME>);
+    const result = await db.select().from(users).all()
+    return Response.json(result);
+  },
+};
+```
 
 #### Step 8 - Run index.ts file
 
