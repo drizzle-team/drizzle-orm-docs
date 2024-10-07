@@ -322,7 +322,6 @@
 
   const computePopovers = () => {
     const cards = document.querySelectorAll('.styled_card_with_popover');
-
     cards.forEach((card) => {
       const cardPopover = card.querySelector('.popover');
 
@@ -330,7 +329,8 @@
 
       computePosition(card, cardPopover, {
         placement: 'top',
-        middleware: [shift({padding: 20}), offset(6)]
+        middleware: [shift({padding: 20}), offset(6)],
+        strategy: 'fixed',
       }).then(({x, y}) => {
         Object.assign(cardPopover.style, {
           left: `${x}px`,
@@ -341,14 +341,16 @@
   }
 
   document.addEventListener("astro:page-load", () => {
-    computePopovers();
+    setTimeout(() => computePopovers(), 50);
 
     window.removeEventListener('resize', computePopovers, false);
-    document.querySelector('.landing-wrap')?.removeEventListener('scroll', computePopovers, false);
+    document.removeEventListener('scroll', computePopovers, false);
 
-    document.querySelector('.landing-wrap')?.addEventListener('scroll', computePopovers);
+    document.addEventListener('scroll', computePopovers);
     window.addEventListener('resize', computePopovers);
   })
+
+  setTimeout(() => computePopovers(), 50);
 </script>
 <style is:global>
   .card_image {
