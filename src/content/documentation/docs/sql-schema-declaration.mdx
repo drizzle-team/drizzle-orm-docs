@@ -42,7 +42,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 ```ts
 import { defineConfig } from "drizzle-kit";
 
-defineConfig({
+export default defineConfig({
   dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
   schema: './src/db/schema.ts'
 })
@@ -75,7 +75,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 ```ts
 import { defineConfig } from "drizzle-kit";
 
-defineConfig({
+export default defineConfig({
   dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
   schema: './src/db/schema'
 })
@@ -99,7 +99,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 ```ts
 import { defineConfig } from "drizzle-kit";
 
-defineConfig({
+export default defineConfig({
   dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
   schema: './src/db/schema'
 })
@@ -120,8 +120,8 @@ Let's go one by one and check how the schema should be defined with drizzle
 
 #### **Tables and columns declaration** 
 
-Table with Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
-there is no such thing as a commin table object in drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL or SQLite
+A table in Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
+there is no such thing as a common table object in drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL or SQLite
 
 ![](@/assets/images/table-structure.svg)
 
