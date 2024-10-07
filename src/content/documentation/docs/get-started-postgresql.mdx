@@ -35,7 +35,7 @@ drizzle-orm node-postgres
 <CodeTabs items={["node-postgres", "node-postgres with config"]}>
 ```typescript copy
 // Make sure to install the 'pg' package 
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("node-postgres", process.env.DATABASE_URL);
  
@@ -43,7 +43,7 @@ const result = await db.execute('select 1');
 ```
 ```typescript copy
 // Make sure to install the 'pg' package 
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 // You can specify any property from the node-postgres connection options
 const db = await drizzle("node-postgres", { 
@@ -84,14 +84,14 @@ drizzle-orm postgres
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["postgres.js", "postgres.js with config"]}>
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("postgres-js", process.env.DATABASE_URL);
 
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 // You can specify any property from the postgres-js connection options
 const db = await drizzle("postgres-js", { 

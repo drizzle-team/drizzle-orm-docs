@@ -37,7 +37,7 @@ drizzle-orm @neondatabase/serverless
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["Neon HTTP", "Neon Websockets", "node-postgres", "postgres.js"]}>
 ```typescript
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("neon-http", process.env.DATABASE_URL);
 
@@ -45,7 +45,7 @@ const result = await db.execute('select 1');
 ```
 <Section> 
 ```typescript 
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("neon-websockets", process.env.DATABASE_URL);
 
@@ -53,7 +53,7 @@ const result = await db.execute('select 1');
 ```
 ```typescript
 // For Node.js - make sure to install the 'ws' and 'bufferutil' packages
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 import ws from 'ws';
 
 const db = await drizzle("neon-websockets", {
@@ -70,7 +70,7 @@ Add the `ws` and `bufferutil` packages to your project's dependencies, and set `
 </Section> 
 ```typescript 
 // Make sure to install the 'pg' package 
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("node-postgres", process.env.DATABASE_URL);
  
@@ -78,7 +78,7 @@ const result = await db.execute('select 1');
 ```
 ```typescript
 // Make sure to install the 'postgres' package
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/connect';
 
 const db = await drizzle("postgres-js", process.env.DATABASE_URL);
 
