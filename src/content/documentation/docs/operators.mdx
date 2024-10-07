@@ -188,6 +188,38 @@ SELECT * FROM table WHERE table.column1 <= table.column2
 
 ## ---
 
+### exists
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
+  
+Value exists
+<Section>
+```typescript
+import { exists } from "drizzle-orm";
+
+const query = db.select().from(table2)
+db.select().from(table).where(exists(query));
+```
+
+```sql
+SELECT * FROM table WHERE EXISTS (SELECT * from table2)
+```
+</Section>
+
+### notExists
+
+<Section>
+```typescript
+import { notExists } from "drizzle-orm";
+
+const query = db.select().from(table2)
+db.select().from(table).where(notExists(query));
+```
+
+```sql
+SELECT * FROM table WHERE NOT EXISTS (SELECT * from table2)
+```
+</Section>
+
 ### isNull
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
@@ -283,38 +315,6 @@ SELECT * FROM table WHERE table.column NOT IN (SELECT table2.column FROM table2)
 
 ## ---
 
-### exists
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
-  
-Value exists
-<Section>
-```typescript
-import { exists } from "drizzle-orm";
-
-const query = db.select().from(table2)
-db.select().from(table).where(exists(query));
-```
-
-```sql
-SELECT * FROM table WHERE EXISTS (SELECT * from table2)
-```
-</Section>
-
-### notExists
-
-<Section>
-```typescript
-import { notExists } from "drizzle-orm";
-
-const query = db.select().from(table2)
-db.select().from(table).where(notExists(query));
-```
-
-```sql
-SELECT * FROM table WHERE NOT EXISTS (SELECT * from table2)
-```
-</Section>
-
 ### between
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
   
@@ -346,6 +346,8 @@ db.select().from(table).where(notBetween(table.column, 2, 7));
 SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7
 ```
 </Section>
+
+## ---
 
 ### like
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
@@ -394,6 +396,8 @@ db.select().from(table).where(notIlike(table.column, "%llo wor%"));
 SELECT * FROM table WHERE table.column NOT ILIKE '%llo wor%'
 ```
 </Section>
+
+## ---
 
 ### not
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': true }} />
@@ -445,6 +449,8 @@ db.select().from(table).where(or(gt(table.column, 5), lt(table.column, 7)));
 SELECT * FROM table WHERE (table.column > 5 OR table.column < 7)
 ```
 </Section>
+
+## ---
 
 ### arrayContains
 <IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />

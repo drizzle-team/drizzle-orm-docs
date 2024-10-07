@@ -146,6 +146,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+## ---
+
 ### serial
 `serial` `serial4`  
 Auto incrementing 4-bytes integer, notational convenience for creating unique identifier columns (similar to the `AUTO_INCREMENT` property supported by some other databases). 
@@ -211,6 +213,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+### ---
 
 ### boolean
 PostgreSQL provides the standard SQL type boolean.
@@ -233,6 +236,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 );
 ```
 </Section>
+
+## ---
 
 ### text
 `text`  
@@ -320,6 +325,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+## ---
+
 ### numeric
 `numeric` `decimal`  
 Exact numeric of selectable precision. Can store numbers with a very large number of digits, up to 131072 digits before the decimal point and up to 16383 digits after the decimal point.
@@ -403,6 +410,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+## ---
+
+
 ### json
 `json`  
 Textual JSON data, as specified in **[RFC 7159.](https://tools.ietf.org/html/rfc7159)**
@@ -479,6 +489,8 @@ jsonb: jsonb().$type<string[]>();
 // won't compile
 jsonb: jsonb().$type<string[]>().default({});
 ```
+
+## ---
 
 ### time
 `time` `timetz` `time with timezone` `time without timezone`  
@@ -628,6 +640,8 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
+## ---
+
 ### point
 `point`  
 Geometric point type
@@ -684,6 +698,8 @@ CREATE TABLE IF NOT EXISTS "items" (
 ```
 </Section>
 
+## ---
+
 ### enum 
 `enum` `enumerated types`  
 Enumerated (enum) types are data types that comprise a static, ordered set of values. 
@@ -711,7 +727,9 @@ CREATE TABLE IF NOT EXISTS "table" (
 ```
 </Section>
 
-## Customizing column data type
+## ---
+
+### Customizing data type
 Every column builder has a `.$type()` method, which allows you to customize the data type of the column. 
 
 This is useful, for example, with unknown or branded types:
@@ -727,8 +745,6 @@ const users = pgTable('users', {
   jsonField: json().$type<Data>(),
 });
 ```
-
-## Constraints & defaults
 
 ### Identity Columns
 

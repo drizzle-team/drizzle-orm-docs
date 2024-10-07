@@ -211,7 +211,9 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-## Customizing column data type
+## ---
+
+### Customizing data type
 Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
 ```ts
 type UserId = number & { __brand: 'user_id' };
@@ -226,7 +228,6 @@ const users = sqliteTable('users', {
 });
 ```
 
-## Columns constraints
 ### Not null
 `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 <Section>
