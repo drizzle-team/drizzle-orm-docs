@@ -1,3 +1,4 @@
+
 ---
 import EndOfContent from '@components/layout/EndOfContent.astro';
 import GlobalStyles from '@components/layout/GlobalStyles.astro';
@@ -9,19 +10,24 @@ import RightAside from '../components/layout/RightAside.astro';
 import DocsSidebar from '../components/layout/DocsSidebar/DocsSidebar.astro';
 import getContentTree from '@/utils/getContentTree';
 import type { IHeading } from '@/types/astro';
+import DialectTabs from "../components/layout/DialectTabs.astro";
+import {dialects} from "../data/dialects";
 
 interface Props {
   customTitle?: string;
+  customSlug?: string;
   description?: string;
   headings: IHeading[];
 }
 
-const { customTitle, headings, description } = Astro.props;
+const { customTitle, headings, description, customSlug } = Astro.props;
 const { slug } = Astro.params;
 const { tree, filteredHeadings, title } = await getContentTree({
   headings,
   slug,
 });
+
+const pageHasDialects = Object.keys(dialects).includes(slug?.split('/').at(-1)!);
 ---
 
 <!doctype html>
@@ -32,41 +38,53 @@ const { tree, filteredHeadings, title } = await getContentTree({
     <MDXStyles />
     <Banner />
     <Header />
-    <main class="documentation-container">
-      <DocsSidebar tree={tree} headings={filteredHeadings} />
-      <div class="documentation-content-wrap scrollbar">
-        <div class="documentation-content">
-          <slot />
-          <EndOfContent />
-          <!-- <Footer /> -->
+    <div class="fixed-container">
+      <div class="fixed-elements">
+        <DocsSidebar tree={tree} customSlug={customSlug} headings={filteredHeadings} />
+        <div class="dialects-container">
+          {pageHasDialects && <DialectTabs />}
         </div>
         <div class="right-aside-container">
           <RightAside />
         </div>
       </div>
+    </div>
+    <main class="documentation-container">
+      <div class="documentation-content">
+        {pageHasDialects && <div style="height: 52px"></div>}
+        <slot />
+        <EndOfContent />
+        <!-- <Footer /> -->
+      </div>
     </main>
-    <style>
-      .right-aside-container {
-        position: relative;
-      }
-
-      @media screen and (max-width: 1024px) {
-        .documentation-content-wrap {
-          grid-template-columns: minmax(0, 1fr);
-        }
-        .right-aside-container {
-          display: none;
-        }
-      }
-    </style>
     <style is:global>
-      .documentation-content-wrap {
-        display: grid;
-        width: 100%;
-        grid-template-columns: minmax(0, 1fr) 260px;
-        overflow-y: scroll;
-        overflow-x: hidden;
-      }
+        body {
+            margin-top: 104px;
+        }
+
+        .fixed-container {
+            position: fixed;
+            top: 104px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        .fixed-elements {
+            max-width: 1440px;
+            width: 100%;
+            justify-content: space-between;
+            display: flex;
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 22px;
+        }
+
+        .right-aside-container {
+            pointer-events: all;
+        }
 
       .navigation_nav_container_blur {
         -webkit-backdrop-filter: blur(12px);
@@ -99,25 +117,35 @@ const { tree, filteredHeadings, title } = await getContentTree({
         width: 100%;
         display: flex;
         margin: 0 auto;
-      }
-
-      body[class~='banner-shown'] .documentation-container {
-        height: calc(100dvh - 104px);
+        padding-left: calc(240px + 24px);
+        padding-right: calc(240px + 24px);
       }
 
       .documentation-content {
         padding-left: 48px;
-        padding-right: 40px;
+        padding-right: 48px;
         padding-top: 1rem;
+        overflow-x: hidden;
         width: 100%;
-        max-width: 892px;
-        position: relative;
+      }
+
+      .dialects-container {
+          padding-left: 48px;
+          padding-right: 48px;
+          padding-top: 1rem;
+          overflow-x: hidden;
+          width: 100%;
       }
 
       @media screen and (max-width: 1279px) {
         .documentation-content {
-          padding-left: 24px;
-          padding-right: 12px;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .dialects-container {
+            padding-left: 16px;
+            padding-right: 16px;
         }
       }
 
@@ -125,6 +153,19 @@ const { tree, filteredHeadings, title } = await getContentTree({
         .right-aside-container {
           display: none;
         }
+
+        .documentation-container {
+            padding-right: 24px;
+        }
+
+        .documentation-content {
+            padding-right: 0;
+        }
+
+          .dialects-container {
+              padding-right: 0;
+          }
+
       }
 
       @media screen and (max-width: 768px) {
@@ -134,16 +175,290 @@ const { tree, filteredHeadings, title } = await getContentTree({
           padding-top: 1rem;
           width: 100%;
         }
+
+          .dialects-container {
+              padding-left: 16px;
+              padding-right: 16px;
+          }
+
+          .documentation-container {
+             padding: 0;
+          }
+
+          .fixed-elements {
+              padding: 0;
+          }
       }
+    </style>
+    <style>
+        @media screen and (max-width: 1024px) {
+            .right-aside-container {
+                display: none;
+            }
+        }
     </style>
     <script>
       const hash = window.location.hash;
       if (hash !== '') {
         const targetElement = document.querySelector(hash);
         if (targetElement) {
-          targetElement.scrollIntoView();
+          setTimeout(() => targetElement.scrollIntoView(), 10);
         }
       }
     </script>
+    <script is:inline>
+      const changeNpmTab = () => {
+        const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'];
+
+        let packageManagerIndex = packageManagers.indexOf(packageManager);
+
+        const updateUI = (index) => {
+          npmContent.forEach((element) => {
+            Array.from(element.children).forEach((child, i) => {
+              child.classList.toggle('hidden', i !== index);
+            });
+          });
+          npmTabs.forEach((element) => {
+            Array.from(element.children).forEach((child, i) => {
+              child.classList.toggle('npm__tab--active', i === index);
+            });
+          });
+
+          npxSelectResizer.querySelector('.line span').innerText = packageManagers[index]
+
+          npxSelects.forEach((element) => {
+            element.value = index;
+            element.style.width = `${npxSelectResizer.offsetWidth}px`
+          });
+        };
+
+        const npmContent = document.querySelectorAll('.npm__content');
+        const npmTabs = document.querySelectorAll('.npm__tabs');
+        const npxSelects = document.querySelectorAll('.npx-select');
+        const npxSelectResizer = document.querySelector('.npx-select-resizer');
+
+        npmContent.forEach((content) => {
+          Array.from(content.children).forEach((child, index) => {
+            child.classList.toggle('hidden', index !== packageManagerIndex);
+          });
+        });
+
+        npmTabs.forEach((tab) => {
+          Array.from(tab.children).forEach((child, index) => {
+            child.classList.toggle('npm__tab--active', index === packageManagerIndex);
+            child.addEventListener('click', () => {
+              packageManager = packageManagers[index];
+              localStorage.setItem('package-manager', packageManager);
+              updateUI(index);
+            });
+          });
+        });
+
+        npxSelects.forEach((element) => {
+          npxSelectResizer.querySelector('.line span').innerText = packageManagers[packageManagerIndex];
+          element.value = packageManagerIndex;
+          setTimeout(() => element.style.width = `${npxSelectResizer.offsetWidth}px`, 1);
+          element.addEventListener('change', (e) => {
+            packageManager = packageManagers[Number(e.target.value)];
+            localStorage.setItem('package-manager', packageManager);
+            updateUI(Number(e.target.value));
+          })
+        });
+      }
+
+      const updateCollapsedSections = () => {
+        document.querySelectorAll('.nav-items-collapsable').forEach((section) => {
+          if (Number(section.getAttribute("data-active-inner-item")) && !expandedSections.find((v) => v === section.id)) {
+            expandedSections = [...expandedSections, section.id]
+          }
+          if (expandedSections.find((v) => v === section.id)) {
+            section.classList.add('expanded');
+          } else {
+            section.classList.remove('expanded');
+          }
+        })
+
+        localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
+      }
+
+      const scrollSidebar = () => {
+        const expandedSections = localStorage.getItem("expandedSections")
+          ? JSON.parse(localStorage.getItem("expandedSections"))
+      : [];
+
+        document.querySelectorAll(".nav-items-collapsable").forEach((section) => {
+          if (expandedSections.find((v) => v === section.id)) {
+            section.classList.add("expanded");
+          } else {
+            section.classList.remove("expanded");
+          }
+        });
+
+        const leftSidebar = document.querySelector(".aside-scroll");
+        const navItems = document.querySelectorAll("[data-nav-index]");
+        const headingsContainer = document.querySelector("[data-headings]");
+        const headingsContainerHeight = headingsContainer?.clientHeight || 0;
+        let itemIndex = 0;
+
+        const activeNavItem = Array.from(navItems).find((item) => {
+          return item.classList.contains("nav-item--active");
+        });
+
+        if (activeNavItem) {
+          itemIndex = +(activeNavItem.getAttribute("data-nav-index") || 0);
+        }
+        if (navItems && leftSidebar) {
+          navItems.forEach((item) => {
+            item.addEventListener("click", () => {
+              const nextIndex = +item.getAttribute("data-nav-index");
+              const scrollTop =
+                leftSidebar.scrollTop -
+                (nextIndex > itemIndex ? headingsContainerHeight : 0);
+              localStorage.setItem("sidebar-scroll", scrollTop.toString());
+            });
+          });
+
+          const findPreviousNavSeparator = (element) => {
+            if (!element) return null;
+
+            let previousElement = element.previousElementSibling;
+
+            while (previousElement) {
+              if (previousElement.classList.contains("nav-separator")) {
+                return previousElement;
+              }
+              previousElement =
+                previousElement.previousElementSibling;
+            }
+
+            return null;
+          };
+
+          const leftSidebarScroll = localStorage.getItem("sidebar-scroll");
+          if (leftSidebarScroll !== null) {
+            leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
+          } else if (activeNavItem) {
+            if (
+              findPreviousNavSeparator(activeNavItem)?.classList.contains(
+                "nav-separator-collapsable",
+              )
+            ) {
+              leftSidebar.scrollTop =
+                findPreviousNavSeparator(activeNavItem).parentElement.offsetTop;
+            } else {
+              leftSidebar.scrollTop =
+                findPreviousNavSeparator(activeNavItem).offsetTop;
+            }
+          }
+        }
+      };
+
+      scrollSidebar();
+      updateCollapsedSections();
+      changeNpmTab();
+    </script>
+    <script>
+      class RemElement extends HTMLElement {
+        constructor() {
+          super();
+        }
+      }
+
+      // Регистрация нового элемента
+      customElements.define('rem', RemElement);
+      customElements.define('rem025', RemElement);
+      customElements.define('rem05', RemElement);
+    </script>
+    <script is:inline data-astro-rerun>
+        document.querySelectorAll("h2").forEach((el) => {
+          if (el.innerText === '---') {
+            el.classList.add('hidden-separator')
+          }
+        })
+    </script>
+    <script>
+      document.addEventListener("astro:after-swap", () => {
+        const npmContent: NodeList = document.querySelectorAll('.npm__content');
+        const npmTabs: NodeList = document.querySelectorAll('.npm__tabs');
+        const npxSelects: NodeList = document.querySelectorAll('.npx-select');
+        const npxSelectResizer = document.querySelector('.npx-select-resizer');
+        const packageManagers: string[] = ['npm', 'yarn', 'pnpm', 'bun'];
+        let packageManager: string = localStorage.getItem('package-manager') || 'npm';
+        let packageManagerIndex: number = packageManagers.indexOf(packageManager);
+
+        const updateUI = (index: number): void => {
+          npmContent.forEach((element) => {
+            Array.from((element as HTMLElement).children).forEach((child, i) => {
+              child.classList.toggle('hidden', i !== index);
+            });
+          });
+          npmTabs.forEach((element) => {
+            Array.from((element as HTMLElement).children).forEach((child, i) => {
+              child.classList.toggle('npm__tab--active', i === index);
+            });
+          });
+
+          npxSelectResizer.querySelector('.line span').innerText = packageManagers[index]
+
+          npxSelects.forEach((element) => {
+            element.value = index;
+            element.style.width = `${npxSelectResizer.offsetWidth}px`
+          });
+        };
+
+        npmContent.forEach((content) => {
+          Array.from((content as HTMLElement).children).forEach((child, index) => {
+            child.classList.toggle('hidden', index !== packageManagerIndex);
+          });
+        });
+
+        npmTabs.forEach((tab) => {
+          Array.from((tab as HTMLElement).children).forEach((child, index) => {
+            child.classList.toggle('npm__tab--active', index === packageManagerIndex);
+            child.addEventListener('click', () => {
+              packageManager = packageManagers[index];
+              localStorage.setItem('package-manager', packageManager);
+              updateUI(index);
+            });
+          });
+        });
+
+        npxSelects.forEach((element) => {
+          npxSelectResizer.querySelector('.line span').innerText = packageManagers[packageManagerIndex];
+          element.value = packageManagerIndex;
+          element.style.width = `${npxSelectResizer.offsetWidth}px`
+          element.addEventListener('change', (e) => {
+            packageManager = packageManagers[Number(e.target.value)];
+            localStorage.setItem('package-manager', packageManager);
+            updateUI(Number(e.target.value));
+          })
+        });
+      })
+      </script>
+    <style is:global>
+      rem {
+          display: block;
+          height: 1rem;
+      }
+
+      rem025 {
+          display: block;
+          height: 0.25rem;
+      }
+
+      rem05 {
+          display: block;
+          height: 0.5rem;
+      }
+
+      .hidden-separator {
+          width: 0;
+          height: 0;
+          pointer-events: none;
+          overflow: hidden;
+          margin: 0 !important;
+          padding: 0 !important;
+      }
+    </style>
   </body>
 </html>

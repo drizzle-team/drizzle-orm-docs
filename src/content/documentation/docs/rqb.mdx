@@ -476,11 +476,11 @@ export const postsRelations = relations(posts, ({ one }) => ({
 ```
 
 ## Querying
-Relational queries are an extension to Drizzle's original **[query builder](/docs/crud)**.
+Relational queries are an extension to Drizzle's original **[query builder](/docs/select)**.
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
 initialization and then just use the `db.query` API.
 <Callout type="info" emoji="ℹ️">
-	`drizzle` import path depends on the **[database driver](/docs/installation-and-db-connection)** you're using.
+	`drizzle` import path depends on the **[database driver](/docs/connect-overview)** you're using.
 </Callout>
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
@@ -835,7 +835,7 @@ await db.query.posts.findMany({
 ### Order By
 Drizzle provides API for ordering in the relational query builder.  
 
-You can use same ordering **[core API](/docs/crud#order-by)** or use
+You can use same ordering **[core API](/docs/select#order-by)** or use
 `order by` operator from the callback with no imports.  
 
 <Section>
@@ -869,7 +869,7 @@ await db.query.posts.findMany({
 Relational query API lets you add custom additional fields. 
 It's useful when you need to retrieve data and apply additional functions to it.
 <Callout type="warning" emoji="⚠️">
-	As of now aggregations are not supported in `extras`, please use **[`core queries`](/docs/crud)** for that.
+	As of now aggregations are not supported in `extras`, please use **[`core queries`](/docs/select)** for that.
 </Callout>
 
 <Section>
@@ -973,7 +973,7 @@ const res: {
 </Section>
 
 ### Prepared statements
-Prepared statements are designed to massively improve query performance — [see here.](/docs/performance)
+Prepared statements are designed to massively improve query performance — [see here.](/docs/perf-queries)
 
 In this section, you can learn how to define placeholders and execute prepared statements 
 using the Drizzle relational query builder.

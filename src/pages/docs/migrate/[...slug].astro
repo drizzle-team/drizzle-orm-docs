@@ -1,0 +1,25 @@
+---
+import { getCollection } from "astro:content";
+
+import Link from "@components/markdown/Link.astro";
+import CustomHeader from "@components/layout/CustomHeader.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
+export async function getStaticPaths() {
+  const releasesEntries = await getCollection("documentation", ({ id }) => {
+    return id.startsWith("docs/migrate/");
+  });
+  return releasesEntries.map((entry) => ({
+    params: { slug: entry.slug.split("/").at(-1) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<DocsLayout customTitle={entry.data.title} customSlug={"docs/learn-overview"} headings={[]}>
+  {entry.data?.title && <CustomHeader>{entry.data.title}</CustomHeader>}
+  <Content components={{ a: Link }} />
+</DocsLayout>

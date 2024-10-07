@@ -1,0 +1,519 @@
+import Tab from "@/components/markdown/Tab.astro";
+import Tabs from "@/components/markdown/Tabs.astro";
+import Callout from "@/components/markdown/Callout.astro";
+
+# Configuring Drizzle kit
+
+## Configuration
+
+By default, Drizzle reads the `drizzle.config.ts` file located in the project's root folder. 
+If you need to specify a different configuration file, you can utilize the `--config=<path>`
+command-line option after any drizzle-kit command.
+
+Drizzle Kit supports multiple formats for the configuration file, including `.ts`, `.js`.
+This flexibility allows you to choose the format that best suits your needs and preferences.
+
+Here are some examples of each file format usage:
+
+**Typescript example**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./schema.ts",
+  out: "./drizzle"
+})
+```
+
+**JavaScript example**
+```js
+/** @type { import("drizzle-kit").Config } */
+export default {
+  dialect: "postgresql",
+  schema: "./schema.ts",
+  out: "./drizzle"
+};
+```
+
+## Options
+
+### dialect
+
+- **Type**: `'postgresql' | 'mysql' | 'sqlite'`
+- **Commands**: all commands
+
+<Callout type="warning" emoji="⚠️">
+	Current param is available in `drizzle-kit@0.21.0` and higher. In previous versions you should not use this param
+</Callout>
+
+The `dialect` parameter is responsible for explicitly providing a database dialect you are using
+for all the commands
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: "postgresql",
+})
+```
+
+### schema
+
+- **Type**: `string | string[]`
+- **Commands**: `generate`, `check`, `up`, `push`, `drop`
+
+`schema` param lets you define where your schema file/files live.  
+
+You can have as many separate schema files as you want and define paths to them using 
+**[`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)**
+or array of globs syntax.
+
+**Usage**
+<Tabs items={["Single file", "Multiple files", "Glob pattern"]}>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  schema: "./schema.ts",
+})
+```
+</Tab>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  schema: ["./user.sql.ts", "./post.sql.ts"],
+})
+```
+</Tab>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  schema: "./schema/*.ts",
+})
+```
+</Tab>
+</Tabs>
+
+### out
+
+- **Type**: `string | string[]`
+- **Default**: `drizzle`
+- **Commands**: `generate`, `check`, `up`, `drop`, `introspect`, `migrate`
+
+The `out` parameter allows you to define the folder for your migrations.
+
+In this folder, drizzle-kit will:
+
+1. Store migration files, `meta`, and `journal`
+2. Output the `schema.ts` file when running `drizzle-kit introspect`
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  out: "./drizzle",
+})
+```
+
+### driver
+
+- **Type**: `'aws-data-api' | 'd1-http' | 'expo' | 'turso'`
+- **Commands**: `push`, `introspect`, `migrate`
+
+The `driver` parameter is responsible for explicitly providing a driver to use when accessing a database 
+for the introspect and push commands. It is also useful for HTTP-based databases where connecting using 
+a database connection url is not possible. For example, **[Turso](https://turso.tech/drizzle)** and **[Cloudflare D1](https://developers.cloudflare.com/d1/)**!
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  driver: "aws-data-api"
+})
+```
+
+### dbCredentials
+
+- **Type**: `PostgresCredentials, MySQLCredentials, SQLiteCredentials, TursoCredentials`
+- **Commands**: `push`, `introspect`
+
+<Callout>
+	Each `dialect` should have `dbCredentials` field to provide a means of connecting to the database.
+</Callout>
+
+**PostgresCredentials** (`postgresql`)
+<Tabs items={["Option 1", "Option 2"]}>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dbCredentials: {
+    url: '',
+  }
+})
+```
+</Tab>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dbCredentials: {
+    host: "",
+    port: "",
+    user: "",
+    password: "",
+    database: "",
+    ssl: true, // can be boolean | "require" | "allow" | "prefer" | "verify-full" | options from node:tls
+  }
+})
+```
+</Tab>
+</Tabs>
+
+**MySQLCredentials** (`mysql`)
+<Tabs items={["Option 1", "Option 2"]}>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dbCredentials: {
+    url: '',
+  }
+})
+```
+</Tab>
+<Tab>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dbCredentials: {
+    host: "",
+    port: "",
+    user: "",
+    password: "",
+    database: "",
+    ssl: "" // can be: string | SslOptions (ssl options from mysql2 package)
+  }
+})
+```
+</Tab>
+</Tabs>
+
+**SQLiteCredentials** (`libsql`, `better-sqlite3`)
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dbCredentials: {
+    url: '', // 👈 this could also be a path to the local sqlite file using 'file:<<path>>'
+  }
+})
+```
+
+**TursoCredentials** (`turso`)
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: "sqlite",
+  driver: "turso",
+  dbCredentials: {
+    url: '',
+    authToken: ''
+  }
+})
+```
+
+**D1Credentials** (`d1`)
+
+To get all needed credentials from Cloudflare dashboard you need to
+
+- Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and then:
+
+To get `accountId`:
+- Open "Workers & Pages" tab
+- Go to "Overview" 
+- Copy **Account ID** from the right sidebar
+
+To get `databaseId`:
+- Open D1 database you want to connect to and copy **Database ID** 
+
+To get `token`:
+- Open "My profile"
+- Go to "API Tokens"
+- Create token with D1 edit permissions
+
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: "sqlite",
+  driver: "d1-http",
+  dbCredentials: {
+    accountId: "",
+    databaseId: "",
+    token: "",
+  }
+})
+```
+
+### migrations
+
+- **Type**: `object`
+- **Commands**: `migrate`
+
+`migrations` param let's use specify custom table and schema(PostgreSQL only) for migrations. 
+By default, all information about executed migrations will be stored in the database inside the
+`__drizzle_migrations` table, and for PostgreSQL, inside the drizzle schema. 
+However, you can configure where to store those records.
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  migrations: {
+    table: "custom_migrations_table",
+    schema: "public"
+  }
+});
+```
+
+### migrations.prefix
+
+- **Type**: `index` | `supabase` | `timestamp` | `unix` | `none`
+- **Commands**: `generate`
+
+1. `index` is the default type and will result in `0001_name.sql` file names;
+2. `supabase` and `timestamp` are equal and will result in `20240627123900_name.sql` file names;
+3. `unix` will result in unix seconds prefixes `1719481298_name.sql` file names;
+4. `none` will omit the prefix completely;
+
+You can specify a custom shape for migration file names, using different prefixes
+
+<Callout type="warning">
+You can use prefixes only if you don't have any migration history already. The kit won't work properly if you mix prefix formats within the same migration folder. Please ensure you use only one prefix format throughout the project.
+
+We are working on making it possible to migrate from one prefix format to another and to ensure interoperability
+</Callout>
+
+```ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  migrations: {
+    prefix: 'supabase'
+  }
+});
+```
+
+### breakpoints
+
+- **Type**: `boolean`
+- **Default**: `true`
+- **Commands**: `generate`, `introspect`
+
+`breakpoints` param lets you enable/disable SQL statement breakpoints in generated migrations. It's optional and `true` by default, 
+it's necessary to properly apply migrations on databases, that do not support multiple DDL alternation statements in one transaction(MySQL, SQLite) 
+and Drizzle ORM has to apply them sequentially one by one.
+```sql {5}
+CREATE TABLE `book` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text
+);
+--> statement-breakpoint
+CREATE TABLE `book_to_author` (
+	`author_id` integer,
+	`book_id` integer,
+	PRIMARY KEY(`book_id`, `author_id`)
+);
+```
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  breakpoints: true
+});
+```
+
+### tablesFilters
+
+- **Type**: `string | string[]`
+- **Commands**: `push`
+
+
+`tablesFilter` param lets you filter tables with glob(opens in a new tab) syntax for db push command.
+It's useful when you have only one database available for several separate projects with separate sql schemas.
+
+How to define multi-project tables with Drizzle ORM — **[see here.](/docs/goodies#multi-project-schema)**
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  tablesFilter: ["project1_*"],
+});
+```
+
+In this case, only tables that start with `project1_` will be synced with the database
+
+### extensionsFilters
+
+- **Type**: `string[]`
+- **Commands**: `push`, `introspect`
+
+<Callout>
+Available from `drizzle-kit@0.22.0`
+</Callout>
+
+The PostGIS extension creates a few internal tables in the `public` schema. This means that if you have a database with the PostGIS extension and use `push` or `introspect`, all those tables will be included in `diff` operations. In this case, you would need to specify `tablesFilter`, find all tables created by the extension, and list them in this parameter.
+
+We have addressed this issue so that you won't need to take all these steps. Simply specify `extensionsFilters` with the name of the extension used, and Drizzle will skip all the necessary tables.
+
+Currently, we only support the `postgis` option, but we plan to add more extensions if they create tables in the `public` schema.
+
+The `postgis` option will skip the `geography_columns`, `geometry_columns`, and `spatial_ref_sys` tables
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defaultConfig({
+  dialect: "postgresql",
+  extensionsFilters: ["postgis"],
+})
+```
+
+### schemaFilter
+
+- **Type**: `string | string[]`
+- **Default**: `["public"]`
+- **Commands**: `push`, `introspect`
+- **Available databases**: `PostgreSQL`
+
+
+The `schemaFilter` parameter allows you to define which schema in PostgreSQL should be used for either `introspect` 
+or `push` commands.
+This parameter accepts a single schema as a string or an array of schemas as strings. No glob pattern is supported here. 
+By default, drizzle will use the `public` schema for both commands, but you can add any schema you need.
+
+For example, having `schemaFilter: ["my_schema"]` will only look for tables in both the database and 
+drizzle schema that are a part of the `my_schema` schema.
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  schemaFilter: ["public", "my_schema"],
+});
+```
+### verbose
+
+- **Type**: `boolean`
+- **Default**: false
+- **Commands**: `push`
+
+This command is used for `drizzle-kit push` commands and prints all statements that will be executed.
+
+<Callout>
+    Note: This command will only print the statements that should be executed.
+    To approve them before applying, please refer to the `strict` command.
+</Callout>
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  verbose: true
+});
+```
+
+### strict
+
+- **Type**: `boolean`
+- **Default**: false
+- **Commands**: `push`
+
+This command is used for `drizzle-kit push` commands and will always ask for your confirmation, either 
+to execute all statements needed to sync your schema with the database or not.
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  strict: true
+});
+```
+
+### introspect
+
+- **Type**: `object`
+
+This section is a reference to `introspect` object inside `drizzle.config.*` file.
+
+#### casing
+
+- **Type**: `'preserve' | 'camel'`
+- **Default**: `camel`
+- **Commands**: 
+
+This command is responsible for a strategy for choosing column, table, constraint JS key names while introspecting your database.
+
+**Usage**
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  introspect: {
+    casing: 'preserve'
+  }
+});
+```
+
+**Example**
+<Tabs items={["preserve", "camel"]}>
+<Tab>
+```ts
+export const user_preferences = sqliteTable(
+  "user_preferences",
+  {
+    id: integer("id").primaryKey(),
+    name: integer("name").notNull(),
+    user_id: integer("user_id").notNull(),
+  }
+);
+```
+</Tab>
+<Tab>
+```ts
+export const userPreferences = sqliteTable(
+  "user_preferences",
+  {
+    id: integer("id").primaryKey(),
+    name: integer("name").notNull(),
+    userId: integer("user_id").notNull(),
+  }
+);
+```
+</Tab>
+</Tabs>

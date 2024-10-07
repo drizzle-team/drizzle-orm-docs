@@ -1,0 +1,66 @@
+import Tab from '@components/markdown/Tab.astro';
+import Tabs from '@components/markdown/Tabs.astro';
+import Npm from "@components/markdown/Npm.astro";
+import Callout from '@components/markdown/Callout.astro';
+import Steps from '@components/markdown/Steps.astro';
+import AnchorCards from '@components/markdown/AnchorCards.astro';
+import Breadcrumbs from '@components/markdown/Breadcrumbs.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+import FileStructure from '@mdx/get-started/FileStructure.mdx';
+import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
+import ConnectXata from '@mdx/get-started/postgresql/ConnectXata.mdx'
+import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx'
+import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
+import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
+import RunFile from '@mdx/get-started/RunFile.mdx';
+import QueryXata from '@mdx/get-started/postgresql/QueryXata.mdx';
+import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
+
+<Breadcrumbs/>
+
+# Get Started with Drizzle and Xata
+
+<Prerequisites>
+  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
+  - **Xata database** - [read here](https://xata.io/docs)
+  - **Xata driver** - [read here](https://xata.io/docs/sdk/typescript/overview) & [GitHub](https://github.com/xataio/client-ts)
+</Prerequisites>
+
+<FileStructure/>
+
+#### Step 1 - Install **@xata.io/client** package
+<InstallPackages lib='@xata.io/client'/>
+
+#### Step 2 - Setup connection variables
+
+<SetupEnv env_variable='DATABASE_URL' />
+
+#### Step 3 - Generate Xata client
+
+To generate the Xata client, please refer to the [Xata docs](https://xata.io/docs/getting-started/installation)
+
+#### Step 4 - Connect Drizzle ORM to the database
+
+<ConnectXata/>
+
+#### Step 5 - Create a table
+
+<CreateTable />
+
+#### Step 6 - Setup Drizzle config file
+
+<SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
+
+#### Step 7 - Applying changes to the database
+
+<ApplyChanges />
+
+#### Step 8 - Seed and Query the database
+
+<QueryXata />
+
+#### Step 9 - Run index.ts file
+
+<RunFile/>

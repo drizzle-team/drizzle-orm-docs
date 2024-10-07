@@ -1,7 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 
-const tutorials = await getCollection("tutorials");
+const tutorials = await getCollection("documentation", ({ id }) => {
+  return id.startsWith("docs/tutorials/");
+});
 
 const formattedTutorials = tutorials.map((tutorial) => (
   {
@@ -22,7 +24,7 @@ const sortedThreeLatestTutorials = formattedTutorials.sort((a, b) => {
   {
     sortedThreeLatestTutorials.map((card) => (
       <a
-        href={`/learn/tutorials/${card.slug}`}
+        href={`/docs/tutorials/${card.slug}`}
         class="tutorials__section__card"
       >
         <div class="tutorials__section__card_icons">

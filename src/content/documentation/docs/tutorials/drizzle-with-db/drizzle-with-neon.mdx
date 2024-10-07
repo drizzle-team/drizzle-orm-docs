@@ -1,0 +1,318 @@
+---
+title: "Drizzle with Neon Postgres"
+date: "2024-05-10"
+svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>',<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 6.75867C4 6.02702 4.29064 5.32535 4.80799 4.80799C5.32535 4.29064 6.02702 4 6.75867 4H17.2413C17.973 4 18.6747 4.29064 19.192 4.80799C19.7094 5.32535 20 6.02702 20 6.75867V15.6742C20 17.2502 18.0053 17.9342 17.0382 16.6902L14.0138 12.7996V17.5173C14.0138 18.1758 13.7522 18.8073 13.2866 19.2728C12.821 19.7384 12.1896 20 11.5311 20H6.75867C6.02702 20 5.32535 19.7094 4.80799 19.192C4.29064 18.6747 4 17.973 4 17.2413V6.75867ZM6.75867 6.20711C6.45378 6.20711 6.20711 6.45378 6.20711 6.75822V17.2413C6.20711 17.5462 6.45378 17.7933 6.75822 17.7933H11.6138C11.7662 17.7933 11.8067 17.6698 11.8067 17.5173V11.1911C11.8067 9.61467 13.8013 8.93067 14.7689 10.1751L17.7933 14.0653V6.75867C17.7933 6.45378 17.8218 6.20711 17.5173 6.20711H6.75867Z" /></svg>]
+---
+
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Npm from "@mdx/Npm.astro";
+import Steps from "@mdx/Steps.astro";
+import Section from "@mdx/Section.astro";
+import Callout from "@mdx/Callout.astro";
+
+This tutorial demonstrates how to use Drizzle ORM with [Neon Postgres](https://neon.tech/) database. If you do not have an existing Neon account, sign up [here](https://neon.tech). 
+
+<Prerequisites>  
+  - You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
+  <Npm>
+    drizzle-orm 
+    -D drizzle-kit
+  </Npm>
+
+  - You should also install the [Neon serverless driver](https://neon.tech/docs/serverless/serverless-driver). 
+  <Npm>
+    @neondatabase/serverless
+  </Npm>
+  
+  - You should have installed the `dotenv` package for managing environment variables. 
+  <Npm>
+    dotenv
+  </Npm>  
+</Prerequisites>
+
+## Setup Neon and Drizzle ORM
+
+<Steps>
+#### Create a new Neon project
+
+Log in to the [Neon Console](https://console.neon.tech/app/projects) and navigate to the Projects section. Select a project or click the `New Project` button to create a new one. 
+
+Your Neon projects come with a ready-to-use Postgres database named `neondb`. We'll use it in this tutorial.
+
+#### Setup connection string variable
+
+Navigate to the **Connection Details** section in the project console to find your database connection string. It should look similar to this:
+
+```bash
+postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb
+```
+
+Add the `DATABASE_URL` environment variable to your `.env` or `.env.local` file, which you'll use to connect to the Neon database.
+
+```text copy
+DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
+```
+
+#### Connect Drizzle ORM to your database 
+
+Create a `db.ts` file and set up your database configuration:
+
+```typescript copy filename="src/db.ts"
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { config } from "dotenv";
+
+config({ path: ".env" }); // or .env.local
+
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql);
+```
+
+#### Create tables
+
+Create a `schema.ts` file and declare your tables:
+
+```typescript copy filename="src/schema.ts"
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+export const usersTable = pgTable('users_table', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age').notNull(),
+  email: text('email').notNull().unique(),
+});
+
+export const postsTable = pgTable('posts_table', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type InsertUser = typeof usersTable.$inferInsert;
+export type SelectUser = typeof usersTable.$inferSelect;
+
+export type InsertPost = typeof postsTable.$inferInsert;
+export type SelectPost = typeof postsTable.$inferSelect;
+```
+
+#### Setup Drizzle config file
+
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+
+Create a `drizzle.config.ts` file in the root of your project and add the following content:
+
+```typescript copy filename="drizzle.config.ts"
+import { config } from 'dotenv';
+import { defineConfig } from "drizzle-kit";
+
+config({ path: '.env' });
+
+export default defineConfig({
+  schema: "./src/schema.ts",
+  out: "./migrations",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+
+#### Applying changes to the database
+
+You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
+
+Generate migrations:
+
+```bash copy
+npx drizzle-kit generate
+```
+
+These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+
+Example of a generated migration:
+
+```sql
+CREATE TABLE IF NOT EXISTS "posts_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"content" text NOT NULL,
+	"user_id" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "users_table" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"age" integer NOT NULL,
+	"email" text NOT NULL,
+	CONSTRAINT "users_table_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+```
+
+Run migrations:
+
+```bash copy
+npx drizzle-kit migrate
+```
+
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+
+```bash copy
+npx drizzle-kit push
+```
+
+<Callout type="warning">Push command is good for situations where you need to quickly test new schema designs or changes in a local development environment, allowing for fast iterations without the overhead of managing migration files.</Callout>
+
+</Steps>
+
+### Basic file structure
+
+This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `db.ts`, schema definitions in `schema.ts`, and a migration script in `migrate.ts` file which is responsible for applying migrations that stored in the `migrations` directory.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │  ├ 📜 db.ts
+ │  └ 📜 schema.ts
+ ├ 📂 migrations
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json
+ │  │  └ 📜 0000_snapshot.json
+ │  └ 📜 0000_dry_richard_fisk.sql
+ ├ 📜 .env
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+## Query examples
+
+For instance, we create `src/queries` folder and separate files for each operation: insert, select, update, delete.
+
+#### Insert data
+
+Read more about insert query in the [documentation](/docs/insert).
+
+```typescript copy filename="src/queries/insert.ts" {4, 8}
+import { db } from '../db';
+import { InsertPost, InsertUser, postsTable, usersTable } from '../schema';
+
+export async function createUser(data: InsertUser) {
+  await db.insert(usersTable).values(data);
+}
+
+export async function createPost(data: InsertPost) {
+  await db.insert(postsTable).values(data);
+}
+```
+
+#### Select data
+
+Read more about select query in the [documentation](/docs/select).
+
+```typescript copy filename="src/queries/select.ts" {5, 16, 41}
+import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
+import { db } from '../db';
+import { SelectUser, usersTable, postsTable } from '../schema';
+
+export async function getUserById(id: SelectUser['id']): Promise<
+  Array<{
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }>
+> {
+  return db.select().from(usersTable).where(eq(usersTable.id, id));
+}
+
+export async function getUsersWithPostsCount(
+  page = 1,
+  pageSize = 5,
+): Promise<
+  Array<{
+    postsCount: number;
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }>
+> {
+  return db
+    .select({
+      ...getTableColumns(usersTable),
+      postsCount: count(postsTable.id),
+    })
+    .from(usersTable)
+    .leftJoin(postsTable, eq(usersTable.id, postsTable.userId))
+    .groupBy(usersTable.id)
+    .orderBy(asc(usersTable.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+}
+
+export async function getPostsForLast24Hours(
+  page = 1,
+  pageSize = 5,
+): Promise<
+  Array<{
+    id: number;
+    title: string;
+  }>
+> {
+  return db
+    .select({
+      id: postsTable.id,
+      title: postsTable.title,
+    })
+    .from(postsTable)
+    .where(between(postsTable.createdAt, sql`now() - interval '1 day'`, sql`now()`))
+    .orderBy(asc(postsTable.title), asc(postsTable.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+}
+```
+
+Alternatively, you can use [relational query syntax](/docs/rqb).
+
+#### Update data
+
+Read more about update query in the [documentation](/docs/update).
+
+```typescript copy filename="src/queries/update.ts" {5}
+import { eq } from 'drizzle-orm';
+import { db } from '../db';
+import { SelectPost, postsTable } from '../schema';
+
+export async function updatePost(id: SelectPost['id'], data: Partial<Omit<SelectPost, 'id'>>) {
+  await db.update(postsTable).set(data).where(eq(postsTable.id, id));
+}
+```
+
+#### Delete data
+
+Read more about delete query in the [documentation](/docs/delete).
+
+```typescript copy filename="src/queries/delete.ts" {5}
+import { db } from '../db';
+import { eq } from 'drizzle-orm';
+import { SelectUser, usersTable } from '../schema';
+
+export async function deleteUser(id: SelectUser['id']) {
+  await db.delete(usersTable).where(eq(usersTable.id, id));
+}
+```

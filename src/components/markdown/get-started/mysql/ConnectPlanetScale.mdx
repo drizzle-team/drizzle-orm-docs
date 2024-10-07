@@ -1,0 +1,35 @@
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+```typescript copy"
+import { drizzle } from "drizzle-orm/connect";
+
+async function main() {
+    const db = await drizzle('planetscale', { connection: {
+      host: process.env.DATABASE_HOST!,
+      username: process.env.DATABASE_USERNAME!,
+      password: process.env.DATABASE_PASSWORD!,
+    }});
+}
+
+main();
+```
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
+
+```typescript copy"
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { Client } from "@planetscale/database";
+
+async function main() {
+    const client = new Client({
+      host: process.env.DATABASE_HOST!,
+      username: process.env.DATABASE_USERNAME!,
+      password: process.env.DATABASE_PASSWORD!,
+    });
+
+    const db = drizzle(client);
+}
+
+main();
+```

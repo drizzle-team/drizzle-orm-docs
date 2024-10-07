@@ -2,6 +2,7 @@
 import Tab from '@components/markdown/Tab.astro';
 import Tabs from '@components/markdown/Tabs.astro';
 import Callout from '@components/markdown/Callout.astro';
+import Section from '@mdx/Section.astro';
 import CodeTabs from '@components/markdown/CodeTabs.astro';
 
 ## Type API
@@ -111,12 +112,10 @@ const db = drizzle(pool, { logger: new MyLogger() });
 
 
 ## Multi-project schema
-`table creator` operator lets you define customise table names.  
+**Table creator** API lets you define customise table names.  
 It's very useful when you need to keep schemas of different projects in one database.
 
-For db push docs — **[see here.](/kit-docs/conf#multi-project-schema)**
-<Tabs items={["PostgreSQL","MySQL","SQLite"]}>
-<Tab>
+<CodeTabs items={["PostgreSQL","MySQL","SQLite"]}>
 ```ts {3}
 import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
 
@@ -127,8 +126,6 @@ const users = pgTable('users', {
   name: text('name').notNull(),
 });
 ```
-</Tab>
-<Tab>
 ```ts {3}
 import { int, text, mysqlTableCreator } from 'drizzle-orm/mysql-core';
 
@@ -139,8 +136,6 @@ const users = mysqlTable('users', {
   name: text('name').notNull(),
 });
 ```
-</Tab>
-<Tab>
 ```ts {3}
 import { int, text, sqliteTableCreator } from 'drizzle-orm/sqlite-core';
 
@@ -151,9 +146,25 @@ const users = sqliteTable('users', {
   name: text('name').notNull(),
 });
 ```
-</Tab>
-</Tabs>
+</CodeTabs>
+```ts {10}
+import { defineConfig } from "drizzle-kit";
 
+export default defineConfig({
+  schema: "./src/schema/*",
+  out: "./drizzle",
+  dialect: "mysql", 
+  dbCredentials: {
+    url: process.env.DATABASE_URL,
+  }
+  tablesFilter: ["project1_*"],
+});
+```
+
+You can apply multiple `or` filters:
+```ts
+tablesFilter: ["project1_*", "project2_*"]
+```
 
 
 ## Printing SQL query

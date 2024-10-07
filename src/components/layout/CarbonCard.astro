@@ -13,10 +13,32 @@
   }
 
   .carbon-card-wrap {
-    width: 100%;
     min-height: 210px;
+      width: 240px;
     background-color: #f6f6f7;
     border-radius: 4px;
+    z-index: 10;
+    position: absolute;
+    bottom: 12px;
+    left: 0px;
+    right: 0px;
+    transform-style: preserve-3d;
+  }
+
+  .carbon-card-wrap::before {
+      content: '';
+      display: block;
+      background-color: white;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -4px;
+      bottom: -12px;
+      transform: translateZ(-1px);
+  }
+
+  html.dark .carbon-card-wrap::before {
+      background-color: #111111;
   }
 
   .carbon-card-wrap #carbonads {

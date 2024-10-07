@@ -1,9 +1,17 @@
 ---
+import { parse } from 'node-html-parser';
+
 interface Props {
   items: string[];
 }
 
 const { items } = Astro.props;
+const slot = await Astro.slots.render('default');
+const parsedHtml = parse(slot);
+
+parsedHtml.querySelectorAll('.tab__content').forEach((tabContent, index) => {
+  if (index !== 0) tabContent.classList.add('hidden');
+});
 ---
 
 <div class="tabs__wrap">
@@ -20,19 +28,11 @@ const { items } = Astro.props;
     }
   </div>
   <div class="tabs__content">
-    <slot />
+    <Fragment set:html={parsedHtml.toString()} />
   </div>
 </div>
-
 <script>
   document.addEventListener("astro:page-load", () => {
-    const tabsContent = document.querySelectorAll('.tabs__content');
-    tabsContent.forEach((tabContent) => {
-      Array.from(tabContent.children).forEach((child, index) => {
-        child.classList.toggle('hidden', index !== 0);
-      });
-    });
-
     document.querySelectorAll('[data-change-tab-btn]').forEach((button) => {
       button.addEventListener('click', (e) => {
         const target = e.target as Element;

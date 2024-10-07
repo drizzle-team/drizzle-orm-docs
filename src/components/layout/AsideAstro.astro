@@ -1,5 +1,6 @@
 ---
 import type { IHeading, TreeNode } from "../../types/astro";
+import CollapseToggleButton from "./DocsSidebar/CollapseToggleButton.astro";
 
 interface Props {
   headings?: IHeading[];
@@ -8,27 +9,192 @@ interface Props {
   forLanding?: boolean;
 }
 
+
 const { headings, slug = "", tree, forLanding = false } = Astro.props;
 const isActive = (path: string) => {
   const pathArray = path.split("/");
   const slugArray = slug.split("/");
   return pathArray.every((element, index) => element === slugArray[index]);
 };
+
+function modifyTree(tree: TreeNode[]): TreeNode[] {
+  const modifiedTree: TreeNode[] = [];
+  let currentCollapsableNode: TreeNode | null = null;
+
+  for (const node of tree) {
+    if (node.type === "collapsable") {
+      currentCollapsableNode = { ...node, items: [] };
+      modifiedTree.push(currentCollapsableNode);
+    } else if (node.type === "separator") {
+      currentCollapsableNode = null;
+      modifiedTree.push(node);
+    } else if (currentCollapsableNode) {
+      currentCollapsableNode.items.push(node);
+    } else {
+      modifiedTree.push(node);
+    }
+  }
+
+  return modifiedTree;
+}
+
+const calculateMaxHeight = (items: TreeNode[]) => {
+  return items.reduce((acc, it) => {
+    if (acc.counter === 6) return acc;
+
+    if (it.type === 'dot-separator') {
+      return  {value: 12 + acc.value, counter: acc.counter}
+    } else {
+      return {value: 26.5 + acc.value, counter: acc.counter + 1}
+    }
+  }, {value: 0, counter: 0}).value + 61
+}
+
+
+const groupedTree = tree.map(t => ({...t, children: modifyTree(t.children)}));
+let i = 0;
+
 ---
 
 <div class="nav-items">
   {
-    tree
+    groupedTree
       .filter((t) => forLanding || isActive(t.name))
       .map((t) =>
-        t.children?.map((n, index) => (
+        t.children?.map((n) => (
           <Fragment key={n.name}>
             {n.type === "separator" && (
               <div class="nav-separator">{n.title}</div>
             )}
+            {n.type === "collapsable" && (
+              <div
+                class={"nav-items-collapsable"}
+                id={n.title}
+                data-active-inner-item={n.items.some(c => isActive(`${t.name}/${c.name}`)) ? 1 : 0}
+                style={`max-height: ${calculateMaxHeight(n.items)}px`}
+              >
+                <div class="nav-separator nav-separator-collapsable">
+                  {n.title}
+                  <CollapseToggleButton />
+                </div>
+                {n.items.map((n) => (
+                  <>
+                    {n.type === "dot-separator" && (
+                      <div class="dot-separator"></div>
+                    )}
+                    {n.type === "mdx" && (
+                      <a
+                        data-nav-index={i++}
+                        class:list={[
+                          isActive(`${t.name}/${n.name}`)
+                            ? "nav-item--active"
+                            : "nav-item",
+                          "nav-item-1",
+                        ]}
+                        href={`/${t.name}/${n.name}`}
+                      >
+                        {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                          <code>{n.title.replaceAll('`', '')}</code>
+                        ) : (
+                          n.title
+                        )}
+                      </a>
+                    )}
+                    {n.type === "subDir" && (
+                      <a
+                        data-nav-index={i++}
+                        class:list={[
+                          isActive(`${t.name}/${n.name}`)
+                            ? "nav-item--active"
+                            : "nav-item",
+                          "nav-item-1",
+                        ]}
+                        href={`/${t.name}/${n.name}/${n.children?.[0].name}`}
+                      >
+                        {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                          <code>{n.title.replaceAll('`', '')}</code>
+                        ) : (
+                          n.title
+                        )}
+                      </a>
+                    )}
+                    {n.type === "withDialects" && (
+                      <a
+                        data-nav-index={i++}
+                        data-href={`/${t.name}/${n.name}`}
+                        class:list={[
+                          isActive(`${t.name}/${n.name}`)
+                            ? "nav-item--active"
+                            : "nav-item",
+                          "nav-item-1",
+                        ]}
+                      >
+                        {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                          <code>{n.title.replaceAll('`', '')}</code>
+                        ) : (
+                          n.title
+                        )}
+                      </a>
+                    )}
+                    {headings &&
+                      slug &&
+                      slug.split("/")[1] === n.name &&
+                      slug === `${t.name}/${n.name}` && (
+                        <div data-headings>
+                          {headings.map((heading) => (
+                            heading.text === '---' ? (
+                              <div class="dot-separator-secondary"></div>
+                            ) : (
+                              <a
+                                data-slug={heading.slug}
+                                class:list={["nav-toc-item", "heading-2"]}
+                                href={`#${heading.slug}`}
+                              >
+                                {heading.text}
+                              </a>
+                            )
+                          ))}
+                        </div>
+                      )}
+                    {n.children?.map((c) => (
+                      <Fragment>
+                        {headings &&
+                          slug &&
+                          slug.split("/")[2] === c.name &&
+                          slug === `${t.name}/${n.name}/${c.name}` && (
+                            <div data-headings>
+                              {headings.map((heading) => (
+                                heading.text === '---' ? (
+                                  <div class="dot-separator-secondary"></div>
+                                ) : (
+                                  <a
+                                    data-slug={heading.slug}
+                                    class:list={["nav-toc-item", "heading-2"]}
+                                    href={`#${heading.slug}`}
+                                  >
+                                    {heading.text}
+                                  </a>
+                                )
+                              ))}
+                            </div>
+                          )}
+                      </Fragment>
+                    ))}
+                  </>
+                ))}
+                <div class="fade"></div>
+                <div class="expand-container">
+                  <button class="expand-container-button">Expand</button>
+                </div>
+              </div>
+
+            )}
+            {n.type === "dot-separator" && (
+              <div class="dot-separator"></div>
+            )}
             {n.type === "mdx" && (
               <a
-                data-nav-index={index}
+                data-nav-index={i++}
                 class:list={[
                   isActive(`${t.name}/${n.name}`)
                     ? "nav-item--active"
@@ -37,12 +203,16 @@ const isActive = (path: string) => {
                 ]}
                 href={`/${t.name}/${n.name}`}
               >
-                {n.title}
+                {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                  <code>{n.title.replaceAll('`', '')}</code>
+                ) : (
+                  n.title
+                )}
               </a>
             )}
             {n.type === "subDir" && (
               <a
-                data-nav-index={index}
+                data-nav-index={i++}
                 class:list={[
                   isActive(`${t.name}/${n.name}`)
                     ? "nav-item--active"
@@ -51,12 +221,16 @@ const isActive = (path: string) => {
                 ]}
                 href={`/${t.name}/${n.name}/${n.children?.[0].name}`}
               >
-                {n.title}
+                {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                  <code>{n.title.replaceAll('`', '')}</code>
+                ) : (
+                  n.title
+                )}
               </a>
             )}
             {n.type === "withDialects" && (
               <a
-                data-nav-index={index}
+                data-nav-index={i++}
                 data-href={`/${t.name}/${n.name}`}
                 class:list={[
                   isActive(`${t.name}/${n.name}`)
@@ -65,7 +239,11 @@ const isActive = (path: string) => {
                   "nav-item-1",
                 ]}
               >
-                {n.title}
+                {n.title[0] === '`' && n.title[n.title.length - 1] === '`' ? (
+                  <code>{n.title.replaceAll('`', '')}</code>
+                ) : (
+                  n.title
+                )}
               </a>
             )}
             {headings &&
@@ -74,13 +252,17 @@ const isActive = (path: string) => {
               slug === `${t.name}/${n.name}` && (
                 <div data-headings>
                   {headings.map((heading) => (
-                    <a
-                      data-slug={heading.slug}
-                      class:list={["nav-toc-item", "heading-2"]}
-                      href={`#${heading.slug}`}
-                    >
-                      {heading.text}
-                    </a>
+                    heading.text === '---' ? (
+                        <div class="dot-separator-secondary"></div>
+                      ) : (
+                        <a
+                          data-slug={heading.slug}
+                          class:list={["nav-toc-item", "heading-2"]}
+                          href={`#${heading.slug}`}
+                        >
+                          {heading.text}
+                        </a>
+                      )
                   ))}
                 </div>
               )}
@@ -92,13 +274,17 @@ const isActive = (path: string) => {
                   slug === `${t.name}/${n.name}/${c.name}` && (
                     <div data-headings>
                       {headings.map((heading) => (
-                        <a
-                          data-slug={heading.slug}
-                          class:list={["nav-toc-item", "heading-2"]}
-                          href={`#${heading.slug}`}
-                        >
-                          {heading.text}
-                        </a>
+                        heading.text === '---' ? (
+                          <div class="dot-separator-secondary"></div>
+                        ) : (
+                          <a
+                            data-slug={heading.slug}
+                            class:list={["nav-toc-item", "heading-2"]}
+                            href={`#${heading.slug}`}
+                          >
+                            {heading.text}
+                          </a>
+                        )
                       ))}
                     </div>
                   )}
@@ -114,10 +300,64 @@ const isActive = (path: string) => {
   import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
   import updateDialectLinks from "@/utils/updateDialectLinks";
 
+  document.addEventListener("astro:after-swap", () => {
+    let expandedSections: string[] = JSON.parse(localStorage.getItem('expandedSections'));
+    const updateCollapsedSections = () => {
+      document.querySelectorAll('.nav-items-collapsable').forEach((section) => {
+        if (Number(section.getAttribute("data-active-inner-item")) && !expandedSections.find((v) => v === section.id)) {
+          expandedSections = [...expandedSections, section.id]
+        }
+        if (expandedSections.find((v) => v === section.id)) {
+          section.classList.add('expanded');
+        } else {
+          section.classList.remove('expanded');
+        }
+      })
+
+      localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
+    }
+
+    updateCollapsedSections()
+  })
+
   document.addEventListener("astro:page-load", () => {
-    const container = document.querySelector(".documentation-content-wrap")!;
+    const container = document.querySelector("html");
     const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
     const links = document.querySelectorAll<HTMLElement>("[data-slug]");
+    let expandedSections: string[] = JSON.parse(localStorage.getItem('expandedSections'));
+
+    const updateCollapsedSections = () => {
+      document.querySelectorAll('.nav-items-collapsable').forEach((section) => {
+        if (expandedSections.find((v) => v === section.id)) {
+          section.classList.add('expanded');
+        } else {
+          section.classList.remove('expanded');
+        }
+      })
+    }
+
+    const handleToggleSection = (id: string) => {
+      if (expandedSections?.find((v) => v === id)) {
+        expandedSections = expandedSections.filter((v) => v !== id);
+      } else {
+        expandedSections = expandedSections ? [...expandedSections, id] : [id];
+      }
+
+      updateCollapsedSections();
+      localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
+    }
+
+    document.querySelectorAll('.section-collapse-button').forEach(e => {
+      e.addEventListener('click', () => {
+        handleToggleSection(e.parentElement.parentElement.id)
+      })
+    })
+
+    document.querySelectorAll('.expand-container-button').forEach(e => {
+      e.addEventListener('click', () => {
+        handleToggleSection(e.parentElement.parentElement.id)
+      })
+    })
 
     const updateLinks = () => {
       const activeAnchors = handleAnchorHighlighting({
@@ -141,7 +381,7 @@ const isActive = (path: string) => {
     };
 
     if (container && links) {
-      container.addEventListener("scroll", throttle(updateLinks, 80));
+      document.addEventListener("scroll", throttle(updateLinks, 80));
       updateLinks();
     }
 

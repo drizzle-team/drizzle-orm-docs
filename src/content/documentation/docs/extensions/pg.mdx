@@ -32,7 +32,7 @@ For more info please refer to the official pg_vector docs **[docs.](https://gith
 <Section>
 ```ts
 const table = pgTable('table', {
-    embedding: vector('embedding', { dimensions: 3 })
+    embedding: vector({ dimensions: 3 })
 })
 ```
 
@@ -57,7 +57,7 @@ Let's take a few examples of `pg_vector` indexes from the `pg_vector` docs and t
 // CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops);
 
 const table = pgTable('items', {
-    embedding: vector('embedding', { dimensions: 3 })
+    embedding: vector({ dimensions: 3 })
 }, (table) => ({
     l2: index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops'))
     ip: index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops'))
@@ -73,7 +73,7 @@ const table = pgTable('items', {
 // CREATE INDEX ON items USING hnsw (embedding bit_jaccard_ops);
 
 const table = pgTable('table', {
-    embedding: vector('embedding', { dimensions: 3 })
+    embedding: vector({ dimensions: 3 })
 }, (table) => ({
     l1: index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops'))
     hamming: index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops'))
@@ -101,7 +101,7 @@ hammingDistance(table.column, '101') // table.column <~> '101'
 jaccardDistance(table.column, '101') // table.column <%> '101'
 ```
 
-If `pg_vector` has some other functions to use, you can replicate implimentation from existing one we have. Here is how it can be done
+If `pg_vector` has some other functions to use, you can replicate implementation from existing one we have. Here is how it can be done
 
 ```ts
 export function l2Distance(
@@ -151,7 +151,7 @@ As [PostGIS](https://postgis.net/) website mentions:
 > PostGIS extends the capabilities of the PostgreSQL relational database by adding support for storing, indexing, and querying geospatial data.
 
 <Callout type="info">
-If you are using the `introspect` or `push` commands with the PostGIS extension and don't want PostGIS tables to be included, you can use [`extensionsFilters`](/kit-docs/config-reference#extensionsfilters) to ignore all the PostGIS tables
+If you are using the `introspect` or `push` commands with the PostGIS extension and don't want PostGIS tables to be included, you can use [`extensionsFilters`](/docs/drizzle-config-file#extensionsfilters) to ignore all the PostGIS tables
 </Callout>
 
 #### Column Types
@@ -191,7 +191,7 @@ With the available Drizzle indexes API, you should be able to write any indexes 
 // CREATE INDEX custom_idx ON table USING GIST (geom);
 
 const table = pgTable('table', {
-  	geo: geometry('geom', { type: 'point' }),
+  	geo: geometry({ type: 'point' }),
 }, (table) => ({
     gist: index('custom_idx').using('gist', table.geo)
 }))

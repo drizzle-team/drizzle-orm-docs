@@ -42,14 +42,13 @@ const getLinkWithDialect = (dialect: string) => {
   }
 
   .dialect-tabs__container {
-    position: sticky;
-    top: 0;
+    position: relative;
     display: flex;
     align-items: center;
-    margin-top: -40px;
     padding-top: 16px;
+      margin-top: -16px;
     z-index: 19;
-    margin-bottom: 32px;
+    margin-bottom: 12px;
     background-color: #fff;
   }
 
@@ -69,9 +68,10 @@ const getLinkWithDialect = (dialect: string) => {
   }
 
   html.dark .dialect-tabs {
-    background-color: #000;
+    background-color: #141414;
     /* box-shadow: 0rem -.0625rem 0rem .0625rem #000000 inset, 0rem 0rem 0rem .0625rem #000000ff inset; */
     box-shadow: none;
+      border: 1px solid #292929;
   }
 
   .dialect-tabs {
@@ -87,11 +87,13 @@ const getLinkWithDialect = (dialect: string) => {
     box-shadow:
       rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset,
       rgb(255, 255, 255) 0px 0.5px 0px 1.5px inset;
+      pointer-events: all;
   }
 
   html.dark .dialect-tabs__tab {
-    background-color: #000;
-    color: #d5d5d5;
+    background-color: transparent;
+    color: #c8c9ca;
+    border: 1px solid transparent;
   }
 
   .dialect-tabs__tab {
@@ -112,11 +114,11 @@ const getLinkWithDialect = (dialect: string) => {
 
 
   html.dark .dialect-tabs__tab:hover {
-    background-color: #171717;
+    background-color: #282828;
   }
 
   html.dark .dialect-tabs__tab--active:hover {
-    background-color: #111;
+    background-color: #282828;
   }
 
 
@@ -125,8 +127,9 @@ const getLinkWithDialect = (dialect: string) => {
   }
 
   html.dark .dialect-tabs__tab--active {
-    background-color: #111;
-    box-shadow: 0rem 0rem 0rem .0625rem #000000ff inset, 0rem .03125rem 0rem .09375rem #666666ff inset;
+    background-color: #282828;
+    box-shadow: none;
+      border: 1px solid #555;
   }
 
   .dialect-tabs__tab--active {
@@ -140,17 +143,6 @@ const getLinkWithDialect = (dialect: string) => {
 
   .dialect-tabs__tab--active:hover {
     background-color: #fff;
-  }
-
-  @media screen and (max-width: 1279px) {
-    .dialect-tabs__container {
-    }
-  }
-
-  @media screen and (max-width: 768px) {
-    .dialect-tabs__container {
-      width: calc(100% + 32px);
-    }
   }
 </style>
 <script>

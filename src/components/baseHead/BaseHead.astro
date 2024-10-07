@@ -90,9 +90,31 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
       return preference;
     };
 
+    let packageManager = localStorage.getItem('package-manager') || 'npm';
+    let expandedSections = localStorage.getItem('expandedSections') ? JSON.parse(localStorage.getItem('expandedSections')) : [];
+
     setPreference(getColorPreference());
     document.addEventListener('astro:page-load', () => setPreference(getColorPreference()))
-    document.addEventListener('astro:after-swap', () => setPreference(getColorPreference()))
+    document.addEventListener('astro:after-swap', () => setPreference(getColorPreference()));
+
+    if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
+      localStorage.removeItem("sidebar-scroll");
+    }
+
+    window.addEventListener('popstate', () => {
+      localStorage.removeItem("sidebar-scroll");
+    });
+
+    document.addEventListener('click', function(event) {
+      const target = event.target.closest('a');
+      if (!target || !target.href) return;
+
+      const isSideBarElement = target && target.href && (target.getAttribute("data-nav-index") || target.getAttribute("data-slug"));
+
+      if (!isSideBarElement && target.hostname === window.location.hostname) {
+        localStorage.removeItem("sidebar-scroll");
+      }
+    });
   </script>
   <script
     type="module"

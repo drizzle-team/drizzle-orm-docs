@@ -1,0 +1,25 @@
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+```typescript copy
+import { drizzle } from 'drizzle-orm';
+
+async function main() {
+    const db = await drizzle("vercel-postgres");
+}
+
+main();
+```
+
+If you need a synchronous connection, you can use our additional connection API, 
+where you specify a driver connection and pass it to the Drizzle instance.
+
+```typescript copy
+import { sql } from '@vercel/postgres';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
+
+async function main() {
+    const db = drizzle(sql)
+}
+
+main();
+```

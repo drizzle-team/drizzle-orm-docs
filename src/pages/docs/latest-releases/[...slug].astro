@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
+export async function getStaticPaths() {
+  const releasesEntries = await getCollection("documentation", ({ id }) => {
+    return id.startsWith("docs/latest-releases/");
+  });
+  return releasesEntries.map((entry) => ({
+    params: { slug: entry.slug.split("/").at(-1) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const options: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
+---
+
+<DocsLayout customTitle={entry.data.title} customSlug={"docs/latest-releases"} headings={[]}>
+  <div class="learn__title-block">
+    <div class="latest-release_title">{entry.data.title}</div>
+  </div>
+  <div class="latest-release_date">
+    {entry.data.pubDate.toLocaleDateString("en-US", options)}
+  </div>
+  <Content />
+</DocsLayout>
+
+<style>
+  html.dark .latest-release_title {
+    color: #c8c9ca;
+  }
+
+  .latest-release_title {
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 48px;
+    letter-spacing: -0.48px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
+  html.dark .latest-release_date {
+    color: #c4c5c6;
+  }
+
+  .latest-release_date {
+    color: rgba(30, 30, 30, 0.4);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: -0.154px;
+  }
+
+  .learn__title-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+      border-left: none;
+    }
+    .latest-release_title {
+      color: #0f172a;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px 0;
+      flex-shrink: 0;
+      border: none;
+    }
+  }
+</style>

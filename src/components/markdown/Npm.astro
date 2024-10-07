@@ -2,7 +2,7 @@
 const items = ["npm", "yarn", "pnpm", "bun"];
 const html = await Astro.slots.render("default");
 const installCommands = ["npm i", "yarn add", "pnpm add", "bun add"];
-const installLines = html.replaceAll(/<\/?p>/g, "").split("\n");
+const installLines = html.replaceAll(/<\/?p>/g, "").replaceAll('—', '--').split("\n");
 const getInstallCommands = (index: number) =>
   installLines
     .map(
@@ -38,44 +38,3 @@ const wrapCodeBlocks = () =>
     <Fragment set:html={wrapCodeBlocks()} />
   </div>
 </div>
-
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const packageManagers: string[] = ['npm', 'yarn', 'pnpm', 'bun'];
-    let packageManager: string = localStorage.getItem('package-manager') || 'npm';
-    let packageManagerIndex: number = packageManagers.indexOf(packageManager);
-
-    const updateUI = (index: number): void => {
-      npmContent.forEach((element) => {
-        Array.from((element as HTMLElement).children).forEach((child, i) => {
-          child.classList.toggle('hidden', i !== index);
-        });
-      });
-      npmTabs.forEach((element) => {
-        Array.from((element as HTMLElement).children).forEach((child, i) => {
-          child.classList.toggle('npm__tab--active', i === index);
-        });
-      });
-    };
-
-    const npmContent: NodeList = document.querySelectorAll('.npm__content');
-    const npmTabs: NodeList = document.querySelectorAll('.npm__tabs');
-
-    npmContent.forEach((content) => {
-      Array.from((content as HTMLElement).children).forEach((child, index) => {
-        child.classList.toggle('hidden', index !== packageManagerIndex);
-      });
-    });
-
-    npmTabs.forEach((tab) => {
-      Array.from((tab as HTMLElement).children).forEach((child, index) => {
-        child.classList.toggle('npm__tab--active', index === packageManagerIndex);
-        child.addEventListener('click', () => {
-          packageManager = packageManagers[index];
-          localStorage.setItem('package-manager', packageManager);
-          updateUI(index);
-        });
-      });
-    });
-  })
-</script>

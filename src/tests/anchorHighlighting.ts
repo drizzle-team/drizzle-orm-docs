@@ -90,7 +90,6 @@ const anchors = [
 const main = (props: Props) => {
   for (let i = 0; i < maxScrollTop; i += 100) {
     props.scrollTop = i;
-    console.log(handleAnchorHighlighting(props));
   }
 };
 

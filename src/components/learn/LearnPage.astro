@@ -1,0 +1,134 @@
+---
+import LatestUpdates from "@components/layout/LatestUpdates.astro";
+import LearnMigrateFromCards from "@components/layout/LearnMigrateFromCards.astro";
+import LearnTutorialCards from '@components/layout/LearnTutorialCards.astro';
+---
+
+
+<div class="frame__wrap">
+  <div class="frame__column">
+    <div class="learn__title-block">
+      <div class="learn__title">Learn with Drizzle</div>
+      <div class="learn__description">
+        Unlock the power of Drizzle ORM with concise tutorials.<br /> Master
+        efficient database interactions for streamlined development.
+      </div>
+      <div class="learn__buttons">
+        <a href="/docs/guides" class="learn__button--primary">Guides</a>
+        <a href="/docs/tutorials" class="learn__button--primary">
+          Tutorials</a
+        >
+        <a href="/docs/latest-releases" class="learn__button--primary">
+          Latest Releases</a
+        >
+      </div>
+    </div>
+    <div class="frame__empty-cell"></div>
+  </div>
+  <div class="frame__column--main-content">
+    <div class="frame__main-content-cell">
+      <div class="learn__migrate-from">
+        <div class="learn__section-title">Migrate to Drizzle</div>
+        <LearnMigrateFromCards />
+        <div class="learn__section-title">Tutorials</div>
+        <LearnTutorialCards />
+        <LatestUpdates />
+      </div>
+    </div>
+    <div class="frame__empty-cell_wrap">
+      <div class="frame__empty-cell--main-content"></div>
+      <div class="frame__empty-cell--main-content--auto"></div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+
+  html.dark .learn__title {
+    color: #e2e8f0;
+  }
+
+  .learn__title {
+    color: #303030;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -.48px;
+  }
+
+  html.dark .learn__description {
+    color: #e2e8f0;
+  }
+
+  .learn__description {
+    color: #303030;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -.5px;
+    line-height: 36px;
+    margin-top: 8px;
+  }
+
+  .learn__buttons {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    margin-top: 40px;
+  }
+
+  html.dark .learn__button--primary {
+    border: 1px solid #fff;
+    color: #e2e8f0;
+  }
+
+  .learn__button--primary {
+    align-items: center;
+    border: 1px solid #e7ebef;
+    border-radius: 4px;
+    color: #222124;
+    cursor: pointer;
+    display: flex;
+    font-size: 16px;
+    font-weight: 500;
+    height: 48px;
+    justify-content: center;
+    text-decoration: none;
+    width: 186px;
+  }
+
+  html.dark .learn__section-title {
+    color: #e2e8f0;
+  }
+
+  .learn__section-title {
+    color: #303030;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -.48px;
+    line-height: 130%;
+    margin: 32px 0 8px;
+  }
+
+
+  @media screen and (max-width: 768px) {
+    .learn__title {
+      font-size: 36px;
+    }
+
+    .learn__description {
+      font-size: 20px;
+      line-height: 32px;
+    }
+
+    .learn__section-title {
+      font-size: 20px;
+    }
+    .learn__buttons {
+      flex-direction: column;
+    }
+
+    .learn__button--primary {
+      width: 100%;
+    }
+  }
+</style>

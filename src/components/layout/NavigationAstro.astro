@@ -51,7 +51,7 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
 
 <style>
     html.dark .header {
-        background-color: #121212cc;
+        background-color: #121212;
         box-shadow:
                 0 0 transparent,
                 0 0 transparent,
@@ -59,7 +59,7 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
     }
 
     .header {
-        background-color: #ffffffd9;
+        background-color: #fff;
         box-shadow:
                 0 0 0 0 transparent,
                 0 0 0 0 transparent,
@@ -67,7 +67,10 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
                 0 1px #0000000f;
 
         z-index: 100;
-        position: relative;
+        position: fixed;
+        top: 40px;
+        left: 0;
+        right: 0;
     }
 
     .header_content {
@@ -136,22 +139,22 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
         }
     }
 </style>
-<script>
-  const burgerBtn = document.querySelector("[data-nav-burger-btn]");
-  const navContainer = document.getElementById("header");
-  const aside = document.getElementById("aside");
+<script is:inline>
+  const toggleBurgerMenu = () => {
+    document.getElementById("header").classList.toggle("nav_container_open");
+    document.getElementById("aside").classList.toggle("invisible");
+    document.body.style.overflow = document.getElementById("header").classList.contains(
+      "nav_container_open",
+    )
+      ? "hidden"
+      : "auto";
+  };
 
-  if (burgerBtn && navContainer && aside) {
-    burgerBtn.addEventListener("click", () => {
-      navContainer.classList.toggle("nav_container_open");
-      aside.classList.toggle("invisible");
-      document.body.style.overflow = navContainer.classList.contains(
-        "nav_container_open",
-      )
-        ? "hidden"
-        : "auto";
-    });
-  }
+  document.addEventListener("astro:page-load", () => {
+    document.querySelector("[data-nav-burger-btn]").removeEventListener("click", toggleBurgerMenu, false)
+    if (document.querySelector("[data-nav-burger-btn]") && document.getElementById("header") && document.getElementById("aside")) {
+      document.querySelector("[data-nav-burger-btn]").addEventListener("click", toggleBurgerMenu)
+    }})
 </script>
 <style>
     .nav_container {

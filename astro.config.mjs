@@ -13,7 +13,7 @@ import yaml from '@rollup/plugin-yaml';
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://orm.drizzle.team",
+  site: import.meta.env.DEV ? "http://localhost:4321" : "https://orm.drizzle.team",
   build: {
     format: "file", // mandatory due to CloudFlare Pages trailing slash problem
   },
@@ -50,6 +50,7 @@ export default defineConfig({
             ariaHidden: true,
             tabIndex: -1,
           },
+          test: ['h2', 'h3', 'h4', 'h5'],
         },
       ],
     ],

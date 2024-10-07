@@ -1,30 +1,28 @@
 ---
+import {parse} from "node-html-parser";
 
 interface Props {
   items: string[];
 }
 
 const { items } = Astro.props;
+let slot = await Astro.slots.render('default');
+const parsedHtml = parse(slot);
 
+parsedHtml.childNodes.forEach((tabContent, index) => {
+  if (index !== 0) tabContent.classList.add('hidden');
+});
 ---
 <div class="codetabs_wrapper">
   <div class="codetabs_tabs">
     {items.map((item, index) => <div class={index === 0 ? "codetabs_tab--active" : "codetabs_tab"} data-change-code-tab-btn>{item}</div>)}
   </div>
   <div class="code codetabs_codeBlock">
-    <slot />
+    <Fragment set:html={parsedHtml.toString()} />
   </div>
 </div>
-
 <script>
   document.addEventListener("astro:page-load", () => {
-    const codeBlocks = document.querySelectorAll('.code');
-    codeBlocks.forEach((codeBlock) => {
-      Array.from(codeBlock.children).forEach((child, index) => {
-        child.classList.toggle('hidden', index !== 0);
-      });
-    });
-
     document.querySelectorAll('[data-change-code-tab-btn]').forEach((button) => {
       button.addEventListener('click', (e) => {
         const target = e.target as Element;

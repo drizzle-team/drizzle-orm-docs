@@ -1,19 +1,18 @@
 import type { IHeading, TreeNode } from "@/types/astro";
 
 export interface SidebarItem {
-  type: "mdx" | "subDir" | "separator" | "empty";
+  type:
+    | "mdx"
+    | "subDir"
+    | "separator"
+    | "empty"
+    | "dot-separator"
+    | "collapsable";
   title: string;
   path: string;
 }
 
-interface metaItems {
-  [key: string]:
-    | string
-    | {
-        type: "separator";
-        title: string;
-      };
-}
+type MetaItems = Array<string | string[]>;
 
 interface Props {
   headings?: IHeading[];
@@ -22,12 +21,8 @@ interface Props {
 
 const getContentTree = async (props: Props) => {
   const [metaFiles, mdxFiles] = await Promise.all([
-    import.meta.glob<Record<string, Record<string, string>>>(
-      "../content/**/*.json",
-    ),
-    import.meta.glob<Record<string, Record<string, string>>>(
-      "../content/**/*.mdx",
-    ),
+    import.meta.glob<Array<string | string[]>>("../content/**/*.json"),
+    import.meta.glob<Array<string | string[]>>("../content/**/*.mdx"),
   ]);
 
   const mdxPaths = Object.keys(mdxFiles);
@@ -47,26 +42,36 @@ const getContentTree = async (props: Props) => {
   };
 
   for (const meta in metaFiles) {
-    const parsed: metaItems = (await metaFiles[meta]()).default;
+    const parsed: MetaItems = (await metaFiles[meta]()).default;
 
     const metaSlug = meta.match(regex);
     if (metaSlug) {
       const extractedText = metaSlug[1];
-      const parsedKeys = Object.keys(parsed);
-      parsedKeys.forEach((key) => {
-        const parsedItem = parsed[key];
-        if (typeof parsedItem === "string") {
+      parsed.forEach((key, i) => {
+        if (Array.isArray(key)) {
           navItems.push({
-            type: getTypeOfFile(`${metaSlug[1]}/${key}`),
-            title: parsedItem,
-            path: `${extractedText}/${key}`,
+            type: getTypeOfFile(`${metaSlug[1]}/${key[0]}`),
+            title: key[1],
+            path: `${extractedText}/${key[0]}`,
           });
         }
-        if (typeof parsedItem === "object") {
-          if (parsedItem.type === "separator") {
+        if (typeof key === "string") {
+          if (key === "---") {
+            navItems.push({
+              type: "dot-separator",
+              title: "dot-separator",
+              path: `${extractedText}/${key}${i}`,
+            });
+          } else if (key.includes("::")) {
+            navItems.push({
+              type: "collapsable",
+              title: key.replace("::", ""),
+              path: `${extractedText}/${key}`,
+            });
+          } else {
             navItems.push({
               type: "separator",
-              title: parsedItem.title,
+              title: key,
               path: `${extractedText}/${key}`,
             });
           }
@@ -80,9 +85,8 @@ const getContentTree = async (props: Props) => {
   const buildTree = (items: SidebarItem[]): TreeNode[] => {
     const tree: TreeNode[] = [];
     for (const item of items) {
-      const parts = item.path.split("/");
+      const parts = item.path?.split("/");
       let currentNode = tree;
-
       for (const part of parts) {
         const existingNode = currentNode.find((node) => node.name === part);
         if (existingNode && existingNode.children) {

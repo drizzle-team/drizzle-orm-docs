@@ -1,0 +1,105 @@
+---
+import { getCollection } from "astro:content";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import Link from "@components/markdown/Link.astro";
+
+export async function getStaticPaths() {
+  const guides = await getCollection("documentation", ({ id }) => {
+    return id.startsWith("docs/guides");
+  });
+
+  const filteredEntries = guides.filter((entry) => !!entry.data.slug);
+
+  const staticPaths = filteredEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+
+  return staticPaths;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<DocsLayout
+  customTitle={entry.data.title}
+  customSlug={"docs/guides"}
+  headings={[]}
+>
+  <div class="guides__title">
+    Drizzle | {entry.data.title}
+  </div>
+  <Content components={{ a: Link }} />
+</DocsLayout>
+
+<style>
+  html.dark .latest-release_title {
+    color: #e2e6f0;
+  }
+
+  .latest-release_title {
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 48px;
+    letter-spacing: -0.48px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
+  .learn__title-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  html.dark .guides__title {
+    color: #e2e6f0;
+  }
+
+  .guides__title {
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.48px;
+    line-height: 48px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 767px) {
+    html.dark .learn__title-block {
+      border-left: none;
+    }
+    .latest-release_title {
+      color: #0f172a;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+    .learn__title-block {
+      display: flex;
+      flex-direction: column;
+      max-width: 920px;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px 0;
+      flex-shrink: 0;
+      border: none;
+    }
+
+    .guides__title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      line-height: 31.2px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+  }
+</style>

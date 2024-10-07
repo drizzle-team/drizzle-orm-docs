@@ -1,4 +1,16 @@
 const mainScript = () => {
+  const expandedSections: string[] = localStorage.getItem("expandedSections")
+    ? JSON.parse(localStorage.getItem("expandedSections")!)
+    : [];
+
+  document.querySelectorAll(".nav-items-collapsable").forEach((section) => {
+    if (expandedSections.find((v) => v === section.id)) {
+      section.classList.add("expanded");
+    } else {
+      section.classList.remove("expanded");
+    }
+  });
+
   const leftSidebar = document.querySelector(".aside-scroll");
   const navItems = document.querySelectorAll("[data-nav-index]");
   const headingsContainer = document.querySelector("[data-headings]");
@@ -23,12 +35,42 @@ const mainScript = () => {
       });
     });
 
+    const findPreviousNavSeparator = (
+      element: Element | null,
+    ): HTMLElement | null => {
+      if (!element) return null;
+
+      let previousElement =
+        element.previousElementSibling as HTMLElement | null;
+
+      while (previousElement) {
+        if (previousElement.classList.contains("nav-separator")) {
+          return previousElement;
+        }
+        previousElement =
+          previousElement.previousElementSibling as HTMLElement | null;
+      }
+
+      return null;
+    };
+
     const leftSidebarScroll = localStorage.getItem("sidebar-scroll");
     if (leftSidebarScroll !== null) {
       leftSidebar.scrollTop = parseInt(leftSidebarScroll, 10);
+    } else if (activeNavItem) {
+      if (
+        findPreviousNavSeparator(activeNavItem)?.classList.contains(
+          "nav-separator-collapsable",
+        )
+      ) {
+        leftSidebar.scrollTop =
+          findPreviousNavSeparator(activeNavItem)!.parentElement!.offsetTop;
+      } else {
+        leftSidebar.scrollTop =
+          findPreviousNavSeparator(activeNavItem)!.offsetTop;
+      }
     }
   }
 };
 
-mainScript();
 document.addEventListener("astro:after-swap", mainScript);

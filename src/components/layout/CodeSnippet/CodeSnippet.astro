@@ -148,6 +148,8 @@ function parseMarkingDefinition(
     })
     .filter((entry) => entry.groupValues.length);
 }
+
+const isOneLine = codeSnippetHtml.match(/<span class="line/g)?.length === 1;
 ---
 
 <figure
@@ -164,7 +166,7 @@ function parseMarkingDefinition(
     {titleHtml && collapsable && <CollapseToggleButton forTitle={true} />}
     {titleHtml && copy && <CopyButton forTitle={true} />}
   </figcaption>
-  <div class="btn-container">
+  <div class:list={["btn-container", isOneLine && "one-line-btn-container"]}>
     {!titleHtml && collapsable && <CollapseToggleButton />}
     {!titleHtml && copy && <CopyButton />}
   </div>

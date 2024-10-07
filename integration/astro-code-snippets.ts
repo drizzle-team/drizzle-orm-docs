@@ -209,7 +209,6 @@ function parseMeta(meta: string) {
     return "";
   });
 
-
   // Find line marking definitions inside curly braces, with an optional marker type prefix.
   //
   // Examples:

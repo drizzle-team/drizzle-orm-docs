@@ -1,0 +1,40 @@
+---
+const items = ["npm", "yarn", "pnpm", "bun"];
+const html = await Astro.slots.render("default");
+const installCommands = ["npx", "yarn", "pnpm", "bun"];
+const installLines = html.replaceAll(/<\/?p>/g, "").replaceAll('—', '--').split("\n");
+const getInstallCommands = (index: number) =>
+  installLines
+    .map(
+      (line) =>
+        `<span class="line"><span style="color:var(--astro-code-token-function)">${installCommands[index]}</span><span style="color:var(--astro-code-token-string)"> ${line}</span></span>`,
+    )
+    .join("\n");
+const wrapCodeBlocks = () =>
+  installCommands.map(
+    (_, index) =>
+      `<figure style="position: relative;" class="code-snippet lang-shell ${
+        index !== 0 ? "hidden" : ""
+      }"><figcaption class="header"></figcaption><pre class="astro-code css-variables" style="background-color:var(--astro-code-color-background);color:var(--astro-code-color-text);overflow-x:auto" tabindex="0" lang="shell"><code>${getInstallCommands(
+        index,
+      )}</code></pre></figure>`,
+  );
+---
+
+<div class="npm__wrapper">
+  <div class="npm__tabs">
+    {
+      items.map((item, index) => (
+        <div
+          class={index === 0 ? "npm__tab npm__tab--active" : "npm__tab"}
+          data-change-npm-btn
+        >
+          {item}
+        </div>
+      ))
+    }
+  </div>
+  <div class="npm__content">
+    <Fragment set:html={wrapCodeBlocks()} />
+  </div>
+</div>

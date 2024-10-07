@@ -160,6 +160,9 @@
       >
     </div>
   </a>
+  <div class="goods__wrap">
+    <div class="goods__text">Our goodies!</div>
+  </div>
 </div>
 <style>
   .aside-posts__container {
@@ -168,6 +171,32 @@
     gap: 1px;
     margin-bottom: 4px;
     width: 100%;
+    min-height: 40px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .aside-posts__container:hover .aside-posts__wrap {
+      margin-top: 0;
+  }
+
+  .aside-posts__container:hover .aside-posts__wrap .aside-posts__image {
+      margin-left: 12px;
+      transform: scale(1);
+  }
+
+  .aside-posts__container:hover .aside-posts__wrap .aside-posts__text {
+      opacity: 1;
+  }
+
+  .aside-posts__container:hover .goods__wrap {
+      opacity: 0;
+      z-index: -1;
+  }
+
+  html.dark .goods__wrap {
+      background-color: #1c1c1c;
   }
 
   html.dark .aside-posts__wrap {
@@ -186,24 +215,60 @@
     color: #fff;
   }
 
+  .goods__wrap {
+      z-index: 1;
+      top: 0;
+      height: 40px;
+      width: 100%;
+      background-color: #f6f6f7;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.15s;
+      position: absolute;
+      pointer-events: none;
+      padding-left: 111px;
+      opacity: 1;
+  }
+
+  .goods__text {
+      font-size: 14px;
+      color: #909090;
+      font-weight: 400;
+  }
+
   .aside-posts__wrap {
     height: 40px;
     width: 100%;
     background-color: #f6f6f7;
     display: flex;
     align-items: center;
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, margin-top 0.15s;
   }
 
-  .aside-posts__wrap:first-child {
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+  .aside-posts__wrap:nth-child(2) {
+      margin-top: -41px;
   }
 
-  .aside-posts__wrap:last-child {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+  .aside-posts__wrap:nth-child(3) {
+      margin-top: -41px;
   }
+
+  .aside-posts__wrap:nth-child(4) {
+      margin-top: -41px;
+  }
+
+  .aside-posts__wrap:nth-child(2) .aside-posts__image  {
+      margin-left: 32px;
+  }
+
+  .aside-posts__wrap:nth-child(3) .aside-posts__image {
+      margin-left: 56px;
+  }
+
+  .aside-posts__wrap:nth-child(4) .aside-posts__image {
+      margin-left: 80px;
+  }
+
 
   .aside-posts__wrap:hover {
     background-color: #eff0f3;
@@ -235,6 +300,9 @@
     height: 24px;
     margin: 12px 8px 12px 12px;
     position: relative;
+      z-index: 6;
+      transition: margin-left 0.15s, transform 0.15s;
+      transform: scale(0.8);
   }
 
   .aside-posts__image--learn {
@@ -260,7 +328,8 @@
     font-size: 14px;
     color: #909090;
     font-weight: 400;
-    transition: color 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, opacity 0.15s;
+      opacity: 0;
   }
 
   .aside-posts__arrow-right {
