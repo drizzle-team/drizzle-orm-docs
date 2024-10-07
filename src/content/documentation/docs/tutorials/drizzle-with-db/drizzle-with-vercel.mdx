@@ -13,7 +13,7 @@ import Callout from '@mdx/Callout.astro';
 This tutorial demonstrates how to use Drizzle ORM with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres). Vercel Postgres is a serverless SQL database designed to integrate with Vercel Functions and your frontend framework.
 
 <Prerequisites>
-- You should have installed Drizzle ORM and [Drizzle kit](https://orm.drizzle.team/kit-docs/overview). You can do this by running the following command:
+- You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
 <Npm>
 drizzle-orm
 -D drizzle-kit
@@ -102,7 +102,7 @@ export type SelectPost = typeof postsTable.$inferSelect;
 
 #### Setup Drizzle config file
 
-**Drizzle config** - a configuration file that is used by [Drizzle Kit](https://orm.drizzle.team/kit-docs/overview) and contains all the information about your database connection, migration folder and schema files.
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
 
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
@@ -167,7 +167,7 @@ Run migrations:
 npx drizzle-kit migrate
 ```
 
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/kit-docs/overview#prototyping-with-db-push):
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
 
 ```bash copy
 npx drizzle-kit push
