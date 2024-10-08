@@ -9,7 +9,7 @@ interface Props {
 const { twit } = Astro.props;
 
 const { text } = twit;
-const formattedText = text.replaceAll(/@\w+/gi, "<span class='mention'>$&</span>");
+const formattedText = text ? text.replaceAll(/@\w+/gi, "<span class='mention'>$&</span>") : null;
 ---
 
 <div class="wrap">
@@ -23,7 +23,9 @@ const formattedText = text.replaceAll(/@\w+/gi, "<span class='mention'>$&</span>
     </div>
   </div>
   <div class="content">
-    <div class="twit_content_text"><Fragment set:html={formattedText} /></div>
+    {formattedText && (
+      <div class="twit_content_text"><Fragment set:html={formattedText} /></div>
+    )}
     {
       twit.twitImage && (
         <Image class="content_image" width={560} src={twit.twitImage} alt={twit.name} />
@@ -105,6 +107,8 @@ const formattedText = text.replaceAll(/@\w+/gi, "<span class='mention'>$&</span>
   .content_image {
     border-radius: 8px;
     border: 1px solid rgb(207, 217, 222);
+    max-height: 180px;
+    object-fit: cover;
   }
 
   @media (max-width: 599px) {
