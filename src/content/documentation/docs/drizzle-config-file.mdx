@@ -37,7 +37,7 @@ Drizzle Kit lets you declare configuration options in `TypeScript` or `JavaScrip
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
+  dialect: "postgresql",
   schema: "./src/schema.ts",
   out: "./drizzle",
 });
@@ -45,23 +45,13 @@ export default defineConfig({
 </CodeTab>
 <CodeTab>
 ```js
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 
-/** @type { import("drizzle-kit").Config } */
-export default {
-  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql"
+export default defineConfig({
+  dialect: "postgresql",
   schema: "./src/schema.ts",
   out: "./drizzle",
-};
-```
-</CodeTab>
-<CodeTab>
-```json
-{
-  "dialect": "postgresql",
-  "schema": "./src/schema.ts",
-  "out": "./drizzle",
-}
+});
 ```
 </CodeTab>
 </CodeTabs>
