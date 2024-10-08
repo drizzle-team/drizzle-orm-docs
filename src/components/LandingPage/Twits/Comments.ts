@@ -18,6 +18,10 @@ import chribjel from "@/assets/images/twits/chribjel.jpg";
 import chribjelTwit from "@/assets/images/twits/chribjelTwit.png";
 import hisbvdis from "@/assets/images/twits/hisbvdis.jpg";
 import aokijs from "@/assets/images/twits/aokijs.jpg";
+import silvenon from "@/assets/images/twits/silvenon.jpg";
+import silvenonTwit from "@/assets/images/twits/silvenonTwit.webp";
+import spacesexdragon from "@/assets/images/twits/spacesexdragon.jpg";
+import spacesexdragonTwit from "@/assets/images/twits/spacesexdragonTwit.jpg";
 
 // Twit images
 
@@ -25,7 +29,7 @@ export interface IComment {
   avatar: ImportMeta;
   name: string;
   login: string;
-  text: string;
+  text?: string;
   href?: string;
   twitImage?: ImportMetaEnv;
 }
@@ -153,6 +157,21 @@ const Comments: IComment[] = [
     login: "aokijs",
     text: `Honestly, fuck the benchmarks. I don‘t care which one‘s faster. All I can say is that Drizzle made my life working with databases dramastically better and that‘s all that matters for me. Thanks for your hard work 🙏🏻`,
     href: "https://x.com/aokijs/status/1833840766839325109",
+  },
+  {
+    avatar: silvenon,
+    name: "Matija Marohnić",
+    login: "silvenon",
+    text: `Every time I hear about @DrizzleORM.`,
+    href: "https://x.com/silvenon/status/1843003214402314695",
+    twitImage: silvenonTwit,
+  },
+  {
+    avatar: spacesexdragon,
+    name: "Joseph Mama 🐀",
+    login: "spacesexdragon",
+    href: "https://x.com/spacesexdragon/status/1843381135134675236",
+    twitImage: spacesexdragonTwit,
   },
 ];
 
