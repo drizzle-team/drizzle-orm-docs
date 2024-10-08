@@ -15,9 +15,9 @@ import homenko from './Images/team/homenko.jpg'
 import artem from './Images/team/artem.jpg'
 import vitalii from './Images/team/vitalii.jpg'
 import shippingData from '../../../data/shipping.yaml';
-import getWeekLabel from "../../../utils/getWeekLabel";
+import getMonthLabel from "../../../utils/getMonthLabel";
 import ProgressBar from "./ProgressBar.astro";
-import fillWeeksGaps from "../../../utils/fillWeeksGaps";
+import fillMonthsGaps from "../../../utils/fillMonthsGaps";
 import progress from "../../../data/progress";
 import addNofollowToExternalLinks from "../../../utils/addNofollowToExternalLinks";
 
@@ -83,7 +83,7 @@ const contributors: { name: string, photo: string}[] = [
   },
 ];
 
-const shipping = fillWeeksGaps(shippingData);
+const shipping = fillMonthsGaps(shippingData);
 ---
 <div class="developers_container">
   <div class="flex-container">
@@ -124,7 +124,7 @@ const shipping = fillWeeksGaps(shippingData);
         .map(([key, value]) => (
           <div class="week">
             <div class="week-title">
-              {getWeekLabel(key)}
+              {getMonthLabel(key)}
             </div>
             <div class="week-details-wrap">
               <ul class="week-details">
@@ -169,6 +169,17 @@ const shipping = fillWeeksGaps(shippingData);
 
     .week-text b {
         font-weight: 700;
+    }
+
+    .week-text code {
+        font-size: 0.8125em;
+        padding: 1px 3px;
+    }
+
+    html.dark .week-text code {
+        background-color: #1a1a1a;
+        border-color: #292929;
+        color: #e2e8f0;
     }
 </style>
 <style>
@@ -484,6 +495,7 @@ const shipping = fillWeeksGaps(shippingData);
         position: relative;
         border-radius: 8px;
         white-space: pre-line;
+        vertical-align: baseline;
     }
 
     html.dark .week-text {
