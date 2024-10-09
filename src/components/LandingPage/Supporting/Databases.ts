@@ -126,6 +126,16 @@ const Databases: {
     },
     sponsorUrl: "https://driz.link/silver-sponsor-tidb",
   },
+  Tembo: {
+    imageSrc: "/public/images/tembo.png",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    sponsorUrl: "https://driz.link/tembo",
+  },
 };
 
 export default Databases;
