@@ -314,7 +314,7 @@ very useful when you need to omit certain columns upon selection.
         ```ts
         import { integer, text, sqliteView } from "drizzle-orm/sqlite-core";
 
-        export const user = pgTable("user", {
+        export const user = sqliteView("user", {
           id: integer("id").primaryKey({ autoIncrement: true }),
           name: text("name"),
           email: text("email"),
