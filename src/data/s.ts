@@ -259,6 +259,27 @@ export const sponsorsData: ISponsor[] = [
   },
   {
     tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/tembo",
+      name: "Tembo",
+      avatarUrl: "/images/tembo.png",
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+    darkStyle: {
+      padding: "9px",
+    },
+    lightStyle: {
+      padding: "9px",
+    },
+  },
+  {
+    tier: {
       name: "$250 a month",
       isOneTime: false,
     },
