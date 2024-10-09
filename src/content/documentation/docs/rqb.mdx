@@ -757,6 +757,9 @@ Just like in our SQL-like query builder,
 relational queries API lets you define filters and conditions with the list of our **[`operators`](/docs/operators)**.  
 
 You can either import them from `drizzle-orm` or use from the callback syntax:
+<Callout>
+  `where` is only available for `many()` relations.
+</Callout>
 <Section>
 ```typescript copy
 import { eq } from 'drizzle-orm';
