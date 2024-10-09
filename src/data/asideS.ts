@@ -175,11 +175,11 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      padding: "4px",
+      padding: "6px",
       filter: "grayscale(1) opacity(0.3)",
     },
     lightStyle: {
-      padding: "4px",
+      padding: "6px",
       filter: "grayscale(1) brightness(4) opacity(0.9)",
     },
   },
@@ -199,13 +199,13 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      padding: "2px",
+      padding: "4px",
       filter: "grayscale(1) brightness(2) opacity(0.2)",
       background:
         'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
     },
     lightStyle: {
-      padding: "2px",
+      padding: "4px",
       filter: "grayscale(1) opacity(0.5)",
       background:
         'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',

@@ -251,10 +251,10 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      padding: "8px",
+      padding: "10px",
     },
     lightStyle: {
-      padding: "8px",
+      padding: "10px",
     },
   },
   {
@@ -272,10 +272,10 @@ export const sponsorsData: ISponsor[] = [
     isActive: true,
     imageType: ImageType.IMAGE,
     darkStyle: {
-      padding: "9px",
+      padding: "11px",
     },
     lightStyle: {
-      padding: "9px",
+      padding: "11px",
     },
   },
   {
