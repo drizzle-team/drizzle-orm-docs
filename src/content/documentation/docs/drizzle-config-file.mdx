@@ -109,10 +109,10 @@ You can have multiple config files in the project, it's very useful when you hav
 ```
 
 ### Migrations folder
-`out` param lets you define folder for your migrations, it's optional and `drizzle` by default.  
-It's very useful since you can have many separate schemas for different databases in the same project 
-and have different migration folders for them.  
-  
+`out` param lets you define folder for your migrations, it's optional and `drizzle` by default.
+It's very useful since you can have many separate schemas for different databases in the same project
+and have different migration folders for them.
+
 Migration folder contains `.sql` migration files and `_meta` folder which is used by `drizzle-kit`
 
 <Section>
@@ -121,9 +121,9 @@ Migration folder contains `.sql` migration files and `_meta` folder which is use
  ├ ...
  ├ 📂 drizzle
  │ ├ 📂 _meta
- │ ├ 📜 user.ts 
- │ ├ 📜 post.ts 
- │ └ 📜 comment.ts 
+ │ ├ 📜 user.ts
+ │ ├ 📜 post.ts
+ │ └ 📜 comment.ts
  ├ 📂 src
  ├ 📜 drizzle.config.ts
  └ 📜 package.json
@@ -144,7 +144,7 @@ export default defineConfig({
 ### `dialect`
 <rem025/>
 
-Dialect of the database you're using 
+Dialect of the database you're using
 |               |                                                 |
 | :------------ | :-----------------------------------            |
 | type        | <Dialects/>                                     |
@@ -156,7 +156,7 @@ Dialect of the database you're using
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "mysql", 
+  dialect: "mysql",
 });
 ```
 
@@ -191,14 +191,14 @@ Defines output folder of your SQL migration files, json snapshots of your schema
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  out: "./drizzle", 
+  out: "./drizzle",
 });
 ```
 
 ### `driver`
 <rem025/>
 
-Drizzle Kit automatically picks available database driver from your current project based on the provided `dialect`, 
+Drizzle Kit automatically picks available database driver from your current project based on the provided `dialect`,
 yet some vendor specific databases require a different subset of connection params.
 
 `driver` option let's you explicitely pick those exceptions drivers.
@@ -218,7 +218,7 @@ yet some vendor specific databases require a different subset of connection para
 ### `dbCredentials`
 <rem025/>
 
-Database connection credentials in a form of `url`, 
+Database connection credentials in a form of `url`,
 `user:password@host:port/db` params or exceptions drivers(<Drivers/>) specific connection options.
 
 |               |                      |
@@ -294,7 +294,7 @@ export default defineConfig({
   dbCredentials: {
     url: ":memory:", // inmemory database
     // or
-    url: "sqlite.db", 
+    url: "sqlite.db",
     // or
     url: "file:sqlite.db" // file: prefix is required by libsql
   }
@@ -359,7 +359,7 @@ export default defineConfig({
 ### `migrations`
 <rem025/>
 
-When running `drizzle-kit migrate` - drizzle will records about 
+When running `drizzle-kit migrate` - drizzle will records about
 successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema(PostgreSQL only).
 
 `migrations` config options lets you change both migrations log `table` name and `schema`.
@@ -414,8 +414,8 @@ export const users = p.pgTable("users", {
 ```sql
 SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_type FROM pg_catalog.pg_attribute a;
 ```
-``` 
- column_name   | data_type        
+```
+ column_name   | data_type
 ---------------+------------------------
  id            | serial
  first-name    | text
@@ -439,8 +439,8 @@ export const users = p.pgTable("users", {
 ```sql
 SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_type FROM pg_catalog.pg_attribute a;
 ```
-``` 
- column_name   | data_type        
+```
+ column_name   | data_type
 ---------------+------------------------
  id            | serial
  first-name    | text
@@ -452,7 +452,7 @@ SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_ty
 </CodeTabs>
 
 
-## --- 
+## ---
 
 ### `tablesFilter`
 <Callout>
@@ -462,7 +462,7 @@ If you want to run multiple projects with one database - check out [our guide](/
 `drizzle-kit push` and `drizzle-kit pull` will by default manage all tables in `public` schema.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
-`tablesFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
+`tablesFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs)
 based table names filter, e.g. `["users", "user_info"]` or `"user*"`
 
 |               |                      |
@@ -510,7 +510,7 @@ export default defineConfig({
 ### `extensionsFilters`
 <rem025/>
 
-Some extensions like [`postgis`](https://postgis.net/), when installed on the database, create its own tables in public schema. 
+Some extensions like [`postgis`](https://postgis.net/), when installed on the database, create its own tables in public schema.
 Those tables have to be ignored by `drizzle-kit push` or `drizzle-kit pull`.
 
 `extensionsFilters` option lets you declare list of installed extensions for drizzle kit to ignore their tables in the schema.
@@ -548,7 +548,7 @@ Prompts confirmation to run printed SQL statements when running `drizzle-kit pus
 ```ts
 export default defineConfig({
   dialect: "postgresql",
-  breakpoints: false,
+  strict: false,
 });
 ```
 
@@ -568,14 +568,14 @@ Print all SQL statements during `drizzle-kit push` command.
 ```ts
 export default defineConfig({
   dialect: "postgresql",
-  breakpoints: false,
+  verbose: true,
 });
 ```
 
 ### `breakpoints`
 <rem025/>
 
-Drizzle Kit will automatically embed `--> statement-breakpoint` into generated SQL migration files, 
+Drizzle Kit will automatically embed `--> statement-breakpoint` into generated SQL migration files,
 that's necessary for databases that do not support multiple DDL alternation statements in one transaction(MySQL and SQLite).
 
 `breakpoints` option flag lets you switch it on and off
