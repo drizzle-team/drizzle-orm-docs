@@ -1,8 +1,10 @@
 import Tab from '@components/markdown/Tab.astro';
 import Tabs from '@components/markdown/Tabs.astro';
+import CodeTabs from '@mdx/CodeTabs.astro';
 import Callout from '@components/markdown/Callout.astro';
 import Section from '@components/markdown/Section.astro';
 import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
+import $count from '@mdx/$count.mdx';
 
 # SQL Select
 Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
@@ -46,9 +48,7 @@ export const users = sqliteTable('users', {
 </Tab>
 </Tabs>
 
-## Basic and partial select
-
-### Select with all columns
+### Basic select
 Select all rows from a table including all columns:
 
 <Section>
@@ -113,22 +113,6 @@ Drizzle cannot perform any type casts based on the provided type generic, becaus
 If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
 </Callout>
 
-If you have an expression you use frequently, you can extract it into a function:
-
-```typescript
-import type { Column } from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
-
-function lower(col: Column) {
-  return sql<string>`lower(${col})`;
-}
-
-const result = await db.select({
-  id: users.id,
-  lowerName: lower(users.name),
-}).from(users);
-```
-
 ### Conditional select
 
 You can have a dynamic selection object based on some condition:
@@ -146,7 +130,77 @@ async function selectUsers(withName: boolean) {
 const users = await selectUsers(true);
 ```
 
-## Filtering
+### Distinct select
+
+You can use `.selectDistinct()` instead of `.select()` to retrieve only unique rows from a dataset:
+<Section>
+```ts
+await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
+
+await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
+```
+```sql
+select distinct "id", "name" from "users" order by "id", "name";
+
+select distinct "id" from "users" order by "id";
+```
+</Section>
+
+In PostgreSQL, you can also use the `distinct on` clause to specify how the unique rows are determined:
+<Callout type='warning'>
+`distinct on` clause is only supported in PostgreSQL.
+</Callout>
+<Section>
+```ts
+await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
+await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
+```
+```sql
+select distinct on ("id") "id", "name" from "users" order by "id";
+select distinct on ("name") "name" from "users" order by "name";
+```
+</Section>
+
+
+
+### Advanced select
+Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
+
+Sneak peek of advanced partial select, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/include-or-exclude-columns).
+<CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
+```ts
+import { getTableColumns, sql } from 'drizzle-orm';
+
+await db.select({
+    ...getTableColumns(posts),
+    titleLength: sql<number>`length(${posts.title})`,
+  }).from(posts);
+```
+```ts
+import { getTableColumns } from 'drizzle-orm';
+
+const { content, ...rest } = getTableColumns(posts); // exclude "content" column
+await db.select({ ...rest }).from(posts); // select all other columns
+```
+```ts
+await db.query.posts.findMany({
+  columns: {
+    title: true,
+  },
+});
+```
+```ts
+await db.query.posts.findMany({
+  columns: {
+    content: false,
+  },
+});
+```
+</CodeTabs>
+
+## ---
+
+### Filters
 
 You can filter the query results using the [filter operators](/docs/operators) in the `.where()` method:
 
@@ -228,7 +282,7 @@ and it will be automatically reflected in your queries because of template inter
 as opposed to hardcoding column or table names when writing raw SQL.
 </Callout>
 
-## Combining filters
+### Combining filters
 You can logically combine filter operators with `and()` and `or()` operators:
 <Section>
 ```typescript copy
@@ -266,41 +320,39 @@ select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
 ```
 </Section>
 
-## Distinct
+### Advanced filters
+In combination with TypeScript, Drizzle APIs provide you powerful and flexible ways to combine filters in queries.
 
-You can use `.selectDistinct()` instead of `.select()` to retrieve only unique rows from a dataset:
-<Section>
+Sneak peek of conditional filtering, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/conditional-filters-in-query).
+<CodeTabs items={["example 1", "example 2"]}>
 ```ts
-await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
-
-await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
+const searchPosts = async (term?: string) => {
+  await db
+    .select()
+    .from(posts)
+    .where(term ? ilike(posts.title, term) : undefined);
+};
+await searchPosts();
+await searchPosts('AI');
 ```
-```sql
-select distinct "id", "name" from "users" order by "id", "name";
-
-select distinct "id" from "users" order by "id";
-```
-</Section>
-
-In PostgreSQL, you can also use the `distinct on` clause to specify how the unique rows are determined:
-
-<Section>
 ```ts
-await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
-await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
+const searchPosts = async (filters: SQL[]) => {
+  await db
+    .select()
+    .from(posts)
+    .where(and(...filters));
+};
+const filters: SQL[] = [];
+filters.push(ilike(posts.title, 'AI'));
+filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
+filters.push(gt(posts.views, 200));
+await searchPosts(filters);
 ```
-```sql
-select distinct on ("id") "id", "name" from "users" order by "id";
-select distinct on ("name") "name" from "users" order by "name";
-```
-</Section>
+</CodeTabs>
 
-<Callout>
-`distinct on` clause is only supported in PostgreSQL.
-</Callout>
+## ---
 
-
-## Limit & offset
+### Limit & offset
 Use `.limit()` and `.offset()` to add `limit` and `offset` clauses to the query - for example, to implement pagination:
 <Section>
 ```typescript
@@ -313,7 +365,7 @@ select "id", "name", "age" from "users" limit 10 offset 10;
 ```
 </Section>
 
-## Order By
+### Order By
 Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
 <Section>
 ```typescript
@@ -335,7 +387,61 @@ select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 ```
 </Section>
 
-## WITH clause
+### Advanced pagination
+Powered by TypeScript, Drizzle APIs let you implement all possible SQL paginations and sorting approaches.
+
+Sneak peek of advanced pagination, for more detailed advaced 
+usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination) 
+and [cursor pagination](/docs/guides/cursor-based-pagination) guides.
+
+<CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
+```ts
+await db
+  .select()
+  .from(users)
+  .orderBy(asc(users.id)) // order by is mandatory
+  .limit(4) // the number of rows to return
+  .offset(4); // the number of rows to skip
+```
+```ts
+const getUsers = async (page = 1, pageSize = 3) => {
+  await db.query.users.findMany({
+    orderBy: (users, { asc }) => asc(users.id),
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  });
+};
+await getUsers();
+```
+```ts
+const getUsers = async (page = 1, pageSize = 10) => {
+   const sq = db
+    .select({ id: users.id })
+    .from(users)
+    .orderBy(users.id)
+    .limit(pageSize)
+    .offset((page - 1) * pageSize)
+    .as('subquery');
+   await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
+};
+```
+```ts
+const nextUserPage = async (cursor?: number, pageSize = 3) => {
+  await db
+    .select()
+    .from(users)
+    .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
+    .limit(pageSize) // the number of rows to return
+    .orderBy(asc(users.id)); // ordering
+};
+// pass the cursor of the last row of the previous page (id)
+await nextUserPage(3);
+```
+</CodeTabs>
+
+## ---
+
+### WITH clause
 
 <Callout>
   Check how to use WITH statement with [insert](/docs/insert#with-insert-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)
@@ -369,7 +475,7 @@ If you don't provide an alias, the field type will become `DrizzleTypeError` and
 If you ignore the type error and still try to use the field,
 you will get a runtime error, since there's no way to reference that field without an alias.
 
-## Select from subquery
+### Select from subquery
 Just like in SQL, you can embed queries into other queries by using the subquery API:
 <Section>
 ```typescript copy
@@ -394,32 +500,9 @@ select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"
 ```
 </Section>
 
-## Iterator
+## ---
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false,  }} />
-
-If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
-
-```ts copy
-const iterator = await db.select().from(users).iterator();
-
-for await (const row of iterator) {
-  console.log(row);
-}
-```
-
-It also works with prepared statements:
-
-```ts copy
-const query = await db.select().from(users).prepare();
-const iterator = await query.iterator();
-
-for await (const row of iterator) {
-  console.log(row);
-}
-```
-
-## Aggregations
+### Aggregations
 With Drizzle, you can do aggregations using functions like `sum`, `count`, `avg`, etc. by
 grouping and filtering with `.groupBy()` and `.having()` respectfully, same as you would do in raw SQL:
 
@@ -457,9 +540,11 @@ select "age", cast(count("id") as int)
 <Callout type="info">
 `cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
 Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
+
+If you need count aggregation - we recommend using our [`$count`](/docs/select#count) API
 </Callout>
 
-## Aggregations helpers
+### Aggregations helpers
 
 Drizzle has a set of wrapped `sql` functions, so you don't need to write
 `sql` templates for common cases in your app
@@ -681,4 +766,34 @@ db
   .groupBy(orders.id)
   .orderBy(asc(orders.id))
   .all();
+```
+
+### $count
+<$count />
+
+## ---
+
+### Iterator
+
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false,  }} />
+
+If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
+
+```ts copy
+const iterator = await db.select().from(users).iterator();
+
+for await (const row of iterator) {
+  console.log(row);
+}
+```
+
+It also works with prepared statements:
+
+```ts copy
+const query = await db.select().from(users).prepare();
+const iterator = await query.iterator();
+
+for await (const row of iterator) {
+  console.log(row);
+}
 ```
