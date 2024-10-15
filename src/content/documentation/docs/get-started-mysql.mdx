@@ -22,24 +22,23 @@ drizzle-orm mysql2
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={['mysql2', 'mysql with config']}>
 ```typescript copy
-import { drizzle } from "drizzle-orm/connect";
+import { drizzle } from "drizzle-orm/mysql2";
 
-const db = await drizzle("mysql2", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
 
 const response = await db.select().from(...)
 ```
 ```typescript copy
-import { drizzle } from "drizzle-orm/connect";
+import { drizzle } from "drizzle-orm/mysql2";
 
 // You can specify any property from the mysql2 connection options
-const db = await drizzle("mysql2", { connection:{ uri: process.env.DATABASE_URL }});
+const db = drizzle({ connection:{ uri: process.env.DATABASE_URL }});
 
 const response = await db.select().from(...)
 ```
 </CodeTabs>
 
-If you need a synchronous connection, you can use our additional connection API, where you specify a driver connection and pass it to the Drizzle instance.
-There're two ways you can connect to the MySQL with `mysql2` driver, either single `client` connection or a `pool`.
+If you need to provide your existing driver:
 
 <CodeTabs items={['Client connection', 'Pool connection']}>
   ```typescript copy
@@ -53,7 +52,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
     ...
   });
 
-  const db = drizzle(connection);
+  const db = drizzle({ client: connection });
   ```
   ```typescript copy
   import { drizzle } from "drizzle-orm/mysql2";
@@ -66,7 +65,7 @@ There're two ways you can connect to the MySQL with `mysql2` driver, either sing
     ...
   });
 
-  const db = drizzle(poolConnection);
+  const db = drizzle({ client: poolConnection });
   ```
 </CodeTabs>
 

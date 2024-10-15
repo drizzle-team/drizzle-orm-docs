@@ -33,9 +33,9 @@ drizzle-orm @planetscale/database
 
 #### Step 2 - Initialize the driver and make a query
 ```typescript copy"
-import { drizzle } from "drizzle-orm/connect";
+import { drizzle } from "drizzle-orm/planetscale-serverless";
 
-const db = await drizzle('planetscale', { connection: {
+const db = drizzle({ connection: {
   host: process.env["DATABASE_HOST"],
   username: process.env["DATABASE_USERNAME"],
   password: process.env["DATABASE_PASSWORD"],
@@ -44,8 +44,7 @@ const db = await drizzle('planetscale', { connection: {
 const response = await db.select().from(...)
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver
 
 ```typescript copy"
 import { drizzle } from "drizzle-orm/planetscale-serverless";
@@ -57,7 +56,7 @@ const client = new Client({
   password: process.env["DATABASE_PASSWORD"],
 });
 
-const db = drizzle(client);
+const db = drizzle({ client });
 ```
 
 Make sure to checkout the PlanetScale official **[MySQL courses](https://planetscale.com/courses/mysql-for-developers/introduction/course-introduction)**, 
