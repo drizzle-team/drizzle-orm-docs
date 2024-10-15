@@ -4,12 +4,7 @@ import IsSupportedChipGroup from '@components/markdown/IsSupportedChipGroup.astr
 import Callout from '@components/markdown/Callout.astro';
 import Section from '@components/markdown/Section.astro';
 
-# Views (WIP)
-<Callout type="warning" emoji="⚠️">
-  Views are currently only implemented in the `drizzle-orm`, `drizzle-kit` does not support views yet. 
-  You can query the views that already exist in the database, but they won't be added to `drizzle-kit` migrations or `db push` as of now.
-</Callout>
-
+# Views
 ## Views declaration
 There're several ways you can declare views with Drizzle ORM.  
 
@@ -28,11 +23,11 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       import { pgTable, pgView, serial, text, timestamp } from "drizzle-orm/pg-core";
 
       export const user = pgTable("user", {
-        id: serial("id"),
-        name: text("name"),
-        email: text("email"),
-        password: text("password"),
-        role: text("role").$type<"admin" | "customer">(),
+        id: serial(),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
         createdAt: timestamp("created_at"),
         updatedAt: timestamp("updated_at"),
       });
@@ -52,11 +47,11 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       import { text, mysqlTable, mysqlView, int, timestamp } from "drizzle-orm/mysql-core";
 
       export const user = mysqlTable("user", {
-        id: int("id").primaryKey().autoincrement(),
-        name: text("name"),
-        email: text("email"),
-        password: text("password"),
-        role: text("role").$type<"admin" | "customer">(),
+        id: int().primaryKey().autoincrement(),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
         createdAt: timestamp("created_at"),
         updatedAt: timestamp("updated_at"),
       });
@@ -76,11 +71,11 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       import { integer, text, sqliteView, sqliteTable } from "drizzle-orm/sqlite-core";
 
       export const user = sqliteTable("user", {
-        id: integer("id").primaryKey({ autoIncrement: true }),
-        name: text("name"),
-        email: text("email"),
-        password: text("password"),
-        role: text("role").$type<"admin" | "customer">(),
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
         createdAt: integer("created_at"),
         updatedAt: integer("updated_at"),
       });
@@ -124,11 +119,11 @@ You can also declare views using `standalone query builder`, it works exactly th
       const qb = new QueryBuilder();
 
       export const user = pgTable("user", {
-        id: serial("id"),
-        name: text("name"),
-        email: text("email"),
-        password: text("password"),
-        role: text("role").$type<"admin" | "customer">(),
+        id: serial(),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
         createdAt: timestamp("created_at"),
         updatedAt: timestamp("updated_at"),
       });
@@ -150,11 +145,11 @@ You can also declare views using `standalone query builder`, it works exactly th
       const qb = new QueryBuilder();
 
       export const user = mysqlTable("user", {
-        id: int("id").primaryKey().autoincrement(),
-        name: text("name"),
-        email: text("email"),
-        password: text("password"),
-        role: text("role").$type<"admin" | "customer">(),
+        id: int().primaryKey().autoincrement(),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
         createdAt: timestamp("created_at"),
         updatedAt: timestamp("updated_at"),
       });
@@ -176,11 +171,11 @@ You can also declare views using `standalone query builder`, it works exactly th
       const qb = new QueryBuilder();
 
       export const user = sqliteTable("user", {
-        id: integer("id").primaryKey({ autoIncrement: true }),
-        name: text("name"),
-        email: text("email"),
-        password: text("password"),
-        role: text("role").$type<"admin" | "customer">(),
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
         createdAt: integer("created_at"),
         updatedAt: integer("updated_at"),
       });
@@ -221,11 +216,11 @@ When you're provided with a read only access to an existing view in the database
 `drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
 ```ts
 export const user = pgTable("user", {
-  id: serial("id"),
-  name: text("name"),
-  email: text("email"),
-  password: text("password"),
-  role: text("role").$type<"admin" | "customer">(),
+  id: serial(),
+  name: text(),
+  email: text(),
+  password: text(),
+  role: text().$type<"admin" | "customer">(),
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });

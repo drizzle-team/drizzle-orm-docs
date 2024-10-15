@@ -317,9 +317,95 @@ If you define a `CHECK` constraint on a column it will allow only certain values
 
 If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
 
-<Callout type="error" emoji="🛑">
-  NOT YET IMPLEMENTED IN DRIZZLE ORM
-</Callout>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
+
+      export const users = pgTable(
+        "users",
+        {
+          id: uuid().defaultRandom().primaryKey(),
+          username: text().notNull(),
+          age: integer(),
+        },
+        (table) => ({
+          checkConstraint: check("age_check1", sql`${table.age} > 21`),
+        })
+      );
+      ```
+      ```sql
+      CREATE TABLE IF NOT EXISTS "users" (
+	      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	      "username" text NOT NULL,
+	      "age" integer,
+	      CONSTRAINT "age_check1" CHECK ("users"."age" > 21)
+      );
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, mysqlTable, text } from "drizzle-orm/mysql-core";
+
+      export const users = mysqlTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: int(),
+        },
+        (table) => ({
+          checkConstraint: check("age_check1", sql`${table.age} > 21`),
+        })
+      );
+      ```
+      ```sql
+      CREATE TABLE `users` (
+	      `id` int NOT NULL,
+	      `username` text NOT NULL,
+	      `age` int,
+	      CONSTRAINT `users_id` PRIMARY KEY(`id`),
+	      CONSTRAINT `age_check1` CHECK(`users`.`age` > 21)
+      );
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+      export const users = sqliteTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: int(),
+        },
+        (table) => ({
+          checkConstraint: check("age_check1", sql`${table.age} > 21`),
+        })
+      );
+      ```
+      ```sql
+      CREATE TABLE `users` (
+	      `id` integer PRIMARY KEY NOT NULL,
+	      `username` text NOT NULL,
+	      `age` integer,
+	      CONSTRAINT "age_check1" CHECK("users"."age" > 21)
+      );
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
 
 ### Primary Key
 
