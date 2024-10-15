@@ -6,7 +6,6 @@ import Section from '@mdx/Section.astro';
 import CodeTabs from '@components/markdown/CodeTabs.astro';
 
 ## Type API
-
 To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers.
 
 <Tabs items={["PostgreSQL","MySQL","SQLite"]}>
@@ -397,4 +396,22 @@ import { Column, is } from 'drizzle-orm';
 if (is(value, Column)) {
   // value's type is narrowed to Column
 }
+```
+
+### Mock Driver
+This API is a successor to `drizzle({} as any)` undefined API which we've used in tests and rarely by other developers. 
+
+We decided to build and expose a proper API, every `drizzle` driver now has `drizzle.mock()`:
+```ts
+import { drizzle } from "drizzle-orm/node-postgres";
+
+const db = drizzle.mock();
+```
+
+you can provide schema if necessary for types
+```ts
+import { drizzle } from "drizzle-orm/node-postgres";
+import * as schema from "./schema"
+
+const db = drizzle.mock({ schema });
 ```
