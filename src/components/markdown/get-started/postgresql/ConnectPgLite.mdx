@@ -1,24 +1,17 @@
 Create a `index.ts` file in the `src/db` directory and initialize the connection:
 
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/pglite';
 
-async function main() {
-    const db = drizzle('pglite', process.env.DATABASE_URL!);
-}
-
-main();
+const db = drizzle(process.env.DATABASE_URL!);
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 
-async function main() {
-    const client = new PGlite(process.env.DATABASE_URL!);
-    const db = drizzle(client);
-}
+const client = new PGlite(process.env.DATABASE_URL!);
+const db = drizzle({ client });
 ```

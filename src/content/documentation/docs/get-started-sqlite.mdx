@@ -26,27 +26,19 @@ drizzle-orm @libsql/client
 </Npm>
 
 #### Step 2 - Initialize the driver and make a query
-<CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
+<CodeTabs items={["libsql", "libsql with config"]}>
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/libsql';
 
-const db = await drizzle("libsql", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
  
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/libsql';
 
 // You can specify any property from the libsql connection options
-const db = await drizzle("libsql", { connection: { url:'', authToken: '' }});
- 
-const result = await db.execute('select 1');
-```
-```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
-
-// You can specify any property from the libsql connection options
-const db = await drizzle("turso", { connection: { url:'', authToken: '' }});
+const db = drizzle({ connection: { url:'', authToken: '' }});
  
 const result = await db.execute('select 1');
 ```
@@ -75,31 +67,29 @@ drizzle-orm better-sqlite3
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["better-sqlite3", "better-sqlite3 with config"]}>
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 
-const db = await drizzle("better-sqlite3", process.env.DATABASE_URL);
+const db = drizzle( process.env.DATABASE_URL);
 
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 
 // You can specify any property from the better-sqlite3 connection options
-const db = await drizzle("better-sqlite3", { connection: { source: process.env.DATABASE_URL }});
+const db =  drizzle({ connection: { source: process.env.DATABASE_URL }});
 
 const result = await db.execute('select 1');
 ```
 </CodeTabs>
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
-
+If you need to provide your existing driver:
 ```typescript copy
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 
 const sqlite = new Database('sqlite.db');
-const db = drizzle(sqlite);
+const db = drizzle({ client: sqlite });
 
 const result = await db.execute('select 1');
 ```

@@ -17,10 +17,10 @@ Drizzle ORM runs SQL queries on your database via **database drivers**.
 
 <CodeTab>
 ```ts
-import { drizzle } from "drizzle-orm/connect"
+import { drizzle } from "drizzle-orm/node-postgres"
 import { users } from "./schema"
 
-const db = await drizzle("node-postgres", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
 const usersCount = await db.$count(users);
 ```
 ```  
@@ -57,9 +57,9 @@ export const users = pgTable("users", {
 Under the hood Drizzle will create a **node-postgres** driver instance which you can access via `db.$client` if necessary
 <Section>
 ```ts
-import { drizzle } from "drizzle-orm/connect"
+import { drizzle } from "drizzle-orm/node-postgres"
 
-const db = await drizzle("node-postgres", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
 const pool = db.$client;
 ```
 ```ts
@@ -74,42 +74,43 @@ const db = drizzle(pool); // <--- sync
 ```
 </Section>
 
-The latter API is our original API which you can use when you need drizzle initialization to be synchronous.  
-Mostly every driver supports initialization via either **connection URL** or a set of **connection params**  
-```ts
-import { drizzle } from "drizzle-orm/connect"
-
-const db = await drizzle("node-postgres", "postgresql://users:password@127.0.0.1:5432/dbname");
-
-// above is equivalent to
-const db = await drizzle("node-postgres", {
-  connection: {
-    user: "user",
-    password: "password",
-    host: "127.0.0.1",
-    port: 5432,
-    database: "dbname",
-  },
-})
-```
-
 Drizzle is by design natively compatible with every **edge** or **serverless** runtime, whenever you'd need access to a serverless database - we've got you covered
-```ts
-import { drizzle } from "drizzle-orm/connect";
 
-const db = await drizzle("neon-http", process.env.DATABASE_URL);
-const db = await drizzle("neon-websocket", process.env.DATABASE_URL);
-const db = await drizzle("vercel-postgres");
-const db = await drizzle("planetscale", process.env.DATABASE_URL);
-const db = await drizzle("d1", { connection: env.DB });
+<CodeTabs items={["Neon HTTP", "Neon with websockets", "Vercel Postgres", "PlanetScale HTTP", "Cloudflare d1"]}>
+```ts
+import { drizzle } from "drizzle-orm/neon-http";
+
+const db = drizzle(process.env.DATABASE_URL);
 ```
+```ts
+import { drizzle } from "drizzle-orm/neon-serverless";
+
+const db = drizzle(process.env.DATABASE_URL);
+```
+```ts
+import { drizzle } from "drizzle-orm/vercel-postgres";
+
+const db = drizzle();
+```
+```ts
+import { drizzle  } from "drizzle-orm/planetscale";
+
+const db = drizzle(process.env.DATABASE_URL);
+```
+```ts
+import { drizzle  } from "drizzle-orm/d1";
+
+const db = drizzle({ connection: env.DB });
+```
+</CodeTabs>
+
 And yes, we do support runtime specific drivers like [Bun SQLite](/docs/connect-bun-sqlite) or [Expo SQLite](/docs/connect-expo-sqlite):
 <Section>
 ```ts
-import { drizzle } from "drizzle-orm/connect"
+import { drizzle } from "drizzle-orm/bun:sqlite"
 
-const db = await drizzle("bun:sqlite"); // <--- will create inmemory db
-const db = await drizzle("bun:sqlite", "./sqlite.db");
+const db = drizzle(); // <--- will create inmemory db
+const db = drizzle("./sqlite.db");
 ```
 ```ts
 import { drizzle } from "drizzle-orm/expo-sqlite";

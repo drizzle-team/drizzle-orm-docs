@@ -161,7 +161,6 @@ This example uses a db object, whose initialization is not covered in this part 
 <Section>
 ```ts
 // schema.ts
-import { drizzle } from "drizzle-orm/connect";
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
@@ -183,7 +182,6 @@ If you want to use different names in your TypeScript code and in the database, 
 <Section>
 ```ts
 // schema.ts
-import { drizzle } from "drizzle-orm/connect";
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
@@ -212,6 +210,7 @@ help you specify the database model naming convention and will attempt to map al
 <Section>
 ```ts
 // schema.ts
+import { drizzle } from "drizzle-orm/node-postgres";
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
@@ -221,7 +220,7 @@ export const users = pgTable('users', {
 ```
 ```ts
 // db.ts
-const db = await drizzle('node-postgres', { connection: process.env.DATABASE_URL, casing: 'snake_case' })
+const db = drizzle({ connection: process.env.DATABASE_URL, casing: 'snake_case' })
 ```
 ```ts
 // query.ts

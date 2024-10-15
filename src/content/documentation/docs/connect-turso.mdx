@@ -29,9 +29,9 @@ drizzle-orm @libsql/client
 
 #### Step 2 - Initialize the driver and make a query
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/libsql';
 
-const db = await drizzle('libsql', { connection: {
+const db = drizzle({ connection: {
   url: process.env.DATABASE_URL, 
   authToken: process.env.DATABASE_AUTH_TOKEN 
 }});
@@ -39,8 +39,7 @@ const db = await drizzle('libsql', { connection: {
 const result = await db.select().from(...)
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 import { drizzle } from 'drizzle-orm/libsql';
@@ -51,7 +50,7 @@ const client = createClient({
   authToken: process.env.DATABASE_AUTH_TOKEN
 });
 
-const db = drizzle(client);
+const db = drizzle({ client });
 
 const result = await db.select().from(users).all()
 ```
