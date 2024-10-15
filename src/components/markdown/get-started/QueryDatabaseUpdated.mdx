@@ -3,12 +3,13 @@ import CodeWithProps from "@/components/markdown/CodeWithProps.astro";
 <CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/$dialect$';
+import { eq } from 'drizzle-orm';
 import { usersTable } from './db/schema';
 
-async function main() {
-  const db = await drizzle("$dialect$", process.env.$env_variable$!);
+const db = drizzle(process.env.$env_variable$!);
 
+async function main() {
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
     age: 30,

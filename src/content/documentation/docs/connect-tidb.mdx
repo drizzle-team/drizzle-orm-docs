@@ -33,22 +33,20 @@ drizzle-orm @tidbcloud/serverless
 
 #### Step 2 - Initialize the driver and make a query
 ```typescript copy filename="index.ts"
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/tidb-serverless';
 
-const db = await drizzle('tidb-serverless', { connection: { url: process.env.TIDB_URL }});
+const db = drizzle({ connection: { url: process.env.TIDB_URL }});
 
 const response = await db.select().from(...)
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
-
+If you need to provide your existing driver:
 ```typescript copy"
 import { connect } from '@tidbcloud/serverless';
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
-const client = connect({ url: '...' });
-const db = drizzle(client);
+const client = connect({ url: process.env.TIDB_URL });
+const db = drizzle({ client });
 ```
 
 #### What's next?
