@@ -2,19 +2,19 @@ import CodeWithProps from "@/components/markdown/CodeWithProps.astro";
 
 Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
 
-<CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/planetscale-serverless';
 import { usersTable } from './db/schema';
 
-async function main() {
-  const db = await drizzle('planetscale', { connection: {
-      host: process.env.DATABASE_HOST!,
-      username: process.env.DATABASE_USERNAME!,
-      password: process.env.DATABASE_PASSWORD!,
-    }});
+const db = drizzle({ connection: {
+  host: process.env.DATABASE_HOST!,
+  username: process.env.DATABASE_USERNAME!,
+  password: process.env.DATABASE_PASSWORD!,
+}});
 
+async function main() {
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
     age: 30,
@@ -49,4 +49,3 @@ async function main() {
 
 main();
 ```
-</CodeWithProps>

@@ -1,26 +1,16 @@
 Create a `index.ts` file in the `src/db` directory and initialize the connection:
 
-```typescript copy filename="index.ts"
-import { drizzle } from 'drizzle-orm/connect';
+```typescript copy
+import { drizzle } from 'drizzle-orm/tidb-serverless';
 
-async function main() {
-    const db = await drizzle('tidb-serverless', process.env.DATABASE_URL!);
-}
-
-main();
+const db = drizzle(process.env.DATABASE_URL!);
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
-
-```typescript copy"
+If you need to provide your existing driver:
+```typescript copy
 import { connect } from '@tidbcloud/serverless';
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
-async function main() {
-    const client = connect({ url: process.env.DATABASE_URL! });
-    const db = drizzle(client);
-}
-
-main();
+const client = connect({ url: process.env.DATABASE_URL! });
+const db = drizzle({ client: client });
 ```
