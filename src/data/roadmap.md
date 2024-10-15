@@ -5,11 +5,11 @@
 - [x] Brocli integration to Drizzle Kit
 - [ ] Generated SQL migration strict mode without `try catches` and `if not exists`
 - [x] Drizzle Kit goes OSS steam 🎉
-- [ ] PostgreSQL enums alternations improvements
+- [x] PostgreSQL enums alternations improvements
 - [ ] PostgreSQL RLS support
-- [ ] `check` constraint support in Drizzle Kit
+- [x] `check` constraint support in Drizzle Kit
 - [x] Exposed API for programmatic access in Drizzle Kit
-- [ ] `materialised views` support in Drizzle Kit
+- [x] `materialised views` support in Drizzle Kit
 - [ ] Drizzle Kit support for consuming schemas and migrations from Prisma, TypeORM and Sequelise to enrich ->Drizzle migration process
 - [ ] Drizzle Studio `mkcert` fixes for dockerised environments
 
@@ -22,7 +22,7 @@
 - [ ] Down migrations, better rollbacks and improvements to `migrate` experience in Drizzle Kit
 - [x] Optional database aliases for columns in table declarations -> `id: serial()`
 - [ ] PostgreSQL RLS support
-- [ ] Relational Querie V2 API
+- [ ] Relational Queries V2 API
 - [x] `drizzle('pg', ...)` driver instantiation to lower the entrance learning curve
 - [ ] CockroachDB support (supported with strict SQL migrations)
 - [ ] Native seeding
