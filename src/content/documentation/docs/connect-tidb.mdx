@@ -35,7 +35,7 @@ drizzle-orm @tidbcloud/serverless
 ```typescript copy filename="index.ts"
 import { drizzle } from 'drizzle-orm/tidb-serverless';
 
-const db = await drizzle({ connection: { url: process.env.TIDB_URL }});
+const db = drizzle({ connection: { url: process.env.TIDB_URL }});
 
 const response = await db.select().from(...)
 ```

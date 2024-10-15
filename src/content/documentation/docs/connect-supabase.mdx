@@ -28,21 +28,20 @@ drizzle-orm postgres
 #### Step 2 - Initialize the driver and make a query
 
 ```typescript copy filename="index.ts"
-import { drizzle } from 'drizzle-orm'
+import { drizzle } from 'drizzle-orm/postgres-js'
 
-const db = drizzle('postgres-js', process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
 
 const allUsers = await db.select().from(...);
 ```
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
 
+If you need to provide your existing driver:
 ```typescript copy filename="index.ts"
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
 const client = postgres(process.env.DATABASE_URL)
-const db = drizzle(client);
+const db = drizzle({ client });
 
 const allUsers = await db.select().from(...);
 ```
@@ -55,7 +54,7 @@ import postgres from 'postgres'
 
 // Disable prefetch as it is not supported for "Transaction" pool mode 
 const client = postgres(process.env.DATABASE_URL, { prepare: false })
-const db = drizzle(client);
+const db = drizzle({ client });
 
 const allUsers = await db.select().from(...);
 ```

@@ -35,18 +35,18 @@ drizzle-orm pg
 <CodeTabs items={["node-postgres", "node-postgres with config"]}>
 ```typescript copy
 // Make sure to install the 'pg' package 
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
-const db = await drizzle("node-postgres", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
  
 const result = await db.execute('select 1');
 ```
 ```typescript copy
 // Make sure to install the 'pg' package 
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
 // You can specify any property from the node-postgres connection options
-const db = await drizzle("node-postgres", { 
+const db = drizzle({ 
   connection: { 
     connectionString: process.env.DATABASE_URL,
     ssl: true
@@ -57,8 +57,7 @@ const result = await db.execute('select 1');
 ```
 </CodeTabs>
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 // Make sure to install the 'pg' package 
@@ -69,7 +68,7 @@ import { Pool } from "pg";
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-const db = drizzle(pool);
+const db = drizzle({ client: pool });
  
 const result = await db.execute('select 1');
 ```
@@ -84,17 +83,17 @@ drizzle-orm postgres
 #### Step 2 - Initialize the driver and make a query
 <CodeTabs items={["postgres.js", "postgres.js with config"]}>
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/postgres-js';
 
-const db = await drizzle("postgres-js", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
 
 const result = await db.execute('select 1');
 ```
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/postgres-js';
 
 // You can specify any property from the postgres-js connection options
-const db = await drizzle("postgres-js", { 
+const db = drizzle({ 
   connection: { 
     url: process.env.DATABASE_URL, 
     ssl: true 
@@ -105,8 +104,7 @@ const result = await db.execute('select 1');
 ```
 </CodeTabs>
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 // Make sure to install the 'postgres' package
@@ -114,7 +112,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 const queryClient = postgres(process.env.DATABASE_URL);
-const db = drizzle(queryClient);
+const db = drizzle({ client: queryClient });
 
 const result = await db.execute('select 1');
 ```

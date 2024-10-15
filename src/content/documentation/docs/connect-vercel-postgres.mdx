@@ -39,15 +39,14 @@ Setup a project according to the **[official docs.](https://vercel.com/docs/stor
 #### Step 3 - Initialize the driver and make a query
 
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
 
-const db = await drizzle("vercel-postgres");
+const db = drizzle();
 
 const result = await db.execute('select 1');
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 import { sql } from '@vercel/postgres';
