@@ -2,53 +2,29 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 
 Create a `index.ts` file in the `src` directory and initialize the connection:
 
-<CodeTabs items={["libsql", "libsql with config", "turso alias"]}>
+<CodeTabs items={["libsql", "libsql with config"]}>
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/libsql';
 
-async function main() {
-  const db = await drizzle("libsql", process.env.DB_FILE_NAME!);
-}
-
-main();
+const db = drizzle(process.env.DB_FILE_NAME!);
 ```
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/libsql';
 
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("libsql", { connection: { url: process.env.DB_FILE_NAME! }});
-}
-
-main();
-```
-```typescript copy
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/connect';
-
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("turso", { connection: { url: process.env.DB_FILE_NAME! }});
-}
-
-main();
+// You can specify any property from the libsql connection options
+const db = drizzle({ connection: { url: process.env.DB_FILE_NAME! }});
 ```
 </CodeTabs>
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 
-async function main() {
-  const client = createClient({ url: process.env.DB_FILE_NAME! });
-  const db = drizzle(client);
-}
-
-main();
+const client = createClient({ url: process.env.DB_FILE_NAME! });
+const db = drizzle({ client });
 ```

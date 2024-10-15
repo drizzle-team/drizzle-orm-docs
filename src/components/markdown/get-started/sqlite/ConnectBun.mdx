@@ -5,39 +5,25 @@ Create a `index.ts` file in the `src` directory and initialize the connection:
 <CodeTabs items={["libsql", "libsql with config"]}>
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/bun:sqlite';
 
-async function main() {
-  const db = await drizzle("bun:sqlite", process.env.DB_FILE_NAME!);
-}
-
-main();
+const db = drizzle(process.env.DB_FILE_NAME!);
 ```
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/bun:sqlite';
 
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("bun:sqlite", { connection: { source: process.env.DB_FILE_NAME! }});
-}
-
-main();
+// You can specify any property from the libsql connection options
+const db = drizzle({ connection: { source: process.env.DB_FILE_NAME! }});
 ```
 </CodeTabs>
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
-
+If you need to provide your existing driver:
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
-async function main() {
-  const sqlite = new Database(process.env.DB_FILE_NAME!);
-  const db = drizzle(sqlite);
-}
-
-main();
+const sqlite = new Database(process.env.DB_FILE_NAME!);
+const db = drizzle({ client: sqlite });
 ```

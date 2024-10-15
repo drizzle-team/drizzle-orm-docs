@@ -22,11 +22,11 @@ drizzle-orm @aws-sdk/client-rds-data
 
 #### Step 2 - Initialize the driver and make a query
 ```typescript copy
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/aws-data-api-pg';
 
 // These three properties are required. You can also specify
 // any property from the RDSDataClient type inside the connection object.
-const db = drizzle('aws-data-api-pg', { connection: {
+const db = drizzle({ connection: {
   database: process.env['DATABASE']!,
   secretArn: process.env['SECRET_ARN']!,
   resourceArn: process.env['RESOURCE_ARN']!,
@@ -35,8 +35,7 @@ const db = drizzle('aws-data-api-pg', { connection: {
 await db.select().from(...);
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 import { drizzle } from 'drizzle-orm/aws-data-api/pg';

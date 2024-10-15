@@ -86,38 +86,30 @@ Create a `index.ts` file in the `src` directory and initialize the connection:
 
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/connect';
+import { drizzle } from 'drizzle-orm/libsql';
 
-async function main() {
-  // You can specify any property from the libsql connection options
-  const db = await drizzle("turso", { 
-    connection: { 
-        url: process.env.TURSO_DATABASE_URL!, 
-        authToken: process.env.TURSO_AUTH_TOKEN!
-    }
-  });
-}
-
-main();
+// You can specify any property from the libsql connection options
+const db = drizzle({ 
+  connection: { 
+    url: process.env.TURSO_DATABASE_URL!, 
+    authToken: process.env.TURSO_AUTH_TOKEN!
+  }
+});
 ```
 
-If you need a synchronous connection, you can use our additional connection API, 
-where you specify a driver connection and pass it to the Drizzle instance.
+If you need to provide your existing driver:
 
 ```typescript copy
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 
-async function main() {
-  const client = createClient({ 
-        url: process.env.TURSO_DATABASE_URL!, 
-        authToken: process.env.TURSO_AUTH_TOKEN!
-   });
-  const db = drizzle(client);
-}
+const client = createClient({ 
+  url: process.env.TURSO_DATABASE_URL!, 
+  authToken: process.env.TURSO_AUTH_TOKEN!
+});
 
-main();
+const db = drizzle({ client });
 ```
 
 #### Step 7 - Query the database

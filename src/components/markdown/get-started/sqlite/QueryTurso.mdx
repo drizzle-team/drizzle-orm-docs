@@ -5,11 +5,12 @@ Let's **update** the `src/index.ts` file with queries to create, read, update, a
 <CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/libsql';
 import { usersTable } from './db/schema';
 
 async function main() {
-  const db = await drizzle("turso", { 
+  const db = drizzle({ 
     connection: { 
         url: process.env.TURSO_DATABASE_URL!, 
         authToken: process.env.TURSO_AUTH_TOKEN!

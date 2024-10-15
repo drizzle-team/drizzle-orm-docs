@@ -66,11 +66,12 @@ In the Vercel Postgres storage tab, you can find the `.env.local` tab and copy t
 
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { usersTable } from './db/schema';
 
 async function main() {
-  const db = await drizzle("vercel-postgres");
+  const db = drizzle();
 
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
@@ -123,11 +124,12 @@ main();
 
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { usersTable } from './db/schema';
 
 async function main() {
-  const db = await drizzle("vercel-postgres");
+  const db = drizzle();
 
   const user: typeof usersTable.$inferInsert = {
     name: 'John',

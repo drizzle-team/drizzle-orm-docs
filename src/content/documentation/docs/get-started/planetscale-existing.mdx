@@ -79,11 +79,12 @@ connect to PlanetScale through TCP, you can refer to our [MySQL Get Started](/do
 
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
-import { drizzle, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/planetscale-serverless';
 import { usersTable } from './db/schema';
 
 async function main() {
-  const db = await drizzle('planetscale', { connection: {
+  const db = drizzle({ connection: {
       host: process.env.DATABASE_HOST!,
       username: process.env.DATABASE_USERNAME!,
       password: process.env.DATABASE_PASSWORD!,

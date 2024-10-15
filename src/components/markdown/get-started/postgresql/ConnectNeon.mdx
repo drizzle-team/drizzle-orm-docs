@@ -7,7 +7,7 @@ Create a `index.ts` file in the `src/db` directory and initialize the connection
 ```typescript
 import { drizzle } from 'drizzle-orm/neon-http';
 
-const db = await drizzle("neon-http", process.env.DATABASE_URL);
+const db = drizzle(process.env.DATABASE_URL);
 ```
 
 If you need a synchronous connection, you can use our additional connection API, 
@@ -18,5 +18,5 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 
 const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle(sql);
+const db = drizzle({ client: sql });
 ```
