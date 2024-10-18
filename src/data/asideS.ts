@@ -3,7 +3,7 @@ import { type ISponsor, ImageType } from "@/types/Sponsors";
 export const sponsorsData: ISponsor[] = [
   {
     tier: {
-      name: "$1,000 one time",
+      name: "$1000 a month",
       isOneTime: false,
     },
     sponsorEntity: {
