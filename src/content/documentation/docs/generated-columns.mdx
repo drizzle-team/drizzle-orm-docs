@@ -60,12 +60,12 @@ Generated columns can be especially useful for:
     <CodeTab>
     ```ts
     export const test = pgTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
     });
     ```
     ```sql
     CREATE TABLE IF NOT EXISTS "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello world!) STORED
+	    "gen_name" text GENERATED ALWAYS AS ('hello world!') STORED
     );
     ```
     </CodeTab>
@@ -75,12 +75,12 @@ Generated columns can be especially useful for:
     <CodeTab>
     ```ts
     export const test = pgTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
     ```sql
     CREATE TABLE IF NOT EXISTS "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello "world"!) STORED,
+	    "gen_name" text GENERATED ALWAYS AS ('hello "world"!') STORED,
     );
     ```
     </CodeTab>
@@ -91,14 +91,14 @@ Generated columns can be especially useful for:
     export const test = pgTable("test", {
         name: text("first_name"),
         generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`hi, ${test.name}!`
+          (): SQL => sql`'hi, ' || ${test.name} || '!'`
         ),
     });
     ```
     ```sql
     CREATE TABLE IF NOT EXISTS "test" (
 	    "first_name" text,
-	    "gen_name" text GENERATED ALWAYS AS (hi, "test"."first_name"!) STORED,
+	    "gen_name" text GENERATED ALWAYS AS ('hi, ' || "test"."first_name" || '!') STORED,
     );
     ```
     </CodeTab>
