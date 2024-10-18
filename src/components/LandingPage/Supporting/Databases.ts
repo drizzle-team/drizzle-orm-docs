@@ -136,6 +136,19 @@ const Databases: {
     },
     sponsorUrl: "https://driz.link/tembo",
   },
+  EdgeDB: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/edb_logo_small.svg",
+      darkThemeSrc: "/public/svg/edb_logo_small.svg",
+    },
+    lightStyle: {
+      width: 26,
+    },
+    darkStyle: {
+      width: 26,
+    },
+    sponsorUrl: "https://driz.link/edgedb",
+  },
 };
 
 export default Databases;

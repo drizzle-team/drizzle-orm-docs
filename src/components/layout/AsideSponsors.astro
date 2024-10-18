@@ -8,15 +8,61 @@ const getStyleString = (style: CSSProperties) => {
   }, "");
 };
 
+const heroSponsors = s.filter(({tier}) => tier.name === '$2500 a month');
+
+const goldSponsors = s.filter(({tier}) => tier.name === '$1000 a month');
+
 const slicedSponsors = [];
 
-for (let i = 0; i < s.length - 1; i += 2) {
-  let items = s.slice(i, i + 2);
+for (let i = 0; i < goldSponsors.length - 1; i += 2) {
+  let items = goldSponsors.slice(i, i + 2);
   slicedSponsors.push(items);
 }
 ---
 
 <div class="aside-sponsors__wrap">
+  {
+    heroSponsors.map((sponsor) => (
+      <div class="aside-sponsors__row">
+        <a
+          class:list={["aside-sponsors__sponsor", "aside-sponsors__hero-sponsor" ]}
+          href={`https://${sponsor.sponsorEntity.login}`}
+          target="_blank"
+          rel={sponsor.followLink ? "" : "nofollow"}
+        >
+          <div
+            class="aside-sponsors__sponsor-image"
+            id="aside-sponsors-img-wrapper"
+          >
+            <img
+              class="aside-sponsors__light-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              style={getStyleString(sponsor.lightStyle || {})}
+            />
+            <img
+              class="aside-sponsors__dark-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              alt={sponsor.sponsorEntity.name || sponsor.sponsorEntity.login}
+              style={getStyleString(sponsor.darkStyle || {})}
+            />
+          </div>
+          {!!sponsor.popover && (
+            <div class="popover">
+              {sponsor.popover}
+            </div>
+          )}
+        </a>
+      </div>
+    ))
+  }
   {
     slicedSponsors.map((slice) => (
       <div class="aside-sponsors__row">
@@ -334,6 +380,15 @@ for (let i = 0; i < s.length - 1; i += 2) {
     .aside-sponsors__sponsor-image
     .aside-sponsors__dark-img {
     filter: none !important;
+  }
+
+  .aside-sponsors__hero-sponsor .aside-sponsors__sponsor-image {
+      transition: filter 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: unset;
+      width: unset;
   }
 
   .aside-sponsors__sponsor-image {
