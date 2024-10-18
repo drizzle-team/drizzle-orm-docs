@@ -83,7 +83,13 @@ CREATE TABLE `table` (
 
 ### Text
 
-A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).  
+A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-16LE`).
+
+<Callout type="info" emoji="ℹ️">
+	It's recommended to use `blob('', { mode: 'json' })` instead of `text('', { mode: 'json' })` because it supports JSONB.
+
+	See **https://www.sqlite.org/json1.html**.
+</Callout>
 
 <Callout type="info" emoji="ℹ️">
 	You can define `{ enum: ["value1", "value2"] }` config to infer `insert` and `select` types, it **won't** check runtime values.
@@ -114,16 +120,6 @@ CREATE TABLE `table` (
 ### Blob
 
 A blob of data, stored exactly as it was input.
-
-<Callout type="info" emoji="ℹ️">
-	It's recommended to use `text('', { mode: 'json' })` instead of `blob('', { mode: 'json' })`, 
-	because it supports JSON functions:
-
-	All JSON functions currently throw an error if any of their arguments are BLOBs because BLOBs 
-	are reserved for a future enhancement in which BLOBs will store the binary encoding for JSON.
-
-	See **https://www.sqlite.org/json1.html**.
-</Callout>
 
 <Section>
 ```typescript
