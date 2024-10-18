@@ -386,8 +386,8 @@ import { usersTable } from 'schema'
 
 await db.select({
     id: usersTable.id,
-    lowerName: sql<string>`lower(${usersTable})`,
-    aliasedName: sql<string>`lower(${usersTable})`.as('aliased_column'),
+    lowerName: sql<string>`lower(${usersTable.name})`,
+    aliasedName: sql<string>`lower(${usersTable.name})`.as('aliased_column'),
     count: sql<number>`count(*)`.mapWith(Number) 
 }).from(usersTable)
 ```
