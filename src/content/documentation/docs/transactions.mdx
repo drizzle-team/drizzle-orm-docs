@@ -67,7 +67,7 @@ const newBalance: number = await db.transaction(async (tx) => {
 You can use transactions with **[relational queries](/docs/rqb)**:
 
 ```ts
-const db = drizzle(..., { schema })
+const db = drizzle({ schema })
 
 await db.transaction(async (tx) => {
   await tx.query.users.findMany({

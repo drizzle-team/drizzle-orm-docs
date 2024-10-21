@@ -150,9 +150,8 @@ Create a `index.ts` file in the `src/db` directory and set up your database conf
 import { Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 
-const pool = new Pool({ connectionString: process.env.POSTGRES_URL! });
 
-export const db = drizzle(pool)
+export const db = drizzle(process.env.POSTGRES_URL!)
 ```
 
 #### Create an API route
@@ -309,10 +308,9 @@ npx drizzle-kit push
 Create a `index.ts` file in the `src/db` directory and set up your database configuration:
 
 ```typescript copy filename="src/db/index.ts"
-import { sql } from '@vercel/postgres';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
 
-export const db = drizzle(sql)
+export const db = drizzle()
 ```
 
 #### Create an API route
@@ -472,13 +470,8 @@ Create a `index.ts` file in the `src/db` directory and set up your database conf
 
 ```typescript copy filename="src/db/index.ts"
 import { drizzle } from "drizzle-orm/planetscale-serverless";
-import { Client } from "@planetscale/database";
 
-const client = new Client({
-  url: process.env.MYSQL_URL!,
-})
-
-export const db = drizzle(client)
+export const db = drizzle(process.env.MYSQL_URL!)
 ```
 
 #### Create an API route
@@ -640,14 +633,11 @@ Create a `index.ts` file in the `src/db` directory and set up your database conf
 
 ```typescript copy filename="src/db/index.ts"
 import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
 
-const client = createClient({
+export const db = drizzle({ connection: {
   url: process.env.TURSO_CONNECTION_URL!,
   authToken: process.env.TURSO_AUTH_TOKEN!,
-});
-
-export const db = drizzle(client)
+}})
 ```
 
 #### Create an API route

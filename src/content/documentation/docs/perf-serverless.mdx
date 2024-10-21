@@ -8,7 +8,7 @@ On the other, hand `edge functions` tend to clean up straight after they're invo
 To reuse your database connection and prepared statements you just have to declare them outside of handler scope:
 ```ts
 const databaseConnection = ...;
-const db = drizzle(databaseConnection);
+const db = drizzle({ client: databaseConnection });
 const prepared = db.select().from(...).prepare();
 
 // AWS handler

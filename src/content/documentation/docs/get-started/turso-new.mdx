@@ -16,6 +16,8 @@ import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
 import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
+import LibsqlTable from '@mdx/LibsqlTable.mdx';
+import LibsqlTabs from '@mdx/LibsqlTabs.mdx';
 
 <Breadcrumbs/>
 
@@ -48,6 +50,11 @@ Check it out [here](https://docs.turso.tech/sdk/ts/quickstart), then return with
 </Callout>
 
 #### Step 3 - Connect Drizzle ORM to the database
+Drizzle has native support for all @libsql/client driver variations:
+
+<LibsqlTable />
+<br/>
+<LibsqlTabs />
 
 Create a `index.ts` file in the `src` directory and initialize the connection:
 
@@ -74,7 +81,7 @@ const client = createClient({
   url: process.env.TURSO_DATABASE_URL!, 
   authToken: process.env.TURSO_AUTH_TOKEN!
 });
-const db = drizzle(client);
+const db = drizzle({ client });
 ```
 
 #### Step 4 - Create a table

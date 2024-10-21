@@ -91,9 +91,9 @@ Read more in [docs](/docs/indexes-constraints#composite-primary-key)
 You can now use the Drizzle `withReplica` function to specify different database connections for read replicas and the main instance for write operations. By default, `withReplicas` will use a random read replica for read operations and the main instance for all other data modification operations. You can also specify custom logic for choosing which read replica connection to use. You have the freedom to make any weighted, custom decision for that. Here are some usage examples:
 
 ```ts copy {5}
-const primaryDb = drizzle(client);
-const read1 = drizzle(client);
-const read2 = drizzle(client);
+const primaryDb = drizzle({ client });
+const read1 = drizzle({ client });
+const read2 = drizzle({ client });
 
 const db = withReplicas(primaryDb, [read1, read2]);
 

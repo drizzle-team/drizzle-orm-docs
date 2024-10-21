@@ -139,7 +139,7 @@ const connectionString = Deno.env.get("SUPABASE_DB_URL")!;
 
 // Disable prefetch as it is not supported for "Transaction" pool mode
 const client = postgres(connectionString, { prepare: false });
-export const db = drizzle(client);
+export const db = drizzle({ client });
 ```
 
 `SUPABASE_DB_URL` is default environment variable for the direct database connection. Learn more about managing environment variables in Supabase Edge Functions in the [documentation](https://supabase.com/docs/guides/functions/secrets).

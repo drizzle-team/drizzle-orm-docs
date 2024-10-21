@@ -294,7 +294,7 @@ const users = sqliteTable('users', {
   cityId: integer('city_id').references(() => cities.id)
 });
 
-const db = drizzle(sqlite);
+const db = drizzle();
 
 const result = db.select().from(cities).leftJoin(users, eq(cities.id, users.cityId)).all();
 ```

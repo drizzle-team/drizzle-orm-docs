@@ -29,7 +29,7 @@ import { startStandaloneServer } from '@apollo/server/standalone';
 
 import * as dbSchema from './schema';
 
-const db = drizzle(client, { schema: dbSchema });
+const db = drizzle({ client, schema: dbSchema });
 
 const { schema } = buildSchema(db);
 

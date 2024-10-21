@@ -134,7 +134,7 @@ Drizzle has useful relational queries API, that lets you easily implement `limit
 ```ts copy {7,8,9}
 import * as schema from './db/schema';
 
-const db = drizzle(..., { schema });
+const db = drizzle({ schema });
 
 const getUsers = async (page = 1, pageSize = 3) => {
   await db.query.users.findMany({

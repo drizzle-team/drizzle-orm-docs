@@ -74,14 +74,11 @@ Create a `drizzle.ts` file in your `src/db` folder and set up your database conf
 
 ```tsx copy filename="src/db/drizzle.ts"
 import { config } from "dotenv";
-import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 
 config({ path: ".env" }); // or .env.local
 
-const sql = neon(process.env.DATABASE_URL!);
-
-export const db = drizzle(sql);
+export const db = drizzle(process.env.DATABASE_URL!);
 ```
 
 #### Declare todo schema

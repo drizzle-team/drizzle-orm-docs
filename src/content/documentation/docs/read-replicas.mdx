@@ -22,15 +22,9 @@ const usersTable = pgTable('users', {
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-const primaryDb = drizzle(new Pool({
-  connectionString: "postgres://user:password@host:port/primary_db",
-}));
-const read1 = drizzle(new Pool({
-  connectionString: "postgres://user:password@host:port/read_replica_1",
-}));
-const read2 = drizzle(new Pool({
-  connectionString: "postgres://user:password@host:port/read_replica_2",
-}));
+const primaryDb = drizzle("postgres://user:password@host:port/primary_db");
+const read1 = drizzle("postgres://user:password@host:port/read_replica_1");
+const read2 = drizzle("postgres://user:password@host:port/read_replica_2");
 
 const db = withReplicas(primaryDb, [read1, read2]);
 ```
@@ -52,21 +46,21 @@ const primaryClient = await mysql.createConnection({
   user: "user",
   database: "primary_db",
 })
-const primaryDb = drizzle(primaryClient);
+const primaryDb = drizzle({ client: primaryClient });
 
 const read1Client = await mysql.createConnection({
   host: "host",
   user: "user",
   database: "read_1",
 })
-const read1 = drizzle(read1Client);
+const read1 = drizzle({ client: read1Client });
 
 const read2Client = await mysql.createConnection({
   host: "host",
   user: "user",
   database: "read_2",
 })
-const read2 = drizzle(read2Client);
+const read2 = drizzle({ client: read2Client });
 
 const db = withReplicas(primaryDb, [read1, read2]);
 ```
@@ -83,9 +77,9 @@ const usersTable = sqliteTable('users', {
 	name: text('name').notNull(),
 });
 
-const primaryDb = drizzle(createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }));
-const read1 = drizzle(createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }));
-const read2 = drizzle(createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }));
+const primaryDb = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
+const read1 = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
+const read2 = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
 
 const db = withReplicas(primaryDb, [read1, read2]);
 ```

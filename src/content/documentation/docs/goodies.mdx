@@ -77,7 +77,7 @@ To enable default query logging, just pass `{ logger: true }` to the `drizzle` i
 ```typescript copy
 import { drizzle } from 'drizzle-orm/...'; // driver specific
 
-const db = drizzle(pool, { logger: true });
+const db = drizzle({ logger: true });
 ```
 
 You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
@@ -92,7 +92,7 @@ class MyLogWriter implements LogWriter {
 }
 
 const logger = new DefaultLogger({ writer: new MyLogWriter() });
-const db = drizzle(pool, { logger });
+const db = drizzle({ logger });
 ```
 
 You can also create a custom logger:
@@ -106,7 +106,7 @@ class MyLogger implements Logger {
   }
 }
 
-const db = drizzle(pool, { logger: new MyLogger() });
+const db = drizzle({ logger: new MyLogger() });
 ```
 
 

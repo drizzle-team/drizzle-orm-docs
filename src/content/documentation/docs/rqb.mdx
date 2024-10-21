@@ -23,7 +23,7 @@ We've made sure you have both the best-in-class developer experience and perform
 	import * as schema from './schema';
 	import { drizzle } from 'drizzle-orm/...';
 
-	const db = drizzle(client, { schema });
+	const db = drizzle({ schema });
 
 	const result = await db.query.users.findMany({
 		with: {
@@ -84,7 +84,7 @@ We've made sure you have both the best-in-class developer experience and perform
 	import * as schema2 from './schema2';
 	import { drizzle } from 'drizzle-orm/...';
 
-	const db = drizzle(client, { schema: { ...schema1, ...schema2 } });
+	const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
 	const result = await db.query.users.findMany({
 		with: {
@@ -120,7 +120,7 @@ const connection = await mysql.createConnection({
   uri: process.env.PLANETSCALE_DATABASE_URL,
 });
 
-const db = drizzle(connection, { schema, mode: 'planetscale' });
+const db = drizzle({ client: connection, schema, mode: 'planetscale' });
 ```
 
 ## Declaring relations
@@ -488,7 +488,7 @@ initialization and then just use the `db.query` API.
 import * as schema from './schema';
 import { drizzle } from 'drizzle-orm/...';
 
-const db = drizzle(client, { schema });
+const db = drizzle({ schema });
 
 await db.query.users.findMany(...);
 ```
@@ -498,7 +498,7 @@ import * as schema1 from './schema1';
 import * as schema2 from './schema2';
 import { drizzle } from 'drizzle-orm/...';
 
-const db = drizzle(client, { schema: { ...schema1, ...schema2 } });
+const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
 await db.query.users.findMany(...);
 ```

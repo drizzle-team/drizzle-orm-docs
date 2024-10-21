@@ -5,6 +5,8 @@ import Steps from '@components/markdown/Steps.astro';
 import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
+import LibsqlTable from "@mdx/LibsqlTable.mdx";
+import LibsqlTabs from "@mdx/LibsqlTabs.mdx";
 
 # Drizzle \<\> Turso
 
@@ -27,83 +29,15 @@ drizzle-orm @libsql/client
 -D drizzle-kit
 </Npm>
 
-#### Step 2 - Initialize the driver and make a query
+#### Step 2 - Initialize the driver
 Drizzle has native support for all `@libsql/client` driver variations:
 
-|                          |                                                                                                                                           |
-| :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| `@libsql/client`         | defaults to `node` import, automatically changes to `web` if `target` or `platofrm` is set for bundler, e.g. `esbuild --platform=browser` |
-| `@libsql/client/node`    | `node` compatible module, supports `:memory:`, `file`, `wss`, `http` and `turso` conneciton protocols                                     |
-| `@libsql/client/web`     | module for fullstack web frameworks like `next`, `nuxt`, `astro`, etc.                                                                    |
-| `@libsql/client/http`    | module for `http` and `https` connection protocols                                                                                        |
-| `@libsql/client/ws`      | module for `ws` and `wss` conneciton protocols                                                                                            |
-| `@libsql/client/sqlite3` | module for `:memory:` and `file` conneciton protocols                                                                                     |
-| `@libsql/client-wasm`    | Separate experimental package for WASM                                                                                                    |
+<LibsqlTable />
 
-<br/>
+<br />
 
-<CodeTabs items={["default", "node", "web", "http", "web sockets", "wasm"]}>
-```typescript copy
-import { drizzle } from 'drizzle-orm/libsql';
+<LibsqlTabs />
 
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
-
-const result = await db.select().from(...)
-```
-```typescript copy
-import { drizzle } from 'drizzle-orm/libsql/node';
-
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
-
-const result = await db.select().from(...)
-```
-```typescript copy
-import { drizzle } from 'drizzle-orm/libsql/web';
-
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
-
-const result = await db.select().from(...)
-```
-```typescript copy
-import { drizzle } from 'drizzle-orm/libsql/http';
-
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
-
-const result = await db.select().from(...)
-```
-```typescript copy
-import { drizzle } from 'drizzle-orm/libsql/ws';
-
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
-
-const result = await db.select().from(...)
-```
-```typescript copy
-import { drizzle } from 'drizzle-orm/libsql/wasm';
-
-const db = drizzle({ connection: {
-  url: process.env.DATABASE_URL, 
-  authToken: process.env.DATABASE_AUTH_TOKEN 
-}});
-
-const result = await db.select().from(...)
-```
-</CodeTabs>
 
 If you need to provide your existing driver:
 
@@ -135,6 +69,25 @@ const db = drizzle({ client });
 const result = await db.select().from(users).all()
 ```
 </CodeTabs>
+
+#### Step 3 - make a query
+
+```ts
+import { drizzle } from 'drizzle-orm/libsql';
+import * as s from 'drizzle-orm/sqlite-core';
+
+const db = drizzle({ connection: {
+  url: process.env.DATABASE_URL, 
+  authToken: process.env.DATABASE_AUTH_TOKEN 
+}});
+
+const users = s.sqliteTable("users", {
+  id: s.integer(),
+  name: s.text(),
+})
+
+const result = await db.select().from(users);
+```
 
 #### What's next?
 
