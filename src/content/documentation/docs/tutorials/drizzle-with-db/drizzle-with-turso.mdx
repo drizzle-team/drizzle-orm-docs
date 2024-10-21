@@ -92,16 +92,13 @@ Create a `index.ts` file in the `src/db` directory and set up your database conf
 ```typescript copy filename="src/db/index.ts"
 import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
 
 config({ path: '.env' }); // or .env.local
 
-const client = createClient({
+export const db = drizzle({ connection: {
   url: process.env.TURSO_CONNECTION_URL!,
   authToken: process.env.TURSO_AUTH_TOKEN!,
-});
-
-export const db = drizzle({ client });
+}});
 ```
 
 #### Create tables
