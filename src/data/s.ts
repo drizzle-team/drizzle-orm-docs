@@ -280,6 +280,34 @@ export const sponsorsData: ISponsor[] = [
   },
   {
     tier: {
+      name: "$2500 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/edgedb",
+      name: "EdgeDB",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      padding: "6px",
+      background:
+        'url("/svg/edb_logo_light.svg") 0% 0% / contain no-repeat content-box',
+      "background-position": "center",
+    },
+    lightStyle: {
+      padding: "6px",
+      background:
+        'url("/svg/edb_logo_dark.svg") 0% 0% / contain no-repeat content-box',
+      "background-position": "center",
+    },
+  },
+  {
+    tier: {
       name: "$250 a month",
       isOneTime: false,
     },
