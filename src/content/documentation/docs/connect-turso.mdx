@@ -28,6 +28,21 @@ drizzle-orm @libsql/client
 </Npm>
 
 #### Step 2 - Initialize the driver and make a query
+Drizzle has native support for all `@libsql/client` driver variations:
+
+|                          |                                                                                                                                           |
+| :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| `@libsql/client`         | defaults to `node` import, automatically changes to `web` if `target` or `platofrm` is set for bundler, e.g. `esbuild --platform=browser` |
+| `@libsql/client/node`    | `node` compatible module, supports `:memory:`, `file`, `wss`, `http` and `turso` conneciton protocols                                     |
+| `@libsql/client/web`     | module for fullstack web frameworks like `next`, `nuxt`, `astro`, etc.                                                                    |
+| `@libsql/client/http`    | module for `http` and `https` connection protocols                                                                                        |
+| `@libsql/client/ws`      | module for `ws` and `wss` conneciton protocols                                                                                            |
+| `@libsql/client/sqlite3` | module for `:memory:` and `file` conneciton protocols                                                                                     |
+| `@libsql/client-wasm`    | Separate experimental package for WASM                                                                                                    |
+
+<br/>
+
+<CodeTabs items={["default", "node", "web", "http", "web sockets", "wasm"]}>
 ```typescript copy
 import { drizzle } from 'drizzle-orm/libsql';
 
@@ -38,9 +53,61 @@ const db = drizzle({ connection: {
 
 const result = await db.select().from(...)
 ```
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql/node';
+
+const db = drizzle({ connection: {
+  url: process.env.DATABASE_URL, 
+  authToken: process.env.DATABASE_AUTH_TOKEN 
+}});
+
+const result = await db.select().from(...)
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql/web';
+
+const db = drizzle({ connection: {
+  url: process.env.DATABASE_URL, 
+  authToken: process.env.DATABASE_AUTH_TOKEN 
+}});
+
+const result = await db.select().from(...)
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql/http';
+
+const db = drizzle({ connection: {
+  url: process.env.DATABASE_URL, 
+  authToken: process.env.DATABASE_AUTH_TOKEN 
+}});
+
+const result = await db.select().from(...)
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql/ws';
+
+const db = drizzle({ connection: {
+  url: process.env.DATABASE_URL, 
+  authToken: process.env.DATABASE_AUTH_TOKEN 
+}});
+
+const result = await db.select().from(...)
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql/wasm';
+
+const db = drizzle({ connection: {
+  url: process.env.DATABASE_URL, 
+  authToken: process.env.DATABASE_AUTH_TOKEN 
+}});
+
+const result = await db.select().from(...)
+```
+</CodeTabs>
 
 If you need to provide your existing driver:
 
+<CodeTabs items={["default", "web"]}>
 ```typescript copy
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
@@ -54,6 +121,20 @@ const db = drizzle({ client });
 
 const result = await db.select().from(users).all()
 ```
+```typescript copy
+import { drizzle } from 'drizzle-orm/libsql/web';
+import { createClient } from '@libsql/client/web';
+
+const client = createClient({ 
+  url: process.env.DATABASE_URL,
+  authToken: process.env.DATABASE_AUTH_TOKEN
+});
+
+const db = drizzle({ client });
+
+const result = await db.select().from(users).all()
+```
+</CodeTabs>
 
 #### What's next?
 
