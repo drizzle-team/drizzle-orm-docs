@@ -16,9 +16,6 @@ where you specify a driver connection and pass it to the Drizzle instance.
 ```typescript
 import { neonConfig, Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import { WebSocket } from 'ws';
-
-neonConfig.webSocketConstructor = WebSocket;
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
