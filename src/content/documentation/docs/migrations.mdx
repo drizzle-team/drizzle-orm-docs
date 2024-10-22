@@ -161,7 +161,7 @@ export const users = p.pgTable("users", {
 └─┬──────────────────────┘                  
   │                                           
   └ 1. read previous migration folders
-    2. find diff between current and previous scheama
+    2. find diff between current and previous schema
     3. prompt developer for renames if necessary
   ┌ 4. generate SQL migration and persist to file
   │    ┌─┴───────────────────────────────────────┐  
@@ -229,7 +229,7 @@ export const users = p.pgTable("users", {
 └─┬──────────────────────┘                  
   │                                           
   └ 1. read previous migration folders
-    2. find diff between current and previous scheama
+    2. find diff between current and previous schema
     3. prompt developer for renames if necessary
   ┌ 4. generate SQL migration and persist to file
   │    ┌─┴───────────────────────────────────────┐  
@@ -250,7 +250,8 @@ CREATE TABLE "users" (
 ```
 ```ts
 // index.ts
-import { drizzle, migrate } from "drizzle-orm/node-postgres"
+import { drizzle } from "drizzle-orm/node-postgres"
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 const db = drizzle(process.env.DATABASE_URL);
 
