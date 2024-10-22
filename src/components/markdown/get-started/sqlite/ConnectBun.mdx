@@ -5,13 +5,13 @@ Create a `index.ts` file in the `src` directory and initialize the connection:
 <CodeTabs items={["libsql", "libsql with config"]}>
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/bun:sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 
 const db = drizzle(process.env.DB_FILE_NAME!);
 ```
 ```typescript copy
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/bun:sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
 
 // You can specify any property from the libsql connection options
 const db = drizzle({ connection: { source: process.env.DB_FILE_NAME! }});
