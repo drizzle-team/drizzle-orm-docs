@@ -14,9 +14,10 @@ If you need a synchronous connection, you can use our additional connection API,
 where you specify a driver connection and pass it to the Drizzle instance.
 
 ```typescript
-import { neon } from '@neondatabase/serverless';
+import { neonConfig, Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 
-const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle({ client: sql });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+const db = drizzle(pool);
 ```
