@@ -18,9 +18,9 @@ import { neonConfig, Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import { WebSocket } from 'ws';
 
-neonConfig.webSocketConstructor = WebSocket
+neonConfig.webSocketConstructor = WebSocket;
 
-const pool = new Pool({ connectionString: process.env.POSTGRES_URL, max: 0 })
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-const db = drizzle(pool)
+const db = drizzle(pool);
 ```
