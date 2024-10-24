@@ -1,0 +1,318 @@
+import Callout from '@components/markdown/Callout.astro';
+
+# Row-Level Security (RLS)
+
+With Drizzle, you can define and manage the enable/disable settings for RLS, create policies with a variety of options, and define and manage roles to which those policies can be applied.
+
+Drizzle supports a raw representation of policies and roles from Postgres that can be used in any way you want, even with popular Postgres database providers such as Supabase and Neon.
+
+In Drizzle, we have specific places with all predefined roles and functions for RLS in both providers, but you can always define your own logic for that
+
+## Enable RLS
+
+If you just want to enable RLS on a table without adding any policies you can use `.enableRLS()`
+
+As PostgreSQL docs mentions:
+> If no policy exists for the table, a default-deny policy is used, meaning that no rows are visible or can be modified. 
+Operations that apply to the whole table, such as TRUNCATE and REFERENCES, are not subject to row security.
+
+```ts
+import { integer, pgTable } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+	id: integer(),
+}).enableRLS();
+```
+
+{/* It will generate
+
+```sql
+CREATE TABLE "users" ("id" integer);
+ALTER TABLE "users" ENABLE ROW LEVEL SECURITY;
+``` */}
+
+## Roles
+
+You can define roles with a few options for now, but the list of options will be bigger in the future
+
+```ts
+import { pgRole } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin', { createRole: true, createDb: true, inherit: true });
+```
+
+If the role already exists in your database and you don't want drizzle-kit to 'see' it or include it in migrations, 
+you can mark this role as existing
+
+```ts
+import { pgRole } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin').existing();
+```
+
+## Policies
+
+To make full use of RLS, you can define policies within a Drizzle table
+
+<Callout title='info'>
+In PostgreSQL, you should define a policy and link it to an existing table. However, since policies are always associated with a specific table, we decided that it should be provided as the third parameter to `pgTable`
+</Callout>
+
+**Example of pgPolicy with all available properties**
+```ts
+import { sql } from 'drizzle-orm';
+import { integer, pgPolicy, pgRole, pgTable } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin');
+
+export const users = pgTable('users', {
+	id: integer(),
+}, (t) => [
+	pgPolicy('policy', {
+		as: 'permissive',
+		to: admin,
+		for: 'delete',
+		using: sql``,
+		withCheck: sql``,
+	}),
+]);
+```
+
+**Policy options**
+|                          |                                                                                                                                           |
+| :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| `as`                     | possible values are `permissive` or `restrictive`                                                                                         |
+| `to`                     | the role to which you want to apply this policy. Possible values: `public`, `current_role`, `current_user`, `session_user`, or any other role name as a string. You can also reference the `pgRole` object |
+| `for`                    | commands this policy will be applied to. Possible values: `all`, `select`, `insert`, `update`, `delete`                                   |
+| `using`                  | sql statement that will be applied to `USING` part of policy creation statement                                                           |
+| `withCheck`              | sql statement that will be applied to `WITH CHECK` part of policy creation statement                                                      |
+
+## Migrations
+
+If you are using drizzle-kit for managing your schema and especcialy roles defined, there may be situations, where you have some roles that are not defined it drizzle schema, so you want drizzle-kit to just skip it without a need to write each role in your drizzle schema and mark it with `.existing()`
+
+For such cases, you can use `entities.roles` in `drizzle.config.ts`. For a complete reference, you can check the [`drizzle.config.ts`]() documentation
+
+By default, `drizzle-kit` won't manage roles for you, so you will need to enable that. in `drizzle.config.ts`
+
+```ts {12-14}
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: 'postgresql',
+  schema: "./drizzle/schema.ts",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!
+  },
+  verbose: true,
+  strict: true,
+  entities: {
+    roles: true
+  }
+});
+```
+
+But if you need more configuration, let's look at a few more examples:
+
+**You have a role `admin` and want to exclude it from the list of manageable roles**
+
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  ...
+  entities: {
+    roles: {
+      exclude: ['admin']
+    }
+  }
+});
+```
+
+**You have a role `admin` and want to include to the list of manageable roles**
+
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  ...
+  entities: {
+    roles: {
+      include: ['admin']
+    }
+  }
+});
+```
+
+**If you are using `Neon` and want to exclude roles defined by `Neon`, you can use the provider option**
+
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  ...
+  entities: {
+    roles: {
+      provider: 'neon'
+    }
+  }
+});
+```
+
+**If you are using `Supabase` and want to exclude roles defined by `Supabase`, you can use the provider option**
+
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  ...
+  entities: {
+    roles: {
+      provider: 'supabase'
+    }
+  }
+});
+```
+
+<Callout title='important'>
+You may encounter situations where Drizzle is slightly outdated compared to new roles specified by database providers, 
+so you may need to use both the `provider` option and `exclude` additional roles. You can easily do this with Drizzle:
+
+```ts
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  ...
+  entities: {
+    roles: {
+      provider: 'supabase',
+      exclude: ['new_supabase_role']
+    }
+  }
+});
+```
+</Callout>
+
+## Using with Neon
+
+The Neon Team helped us implement their vision of a wrapper on top of our raw policies API. We defined a specific 
+`/neon` import with the `crudPolicy` function implementation and a few predefined functions, along with default 
+roles that exist in Neon
+
+Here is an example of how to use the `crudPolicy` function
+```ts
+import { crudPolicy } from 'drizzle-orm/neon';
+import { integer, pgRole, pgTable } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin');
+
+export const users = pgTable('users', {
+	id: integer(),
+}, (t) => [
+	crudPolicy({ role: admin, read: true, modify: false }),
+]);
+```
+
+This policy will be equivalent to
+
+```ts
+import { sql } from 'drizzle-orm';
+import { integer, pgPolicy, pgRole, pgTable } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin');
+
+export const users = pgTable('users', {
+	id: integer(),
+}, (t) => [
+	pgPolicy(`crud-${admin.name}-policy-insert`, {
+		for: 'insert',
+		to: admin,
+		withCheck: sql`false`,
+	}),
+	pgPolicy(`crud-${admin.name}-policy-update`, {
+		for: 'update',
+		to: admin,
+		using: sql`false`,
+		withCheck: sql`false`,
+	}),
+	pgPolicy(`crud-${admin.name}-policy-delete`, {
+		for: 'delete',
+		to: admin,
+		using: sql`false`,
+	}),
+	pgPolicy(`crud-${admin.name}-policy-select`, {
+		for: 'select',
+		to: admin,
+		using: sql`true`,
+	}),
+]);
+```
+
+Neon also exposes a few roles and functions, so if you are using Neon for RLS, you can use these roles, which are marked as existing, and functions for your RLS queries
+
+```ts
+// drizzle-orm/neon
+export const authenticatedRole = pgRole('authenticated').existing();
+export const anonymousRole = pgRole('anonymous').existing();
+
+export const authUid = (userIdColumn: AnyPgColumn) => sql`(select auth.user_id() = ${userIdColumn})`;
+```
+
+so you can use it like this
+
+```ts
+import { sql } from 'drizzle-orm';
+import { authenticatedRole } from 'drizzle-orm/neon';
+import { integer, pgPolicy, pgRole, pgTable } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin');
+
+export const users = pgTable('users', {
+	id: integer(),
+}, (t) => [
+	pgPolicy(`policy-insert`, {
+		for: 'insert',
+		to: authenticatedRole,
+		withCheck: sql`false`,
+	}),
+]);
+```
+
+## Using with Supabase
+
+We also have a `/supabase` import with a set of predefined roles marked as existing, so you can use them in your schema. 
+This import will be extended with more functions and helpers to make using RLS and Supabase simpler and more enjoyable
+
+```ts
+// drizzle-orm/supabase
+export const anonRole = pgRole('anon').existing();
+export const authenticatedRole = pgRole('authenticated').existing();
+export const serviceRole = pgRole('service_role').existing();
+export const postgresRole = pgRole('postgres_role').existing();
+```
+
+so you can use it like this
+
+```ts
+import { sql } from 'drizzle-orm';
+import { serviceRole } from 'drizzle-orm/supabase';
+import { integer, pgPolicy, pgRole, pgTable } from 'drizzle-orm/pg-core';
+
+export const admin = pgRole('admin');
+
+export const users = pgTable('users', {
+	id: integer(),
+}, (t) => [
+	pgPolicy(`policy-insert`, {
+		for: 'insert',
+		to: serviceRole,
+		withCheck: sql`false`,
+	}),
+]);
+```
