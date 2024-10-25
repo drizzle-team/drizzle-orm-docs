@@ -24,6 +24,10 @@ export const users = pgTable('users', {
 }).enableRLS();
 ```
 
+<Callout title='important'>
+If you add a policy to a table, RLS will be enabled automatically, so there's no need to explicitly enable it if you want to add policies to this table
+</Callout>
+
 ## Roles
 
 You can define roles with a few options for now, but the list of options will be bigger in the future
