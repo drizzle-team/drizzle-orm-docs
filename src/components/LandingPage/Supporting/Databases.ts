@@ -149,6 +149,19 @@ const Databases: {
     },
     sponsorUrl: "https://driz.link/edgedb",
   },
+  "SQLite Cloud": {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/sqlite-cloud.svg",
+      darkThemeSrc: "/public/svg/sqlite-cloud.svg",
+    },
+    lightStyle: {
+      width: 26,
+    },
+    darkStyle: {
+      width: 26,
+    },
+    sponsorUrl: "https://driz.link/sqlitecloud",
+  },
 };
 
 export default Databases;

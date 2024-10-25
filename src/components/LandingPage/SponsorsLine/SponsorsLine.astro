@@ -200,6 +200,9 @@
               if (item.sponsorEntity.name) {
                 cardName.textContent = customName[item.sponsorEntity.login as keyof typeof customName]
                   || item.sponsorEntity.name;
+                if (item.sponsorEntity.name === 'SQLite Cloud') {
+                  cardName.style.fontSize = '12px';
+                }
               } else {
                 cardName.textContent =
                   item.sponsorEntity.__typename === "User"
@@ -392,6 +395,10 @@
     grid-gap: 10px;
   }
 
+  .hero .styled_card {
+      height: unset;
+  }
+
   .gold {
     grid-template-rows: repeat(2, 112px);
     grid-auto-columns: 90px;
@@ -546,6 +553,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     gap: 6px;
   }
@@ -560,10 +568,11 @@
   }
 
   .styled_card {
-    padding: 10px;
+    padding: 10px 4px;
     border-radius: 4px;
     background-color: #ffffff;
     border: 1px solid #e8e8e8;
+    height: 114.5px;
   }
 
   .styled_card_with_popover {
