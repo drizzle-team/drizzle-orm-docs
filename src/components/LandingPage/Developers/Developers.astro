@@ -15,11 +15,9 @@ import homenko from './Images/team/homenko.jpg'
 import artem from './Images/team/artem.jpg'
 import vitalii from './Images/team/vitalii.jpg'
 import shippingData from '../../../data/shipping.yaml';
-import getMonthLabel from "../../../utils/getMonthLabel";
 import ProgressBar from "./ProgressBar.astro";
-import fillMonthsGaps from "../../../utils/fillMonthsGaps";
 import progress from "../../../data/progress";
-import addNofollowToExternalLinks from "../../../utils/addNofollowToExternalLinks";
+import { addNofollowToExternalLinks, fillMonthsGaps, getMonthLabel } from "@/utils";
 import type { ImageMetadata } from "astro";
 
 const drizzleTeam: { name: string, photo: ImageMetadata, url?: string}[] = [

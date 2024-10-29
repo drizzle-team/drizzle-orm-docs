@@ -1,4 +1,4 @@
-import type { ICards } from "@/types/SVGTypes";
+import type { ICards } from "@/types";
 
 export const dialects: ICards = {
   pg: {

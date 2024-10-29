@@ -1,4 +1,4 @@
-import { type ISponsor, ImageType } from "@/types/Sponsors";
+import { type ISponsor, ImageType } from "@/types";
 
 export const sponsorsData: ISponsor[] = [
   {

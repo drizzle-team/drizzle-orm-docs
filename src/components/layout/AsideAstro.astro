@@ -1,5 +1,5 @@
 ---
-import type { IHeading, TreeNode } from "../../types/astro";
+import type { IHeading, TreeNode } from "@/types";
 import CollapseToggleButton from "./DocsSidebar/CollapseToggleButton.astro";
 
 interface Props {
@@ -297,8 +297,8 @@ let i = 0;
 </div>
 <script>
   import throttle from "lodash.throttle";
-  import handleAnchorHighlighting from "@/utils/handleAnchorHighlighting";
-  import updateDialectLinks from "@/utils/updateDialectLinks";
+  import { handleAnchorHighlighting } from "@/utils-client";
+  import { updateDialectLinks } from "@/utils-client";
 
   document.addEventListener("astro:after-swap", () => {
     let expandedSections: string[] = JSON.parse(localStorage.getItem('expandedSections') || '[]');

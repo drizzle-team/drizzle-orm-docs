@@ -1,4 +1,4 @@
-import type { ISupportingElement } from "@/types/Supporting";
+import type { ISupportingElement } from "@/types";
 
 const Databases: {
   [key: string]: ISupportingElement;
