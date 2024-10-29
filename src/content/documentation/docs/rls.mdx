@@ -84,6 +84,28 @@ export const users = pgTable('users', {
 | `using`                  | The SQL statement that will be applied to the `USING` part of the policy creation statement.                                              |
 | `withCheck`              | An SQL statement that will be applied to the `WITH CHECK` part of the policy creation statement.                                          |
 
+
+**Link Policy to an existing table**
+
+There are situations where you need to link a policy to an existing table in your database. 
+The most common use case is with database providers like `Neon` or `Supabase`, where you need to add a policy 
+to their existing tables. In this case, you can use the `.link()` API
+
+```ts
+import { sql } from "drizzle-orm";
+import { pgPolicy } from "drizzle-orm/pg-core";
+import { authenticatedRole, realtimeMessages } from "drizzle-orm/supabase";
+
+export const policy = pgPolicy("authenticated role insert policy", {
+  for: "insert",
+  to: authenticatedRole,
+  using: sql``,
+}).link(realtimeMessages);
+```
+
+{/* <Callout title='important'>
+<Callout> */}
+
 ## Migrations
 
 If you are using drizzle-kit to manage your schema and roles, there may be situations where you want to refer to roles that are not defined in your Drizzle schema. In such cases, you may want drizzle-kit to skip managing these roles without having to define each role in your drizzle schema and marking it with `.existing()`.
@@ -110,7 +132,7 @@ export default defineConfig({
 });
 ```
 
-In case you need additional configuration options, let’s take a look at a few more examples.
+In case you need additional configuration options, let's take a look at a few more examples.
 
 **You have an `admin` role and want to exclude it from the list of manageable roles**
 
@@ -293,6 +315,7 @@ export const anonRole = pgRole('anon').existing();
 export const authenticatedRole = pgRole('authenticated').existing();
 export const serviceRole = pgRole('service_role').existing();
 export const postgresRole = pgRole('postgres_role').existing();
+export const supabaseAuthAdminRole = pgRole('supabase_auth_admin').existing();
 ```
 
 For example, you can use the `Supabase` predefined roles like this:
@@ -313,4 +336,75 @@ export const users = pgTable('users', {
 		withCheck: sql`false`,
 	}),
 ]);
+```
+
+The `/supabase` import also includes predefined tables and functions that you can use in your application
+
+```ts
+// drizzle-orm/supabase
+
+const auth = pgSchema('auth');
+export const authUsers = auth.table('users', {
+	id: uuid().primaryKey().notNull(),
+});
+
+const realtime = pgSchema('realtime');
+export const realtimeMessages = realtime.table(
+	'messages',
+	{
+		id: bigserial({ mode: 'bigint' }).primaryKey(),
+		topic: text().notNull(),
+		extension: text({
+			enum: ['presence', 'broadcast', 'postgres_changes'],
+		}).notNull(),
+	},
+);
+
+export const authUid = sql`(select auth.uid())`;
+export const realtimeTopic = sql`realtime.topic()`;
+```
+
+This allows you to use it in your code, and Drizzle Kit will treat them as existing databases,
+using them only as information to connect to other entities
+
+```ts
+import { foreignKey, pgPolicy, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm/sql";
+import { authenticatedRole, authUsers } from "drizzle-orm/supabase";
+
+export const profiles = pgTable(
+  "profiles",
+  {
+    id: uuid().primaryKey().notNull(),
+    email: text().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.id],
+	  // reference to the auth table from Supabase
+      foreignColumns: [authUsers.id],
+      name: "profiles_id_fk",
+    }).onDelete("cascade"),
+    pgPolicy("authenticated can view all profiles", {
+      for: "select",
+	  // using predefined role from Supabase
+      to: authenticatedRole,
+      using: sql`true`,
+    }),
+  ]
+);
+```
+
+Let's check an example of adding a policy to a table that exists in `Supabase`
+
+```ts
+import { sql } from "drizzle-orm";
+import { pgPolicy } from "drizzle-orm/pg-core";
+import { authenticatedRole, realtimeMessages } from "drizzle-orm/supabase";
+
+export const policy = pgPolicy("authenticated role insert policy", {
+  for: "insert",
+  to: authenticatedRole,
+  using: sql``,
+}).link(realtimeMessages);
 ```
