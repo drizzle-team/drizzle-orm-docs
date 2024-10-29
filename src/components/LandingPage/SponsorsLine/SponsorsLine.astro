@@ -55,7 +55,7 @@
 </template>
 <script>
   import { sponsorsHandler } from "@/utils-client";
-  import sponsorTypes from "@/data/sponsor-types";
+  import { sponsorConfig } from "@/data/sponsor-config";
   import { ImageType } from "@/types";
   import type { CSSProperties } from "react";
 
@@ -105,13 +105,13 @@
             true,
           ) as HTMLElement;
           const headerName = cards.querySelector("#header-text")!;
-          headerName.textContent = `${sponsorTypes[type.name].header} sponsors`;
+          headerName.textContent = `${sponsorConfig[type.name].header} sponsors`;
           const emoji = cards.querySelector("#emoji")!;
-          emoji.textContent = sponsorTypes[type.name].emoji;
+          emoji.textContent = sponsorConfig[type.name].emoji;
           const cardsBlock = cards.querySelector("#cards-block")!;
           cardsBlock.className = `${type.name} cards`;
           type.items.forEach((item) => {
-            if (sponsorTypes[type.name].hasName) {
+            if (sponsorConfig[type.name].hasName) {
               //WITH NAME
               const card = sponsorCardWithNameTemplate.content.cloneNode(
                 true,
@@ -132,7 +132,7 @@
               if (!item.imageType) {
                 imgDark.src = getImgLink(
                   item.sponsorEntity.avatarUrl,
-                  sponsorTypes[type.name].size,
+                  sponsorConfig[type.name].size,
                 );
               }
               imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
@@ -161,7 +161,7 @@
               if (!item.imageType) {
                 imgLight.src = getImgLink(
                   item.sponsorEntity.avatarUrl,
-                  sponsorTypes[type.name].size,
+                  sponsorConfig[type.name].size,
                 );
               }
               imgLight.alt =
@@ -178,8 +178,8 @@
               )! as HTMLDivElement;
               imgWrapper.setAttribute(
                 "style",
-                `width: ${sponsorTypes[type.name].size}px; height: ${
-                  sponsorTypes[type.name].size
+                `width: ${sponsorConfig[type.name].size}px; height: ${
+                  sponsorConfig[type.name].size
                 }px`,
               );
               const gitLink = card.querySelector(
@@ -224,7 +224,7 @@
                 "#card-wrapper",
               )! as HTMLDivElement;
               cardWrapper.classList.add("with_name");
-              if (sponsorTypes[type.name].hasCard) {
+              if (sponsorConfig[type.name].hasCard) {
                 if (item.popover) {
                   cardWrapper.classList.add("styled_card_with_popover");
                   const popover =
@@ -269,7 +269,7 @@
               if (!item.imageType) {
                 imgDark.src = getImgLink(
                   item.sponsorEntity.avatarUrl,
-                  sponsorTypes[type.name].size,
+                  sponsorConfig[type.name].size,
                 );
               }
               imgDark.alt = item.sponsorEntity.name || item.sponsorEntity.login;
@@ -299,7 +299,7 @@
               if (!item.imageType) {
                 imgLight.src = getImgLink(
                   item.sponsorEntity.avatarUrl,
-                  sponsorTypes[type.name].size,
+                  sponsorConfig[type.name].size,
                 );
               }
               imgLight.alt =
@@ -310,8 +310,8 @@
               )! as HTMLDivElement;
               imgWrapper.setAttribute(
                 "style",
-                `width: ${sponsorTypes[type.name].size}px; height: ${
-                  sponsorTypes[type.name].size
+                `width: ${sponsorConfig[type.name].size}px; height: ${
+                  sponsorConfig[type.name].size
                 }px`,
               );
               const gitLink = card.querySelector(

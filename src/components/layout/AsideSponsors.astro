@@ -1,6 +1,6 @@
 ---
 import type { CSSProperties } from "react";
-import s from "@/data/asideS";
+import { asideSponsors } from "@/data/aside-sponsors";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
@@ -8,9 +8,9 @@ const getStyleString = (style: CSSProperties) => {
   }, "");
 };
 
-const heroSponsors = s.filter(({tier}) => tier.name === '$2500 a month');
+const heroSponsors = asideSponsors.filter(({tier}) => tier.name === '$2500 a month');
 
-const goldSponsors = s.filter(({tier}) => tier.name === '$1000 a month');
+const goldSponsors = asideSponsors.filter(({tier}) => tier.name === '$1000 a month');
 
 const slicedSponsors = [];
 

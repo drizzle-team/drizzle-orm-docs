@@ -1,4 +1,4 @@
-import sponsorsData from "@/data/s";
+import { customSponsors } from "@/data/custom-sponsors";
 import { type ISponsor } from "@/types";
 
 interface AnchorProps {
@@ -53,7 +53,7 @@ export const sponsorsHandler = async () => {
   const response = await fetch("https://api.drizzle.team/v2/sponsors");
   const { sponsors } = await response.json();
 
-  const allSponsors = [...sponsors, ...sponsorsData];
+  const allSponsors = [...sponsors, ...customSponsors];
   let pastSponsors: ISponsor[] = [];
 
   const currentDate = new Date();

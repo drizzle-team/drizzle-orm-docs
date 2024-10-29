@@ -1,6 +1,6 @@
 import { ImageType, type ISponsor } from "@/types";
 
-export const sponsorsData: ISponsor[] = [
+export const customSponsors: ISponsor[] = [
   {
     tier: {
       name: "$100 a month",
@@ -362,5 +362,3 @@ export const sponsorsData: ISponsor[] = [
     imageType: ImageType.IMAGE,
   },
 ];
-
-export default sponsorsData;

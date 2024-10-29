@@ -1,4 +1,4 @@
-const sponsorTypes: {
+export const sponsorConfig: {
   [key: string]: {
     header: string;
     size: number;
@@ -73,5 +73,3 @@ const sponsorTypes: {
     rowSize: 134,
   },
 };
-
-export default sponsorTypes;
