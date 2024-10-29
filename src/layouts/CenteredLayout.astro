@@ -9,7 +9,6 @@ import type { IHeading } from "@/types/astro";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
 import DocsSidebar from "../components/layout/DocsSidebar/DocsSidebar.astro";
 import getContentTree from '@/utils/getContentTree';
-import type { IHeading } from '@/types/astro';
 
 interface Props {
   customTitle?: string;
@@ -139,5 +138,125 @@ const { title, tree  } = await getContentTree({
         }
       }
     </script>
+        <script is:inline>
+          const changeNpmTab = () => {
+            const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'];
+    
+            let packageManagerIndex = packageManagers.indexOf(packageManager);
+    
+            const updateUI = (index) => {
+              npmContent.forEach((element) => {
+                Array.from(element.children).forEach((child, i) => {
+                  child.classList.toggle('hidden', i !== index);
+                });
+              });
+              npmTabs.forEach((element) => {
+                Array.from(element.children).forEach((child, i) => {
+                  child.classList.toggle('npm__tab--active', i === index);
+                });
+              });
+    
+              npxSelectResizer.querySelector('.line span').innerText = packageManagers[index]
+    
+              npxSelects.forEach((element) => {
+                element.value = index;
+                element.style.width = `${npxSelectResizer.offsetWidth}px`
+              });
+            };
+    
+            const npmContent = document.querySelectorAll('.npm__content');
+            const npmTabs = document.querySelectorAll('.npm__tabs');
+            const npxSelects = document.querySelectorAll('.npx-select');
+            const npxSelectResizer = document.querySelector('.npx-select-resizer');
+    
+            npmContent.forEach((content) => {
+              Array.from(content.children).forEach((child, index) => {
+                child.classList.toggle('hidden', index !== packageManagerIndex);
+              });
+            });
+    
+            npmTabs.forEach((tab) => {
+              Array.from(tab.children).forEach((child, index) => {
+                child.classList.toggle('npm__tab--active', index === packageManagerIndex);
+                child.addEventListener('click', () => {
+                  packageManager = packageManagers[index];
+                  localStorage.setItem('package-manager', packageManager);
+                  updateUI(index);
+                });
+              });
+            });
+    
+            npxSelects.forEach((element) => {
+              npxSelectResizer.querySelector('.line span').innerText = packageManagers[packageManagerIndex];
+              element.value = packageManagerIndex;
+              setTimeout(() => element.style.width = `${npxSelectResizer.offsetWidth}px`, 1);
+              element.addEventListener('change', (e) => {
+                packageManager = packageManagers[Number(e.target.value)];
+                localStorage.setItem('package-manager', packageManager);
+                updateUI(Number(e.target.value));
+              })
+            });
+          }
+          changeNpmTab();
+        </script>
+        <script>
+          document.addEventListener("astro:after-swap", () => {
+            const npmContent: NodeList = document.querySelectorAll('.npm__content');
+            const npmTabs: NodeList = document.querySelectorAll('.npm__tabs');
+            const npxSelects: NodeList = document.querySelectorAll('.npx-select');
+            const npxSelectResizer = document.querySelector('.npx-select-resizer');
+            const packageManagers: string[] = ['npm', 'yarn', 'pnpm', 'bun'];
+            let packageManager: string = localStorage.getItem('package-manager') || 'npm';
+            let packageManagerIndex: number = packageManagers.indexOf(packageManager);
+    
+            const updateUI = (index: number): void => {
+              npmContent.forEach((element) => {
+                Array.from((element as HTMLElement).children).forEach((child, i) => {
+                  child.classList.toggle('hidden', i !== index);
+                });
+              });
+              npmTabs.forEach((element) => {
+                Array.from((element as HTMLElement).children).forEach((child, i) => {
+                  child.classList.toggle('npm__tab--active', i === index);
+                });
+              });
+    
+              npxSelectResizer.querySelector('.line span').innerText = packageManagers[index]
+    
+              npxSelects.forEach((element) => {
+                element.value = index;
+                element.style.width = `${npxSelectResizer.offsetWidth}px`
+              });
+            };
+    
+            npmContent.forEach((content) => {
+              Array.from((content as HTMLElement).children).forEach((child, index) => {
+                child.classList.toggle('hidden', index !== packageManagerIndex);
+              });
+            });
+    
+            npmTabs.forEach((tab) => {
+              Array.from((tab as HTMLElement).children).forEach((child, index) => {
+                child.classList.toggle('npm__tab--active', index === packageManagerIndex);
+                child.addEventListener('click', () => {
+                  packageManager = packageManagers[index];
+                  localStorage.setItem('package-manager', packageManager);
+                  updateUI(index);
+                });
+              });
+            });
+    
+            npxSelects.forEach((element) => {
+              npxSelectResizer.querySelector('.line span').innerText = packageManagers[packageManagerIndex];
+              element.value = packageManagerIndex;
+              element.style.width = `${npxSelectResizer.offsetWidth}px`
+              element.addEventListener('change', (e) => {
+                packageManager = packageManagers[Number(e.target.value)];
+                localStorage.setItem('package-manager', packageManager);
+                updateUI(Number(e.target.value));
+              })
+            });
+          })
+          </script>
   </body>
 </html>
