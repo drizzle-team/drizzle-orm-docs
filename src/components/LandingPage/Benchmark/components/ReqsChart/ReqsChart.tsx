@@ -2,7 +2,7 @@ import { type FC, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./ReqsChart.module.css";
 
-import { CheckIcon, XIcon } from "@/components/Icons/Icons";
+import { CheckIcon, XIcon } from "@/assets/icons/Icons";
 import { SVGViewBoxHeight, SVGViewBoxWidth } from "../../constants";
 import type { IData } from "../../types";
 import fixedHelper from "../../utils/fixedHelper";

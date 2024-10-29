@@ -1,6 +1,6 @@
 import { type FC } from "react";
-import DrizzleLogo from "@/components/Icons/DrizzleLogo";
-import PrismaIcon from "@/components/Icons/PrismaIcon";
+import DrizzleLogo from "@/assets/icons/DrizzleLogo";
+import PrismaIcon from "@/assets/icons/PrismaIcon";
 
 interface Props {
   logo: string;

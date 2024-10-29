@@ -1,6 +1,6 @@
 import { type FC, useState, useRef, useEffect, useMemo } from "react";
 
-import { CheckIcon } from "@components/Icons/Icons";
+import { CheckIcon } from "@/assets/icons/Icons";
 import { SVGViewBoxHeight, SVGViewBoxWidth } from "../../constants";
 import { type IData } from "../../types";
 import fixedHelper from "../../utils/fixedHelper";

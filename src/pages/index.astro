@@ -1,8 +1,93 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import LandingPage from '@components/LandingPage/LandingPage.astro';
+import Layout from "@/ui/Layout.astro";
+import Supporting from "@/components/LandingPage/Supporting/Supporting.astro";
+import Runtimes from "@/components/LandingPage/Supporting/Runtimes";
+import Databases from "@/components/LandingPage/Supporting/Databases";
+import DrizzleStudio from "@/components/LandingPage/DrizzleStudio/DrizzleStudio.astro";
+import Pricing from "@/components/LandingPage/Pricing/Pricing.astro";
+import Twits from "@/components/LandingPage/Twits/Twits.astro";
+import SponsorsLine from "@/components/LandingPage/SponsorsLine/SponsorsLine.astro";
+import Benchmark from "@/components/LandingPage/Benchmark/Benchmark";
+import NewHeader from "@/components/LandingPage/NewHeader/NewHeader.astro";
+import Developers from "@/components/LandingPage/Developers/Developers.astro";
+
+const runtimes: string[] = [
+  "Cloudflare Workers",
+  "Supabase functions",
+  "Vercel functions",
+  "Deno deploy",
+  "Bun",
+  "Lagon",
+  "Fly.io",
+  "ElectronJS",
+  "Expo",
+  "React Native",
+  "Browser",
+];
+const databases: string[] = [
+  "EdgeDB",
+  "PlanetScale",
+  "Neon",
+  "Vercel Postgres",
+  "Turso",
+  "Supabase",
+  "Xata",
+  "PostgreSQL",
+  "TiDB",
+  "MySQL",
+  "Tembo",
+  "LiteFS",
+  "SQLite Cloud",
+  "SQLite",
+  "Web SQLite",
+];
 ---
 
 <Layout title="Drizzle ORM - next gen TypeScript ORM.">
-	<LandingPage />
+  <div class="wrap">
+    <NewHeader />
+    <Developers />
+    <Benchmark client:load />
+    <Supporting
+      rowsNum={4}
+      imageType="liveontheedge"
+      title="Live on the edge"
+      description="We support every major serverful and serverless runtime"
+      items={runtimes}
+      data={Runtimes}
+    />
+    <Supporting
+      rowsNum={3}
+      imageType="connecteverywhere"
+      title="Connect to any database"
+      description="We support all platform-specific, tcp, http and websocket based drivers"
+      items={databases}
+      data={Databases}
+    />
+    <DrizzleStudio />
+    <SponsorsLine />
+    <div id="pricing"></div>
+    <Pricing />
+    <Twits />
+  </div>
+
+  <style>
+    .wrap {
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      color: #222;
+    }
+
+    html[class~="dark"] .wrap {
+      color: rgb(226, 232, 240);
+    }
+  </style>
+  <script>
+    window.addEventListener("beforeunload", () => {
+      localStorage.setItem("sidebar-scroll", "0");
+    });
+  </script>
 </Layout>

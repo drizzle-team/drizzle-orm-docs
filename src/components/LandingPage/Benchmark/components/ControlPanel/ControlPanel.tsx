@@ -7,9 +7,9 @@ import SpeedSelector from "../SpeedSelector/SpeedSelector";
 import Configuration from "../Configuration/Configuration";
 import Performance from "../Performance/Performance";
 import { useBenchmarkContext } from "../../context/useBenchmarkContext";
-import OptionsIcon from "@/components/Icons/OptionsIcon";
+import OptionsIcon from "@/assets/icons/OptionsIcon";
+import ArrowRight from "@/assets/icons/ArrowRight";
 import BenchmarkConifg from "../BenchmarkConfig/BenchmarkConfig";
-import ArrowRight from "@/components/Icons/ArrowRight";
 import getBenchmarkData from "../../utils/getBenchmarkData.ts";
 import Rewind from "@components/LandingPage/Benchmark/components/Rewind/Rewind.tsx";
 

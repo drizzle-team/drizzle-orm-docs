@@ -84,17 +84,17 @@ interface ContentTreeProps {
 
 export const getContentTree = async (props: ContentTreeProps) => {
   const [metaFiles, mdxFiles] = await Promise.all([
-    import.meta.glob("../content/**/*.json"),
-    import.meta.glob<Array<string | string[]>>("../content/**/*.mdx"),
+    import.meta.glob("./content/**/*.json"),
+    import.meta.glob<Array<string | string[]>>("./content/**/*.mdx"),
   ]);
 
   const mdxPaths = Object.keys(mdxFiles);  
-  const regex = /\.\.\/content\/(.*?)\/_meta\.json/;
+  const regex = /\.\/content\/(.*?)\/_meta\.json/;
 
   const navItems: SidebarItem[] = [];
 
   const getTypeOfFile = (value: string): SidebarItem["type"] => {
-    if (mdxPaths.includes(`../content/${value}.mdx`)) {
+    if (mdxPaths.includes(`./content/${value}.mdx`)) {
       return "mdx";
     }
     if (mdxPaths.some((path) => path.includes(value))) {
