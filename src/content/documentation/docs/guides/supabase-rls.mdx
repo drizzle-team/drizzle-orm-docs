@@ -15,7 +15,8 @@ import Npm from "@mdx/Npm.astro";
   - You should have a [Supabase Database](https://supabase.com/) setup or
   install the latest [Supabase
   CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)
-  and create a new local project. - [Row-Level Security (RLS)](/docs/rls)
+  and create a new local project. 
+  - [Row-Level Security (RLS)](/docs/rls)
 </Prerequisites>
 
 <Callout title="important">
@@ -255,7 +256,6 @@ GRANT authenticated TO rls_client;
 `createDrizzle` exposes the same API as the drizzle-orm client but also includes an `rls` method.
 This method is a `transaction` (from `client`) on which we set the necessary configuration for Supabase to handle RLS.
 
-
 ```sql
  -- auth.jwt()
  select set_config('request.jwt.claims', <stringified token>, TRUE);
@@ -265,8 +265,6 @@ This method is a `transaction` (from `client`) on which we set the necessary con
  set local role <token.role ?? "anon">;
 ```
 </Callout>
-
-
 
 Now we can make protected queries.
 
