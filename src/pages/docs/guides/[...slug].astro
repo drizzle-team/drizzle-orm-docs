@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import DocsLayout from "@/layouts/DocsLayout.astro";
-import Link from "@components/markdown/Link.astro";
+import Link from "@mdx/Link.astro";
 
 export async function getStaticPaths() {
   const guides = await getCollection("docs", ({ id }) => {

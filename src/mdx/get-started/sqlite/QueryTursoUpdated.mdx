@@ -1,24 +1,27 @@
-import CodeWithProps from "@/components/markdown/CodeWithProps.astro";
+import CodeWithProps from "@mdx/CodeWithProps.astro";
 
 Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
 
+<CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { drizzle } from 'drizzle-orm/libsql';
 import { usersTable } from './db/schema';
 
-const db = drizzle({ connection: {
-  host: process.env.DATABASE_HOST!,
-  username: process.env.DATABASE_USERNAME!,
-  password: process.env.DATABASE_PASSWORD!,
-}});
-
 async function main() {
+  const db = drizzle({ 
+    connection: { 
+        url: process.env.TURSO_DATABASE_URL!, 
+        authToken: process.env.TURSO_AUTH_TOKEN!
+    }
+  });
+
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
     age: 30,
     email: 'john@example.com',
+    phone: '123-456-7890',
   };
 
   await db.insert(usersTable).values(user);
@@ -32,6 +35,7 @@ async function main() {
     name: string;
     age: number;
     email: string;
+    phone: string | null;
   }[]
   */
 
@@ -49,3 +53,4 @@ async function main() {
 
 main();
 ```
+</CodeWithProps>

@@ -1,4 +1,4 @@
-import CodeWithProps from "@/components/markdown/CodeWithProps.astro";
+import CodeWithProps from "@mdx/CodeWithProps.astro";
 
 Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
 
@@ -18,6 +18,7 @@ async function main() {
     name: 'John',
     age: 30,
     email: 'john@example.com',
+    phone: '123-456-7890',
   };
 
   await db.insert(usersTable).values(user);
@@ -31,6 +32,7 @@ async function main() {
     name: string;
     age: number;
     email: string;
+    phone: string | null;
   }[]
   */
 

@@ -1,22 +1,15 @@
-import CodeWithProps from "@/components/markdown/CodeWithProps.astro";
-
-Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
+import CodeWithProps from "@mdx/CodeWithProps.astro";
 
 <CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/$dialect$';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/libsql';
 import { usersTable } from './db/schema';
 
-async function main() {
-  const db = drizzle({ 
-    connection: { 
-        url: process.env.TURSO_DATABASE_URL!, 
-        authToken: process.env.TURSO_AUTH_TOKEN!
-    }
-  });
+const db = drizzle(process.env.$env_variable$!);
 
+async function main() {
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
     age: 30,
