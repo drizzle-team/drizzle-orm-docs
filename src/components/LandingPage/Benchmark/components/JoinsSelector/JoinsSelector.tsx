@@ -33,7 +33,6 @@ const JoinsSelector: FC = () => {
         <option
           key={item.name}
           value={String(item.value)}
-          selected={selectedItems.joins === item.value}
         >
           {item.name}
         </option>

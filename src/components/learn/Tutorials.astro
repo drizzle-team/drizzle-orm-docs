@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 
-const tutorials = await getCollection("documentation", ({ id }) => {
-  return id.startsWith("docs/tutorials/");
+const tutorials = await getCollection("docs", ({ id }) => {
+  return id.startsWith("tutorials/");
 });
 
 const formattedTutorials = tutorials.map((tutorial) => ({

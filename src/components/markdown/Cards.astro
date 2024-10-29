@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { cards } = Astro.props;
-const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
+const svgs = import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
 
 ---
 <div class={"cards"}>

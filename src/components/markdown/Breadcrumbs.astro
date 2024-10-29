@@ -7,7 +7,7 @@ const flatItems = getStartedItems.map((v) => v.items).flat(1)
 
 const currentItem = flatItems.find((item) => `/${slug}` === item.path.new || `/${slug}` === item.path.existing);
 
-const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
+const databaseType = `/${slug}` === currentItem?.path.new ? 'new' : 'existing';
 ---
 
 <div class="breadcrumbs-container">
@@ -22,7 +22,7 @@ const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
       whiteSpace: "nowrap",
     }}
   >
-    {currentItem.name}
+    {currentItem?.name}
   </div>
   <div
     id="db-type-resizer"
@@ -58,14 +58,14 @@ const databaseType = `/${slug}` === currentItem.path.new ? 'new' : 'existing';
   <div class="dot"></div>
   <select id="db-select" class="select">
     {flatItems.map((item) => (
-      <option id={item.name} value={item.name} selected={item.name === currentItem.name}>
+      <option id={item.name} value={item.name} selected={item.name === currentItem?.name}>
         {item.name}
       </option>
     ))}
   </select>
 </div>
 
-<script define:vars={{currentItem, flatItems, databaseType}}>
+<script is:inline define:vars={{currentItem, flatItems, databaseType}}>
   const dbSelect = document.getElementById('db-select');
   const dbTypeSelect = document.getElementById('db-type-select');
   const dbSelectResizer = document.getElementById('db-resizer');

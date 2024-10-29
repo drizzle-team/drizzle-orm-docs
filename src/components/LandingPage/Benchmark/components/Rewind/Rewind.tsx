@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useRef } from "react";
+import { type FC, useMemo, useRef } from "react";
 
 import styles from "./Rewind.module.css";
 

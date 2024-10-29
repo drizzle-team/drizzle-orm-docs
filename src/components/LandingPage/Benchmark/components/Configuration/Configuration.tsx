@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState } from "react";
+import React, { type FC } from "react";
 import styles from "./Configuration.module.css";
 
 import data from "../../configurationData";

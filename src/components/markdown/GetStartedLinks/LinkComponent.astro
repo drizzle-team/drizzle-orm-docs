@@ -1,5 +1,6 @@
 ---
 import type { SVGProps } from '@/types/SVGTypes';
+import type { CSSProperties } from 'react';
 
 interface Props {
   link: {
@@ -54,11 +55,11 @@ const darkStylesSVGString = svgCodeDark.replace(/<svg/, `<svg ${getParamsString(
 <a id={link.name} class="get-started-link" href={link.path.new}>
   <div class="img_light">
     {isSvg && <Fragment set:html={lightStylesSVGString} />}
-    {!isSvg && <img class="image" src={getImagePath(icon.light.path)} style={{...icon.light.style}}/>}
+    {!isSvg && <img class="image" src={getImagePath(icon.light.path)} style={{...(icon.light.style as CSSProperties)}}/>}
   </div>
   <div class="img_dark">
     {isSvg && <Fragment set:html={darkStylesSVGString} />}
-    {!isSvg && <img class="image" src={getImagePath(icon.dark.path)} style={{...icon.dark.style}}/>}
+    {!isSvg && <img class="image" src={getImagePath(icon.dark.path)} style={{...(icon.dark.style as CSSProperties)}}/>}
   </div>
   <span class="link-name">{link.name}</span>
 </a>

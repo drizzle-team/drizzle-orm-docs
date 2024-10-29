@@ -20,8 +20,9 @@ import ProgressBar from "./ProgressBar.astro";
 import fillMonthsGaps from "../../../utils/fillMonthsGaps";
 import progress from "../../../data/progress";
 import addNofollowToExternalLinks from "../../../utils/addNofollowToExternalLinks";
+import type { ImageMetadata } from "astro";
 
-const drizzleTeam: { name: string, photo: string, url?: string}[] = [
+const drizzleTeam: { name: string, photo: ImageMetadata, url?: string}[] = [
   {
     name: 'Andrew Sherman',
     photo: sherman,
@@ -64,7 +65,7 @@ const drizzleTeam: { name: string, photo: string, url?: string}[] = [
   },
 ];
 
-const contributors: { name: string, photo: string}[] = [
+const contributors: { name: string, photo: ImageMetadata}[] = [
   {
     name: 'angelelz',
     photo: angelelz,

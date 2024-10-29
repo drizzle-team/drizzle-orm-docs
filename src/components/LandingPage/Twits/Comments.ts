@@ -1,3 +1,5 @@
+import type { ImageMetadata } from "astro";
+
 import aarondfrancis from "@/assets/images/twits/aarondfrancis.jpg";
 import anthonysheww from "@/assets/images/twits/anthonysheww.jpg";
 import imfelquis from "@/assets/images/twits/imfelquis.jpg";
@@ -26,12 +28,12 @@ import spacesexdragonTwit from "@/assets/images/twits/spacesexdragonTwit.jpg";
 // Twit images
 
 export interface IComment {
-  avatar: ImportMeta;
+  avatar: ImageMetadata;
   name: string;
   login: string;
   text?: string;
   href?: string;
-  twitImage?: ImportMetaEnv;
+  twitImage?: ImageMetadata;
 }
 
 const Comments: IComment[] = [

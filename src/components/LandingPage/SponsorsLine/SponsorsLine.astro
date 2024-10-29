@@ -59,19 +59,19 @@
   import { ImageType } from "@/types/Sponsors";
   import type { CSSProperties } from "react";
 
-  document.addEventListener('astro:page-load', async () => {
+  document.addEventListener("astro:page-load", async () => {
     const sponsorLinks = {
       unkeyed: "unkey.dev",
       wakatime: "wakatime.com",
       nodecraft: "nodecraft.com",
       devhuset: "devhuset.no",
       un: "driz.link/silver-sponsor-uninbox",
-      encoredev: "driz.link/silver-sponsor-encore"
+      encoredev: "driz.link/silver-sponsor-encore",
     };
 
     const customName = {
-      un: "Uninbox"
-    }
+      un: "Uninbox",
+    };
 
     const getStyleString = (style: CSSProperties) => {
       return Object.keys(style).reduce((acc, key) => {
@@ -164,7 +164,8 @@
                   sponsorTypes[type.name].size,
                 );
               }
-              imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+              imgLight.alt =
+                item.sponsorEntity.name || item.sponsorEntity.login;
               imgLight.setAttribute(
                 "style",
                 `border-radius: ${roundPercentages}%; ${getStyleString(
@@ -181,13 +182,21 @@
                   sponsorTypes[type.name].size
                 }px`,
               );
-              const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
+              const gitLink = card.querySelector(
+                "#git-link",
+              )! as HTMLLinkElement;
               if (item.imageType) {
                 gitLink.href = `https://${item.sponsorEntity.login}`;
               } else {
-                if (sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]) {
+                if (
+                  sponsorLinks[
+                    item.sponsorEntity.login as keyof typeof sponsorLinks
+                  ]
+                ) {
                   gitLink.href = `https://${
-                    sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]
+                    sponsorLinks[
+                      item.sponsorEntity.login as keyof typeof sponsorLinks
+                    ]
                   }`;
                 } else {
                   gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
@@ -198,10 +207,12 @@
                 "#card-name",
               )! as HTMLDivElement;
               if (item.sponsorEntity.name) {
-                cardName.textContent = customName[item.sponsorEntity.login as keyof typeof customName]
-                  || item.sponsorEntity.name;
-                if (item.sponsorEntity.name === 'SQLite Cloud') {
-                  cardName.style.fontSize = '12px';
+                cardName.textContent =
+                  customName[
+                    item.sponsorEntity.login as keyof typeof customName
+                  ] || item.sponsorEntity.name;
+                if (item.sponsorEntity.name === "SQLite Cloud") {
+                  cardName.style.fontSize = "12px";
                 }
               } else {
                 cardName.textContent =
@@ -215,8 +226,12 @@
               cardWrapper.classList.add("with_name");
               if (sponsorTypes[type.name].hasCard) {
                 if (item.popover) {
-                  cardWrapper.classList.add("styled_card_with_popover")
-                  cardWrapper.querySelector('.popover').innerHTML = item.popover
+                  cardWrapper.classList.add("styled_card_with_popover");
+                  const popover =
+                    cardWrapper.querySelector<HTMLDivElement>(".popover");
+                  if (popover) {
+                    popover.innerHTML = item.popover;
+                  }
                 }
                 cardWrapper.classList.add("styled_card");
               }
@@ -287,7 +302,8 @@
                   sponsorTypes[type.name].size,
                 );
               }
-              imgLight.alt = item.sponsorEntity.name || item.sponsorEntity.login;
+              imgLight.alt =
+                item.sponsorEntity.name || item.sponsorEntity.login;
 
               const imgWrapper = card.querySelector(
                 "#img-wrapper",
@@ -298,13 +314,21 @@
                   sponsorTypes[type.name].size
                 }px`,
               );
-              const gitLink = card.querySelector("#git-link")! as HTMLLinkElement;
+              const gitLink = card.querySelector(
+                "#git-link",
+              )! as HTMLLinkElement;
               if (item.imageType) {
                 gitLink.href = `https://${item.sponsorEntity.login}`;
               } else {
-                if (sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]) {
+                if (
+                  sponsorLinks[
+                    item.sponsorEntity.login as keyof typeof sponsorLinks
+                  ]
+                ) {
                   gitLink.href = `https://${
-                    sponsorLinks[item.sponsorEntity.login as keyof typeof sponsorLinks]
+                    sponsorLinks[
+                      item.sponsorEntity.login as keyof typeof sponsorLinks
+                    ]
                   }`;
                 } else {
                   gitLink.href = `https://github.com/${item.sponsorEntity.login}`;
@@ -318,40 +342,44 @@
         }
       });
     }
-  })
+  });
 </script>
-<script lang="ts" type="module">
-  import {computePosition, shift, offset} from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.8/+esm';
+<script is:inline type="module">
+  import {
+    computePosition,
+    shift,
+    offset,
+  } from "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.8/+esm";
 
   const computePopovers = () => {
-    const cards = document.querySelectorAll('.styled_card_with_popover');
+    const cards = document.querySelectorAll(".styled_card_with_popover");
     cards.forEach((card) => {
-      const cardPopover = card.querySelector('.popover');
+      const cardPopover = card.querySelector(".popover");
 
-      if (!cardPopover)  return;
+      if (!cardPopover) return;
 
       computePosition(card, cardPopover, {
-        placement: 'top',
-        middleware: [shift({padding: 20}), offset(6)],
-        strategy: 'fixed',
-      }).then(({x, y}) => {
+        placement: "top",
+        middleware: [shift({ padding: 20 }), offset(6)],
+        strategy: "fixed",
+      }).then(({ x, y }) => {
         Object.assign(cardPopover.style, {
           left: `${x}px`,
           top: `${y}px`,
         });
       });
-    })
-  }
+    });
+  };
 
   document.addEventListener("astro:page-load", () => {
     setTimeout(() => computePopovers(), 50);
 
-    window.removeEventListener('resize', computePopovers, false);
-    document.removeEventListener('scroll', computePopovers, false);
+    window.removeEventListener("resize", computePopovers, false);
+    document.removeEventListener("scroll", computePopovers, false);
 
-    document.addEventListener('scroll', computePopovers);
-    window.addEventListener('resize', computePopovers);
-  })
+    document.addEventListener("scroll", computePopovers);
+    window.addEventListener("resize", computePopovers);
+  });
 
   setTimeout(() => computePopovers(), 50);
 </script>
@@ -362,7 +390,7 @@
   }
 
   #git-link {
-      height: fit-content;
+    height: fit-content;
   }
 
   .card_image img {
@@ -396,7 +424,7 @@
   }
 
   .hero .styled_card {
-      height: unset;
+    height: unset;
   }
 
   .gold {
@@ -576,34 +604,43 @@
   }
 
   .styled_card_with_popover {
-      position: relative;
+    position: relative;
   }
 
-   .popover {
-      position: fixed;
-      top: 0;
-      white-space: nowrap;
-      left: 0;
-      width: max-content;
-      opacity: 0;
-      pointer-events: none;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 4px 12px;
-      background: white;
-      border-radius: 4px;
-      z-index: 999;
-      box-shadow: 0 0 0 0 #fff, 0 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
-      transition: opacity 0.3s;
+  .popover {
+    position: fixed;
+    top: 0;
+    white-space: nowrap;
+    left: 0;
+    width: max-content;
+    opacity: 0;
+    pointer-events: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 12px;
+    background: white;
+    border-radius: 4px;
+    z-index: 999;
+    box-shadow:
+      0 0 0 0 #fff,
+      0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 1px 2px 0 rgba(0, 0, 0, 0.1),
+      0 2px 4px 0 rgba(0, 0, 0, 0.075);
+    transition: opacity 0.3s;
   }
 
   html.dark .styled_card_with_popover .popover {
-      background: #000;
-      box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 1px hsla(0, 0%, 100%, .2), 0 1px 2px 0 rgba(0, 0, 0, .1), 0 2px 4px 0 rgba(0, 0, 0, .075);
+    background: #000;
+    box-shadow:
+      0 0 0 0 transparent,
+      0 0 0 0 transparent,
+      0 0 0 1px hsla(0, 0%, 100%, 0.2),
+      0 1px 2px 0 rgba(0, 0, 0, 0.1),
+      0 2px 4px 0 rgba(0, 0, 0, 0.075);
   }
 
-  .styled_card_with_popover:hover .popover{
-      opacity: 1;
+  .styled_card_with_popover:hover .popover {
+    opacity: 1;
   }
 
   .round-20 {

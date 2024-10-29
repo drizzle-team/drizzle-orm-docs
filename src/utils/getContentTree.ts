@@ -12,8 +12,6 @@ export interface SidebarItem {
   path: string;
 }
 
-type MetaItems = Array<string | string[]>;
-
 interface Props {
   headings?: IHeading[];
   slug?: string;
@@ -21,18 +19,17 @@ interface Props {
 
 const getContentTree = async (props: Props) => {
   const [metaFiles, mdxFiles] = await Promise.all([
-    import.meta.glob<Array<string | string[]>>("../content/**/*.json"),
+    import.meta.glob("../content/**/*.json"),
     import.meta.glob<Array<string | string[]>>("../content/**/*.mdx"),
   ]);
 
-  const mdxPaths = Object.keys(mdxFiles);
-
-  const regex = /\.\.\/content\/documentation\/(.*?)\/_meta\.json/;
+  const mdxPaths = Object.keys(mdxFiles);  
+  const regex = /\.\.\/content\/(.*?)\/_meta\.json/;
 
   const navItems: SidebarItem[] = [];
 
   const getTypeOfFile = (value: string): SidebarItem["type"] => {
-    if (mdxPaths.includes(`../content/documentation/${value}.mdx`)) {
+    if (mdxPaths.includes(`../content/${value}.mdx`)) {
       return "mdx";
     }
     if (mdxPaths.some((path) => path.includes(value))) {
@@ -42,8 +39,7 @@ const getContentTree = async (props: Props) => {
   };
 
   for (const meta in metaFiles) {
-    const parsed: MetaItems = (await metaFiles[meta]()).default;
-
+    const { default: parsed } = await metaFiles[meta]() as { default: string[] };
     const metaSlug = meta.match(regex);
     if (metaSlug) {
       const extractedText = metaSlug[1];

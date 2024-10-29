@@ -21,7 +21,7 @@ const SpeedSelector: FC<IProps> = ({ speed, setSpeed }) => {
       onChange={handleChange}
     >
       {items.map((item) => (
-        <option key={item} value={item} selected={speed === item}>
+        <option key={item} value={item}>
           {item}x
         </option>
       ))}

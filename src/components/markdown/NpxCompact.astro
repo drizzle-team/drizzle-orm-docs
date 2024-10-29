@@ -2,7 +2,7 @@
 const html = await Astro.slots.render("default");
 const installCommands = ["npx", "yarn", "pnpm", "bun"];
 const installLines = html.replaceAll(/<\/?p>/g, "").replaceAll('—', '--').split("\n");
-const getInstallCommands = (index: number) =>
+const getInstallCommands = () =>
   installLines
     .map(
       (line) =>
@@ -14,9 +14,7 @@ const wrapCodeBlocks = () =>
     (_, index) =>
       `<figure style="position: relative;" class="code-snippet lang-shell ${
         index !== 0 ? "hidden" : ""
-      }"><figcaption class="header"></figcaption><pre class="astro-code css-variables" style="background-color:var(--astro-code-color-background);color:var(--astro-code-color-text);overflow-x:auto" tabindex="0" lang="shell"><code>${getInstallCommands(
-        index,
-      )}</code></pre></figure>`,
+      }"><figcaption class="header"></figcaption><pre class="astro-code css-variables" style="background-color:var(--astro-code-color-background);color:var(--astro-code-color-text);overflow-x:auto" tabindex="0" lang="shell"><code>${getInstallCommands()}</code></pre></figure>`,
   );
 ---
 

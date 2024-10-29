@@ -109,7 +109,6 @@ const { forTitle } = Astro.props;
     copyBtn.forEach((n) => {
       n.addEventListener("click", () => {
         let timeouts: NodeJS.Timeout[] = [];
-        const isForTitle = n.dataset.forTitle === "true";
         const parentSnippet = n.closest(".code-snippet");
         if (!parentSnippet) return;
         const { textContent } = parentSnippet.querySelector(".btn-container")!

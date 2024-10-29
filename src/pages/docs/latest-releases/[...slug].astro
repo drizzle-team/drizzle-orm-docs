@@ -3,11 +3,11 @@ import { getCollection } from "astro:content";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
 export async function getStaticPaths() {
-  const releasesEntries = await getCollection("documentation", ({ id }) => {
-    return id.startsWith("docs/latest-releases/");
+  const releasesEntries = await getCollection("docs", ({ id }) => {
+    return id.startsWith("latest-releases/");
   });
   return releasesEntries.map((entry) => ({
-    params: { slug: entry.slug.split("/").at(-1) },
+    params: { slug: entry.slug.split('/').at(-1) },
     props: { entry },
   }));
 }

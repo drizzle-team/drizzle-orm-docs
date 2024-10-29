@@ -323,14 +323,12 @@ export const sponsorsData: ISponsor[] = [
     darkStyle: {
       padding: "6px",
       background:
-        'url("/svg/edb_logo_light.svg") 0% 0% / contain no-repeat content-box',
-      "background-position": "center",
+        'url("/svg/edb_logo_light.svg") center / contain no-repeat content-box',
     },
     lightStyle: {
       padding: "6px",
       background:
-        'url("/svg/edb_logo_dark.svg") 0% 0% / contain no-repeat content-box',
-      "background-position": "center",
+        'url("/svg/edb_logo_dark.svg") center / contain no-repeat content-box',
     },
   },
   {

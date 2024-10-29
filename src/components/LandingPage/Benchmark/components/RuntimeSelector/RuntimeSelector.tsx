@@ -68,7 +68,7 @@ const RuntimeSelector: FC = () => {
             <option
               key={item.value}
               value={item.value}
-              selected={selectedItems.runtime === item.value}
+              // selected={selectedItems.runtime === item.value}
             >
               {item.name}
             </option>

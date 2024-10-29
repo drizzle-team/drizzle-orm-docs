@@ -4,18 +4,15 @@ import DocsLayout from "@/layouts/DocsLayout.astro";
 import Link from "@components/markdown/Link.astro";
 
 export async function getStaticPaths() {
-  const guides = await getCollection("documentation", ({ id }) => {
-    return id.startsWith("docs/guides");
+  const guides = await getCollection("docs", ({ id }) => {
+    return id.startsWith("guides");
   });
 
   const filteredEntries = guides.filter((entry) => !!entry.data.slug);
-
-  const staticPaths = filteredEntries.map((entry) => ({
+  return filteredEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));
-
-  return staticPaths;
 }
 
 const { entry } = Astro.props;

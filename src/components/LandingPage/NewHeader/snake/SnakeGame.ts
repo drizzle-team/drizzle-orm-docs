@@ -165,16 +165,16 @@ export class SnakeGame {
     document.querySelector("#score")?.classList.remove("hidden");
     document.querySelector(".powered")?.classList.remove("powered-hidden");
 
-    const key = event.keyCode;
+    const key = event.key;
     const lastDirection = this.directionQueue[this.directionQueue.length - 1];
 
-    if (key === 37 && lastDirection !== "RIGHT") {
+    if (key === "ArrowLeft" && lastDirection !== "RIGHT") {
       this.enqueueDirection("LEFT");
-    } else if (key === 38 && lastDirection !== "DOWN") {
+    } else if (key === "ArrowUp" && lastDirection !== "DOWN") {
       this.enqueueDirection("UP");
-    } else if (key === 39 && lastDirection !== "LEFT") {
+    } else if (key === "ArrowRight" && lastDirection !== "LEFT") {
       this.enqueueDirection("RIGHT");
-    } else if (key === 40 && lastDirection !== "UP") {
+    } else if (key === "ArrowDown" && lastDirection !== "UP") {
       this.enqueueDirection("DOWN");
     }
   }

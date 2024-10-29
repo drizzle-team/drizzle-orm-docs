@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 
-const articles = await getCollection("documentation", ({ id }) => {
-  return id.startsWith('docs/latest-releases/');
+const articles = await getCollection("docs", ({ id }) => {
+  return id.startsWith('latest-releases/');
 });
 
 const filteredArticles = articles.sort(
@@ -25,7 +25,7 @@ const options: Intl.DateTimeFormatOptions = {
   {
     filteredArticles.map((update) => (
       <a
-        href={`/${update.slug}`}
+        href={`/docs/${update.slug}`}
         class="latest-updates__card"
       >
         <div class="latest-updates__card_title">{update.data.title}</div>

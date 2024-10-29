@@ -1,12 +1,12 @@
 import styles from "./Benchmark.module.css";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DemoPerformance from "@components/LandingPage/Benchmark/components/DemoPerformance/DemoPerformance.tsx";
 import { type IData } from "@components/LandingPage/Benchmark/types.ts";
 import getDemoBenchmarkData from "@components/LandingPage/Benchmark/utils/getDemoBenchmarkData.ts";
 import { BenchmarkProvider } from "@components/LandingPage/Benchmark/context/useBenchmarkContext.tsx";
 
 const Benchmark = () => {
-  const [isShaking, setIsShaking] = useState<boolean>(false);
+  const [isShaking] = useState<boolean>(false);
   const [drizzleData, setDrizzleData] = useState<IData[] | null>(null);
   const [compareData, setCompareData] = useState<IData[] | null>(null);
 

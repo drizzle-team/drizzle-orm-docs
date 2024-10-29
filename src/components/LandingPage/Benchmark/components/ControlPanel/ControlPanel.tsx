@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, type FC } from "react";
+import { useEffect, useMemo, useState, type FC } from "react";
 
 import styles from "./ControlPanel.module.css";
 import type { IData } from "../../types";

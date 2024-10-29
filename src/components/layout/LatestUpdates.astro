@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 
-const articles = await getCollection("documentation", ({ id }) => {
-  return id.startsWith('docs/latest-releases/');
+const articles = await getCollection("docs", ({ id }) => {
+  return id.startsWith('latest-releases/');
 });
 
 const filteredArticles = articles.sort(

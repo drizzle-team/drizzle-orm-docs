@@ -3,7 +3,7 @@ import {getStartedItems} from "./data";
 import LinkComponent from "./LinkComponent.astro";
 import Tag from "../Tag.astro";
 
-const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
+const svgs = import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
 ---
 
 <div style="margin: 24px 0">
@@ -59,7 +59,7 @@ const svgs = await import.meta.glob<Record<string, any>>('/public/svg/*.svg', { 
   </div>
 </div>
 
-<script define:vars={{getStartedItems}}>
+<script is:inline define:vars={{getStartedItems}}>
   const toggleLinks = (type) => {
     switch (type) {
       case 'new':

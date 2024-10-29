@@ -10,6 +10,7 @@ let slot = await Astro.slots.render('default');
 const parsedHtml = parse(slot);
 
 parsedHtml.childNodes.forEach((tabContent, index) => {
+  // @ts-ignore
   if (index !== 0) tabContent.classList.add('hidden');
 });
 ---

@@ -138,7 +138,6 @@ const { forTitle } = Astro.props;
       "[data-collapse-btn]",
     ) as NodeListOf<HTMLElement>;
     collapseButton.forEach((n) => {
-      const isForTitle = n.dataset.forTitle === "true";
       n.addEventListener("click", () => {
         const parent = n.closest(".code-snippet");
         if (parent) {
@@ -150,7 +149,6 @@ const { forTitle } = Astro.props;
       "[data-expand-button]",
     ) as NodeListOf<HTMLElement>;
     expandButton.forEach((n) => {
-      const isForTitle = n.dataset.forTitle === "true";
       n.addEventListener("click", () => {
         const parent = n.closest(".code-snippet");
         if (parent) {

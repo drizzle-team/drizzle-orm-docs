@@ -1,10 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 
-import guideMap from "@/content/documentation/docs/guides/_map.json";
+import guideMap from "@/content/docs/guides/_map.json";
 
-const guides = await getCollection("documentation", ({ id }) => {
-  return id.startsWith('docs/guides');
+const guides = await getCollection("docs", ({ id }) => {
+  return id.startsWith('guides');
 });
 
 const sortedGuides: typeof guides = [];

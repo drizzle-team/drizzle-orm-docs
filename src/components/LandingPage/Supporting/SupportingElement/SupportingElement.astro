@@ -95,7 +95,7 @@ const darkStylesSVGString = svgCodeDark.replace(/<svg/, `<svg ${getParamsString(
   </div>
 )}
 
-<style is:global define:vars={{widthLight: `${lightStyle.width}px`, widthDark: `${darkStyle.width}px`}}>
+<style is:global define:vars={{widthLight: lightStyle && `${lightStyle.width}px`, widthDark: darkStyle && `${darkStyle.width}px`}}>
   .supporting__icon svg, .supporting__icon img {
     height: 100%;
     width: 100%;
