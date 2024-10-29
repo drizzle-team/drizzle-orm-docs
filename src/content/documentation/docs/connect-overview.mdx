@@ -107,7 +107,7 @@ const db = drizzle({ connection: env.DB });
 And yes, we do support runtime specific drivers like [Bun SQLite](/docs/connect-bun-sqlite) or [Expo SQLite](/docs/connect-expo-sqlite):
 <Section>
 ```ts
-import { drizzle } from "drizzle-orm/bun:sqlite"
+import { drizzle } from "drizzle-orm/bun-sqlite"
 
 const db = drizzle(); // <--- will create an in-memory db
 const db = drizzle("./sqlite.db");
