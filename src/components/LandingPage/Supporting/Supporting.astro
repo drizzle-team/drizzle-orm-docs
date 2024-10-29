@@ -16,7 +16,7 @@ interface Props {
 
 const { title, description, items, rowsNum, data, imageType } = Astro.props;
 
-const svgs = import.meta.glob<Record<string, any>>('/public/svg/*.svg', { as: 'raw' });
+const svgs = import.meta.glob<Record<string, any>>('/public/svg/*.svg', { query: '?raw', import: "default" });
 ---
 <div class="wrap">
     <div class="leftside">

@@ -1030,11 +1030,7 @@
   .code-snippet {
     margin: 6px 0;
     height: auto;
-    max-height: 500vh;
-    transition: max-height 0.3s ease-in-out;
     overflow-y: hidden;
-    .header {
-    }
     pre {
       background-color: #fafafa !important;
       -webkit-font-smoothing: auto;
@@ -1064,7 +1060,7 @@
       }
     }
 
-    .mark {
+    .highlighted {
       box-shadow:
         rgba(0, 0, 0, 0) 0px 0px 0px 0px,
         rgba(0, 0, 0, 0) 0px 0px 0px 0px,
@@ -1090,10 +1086,10 @@
       top: 16px;
     }
 
-  .one-line-btn-container {
+    &.one-line-btn-container .btn-container {
       top: 50%;
       transform: translateY(-50%);
-  }
+    }
 
     .expand-icon {
       display: none;
@@ -1264,5 +1260,80 @@
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
+  }
+</style>
+<!-- COPY BUTTON STYLES -->
+<style lang="scss" is:global>
+  html[class~="dark"] .button-wrap:hover {
+    color: #c4c5c6;
+    border-color: #555;
+  }
+  html[class~="dark"] .button-wrap {
+    border-color: #292929;
+    background-color: #222;
+    color: #909090;
+  }
+
+  .button-wrap:hover {
+    color: #111827;
+  }
+
+  .button-wrap {
+    border: 1px solid rgba(33, 39, 46, 0.12);
+    border-radius: 2px;
+    backdrop-filter: blur(12px);
+    cursor: pointer;
+    text-transform: none;
+    font-size: 100%;
+    outline-offset: 2px;
+    outline: 2px solid transparent;
+    -webkit-transition-property: all;
+    -o-transition-property: all;
+    transition-property: all;
+    -webkit-transition-duration: 0.15s;
+    -o-transition-duration: 0.15s;
+    transition-duration: 0.15s;
+    -webkit-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    -o-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.375rem;
+    background-color: #f5f5f5;
+    color: rgba(75, 85, 99, 0.6);
+    z-index: 99;
+    opacity: 0;
+  }
+
+  .button-wrap--title {
+    position: static;
+    margin: 0;
+    opacity: 1;
+  }
+
+  .button-wrap {
+    .ready {
+      display: block;
+    }
+    .success {
+      display: none;
+    }
+
+    &.copied {
+      opacity: 1 !important;
+    }
+
+    &.hide-svg {
+      .ready {
+        display: none;
+      }
+      .success {
+        display: block;
+      }
+    }
+  }
+
+  .button-wrap svg {
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
   }
 </style>

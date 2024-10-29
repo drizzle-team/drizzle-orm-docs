@@ -5,7 +5,7 @@ import NavigationAstro from "@components/layout/NavigationAstro.astro";
 import Footer from "@components/layout/Footer.astro";
 import BaseHead from "@/ui/BaseHead.astro";
 import Banner from "@components/layout/Banner.astro";
-import DocsSidebar from "../components/layout/DocsSidebar/DocsSidebar.astro";
+import DocsSidebar from "../components/layout/DocsSidebar.astro";
 
 interface Props {
   title: string;
@@ -32,6 +32,39 @@ const { tree } = await getContentTree({});
       <div class="bottom-margin"></div>
       <Footer />
     </main>
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        const copyBtn = document.querySelectorAll(
+          "[data-copy-btn]",
+        ) as NodeListOf<HTMLElement>;
+        copyBtn.forEach((n) => {
+          n.addEventListener("click", () => {
+            let timeouts: NodeJS.Timeout[] = [];
+
+            if (timeouts.length) {
+              timeouts.forEach((id) => {
+                clearTimeout(id);
+              });
+            }
+
+            navigator.clipboard.writeText(n.dataset.code!);
+
+            n.classList.add("copied");
+            n.classList.add("hide-svg");
+            timeouts.push(
+              setTimeout(() => {
+                n.classList.remove("copied");
+              }, 1500),
+            );
+            timeouts.push(
+              setTimeout(() => {
+                n.classList.remove("hide-svg");
+              }, 2000),
+            );
+          });
+        });
+      });
+    </script>
     <style>
         body {
             margin-top: 104px;

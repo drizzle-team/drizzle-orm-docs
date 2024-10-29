@@ -6,7 +6,7 @@ import Banner from "@components/layout/Banner.astro";
 import BaseHead from "@/ui/BaseHead.astro";
 import Header from "../components/layout/Header.astro";
 import RightAside from "../components/layout/RightAside.astro";
-import DocsSidebar from "../components/layout/DocsSidebar/DocsSidebar.astro";
+import DocsSidebar from "../components/layout/DocsSidebar.astro";
 import { getContentTree } from "@/utils";
 import type { IHeading } from "@/types";
 import DialectTabs from "../components/layout/DialectTabs.astro";
@@ -409,6 +409,39 @@ const pageHasDialects = Object.keys(dialects).includes(
         if (el.innerText === "---") {
           el.classList.add("hidden-separator");
         }
+      });
+    </script>
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        const copyBtn = document.querySelectorAll(
+          "[data-copy-btn]",
+        ) as NodeListOf<HTMLElement>;
+        copyBtn.forEach((n) => {
+          n.addEventListener("click", () => {
+            let timeouts: NodeJS.Timeout[] = [];
+
+            if (timeouts.length) {
+              timeouts.forEach((id) => {
+                clearTimeout(id);
+              });
+            }
+
+            navigator.clipboard.writeText(n.dataset.code!);
+
+            n.classList.add("copied");
+            n.classList.add("hide-svg");
+            timeouts.push(
+              setTimeout(() => {
+                n.classList.remove("copied");
+              }, 1500),
+            );
+            timeouts.push(
+              setTimeout(() => {
+                n.classList.remove("hide-svg");
+              }, 2000),
+            );
+          });
+        });
       });
     </script>
     <script>

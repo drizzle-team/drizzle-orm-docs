@@ -1,7 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import { describe, it, expect } from "vitest";
-import addNofollowToExternalLinks from "../utils/addNofollowToExternalLinks";
+import { addNofollowToExternalLinks } from "../src/utils";
 
 describe("addNofollowToExternalLinks", () => {
   it('should add rel="nofollow" and target="_blank" to external links', () => {

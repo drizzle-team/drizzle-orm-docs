@@ -2,14 +2,21 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import AutoImport from "astro-auto-import";
 import react from "@astrojs/react";
-import {
-  astroCodeSnippets,
-  codeSnippetAutoImport,
-} from "./integration/astro-code-snippets";
 import sitemap from "@astrojs/sitemap";
 import yaml from '@rollup/plugin-yaml';
+import {
+  codeSnippetTransformer,
+} from './src/transformers';
+import {
+  transformerNotationDiff,
+  transformerNotationHighlight,
+  transformerNotationWordHighlight,
+  transformerNotationFocus,
+  transformerNotationErrorLevel,
+  transformerMetaHighlight,
+  transformerMetaWordHighlight,
+} from '@shikijs/transformers';
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,7 +25,14 @@ export default defineConfig({
     format: "file", // mandatory due to CloudFlare Pages trailing slash problem
   },
   vite: {
-    plugins: [yaml()]
+    plugins: [yaml()],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    }
   },
   image: {
     domains: ["img.youtube.com"],
@@ -28,10 +42,6 @@ export default defineConfig({
     defaultStrategy: "viewport",
   },
   integrations: [
-    AutoImport({
-      imports: [codeSnippetAutoImport],
-    }),
-    astroCodeSnippets(),
     mdx(),
     react({
       experimentalReactChildren: true,
@@ -56,6 +66,16 @@ export default defineConfig({
     ],
     shikiConfig: {
       theme: "css-variables",
+      transformers: [
+        codeSnippetTransformer(),
+        transformerNotationDiff(),
+        transformerNotationHighlight(),
+        transformerNotationWordHighlight(),
+        transformerNotationFocus(),
+        transformerNotationErrorLevel(),
+        transformerMetaHighlight(),
+        transformerMetaWordHighlight(),
+      ]
     },
   },
   shikiConfig: {

@@ -7,8 +7,8 @@ import BaseHead from "@/ui/BaseHead.astro";
 import Footer from "../components/layout/Footer.astro";
 import type { IHeading } from "@/types";
 import NavigationAstro from "@components/layout/NavigationAstro.astro";
-import DocsSidebar from "../components/layout/DocsSidebar/DocsSidebar.astro";
-import { getContentTree } from '@/utils';
+import DocsSidebar from "../components/layout/DocsSidebar.astro";
+import { getContentTree } from "@/utils";
 
 interface Props {
   customTitle?: string;
@@ -19,7 +19,7 @@ interface Props {
 
 const { customTitle, headings, description, isStudio } = Astro.props;
 const { slug } = Astro.params;
-const { title, tree  } = await getContentTree({
+const { title, tree } = await getContentTree({
   headings,
   slug,
 });
@@ -39,7 +39,9 @@ const { title, tree  } = await getContentTree({
     <div class="aside-wrap">
       <DocsSidebar tree={tree} headings={[]} forLanding={true} />
     </div>
-    <main class:list={["documentation-container scrollbar", isStudio && "relative"]}>
+    <main
+      class:list={["documentation-container scrollbar", isStudio && "relative"]}
+    >
       <div class="documentation-content">
         <slot />
         <EndOfContent />
@@ -52,7 +54,7 @@ const { title, tree  } = await getContentTree({
       }
 
       .aside-wrap {
-          display: none;
+        display: none;
       }
 
       @media screen and (max-width: 1024px) {
@@ -62,15 +64,15 @@ const { title, tree  } = await getContentTree({
       }
 
       @media screen and (max-width: 768px) {
-          .aside-wrap {
-              display: block;
-          }
+        .aside-wrap {
+          display: block;
+        }
       }
     </style>
     <style is:global>
-        body {
-            margin-top: 104px;
-        }
+      body {
+        margin-top: 104px;
+      }
       .navigation_nav_container_blur {
         -webkit-backdrop-filter: blur(12px);
         backdrop-filter: blur(12px);
@@ -137,6 +139,194 @@ const { title, tree  } = await getContentTree({
           targetElement.scrollIntoView();
         }
       }
+    </script>
+    <script is:inline>
+      const changeNpmTab = () => {
+        const packageManagers = ["npm", "yarn", "pnpm", "bun"];
+
+        let packageManagerIndex = packageManagers.indexOf(packageManager);
+
+        const updateUI = (index) => {
+          npmContent.forEach((element) => {
+            Array.from(element.children).forEach((child, i) => {
+              child.classList.toggle("hidden", i !== index);
+            });
+          });
+          npmTabs.forEach((element) => {
+            Array.from(element.children).forEach((child, i) => {
+              child.classList.toggle("npm__tab--active", i === index);
+            });
+          });
+
+          npxSelectResizer.querySelector(".line span").innerText =
+            packageManagers[index];
+
+          npxSelects.forEach((element) => {
+            element.value = index;
+            element.style.width = `${npxSelectResizer.offsetWidth}px`;
+          });
+        };
+
+        const npmContent = document.querySelectorAll(".npm__content");
+        const npmTabs = document.querySelectorAll(".npm__tabs");
+        const npxSelects = document.querySelectorAll(".npx-select");
+        const npxSelectResizer = document.querySelector(".npx-select-resizer");
+
+        npmContent.forEach((content) => {
+          Array.from(content.children).forEach((child, index) => {
+            child.classList.toggle("hidden", index !== packageManagerIndex);
+          });
+        });
+
+        npmTabs.forEach((tab) => {
+          Array.from(tab.children).forEach((child, index) => {
+            child.classList.toggle(
+              "npm__tab--active",
+              index === packageManagerIndex,
+            );
+            child.addEventListener("click", () => {
+              packageManager = packageManagers[index];
+              localStorage.setItem("package-manager", packageManager);
+              updateUI(index);
+            });
+          });
+        });
+
+        npxSelects.forEach((element) => {
+          npxSelectResizer.querySelector(".line span").innerText =
+            packageManagers[packageManagerIndex];
+          element.value = packageManagerIndex;
+          setTimeout(
+            () => (element.style.width = `${npxSelectResizer.offsetWidth}px`),
+            1,
+          );
+          element.addEventListener("change", (e) => {
+            packageManager = packageManagers[Number(e.target.value)];
+            localStorage.setItem("package-manager", packageManager);
+            updateUI(Number(e.target.value));
+          });
+        });
+      };
+      changeNpmTab();
+    </script>
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        const copyBtn = document.querySelectorAll(
+          "[data-copy-btn]",
+        ) as NodeListOf<HTMLElement>;
+        copyBtn.forEach((n) => {
+          n.addEventListener("click", () => {
+            let timeouts: NodeJS.Timeout[] = [];
+
+            if (timeouts.length) {
+              timeouts.forEach((id) => {
+                clearTimeout(id);
+              });
+            }
+
+            navigator.clipboard.writeText(n.dataset.code!);
+
+            n.classList.add("copied");
+            n.classList.add("hide-svg");
+            timeouts.push(
+              setTimeout(() => {
+                n.classList.remove("copied");
+              }, 1500),
+            );
+            timeouts.push(
+              setTimeout(() => {
+                n.classList.remove("hide-svg");
+              }, 2000),
+            );
+          });
+        });
+      });
+    </script>
+    <script>
+      document.addEventListener("astro:after-swap", () => {
+        const npmContent: NodeList = document.querySelectorAll(".npm__content");
+        const npmTabs: NodeList = document.querySelectorAll(".npm__tabs");
+        const npxSelects =
+          document.querySelectorAll<HTMLSelectElement>(".npx-select");
+        const npxSelectResizer = document.querySelector<HTMLDivElement>(
+          ".npx-select-resizer",
+        );
+        const packageManagers: string[] = ["npm", "yarn", "pnpm", "bun"];
+        let packageManager: string =
+          localStorage.getItem("package-manager") || "npm";
+        let packageManagerIndex: number =
+          packageManagers.indexOf(packageManager);
+
+        const updateUI = (index: number): void => {
+          npmContent.forEach((element) => {
+            Array.from((element as HTMLElement).children).forEach(
+              (child, i) => {
+                child.classList.toggle("hidden", i !== index);
+              },
+            );
+          });
+          npmTabs.forEach((element) => {
+            Array.from((element as HTMLElement).children).forEach(
+              (child, i) => {
+                child.classList.toggle("npm__tab--active", i === index);
+              },
+            );
+          });
+          const lineSpan =
+            npxSelectResizer?.querySelector<HTMLSpanElement>(".line span");
+          if (lineSpan) {
+            lineSpan.innerText = packageManagers[index];
+          }
+
+          npxSelects.forEach((element) => {
+            element.value = index.toString();
+            if (npxSelectResizer) {
+              element.style.width = `${npxSelectResizer.offsetWidth}px`;
+            }
+          });
+        };
+
+        npmContent.forEach((content) => {
+          Array.from((content as HTMLElement).children).forEach(
+            (child, index) => {
+              child.classList.toggle("hidden", index !== packageManagerIndex);
+            },
+          );
+        });
+
+        npmTabs.forEach((tab) => {
+          Array.from((tab as HTMLElement).children).forEach((child, index) => {
+            child.classList.toggle(
+              "npm__tab--active",
+              index === packageManagerIndex,
+            );
+            child.addEventListener("click", () => {
+              packageManager = packageManagers[index];
+              localStorage.setItem("package-manager", packageManager);
+              updateUI(index);
+            });
+          });
+        });
+
+        npxSelects.forEach((element) => {
+          const lineSpan =
+            npxSelectResizer?.querySelector<HTMLSpanElement>(".line span");
+          if (lineSpan) {
+            lineSpan.innerText = packageManagers[packageManagerIndex];
+          }
+
+          element.value = packageManagerIndex.toString();
+          if (npxSelectResizer) {
+            element.style.width = `${npxSelectResizer.offsetWidth}px`;
+          }
+          element.addEventListener("change", (e) => {
+            const selectElement = e.target as HTMLSelectElement;
+            packageManager = packageManagers[Number(selectElement.value)];
+            localStorage.setItem("package-manager", packageManager);
+            updateUI(Number(selectElement.value));
+          });
+        });
+      });
     </script>
   </body>
 </html>
