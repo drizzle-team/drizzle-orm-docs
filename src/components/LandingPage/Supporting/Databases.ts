@@ -173,7 +173,7 @@ const Databases: {
     darkStyle: {
       width: 36,
     },
-    sponsorUrl: "https://twitter.com/DrizzleORM",
+    sponsorUrl: "https://driz.link/rickroll",
   },
 };
 
