@@ -1,0 +1,284 @@
+---
+title: Implementing Row Level Security (RLS) with Supabase
+slug: supabase-rls
+---
+
+import Callout from "@components/markdown/Callout.astro";
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@components/markdown/CodeTabs.astro";
+import CodeTab from "@components/markdown/CodeTab.astro";
+import Npm from "@mdx/Npm.astro";
+
+<Prerequisites>
+  - You should have a [Supabase Database](https://supabase.com/) setup or
+  install the latest [Supabase
+  CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)
+  and create a new local project. 
+  - [Row-Level Security (RLS)](/docs/rls)
+</Prerequisites>
+
+<Callout title="important">
+  To enforce security, you should use two Drizzle clients: one with the
+  `postgres` user and one with a low-privilege user with `anon` and
+  `authenticated` roles.
+</Callout>
+
+<Section>
+```sql
+CREATE USER rls_client
+WITH
+LOGIN PASSWORD 'your_strong_password_for_rls_client';
+
+GRANT anon TO rls_client;
+
+GRANT authenticated TO rls_client;
+
+````
+<CodeTabs items={["db.ts", "schema.ts", "utils.ts", ".env"]}>
+  <CodeTab>
+  ```ts copy {17,18,19,20,23,24,25,26,35}
+  import postgres from "postgres";
+  import { DrizzleConfig } from "drizzle-orm";
+  import { createDrizzle } from "drizzle-orm/supabase";
+  import { drizzle } from "drizzle-orm/postgres-js";
+
+  import { createClient } from "@/utils/supabase/server";
+
+  import * as schema from "./schema";
+  import { decode } from "./jwt";
+
+  const config = {
+    casing: "snake_case",
+    schema,
+  } satisfies DrizzleConfig<typeof schema>;
+
+  // ByPass RLS
+  const admin = drizzle({
+    client: postgres(process.env.ADMIN_DATABASE_URL!, { prepare: false }),
+    ...config,
+  });
+
+  // Protected by RLS
+  const client = drizzle({
+    client: postgres(process.env.DATABASE_URL!, { prepare: false }),
+    ...config,
+  });
+
+  export async function createDrizzleSupabaseClient() {
+    // This example uses Next.js capabilities
+    const { data: { session } } = await createClient().auth.getSession();
+
+    // Decode the access token on your own (from Supabase client, custom session cookie, etc.).
+    const token = decode(session?.access_token ?? "");
+
+    return createDrizzle(token, { admin, client });
+  }
+  ```
+  </CodeTab>
+   <CodeTab>
+   ```ts
+  import { sql, exists, and, eq, inArray } from "drizzle-orm";
+  import {
+    bigint,
+    foreignKey,
+    pgTable,
+    text,
+    timestamp,
+    unique,
+    uuid,
+    pgPolicy,
+  } from "drizzle-orm/pg-core";
+  import {
+    authenticatedRole,
+    authUid,
+    authUsers,
+    realtimeMessages,
+    realtimeTopic,
+    supabaseAuthAdminRole,
+  } from "drizzle-orm/supabase";
+
+  /* ------------------------------ public schema; ------------------------------ */
+
+  export const rooms = pgTable(
+    "rooms",
+    {
+      id: bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity(),
+      topic: text().notNull(),
+    },
+    (table) => [
+      unique("rooms_topic_key").on(table.topic),
+      pgPolicy("authenticated can read rooms", {
+        for: "select",
+        to: authenticatedRole,
+        using: sql`true`,
+      }),
+      pgPolicy("authenticated can add rooms", {
+        for: "insert",
+        to: authenticatedRole,
+        withCheck: sql`true`,
+      }),
+    ]
+  );
+
+  export type Room = typeof rooms.$inferSelect;
+
+  export const profiles = pgTable(
+    "profiles",
+    {
+      id: uuid().primaryKey().notNull(),
+      email: text().notNull(),
+    },
+    (table) => [
+      foreignKey({
+        columns: [table.id],
+        foreignColumns: [authUsers.id],
+        name: "profiles_id_fk",
+      }).onDelete("cascade"),
+      pgPolicy("authenticated can view all profiles", {
+        for: "select",
+        to: authenticatedRole,
+        using: sql`true`,
+      }),
+      pgPolicy("supabase_auth_admin can insert profile", {
+        for: "insert",
+        to: supabaseAuthAdminRole,
+        withCheck: sql`true`,
+      }),
+    ]
+  );
+
+  export const roomsUsers = pgTable(
+    "rooms_users",
+    {
+      userId: uuid().notNull(),
+      roomTopic: text().notNull(),
+      joinedAt: timestamp({
+        mode: "string",
+        precision: 3,
+      })
+        .notNull()
+        .defaultNow(),
+    },
+    (table) => [
+      foreignKey({
+        columns: [table.userId],
+        foreignColumns: [authUsers.id],
+        name: "rooms_users_user_id_fk",
+      }),
+      foreignKey({
+        columns: [table.roomTopic],
+        foreignColumns: [rooms.topic],
+        name: "rooms_users_room_topic_fk",
+      }),
+      pgPolicy("authenticated can read rooms_users", {
+        for: "select",
+        to: authenticatedRole,
+        using: sql`true`,
+      }),
+      pgPolicy("authenticated can add rooms_users", {
+        for: "insert",
+        to: authenticatedRole,
+        withCheck: sql`true`,
+      }),
+    ]
+  );
+
+  export const P1 = pgPolicy(
+    "authenticated can read broadcast and presence state",
+    {
+      for: "select",
+      to: authenticatedRole,
+      using: exists(
+        sql`(
+        select 1 from ${roomsUsers} where
+        ${and(
+          eq(roomsUsers.userId, authUid),
+          eq(roomsUsers.roomTopic, realtimeTopic),
+          inArray(realtimeMessages.extension, [
+            "presence",
+            "broadcast",
+          ]).inlineParams()
+        )}
+      )`
+      ),
+    }
+  ).link(realtimeMessages);
+
+  export const P2 = pgPolicy(
+    "authenticated can send broadcast and track presence",
+    {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: exists(
+        sql`(
+        select 1 from ${roomsUsers} where
+        ${and(
+          eq(roomsUsers.userId, authUid),
+          eq(roomsUsers.roomTopic, realtimeTopic),
+          inArray(realtimeMessages.extension, [
+            "presence",
+            "broadcast",
+          ]).inlineParams()
+        )}
+      )`
+      ),
+    }
+  ).link(realtimeMessages);
+
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```ts
+  import { jwtDecode, JwtPayload } from "jwt-decode";
+
+  export function decode(accessToken: string) {
+      try {
+        return jwtDecode<JwtPayload & { role: string }>(accessToken);
+      } catch (error) {
+        return { role: "anon" } as JwtPayload & { role: string };
+      }
+  }
+    ```
+  </CodeTab>
+  <CodeTab>
+    ```txt
+  ADMIN_DATABASE_URL=postgresql://postgres.[YOUR-SUPABASE-PROJECT-ID]:[YOUR-ROOT-PASSWORD]@[YOUR-SUPABASE-REGION].pooler.supabase.com:6543/postgres
+  DATABASE_URL=postgresql://rls_client.[YOUR-SUPABASE-PROJECT-ID]:[YOUR-RLS-CLIENT-PASSWORD]@[YOUR-SUPABASE-REGION].pooler.supabase.com:6543/postgres
+    ```
+  </CodeTab>
+</CodeTabs>
+
+</Section>
+
+<Callout title="important">
+`createDrizzle` exposes the same API as the drizzle-orm client but also includes an `rls` method.
+This method is a `transaction` (from `client`) on which we set the necessary configuration for Supabase to handle RLS.
+
+```sql
+ -- auth.jwt()
+ select set_config('request.jwt.claims', <stringified token>, TRUE);
+ -- auth.uid()
+ select set_config('request.jwt.claim.sub', <token.sub>, TRUE);
+ -- set local role
+ set local role <token.role ?? "anon">;
+```
+</Callout>
+
+Now we can make protected queries.
+
+```ts
+const db = await createDrizzleSupabaseClient();
+
+const [user] = await db.rls((tx) =>
+  tx.select().from(profiles).where(eq(profiles.email, email))
+);
+```
+Or bypass RLS.
+
+```ts
+const db = await createDrizzleSupabaseClient();
+
+const [user] = await db.admin.select().from(profiles).where(eq(profiles.email, email));
+````
