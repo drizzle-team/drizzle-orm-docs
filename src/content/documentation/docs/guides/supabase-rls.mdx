@@ -280,5 +280,5 @@ Or bypass RLS.
 ```ts
 const db = await createDrizzleSupabaseClient();
 
-const [user] = await db.select().from(profiles).where(eq(profiles.email, email));
+const [user] = await db.admin.select().from(profiles).where(eq(profiles.email, email));
 ````
