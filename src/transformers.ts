@@ -18,7 +18,7 @@ export const codeSnippetTransformer = (): ShikiTransformer => {
       );
 
       // Check if the meta contains a filename
-      const matchFilename = meta?.__raw?.match(/filename="([^"]+)"/);
+      const matchFilename = meta?.__raw?.match(/filename=['"]([^'"]+)['"]/);
       const figcaption = h("figcaption", { class: "header" }, []);
       if (matchFilename) {
         // Add a title to the figure element
@@ -26,7 +26,9 @@ export const codeSnippetTransformer = (): ShikiTransformer => {
           figure.properties.className.push("has-title");
         const fileName = matchFilename[0]
           .replace('filename="', "")
-          .replace('"', "");
+          .replace("filename='", "")
+          .replace('"', "")
+          .replace("'", "");
         figcaption.children.push(h("span", { class: "title" }, fileName));
       }
 

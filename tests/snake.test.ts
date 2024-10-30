@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   gameSegments,
   mapSnake,
-} from "../components/LandingPage/NewHeader/snake/mapSnake";
+} from "../components/landing/header/snake/mapSnake";
 
 const gridHeight = 10;
 const gridWidth = 19;

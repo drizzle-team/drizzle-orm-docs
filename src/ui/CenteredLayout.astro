@@ -1,13 +1,13 @@
 ---
-import EndOfContent from "@components/layout/EndOfContent.astro";
-import GlobalStyles from "@components/layout/GlobalStyles.astro";
-import MDXStyles from "@components/layout/MDXStyles.astro";
-import Banner from "@components/layout/Banner.astro";
+import EndOfContent from "./components/EndOfContent.astro";
+import GlobalStyles from "./components/GlobalStyles.astro";
+import MDXStyles from "./components/MDXStyles.astro";
+import Banner from "./components/Banner.astro";
 import BaseHead from "@/ui/BaseHead.astro";
-import Footer from "../components/layout/Footer.astro";
+import Footer from "./components/Footer.astro";
 import type { IHeading } from "@/types";
-import NavigationAstro from "@components/layout/NavigationAstro.astro";
-import DocsSidebar from "../components/layout/DocsSidebar.astro";
+import NavigationAstro from "./components/NavigationAstro.astro";
+import DocsSidebar from "./components/DocsSidebar.astro";
 import { getContentTree } from "@/utils";
 
 interface Props {
@@ -143,7 +143,7 @@ const { title, tree } = await getContentTree({
     <script is:inline>
       const changeNpmTab = () => {
         const packageManagers = ["npm", "yarn", "pnpm", "bun"];
-
+        // @ts-nocheck
         let packageManagerIndex = packageManagers.indexOf(packageManager);
 
         const updateUI = (index) => {
@@ -185,7 +185,9 @@ const { title, tree } = await getContentTree({
               index === packageManagerIndex,
             );
             child.addEventListener("click", () => {
+              // @ts-nocheck
               packageManager = packageManagers[index];
+              // @ts-nocheck
               localStorage.setItem("package-manager", packageManager);
               updateUI(index);
             });
@@ -201,7 +203,9 @@ const { title, tree } = await getContentTree({
             1,
           );
           element.addEventListener("change", (e) => {
+            // @ts-nocheck
             packageManager = packageManagers[Number(e.target.value)];
+            // @ts-nocheck
             localStorage.setItem("package-manager", packageManager);
             updateUI(Number(e.target.value));
           });

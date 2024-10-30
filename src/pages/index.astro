@@ -1,17 +1,16 @@
 ---
 import Layout from "@/ui/Layout.astro";
-import Supporting from "@/components/LandingPage/Supporting/Supporting.astro";
-import Runtimes from "@/components/LandingPage/Supporting/Runtimes";
-import Databases from "@/components/LandingPage/Supporting/Databases";
-import DrizzleStudio from "@/components/LandingPage/DrizzleStudio/DrizzleStudio.astro";
-import Pricing from "@/components/LandingPage/Pricing/Pricing.astro";
-import Twits from "@/components/LandingPage/Twits/Twits.astro";
-import SponsorsLine from "@/components/LandingPage/SponsorsLine/SponsorsLine.astro";
-import Benchmark from "@/components/LandingPage/Benchmark/Benchmark";
-import NewHeader from "@/components/LandingPage/NewHeader/NewHeader.astro";
-import Developers from "@/components/LandingPage/Developers/Developers.astro";
+import Supporting from "@components/landing/Supporting.astro";
+import { runtimes, databases } from "@/data/databases-and-runtimes";
+import DrizzleStudio from "@components/landing/DrizzleStudio.astro";
+import Pricing from "@components/landing/Pricing.astro";
+import Tweets from "@components/landing/Tweets.astro";
+import SponsorsLine from "@components/landing/SponsorsLine.astro";
+import Benchmark from "@components/landing/benchmark/Benchmark";
+import Header from "@components/landing/Header.astro";
+import Developers from "@components/landing/Developers.astro";
 
-const runtimes: string[] = [
+const runtimeNames: string[] = [
   "Cloudflare Workers",
   "Supabase functions",
   "Vercel functions",
@@ -24,7 +23,7 @@ const runtimes: string[] = [
   "React Native",
   "Browser",
 ];
-const databases: string[] = [
+const databaseNames: string[] = [
   "EdgeDB",
   "PlanetScale",
   "Neon",
@@ -45,7 +44,7 @@ const databases: string[] = [
 
 <Layout title="Drizzle ORM - next gen TypeScript ORM.">
   <div class="wrap">
-    <NewHeader />
+    <Header />
     <Developers />
     <Benchmark client:load />
     <Supporting
@@ -53,22 +52,22 @@ const databases: string[] = [
       imageType="liveontheedge"
       title="Live on the edge"
       description="We support every major serverful and serverless runtime"
-      items={runtimes}
-      data={Runtimes}
+      items={runtimeNames}
+      data={runtimes}
     />
     <Supporting
       rowsNum={3}
       imageType="connecteverywhere"
       title="Connect to any database"
       description="We support all platform-specific, tcp, http and websocket based drivers"
-      items={databases}
-      data={Databases}
+      items={databaseNames}
+      data={databases}
     />
     <DrizzleStudio />
     <SponsorsLine />
     <div id="pricing"></div>
     <Pricing />
-    <Twits />
+    <Tweets />
   </div>
 
   <style>

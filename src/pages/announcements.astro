@@ -3,7 +3,7 @@ import Layout from "@/ui/Layout.astro";
 import { Image } from "astro:assets";
 import LogoImage from "@/assets/images/announcements/logo.jpg";
 import LogoDarkImage from "@/assets/images/announcements/logo-dark.jpg";
-const posts = await Astro.glob("../data/announcements/*.md");
+const posts = await Astro.glob("../content/announcements/*.md");
 
 const getPostDate = (date: string): string => {
   const timeAgo = new Date().getTime() - new Date(date).getTime();
