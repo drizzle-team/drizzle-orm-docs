@@ -110,7 +110,7 @@ export const policy = pgPolicy("authenticated role insert policy", {
 
 If you are using drizzle-kit to manage your schema and roles, there may be situations where you want to refer to roles that are not defined in your Drizzle schema. In such cases, you may want drizzle-kit to skip managing these roles without having to define each role in your drizzle schema and marking it with `.existing()`.
 
-In these cases, you can use `entities.roles` in `drizzle.config.ts`. For a complete reference, refer to the the [`drizzle.config.ts`]() documentation.
+In these cases, you can use `entities.roles` in `drizzle.config.ts`. For a complete reference, refer to the the [`drizzle.config.ts`](docs/drizzle-config-file) documentation.
 
 By default, `drizzle-kit` does not manage roles for you, so you will need to enable this feature in `drizzle.config.ts`.
 
@@ -217,6 +217,28 @@ export default defineConfig({
 });
 ```
 </Callout>
+
+## RLS on views
+
+With Drizzle, you can also specify RLS policies on views. For this, you need to use `security_invoker` in the view's WITH options. Here is a small example:
+
+```ts {5}
+...
+
+export const roomsUsersProfiles = pgView("rooms_users_profiles")
+  .with({
+    securityInvoker: true,
+  })
+  .as((qb) =>
+    qb
+      .select({
+        ...getTableColumns(roomsUsers),
+        email: profiles.email,
+      })
+      .from(roomsUsers)
+      .innerJoin(profiles, eq(roomsUsers.userId, profiles.id))
+  );
+```
 
 ## Using with Neon
 
@@ -407,4 +429,76 @@ export const policy = pgPolicy("authenticated role insert policy", {
   to: authenticatedRole,
   using: sql``,
 }).link(realtimeMessages);
+```
+
+We also have a great example showcasing how to use Drizzle RLS with Supabase and how to make actual queries with it. 
+It also includes a great wrapper, `createDrizzle`, that can handle all the transactional work with Supabase for you. 
+In upcoming releases, it will be moved to drizzle-orm/supabase, allowing you to use it natively
+
+Please check [Drizzle SupaSecureSlack repo](https://github.com/rphlmr/drizzle-supabase-rls)
+
+Here is an example of an implementation from this repository
+```ts
+type SupabaseToken = {
+  iss?: string;
+  sub?: string;
+  aud?: string[] | string;
+  exp?: number;
+  nbf?: number;
+  iat?: number;
+  jti?: string;
+  role?: string;
+};
+
+export function createDrizzle(token: SupabaseToken, { admin, client }: { admin: PgDatabase<any>; client: PgDatabase<any> }) {
+  return {
+    admin,
+    rls: (async (transaction, ...rest) => {
+      return await client.transaction(async (tx) => {
+        // Supabase exposes auth.uid() and auth.jwt()
+        // https://supabase.com/docs/guides/database/postgres/row-level-security#helper-functions
+        try {
+          await tx.execute(sql`
+          -- auth.jwt()
+          select set_config('request.jwt.claims', '${sql.raw(
+            JSON.stringify(token)
+          )}', TRUE);
+          -- auth.uid()
+          select set_config('request.jwt.claim.sub', '${sql.raw(
+            token.sub ?? ""
+          )}', TRUE);												
+          -- set local role
+          set local role ${sql.raw(token.role ?? "anon")};
+          `);
+          return await transaction(tx);
+        } finally {
+          await tx.execute(sql`
+            -- reset
+            select set_config('request.jwt.claims', NULL, TRUE);
+            select set_config('request.jwt.claim.sub', NULL, TRUE);
+            reset role;
+            `);
+        }
+      }, ...rest);
+    }) as typeof client.transaction,
+  };
+}
+```
+
+And it can be used as 
+
+```ts
+// https://github.com/orgs/supabase/discussions/23224
+// Should be secure because we use the access token that is signed, and not the data read directly from the storage
+export async function createDrizzleSupabaseClient() {
+  const {
+    data: { session },
+  } = await createClient().auth.getSession();
+  return createDrizzle(decode(session?.access_token ?? ""), { admin, client });
+}
+
+async function getRooms() {
+  const db = await createDrizzleSupabaseClient();
+  return db.rls((tx) => tx.select().from(rooms));
+}
 ```
