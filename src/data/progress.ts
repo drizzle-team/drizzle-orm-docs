@@ -1,1 +1,1 @@
-export default 70;
+export default 75;
