@@ -162,6 +162,19 @@ export const databases: {
     },
     sponsorUrl: "https://driz.link/sqlitecloud",
   },
+  "Prisma Postgres": {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/prisma.svg",
+      darkThemeSrc: "/public/svg/prisma-dark.svg",
+    },
+    lightStyle: {
+      width: 36,
+    },
+    darkStyle: {
+      width: 36,
+    },
+    sponsorUrl: "https://driz.link/rickroll",
+  },
 };
 
 export const runtimes: {
