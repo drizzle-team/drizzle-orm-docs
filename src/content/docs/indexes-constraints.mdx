@@ -1,0 +1,991 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# Indexes & Constraints
+
+## Constraints
+
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
+
+### Default
+
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { integer, uuid, pgTable } from "drizzle-orm/pg-core";
+
+    const table = pgTable('table', {
+      integer1: integer('integer1').default(42),
+      integer2: integer('integer2').default(sql`'42'::integer`),
+      uuid1: uuid('uuid1').defaultRandom(),
+      uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
+    });
+    ```
+
+    ```sql
+    CREATE TABLE IF NOT EXISTS "table" (
+      "integer1" integer DEFAULT 42,
+      "integer2" integer DEFAULT '42'::integer,
+      "uuid1" uuid DEFAULT gen_random_uuid(),
+      "uuid2" uuid DEFAULT gen_random_uuid()
+    );
+    ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { int, time, mysqlTable } from "drizzle-orm/mysql-core";
+    
+    const table = mysqlTable("table", {
+      int: int("int").default(42),
+      time: time("time").default(sql`cast("14:06:10" AS TIME)`),
+    });
+    ```
+    ```sql
+    CREATE TABLE `table` (
+      `int` int DEFAULT 42,
+      `time` time DEFAULT cast("14:06:10" AS TIME)
+    );
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    const table = sqliteTable('table', {
+      int1: integer('int1').default(42),
+      int2: integer('int2').default(sql`(abs(42))`)
+    });
+
+    ```
+    ```sql
+    CREATE TABLE `table` (
+      `int1` integer DEFAULT 42
+      `int2` integer DEFAULT (abs(42))
+    );
+    ```
+    </Section>
+
+  </Tab>
+</Tabs>
+
+### Not null
+
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
+This enforces a field to always contain a value, which means that you cannot insert a new record,
+or update a record without adding a value to this field.
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { integer, pgTable } from "drizzle-orm/pg-core";
+
+      const table = pgTable('table', {
+        integer: integer('integer').notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE IF NOT EXISTS "table" (
+        "integer" integer NOT NULL,
+      );
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+      const table = mysqlTable('table', {
+        int: int('int').notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE `table` (
+        `int` int NOT NULL,
+      );
+      ```
+    </Section>
+
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy
+      const table = sqliteTable('table', { 
+        numInt: integer('numInt').notNull() 
+      });
+      ```
+
+      ```sql
+      CREATE TABLE table (
+        `numInt` integer NOT NULL
+      );
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
+
+### Unique
+
+The `UNIQUE` constraint ensures that all values in a column are different.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
+A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { integer, text, unique, pgTable } from "drizzle-orm/pg-core";
+
+      export const user = pgTable('user', {
+        id: integer('id').unique(),
+      });
+
+      export const table = pgTable('table', {
+        id: integer('id').unique('custom_name'),
+      });
+
+      export const composite = pgTable('composite_example', {
+        id: integer('id'),
+        name: text('name'),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+
+      // In Postgres 15.0+ NULLS NOT DISTINCT is available
+      // This example demonstrates both available usages
+      export const userNulls = pgTable('user_nulls_example', {
+        id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
+      }, (t) => ({
+        unq: unique().on(t.id).nullsNotDistinct()
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE IF NOT EXISTS "composite_example" (
+	    "id" integer,
+        "name" text,
+        CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
+        CONSTRAINT "custom_name" UNIQUE("id","name")
+      );
+
+      CREATE TABLE IF NOT EXISTS "table" (
+      	"id" integer,
+      	CONSTRAINT "custom_name" UNIQUE("id")
+      );
+
+      CREATE TABLE IF NOT EXISTS "user" (
+      	"id" integer,
+      	CONSTRAINT "user_id_unique" UNIQUE("id")
+      );
+
+      CREATE TABLE IF NOT EXISTS "user_nulls_example" (
+	    "id" integer,
+	    CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
+	    CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
+      );
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, varchar, unique, mysqlTable } from "drizzle-orm/mysql-core";
+
+      export const user = mysqlTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = mysqlTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = mysqlTable('composite_example', {
+        id: int('id'),
+        name: varchar('name', { length: 256 }),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+      	`id` int,
+      	CONSTRAINT `user_id_unique` UNIQUE(`id`)
+      );
+
+      CREATE TABLE `table` (
+      	`id` int,
+      	CONSTRAINT `custom_name` UNIQUE(`id`)
+      );
+
+      CREATE TABLE `composite_example` (
+	    `id` int,
+	    `name` varchar(256),
+	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+      );
+      ```
+    </Section>
+
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy
+      import { int, text, unique, sqliteTable } from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = sqliteTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = sqliteTable('composite_example', {
+        id: int('id'),
+        name: text('name'),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+	      `id` integer
+      );
+
+      CREATE TABLE `table` (
+      	`id` integer
+      );
+
+      CREATE TABLE `composite_example` (
+      	`id` integer,
+      	`name` text
+      );
+
+      CREATE UNIQUE INDEX `composite_example_id_name_unique` ON `composite_example` (`id`,`name`);
+      CREATE UNIQUE INDEX `custom_name` ON `composite_example` (`id`,`name`);
+      CREATE UNIQUE INDEX `custom_name` ON `table` (`id`);
+      CREATE UNIQUE INDEX `user_id_unique` ON `user` (`id`);
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
+
+### Check
+
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
+If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+
+If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
+
+      export const users = pgTable(
+        "users",
+        {
+          id: uuid().defaultRandom().primaryKey(),
+          username: text().notNull(),
+          age: integer(),
+        },
+        (table) => ({
+          checkConstraint: check("age_check1", sql`${table.age} > 21`),
+        })
+      );
+      ```
+      ```sql
+      CREATE TABLE IF NOT EXISTS "users" (
+	      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	      "username" text NOT NULL,
+	      "age" integer,
+	      CONSTRAINT "age_check1" CHECK ("users"."age" > 21)
+      );
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, mysqlTable, text } from "drizzle-orm/mysql-core";
+
+      export const users = mysqlTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: int(),
+        },
+        (table) => ({
+          checkConstraint: check("age_check1", sql`${table.age} > 21`),
+        })
+      );
+      ```
+      ```sql
+      CREATE TABLE `users` (
+	      `id` int NOT NULL,
+	      `username` text NOT NULL,
+	      `age` int,
+	      CONSTRAINT `users_id` PRIMARY KEY(`id`),
+	      CONSTRAINT `age_check1` CHECK(`users`.`age` > 21)
+      );
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+      export const users = sqliteTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: int(),
+        },
+        (table) => ({
+          checkConstraint: check("age_check1", sql`${table.age} > 21`),
+        })
+      );
+      ```
+      ```sql
+      CREATE TABLE `users` (
+	      `id` integer PRIMARY KEY NOT NULL,
+	      `username` text NOT NULL,
+	      `age` integer,
+	      CONSTRAINT "age_check1" CHECK("users"."age" > 21)
+      );
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
+
+### Primary Key
+
+The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
+Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
+
+A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy
+      import { serial, text, pgTable } from "drizzle-orm/pg-core";
+
+      const user = pgTable('user', {
+        id: serial('id').primaryKey(),
+      });
+
+      const table = pgTable('table', {
+        id: text('cuid').primaryKey(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE IF NOT EXISTS "user" (
+        "id" serial PRIMARY KEY,
+      );
+
+      CREATE TABLE IF NOT EXISTS "table" (
+        "cuid" text PRIMARY KEY,
+      );
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
+
+      export const user = mysqlTable("user", {
+        id: int("id").autoincrement().primaryKey(),
+      })
+
+      export const table = mysqlTable("table", {
+        cuid: text("cuid").primaryKey(),
+      })
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+        `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL
+      );
+
+      CREATE TABLE `table` (
+        `cuid` text PRIMARY KEY NOT NULL
+      );
+      ```
+    </Section>
+
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy
+      import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable("user", {
+        id: integer("id").primaryKey(),
+      })
+
+      export const pet = sqliteTable("pet", {
+        id: integer("id").primaryKey(),
+      })
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+          `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+      );
+
+      CREATE TABLE `pet` (
+          `id` integer PRIMARY KEY AUTOINCREMENT
+      )
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
+
+### Composite Primary Key
+
+Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
+
+Drizzle ORM provides a standalone `primaryKey` operator for that:
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+      ```typescript copy {18, 19}
+      import { serial, text, integer, primaryKey, pgTable } from "drizzle-orm/pg-core";
+
+      export const user = pgTable("user", {
+        id: serial("id").primaryKey(),
+        name: text("name"),
+      });
+
+      export const book = pgTable("book", {
+        id: serial("id").primaryKey(),
+        name: text("name"),
+      });
+
+      export const booksToAuthors = pgTable("books_to_authors", {
+        authorId: integer("author_id"),
+        bookId: integer("book_id"),
+      }, (table) => {
+        return {
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+        };
+      });
+      ```
+
+      ```sql {6, 9}
+      ...
+
+      CREATE TABLE IF NOT EXISTS "books_to_authors" (
+        "author_id" integer,
+        "book_id" integer,
+        PRIMARY KEY("book_id","author_id"),
+      );
+
+      ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");
+      ```
+    </Section>
+
+  </Tab> 
+  <Tab>
+    <Section>
+      ```typescript {18, 19}
+      import { int, text, primaryKey, mysqlTable } from "drizzle-orm/mysql-core";
+
+      export const user = mysqlTable("user", {
+        id: int("id").autoincrement().primaryKey(),
+        name: text("name"),
+      });
+
+      export const book = mysqlTable("book", {
+        id: int("id").autoincrement().primaryKey(),
+        name: text("name"),
+      });
+
+      export const booksToAuthors = mysqlTable("books_to_authors", {
+        authorId: int("author_id"),
+        bookId: int("book_id"),
+      }, (table) => {
+        return {
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+        };
+      });
+      ```
+
+      ```sql {6}
+      ...
+
+      CREATE TABLE `books_to_authors` (
+        `author_id` int,
+        `book_id` int,
+        PRIMARY KEY(`book_id`,`author_id`)
+      );
+      ```
+    </Section>
+
+  </Tab>
+  <Tab>
+   <Section>
+      ```typescript copy {18, 19}
+      import { integer, text, primaryKey, sqliteTable} from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable("user", {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        name: text("name"),
+      });
+
+      export const book = sqliteTable("book", {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        name: text("name"),
+      });
+
+      export const bookToAuthor = sqliteTable("book_to_author", {
+        authorId: integer("author_id"),
+        bookId: integer("book_id"),
+      }, (table) => {
+        return {
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+        };
+      });
+      ```
+      ```sql {6}
+      ...
+
+      CREATE TABLE `book_to_author` (
+        `author_id` integer,
+        `book_id` integer,
+        PRIMARY KEY(`book_id`, `author_id`)
+      );
+      ```
+    </Section>
+
+  </Tab>
+</Tabs>
+
+### Foreign key
+
+The `FOREIGN KEY` constraint is used to prevent actions that would destroy links between tables.
+A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
+The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
+
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    ```typescript copy {11}
+    import { serial, text, integer, pgTable } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      id: serial("id"),
+      name: text("name"),
+    });
+
+    export const book = pgTable("book", {
+      id: serial("id"),
+      name: text("name"),
+      authorId: integer("author_id").references(() => user.id)
+    });
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript {11}
+    import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
+
+    export const user = mysqlTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+    });
+
+    export const book = mysqlTable("book", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      authorId: int("author_id").references(() => user.id)
+    });
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript {11}
+    import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+    });
+
+    export const book = sqliteTable("book", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+      authorId: integer("author_id").references(() => user.id)
+    });
+    ```
+
+  </Tab>
+</Tabs>
+
+If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
+set return type for reference callback or use a standalone `foreignKey` operator.
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    ```typescript copy {6,16-19}
+    import { serial, text, integer, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      id: serial("id"),
+      name: text("name"),
+      parentId: integer("parent_id").references((): AnyPgColumn => user.id)
+    });
+
+    // or
+    export const user = pgTable("user", {
+      id: serial("id"),
+      name: text("name"),
+      parentId: integer("parent_id"),
+    }, (table) => {
+      return {
+        parentReference: foreignKey({
+          columns: [table.parentId],
+          foreignColumns: [table.id],
+          name: "custom_fk"
+        }),
+      };
+    });
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript {6,16-19}
+    import { int, text, foreignKey, AnyMySqlColumn, mysqlTable } from "drizzle-orm/mysql-core";
+
+    export const user = mysqlTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      parentId: int("parent_id").references((): AnyMySqlColumn => user.id),
+    });
+
+    // or
+    export const user = mysqlTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      parentId: int("parent_id")
+    }, (table) => {
+      return {
+        parentReference: foreignKey({
+          columns: [table.parentId],
+          foreignColumns: [table.id],
+          name: "custom_fk"
+        }),
+      };
+    });
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript {6,16-19}
+    import { integer, text, foreignKey, sqliteTable, AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+      parentId: integer("parent_id").references((): AnySQLiteColumn => user.id)
+    });
+
+    //or
+    export const user = sqliteTable("user", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+      parentId: integer("parent_id"),
+    }, (table) => {
+      return {
+        parentReference: foreignKey({
+          columns: [table.parentId],
+          foreignColumns: [table.id],
+          name: "custom_fk"
+        }),
+      };
+    });
+    ```
+
+  </Tab>
+</Tabs>
+To declare multicolumn foreign keys you can use a dedicated `foreignKey` operator:
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    ```typescript copy {4-5,14-15,18-21}
+    import { serial, text, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => {
+      return {
+        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
+      };
+    });
+
+    export const profile = pgTable("profile", {
+      id: serial("id").primaryKey(),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => {
+      return {
+        userReference: foreignKey({
+          columns: [table.userFirstName, table.userLastName],
+          foreignColumns: [user.firstName, user.lastName]
+          name: "custom_fk"
+        })
+      }
+    })
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript copy {4-5,14-15,18-21}
+    import { int, text, primaryKey, foreignKey, mysqlTable, AnyMySqlColumn } from "drizzle-orm/mysql-core";
+
+    export const user = mysqlTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => {
+      return {
+        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
+      };
+    });
+
+    export const profile = mysqlTable("profile", {
+      id: int("id").autoincrement().primaryKey(),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => {
+      return {
+        userReference: foreignKey({
+          columns: [table.userFirstName, table.userLastName],
+          foreignColumns: [user.firstName, user.lastName],
+          name: "custom_name"
+        })
+      }
+    });
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript {4-5,14-15,18-21}
+    import { integer, text, primaryKey, foreignKey, sqliteTable, AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => {
+      return {
+        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
+      };
+    });
+
+    export const profile = sqliteTable("profile", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => {
+      return {
+        userReference: foreignKey({
+          columns: [table.userFirstName, table.userLastName],
+          foreignColumns: [user.firstName, user.lastName],
+          name: "custom_name"
+        })
+      }
+    });
+    ```
+
+  </Tab>
+</Tabs>
+
+## Indexes
+
+Drizzle ORM provides API for both `index` and `unique index` declaration:
+
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+  <Tab>
+    <Section>
+    ```typescript copy {9-10}
+    import { serial, text, index, uniqueIndex, pgTable } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      id: serial("id").primaryKey(),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => {
+      return {
+        nameIdx: index("name_idx").on(table.name),
+        emailIdx: uniqueIndex("email_idx").on(table.email),
+      };
+    });
+    ```
+    ```sql {5-6}
+    CREATE TABLE "user" (
+      ...
+    );
+
+    CREATE INDEX "name_idx" ON "user" ("name");
+    CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
+    ```
+    </Section>
+    <Callout type="warning" emoji="⚠️">
+      For versions before `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` `drizzle-kit` only supports index `name` and `on()` param.
+
+      After versions `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` all fields are supported in drizzle-kit!
+    </Callout>
+
+
+    Starting from 0.31.0 a new index api for Drizzle ORM provides set of all params for index creation:
+
+```ts
+// First example, with `.on()`
+index('name')
+  .on(table.column1.asc(), table.column2.nullsFirst(), ...) or .onOnly(table.column1.desc().nullsLast(), table.column2, ...)
+  .concurrently()
+  .where(sql``)
+  .with({ fillfactor: '70' })
+
+// Second Example, with `.using()`
+index('name')
+  .using('btree', table.column1.asc(), sql`lower(${table.column2})`, table.column1.op('text_ops'))
+  .where(sql``) // sql expression
+  .with({ fillfactor: '70' })
+```
+
+  </Tab>
+  <Tab>
+    <Section>
+    ```typescript copy {9-10}
+    import { int, text, index, uniqueIndex, mysqlTable } from "drizzle-orm/mysql-core";
+
+    export const user = mysqlTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => {
+      return {
+        nameIdx: index("name_idx").on(table.name),
+        emailIdx: uniqueIndex("email_idx").on(table.email),
+      };
+    });
+    ```
+    ```sql {5-6}
+    CREATE TABLE `user` (
+      ...
+    );
+
+    CREATE INDEX `name_idx` ON `user` (`name`);
+    CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
+    ```
+    </Section>
+    <Callout type="warning" emoji="⚠️">
+      As of now `drizzle-kit` only supports index `name` and `on()` param.
+    </Callout>
+
+     Drizzle ORM provides set of all params for index creation:
+
+    ```typescript
+    // Index declaration reference
+    index("name")
+      .on(table.name)
+      .algorythm("default") // "default" | "copy" | "inplace"
+      .using("btree") // "btree" | "hash"
+      .lock("default") // "none" | "default" | "exclusive" | "shared"
+    ```
+  </Tab>
+  <Tab>
+    <Section>
+    ```typescript {9-10}
+    import { integer, text, index, uniqueIndex, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => {
+      return {
+        nameIdx: index("name_idx").on(table.name),
+        emailIdx: uniqueIndex("email_idx").on(table.email),
+      };
+    });
+    ```
+    ```sql {5-6}
+    CREATE TABLE `user` (
+      ...
+    );
+
+    CREATE INDEX `name_idx` ON `user` (`name`);
+    CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
+    ```
+    </Section>
+
+     Drizzle ORM provides set of all params for index creation:
+     
+    ```typescript
+    // Index declaration reference
+    index("name")
+      .on(table.name)
+      .where(sql`...`)
+    ```
+  </Tab>
+</Tabs>

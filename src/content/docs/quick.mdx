@@ -1,0 +1,91 @@
+import Npm from "@mdx/Npm.astro";
+
+# Quick start
+Lets build a quick start app with `PostgreSQL` + `postgresjs` and run our first migration.
+
+The first thing we need to do is to install `drizzle-orm` and `drizzle-kit`:
+
+<Npm>
+drizzle-orm postgres
+-D drizzle-kit
+</Npm>
+
+Lets declare our `schema.ts`:
+
+```plaintext {4}
+📦 <project root>
+ ├ ...
+ ├ 📂 src
+ │ └ 📜 schema.ts
+ └ 📜 package.json
+```
+```ts copy filename="schema.ts"
+import { serial, text, timestamp, pgTable } from "drizzle-orm/pg-core";
+
+export const user = pgTable("user", {
+  id: serial("id"),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  role: text("role").$type<"admin" | "customer">(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
+```
+
+Now lets add drizzle configuration file:
+```plaintext {4}
+📦 <project root>
+ ├ ...
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+```ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/schema.ts",
+  out: "./drizzle",
+});
+```
+
+Add `generate` and `migrate` commands to `package.json` and run our first migrations generation:
+
+```json filename="package.json" {5,6}
+{
+  "name": "first time?",
+  "version": "0.0.1",
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
+  }, 
+}
+```
+```shell filename="terminal"
+$ npm run generate
+...
+
+[✓] Your SQL migration file ➜ drizzle/0000_pale_mister_fear.sql 🚀
+```
+
+Done! We now have our first SQL migration file 🥳
+```plaintext {4}
+📦 <project root>
+ ├ 📂 drizzle
+ │ ├ 📂 _meta
+ │ └ 📜 0000_pale_mister_fear.sql
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+Now lets run our first migration to the database:
+
+```shell filename="terminal"
+$ npm run migrate
+```
+
+That's it, folks!  
+
+**My personal congratulations 🎉**

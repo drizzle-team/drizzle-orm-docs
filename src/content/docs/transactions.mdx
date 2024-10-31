@@ -1,0 +1,153 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+
+# Transactions
+
+SQL transaction is a grouping of one or more SQL statements that interact with a database.
+A transaction in its entirety can commit to a database as a single logical unit
+or rollback (become undone) as a single logical unit.
+
+Drizzle ORM provides APIs to run SQL statements in transactions:
+
+```ts copy
+const db = drizzle(...)
+
+await db.transaction(async (tx) => {
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, 'Dan'));
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
+});
+```
+
+Drizzle ORM supports `savepoints` with nested transactions API:
+
+```ts copy {7-9}
+const db = drizzle(...)
+
+await db.transaction(async (tx) => {
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, 'Dan'));
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
+
+  await tx.transaction(async (tx2) => {
+    await tx2.update(users).set({ name: "Mr. Dan" }).where(eq(users.name, "Dan"));
+  });
+});
+```
+
+You can embed business logic to the transaction and rollback whenever needed:
+
+```ts copy {7}
+const db = drizzle(...)
+
+await db.transaction(async (tx) => {
+  const [account] = await tx.select({ balance: accounts.balance }).from(accounts).where(eq(users.name, 'Dan'));
+  if (account.balance < 100) {
+    // This throws an exception that rollbacks the transaction.
+    tx.rollback()
+  }
+
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, 'Dan'));
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
+});
+```
+
+You can return values from the transaction:
+
+```ts copy {8}
+const db = drizzle(...)
+
+const newBalance: number = await db.transaction(async (tx) => {
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, 'Dan'));
+  await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
+
+  const [account] = await tx.select({ balance: accounts.balance }).from(accounts).where(eq(users.name, 'Dan'));
+  return account.balance;
+});
+```
+
+You can use transactions with **[relational queries](/docs/rqb)**:
+
+```ts
+const db = drizzle({ schema })
+
+await db.transaction(async (tx) => {
+  await tx.query.users.findMany({
+    with: {
+      accounts: true
+    }
+  });
+});
+```
+
+
+
+
+
+We provide dialect-specific transaction configuration APIs:
+
+<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tab>
+```ts copy {6-8}
+await db.transaction(
+  async (tx) => {
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, "Dan"));
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, "Andrew"));
+  }, {
+    isolationLevel: "read committed",
+    accessMode: "read write",
+    deferrable: true,
+  }
+);
+
+interface PgTransactionConfig {
+  isolationLevel?:
+    | "read uncommitted"
+    | "read committed"
+    | "repeatable read"
+    | "serializable";
+  accessMode?: "read only" | "read write";
+  deferrable?: boolean;
+}
+```
+</Tab>
+<Tab>
+```ts {6-8}
+await db.transaction(
+  async (tx) => {
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, "Dan"));
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, "Andrew"));
+  }, {
+    isolationLevel: "read committed",
+    accessMode: "read write",
+    withConsistentSnapshot: true,
+  }
+);
+
+interface MySqlTransactionConfig {
+  isolationLevel?:
+    | "read uncommitted"
+    | "read committed"
+    | "repeatable read"
+    | "serializable";
+  accessMode?: "read only" | "read write";
+  withConsistentSnapshot?: boolean;
+}
+```
+</Tab>
+<Tab>
+```ts {6}
+await db.transaction(
+  async (tx) => {
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, "Dan"));
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, "Andrew"));
+  }, {
+    behavior: "deferred",
+  }
+);
+
+interface SQLiteTransactionConfig {
+    behavior?: 'deferred' | 'immediate' | 'exclusive';
+}
+```
+</Tab>
+</Tabs>
+

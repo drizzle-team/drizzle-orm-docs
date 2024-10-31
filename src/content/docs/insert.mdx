@@ -1,0 +1,218 @@
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
+import Section from '@mdx/Section.astro';
+import Callout from '@mdx/Callout.astro';
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+
+# SQL Insert
+Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
+
+## Insert one row
+Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
+
+<Section>
+```typescript copy 
+await db.insert(users).values({ name: 'Andrew' });
+```
+```sql
+insert into "users" ("name") values ("Andrew");
+```
+</Section>
+
+If you need insert type for a particular table you can use `typeof usersTable.$inferInsert` syntax. 
+```typescript copy 
+type NewUser = typeof users.$inferInsert;
+
+const insertUser = async (user: NewUser) => {
+  return db.insert(users).values(user);
+}
+
+const newUser: NewUser = { name: "Alef" };
+await insertUser(newUser);
+```
+
+## Insert returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+You can insert a row and get it back in PostgreSQL and SQLite like such:
+```typescript copy
+await db.insert(users).values({ name: "Dan" }).returning();
+
+// partial return
+await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
+```
+
+## Insert $returningId
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true }} />
+
+MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. There is only one way to do it for `primary keys` with `autoincrement` (or `serial`) types, where you can access `insertId` and `affectedRows` fields. We've prepared an automatic way for you to handle such cases with Drizzle and automatically receive all inserted IDs as separate objects
+
+```ts
+import { boolean, int, text, mysqlTable } from 'drizzle-orm/mysql-core';
+
+const usersTable = mysqlTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+  verified: boolean('verified').notNull().default(false),
+});
+
+
+const result = await db.insert(usersTable).values([{ name: 'John' }, { name: 'John1' }]).$returningId();
+//    ^? { id: number }[]
+```
+
+Also with Drizzle, you can specify a `primary key` with `$default` function that will generate custom primary keys at runtime. We will also return those generated keys for you in the `$returningId()` call
+
+```ts
+import { varchar, text, mysqlTable } from 'drizzle-orm/mysql-core';
+import { createId } from '@paralleldrive/cuid2';
+
+const usersTableDefFn = mysqlTable('users_default_fn', {
+  customId: varchar('id', { length: 256 }).primaryKey().$defaultFn(createId),
+  name: text('name').notNull(),
+});
+
+
+const result = await db.insert(usersTableDefFn).values([{ name: 'John' }, { name: 'John1' }]).$returningId();
+//  ^? { customId: string }[]
+```
+
+> If there is no primary keys -> type will be `{}[]` for such queries
+
+## Insert multiple rows
+```typescript copy
+await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
+```
+
+## Upserts and conflicts
+Drizzle ORM provides simple interfaces for handling upserts and conflicts.
+
+### On conflict do nothing
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+
+`onConflictDoNothing` will cancel the insert if there's a conflict:
+
+```typescript copy
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoNothing();
+
+// explicitly specify conflict target
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoNothing({ target: users.id });
+```
+
+### On conflict do update
+
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+
+`onConflictDoUpdate` will update the row if there's a conflict:
+```typescript
+await db.insert(users)
+  .values({ id: 1, name: 'Dan' })
+  .onConflictDoUpdate({ target: users.id, set: { name: 'John' } });
+```
+
+#### `where` clauses
+
+`on conflict do update` can have a `where` clause in two different places -
+as part of the conflict target (i.e. for partial indexes) or as part of the `update` clause:
+
+```sql
+insert into employees (employee_id, name)
+values (123, 'John Doe')
+on conflict (employee_id) where name <> 'John Doe'
+do update set name = excluded.name
+
+insert into employees (employee_id, name)
+values (123, 'John Doe')
+on conflict (employee_id) do update set name = excluded.name
+where name <> 'John Doe';
+```
+
+To specify these conditions in Drizzle, you can use `setWhere` and `targetWhere` clauses:
+
+```typescript
+await db.insert(employees)
+  .values({ employeeId: 123, name: 'John Doe' })
+  .onConflictDoUpdate({
+    target: employees.employeeId,
+    targetWhere: sql`name <> 'John Doe'`,
+    set: { name: sql`excluded.name` }
+  });
+
+await db.insert(employees)
+  .values({ employeeId: 123, name: 'John Doe' })
+  .onConflictDoUpdate({
+    target: employees.employeeId,
+    set: { name: 'John Doe' },
+    setWhere: sql`name <> 'John Doe'`
+  });
+```
+
+<hr />
+
+Upsert with composite indexes, or composite primary keys for `onConflictDoUpdate`:
+
+```typescript
+await db.insert(users)
+  .values({ firstName: 'John', lastName: 'Doe' })
+  .onConflictDoUpdate({
+    target: [users.firstName, users.lastName],
+    set: { firstName: 'John1' }
+  });
+```
+
+### On duplicate key update
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true }} />
+
+MySQL supports [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html) instead of `ON CONFLICT` clauses. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if *any* unique index conflicts.
+
+Drizzle supports this through the `onDuplicateKeyUpdate` method:
+
+```typescript
+// Note that MySQL automatically determines targets based on the primary key and unique indexes
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { name: 'John' } });
+```
+
+While MySQL does not directly support doing nothing on conflict, you can perform a no-op by setting any column's value to itself and achieve the same effect:
+
+```typescript
+import { sql } from 'drizzle-orm';
+
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { id: sql`id` } });
+```
+
+## WITH INSERT clause
+
+<Callout>
+  Check how to use WITH statement with [select](/docs/select#with-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)
+</Callout>
+
+Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+<Section>
+```typescript copy
+const userCount = db.$with('user_count').as(
+	db.select({ value: sql`count(*)`.as('value') }).from(users)
+);
+
+const result = await db.with(userCount)
+	.insert(users)
+	.values([
+		{ username: 'user1', admin: sql`((select * from ${userCount}) = 0)` }
+	])
+	.returning({
+		admin: users.admin
+	});
+```
+```sql
+with "user_count" as (select count(*) as "value" from "users") 
+insert into "users" ("username", "admin") 
+values ($1, ((select * from "user_count") = 0)) 
+returning "admin"
+```
+</Section>

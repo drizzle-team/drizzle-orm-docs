@@ -1,0 +1,62 @@
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Sequences
+
+<Callout type="info">
+To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
+</Callout>
+
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': false, 'MySQL': false }} />
+
+Sequences in PostgreSQL are special single-row tables created to generate unique identifiers, often used for auto-incrementing primary key values. They provide a thread-safe way to generate unique sequential values across multiple sessions.
+<br/>
+
+**Key Features**
+- Creation and Initialization: Use CREATE SEQUENCE to create a new sequence. Parameters such as increment value, start value, min/max values, and cache size can be specified.
+
+- Manipulation Functions
+    - `nextval('sequence_name')`: Advances the sequence and returns the next value.
+    - `currval('sequence_name')`: Returns the current value of the sequence for the current session.
+    - `setval('sequence_name', value)`: Sets the sequence's current value.
+    - `lastval()`: Returns the last value returned by nextval in the current session.
+
+- Ownership: Sequences can be linked to table columns using the OWNED BY clause. Dropping the table or column will automatically drop the associated sequence.
+- Cycling: Sequences can be set to cycle when they reach their maximum or minimum value using the CYCLE option. The default is NO CYCLE.
+- Caching: Sequence values can be preallocated using the CACHE option for improved performance.
+<br/>
+
+**Limitations**
+- Gaps: Sequences are not gapless. Aborted transactions or crashes can lead to gaps in the sequence values.
+- Concurrency: While sequences provide unique values across sessions, the values may be out of order when considering all sessions.
+- No Rollback: Changes to sequences are not rolled back if a transaction fails. This ensures unique values but can lead to gaps.
+- Crash Recovery: Unlogged sequences or sequences modified before a crash might not be properly restored to their previous state.
+<br/>
+
+**Practical Use**
+- Default Behavior: By default, sequences increment by 1 and start at 1.
+- Custom Behavior: Custom start points, increments, min/max values, and cycling can be specified.
+- Associations: Commonly associated with table columns for auto-incrementing fields, making management of unique identifiers seamless.
+<br/>
+
+**Usage Example**
+```ts
+import { pgSchema, pgSequence } from "drizzle-orm/pg-core";
+
+// No params specified
+export const customSequence = pgSequence("name");
+
+// Sequence with params
+export const customSequence = pgSequence("name", {
+      startWith: 100,
+      maxValue: 10000,
+      minValue: 100,
+      cycle: true,
+      cache: 10,
+      increment: 2
+});
+
+// Sequence in custom schema
+export const customSchema = pgSchema('custom_schema');
+export const customSequence = customSchema.sequence("name");
+```

@@ -1,13 +1,13 @@
 ---
 import { getCollection } from "astro:content";
 
-import Link from "@components/markdown/Link.astro";
-import CustomHeader from "@components/layout/CustomHeader.astro";
-import DocsLayout from "@/layouts/DocsLayout.astro";
+import Link from "@mdx/Link.astro";
+import CustomHeader from "@components/CustomHeader.astro";
+import DocsLayout from "@/ui/DocsLayout.astro";
 
 export async function getStaticPaths() {
-  const releasesEntries = await getCollection("documentation", ({ id }) => {
-    return id.startsWith("docs/migrate/");
+  const releasesEntries = await getCollection("docs", ({ id }) => {
+    return id.startsWith("migrate/");
   });
   return releasesEntries.map((entry) => ({
     params: { slug: entry.slug.split("/").at(-1) },

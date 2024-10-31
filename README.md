@@ -5,7 +5,7 @@ MDX files are located in this folder:
 ```text
 ├── src/
 │   ├── content/
-│   │   └── documentation
+│   │   └── docs
 ```
 
 Announcements markdown files:

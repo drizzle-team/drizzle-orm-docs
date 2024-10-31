@@ -1,0 +1,447 @@
+---
+title: Upsert Query
+slug: upsert
+---
+
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- [Insert statement](/docs/insert), [onConflictDoUpdate method](/docs/insert#on-conflict-do-update) and [onDuplicateKeyUpdate method](/docs/insert#on-duplicate-key-update)
+- [Composite primary key](/docs/indexes-constraints#composite-primary-key)
+- [sql operator](/docs/sql)
+</Prerequisites>
+
+### PostgreSQL and SQLite
+
+To implement an upsert query in PostgreSQL and SQLite (skip to [MySQL](/docs/guides/upsert#mysql)) with Drizzle you can use `.onConflictDoUpdate()` method:
+
+<Section>
+```ts copy {8,9,10,11}
+import { users } from './schema';
+
+const db = drizzle(...);
+
+await db
+  .insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { name: 'Super John' },
+  });
+```
+
+```sql
+insert into users ("id", "name") values (1, 'John')
+  on conflict ("id") do update set name = 'Super John';
+```
+</Section>
+
+To upsert multiple rows in one query in PostgreSQL and SQLite you can use `sql operator` and `excluded` keyword. `excluded` is a special reference that refer to the row that was proposed for insertion, but wasn't inserted because of the conflict.
+
+This is how you can do it:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {21,24}
+    import { sql } from 'drizzle-orm';
+    import { users } from './schema';
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: { lastLogin: sql.raw(`excluded.${users.lastLogin.name}`) },
+      });
+    ```
+
+    ```sql
+    insert into users ("id", "last_login") 
+      values 
+        (1, '2024-03-15T22:29:06.679Z'),
+        (2, '2024-03-15T23:29:06.679Z'),
+        (3, '2024-03-16T00:29:06.679Z')
+      on conflict ("id") do update set last_login = excluded.last_login;
+    ```
+  </CodeTab>
+  ```ts copy
+  import { pgTable, serial, timestamp } from 'drizzle-orm/pg-core';
+
+  export const users = pgTable('users', {
+    id: serial('id').primaryKey(),
+    lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
+  });
+  ```
+</CodeTabs>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in PostgreSQL and SQLite:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {43,46}
+    import { SQL, getTableColumns, sql } from 'drizzle-orm';
+    import { PgTable } from 'drizzle-orm/pg-core';
+    import { SQLiteTable } from 'drizzle-orm/sqlite-core';
+    import { users } from './schema';
+
+    const buildConflictUpdateColumns = <
+      T extends PgTable | SQLiteTable,
+      Q extends keyof T['_']['columns']
+    >(
+      table: T,
+      columns: Q[],
+    ) => {
+      const cls = getTableColumns(table);
+
+      return columns.reduce((acc, column) => {
+        const colName = cls[column].name;
+        acc[column] = sql.raw(`excluded.${colName}`);
+
+        return acc;
+      }, {} as Record<Q, SQL>);
+    };
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+        active: true,
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+        active: true,
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+        active: true,
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: buildConflictUpdateColumns(users, ['lastLogin', 'active']),
+      });
+    ```
+
+    ```sql
+    insert into users ("id", "last_login", "active")
+    values
+      (1, '2024-03-16T15:44:41.141Z', true),
+      (2, '2024-03-16T16:44:41.141Z', true),
+      (3, '2024-03-16T17:44:41.141Z', true)
+    on conflict ("id") do update set last_login = excluded.last_login, active = excluded.active;
+    ```
+  </CodeTab>
+  ```ts copy
+  import { boolean, pgTable, serial, timestamp } from 'drizzle-orm/pg-core';
+
+  export const users = pgTable('users', {
+    id: serial('id').primaryKey(),
+    lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
+    active: boolean('active').notNull().default(false),
+  });
+  ```
+</CodeTabs>
+
+This is how you can implement an upsert query with multiple targets in PostgreSQL and SQLite:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { inventory } from './schema';
+
+await db
+  .insert(inventory)
+  .values({ warehouseId: 1, productId: 1, quantity: 100 })
+  .onConflictDoUpdate({
+    target: [inventory.warehouseId, inventory.productId], // composite primary key
+    set: { quantity: sql`${inventory.quantity} + 100` }, // add 100 to the existing quantity
+  });
+```
+
+```sql
+insert into inventory ("warehouse_id", "product_id", "quantity") values (1, 1, 100)
+  on conflict ("warehouse_id","product_id") do update set quantity = quantity + 100;
+```
+</Section>
+
+If you want to implement upsert query with `where` clause for `update` statement, you can use `setWhere` property in `onConflictDoUpdate` method:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+  ```ts copy {25,26,27,28}
+  import { or, sql } from 'drizzle-orm';
+  import { products } from './schema';
+
+  const data = {
+    id: 1,
+    title: 'Phone',
+    price: '999.99',
+    stock: 10,
+    lastUpdated: new Date(),
+  };
+
+  const excludedPrice = sql.raw(`excluded.${products.price.name}`);
+  const excludedStock = sql.raw(`excluded.${products.stock.name}`);
+
+  await db
+    .insert(products)
+    .values(data)
+    .onConflictDoUpdate({
+      target: products.id,
+      set: {
+        price: excludedPrice,
+        stock: excludedStock,
+        lastUpdated: sql.raw(`excluded.${products.lastUpdated.name}`)
+      },
+      setWhere: or(
+        sql`${products.stock} != ${excludedStock}`,
+        sql`${products.price} != ${excludedPrice}`
+      ),
+    });
+  ```
+
+  ```sql
+  insert into products ("id", "title", "stock", "price", "last_updated")
+    values (1, 'Phone', 10, '999.99', '2024-04-29T21:56:55.563Z')
+    on conflict ("id") do update
+    set stock = excluded.stock, price = excluded.price, last_updated = excluded.last_updated
+    where (stock != excluded.stock or price != excluded.price);
+  ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, numeric, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+  export const products = pgTable('products', {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    stock: integer('stock').notNull(),
+    price: numeric('price', { precision: 10, scale: 2 }).notNull(),
+    lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  });
+  ```
+</CodeTabs>
+
+
+If you want to update all columns except of specific one, you can leave the previous value like this:
+
+<Section>
+```ts copy {16}
+import { sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const data = {
+  id: 1,
+  name: 'John',
+  email: 'john@email.com',
+  age: 29,
+};
+
+await db
+  .insert(users)
+  .values(data)
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { ...data, email: sql`${users.email}` }, // leave email as it was
+});
+```
+
+```sql
+insert into users ("id", "name", "email", "age") values (1, 'John', 'john@email.com', 29)
+  on conflict ("id") do update set id = 1, name = 'John', email = email, age = 29;
+```
+</Section>
+
+### MySQL
+
+To implement an upsert query in MySQL with Drizzle you can use `.onDuplicateKeyUpdate()` method. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if any unique index conflicts.
+
+This is how you can do it:
+
+<Section>
+```ts copy {4}
+await db
+  .insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { name: 'Super John' } });
+```
+
+```sql
+insert into users (`id`, `first_name`) values (1, 'John')
+  on duplicate key update first_name = 'Super John';
+```
+</Section>
+
+To upsert multiple rows in one query in MySQL you can use `sql operator` and `values()` function. `values()` function refers to the value of column that would be inserted if duplicate-key conflict hadn't occurred.  
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {21,24}
+    import { sql } from 'drizzle-orm';
+    import { users } from './schema';
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onDuplicateKeyUpdate({
+        set: {
+          lastLogin: sql`values(${users.lastLogin})`,
+        },
+      });
+    ```
+
+    ```sql
+    insert into users (`id`, `last_login`)
+      values
+        (1, '2024-03-15 23:08:27.025'),
+        (2, '2024-03-15 00:08:27.025'),
+        (3, '2024-03-15 01:08:27.025')
+      on duplicate key update last_login = values(last_login);
+    ```
+  </CodeTab>
+  ```ts copy
+  import { mysqlTable, serial, timestamp } from 'drizzle-orm/mysql-core';
+
+  export const users = mysqlTable('users', {
+    id: serial('id').primaryKey(),
+    lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
+  });
+  ```
+</CodeTabs>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in MySQL:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {36,38}
+    import { SQL, getTableColumns, sql } from 'drizzle-orm';
+    import { MySqlTable } from 'drizzle-orm/mysql-core';
+    import { users } from './schema';
+
+    const buildConflictUpdateColumns = <T extends MySqlTable, Q extends keyof T['_']['columns']>(
+      table: T,
+      columns: Q[],
+    ) => {
+      const cls = getTableColumns(table);
+      return columns.reduce((acc, column) => {
+        acc[column] = sql`values(${cls[column]})`;
+        return acc;
+      }, {} as Record<Q, SQL>);
+    };
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+        active: true,
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+        active: true,
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+        active: true,
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onDuplicateKeyUpdate({
+        set: buildConflictUpdateColumns(users, ['lastLogin', 'active']),
+      });
+    ```
+
+    ```sql
+    insert into users (`id`, `last_login`, `active`)
+      values
+        (1, '2024-03-16 15:23:28.013', true),
+        (2, '2024-03-16 16:23:28.013', true),
+        (3, '2024-03-16 17:23:28.013', true)
+      on duplicate key update last_login = values(last_login), active = values(active);
+    ```
+  </CodeTab>
+  ```ts copy
+  import { boolean, mysqlTable, serial, timestamp } from 'drizzle-orm/mysql-core';
+
+  export const users = mysqlTable('users', {
+    id: serial('id').primaryKey(),
+    lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
+    active: boolean('active').notNull().default(false),
+  });
+  ```
+</CodeTabs>
+
+If you want to update all columns except of specific one, you can leave the previous value like this:
+
+<Section>
+```ts copy {15}
+import { sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const data = {
+  id: 1,
+  name: 'John',
+  email: 'john@email.com',
+  age: 29,
+};
+
+await db
+  .insert(users)
+  .values(data)
+  .onDuplicateKeyUpdate({
+    set: { ...data, email: sql`${users.email}` }, // leave email as it was
+});
+```
+
+```sql
+insert into users (`id`, `name`, `email`, `age`) values (1, 'John', 'john@email.com', 29)
+  on duplicate key update id = 1, name = 'John', email = email, age = 29;
+```
+</Section>

@@ -1,14 +1,14 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "exclude": ["node_modules", "dist", "public"],
+  "exclude": ["node_modules", "dist", "public", "./src/ui/BaseHead.astro", "./src/ui/Layout.astro", "./src/ui/DocsLayout.astro", "./src/ui/CenteredLayout.astro"],
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
       "@mdx/*": [
-        "components/markdown/*"
+        "mdx/*"
       ],
       "@components/*": [
-        "components/*"
+        "ui/components/*"
       ],
       "@/*": [
         "*"

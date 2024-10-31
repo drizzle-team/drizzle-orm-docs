@@ -1,0 +1,77 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
+import Section from '@mdx/Section.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Table schemas
+
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': false }} />
+
+Drizzle ORM provides you an API for declaring SQL schemas for PostgreSQL and MySQL dialects.
+
+If you declare an entity within a schema, query builder will prepend schema names in queries:<br/>
+`select * from "schema"."users"`
+
+<Tabs items={['PostgreSQL', 'MySQL', "SQLite"]}>
+  <Tab>
+    <Section>
+    ```ts copy {3,5,7}
+    import { serial, text, pgTable, pgSchema } from "drizzle-orm/pg-core";
+
+    export const mySchema = pgSchema("my_schema");
+
+    export const colors = mySchema.enum('colors', ['red', 'green', 'blue']);
+
+    export const mySchemaUsers = mySchema.table('users', {
+      id: serial('id').primaryKey(),
+      name: text('name'),
+      color: colors('color').default('red'),
+    });
+
+    
+    ```
+    ```sql
+    CREATE SCHEMA "my_schema";
+
+    CREATE TYPE "my_schema"."colors" AS ENUM ('red', 'green', 'blue');
+
+    CREATE TABLE "my_schema"."users" (
+      "id" serial PRIMARY KEY,
+      "name" text,
+      "color" "my_schema"."colors" DEFAULT 'red'
+    );
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+    ```ts {3,5}
+    import { int, text, mysqlTable, mysqlSchema } from "drizzle-orm/mysql-core";
+
+    export const mySchema = mysqlSchema("my_schema")
+
+    export const mySchemaUsers = mySchema.table("users", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+    });
+    ```
+    ```sql
+    CREATE SCHEMA "my_schema";
+
+    CREATE TABLE "my_schema"."users" (
+      "id" serial PRIMARY KEY,
+      "name" text
+    );
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+  SQLite does not have support for schemas 😕
+  </Tab>
+</Tabs>
+
+{/* TODO: ??? example > **Warning**
+> If you will have tables with same names in different schemas then drizzle will respond with `never[]` error in result types and error from database
+>
+> In this case you may use [alias syntax](./joins#join-aliases-and-self-joins) */}

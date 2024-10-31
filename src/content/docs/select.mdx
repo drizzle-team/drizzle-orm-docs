@@ -1,0 +1,799 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import CodeTabs from '@mdx/CodeTabs.astro';
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
+import $count from '@mdx/$count.mdx';
+
+# SQL Select
+Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
+It natively supports mostly every query feature and capability of every dialect,
+and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
+
+For the following examples, let's assume you have a `users` table defined like this:
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tab>
+```typescript
+import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core';
+
+export const users = mysqlTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age'),
+});
+```
+</Tab>
+</Tabs>
+
+### Basic select
+Select all rows from a table including all columns:
+
+<Section>
+```typescript
+const result = await db.select().from(users);
+/*
+  {
+    id: number;
+    name: string;
+    age: number | null;
+  }[]
+*/
+```
+```sql
+select "id", "name", "age" from "users";
+```
+</Section>
+
+Notice that the result type is inferred automatically based on the table definition, including columns nullability.
+
+<Callout type="info">
+Drizzle always explicitly lists columns in the `select` clause instead of using `select *`.<br />
+This is required internally to guarantee the fields order in the query result, and is also generally considered a good practice.
+</Callout>
+
+### Partial select
+In some cases, you might want to select only a subset of columns from a table.
+You can do that by providing a selection object to the `.select()` method:
+<Section>
+```typescript copy
+const result = await db.select({
+  field1: users.id,
+  field2: users.name,
+}).from(users);
+
+const { field1, field2 } = result[0];
+```
+```sql
+select "id", "name" from "users";
+```
+</Section>
+
+Like in SQL, you can use arbitrary expressions as selection fields, not just table columns:
+
+<Section>
+```typescript
+const result = await db.select({
+  id: users.id,
+  lowerName: sql<string>`lower(${users.name})`,
+}).from(users);
+```
+```sql
+select "id", lower("name") from "users";
+```
+</Section>
+
+<Callout type="warning">
+By specifying `sql<string>`, you are telling Drizzle that the **expected** type of the field is `string`.<br />
+If you specify it incorrectly (e.g. use `sql<number>` for a field that will be returned as a string), the runtime value won't match the expected type.
+Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
+
+If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
+</Callout>
+
+### Conditional select
+
+You can have a dynamic selection object based on some condition:
+
+```typescript
+async function selectUsers(withName: boolean) {
+  return db
+    .select({
+      id: users.id,
+      ...(withName ? { name: users.name } : {}),
+    })
+    .from(users);
+}
+
+const users = await selectUsers(true);
+```
+
+### Distinct select
+
+You can use `.selectDistinct()` instead of `.select()` to retrieve only unique rows from a dataset:
+<Section>
+```ts
+await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
+
+await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
+```
+```sql
+select distinct "id", "name" from "users" order by "id", "name";
+
+select distinct "id" from "users" order by "id";
+```
+</Section>
+
+In PostgreSQL, you can also use the `distinct on` clause to specify how the unique rows are determined:
+<Callout type='warning'>
+`distinct on` clause is only supported in PostgreSQL.
+</Callout>
+<Section>
+```ts
+await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
+await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
+```
+```sql
+select distinct on ("id") "id", "name" from "users" order by "id";
+select distinct on ("name") "name" from "users" order by "name";
+```
+</Section>
+
+
+
+### Advanced select
+Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
+
+Sneak peek of advanced partial select, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/include-or-exclude-columns).
+<CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
+```ts
+import { getTableColumns, sql } from 'drizzle-orm';
+
+await db.select({
+    ...getTableColumns(posts),
+    titleLength: sql<number>`length(${posts.title})`,
+  }).from(posts);
+```
+```ts
+import { getTableColumns } from 'drizzle-orm';
+
+const { content, ...rest } = getTableColumns(posts); // exclude "content" column
+await db.select({ ...rest }).from(posts); // select all other columns
+```
+```ts
+await db.query.posts.findMany({
+  columns: {
+    title: true,
+  },
+});
+```
+```ts
+await db.query.posts.findMany({
+  columns: {
+    content: false,
+  },
+});
+```
+</CodeTabs>
+
+## ---
+
+### Filters
+
+You can filter the query results using the [filter operators](/docs/operators) in the `.where()` method:
+
+<Section>
+```typescript copy
+import { eq, lt, gte, ne } from 'drizzle-orm';
+
+await db.select().from(users).where(eq(users.id, 42));
+await db.select().from(users).where(lt(users.id, 42));
+await db.select().from(users).where(gte(users.id, 42));
+await db.select().from(users).where(ne(users.id, 42));
+...
+```
+```sql
+select "id", "name", "age" from "users" where "id" = 42;
+select "id", "name", "age" from "users" where "id" < 42;
+select "id", "name", "age" from "users" where "id" >= 42;
+select "id", "name", "age" from "users" where "id" <> 42;
+```
+</Section>
+
+All filter operators are implemented using the [`sql`](/docs/sql) function.
+You can use it yourself to write arbitrary SQL filters, or build your own operators.
+For inspiration, you can check how the operators provided by Drizzle are [implemented](https://github.com/drizzle-team/drizzle-orm/blob/main/drizzle-orm/src/sql/expressions/conditions.ts).
+<Section>
+```typescript copy
+import { sql } from 'drizzle-orm';
+
+function equals42(col: Column) {
+  return sql`${col} = 42`;
+}
+
+await db.select().from(users).where(sql`${users.id} < 42`);
+await db.select().from(users).where(sql`${users.id} = 42`);
+await db.select().from(users).where(equals42(users.id));
+await db.select().from(users).where(sql`${users.id} >= 42`);
+await db.select().from(users).where(sql`${users.id} <> 42`);
+await db.select().from(users).where(sql`lower(${users.name}) = 'aaron'`);
+```
+```sql
+select "id", "name", "age" from "users" where 'id' < 42;
+select "id", "name", "age" from "users" where 'id' = 42;
+select "id", "name", "age" from "users" where 'id' = 42;
+select "id", "name", "age" from "users" where 'id' >= 42;
+select "id", "name", "age" from "users" where 'id' <> 42;
+select "id", "name", "age" from "users" where lower("name") = 'aaron';
+```
+</Section>
+
+<Callout type='info'>
+All the values provided to filter operators and to the `sql` function are parameterized automatically.
+For example, this query:
+```ts
+await db.select().from(users).where(eq(users.id, 42));
+```
+will be translated to:
+```sql
+select "id", "name", "age" from "users" where "id" = $1; -- params: [42]
+```
+</Callout>
+
+Inverting condition with a `not` operator:
+<Section>
+```typescript copy
+import { eq, not, sql } from 'drizzle-orm';
+
+await db.select().from(users).where(not(eq(users.id, 42)));
+await db.select().from(users).where(sql`not ${users.id} = 42`);
+```
+```sql
+select "id", "name", "age" from "users" where not ("id" = 42);
+select "id", "name", "age" from "users" where not ("id" = 42);
+```
+</Section>
+
+<Callout type="info">
+You can safely alter schema, rename tables and columns
+and it will be automatically reflected in your queries because of template interpolation,
+as opposed to hardcoding column or table names when writing raw SQL.
+</Callout>
+
+### Combining filters
+You can logically combine filter operators with `and()` and `or()` operators:
+<Section>
+```typescript copy
+import { eq, and, sql } from 'drizzle-orm';
+
+await db.select().from(users).where(
+  and(
+    eq(users.id, 42),
+    eq(users.name, 'Dan')
+  )
+);
+await db.select().from(users).where(sql`${users.id} = 42 and ${users.name} = 'Dan'`);
+```
+```sql
+select "id", "name", "age" from "users" where "id" = 42 and "name" = 'Dan';
+select "id", "name", "age" from "users" where "id" = 42 and "name" = 'Dan';
+```
+</Section>
+
+<Section>
+```typescript copy
+import { eq, or, sql } from 'drizzle-orm';
+
+await db.select().from(users).where(
+  or(
+    eq(users.id, 42), 
+    eq(users.name, 'Dan')
+  )
+);
+await db.select().from(users).where(sql`${users.id} = 42 or ${users.name} = 'Dan'`);
+```
+```sql
+select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
+select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
+```
+</Section>
+
+### Advanced filters
+In combination with TypeScript, Drizzle APIs provide you powerful and flexible ways to combine filters in queries.
+
+Sneak peek of conditional filtering, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/conditional-filters-in-query).
+<CodeTabs items={["example 1", "example 2"]}>
+```ts
+const searchPosts = async (term?: string) => {
+  await db
+    .select()
+    .from(posts)
+    .where(term ? ilike(posts.title, term) : undefined);
+};
+await searchPosts();
+await searchPosts('AI');
+```
+```ts
+const searchPosts = async (filters: SQL[]) => {
+  await db
+    .select()
+    .from(posts)
+    .where(and(...filters));
+};
+const filters: SQL[] = [];
+filters.push(ilike(posts.title, 'AI'));
+filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
+filters.push(gt(posts.views, 200));
+await searchPosts(filters);
+```
+</CodeTabs>
+
+## ---
+
+### Limit & offset
+Use `.limit()` and `.offset()` to add `limit` and `offset` clauses to the query - for example, to implement pagination:
+<Section>
+```typescript
+await db.select().from(users).limit(10);
+await db.select().from(users).limit(10).offset(10);
+```
+```sql
+select "id", "name", "age" from "users" limit 10;
+select "id", "name", "age" from "users" limit 10 offset 10;
+```
+</Section>
+
+### Order By
+Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
+<Section>
+```typescript
+import { asc, desc } from 'drizzle-orm';
+
+await db.select().from(users).orderBy(users.name);
+await db.select().from(users).orderBy(desc(users.name));
+
+// order by multiple fields
+await db.select().from(users).orderBy(users.name, users.name2);
+await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
+```
+```sql
+select "id", "name", "age" from "users" order by "name";
+select "id", "name", "age" from "users" order by "name" desc;
+
+select "id", "name", "age" from "users" order by "name", "name2";
+select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
+```
+</Section>
+
+### Advanced pagination
+Powered by TypeScript, Drizzle APIs let you implement all possible SQL paginations and sorting approaches.
+
+Sneak peek of advanced pagination, for more detailed advaced 
+usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination) 
+and [cursor pagination](/docs/guides/cursor-based-pagination) guides.
+
+<CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
+```ts
+await db
+  .select()
+  .from(users)
+  .orderBy(asc(users.id)) // order by is mandatory
+  .limit(4) // the number of rows to return
+  .offset(4); // the number of rows to skip
+```
+```ts
+const getUsers = async (page = 1, pageSize = 3) => {
+  await db.query.users.findMany({
+    orderBy: (users, { asc }) => asc(users.id),
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  });
+};
+await getUsers();
+```
+```ts
+const getUsers = async (page = 1, pageSize = 10) => {
+   const sq = db
+    .select({ id: users.id })
+    .from(users)
+    .orderBy(users.id)
+    .limit(pageSize)
+    .offset((page - 1) * pageSize)
+    .as('subquery');
+   await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
+};
+```
+```ts
+const nextUserPage = async (cursor?: number, pageSize = 3) => {
+  await db
+    .select()
+    .from(users)
+    .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
+    .limit(pageSize) // the number of rows to return
+    .orderBy(asc(users.id)); // ordering
+};
+// pass the cursor of the last row of the previous page (id)
+await nextUserPage(3);
+```
+</CodeTabs>
+
+## ---
+
+### WITH clause
+
+<Callout>
+  Check how to use WITH statement with [insert](/docs/insert#with-insert-clause), [update](/docs/update#with-update-clause), [delete](/docs/delete#with-delete-clause)
+</Callout>
+
+Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+<Section>
+```typescript copy
+const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
+
+const result = await db.with(sq).select().from(sq);
+```
+```sql
+with sq as (select "id", "name", "age" from "users" where "id" = 42)
+select "id", "name", "age" from sq;
+```
+</Section>
+
+To select arbitrary SQL values as fields in a CTE and reference them in other CTEs or in the main query,
+you need to add aliases to them:
+```typescript copy
+
+const sq = db.$with('sq').as(db.select({ 
+  name: sql<string>`upper(${users.name})`.as('name'),
+})
+.from(users));
+
+const result = await db.with(sq).select({ name: sq.name }).from(sq);
+```
+If you don't provide an alias, the field type will become `DrizzleTypeError` and you won't be able to reference it in other queries.
+If you ignore the type error and still try to use the field,
+you will get a runtime error, since there's no way to reference that field without an alias.
+
+### Select from subquery
+Just like in SQL, you can embed queries into other queries by using the subquery API:
+<Section>
+```typescript copy
+const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
+const result = await db.select().from(sq);
+```
+```sql
+select "id", "name", "age" from (select "id", "name", "age" from "users" where "id" = 42) "sq";
+```
+</Section>
+
+Subqueries can be used in any place where a table can be used, for example in joins:
+<Section>
+```typescript copy
+const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
+const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
+```
+```sql
+select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"."age" from "users"
+  left join (select "id", "name", "age" from "users" where "id" = 42) "sq"
+    on "users"."id" = "sq"."id";
+```
+</Section>
+
+## ---
+
+### Aggregations
+With Drizzle, you can do aggregations using functions like `sum`, `count`, `avg`, etc. by
+grouping and filtering with `.groupBy()` and `.having()` respectfully, same as you would do in raw SQL:
+
+<Section>
+```typescript
+import { gt } from 'drizzle-orm';
+
+await db.select({
+  age: users.age,
+  count: sql<number>`cast(count(${users.id}) as int)`,
+})
+  .from(users)
+  .groupBy(users.age);
+
+await db.select({
+  age: users.age,
+  count: sql<number>`cast(count(${users.id}) as int)`,
+})
+  .from(users)
+  .groupBy(users.age)
+  .having(({ count }) => gt(count, 1));
+```
+```sql
+select "age", cast(count("id") as int)
+  from "users"
+  group by "age";
+
+select "age", cast(count("id") as int)
+  from "users"
+  group by "age"
+  having cast(count("id") as int) > 1;
+```
+</Section>
+
+<Callout type="info">
+`cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL and `decimal` in MySQL, which are treated as string values instead of numbers.
+Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
+
+If you need count aggregation - we recommend using our [`$count`](/docs/select#count) API
+</Callout>
+
+### Aggregations helpers
+
+Drizzle has a set of wrapped `sql` functions, so you don't need to write
+`sql` templates for common cases in your app
+
+<Callout type="info">
+ Remember, aggregation functions are often used with the GROUP BY clause of the SELECT statement. 
+ So if you are selecting using aggregating functions and other columns in one query, 
+ be sure to use the `.groupBy` clause
+</Callout>
+
+
+**count**
+
+Returns the number of values in `expression`.
+<Section>
+```ts
+import { count } from 'drizzle-orm'
+
+await db.select({ value: count() }).from(users);
+await db.select({ value: count(users.id) }).from(users);
+```
+```sql
+select count("*") from "users";
+select count("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`count('*'))`.mapWith(Number) 
+}).from(users);
+
+await db.select({ 
+  value: sql`count(${users.id})`.mapWith(Number) 
+}).from(users);
+```
+</Section>
+
+**countDistinct**
+
+Returns the number of non-duplicate values in `expression`.
+<Section>
+```ts
+import { countDistinct } from 'drizzle-orm'
+
+await db.select({ value: countDistinct(users.id) }).from(users);
+```
+```sql
+select count(distinct "id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`count(${users.id})`.mapWith(Number) 
+}).from(users);
+```
+</Section>
+
+**avg**
+
+Returns the average (arithmetic mean) of all non-null values in `expression`.
+<Section>
+```ts
+import { avg } from 'drizzle-orm'
+
+await db.select({ value: avg(users.id) }).from(users);
+```
+```sql
+select avg("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`avg(${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**avgDistinct**
+
+Returns the average (arithmetic mean) of all non-null values in `expression`.
+<Section>
+```ts
+import { avgDistinct } from 'drizzle-orm'
+
+await db.select({ value: avgDistinct(users.id) }).from(users);
+```
+```sql
+select avg(distinct "id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`avg(distinct ${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**sum**
+
+Returns the sum of all non-null values in `expression`.
+<Section>
+```ts
+import { sum } from 'drizzle-orm'
+
+await db.select({ value: sum(users.id) }).from(users);
+```
+```sql
+select sum("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`sum(${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**sumDistinct**
+
+Returns the sum of all non-null and non-duplicate values in `expression`.
+<Section>
+```ts
+import { sumDistinct } from 'drizzle-orm'
+
+await db.select({ value: sumDistinct(users.id) }).from(users);
+```
+```sql
+select sum(distinct "id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`sum(distinct ${users.id})`.mapWith(String) 
+}).from(users);
+```
+</Section>
+
+**max**
+
+Returns the maximum value in `expression`.
+<Section>
+```ts
+import { max } from 'drizzle-orm'
+
+await db.select({ value: max(users.id) }).from(users);
+```
+```sql
+select max("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`max(${expression})`.mapWith(users.id) 
+}).from(users);
+```
+</Section>
+
+**min**
+
+Returns the minimum value in `expression`.
+<Section>
+```ts
+import { min } from 'drizzle-orm'
+
+await db.select({ value: min(users.id) }).from(users);
+```
+```sql
+select min("id") from "users";
+```
+```ts
+// It's equivalent to writing
+await db.select({ 
+  value: sql`min(${users.id})`.mapWith(users.id) 
+}).from(users);
+```
+</Section>
+
+A more advanced example:
+
+```typescript copy
+const orders = sqliteTable('order', {
+  id: integer('id').primaryKey(),
+  orderDate: integer('order_date', { mode: 'timestamp' }).notNull(),
+  requiredDate: integer('required_date', { mode: 'timestamp' }).notNull(),
+  shippedDate: integer('shipped_date', { mode: 'timestamp' }),
+  shipVia: integer('ship_via').notNull(),
+  freight: numeric('freight').notNull(),
+  shipName: text('ship_name').notNull(),
+  shipCity: text('ship_city').notNull(),
+  shipRegion: text('ship_region'),
+  shipPostalCode: text('ship_postal_code'),
+  shipCountry: text('ship_country').notNull(),
+  customerId: text('customer_id').notNull(),
+  employeeId: integer('employee_id').notNull(),
+});
+
+const details = sqliteTable('order_detail', {
+  unitPrice: numeric('unit_price').notNull(),
+  quantity: integer('quantity').notNull(),
+  discount: numeric('discount').notNull(),
+  orderId: integer('order_id').notNull(),
+  productId: integer('product_id').notNull(),
+});
+
+
+db
+  .select({
+    id: orders.id,
+    shippedDate: orders.shippedDate,
+    shipName: orders.shipName,
+    shipCity: orders.shipCity,
+    shipCountry: orders.shipCountry,
+    productsCount: sql<number>`cast(count(${details.productId}) as int)`,
+    quantitySum: sql<number>`sum(${details.quantity})`,
+    totalPrice: sql<number>`sum(${details.quantity} * ${details.unitPrice})`,
+  })
+  .from(orders)
+  .leftJoin(details, eq(orders.id, details.orderId))
+  .groupBy(orders.id)
+  .orderBy(asc(orders.id))
+  .all();
+```
+
+### $count
+<$count />
+
+## ---
+
+### Iterator
+
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false,  }} />
+
+If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
+
+```ts copy
+const iterator = await db.select().from(users).iterator();
+
+for await (const row of iterator) {
+  console.log(row);
+}
+```
+
+It also works with prepared statements:
+
+```ts copy
+const query = await db.select().from(users).prepare();
+const iterator = await query.iterator();
+
+for await (const row of iterator) {
+  console.log(row);
+}
+```

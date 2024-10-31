@@ -1,0 +1,98 @@
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# SQL Update
+
+```typescript copy
+await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'));
+```
+
+The object that you pass to `update` should have keys that match column names in your database schema.
+Values of `undefined` are ignored in the object: to set a column to `null`, pass `null`.
+You can pass SQL as a value to be used in the update object, like this:
+
+```typescript copy
+await db.update(users)
+  .set({ updatedAt: sql`NOW()` })
+  .where(eq(users.name, 'Dan'));
+```
+
+### Limit
+
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true }} />
+
+Use `.limit()` to add `limit` clause to the query - for example:
+<Section>
+```typescript
+await db.update(usersTable).set({ verified: true }).limit(2);
+```
+```sql
+update "users" set "verified" = $1 limit $2;
+```
+</Section>
+
+### Order By
+Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
+<Section>
+```typescript
+import { asc, desc } from 'drizzle-orm';
+
+await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name);
+await db.update(usersTable).set({ verified: true }).orderBy(desc(usersTable.name));
+
+// order by multiple fields
+await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name, usersTable.name2);
+await db.update(usersTable).set({ verified: true }).orderBy(asc(usersTable.name), desc(usersTable.name2));
+```
+```sql
+update "users" set "verified" = $1 order by "name";
+update "users" set "verified" = $1 order by "name" desc;
+
+update "users" set "verified" = $1 order by "name", "name2";
+update "users" set "verified" = $1 order by "name" asc, "name2" desc;
+```
+</Section>
+
+### Update with returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+You can update a row and get it back in PostgreSQL and SQLite:
+```typescript copy
+const updatedUserId: { updatedId: number }[] = await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'))
+  .returning({ updatedId: users.id });
+```
+
+## WITH UPDATE clause
+
+<Callout>
+  Check how to use WITH statement with [select](/docs/select#with-clause), [insert](/docs/insert#with-insert-clause), [delete](/docs/delete#with-delete-clause)
+</Callout>
+
+Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+<Section>
+```typescript copy
+const averagePrice = db.$with('average_price').as(
+        db.select({ value: sql`avg(${products.price})`.as('value') }).from(products)
+);
+
+const result = await db.with(averagePrice)
+		.update(products)
+		.set({
+			cheap: true
+		})
+		.where(lt(products.price, sql`(select * from ${averagePrice})`))
+		.returning({
+			id: products.id
+		});
+```
+```sql
+with "average_price" as (select avg("price") as "value" from "products") 
+update "products" set "cheap" = $1 
+where "products"."price" < (select * from "average_price") 
+returning "id"
+```
+</Section>

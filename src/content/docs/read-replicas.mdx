@@ -1,0 +1,129 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+
+# Read Replicas
+
+When your project involves a set of read replica instances, and you require a convenient method for managing 
+SELECT queries from read replicas, as well as performing create, delete, and update operations on the primary 
+instance, you can leverage the `withReplicas()` function within Drizzle
+
+<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tab>
+```ts copy
+import { sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { boolean, jsonb, pgTable, serial, text, timestamp, withReplicas } from 'drizzle-orm/pg-core';
+
+const usersTable = pgTable('users', {
+	id: serial('id' as string).primaryKey(),
+	name: text('name').notNull(),
+	verified: boolean('verified').notNull().default(false),
+	jsonb: jsonb('jsonb').$type<string[]>(),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+const primaryDb = drizzle("postgres://user:password@host:port/primary_db");
+const read1 = drizzle("postgres://user:password@host:port/read_replica_1");
+const read2 = drizzle("postgres://user:password@host:port/read_replica_2");
+
+const db = withReplicas(primaryDb, [read1, read2]);
+```
+</Tab>
+<Tab>
+```ts copy
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
+import { boolean, mysqlTable, serial, text, withReplicas } from 'drizzle-orm/mysql-core';
+
+const usersTable = mysqlTable('users', {
+	id: serial('id' as string).primaryKey(),
+	name: text('name').notNull(),
+	verified: boolean('verified').notNull().default(false),
+});
+
+const primaryClient = await mysql.createConnection({
+  host: "host",
+  user: "user",
+  database: "primary_db",
+})
+const primaryDb = drizzle({ client: primaryClient });
+
+const read1Client = await mysql.createConnection({
+  host: "host",
+  user: "user",
+  database: "read_1",
+})
+const read1 = drizzle({ client: read1Client });
+
+const read2Client = await mysql.createConnection({
+  host: "host",
+  user: "user",
+  database: "read_2",
+})
+const read2 = drizzle({ client: read2Client });
+
+const db = withReplicas(primaryDb, [read1, read2]);
+```
+</Tab>
+<Tab>
+```ts copy
+import { sql } from 'drizzle-orm';
+import { sqliteTable, int, text, withReplicas } from 'drizzle-orm/sqlite-core';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
+
+const usersTable = sqliteTable('users', {
+	id: int('id' as string).primaryKey(),
+	name: text('name').notNull(),
+});
+
+const primaryDb = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
+const read1 = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
+const read2 = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
+
+const db = withReplicas(primaryDb, [read1, read2]);
+```
+</Tab>
+</Tabs>
+
+You can now use the `db` instance the same way you did before. Drizzle will 
+handle the choice between read replica and the primary instance automatically
+
+```ts
+// Read from either the read1 connection or the read2 connection
+await db.select().from(usersTable)
+
+// Use the primary database for the delete operation
+await db.delete(usersTable).where(eq(usersTable.id, 1))
+```
+
+You can use the `$primary` key to force using primary instances even for read operations
+
+```ts
+// read from primary
+await db.$primary.select().from(usersTable);
+```
+
+With Drizzle, you can also specify custom logic for choosing read replicas. 
+You can make a weighted decision or any other custom selection method for random read replica choice. 
+Here is an implementation example of custom logic for selecting read replicas, 
+where the first replica has a 70% chance of being chosen, and the second replica has a 30% 
+chance of being selected.
+
+Keep in mind that you can implement any type of random selection method for read replicas
+
+```ts
+const db = withReplicas(primaryDb, [read1, read2], (replicas) => {
+    const weight = [0.7, 0.3];
+    let cumulativeProbability = 0;
+    const rand = Math.random();
+
+    for (const [i, replica] of replicas.entries()) {
+      cumulativeProbability += weight[i]!;
+      if (rand < cumulativeProbability) return replica;
+    }
+    return replicas[0]!
+});
+
+await db.select().from(usersTable)
+```
