@@ -1,6 +1,5 @@
 ---
 import { getContentTree } from "@/utils";
-import GlobalStyles from "./components/GlobalStyles.astro";
 import NavigationAstro from "./components/NavigationAstro.astro";
 import Footer from "./components/Footer.astro";
 import BaseHead from "@/ui/BaseHead.astro";
@@ -20,7 +19,6 @@ const { tree } = await getContentTree({});
   <BaseHead title={title} />
   <body class="banner-shown">
     <Banner />
-    <GlobalStyles />
     <NavigationAstro />
     <main class="landing-wrap scrollbar">
       <div class="landing-content">
