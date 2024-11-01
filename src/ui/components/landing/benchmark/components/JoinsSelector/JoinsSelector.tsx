@@ -27,7 +27,7 @@ const JoinsSelector: FC = () => {
     <select
       className={styles.button}
       onChange={handleChange}
-      defaultValue={String(selectedItems.joins)}
+      value={String(selectedItems.joins)}
     >
       {items.map((item) => (
         <option

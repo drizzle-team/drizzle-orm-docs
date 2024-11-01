@@ -17,7 +17,7 @@ const SpeedSelector: FC<IProps> = ({ speed, setSpeed }) => {
   return (
     <select
       className={styles.button}
-      defaultValue={speed}
+      value={speed}
       onChange={handleChange}
     >
       {items.map((item) => (
