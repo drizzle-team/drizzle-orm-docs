@@ -223,6 +223,15 @@ export const users = pgTable('users', {
 const db = drizzle({ connection: process.env.DATABASE_URL, casing: 'snake_case' })
 ```
 ```ts
+// drizzle.config.ts
+export default defineConfig({
+    dbCredentials: {
+    url: process.env.DATABSE_URL,
+  },
+  casing: "snake_case",
+});
+```
+```ts
 // query.ts
 await db.select().from(users);
 ```
