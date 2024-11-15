@@ -361,4 +361,19 @@ export const customSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.IMAGE,
   },
+  {
+    tier: {
+      name: "$250 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "sheetjs.com",
+      name: "SheetJS",
+      avatarUrl: "/images/sheetjs.png",
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];
