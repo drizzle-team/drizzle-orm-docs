@@ -1,23 +1,25 @@
-import Npm from '@mdx/Npm.astro';
-import Tab from '@mdx/Tab.astro';
-import Tabs from '@mdx/Tabs.astro';
+import Npm from "@mdx/Npm.astro";
+import Tab from "@mdx/Tab.astro";
+import Tabs from "@mdx/Tabs.astro";
 
-# Drizzle Seed 
+# Drizzle Seed
 
-`drizzle-seed` is a TypeScript library that helps you generate deterministic, yet realistic, 
-fake data to populate your database. By leveraging a seedable pseudorandom number generator (pRNG), 
+`drizzle-seed` is a TypeScript library that helps you generate deterministic, yet realistic,
+fake data to populate your database. By leveraging a seedable pseudorandom number generator (pRNG),
 it ensures that the data you generate is consistent and reproducible across different runs.
- This is especially useful for testing, development, and debugging purposes.
+This is especially useful for testing, development, and debugging purposes.
 
 #### What is Deterministic Data Generation?
-Deterministic data generation means that the same input will always produce the same output. 
-In the context of `drizzle-seed`, when you initialize the library with the same seed number, 
+
+Deterministic data generation means that the same input will always produce the same output.
+In the context of `drizzle-seed`, when you initialize the library with the same seed number,
 it will generate the same sequence of fake data every time. This allows for predictable and repeatable data sets.
 
 #### Pseudorandom Number Generator (pRNG)
-A pseudorandom number generator is an algorithm that produces a sequence of numbers 
-that approximates the properties of random numbers. However, because it's based on an initial value 
-called a seed, you can control its randomness. By using the same seed, the pRNG will produce the 
+
+A pseudorandom number generator is an algorithm that produces a sequence of numbers
+that approximates the properties of random numbers. However, because it's based on an initial value
+called a seed, you can control its randomness. By using the same seed, the pRNG will produce the
 same sequence of numbers, making your data generation process reproducible.
 
 #### Benefits of Using a pRNG:
@@ -30,27 +32,25 @@ With drizzle-seed, you get the best of both worlds: the ability to generate real
 
 ## Installation
 
-<Npm>
-drizzle-seed
-</Npm>
+<Npm>drizzle-seed</Npm>
 
 ## Basic Usage
 
 In this example we will create 10 users with random names and ids
 
 ```ts {12}
-import { pgTable, integer } from 'drizzle-orm/pg-core'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { seed } from 'drizzle-seed'
+import { pgTable, integer } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { seed } from "drizzle-seed";
 
-const users = pgTable('users', {
-    id: integer().primaryKey(),
-    name: text().notNull()
+const users = pgTable("users", {
+  id: integer().primaryKey(),
+  name: text().notNull(),
 });
 
 async function main() {
-    const db = drizzle(process.env.DATABASE_URL!);
-    await seed(db, { users });
+  const db = drizzle(process.env.DATABASE_URL!);
+  await seed(db, { users });
 }
 
 main();
@@ -58,9 +58,9 @@ main();
 
 ## Options
 
-**`count`** 
+**`count`**
 
-By default, the `seed` function will create 10 entities. 
+By default, the `seed` function will create 10 entities.
 However, if you need more for your tests, you can specify this in the seed options object
 
 ```ts
@@ -82,12 +82,12 @@ With `drizzle-seed`, you can easily reset your database and seed it with new val
 
 ```ts
 // path to a file with schema you want to reset
-import * as schema from './schema.ts'
-import { reset } from 'drizzle-seed'
+import * as schema from "./schema.ts";
+import { reset } from "drizzle-seed";
 
 async function main() {
-    const db = drizzle(process.env.DATABASE_URL!);
-    await reset(db, schema);
+  const db = drizzle(process.env.DATABASE_URL!);
+  await reset(db, schema);
 }
 
 main();
@@ -103,6 +103,7 @@ ensure that all tables are empty after running the reset function
 ```sql
 TRUNCATE tableName1, tableName2, ... CASCADE;
 ```
+
 </Tab>
 <Tab>
 For MySQL, the `drizzle-seed` package will first disable `FOREIGN_KEY_CHECKS` to ensure the next step won't fail, and then 
@@ -115,6 +116,7 @@ TRUNCATE tableName2;
 ...
 SET FOREIGN_KEY_CHECKS = 1;
 ```
+
 </Tab>
 <Tab>
 For SQLite, the `drizzle-seed` package will first disable the `foreign_keys` pragma to ensure the next step won't fail, 
@@ -127,6 +129,7 @@ DELETE FROM tableName2;
 ...
 PRAGMA foreign_keys = ON;
 ```
+
 </Tab>
 </Tabs>
 
@@ -136,12 +139,10 @@ In case you need to change the behavior of the seed generator functions that Dri
 
 ```ts
 await seed(db, schema).refine((f) => ({
-    users: {
-        columns: {
-
-        }
-    },
-    count: 10
+  users: {
+    columns: {},
+  },
+  count: 10,
 }));
 ```
 
@@ -149,6 +150,686 @@ await seed(db, schema).refine((f) => ({
 
 // list of all generators in `drizzle.config.ts` style
 
+## ---
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `valuesFromArray`
+
+<rem025 />
+generates values from given array
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{values: (number \| string \| boolean \| undefined)[] \| { weight: number; values: (number \| string \| boolean \| undefined)[] }[]; isUnique?: boolean;}`|
+| default       | --                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      title: funcs.valuesFromArray({
+        values: ["Title1", "Title2", "Title3", "Title4", "Title5"],
+        isUnique: true,
+      }),
+    },
+  },
+}));
+
+```
+```ts
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      title: funcs.valuesFromArray({
+        values: [
+          { weight: 0.35, values: ["Title1", "Title2"] },
+          { weight: 0.5, values: ["Title3", "Title4"] },
+          { weight: 0.15, values: ["Title5"] },
+        ],
+        isUnique: false,
+      }),
+    },
+  },
+}));
+```
+
+### `intPrimaryKey`
+
+<rem025 />
+generates sequential integers starting with 1.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      id: funcs.intPrimaryKey(),
+    },
+  },
+}));
+
+```
+
+### `number`
+
+<rem025 />
+generates numbers with floating point in given range.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{minValue?: number;maxValue?: number;precision?: number;isUnique?: boolean;} \| undefined` |
+| default       | `{precision: 100, maxValue: precision * 1000, minValue: -maxValue}`                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  products: {
+    columns: {
+      unitPrice: funcs.number({
+        minValue: 10,
+        maxValue: 120,
+        precision: 100,
+        isUnique: false,
+      }),
+    },
+  },
+}));
+
+```
+
+### `int`
+
+<rem025 />
+generates integers with given range.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{minValue?: number \| bigint;maxValue?: number \| bigint;isUnique?: boolean;}` |
+| default       | `{maxValue: 1000, minValue: -maxValue}`                       |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  products: {
+    columns: {
+      unitsInStock: funcs.int({
+        minValue: 0,
+        maxValue: 100,
+        isUnique: false,
+      }),
+    },
+  },
+}));
+
+```
+
+### `boolean`
+
+<rem025 />
+generates boolean values(true or false).
+
+|               |                           |
+| :------------ | :------------------------ |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      isAvailable: funcs.boolean(),
+    },
+  },
+}));
+
+```
+
+### `date`
+
+<rem025 />
+generates date within given range.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{ minDate?: string \| Date; maxDate?: string \| Date }` |
+| default       | `{ minDate: '2020-05-08', maxDate: '2028-05-08' }`                        |
+
+If only one of params(`minDate` or `maxDate`) is passed then unspecified param will be calculated by (adding or subtracting) 8 years to/from specified one.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      birthDate: funcs.date({ minDate: "1990-01-01", maxDate: "2010-12-31" }),
+    },
+  },
+}));
+
+```
+
+### `time`
+
+<rem025 />
+generates time in 24 hours style.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      birthTime: funcs.time(),
+    },
+  },
+}));
+
+```
+
+### `timestamp`
+
+<rem025 />
+generates timestamps.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  orders: {
+    columns: {
+      shippedDate: funcs.timestamp(),
+    },
+  },
+}));
+
+```
+
+### `datetime`
+
+<rem025 />
+generates datetime objects.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  orders: {
+    columns: {
+      shippedDate: funcs.datetime(),
+    },
+  },
+}));
+
+```
+
+### `year`
+
+<rem025 />
+generates years. 
+
+example of generated value: "2024"
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      birthYear: funcs.year(),
+    },
+  },
+}));
+
+```
+
+### `json`
+
+<rem025 />
+generates json objects with fixed structure.
+
+json structure can equal this:
+
+```
+{
+    email,
+    name,
+    isGraduated,
+    hasJob,
+    salary,
+    startedWorking,
+    visitedCountries,
+}
+```
+
+or this
+
+```
+{
+    email,
+    name,
+    isGraduated,
+    hasJob,
+    visitedCountries,
+}
+```
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      metadata: funcs.json(),
+    },
+  },
+}));
+
+```
+
+### `interval`
+
+<rem025 />
+generates time intervals.
+
+example of generated value: "1 years 12 days 5 minutes"
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{ isUnique?: boolean }`  |
+| default       | --                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      timeSpentOnWebsite: funcs.interval(),
+    },
+  },
+}));
+
+```
+
+### `string`
+
+<rem025 />
+generates random strings.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{ isUnique?: boolean }`  |
+| default       | --                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      hashedPassword: funcs.string({ isUnique: false }),
+    },
+  },
+}));
+
+```
+
+### `firstName`
+
+<rem025 />
+generates person's first names.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{ isUnique?: boolean }`  |
+| default       | --                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      firstName: funcs.firstName({ isUnique: true }),
+    },
+  },
+}));
+
+```
+
+### `lastName`
+
+<rem025 />
+generates person's last names.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{ isUnique?: boolean }`  |
+| default       | --                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      lastName: funcs.lastName({ isUnique: false }),
+    },
+  },
+}));
+
+```
+
+### `fullName`
+
+<rem025 />
+generates person's full names.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{ isUnique?: boolean }`  |
+| default       | --                        |
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      fullName: funcs.fullName({ isUnique: true }),
+    },
+  },
+}));
+
+```
+
+### `email`
+
+<rem025 />
+generates unique emails.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | --                        |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  users: {
+    columns: {
+      email: funcs.email(),
+    },
+  },
+}));
+
+```
+
+### `phoneNumber`
+
+<rem025 />
+generates unique phone numbers.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{template?: string;prefixes?: string[];generatedDigitsNumbers?: number \| number[];}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
+
+### `default`
+
+<rem025 />
+generates same given value each time the generator is called.
+
+|               |                           |
+| :------------ | :--------                 |
+| param type    | `{defaultValue: unknown}` |
+| default       | --                        |
+
+<rem025 />
+```ts 
+import {seed} from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  posts: {
+    columns: {
+      content: funcs.default({ defaultValue: "post content" }),
+    },
+  },
+}));
+
+```
 ## Weighted Random
 
 // Explain it and show a few examples
@@ -158,3 +839,4 @@ await seed(db, schema).refine((f) => ({
 // example of seed function for benchmarks
 
 ## Limitations
+```
