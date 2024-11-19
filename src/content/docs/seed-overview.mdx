@@ -280,6 +280,42 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 
 ```
 
+### `testing`
+
+<rem025 />
+generates numbers with floating point in given range.
+
+|               | param                          | default|type|
+| :------------ | :--------                 |:--------|:--------|
+|     | `precision` | `100` | number |
+|        | `maxValue` | `precision * 100` |number|
+|        | `array` | [dataset](https://google.com) |any[]|
+
+If `isUnique` is not specified, `isUnique` will be the same as database column uniqueness.
+
+<rem025 />
+```ts 
+import { seed } from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  products: {
+    columns: {
+      unitPrice: funcs.number({
+        // sfd sdf
+        minValue: 10,
+        // sdfsd
+        maxValue: 120,
+        // sdfpojsfkd
+        precision: 100,
+        // sfsfsf
+        isUnique: false,
+      }),
+    },
+  },
+}));
+
+```
+
 ### `int`
 
 <rem025 />
