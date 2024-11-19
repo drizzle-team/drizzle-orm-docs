@@ -270,13 +270,24 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/gold",
-      name: "Become a Gold Sponsor",
+      login: "driz.link/singlestore",
+      name: "SingleStore",
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
-    createdAt: "2023-11-16T13:32:16Z",
+    createdAt: "2023-06-11T13:32:16Z",
     isActive: true,
     imageType: ImageType.SVG,
+    darkStyle: {
+      padding: "4px",
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/single_store_dark.svg") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      padding: "4px",
+      filter: "invert(0.6)",
+      background: 'url("/svg/single_store_light.svg") 0% 0% / cover no-repeat content-box',
+    },
   },
 ];
