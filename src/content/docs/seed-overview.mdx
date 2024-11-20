@@ -1,6 +1,7 @@
 import Npm from "@mdx/Npm.astro";
 import Tab from "@mdx/Tab.astro";
 import Tabs from "@mdx/Tabs.astro";
+import Callout from '@mdx/Callout.astro';
 
 # Drizzle Seed
 
@@ -39,7 +40,7 @@ With drizzle-seed, you get the best of both worlds: the ability to generate real
 In this example we will create 10 users with random names and ids
 
 ```ts {12}
-import { pgTable, integer } from "drizzle-orm/pg-core";
+import { pgTable, integer, text } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { seed } from "drizzle-seed";
 
@@ -135,31 +136,156 @@ PRAGMA foreign_keys = ON;
 
 ## Refinements
 
-In case you need to change the behavior of the seed generator functions that Drizzle-Seed uses by default, you can specify your own implementation and even use your own list of values for the seeding process
+In case you need to change the behavior of the seed generator functions that `drizzle-seed` uses by default, you can specify your own implementation and even use your own list of values for the seeding process
 
+`.refine` is a callback that receives a list of all available generator functions from `drizzle-seed`. It should return an object with keys representing the tables you want to refine, defining their behavior as needed. 
+Each table can specify several properties to simplify seeding your database:
+
+<rem025 />
+
+- `columns`: Refine the default behavior of each column by specifying the required generator function.
+- `count`: Specify the number of rows to insert into the database. By default, it's 10. If a global count is defined in the `seed()` options, the count defined here will override it for this specific table.
+- `with`: Define how many referenced entities to create for each parent table if you want to generate associated entities.
+
+<Callout title='info'>
+You can also specify a weighted random distribution for the number of referenced values you want to create. For details on this API, you can refer to [Weighted Random docs](#weighted-random) docs section
+</Callout>
+
+**API**
 ```ts
 await seed(db, schema).refine((f) => ({
   users: {
     columns: {},
+    count: 10,
+    with: {
+        posts: 10
+    }
   },
-  count: 10,
 }));
 ```
 
-## Generators
+Let's check a few examples with an explanation of what will happen:
 
-// list of all generators in `drizzle.config.ts` style
+```ts filename='schema.ts'
+import { pgTable, integer, text } from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+  id: integer().primaryKey(),
+  name: text().notNull(),
+});
+
+export const posts = pgTable("users", {
+  id: integer().primaryKey(),
+  description: text(),
+  userId: integer('user_id').references(() => users.id),
+});
+```
+
+**Example 1**: Seed only the `users` table with 20 entities and with refined seed logic for the `name` column
+```ts filename='index.ts'
+import { drizzle } from "drizzle-orm/node-postgres";
+import { seed } from "drizzle-seed";
+import * as schema from './schema.ts'
+
+async function main() {
+  const db = drizzle(process.env.DATABASE_URL!);
+
+  await seed(db, { users: schema.users }).refine((f) => ({
+    users: {
+        columns: {
+            name: f.fullName(),
+        },
+        count: 20
+    }
+  }));
+}
+
+main();
+```
+
+**Example 2**: Seed the `users` table with 20 entities and add 10 `posts` for each `user` by seeding the `posts` table and creating a reference from `posts` to `users`
+```ts filename='index.ts'
+import { drizzle } from "drizzle-orm/node-postgres";
+import { seed } from "drizzle-seed";
+import * as schema from './schema.ts'
+
+async function main() {
+  const db = drizzle(process.env.DATABASE_URL!);
+
+  await seed(db, schema).refine((f) => ({
+    users: {
+        count: 20,
+        with: {
+            posts: 10
+        }
+    }
+  }));
+}
+
+main();
+```
+
+**Example 3**: Seed the `users` table with 5 entities and populate the database with 100 `posts` without connecting them to the `users` entities. Refine `id` generation for `users` so 
+that it starts from `10000` and remains unique, and refine `posts` to retrieve values from a self-defined array
+```ts filename='index.ts'
+import { drizzle } from "drizzle-orm/node-postgres";
+import { seed } from "drizzle-seed";
+import * as schema from './schema.ts'
+
+async function main() {
+  const db = drizzle(process.env.DATABASE_URL!);
+
+  await seed(db, schema).refine((f) => ({
+    users: {
+        count: 5,
+        columns: {
+            id: f.int({
+            minValue: 10000,
+            isUnique: true,
+          }),
+        }
+    },
+    posts: {
+        count: 100,
+        columns: {
+            description: f.valuesFromArray({
+            values: [
+                "The sun set behind the mountains, painting the sky in hues of orange and purple", 
+                "I can't believe how good this homemade pizza turned out!", 
+                "Sometimes, all you need is a good book and a quiet corner.", 
+                "Who else thinks rainy days are perfect for binge-watching old movies?", 
+                "Tried a new hiking trail today and found the most amazing waterfall!",
+                // ...
+            ],
+          })
+        }
+    }
+  }));
+}
+
+main();
+```
+
+<Callout type='warning'>
+There are many more possibilities that we will define in these docs, but for now, you can explore a few sections in this documentation. Check the [Generators](#generators) section to get familiar with all the available generator functions you can use.
+
+A particularly great feature is the ability to use weighted randomization, both for generator values created for a column and for determining the number of related entities that can be generated by `drizzle-seed`.
+
+Please check [Weighted Random docs](#weighted-random) for more info.
+</Callout>
+
+## Generators
 
 ## ---
 
 ### `default`
 
 <rem025 />
-generates same given value each time the generator is called.
+Generates the same given value each time the generator is called.
 
 |  | param          | default     | type
 |:-| :--------      | :--------   | :--------
-|  |`defaultValue`  |--           |`unknown`
+|  |`defaultValue`  |--           |`any`
 
 <rem025 />
 
@@ -182,11 +308,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `valuesFromArray`
 
 <rem025 />
-generates values from given array
+Generates values from given array
 
 |  | param      | default                   | type
 |:-| :--------  | :--------                 | :--------
-|  |`values`    |--                         |`(number \| string \| boolean \| undefined)[]` \| `{ weight: number; values: (number \| string \| boolean \| undefined)[] }[]`
+|  |`values`    |--                         |`any[]` \| `{ weight: number; values: any[] }[]`
 |  |`isUnique`  |database column uniqueness |`boolean`
 
 
@@ -198,10 +324,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   posts: {
     columns: {
       title: funcs.valuesFromArray({
-        // array of values you want to generate.(can be array of weighted values)
+        // Array of values you want to generate (can be an array of weighted values)
         values: ["Title1", "Title2", "Title3", "Title4", "Title5"],
 
-        // property that controls if generated values gonna be unique or not.
+        // Property that controls whether the generated values will be unique or not
         isUnique: true,
       }),
     },
@@ -213,7 +339,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `intPrimaryKey`
 
 <rem025 />
-generates sequential integers starting with 1.
+Generates sequential integers starting from 1.
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -237,7 +363,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `number`
 
 <rem025 />
-generates numbers with floating point in given range.
+Generates numbers with a floating point within the given range
 
 |  | param      | default                                                                                               | type
 |:-| :--------  | :--------                                                                                             | :--------
@@ -277,7 +403,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `int`
 
 <rem025 />
-generates integers with given range.
+Generates integers within the given range
 
 |  | param      | default                                                                            | type
 |:-| :--------  | :--------                                                                          | :--------
@@ -311,7 +437,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `boolean`
 
 <rem025 />
-generates boolean values(true or false).
+Generates boolean values (true or false)
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -334,14 +460,16 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `date`
 
 <rem025 />
-generates date within given range.
+Generates a date within the given range
 
 |  | param      | default                                                     | type
-|:-| :--------  | :--------                                                   | :--------
-|  |`minDate`   |`new Date('2020-05-08')` if maxDate is not specified either  |`string \| Date`
-|  |`maxDate`   |`new Date('2028-05-08')` if minDate is not specified either  |`string \| Date`
+|:-| :--------  | :--------------                                                   | :--------
+|  |`minDate`   |`new Date('2020-05-08')` | `string \| Date`
+|  |`maxDate`   |`new Date('2028-05-08')` | `string \| Date`
 
-If only one of params(`minDate` or `maxDate`) is passed then unspecified param will be calculated by (adding or subtracting) 8 years to/from specified one.
+<Callout type='warning'>
+If only one of the parameters (`minDate` or `maxDate`) is provided, the unspecified parameter will be calculated by adding or subtracting 8 years to/from the specified one
+</Callout>
 
 <rem025 />
 ```ts 
@@ -366,7 +494,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `time`
 
 <rem025 />
-generates time in 24 hours style.
+Generates time in 24-hour format
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -389,7 +517,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `timestamp`
 
 <rem025 />
-generates timestamps.
+Generates timestamps
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -412,7 +540,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `datetime`
 
 <rem025 />
-generates datetime objects.
+Generates datetime objects
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -434,9 +562,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `year`
 
 <rem025 />
-generates years. 
-
-example of generated value: "2024"
+Generates years in `YYYY` format
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -459,34 +585,17 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `json`
 
 <rem025 />
-generates json objects with fixed structure.
+Generates JSON objects with a fixed structure
 
-json structure can equal this:
+```ts
+{ email, name, isGraduated, hasJob, salary, startedWorking, visitedCountries}
 
-```
-{
-    email,
-    name,
-    isGraduated,
-    hasJob,
-    salary,
-    startedWorking,
-    visitedCountries,
-}
+// or
+
+{ email, name, isGraduated, hasJob, visitedCountries }
 ```
 
-or this
-
-```
-{
-    email,
-    name,
-    isGraduated,
-    hasJob,
-    visitedCountries,
-}
-```
-json structure will be picked randomly.
+> The JSON structure will be picked randomly
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -509,13 +618,13 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `interval`
 
 <rem025 />
-generates time intervals.
+Generates time intervals.
 
-example of generated value: "1 years 12 days 5 minutes"
+Example of a generated value: `1 year 12 days 5 minutes`
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | column uniqueness  |`boolean`
 
 <rem025 />
 ```ts 
@@ -525,7 +634,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       timeSpentOnWebsite: funcs.interval({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: true
       }),
     },
@@ -537,11 +646,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `string`
 
 <rem025 />
-generates random strings.
+Generates random strings
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 ```ts 
@@ -551,7 +660,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       hashedPassword: funcs.string({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: false 
       }),
     },
@@ -563,11 +672,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `firstName`
 
 <rem025 />
-generates person's first names.
+Generates a person's first name
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 ```ts 
@@ -577,7 +686,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       firstName: funcs.firstName({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: true 
       }),
     },
@@ -589,11 +698,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `lastName`
 
 <rem025 />
-generates person's last names.
+Generates a person's last name
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 ```ts 
@@ -603,7 +712,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       lastName: funcs.lastName({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: false 
       }),
     },
@@ -615,11 +724,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `fullName`
 
 <rem025 />
-generates person's full names.
+Generates a person's full name
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 ```ts 
@@ -629,7 +738,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       fullName: funcs.fullName({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: true 
       }),
     },
@@ -641,7 +750,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `email`
 
 <rem025 />
-generates unique emails.
+Generates unique email addresses
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -664,13 +773,13 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `phoneNumber`
 
 <rem025 />
-generates unique phone numbers.
+Generates unique phone numbers
 
 |  | param                    | default                                         | type
 |:-| :--------                | :--------                                       | :--------
 |  |`template`                |--                                               |`string`
-|  |`prefixes`                |`country and operator prefixes from each row of` [phoneInfo](https://github.com/OleksiiKH0240/drizzle-orm/blob/main/drizzle-seed/src/datasets/phonesInfo.ts) `joined by space`   |`string[]`
-|  |`generatedDigitsNumbers`  |`Array.from<number>({ length: prefixes.length }).fill(7) if prefixes is specified;` `number length from each row of` [phoneInfo](https://github.com/OleksiiKH0240/drizzle-orm/blob/main/drizzle-seed/src/datasets/phonesInfo.ts) `substructed by operator prefix length if prefixes is not specified`                                               |`number \| number[]`
+|  |`prefixes`                |[Used dataset for prefixes](https://github.com/OleksiiKH0240/drizzle-orm/blob/main/drizzle-seed/src/datasets/phonesInfo.ts)   |`string[]`
+|  |`generatedDigitsNumbers`  | `7` - `if prefixes was not defined`            |`number \| number[]`
 
 <rem025 />
 ```ts 
@@ -711,7 +820,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ```ts 
 import { seed } from "drizzle-seed";
 
-//generate phone number using prefixes and generatedDigitsNumbers properties but with different generatedDigitsNumbers for prefixes
+// generate phone number using prefixes and generatedDigitsNumbers properties but with different generatedDigitsNumbers for prefixes
 await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
@@ -730,11 +839,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `country`
 
 <rem025 />
-generates country's names.
+Generates country's names
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 
@@ -745,7 +854,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       country: funcs.country({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: false 
       }),
     },
@@ -757,11 +866,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `city`
 
 <rem025 />
-generates city's names.
+Generates city's names
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 
@@ -772,7 +881,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       city: funcs.city({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: false 
       }),
     },
@@ -784,11 +893,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `streetAddress`
 
 <rem025 />
-generates street address.
+Generates street address
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 
@@ -799,7 +908,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       streetAddress: funcs.streetAddress({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: false 
       }),
     },
@@ -811,7 +920,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `jobTitle`
 
 <rem025 />
-generates job titles.
+Generates job titles
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -835,11 +944,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `postcode`
 
 <rem025 />
-generates postal codes.
+Generates postal codes
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 
@@ -850,7 +959,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       postcode: funcs.postcode({
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: true 
       }),
     },
@@ -862,7 +971,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `state`
 
 <rem025 />
-generates states of America.
+Generates US states
 
 |  | param      | default    | type
 |:-| :--------  | :--------  | :--------
@@ -886,11 +995,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `companyName`
 
 <rem025 />
-generates company's names.
+Generates random company's names
 
 |  | param      | default                    | type
 |:-| :--------  | :--------                  | :--------
-|  |`isUnique`  |database column uniqueness  |`boolean`
+|  |`isUnique`  | -  |`boolean`
 
 <rem025 />
 
@@ -901,7 +1010,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       company: funcs.companyName({ 
-        // `isUnique` - property that controls if generated values gonna be unique or not.
+        // `isUnique` - property that controls whether the generated values will be unique or not
         isUnique: true 
       }),
     },
@@ -912,11 +1021,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `loremIpsum`
 
 <rem025 />
-generates 'lorem ipsum' text sentences.
+Generates `lorem ipsum` text sentences.
 
 |  | param            | default    | type
 |:-| :--------        | :--------  | :--------
-|  |`sentencesCount`  |1           |`number`
+|  |`sentencesCount`  | 1           |`number`
 
 <rem025 />
 
@@ -939,7 +1048,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `point`
 
 <rem025 />
-generates 2D points within specified ranges for x and y coordinates.
+Generates 2D points within specified ranges for x and y coordinates.
 
 |  | param       | default                                                                                 | type
 |:-| :--------   | :--------                                                                               | :--------
@@ -982,7 +1091,7 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 ### `line`
 
 <rem025 />
-generates 2D lines within specified ranges for a, b and c parameters of line.
+Generates 2D lines within specified ranges for a, b and c parameters of line.
 
 ```
 line equation: a*x + b*y + c = 0
