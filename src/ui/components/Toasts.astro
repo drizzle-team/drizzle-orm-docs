@@ -1,0 +1,215 @@
+---
+
+const toasts = [
+  // {
+  //   icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+  //   title: "Two",
+  //   description: "One",
+  //   href: ""
+  // },
+  // {
+  //   icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+  //   title: "Three",
+  //   description: "One",
+  //   href: ""
+  // },
+  {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+    title: "One Dollar Stats",
+    description: "$1 per mo web analytics",
+    href: "https://onedollarstats.com/"
+  },
+];
+---
+<div data-toasts class="toasts-wrap animated_bottom" transition:persist="toasts">
+  <div class="by-drizzle">Product by Drizzle</div>
+  {
+    toasts.map((toast, index) => (
+      <a
+        href={toast.href}
+        target="_blank"
+        rel="noreferrer nofollow"
+        data-toast={index}
+        style={`transform: translateY(${(toasts.length - index - 1) * 100}%) scale(${1 - (toasts.length - index - 1) * 0.06});`}
+        class="toast"
+      >
+        <div class="toast-content">
+          <div class="toast-icon">
+            <Fragment set:html={toast.icon} />
+          </div>
+          <div class="toast-text">
+            <span class="toast-title">{toast.title}</span>
+            <span class="toast-description">{toast.description}</span>
+          </div>
+        </div>
+      </a>
+    ))
+  }
+</div>
+<style>
+  .toasts-wrap {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 1000;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    opacity: 1;
+    transition: opacity 1s;
+    margin-bottom: 32px;
+  }
+
+  .toasts-wrap-fade {
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+
+  .toast {
+    transition: transform 0.2s cubic-bezier(0.41, 0.41, 0.35, 1.3);
+  }
+
+  .toasts-wrap:has(.toast:hover) .toast {
+    transform: none !important;
+  }
+
+  .toasts-wrap-fade:has(.toast:hover) {
+    opacity: 1 !important;
+  }
+
+  html.dark .toast-content {
+    background: #111;
+    border: 1px solid #292929;
+  }
+
+  .toast-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px 0px; */
+    background: #FBFBFC;
+    border-radius: 8px;
+    border: 1px solid #E0E1E3;
+  }
+
+  .toast-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .toast-title {
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: normal;
+  }
+
+  .toast-description {
+    font-size: 12px;
+    line-height: normal;
+
+  }
+
+  .toast:not(:last-child) .toast-content {
+    margin-bottom: 8px;
+  }
+
+  @keyframes bottom {
+    0% {
+      transform: translateY(20%);
+      opacity: 0;
+    }
+    75% {
+      transform: translateY(-10%);
+      opacity: 0.75;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animated_bottom {
+    animation: bottom 0.3s;
+  }
+
+  .animated_fadeout {
+    animation: fadeOut 3s;
+  }
+
+  html.dark .toast-icon {
+    background: #111;
+    border: 1px solid #292929;
+  }
+
+  .toast-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    padding: 6px;
+    margin: 8px;
+    aspect-ratio: 1;
+    border: 1px solid #E0E1E3;
+  }
+
+  html.dark .by-drizzle {
+    background: #111;
+    border: 1px solid #292929;
+  }
+
+  .by-drizzle {
+    text-transform: uppercase;
+    font-size: 12px;
+    bottom: 0;
+    position: absolute;
+    transition: bottom 0.2s;
+    margin-bottom: 8px;
+    left: 50%;
+    border: 1px solid #E0E1E3;
+    white-space: pre;
+    z-index: -1;
+    transform: translateX(-50%);
+    background-color: #FBFBFC;
+    padding: 0 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  .toasts-wrap:has(.toast:hover) .by-drizzle{
+    bottom: -26px;
+  }
+</style>
+<style is:global>
+    .toast-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", (e) => {
+    const toasts = document.querySelectorAll("[data-toast]");
+    toasts.forEach((toast, index) => {
+      setTimeout(() => {
+        toast.setAttribute(
+          "style",
+          `transform: translateY(calc(${(toasts.length - index - 1) * 100}% - ${(toasts.length - index - 1) * 12}px)) scale(${1 - (toasts.length - index - 1) * 0.06});`
+        );
+      }, 100 * toasts.length - index * 100);
+      if (index !== toasts.length - 1) {
+        toast.classList.add("animated_fadeout");
+      }
+    });
+    const toastsWrap = document.querySelector("[data-toasts]");
+    if (toastsWrap) {
+      setTimeout(() => {
+        toastsWrap.classList.remove("animated_bottom");
+      }, 300);
+      setTimeout(() => {
+        toastsWrap.classList.add("toasts-wrap-fade");
+      }, 3000);
+    }
+  });
+</script>
