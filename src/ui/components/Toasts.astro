@@ -1,27 +1,19 @@
 ---
-
 const toasts = [
-  // {
-  //   icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
-  //   title: "Two",
-  //   description: "One",
-  //   href: ""
-  // },
-  // {
-  //   icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
-  //   title: "Three",
-  //   description: "One",
-  //   href: ""
-  // },
   {
     icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
     title: "One Dollar Stats",
     description: "$1 per mo web analytics",
-    href: "https://onedollarstats.com/"
+    href: "https://driz.link/onedollarstats",
   },
 ];
 ---
-<div data-toasts class="toasts-wrap animated_bottom" transition:persist="toasts">
+
+<div
+  data-toasts
+  class="toasts-wrap animated_bottom"
+  transition:persist="toasts"
+>
   <div class="by-drizzle">Product by Drizzle</div>
   {
     toasts.map((toast, index) => (
@@ -30,12 +22,14 @@ const toasts = [
         target="_blank"
         rel="noreferrer nofollow"
         data-toast={index}
+        data-toast-name={toast.title}
         style={`transform: translateY(${(toasts.length - index - 1) * 100}%) scale(${1 - (toasts.length - index - 1) * 0.06});`}
         class="toast"
       >
         <div class="toast-content">
           <div class="toast-icon">
             <Fragment set:html={toast.icon} />
+            <div class="toast-indicator" />
           </div>
           <div class="toast-text">
             <span class="toast-title">{toast.title}</span>
@@ -51,7 +45,7 @@ const toasts = [
     display: flex;
     flex-direction: column;
     position: absolute;
-    z-index: 1000;
+    z-index: 2;
     bottom: 0;
     left: 0;
     right: 0;
@@ -88,9 +82,9 @@ const toasts = [
     align-items: center;
     width: 100%;
     /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px 0px; */
-    background: #FBFBFC;
+    background: #fbfbfc;
     border-radius: 8px;
-    border: 1px solid #E0E1E3;
+    border: 1px solid #e0e1e3;
   }
 
   .toast-text {
@@ -109,7 +103,6 @@ const toasts = [
   .toast-description {
     font-size: 12px;
     line-height: normal;
-
   }
 
   .toast:not(:last-child) .toast-content {
@@ -118,11 +111,11 @@ const toasts = [
 
   @keyframes bottom {
     0% {
-      transform: translateY(20%);
+      transform: translateY(100%);
       opacity: 0;
     }
     75% {
-      transform: translateY(-10%);
+      transform: translateY(-15%);
       opacity: 0.75;
     }
     100% {
@@ -145,6 +138,7 @@ const toasts = [
   }
 
   .toast-icon {
+    position: relative;
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -152,56 +146,104 @@ const toasts = [
     padding: 6px;
     margin: 8px;
     aspect-ratio: 1;
-    border: 1px solid #E0E1E3;
+    border: 1px solid #e0e1e3;
+  }
+
+  .toast-indicator {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    bottom: 0px;
+    right: 0px;
+    border-radius: 100%;
+    background: #ef4444;
   }
 
   html.dark .by-drizzle {
     background: #111;
     border: 1px solid #292929;
+    color: #909090;
   }
 
   .by-drizzle {
     text-transform: uppercase;
-    font-size: 12px;
-    bottom: 0;
+    font-size: 10px;
+    bottom: -24px;
     position: absolute;
     transition: bottom 0.2s;
     margin-bottom: 8px;
     left: 50%;
-    border: 1px solid #E0E1E3;
+    color: #909090;
+    border: 1px solid #e0e1e3;
     white-space: pre;
     z-index: -1;
     transform: translateX(-50%);
-    background-color: #FBFBFC;
+    background-color: #fbfbfc;
     padding: 0 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
   }
-
-  .toasts-wrap:has(.toast:hover) .by-drizzle{
-    bottom: -26px;
-  }
 </style>
 <style is:global>
-    .toast-icon svg {
-      width: 100%;
-      height: 100%;
-    }
+  .toast-icon svg {
+    width: 100%;
+    height: 100%;
+  }
 </style>
+<script is:inline>
+  const toasts = document.querySelectorAll("[data-toast]");
+  const localStorageItems = localStorage.getItem("toasts");
+  const storedToasts = localStorageItems ? JSON.parse(localStorageItems) : [];
+  toasts.forEach((toast) => {
+    const toastName = toast.dataset.toastName;
+    const toastIndicator = toast.querySelector(".toast-indicator");
+    if (storedToasts.includes(toastName) && toastIndicator) {
+      toastIndicator.style.display = "none";
+    }
+  });
+</script>
 <script>
-  document.addEventListener("DOMContentLoaded", (e) => {
-    const toasts = document.querySelectorAll("[data-toast]");
+  const initToasts = () => {
+    const toasts = document.querySelectorAll(
+      "[data-toast]",
+    ) as NodeListOf<HTMLElement>;
+    const localStorageItems = localStorage.getItem("toasts");
+    const storedToasts = localStorageItems ? JSON.parse(localStorageItems) : [];
+
     toasts.forEach((toast, index) => {
-      setTimeout(() => {
-        toast.setAttribute(
-          "style",
-          `transform: translateY(calc(${(toasts.length - index - 1) * 100}% - ${(toasts.length - index - 1) * 12}px)) scale(${1 - (toasts.length - index - 1) * 0.06});`
-        );
-      }, 100 * toasts.length - index * 100);
+      const toastName = toast.dataset.toastName;
+      const toastIndicator = toast.querySelector(
+        ".toast-indicator",
+      ) as HTMLElement;
+      if (storedToasts.includes(toastName) && toastIndicator) {
+        toastIndicator.style.display = "none";
+      }
+
+      toast.addEventListener("mouseenter", () => {
+        if (!storedToasts.includes(toastName)) {
+          storedToasts.push(toastName);
+          localStorage.setItem("toasts", JSON.stringify(storedToasts));
+        }
+        if (toastIndicator) {
+          toastIndicator.style.display = "none";
+        }
+      });
+
+      setTimeout(
+        () => {
+          toast.setAttribute(
+            "style",
+            `transform: translateY(calc(${(toasts.length - index - 1) * 100}% - ${(toasts.length - index - 1) * 12}px)) scale(${1 - (toasts.length - index - 1) * 0.06});`,
+          );
+        },
+        100 * toasts.length - index * 100,
+      );
+
       if (index !== toasts.length - 1) {
         toast.classList.add("animated_fadeout");
       }
     });
+
     const toastsWrap = document.querySelector("[data-toasts]");
     if (toastsWrap) {
       setTimeout(() => {
@@ -211,5 +253,6 @@ const toasts = [
         toastsWrap.classList.add("toasts-wrap-fade");
       }, 3000);
     }
-  });
+  };
+  document.addEventListener("astro:page-load", initToasts);
 </script>
