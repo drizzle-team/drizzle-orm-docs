@@ -180,7 +180,7 @@ export const users = pgTable("users", {
   name: text().notNull(),
 });
 
-export const posts = pgTable("users", {
+export const posts = pgTable("posts", {
   id: integer().primaryKey(),
   description: text(),
   userId: integer('user_id').references(() => users.id),
@@ -232,7 +232,7 @@ main();
 ```
 
 **Example 3**: Seed the `users` table with 5 entities and populate the database with 100 `posts` without connecting them to the `users` entities. Refine `id` generation for `users` so 
-that it starts from `10000` and remains unique, and refine `posts` to retrieve values from a self-defined array
+that it will give any int from `10000` to `20000` and remains unique, and refine `posts` to retrieve values from a self-defined array
 ```ts filename='index.ts'
 import { drizzle } from "drizzle-orm/node-postgres";
 import { seed } from "drizzle-seed";
@@ -246,9 +246,10 @@ async function main() {
         count: 5,
         columns: {
             id: f.int({
-            minValue: 10000,
-            isUnique: true,
-          }),
+              minValue: 10000,
+              maxValue: 20000,
+              isUnique: true,
+            }),
         }
     },
     posts: {
@@ -316,9 +317,9 @@ export const details = pgTable(
     quantity: integer().notNull(),
     discount: doublePrecision().notNull(),
 
-    productId: integer("product_id")
+    orderId: integer("order_id")
       .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
+      .references(() => orders.id, { onDelete: "cascade" }),
   }
 );
 ```
@@ -337,7 +338,7 @@ async function main() {
     orders: {
        count: 5000,
        columns: {
-           unitPrice: funcs.weightedRandom(
+           unitPrice: f.weightedRandom(
                [
                    {
                        weight: 0.3,
@@ -386,7 +387,6 @@ main();
 
 ## Complex example
 
-// example of seed function for benchmarks
 <CodeTabs items={["main.ts", "schema.ts"]}>
 <Section>
 ```ts
@@ -626,5 +626,19 @@ export const details = pgTable('order_detail', {
 ```
 </Section>
 </CodeTabs>
+
 ## Limitations
 
+#### Types limitations for `with`
+
+Due to certain TypeScript limitations and the current API in Drizzle, it is not possible to properly infer references between tables, especially when circular dependencies between tables exist.
+
+This means the `with` option will display all tables in the schema, and you will need to manually select the one that has a one-to-many relationship
+
+<Callout title='warning'>
+The `with` option works for one-to-many relationships. For example, if you have one `user` and many `posts`, you can use users `with` posts, but you cannot use posts `with` users
+</Callout>
+
+#### Type limitations for the third parameter in Drizzle tables:
+
+Currently, we do not have type support for the third parameter in Drizzle tables. While it will work at runtime, it will not function correctly at the type level
