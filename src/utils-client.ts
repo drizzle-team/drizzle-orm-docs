@@ -53,7 +53,7 @@ export const sponsorsHandler = async () => {
   const response = await fetch("https://api.drizzle.team/v2/sponsors");
   const { sponsors } = await response.json();
 
-  const allSponsors = [...sponsors, ...customSponsors];
+  const allSponsors = [...customSponsors, ...sponsors];
   let pastSponsors: ISponsor[] = [];
 
   const currentDate = new Date();

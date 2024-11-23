@@ -217,7 +217,7 @@
               } else {
                 cardName.textContent =
                   item.sponsorEntity.__typename === "User"
-                    ? "@"
+                    ? "@" + item.sponsorEntity.login
                     : "" + item.sponsorEntity.login;
               }
               const cardWrapper = card.querySelector(
