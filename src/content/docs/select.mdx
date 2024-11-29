@@ -12,7 +12,7 @@ It natively supports mostly every query feature and capability of every dialect,
 and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
 
 For the following examples, let's assume you have a `users` table defined like this:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
 <Tab>
 ```typescript
 import { pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -26,12 +26,12 @@ export const users = pgTable('users', {
 </Tab>
 <Tab>
 ```typescript
-import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, text, int } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  age: integer('age'),
+  age: int('age'),
 });
 ```
 </Tab>
@@ -43,6 +43,17 @@ export const users = sqliteTable('users', {
   id: integer('id').primaryKey(),
   name: text('name').notNull(),
   age: integer('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { singlestoreTable, serial, text, int } from 'drizzle-orm/singlestore-core';
+
+export const users = singlestoreTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+  age: int('age'),
 });
 ```
 </Tab>
@@ -775,7 +786,7 @@ db
 
 ### Iterator
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false,  }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false, 'SingleStore[WIP]': false }} />
 
 If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
 
