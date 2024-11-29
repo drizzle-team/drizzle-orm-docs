@@ -38,4 +38,16 @@ export const dialects: ICards = {
     description: "Collection of nodejs modules to interact with PostgreSQL",
     href: "/sqlite",
   },
+  singlestore: {
+    title: "SingleStore",
+    imageSrc: "/public/svg/singlestore.svg",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    description: "Collection of nodejs modules to interact with PostgreSQL",
+    href: "/singlestore",
+  },
 };
