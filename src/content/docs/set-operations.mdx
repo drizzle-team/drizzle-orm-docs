@@ -2,6 +2,7 @@ import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
 
 # Set Operations
 
@@ -13,7 +14,7 @@ Combine all results from two query blocks into a single result, omitting any dup
 
 Get all names from customers and users tables without duplicates.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -185,6 +186,64 @@ Get all names from customers and users tables without duplicates.
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { union } from 'drizzle-orm/singlestore-core'
+    import { users, customers } from './schema'
+
+    const allNamesForUserQuery = db.select({ name: users.name }).from(users);
+
+    const result = await union(
+		allNamesForUserQuery,
+		db.select({ name: customers.name }).from(customers)
+	).limit(10);
+    ```
+    ```sql
+    (select `name` from `sellers`)
+    union
+    (select `name` from `customers`)
+    limit ?
+    ```
+	</CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { users, customers } from './schema'
+
+    const result = await db
+      .select({ name: users.name })
+      .from(users)
+      .union(db.select({ name: customers.name }).from(customers))
+      .limit(10);
+    ```
+    ```sql
+    (select `name` from `sellers`)
+    union
+    (select `name` from `customers`)
+    limit ?
+    ```
+    </CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int, mysqlTable, text, varchar } from "drizzle-orm/singlestore-core";
+
+    const users = mysqlTable('sellers', {
+        id: int('id').primaryKey(),
+        name: varchar('name', { length: 256 }).notNull(),
+        address: text('address'),
+    });
+    
+    const customers = mysqlTable('customers', {
+        id: int('id').primaryKey(),
+        name: varchar('name', { length: 256 }).notNull(),
+        city: text('city'),
+        email: varchar('email', { length: 256 }).notNull()
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Union All
@@ -195,7 +254,7 @@ representing in-store sales. In this case, you want to combine the data from bot
 single result set. Since there might be duplicate transactions, 
 you want to keep all the records and not eliminate duplicates.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -364,6 +423,65 @@ you want to keep all the records and not eliminate duplicates.
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  <Callout type='warning'>
+  UNION ALL with ORDER BY behavior inconsistent with MySQL: SingleStore parses UNION ALL followed by ORDER BY commands differently from MySQL. In SingleStore, the following query is valid. In MySQL, it is invalid.
+  </Callout>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { unionAll } from 'drizzle-orm/singlestore-core'
+    import { onlineSales, inStoreSales } from './schema'
+
+    const onlineTransactions = db.select({ transaction: onlineSales.transactionId }).from(onlineSales);
+    const inStoreTransactions = db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales);
+
+    const result = await unionAll(onlineTransactions, inStoreTransactions);
+    ```
+    ```sql
+    select `transaction_id` from `online_sales`
+    union all
+    select `transaction_id` from `in_store_sales`
+    ```
+    </CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { onlineSales, inStoreSales } from './schema'
+
+    const result = await db
+      .select({ transaction: onlineSales.transactionId })
+      .from(onlineSales)
+      .unionAll(
+        db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
+      );
+    ```
+    ```sql
+    (select `transaction_id` from `online_sales`)
+    union all 
+    (select `transaction_id` from `in_store_sales`)
+    ```
+	</CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/singlestore-core";
+
+    const onlineSales = mysqlTable('online_sales', {
+        transactionId: int('transaction_id').primaryKey(),
+        productId: int('product_id').unique(),
+        quantitySold: int('quantity_sold'),
+        saleDate: timestamp('sale_date', { mode: 'date' }),
+    });
+    
+    const inStoreSales = mysqlTable('in_store_sales', {
+        transactionId: int('transaction_id').primaryKey(),
+        productId: int('product_id').unique(),
+        quantitySold: int('quantity_sold'),
+        saleDate: timestamp('sale_date', { mode: 'date' }),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Intersect
@@ -377,7 +495,7 @@ enrollments of the same course by the same student.
 In this scenario, you want to find courses that are common between the two departments but don't want 
 to count the same course multiple times even if multiple students from the same department are enrolled in it.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -528,6 +646,56 @@ to count the same course multiple times even if multiple students from the same 
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+    <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { intersect } from 'drizzle-orm/singlestore-core'
+    import { depA, depB } from './schema'
+
+    const departmentACourses = db.select({ courseName: depA.courseName }).from(depA);
+    const departmentBCourses = db.select({ courseName: depB.courseName }).from(depB);
+
+    const result = await intersect(departmentACourses, departmentBCourses);
+    ```
+    ```sql
+    select `projects_name` from `department_a_projects`
+    intersect
+    select `projects_name` from `department_b_projects`
+    ```
+	</CodeTab>
+    <CodeTab>
+    ```typescript copy
+    import { depA, depB } from './schema'
+
+    const result = await db
+      .select({ courseName: depA.courseName })
+      .from(depA)
+      .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    ```
+    ```sql
+    select `projects_name` from `department_a_projects`
+    intersect
+    select `projects_name` from `department_b_projects`
+    ```
+    </CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int, mysqlTable, varchar } from "drizzle-orm/singlestore-core";
+
+    const depA = mysqlTable('department_a_courses', {
+        studentId: int('student_id'),
+        courseName: varchar('course_name', { length: 256 }).notNull(),
+    });
+    
+    const depB = pgTable('department_b_courses', {
+        studentId: int('student_id'),
+        courseName: varchar('course_name', { length: 256 }).notNull(),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Intersect All
@@ -542,7 +710,7 @@ In this scenario, you want to find products that are ordered by both regular cus
 but you want to retain the quantity information, even if the same product is ordered multiple 
 times by different customers.
 
-<Tabs items={["PostgreSQL", "MySQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -678,6 +846,9 @@ times by different customers.
     ```
     </CodeTab>
   </CodeTabs>
+  </Tab>
+  <Tab>
+  Not supported by SingleStore
   </Tab> 
 </Tabs>
 
@@ -692,7 +863,7 @@ In this scenario, you want to identify the projects that are exclusive to one de
 not shared with the other department. You don't want to count the same project 
 multiple times, even if multiple employees from the same department are assigned to it.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -843,6 +1014,56 @@ multiple times, even if multiple employees from the same department are assigned
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { except } from 'drizzle-orm/singlestore-core'
+    import { depA, depB } from './schema'
+
+    const departmentACourses = db.select({ courseName: depA.projectsName }).from(depA);
+    const departmentBCourses = db.select({ courseName: depB.projectsName }).from(depB);
+
+    const result = await except(departmentACourses, departmentBCourses);
+    ```
+    ```sql
+    select `projects_name` from `department_a_projects`
+    except
+    select `projects_name` from `department_b_projects`
+    ```
+	</CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { depA, depB } from './schema'
+
+    const result = await db
+        .select({ courseName: depA.projectsName })
+        .from(depA)
+        .except(db.select({ courseName: depB.projectsName }).from(depB));
+    ```
+    ```sql
+    select `projects_name` from `department_a_projects`
+    except
+    select `projects_name` from `department_b_projects`
+    ```
+    </CodeTab>
+    <CodeTab>
+	```typescript 
+    import { int, mysqlTable, varchar } from "drizzle-orm/singlestore-core";
+
+    const depA = mysqlTable('department_a_projects', {
+        employeeId: int('employee_id'),
+        projectsName: varchar('projects_name', { length: 256 }).notNull(),
+    });
+    
+    const depB = mysqlTable('department_b_projects', {
+        employeeId: int('employee_id'),
+        projectsName: varchar('projects_name', { length: 256 }).notNull(),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Except All
@@ -855,7 +1076,7 @@ In this case, you want to keep track of the quantity of each product, even if it
 In this scenario, you want to find products that are exclusively ordered by regular customers and not 
 ordered by VIP customers. You want to retain the quantity information, even if the same product is ordered multiple times by different regular customers.
 
-<Tabs items={["PostgreSQL", "MySQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SingleStore"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -992,4 +1213,7 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  Not supported by SingleStore
+  </Tab>
 </Tabs>
