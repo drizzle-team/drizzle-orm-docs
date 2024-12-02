@@ -7,7 +7,8 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.'
+const defaultDescription =
+  "Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.";
 ---
 
 <head>
@@ -27,17 +28,10 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
   />
   <meta name="generator" content={Astro.generator} />
   <title>{title}</title>
-  <meta
-    name="description"
-    content={defaultDescription || description}
-  />
+  <meta name="description" content={defaultDescription || description} />
   <meta property="og:title" content={title} />
-  <meta
-    property="og:description"
-    content={defaultDescription || description}
-  />
+  <meta property="og:description" content={defaultDescription || description} />
   <script is:inline>
-
     const transitionManager = () => {
       const style = document.createElement("style");
       const css = document.createTextNode(`* {
@@ -50,7 +44,7 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
       style.appendChild(css);
       const enable = () => document.head.removeChild(style);
       const disable = () => document.head.appendChild(style);
-      return {enable, disable, style};
+      return { enable, disable, style };
     };
 
     const setPreference = (themeName) => {
@@ -90,27 +84,37 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
       }
       return preference;
     };
-    let packageManager = localStorage.getItem('package-manager') || 'npm';
-    let expandedSections = localStorage.getItem('expandedSections') ? JSON.parse(localStorage.getItem('expandedSections')) : [];
+    let packageManager = localStorage.getItem("package-manager") || "npm";
+    let expandedSections = localStorage.getItem("expandedSections")
+      ? JSON.parse(localStorage.getItem("expandedSections"))
+      : [];
 
     setPreference(getColorPreference());
-    document.addEventListener('astro:page-load', () => setPreference(getColorPreference()))
-    document.addEventListener('astro:after-swap', () => setPreference(getColorPreference()));
+    document.addEventListener("astro:page-load", () =>
+      setPreference(getColorPreference()),
+    );
+    document.addEventListener("astro:after-swap", () =>
+      setPreference(getColorPreference()),
+    );
 
     const [navigationEntry] = performance.getEntriesByType("navigation");
     if (navigationEntry && navigationEntry.type !== "reload") {
       localStorage.removeItem("sidebar-scroll");
     }
 
-    window.addEventListener('popstate', () => {
+    window.addEventListener("popstate", () => {
       localStorage.removeItem("sidebar-scroll");
     });
 
-    document.addEventListener('click', function(event) {
-      const target = event.target.closest('a');
+    document.addEventListener("click", function (event) {
+      const target = event.target.closest("a");
       if (!target || !target.href) return;
 
-      const isSideBarElement = target && target.href && (target.getAttribute("data-nav-index") || target.getAttribute("data-slug"));
+      const isSideBarElement =
+        target &&
+        target.href &&
+        (target.getAttribute("data-nav-index") ||
+          target.getAttribute("data-slug"));
 
       if (!isSideBarElement && target.hostname === window.location.hostname) {
         localStorage.removeItem("sidebar-scroll");
@@ -122,7 +126,11 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
     type="module"
     src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js"
     defer></script>
-  <script is:inline defer data-domain="orm.drizzle.team" src="https://plausible.io/js/script.js"></script>
+  <script
+    is:inline
+    defer
+    data-domain="orm.drizzle.team"
+    src="https://plausible.io/js/script.js"></script>
   <script is:inline src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
   <link rel="stylesheet" href="/preferred.css" />
@@ -134,8 +142,9 @@ const defaultDescription = 'Drizzle ORM is a lightweight and performant TypeScri
   <script
     is:inline
     defer
-    data-site-id="orm.drizzle.team" 
-    src="https://assets.onedollarstats.com/tracker.js"> 
-  </script>
+    data-site-id="orm.drizzle.team"
+    src="https://assets.onedollarstats.com/tracker.js"></script>
+  <script is:inline async src="https://scripts.simpleanalyticscdn.com/latest.js"
+  ></script>
   <GlobalStyles />
 </head>
