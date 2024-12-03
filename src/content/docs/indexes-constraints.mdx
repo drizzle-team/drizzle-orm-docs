@@ -20,7 +20,7 @@ then the default value of the column is `NULL`.
 An explicit `DEFAULT` clause may specify that the default value is `NULL`,
 a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
     ```typescript
@@ -86,6 +86,25 @@ a string constant, a blob constant, a signed-number, or any constant expression 
     </Section>
 
   </Tab>
+  <Tab>
+    <Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { int, time, singlestoreTable } from "drizzle-orm/singlestore-core";
+    
+    const table = singlestoreTable("table", {
+      int: int("int").default(42),
+      time: time("time").default(sql`cast("14:06:10" AS TIME)`),
+    });
+    ```
+    ```sql
+    CREATE TABLE `table` (
+      `int` int DEFAULT 42,
+      `time` time DEFAULT cast("14:06:10" AS TIME)
+    );
+    ```
+    </Section>
+  </Tab>
 </Tabs>
 
 ### Not null
@@ -95,7 +114,7 @@ By default, a column can hold **NULL** values. The `NOT NULL` constraint enforce
 This enforces a field to always contain a value, which means that you cannot insert a new record,
 or update a record without adding a value to this field.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -148,6 +167,24 @@ or update a record without adding a value to this field.
     </Section>
 
   </Tab>
+    <Tab>
+    <Section>
+      ```typescript
+      import { int, singlestoreTable } from "drizzle-orm/singlestore-core";
+
+      const table = singlestoreTable('table', {
+        int: int('int').notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE `table` (
+        `int` int NOT NULL,
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Unique
@@ -162,7 +199,7 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
   You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
 </Callout>
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -307,6 +344,49 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
     </Section>
 
   </Tab>
+    <Tab>
+    <Section>
+      ```typescript
+      import { int, varchar, unique, singlestoreTable } from "drizzle-orm/singlestore-core";
+
+      export const user = singlestoreTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = singlestoreTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = singlestoreTable('composite_example', {
+        id: int('id'),
+        name: varchar('name', { length: 256 }),
+      }, (t) => ({
+        unq: unique().on(t.id, t.name),
+        unq2: unique('custom_name').on(t.id, t.name)
+      }));
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+      	`id` int,
+      	CONSTRAINT `user_id_unique` UNIQUE(`id`)
+      );
+
+      CREATE TABLE `table` (
+      	`id` int,
+      	CONSTRAINT `custom_name` UNIQUE(`id`)
+      );
+
+      CREATE TABLE `composite_example` (
+	    `id` int,
+	    `name` varchar(256),
+	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Check
@@ -317,7 +397,7 @@ If you define a `CHECK` constraint on a column it will allow only certain values
 
 If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -405,6 +485,9 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
     </Section>
 
   </Tab>
+  <Tab>
+    Currently not supported in SingleStore
+  </Tab>
 </Tabs>
 
 ### Primary Key
@@ -414,7 +497,7 @@ Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.
 
 A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -493,6 +576,32 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
     </Section>
 
   </Tab>
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, text, singlestoreTable } from "drizzle-orm/singlestore-core";
+
+      export const user = singlestoreTable("user", {
+        id: int("id").autoincrement().primaryKey(),
+      })
+
+      export const table = singlestoreTable("table", {
+        cuid: text("cuid").primaryKey(),
+      })
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+        `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL
+      );
+
+      CREATE TABLE `table` (
+        `cuid` text PRIMARY KEY NOT NULL
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Composite Primary Key
@@ -500,7 +609,7 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
 
 Drizzle ORM provides a standalone `primaryKey` operator for that:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
       ```typescript copy {18, 19}
@@ -616,6 +725,44 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
     </Section>
 
   </Tab>
+  <Tab>
+    <Section>
+      ```typescript {18, 19}
+      import { int, text, primaryKey, mysqlTable } from "drizzle-orm/singlestore-core";
+
+      export const user = singlestoreTable("user", {
+        id: int("id").autoincrement().primaryKey(),
+        name: text("name"),
+      });
+
+      export const book = singlestoreTable("book", {
+        id: int("id").autoincrement().primaryKey(),
+        name: text("name"),
+      });
+
+      export const booksToAuthors = singlestoreTable("books_to_authors", {
+        authorId: int("author_id"),
+        bookId: int("book_id"),
+      }, (table) => {
+        return {
+          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
+          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+        };
+      });
+      ```
+
+      ```sql {6}
+      ...
+
+      CREATE TABLE `books_to_authors` (
+        `author_id` int,
+        `book_id` int,
+        PRIMARY KEY(`book_id`,`author_id`)
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Foreign key
@@ -627,7 +774,7 @@ The table with the foreign key is called the child table, and the table with the
 Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     ```typescript copy {11}
     import { serial, text, integer, pgTable } from "drizzle-orm/pg-core";
@@ -679,12 +826,15 @@ You can declare them in a column declaration statement:
     ```
 
   </Tab>
+  <Tab>
+    Currently not supported in SingleStore
+  </Tab>
 </Tabs>
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     ```typescript copy {6,16-19}
     import { serial, text, integer, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
@@ -766,9 +916,12 @@ set return type for reference callback or use a standalone `foreignKey` operator
     ```
 
   </Tab>
+  <Tab>
+    Currently not supported in SingleStore
+  </Tab>
 </Tabs>
 To declare multicolumn foreign keys you can use a dedicated `foreignKey` operator:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     ```typescript copy {4-5,14-15,18-21}
     import { serial, text, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
@@ -856,13 +1009,16 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
     ```
 
   </Tab>
+  <Tab>
+    Currently not supported in SingleStore
+  </Tab>
 </Tabs>
 
 ## Indexes
 
 Drizzle ORM provides API for both `index` and `unique index` declaration:
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
   <Tab>
     <Section>
     ```typescript copy {9-10}
@@ -987,5 +1143,31 @@ index('name')
       .on(table.name)
       .where(sql`...`)
     ```
+  </Tab>
+  <Tab>
+    <Section>
+    ```typescript copy {9-10}
+    import { int, text, index, uniqueIndex, singlestoreTable } from "drizzle-orm/singlestore-core";
+
+    export const user = singlestoreTable("user", {
+      id: int("id").primaryKey().autoincrement(),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => {
+      return {
+        nameIdx: index("name_idx").on(table.name),
+        emailIdx: uniqueIndex("email_idx").on(table.email),
+      };
+    });
+    ```
+    ```sql {5-6}
+    CREATE TABLE `user` (
+      ...
+    );
+
+    CREATE INDEX `name_idx` ON `user` (`name`);
+    CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
+    ```
+    </Section>
   </Tab>
 </Tabs>

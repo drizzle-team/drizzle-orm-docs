@@ -36,6 +36,19 @@ export const databases: {
       width: 24,
     },
   },
+  SingleStore: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/singlestore_light.svg",
+      darkThemeSrc: "/public/svg/singlestore_dark.svg",
+    },
+    lightStyle: {
+      width: 26,
+    },
+    darkStyle: {
+      width: 26,
+    },
+    sponsorUrl: "https://driz.link/singlestore",
+  },
   Turso: {
     imageSrc: {
       lightThemeSrc: "/public/svg/new-turso.svg",

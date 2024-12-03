@@ -222,6 +222,29 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "SingleStore",
+        path: {
+          existing: "/docs/get-started/singlestore-existing",
+          new: "/docs/get-started/singlestore-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/singlestore_light.svg",
+            style: {
+              width: 20,
+              fill: "#00546B",
+            },
+          },
+          dark: {
+            path: "/public/svg/singlestore_dark.svg",
+            style: {
+              width: 20,
+              fill: "#F0F0F0",
+            },
+          },
+        },
+      }
     ],
   },
   {
@@ -307,6 +330,27 @@ export const getStartedItems: GetStartedItems = [
             path: "/public/svg/bun.svg",
             style: {
               width: 20,
+            },
+          },
+        },
+      },
+      {
+        name: "Cloudflare Durable Objects",
+        path: {
+          existing: "/docs/get-started/do-existing",
+          new: "/docs/get-started/do-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/cloudflare.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/cloudflare.svg",
+            style: {
+              width: 26,
             },
           },
         },

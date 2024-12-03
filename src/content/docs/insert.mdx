@@ -32,7 +32,7 @@ await insertUser(newUser);
 ```
 
 ## Insert returning
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false}} />
 You can insert a row and get it back in PostgreSQL and SQLite like such:
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
@@ -42,7 +42,7 @@ await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: u
 ```
 
 ## Insert $returningId
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true }} />
 
 MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. There is only one way to do it for `primary keys` with `autoincrement` (or `serial`) types, where you can access `insertId` and `affectedRows` fields. We've prepared an automatic way for you to handle such cases with Drizzle and automatically receive all inserted IDs as separate objects
 
@@ -87,7 +87,7 @@ await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 Drizzle ORM provides simple interfaces for handling upserts and conflicts.
 
 ### On conflict do nothing
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false }} />
 
 `onConflictDoNothing` will cancel the insert if there's a conflict:
 
@@ -164,7 +164,7 @@ await db.insert(users)
 ```
 
 ### On duplicate key update
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true }} />
 
 MySQL supports [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html) instead of `ON CONFLICT` clauses. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if *any* unique index conflicts.
 
