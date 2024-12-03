@@ -334,6 +334,27 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "Cloudflare Durable Objects",
+        path: {
+          existing: "/docs/get-started/do-existing",
+          new: "/docs/get-started/do-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/cloudflare.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/cloudflare.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
     ],
   },
   {

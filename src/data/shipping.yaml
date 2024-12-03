@@ -1,3 +1,111 @@
+2024-12:
+  - | 
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.29.0'>v0.29.0</a> release</b>
+    and <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.37.0'>v0.37.0</a> release</b>
+
+    <ul>
+    <li>New dialect <b>SingleStore</b> is available in Drizzle</li>
+    <li>New driver for <b>Durable Objects SQLite</b> is available in Drizzle</li>
+    <li>[BUG]: $with is undefined on withReplicas</li>
+    <li>[BUG]: Neon serverless driver accepts authToken as a promise, but the $withAuth does not</li>
+    </ul>
+
+2024-11:
+  - |
+    <b>🎉 OneDollarStats is now available in Open Alpha release!</b>
+
+    <a href='https://onedollarstats.com/'>OneDollarStats</a> is a $1 per month web analytics built by Drizzle Team
+
+  - |
+    <b>🎉 New `drizzle-seed` package is now available</b>
+
+    For more info check our <a href='https://orm.drizzle.team/docs/seed-overview'>seed documentation</a>
+
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.36.4'>v0.36.4</a> release</b>
+
+    <ul>
+    <li>Added .$withAuth() API for Neon HTTP driver</li>
+    <li>Added OVERRIDING SYSTEM VALUE api to db.insert()</li>
+    </ul>
+
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.36.3'>v0.36.3</a> release</b>
+
+    <ul>
+    <li>Support for UPDATE ... FROM in PostgreSQL and SQLite</li>
+    <li>Support for INSERT INTO ... SELECT in all dialects</li>
+    </ul>
+
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.28.1'>v0.28.1</a> release</b>
+    and <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.36.2'>v0.36.2</a> release</b>
+
+    <ul>
+    <li>Support more types in like, notLike, ilike and notIlike expressions</li>
+    <li>Fixed typos in repository: thanks @armandsalle, @masto, @wackbyte, @Asher-JH, @MaxLeiter</li>
+    <li>fix: wrong dialect set in mysql/sqlite introspect</li>
+    <li>Fixed .generated behavior with non-strict tsconfig</li>
+    <li>Fix Drizzle ORM for expo-sqlite</li>
+    <li>Fixed lack of schema name on columns in sql</li>
+    <li>fix: Adjust neon http driver entity kind</li>
+    <li>Export PgIntegerBuilderInitial type</li>
+    <li>[MySQL] Correct $returningId() implementation to correctly store selected fields</li>
+    </ul>
+
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.28.0'>v0.28.0</a> release</b>
+    and <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.36.1'>v0.36.1</a> release</b>
+
+    <ul>
+    <li>Added an OHM static imports checker to identify unexpected imports within a chain of imports in the drizzle-kit repo. For example, it checks if drizzle-orm is imported before drizzle-kit and verifies if the drizzle-orm import is available in your project.</li>
+    <li>Adding more columns to Supabase auth.users table schema</li>
+    </ul>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: Using sql.placeholder with limit and/or offset for a prepared statement produces TS error</li>
+    <li>[BUG] If a query I am trying to modify with a dynamic query (....$dynamic()) contains any placeholders, I'm getting an error that says No value for placeholder.... provided</li>
+    <li>[BUG]: Error thrown when trying to insert an array of new rows using generatedAlwaysAsIdentity() for the id column</li>
+    <li>[BUG]: Unable to Use BigInt Types with Bun and Drizzle</li>
+    <li>[BUG]: [drizzle-kit]: Fix breakpoints option cannot be disabled</li>
+    <li>[BUG]: drizzle-kit introspect: SMALLINT import missing and incorrect DECIMAL UNSIGNED handling</li>
+    <li>Unsigned tinyints preventing migrations</li>
+    <li>[BUG]: Can't parse float(8,2) from database (precision and scale and/or unsigned breaks float types)</li>
+    <li>[BUG]: PgEnum generated migration doesn't escape single quotes</li>
+    <li>[BUG]: single quote not escaped correctly in migration file</li>
+    <li>[BUG]: Migrations does not escape single quotes</li>
+    <li>[BUG]: Issue with quoted default string values</li>
+    <li>[BUG]: SQl commands in wrong roder</li>
+    <li>[BUG]: Time with precision in drizzle-orm/pg-core adds double-quotes around type</li>
+    <li>[BUG]: Postgres push fails due to lack of quotes</li>
+    <li>[BUG]: TypeError: Cannot read properties of undefined (reading 'compositePrimaryKeys')</li>
+    <li>[BUG]: drizzle-kit introspect generates CURRENT_TIMESTAMP without sql operator on date column</li>
+    <li>[BUG]: Drizzle-kit introspect doesn't pull correct defautl statement</li>
+    <li>[BUG]: Problem on MacBook - This statement does not return data. Use run() instead</li>
+    <li>[BUG]: Enum column names that are used as arrays are not quoted</li>
+    <li>[BUG]: drizzle-kit generate ignores index operators</li>
+    <li>dialect param config error message is wrong</li>
+    <li>[BUG]: Error setting default enum field values</li>
+    <li>[BUG]: drizzle-kit does not respect the order of columns configured in primaryKey()</li>
+    <li>[BUG]: Cannot drop Unique Constraint MySQL</li>
+    </ul>
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.27.2'>v0.27.2</a> release</b>
+
+    <ul>
+    <li>Fix [BUG]: Undefined properties when using drizzle-kit push</li>
+    <li>Fix TypeError: Cannot read properties of undefined (reading 'isRLSEnabled')</li>
+    <li>Fix push bugs, when pushing a schema with linked policy to a table from drizzle-orm/supabase</li>
+    </ul>
+
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.27.1'>v0.27.1</a> release</b>
+
+    <ul>
+    <li>Fix: [BUG]: When using RLS policies and Views, the view is the last clause generated</li>
+    </ul>
+
 2024-10:
   - |
     <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.36.0'>v0.36.0</a> release</b>
