@@ -4,25 +4,25 @@ import Section from "@mdx/Section.astro";
 import Tab from "@mdx/Tab.astro";
 import Tabs from "@mdx/Tabs.astro";
 import Callout from "@mdx/Callout.astro";
-import Prerequisites from "@mdx/Prerequisites.astro"
+import Prerequisites from "@mdx/Prerequisites.astro";
 import Npx from "@mdx/Npx.astro";
-import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx"
-import Dialects from "@mdx/Dialects.mdx"
+import SchemaFilePaths from "@mdx/SchemaFilePaths.mdx";
+import Dialects from "@mdx/Dialects.mdx";
 
-# `drizzle-kit generate` 
+# `drizzle-kit generate`
 
 <Prerequisites>
-- Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
-- Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
-- Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
+  - Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
+  - Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration) -
+  Database connection basics - [read here](/docs/connect-overview) - Drizzle
+  migrations fundamentals - [read here](/docs/migrations) - Drizzle Kit
+  [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
 </Prerequisites>
 
-
-<br/>
+<br />
 
 `drizzle-kit generate` lets you generate SQL migrations based on you Drizzle schema upon declaration or on subsequent schema changes.
+
 <Callout collapsed="How it works under the hood?">
 Drizzle Kit `generate` command triggers a sequence of events:
 1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
@@ -59,19 +59,20 @@ export const users = p.pgTable("users", {
 -- drizzle/0000_premium_mister_fear.sql
 
 CREATE TABLE "users" (
- "id" SERIAL PRIMARY KEY,
- "name" TEXT,
- "email" TEXT UNIQUE
+"id" SERIAL PRIMARY KEY,
+"name" TEXT,
+"email" TEXT UNIQUE
 );
-```
+
+````
 </Section>
 </Callout>
 
-It's designed to cover [code first](/docs/migrations) approach of managing Drizzle migrations. 
-You can apply generated migrations using [`drizzle-kit migrate`](/docs/drizzle-kit-migrate), using drizzle-orm's `migrate()`, 
-using external migration tools like bytebase or running migrations yourself directly on the database. 
+It's designed to cover [code first](/docs/migrations) approach of managing Drizzle migrations.
+You can apply generated migrations using [`drizzle-kit migrate`](/docs/drizzle-kit-migrate), using drizzle-orm's `migrate()`,
+using external migration tools like bytebase or running migrations yourself directly on the database.
 
-`drizzle-kit generate` command requires you to provide both `dialect` and `schema` path options, 
+`drizzle-kit generate` command requires you to provide both `dialect` and `schema` path options,
 you can set them either via [drizzle.config.ts](/docs/drizzle-config-file) config file or via CLI options
 <CodeTabs items={["With config file", "As CLI options"]}>
 <Section>
@@ -83,40 +84,48 @@ export default defineConfig({
   dialect: "postgresql",
   schema: "./src/schema.ts",
 });
-```
+````
+
 ```shell
 npx drizzle-kit generate
 ```
+
 </Section>
 
 ```shell
 npx drizzle-kit generate --dialect=postgresql --schema=./src/schema.ts
 ```
+
 </CodeTabs>
 
 ### Schema files path
-You can have a single `schema.ts` file or as many schema files as you want spread out across the project. 
+
+You can have a single `schema.ts` file or as many schema files as you want spread out across the project.
 Drizzle Kit requires you to specify path(s) to them as a [glob](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) via `schema` configuration option.
 
-<SchemaFilePaths/>
-
+<SchemaFilePaths />
 
 ### Custom migration file name
+
 You can set custom migration file names by providing `--name` CLI option
+
 ```shell
 npx drizzle-kit generate --name=init
 ```
+
 ```plaintext {4}
 📦 <project root>
  ├ 📂 drizzle
  │ ├ 📂 _meta
- │ └ 📜 0000_init.sql 
+ │ └ 📜 0000_init.sql
  ├ 📂 src
  └ …
 ```
 
 ### Multiple configuration files in one project
+
 You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases or different databases on the same project:
+
 <Npx>
   drizzle-kit generate --config=drizzle-dev.config.ts
   drizzle-kit generate --config=drizzle-prod.config.ts
@@ -133,12 +142,14 @@ You can have multiple config files in the project, it's very useful when you hav
 ```
 
 ### Custom migrations
-You can generate empty migration files to write your own custom SQL migrations 
+
+You can generate empty migration files to write your own custom SQL migrations
 for DDL alternations currently not supported by Drizzle Kit or data seeding. Extended docs on custom migrations - [see here](/docs/kit-custom-migrations)
 
 ```shell
 drizzle-kit generate --custom --name=seed-users
 ```
+
 <Section>
 ```plaintext {5}
 📦 <project root>
@@ -155,7 +166,8 @@ drizzle-kit generate --custom --name=seed-users
 INSERT INTO "users" ("name") VALUES('Dan');
 INSERT INTO "users" ("name") VALUES('Andrew');
 INSERT INTO "users" ("name") VALUES('Dandrew');
-```
+
+````
 </Section>
 
 ### Extended list of available configurations
@@ -178,7 +190,7 @@ drizzle-kit push --name=seed_users --custom
 <br/>
 <hr/>
 <br/>
-We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/drizzle-config-file) file, 
+We recommend configuring `drizzle-kit` through [drizzle.config.ts](/docs/drizzle-config-file) file,
 yet you can provide all configuration options through CLI if necessary, e.g. in CI/CD pipelines, etc.
 
 |               |            |                                                                            |
@@ -191,7 +203,7 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 
 
 ### Extended example
-Example of how to create a custom postgresql migration file named `0001_seed-users.sql` 
+Example of how to create a custom postgresql migration file named `0001_seed-users.sql`
 with Drizzle schema located in `./src/schema.ts` and migrations folder named `./migrations` instead of default `./drizzle`.
 
 We will also place drizzle config file in the `configs` folder.
@@ -205,7 +217,8 @@ Let's create config file:
  │ └ 📜 drizzle.config.ts
  ├ 📂 src
  └ …
-```
+````
+
 ```ts filename='drizzle.config.ts'
 import { defineConfig } from "drizzle-kit";
 
@@ -217,10 +230,13 @@ export default defineConfig({
 ```
 
 Now let's run
+
 ```shell
 npx drizzle-kit generate --config=./configs/drizzle.config.ts --name=seed-users --custom
 ```
+
 And it will successfully generate
+
 <Section>
 ```plaintext {6}
 📦 <project root>
@@ -237,5 +253,7 @@ And it will successfully generate
 INSERT INTO "users" ("name") VALUES('Dan');
 INSERT INTO "users" ("name") VALUES('Andrew');
 INSERT INTO "users" ("name") VALUES('Dandrew');
+
 ```
 </Section>
+```
