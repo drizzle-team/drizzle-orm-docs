@@ -216,18 +216,18 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       export const composite = pgTable('composite_example', {
         id: integer('id'),
         name: text('name'),
-      }, (t) => ({
+      }, (t) => [{
         unq: unique().on(t.id, t.name),
         unq2: unique('custom_name').on(t.id, t.name)
-      }));
+      }]);
 
       // In Postgres 15.0+ NULLS NOT DISTINCT is available
       // This example demonstrates both available usages
       export const userNulls = pgTable('user_nulls_example', {
         id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
-      }, (t) => ({
+      }, (t) => [{
         unq: unique().on(t.id).nullsNotDistinct()
-      }));
+      }]);
       ```
 
       ```sql
@@ -411,9 +411,9 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
           username: text().notNull(),
           age: integer(),
         },
-        (table) => ({
+        (table) => [{
           checkConstraint: check("age_check1", sql`${table.age} > 21`),
-        })
+        }]
       );
       ```
       ```sql
@@ -629,10 +629,10 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
         authorId: integer("author_id"),
         bookId: integer("book_id"),
       }, (table) => {
-        return {
+        return [{
           pk: primaryKey({ columns: [table.bookId, table.authorId] }),
           pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
-        };
+        }];
       });
       ```
 
@@ -851,13 +851,13 @@ set return type for reference callback or use a standalone `foreignKey` operator
       name: text("name"),
       parentId: integer("parent_id"),
     }, (table) => {
-      return {
+      return [{
         parentReference: foreignKey({
           columns: [table.parentId],
           foreignColumns: [table.id],
           name: "custom_fk"
         }),
-      };
+      }];
     });
     ```
 
@@ -940,13 +940,13 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
       userFirstName: text("user_first_name"),
       userLastName: text("user_last_name"),
     }, (table) => {
-      return {
+      return [{
         userReference: foreignKey({
           columns: [table.userFirstName, table.userLastName],
           foreignColumns: [user.firstName, user.lastName]
           name: "custom_fk"
         })
-      }
+      }]
     })
     ```
 
