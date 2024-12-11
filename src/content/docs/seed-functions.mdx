@@ -160,6 +160,29 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 
 ```
 
+### `uuid`
+
+<rem025 />
+Generates v4 UUID strings
+
+|  | param      | default    | type
+|:-| :--------  | :--------  | :--------
+|  |--          |--          |--
+
+<rem025 />
+```ts 
+import { seed } from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  products: {
+    columns: {
+      id: funcs.uuid(),
+    },
+  },
+}));
+
+```
+
 ### `boolean`
 
 <rem025 />
@@ -865,5 +888,3 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
     },
   },
 }));
-
-```
