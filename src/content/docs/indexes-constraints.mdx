@@ -629,10 +629,10 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
         authorId: integer("author_id"),
         bookId: integer("book_id"),
       }, (table) => {
-        return [{
-          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
-          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
-        }];
+        return [
+          primaryKey({ columns: [table.bookId, table.authorId] }),
+          primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+        ];
       });
       ```
 
@@ -642,7 +642,7 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       CREATE TABLE IF NOT EXISTS "books_to_authors" (
         "author_id" integer,
         "book_id" integer,
-        PRIMARY KEY("book_id","author_id"),
+        CONSTRAINT "books_to_authors_book_id_author_id_pk" PRIMARY KEY("book_id","author_id"),
       );
 
       ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");
