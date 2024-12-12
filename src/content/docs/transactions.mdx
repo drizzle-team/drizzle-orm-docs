@@ -84,7 +84,7 @@ await db.transaction(async (tx) => {
 
 We provide dialect-specific transaction configuration APIs:
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
 <Tab>
 ```ts copy {6-8}
 await db.transaction(
@@ -146,6 +146,30 @@ await db.transaction(
 
 interface SQLiteTransactionConfig {
     behavior?: 'deferred' | 'immediate' | 'exclusive';
+}
+```
+</Tab>
+<Tab>
+```ts {6-8}
+await db.transaction(
+  async (tx) => {
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, "Dan"));
+    await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, "Andrew"));
+  }, {
+    isolationLevel: "read committed",
+    accessMode: "read write",
+    withConsistentSnapshot: true,
+  }
+);
+
+interface SingleStoreTransactionConfig {
+  isolationLevel?:
+    | "read uncommitted"
+    | "read committed"
+    | "repeatable read"
+    | "serializable";
+  accessMode?: "read only" | "read write";
+  withConsistentSnapshot?: boolean;
 }
 ```
 </Tab>

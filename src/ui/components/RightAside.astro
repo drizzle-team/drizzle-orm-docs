@@ -1,20 +1,20 @@
 ---
 import AsideArticle from "./AsidePosts.astro";
 import AsideSponsors from "./AsideSponsors.astro";
-import CarbonCard from "./CarbonCard.astro";
 import SmallProgressBar from "./SmallProgressBar.astro";
 import progress from "../../data/progress";
+import Toasts from "./Toasts.astro";
 ---
 
 <div class="aside-right">
   <div class="aside-right__content">
-      <div class="progress-wrap">
-        <SmallProgressBar  progress={progress} />
-      </div>
-      <AsideArticle />
-      <AsideSponsors />
+    <div class="progress-wrap">
+      <SmallProgressBar progress={progress} />
+    </div>
+    <AsideArticle />
+    <AsideSponsors />
   </div>
-  <CarbonCard />
+  <Toasts />
 </div>
 <style>
   .aside-right {
@@ -27,7 +27,11 @@ import progress from "../../data/progress";
     justify-content: space-between;
     height: calc(100vh - 104px);
     z-index: 99;
-      position: relative;
+    position: relative;
+  }
+
+  html.dark .aside-right__content {
+    background-color: #111;
   }
 
   .aside-right__content {
@@ -36,11 +40,14 @@ import progress from "../../data/progress";
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    position: relative;
+    z-index: 10000;
+    background-color: #fff;
   }
 
   .progress-wrap {
-      width: 100%;
-      margin-bottom: 4px;
+    width: 100%;
+    margin-bottom: 4px;
   }
 
   @media screen and (max-width: 1024px) {

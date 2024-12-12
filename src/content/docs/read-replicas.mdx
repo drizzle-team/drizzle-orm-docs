@@ -7,7 +7,7 @@ When your project involves a set of read replica instances, and you require a co
 SELECT queries from read replicas, as well as performing create, delete, and update operations on the primary 
 instance, you can leverage the `withReplicas()` function within Drizzle
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
 <Tab>
 ```ts copy
 import { sql } from 'drizzle-orm';
@@ -80,6 +80,42 @@ const usersTable = sqliteTable('users', {
 const primaryDb = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
 const read1 = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
 const read2 = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });
+
+const db = withReplicas(primaryDb, [read1, read2]);
+```
+</Tab>
+<Tab>
+```ts copy
+import { drizzle } from "drizzle-orm/singlestore";
+import mysql from "mysql2/promise";
+import { boolean, singlestoreTable, serial, text, withReplicas } from 'drizzle-orm/singlestore-core';
+
+const usersTable = singlestoreTable('users', {
+	id: serial('id' as string).primaryKey(),
+	name: text('name').notNull(),
+	verified: boolean('verified').notNull().default(false),
+});
+
+const primaryClient = await mysql.createConnection({
+  host: "host",
+  user: "user",
+  database: "primary_db",
+})
+const primaryDb = drizzle({ client: primaryClient });
+
+const read1Client = await mysql.createConnection({
+  host: "host",
+  user: "user",
+  database: "read_1",
+})
+const read1 = drizzle({ client: read1Client });
+
+const read2Client = await mysql.createConnection({
+  host: "host",
+  user: "user",
+  database: "read_2",
+})
+const read2 = drizzle({ client: read2Client });
 
 const db = withReplicas(primaryDb, [read1, read2]);
 ```

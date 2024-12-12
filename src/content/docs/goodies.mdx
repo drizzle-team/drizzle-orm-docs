@@ -8,7 +8,7 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 ## Type API
 To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers.
 
-<Tabs items={["PostgreSQL","MySQL","SQLite"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore"]}>
 <Tab>
 ```ts
 import { serial, text, pgTable } from 'drizzle-orm/pg-core';
@@ -69,6 +69,26 @@ type SelectUser = InferSelectModel<typeof users>;
 type InsertUser = InferInsertModel<typeof users>;
 ```
 </Tab>
+<Tab>
+```ts
+import { int, text, singlestoreTable } from 'drizzle-orm/singlestore-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = singlestoreTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
+// or
+type SelectUser = typeof users._.$inferSelect;
+type InsertUser = typeof users._.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+</Tab>
 </Tabs>
 
 
@@ -114,7 +134,7 @@ const db = drizzle({ logger: new MyLogger() });
 **Table creator** API lets you define customise table names.  
 It's very useful when you need to keep schemas of different projects in one database.
 
-<CodeTabs items={["PostgreSQL","MySQL","SQLite"]}>
+<CodeTabs items={["PostgreSQL","MySQL","SQLite", "SingleStore"]}>
 ```ts {3}
 import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
 
@@ -141,6 +161,16 @@ import { int, text, sqliteTableCreator } from 'drizzle-orm/sqlite-core';
 const sqliteTable = sqliteTableCreator((name) => `project1_${name}`);
 
 const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
+```ts {3}
+import { int, text, singlestoreTableCreator } from 'drizzle-orm/singlestore-core';
+
+const mysqlTable = singlestoreTableCreator((name) => `project1_${name}`);
+
+const users = singlestoreTable('users', {
   id: int('id').primaryKey(),
   name: text('name').notNull(),
 });
@@ -185,7 +215,7 @@ const query = db
 If you have some complex queries to execute and `drizzle-orm` can't handle them yet,
 you can use the `db.execute` method to execute raw `parametrized` queries.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
     <Tab>
     ```ts
     const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
@@ -210,13 +240,21 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
     const res: Database.RunResult = db.run(statement)
     ```
     </Tab>
+    <Tab>
+    ```typescript copy
+    import { ..., SingleStoreQueryResult } from "drizzle-orm/singlestore";
+
+    const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+    const res: SingleStoreRawQueryResult = await db.execute(statement);
+    ```
+    </Tab>
 </Tabs>
 
 
 ## Standalone query builder
 Drizzle ORM provides a standalone query builder that allows you to build queries
 without creating a database instance and get generated SQL.
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore"]}>
     <Tab>
         ```typescript copy
         import { QueryBuilder } from 'drizzle-orm/pg-core';
@@ -247,13 +285,23 @@ without creating a database instance and get generated SQL.
         const { sql, params } = query.toSQL();
         ```
     </Tab>
+    <Tab>
+        ```typescript copy
+        import { QueryBuilder } from 'drizzle-orm/singlestore-core';
+
+        const qb = new QueryBuilder();
+
+        const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+        const { sql, params } = query.toSQL();
+        ```
+    </Tab>
 </Tabs>
 
 ## Get typed table columns
 You can get a typed table columns map,
 very useful when you need to omit certain columns upon selection.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore"]}>
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
@@ -323,10 +371,33 @@ very useful when you need to omit certain columns upon selection.
         ```
       </CodeTabs>
   </Tab>
+  <Tab>
+      <CodeTabs items={["index.ts", "schema.ts"]}>
+        ```ts
+        import { getTableColumns } from "drizzle-orm";
+        import { user } from "./schema";
+
+        const { password, role, ...rest } = getTableColumns(user);
+
+        await db.select({ ...rest }).from(users);
+        ```
+        ```ts
+        import { int, text, mysqlTable } from "drizzle-orm/singlestore-core";
+
+        export const user = singlestoreTable("user", {
+          id: int("id").primaryKey().autoincrement(),
+          name: text("name"),
+          email: text("email"),
+          password: text("password"),
+          role: text("role").$type<"admin" | "customer">(),
+        });
+        ```
+      </CodeTabs>
+  </Tab>
 </Tabs>
 
 ## Get table information
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore"]}>
   <Tab>
     ```ts copy
     import { getTableConfig, pgTable } from 'drizzle-orm/pg-core';
@@ -371,6 +442,22 @@ very useful when you need to omit certain columns upon selection.
     columns,
     indexes,
     foreignKeys,
+    checks,
+    primaryKeys,
+    name,
+    schema,
+  } = getTableConfig(table);
+  ```
+  </Tab>
+  <Tab>
+  ```ts copy
+  import { getTableConfig, mysqlTable } from 'drizzle-orm/singlestore-core';
+
+  export const table = singlestoreTable(...);
+
+  const {
+    columns,
+    indexes,
     checks,
     primaryKeys,
     name,

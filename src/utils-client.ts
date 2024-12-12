@@ -53,7 +53,7 @@ export const sponsorsHandler = async () => {
   const response = await fetch("https://api.drizzle.team/v2/sponsors");
   const { sponsors } = await response.json();
 
-  const allSponsors = [...sponsors, ...customSponsors];
+  const allSponsors = [...customSponsors, ...sponsors];
   let pastSponsors: ISponsor[] = [];
 
   const currentDate = new Date();
@@ -110,6 +110,8 @@ export const sponsorsHandler = async () => {
       }
     }
   });
+
+  gold = gold.filter((s) => s.sponsorEntity.login !== "samalberto25")
 
   superhero = superhero.filter((s) => filterFunc(s));
   hero = hero.filter((s) => filterFunc(s));

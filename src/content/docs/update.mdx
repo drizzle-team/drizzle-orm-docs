@@ -22,7 +22,7 @@ await db.update(users)
 
 ### Limit
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true }} />
 
 Use `.limit()` to add `limit` clause to the query - for example:
 <Section>
@@ -57,7 +57,7 @@ update "users" set "verified" = $1 order by "name" asc, "name2" desc;
 </Section>
 
 ### Update with returning
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false , 'SingleStore': false}} />
 You can update a row and get it back in PostgreSQL and SQLite:
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
@@ -99,7 +99,7 @@ returning "id"
 
 ## Update ... from
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': true, 'SingleStore': false }} />
 
 As the SQLite documentation mentions:
 
@@ -146,7 +146,7 @@ from "cities" "c"
 ```
 </Section>
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false, 'SingleStore': false }} />
 
 In Postgres, you can also return columns from the joined tables.
 <Section>
