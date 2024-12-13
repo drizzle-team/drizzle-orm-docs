@@ -830,6 +830,15 @@ await db.select()
   .where(eq(users.name, 'David'));
 ```
 
+You can also use this option on any join you want
+
+```ts
+await db.select()
+  .from(users)
+  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
+  .where(eq(users.name, 'David'));
+```
+
 ### Ignore Index
 
 The `IGNORE INDEX` hint tells the optimizer to avoid using specific indexes for the query. MySQL will consider all other indexes (if any) or perform a full table scan if necessary.
@@ -849,6 +858,16 @@ await db.select()
   .where(eq(users.name, 'David'));
 ```
 
+You can also use this option on any join you want
+
+```ts
+await db.select()
+  .from(users)
+  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
+  .where(eq(users.name, 'David'));
+```
+
+
 ### Force Index
 
 The `FORCE INDEX` hint forces the optimizer to use the specified index(es) for the query. If the specified index cannot be used, MySQL will not fall back to other indexes; it might resort to a full table scan instead.
@@ -865,5 +884,14 @@ const usersTableNameIndex = index('users_name_index').on(users.name);
 
 await db.select()
   .from(users, { forceIndex: usersTableNameIndex })
+  .where(eq(users.name, 'David'));
+```
+
+You can also use this option on any join you want
+
+```ts
+await db.select()
+  .from(users)
+  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
   .where(eq(users.name, 'David'));
 ```
