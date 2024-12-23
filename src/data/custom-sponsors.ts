@@ -240,7 +240,7 @@ export const customSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.li/decocx",
+      login: "driz.link/decocx",
       name: "Deco",
       avatarUrl: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
         <path d="M6.77828 19.8642C4.2582 19.8642 2.25696 18.9006 1.07104 17.1959C-0.189006 15.417 -0.337247 12.8969 0.626315 10.2286C1.96048 6.74493 5.14764 4.59545 9.00189 4.59545H9.07601C9.07601 4.52133 9.07601 4.44721 9.07601 4.29897C9.00189 3.03893 9.81721 1.92712 11.0031 1.55652L14.4868 0.22236C14.8574 0.0741201 15.228 0 15.5986 0C16.7104 0 17.7481 0.592961 18.2669 1.63064L19.6752 4.59545C20.1199 5.48489 20.1199 6.59669 19.6011 7.41201C19.0822 8.22733 18.2669 8.67205 17.3775 8.74618C17.1551 9.1909 17.0069 9.63562 16.7845 10.0062C16.3398 11.0439 15.8951 12.0816 15.3762 13.1934C13.4491 17.1959 11.2996 19.8642 6.77828 19.8642Z" fill="#113032"/>
@@ -329,6 +329,32 @@ export const customSponsors: ISponsor[] = [
       padding: "6px",
       background:
         'url("/svg/edb_logo_dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$2500 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/upstash",
+      name: "Upstash",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-12-22T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      background:
+        'url("/svg/upstash-icon-dark-bg.svg") 0% 0% / cover no-repeat content-box',
+      padding: "12px",
+    },
+    lightStyle: {
+      background:
+        'url("/svg/upstash-icon-white-bg.svg") 0% 0% / cover no-repeat content-box',
+      padding: "12px",
     },
   },
   {
