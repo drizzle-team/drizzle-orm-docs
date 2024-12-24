@@ -1,3 +1,56 @@
+<!-- STYLES FOR BANNER  -->
+<style is:global lang="scss">
+  body:has(#banner) {
+    margin-top: 104px;
+    #header {
+      top: 40px;
+    }
+
+    .fixed-container {
+      top: 104px;
+    }
+
+    .aside-right {
+      height: calc(100vh - 104px);
+    }
+
+    .aside-scroll {
+      height: calc(100dvh - 104px);
+    }
+
+    @media screen and (max-width: 768px) {
+      #aside {
+        height: calc(100% - 104px);
+      }
+    }
+  }
+
+  body {
+    margin-top: 64px;
+  }
+
+  #header {
+    top: 0;
+  }
+
+  .fixed-container {
+    top: 64px;
+  }
+
+  .aside-scroll {
+    height: calc(100dvh - 64px);
+  }
+
+  .aside-right {
+    height: calc(100vh - 64px);
+  }
+
+  @media screen and (max-width: 768px) {
+    #aside {
+      height: calc(100% - 64px);
+    }
+  }
+</style>
 <style is:global>
   @font-face {
     font-family: "Menlo";
@@ -391,7 +444,7 @@
   }
 
   html.dark .search-wrap--centered .DocSearch-Button-Placeholder {
-      color: #909090;
+    color: #909090;
   }
 
   .search-wrap--centered .DocSearch-Button-Placeholder {
@@ -399,7 +452,7 @@
   }
 
   html.dark .search-wrap--centered .DocSearch-Button svg {
-      color: #909090 !important;
+    color: #909090 !important;
   }
 
   .search-wrap--centered .DocSearch-Button svg {
@@ -431,21 +484,21 @@
   }
 
   html[class~="dark"] .default {
-      color: #bfdbfe;
+    color: #bfdbfe;
   }
 
   .default {
-      color: #1e3a8a;
+    color: #1e3a8a;
   }
 
   html[class~="dark"] .default {
-      background-color: rgb(21 31 59);
-      border: 1px solid rgba(191, 219, 254, 0.3);
+    background-color: rgb(21 31 59);
+    border: 1px solid rgba(191, 219, 254, 0.3);
   }
 
   .default {
-      background-color: #dbeafe;
-      border: 1px solid #bfdbfe;
+    background-color: #dbeafe;
+    border: 1px solid #bfdbfe;
   }
 
   html[class~="dark"] .warning {
@@ -485,21 +538,21 @@
   }
 
   .callout-label {
-      margin-top: 6px;
-      border-radius: 2px;
-      padding: 2px 4px;
-      width: fit-content;
-      margin-left: 8px;
-      margin-bottom: calc(-6px - 8px);
-      z-index: 1;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      position: relative;
+    margin-top: 6px;
+    border-radius: 2px;
+    padding: 2px 4px;
+    width: fit-content;
+    margin-left: 8px;
+    margin-bottom: calc(-6px - 8px);
+    z-index: 1;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    position: relative;
   }
 
-  .callout-label +  .callout-wrap {
-      padding-top: 12px;
+  .callout-label + .callout-wrap {
+    padding-top: 12px;
   }
 
   .callout-wrap {
@@ -515,8 +568,8 @@
   }
 
   html.dark .callout-wrap {
-      background: #1a1a1a;
-      border-color: #292929;
+    background: #1a1a1a;
+    border-color: #292929;
   }
 
   .callout-content {
@@ -533,51 +586,51 @@
   }
 
   .callout-wrap .code-snippet > pre {
-      background-color: white !important;
+    background-color: white !important;
   }
 
   html.dark .callout-wrap .code-snippet > pre {
-      background-color: #141414 !important;
+    background-color: #141414 !important;
   }
 
   .callout-wrap .npm__content:not(.hidden) figure {
-      margin-bottom: 0;
+    margin-bottom: 0;
   }
 
   .callout-wrap .npm__wrapper:last-child {
-      margin-bottom: 0;
+    margin-bottom: 0;
   }
 
   html.dark .callout-wrap .npm__tabs {
-      background-color: #171717;
+    background-color: #171717;
   }
 
   html.dark .callout-wrap .npm__tab {
-      background-color: #171717;
+    background-color: #171717;
   }
 
   html.dark .callout-wrap .npm__tab--active {
-      background-color: #141414;
+    background-color: #141414;
   }
 
   .callout-wrap .npm__tab--active {
-      background-color: white;
+    background-color: white;
   }
 
   html.dark .callout-wrap .codetabs_tab--active {
-      background-color: #141414;
+    background-color: #141414;
   }
 
   html.dark .callout-wrap .codetabs_tabs {
-      background-color: #171717;
+    background-color: #171717;
   }
 
   html.dark .callout-wrap .codetabs_tab {
-      background-color: #171717;
+    background-color: #171717;
   }
 
   .callout-wrap .codetabs_tab--active {
-      background-color: white;
+    background-color: white;
   }
 
   /* NPM */
@@ -597,84 +650,84 @@
   }
 
   .npm__tabs {
-      display: flex;
-      flex-direction: row;
-      padding: 0;
-      background-color: #f5f5f5;
-      border-top-left-radius: 2px;
-      border-top-right-radius: 2px;
-      overflow: auto;
-      border-right: 1px solid #e0e1e3;
-      border-left: 1px solid #e0e1e3;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    background-color: #f5f5f5;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    overflow: auto;
+    border-right: 1px solid #e0e1e3;
+    border-left: 1px solid #e0e1e3;
   }
 
   .npm__tabs::after {
-      content: "";
-      display: flex;
-      flex: 1;
-      border-bottom: 1px solid #e0e1e3;
-      border-top: 1px solid #e0e1e3;
+    content: "";
+    display: flex;
+    flex: 1;
+    border-bottom: 1px solid #e0e1e3;
+    border-top: 1px solid #e0e1e3;
   }
 
   html.dark .npm__tabs {
-      border-color: #292929;
-      background-color: #141414;
+    border-color: #292929;
+    background-color: #141414;
   }
 
   html.dark .npm__tabs::after {
-      border-color: #292929;
+    border-color: #292929;
   }
 
   html[class~="dark"] .npm__tab,
   html[class~="dark"] .npm__tab--active {
-      background-color: #141414;
-      color: #c4c5c6;
-      border-right: 1px solid #292929;
-      border-bottom: 1px solid #292929;
-      border-top: 1px solid #292929;
+    background-color: #141414;
+    color: #c4c5c6;
+    border-right: 1px solid #292929;
+    border-bottom: 1px solid #292929;
+    border-top: 1px solid #292929;
   }
 
   .npm__tab,
   .npm__tab--active {
-      background-color: #f5f5f5;
-      cursor: pointer;
-      user-select: none;
-      color: #374152;
-      font-size: 13px;
-      padding: 6px 12px;
-      box-sizing: border-box;
-      position: relative;
-      border-right: 1px solid #e0e1e3;
-      border-bottom: 1px solid #e0e1e3;
-      border-top: 1px solid #e0e1e3;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    user-select: none;
+    color: #374152;
+    font-size: 13px;
+    padding: 6px 12px;
+    box-sizing: border-box;
+    position: relative;
+    border-right: 1px solid #e0e1e3;
+    border-bottom: 1px solid #e0e1e3;
+    border-top: 1px solid #e0e1e3;
   }
 
   .npm__tab--active::after {
-      content: "";
-      display: block;
-      background: #37352f;
-      height: 2px;
-      position: absolute;
-      top: -1px;
-      left: -1px;
-      right: -1px;
+    content: "";
+    display: block;
+    background: #37352f;
+    height: 2px;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
   }
 
   .npm__tab--active {
-      background: #fafafa;
-      border-bottom-color: transparent;
-      border-top-color: transparent;
+    background: #fafafa;
+    border-bottom-color: transparent;
+    border-top-color: transparent;
   }
 
   html[class~="dark"] .npm__tab--active {
-      color: #c4c5c6;
-      background: #1a1a1a;
-      border-bottom-color: transparent;
-      border-top-color: transparent;
+    color: #c4c5c6;
+    background: #1a1a1a;
+    border-bottom-color: transparent;
+    border-top-color: transparent;
   }
 
   html[class~="dark"] .npm__tab--active::after {
-      background: #c4c5c6;
+    background: #c4c5c6;
   }
 
   /* CODE TABS */
@@ -702,7 +755,7 @@
   }
 
   .codetabs_wrapper .section__wrap {
-      margin: 0;
+    margin: 0;
   }
 
   html[class~="dark"] .codetabs_tabs {
@@ -710,32 +763,32 @@
   }
 
   .codetabs_tabs {
-      display: flex;
-      flex-direction: row;
-      padding: 0;
-      background-color: #f5f5f5;
-      border-top-left-radius: 2px;
-      border-top-right-radius: 2px;
-      overflow: auto;
-      border-right: 1px solid #e0e1e3;
-      border-left: 1px solid #e0e1e3;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    background-color: #f5f5f5;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    overflow: auto;
+    border-right: 1px solid #e0e1e3;
+    border-left: 1px solid #e0e1e3;
   }
 
   html.dark .codetabs_tabs {
-      border-color: #292929;
-      background-color: #141414;
+    border-color: #292929;
+    background-color: #141414;
   }
 
   html.dark .codetabs_tabs::after {
-      border-color: #292929;
+    border-color: #292929;
   }
 
   .codetabs_tabs::after {
-      content: "";
-      display: flex;
-      flex: 1;
-      border-bottom: 1px solid #e0e1e3;
-      border-top: 1px solid #e0e1e3;
+    content: "";
+    display: flex;
+    flex: 1;
+    border-bottom: 1px solid #e0e1e3;
+    border-top: 1px solid #e0e1e3;
   }
 
   html[class~="dark"] .codetabs_tab,
@@ -749,20 +802,19 @@
 
   .codetabs_tab,
   .codetabs_tab--active {
-      background-color: #f5f5f5;
-      cursor: pointer;
-      user-select: none;
-      color: #374152;
-      font-size: 13px;
-      padding: 6px 12px;
-      box-sizing: border-box;
-      position: relative;
-      border-right: 1px solid #e0e1e3;
-      border-bottom: 1px solid #e0e1e3;
-      border-top: 1px solid #e0e1e3;
-      white-space: nowrap;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    user-select: none;
+    color: #374152;
+    font-size: 13px;
+    padding: 6px 12px;
+    box-sizing: border-box;
+    position: relative;
+    border-right: 1px solid #e0e1e3;
+    border-bottom: 1px solid #e0e1e3;
+    border-top: 1px solid #e0e1e3;
+    white-space: nowrap;
   }
-
 
   html[class~="dark"] .codetabs_tab--active {
     color: #c4c5c6;
@@ -772,24 +824,24 @@
   }
 
   html[class~="dark"] .codetabs_tab--active::after {
-      background-color: #c4c5c6;
+    background-color: #c4c5c6;
   }
 
   .codetabs_tab--active::after {
-      content: "";
-      display: block;
-      background: #37352f;
-      height: 2px;
-      position: absolute;
-      top: -1px;
-      left: -1px;
-      right: -1px;
+    content: "";
+    display: block;
+    background: #37352f;
+    height: 2px;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
   }
 
   .codetabs_tab--active {
-      background: #fafafa;
-      border-bottom-color: transparent;
-      border-top-color: transparent;
+    background: #fafafa;
+    border-bottom-color: transparent;
+    border-top-color: transparent;
   }
 
   /* CODE TAB */
@@ -805,8 +857,8 @@
   }
 
   .codetabs_wrapper .section__wrap > figure:first-child > pre {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
   .codetab_wrapper > figure:last-child > pre {
@@ -833,24 +885,24 @@
   }
 
   .section__wrap > figure:not(:first-child) > pre {
-      border-top: none;
+    border-top: none;
   }
 
   .section__wrap .callout-wrap {
-      margin: 0;
-      border-radius: 0;
+    margin: 0;
+    border-radius: 0;
   }
 
   .section__wrap > .callout-wrap:first-child {
-      border-radius: 2px 2px 0 0;
+    border-radius: 2px 2px 0 0;
   }
 
   .section__wrap > .callout-wrap:last-child {
-      border-radius: 0 0 2px 2px;
+    border-radius: 0 0 2px 2px;
   }
 
   .section__wrap > .callout-wrap:not(:first-child) {
-      border-top: none;
+    border-top: none;
   }
 
   .section__wrap > figure > pre {
@@ -871,26 +923,29 @@
   }
 
   .section__wrap > .codetabs_wrapper:not(:first-child) > .codetabs_tabs {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: 0;
   }
 
   .section__wrap > .codetabs_wrapper {
-      margin: 0;
+    margin: 0;
   }
 
-  .section__wrap > .codetabs_wrapper:not(:first-child) > .codetabs_tabs::after  {
-      border-top-color: transparent;
+  .section__wrap > .codetabs_wrapper:not(:first-child) > .codetabs_tabs::after {
+    border-top-color: transparent;
   }
 
-  .section__wrap > .codetabs_wrapper:not(:first-child) > .codetabs_tabs .codetabs_tab {
-      border-top-color: transparent;
+  .section__wrap
+    > .codetabs_wrapper:not(:first-child)
+    > .codetabs_tabs
+    .codetabs_tab {
+    border-top-color: transparent;
   }
 
   .section__wrap > .codetabs_wrapper:not(:last-child) figure > pre {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   .section__wrap > figure.has-title > pre {
@@ -902,7 +957,6 @@
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
   }
-
 
   /* TABS */
 
@@ -1147,7 +1201,7 @@
       pre {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
-          border-top: none;
+        border-top: none;
       }
 
       .header {
@@ -1193,7 +1247,7 @@
 
         .expand-button-wrap {
           background: linear-gradient(to top, #1a1a1a, 70%, transparent);
-            border-color: #292929;
+          border-color: #292929;
         }
       }
       &.has-title {

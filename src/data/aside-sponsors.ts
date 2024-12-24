@@ -251,16 +251,16 @@ export const asideSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      width: "72px",
       filter: "grayscale(1) brightness(2) opacity(0.3)",
       background:
         'url("/svg/edb_logo_light.svg") center / contain no-repeat content-box',
+      minWidth: "calc(100% + 16px)"
     },
     lightStyle: {
-      width: "72px",
       filter: "grayscale(1) opacity(0.6)",
       background:
         'url("/svg/edb_logo_dark.svg") center / contain no-repeat content-box',
+      minWidth: "calc(100% + 16px)"
     },
   },
   {
@@ -286,7 +286,6 @@ export const asideSponsors: ISponsor[] = [
       padding: "6px",
     },
     lightStyle: {
-      width: "48px",
       filter: "brightness(0.8) grayscale(1)",
       background:
         'url("/svg/upstash-icon-white-bg.svg") 0% 0% / cover no-repeat content-box',
