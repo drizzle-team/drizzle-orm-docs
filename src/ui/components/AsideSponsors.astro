@@ -4,7 +4,7 @@ import { asideSponsors } from "@/data/aside-sponsors";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
-    return acc + `${key}: ${style[key as keyof CSSProperties]};`;
+    return acc + `${key === "minWidth" ? "min-width" : key}: ${style[key as keyof CSSProperties]};`;
   }, "");
 };
 
@@ -113,51 +113,6 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     ))
   }
 </div>
-<a
-  href="https://driz.link/gold"
-  target="_blank"
-  rel="nofollow noreferrer"
-  class="aside-sponsors__become-btn"
->
-  <div class="aside-sponsors__sponsor-wrap">
-    <div class="aside-sponsors__become-btn__text">Become a Gold Sponsor</div>
-    <div class="aside-sponsors__become-btn__svg">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="feather feather-arrow-right"
-        data-astro-cid-iirlvvjs=""
-        data-astro-source-file="/Users/vladstogniy/WebstormProjects/orm-drizzle-docs-astro/src/components/layout/AsidePosts.astro"
-        data-astro-source-loc="31:9"
-      >
-        <line
-          x1="5"
-          y1="12"
-          x2="19"
-          y2="12"
-          data-astro-cid-iirlvvjs=""
-          data-astro-source-file="/Users/vladstogniy/WebstormProjects/orm-drizzle-docs-astro/src/components/layout/AsidePosts.astro"
-          data-astro-source-loc="31:9"
-        >
-        </line>
-        <polyline
-          points="12 5 19 12 12 19"
-          data-astro-cid-iirlvvjs=""
-          data-astro-source-file="/Users/vladstogniy/WebstormProjects/orm-drizzle-docs-astro/src/components/layout/AsidePosts.astro"
-          data-astro-source-loc="31:53"
-        >
-        </polyline>
-      </svg>
-    </div>
-  </div>
-</a>
 <script is:inline type="module">
   import {
     computePosition,
@@ -303,7 +258,7 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     border-bottom-right-radius: 5px;
   }
 
-  .aside-sponsors__row > .aside-sponsors__sponsor {
+  .aside-sponsors__sponsor {
     height: 74px;
   }
 
@@ -330,13 +285,11 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     position: relative;
   }
 
-  html.dark .aside-sponsors__sponsor::before,
-  html.dark .aside-sponsors__become-btn::before {
+  html.dark .aside-sponsors__sponsor::before {
     background-image: url("../../assets/images/dark-gradient.png");
   }
 
-  .aside-sponsors__sponsor::before,
-  .aside-sponsors__become-btn::before {
+  .aside-sponsors__sponsor::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -354,12 +307,7 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     transition: opacity 0.2s;
   }
 
-  .aside-sponsors__become-btn::before {
-    border-radius: 5px;
-  }
-
-  .aside-sponsors__sponsor:hover::before,
-  .aside-sponsors__become-btn:hover::before {
+  .aside-sponsors__sponsor:hover::before {
     opacity: 1;
   }
 
@@ -386,8 +334,6 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: unset;
-    width: unset;
   }
 
   html.dark .aside-sponsors__sponsor-wrap:hover {
@@ -431,48 +377,6 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     transition: filter 0.2s;
   }
 
-  .aside-sponsors__become-btn .aside-sponsors__sponsor-wrap {
-    border-radius: 4px;
-  }
-
-  .aside-sponsors__become-btn {
-    font-size: 12px;
-    margin-top: 4px;
-    position: relative;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 32px;
-    margin-bottom: 12px;
-    transition: all 0.2s ease-in-out;
-    width: 100%;
-    color: #909090;
-    overflow: hidden;
-  }
-
-  .aside-sponsors__become-btn__svg {
-    height: 16px;
-    width: 16px;
-    margin-left: -16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      margin-left 150ms ease-in-out,
-      opacity 150ms ease-in-out;
-    opacity: 0;
-  }
-
-  .aside-sponsors__become-btn:hover .aside-sponsors__become-btn__svg {
-    margin-left: 4px;
-    opacity: 1;
-  }
-  .aside-sponsors__become-btn__svg svg {
-    width: 12px;
-    height: 12px;
-  }
-
   .aside-sponsors__sponsor {
     position: relative;
   }
@@ -511,5 +415,27 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
 
   .aside-sponsors__sponsor:hover .popover {
     opacity: 1;
+  }
+
+  @media screen and (max-height: 826px) {
+    body:has(#banner) .aside-sponsors__sponsor {
+      height: 62px;
+    }
+
+    .aside-sponsors__sponsor-image {
+      height: 40px;
+      width: 40px;
+    }
+  }
+
+  @media screen and (max-height: 790px) {
+    body:not(:has(#banner)) .aside-sponsors__sponsor {
+      height: 62px;
+    }
+
+    body:not(:has(#banner)) .aside-sponsors__sponsor-image {
+      height: 40px;
+      width: 40px;
+    }
   }
 </style>

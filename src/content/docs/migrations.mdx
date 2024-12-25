@@ -350,3 +350,66 @@ CREATE TABLE "users" (
 
 <rem/>
 <rem/>
+<rem/>
+
+<Tag style="font-size: 12px">**Option 6**</Tag>
+> I want to have database schema in my TypeScript codebase,
+> I want Drizzle to output the SQL representation of my Drizzle schema to the console,
+> and I will apply them to my database via Atlas 
+
+<Callout collapsed="Expand details">
+That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
+Drizzle let's you export SQL statements based on your schema changes with [`drizzle-kit export`](/docs/drizzle-kit-generate) and then 
+you can apply them to the database via external migration tools.
+
+<Section>
+```typescript filename="src/schema.ts"
+import * as p from "drizzle-orm/pg-core";
+
+export const users = p.pgTable("users", {
+  id: p.serial().primaryKey(),
+  name: p.text(),
+  email: p.text().unique(), 
+};
+```
+```                                  
+┌────────────────────────┐                  
+│ $ drizzle-kit export   │                  
+└─┬──────────────────────┘                  
+  │                                           
+  └ 1. read your drizzle schema
+    2. generated SQL representation of your schema
+  ┌ 4. outputs to console
+  │    
+  │       
+  │      
+  │        
+  │        
+  v
+```
+```sql
+CREATE TABLE "users" (
+ "id" SERIAL PRIMARY KEY,
+ "name" TEXT,
+ "email" TEXT UNIQUE
+);
+```
+```
+┌───────────────────────────────────┐                  
+│ (._.) now you run your migrations │           
+└─┬─────────────────────────────────┘  
+  │
+ via Atlas
+  │                                    ┌──────────────┐
+  │  ┌────────────────────┐            │              │
+  └──│ Atlas              ├───────────>│  Database    │      
+     └────────────────────┘            │              │       
+                                       └──────────────┘
+
+[✓] done!                                                 
+```
+</Section>
+</Callout>
+
+<rem/>
+<rem/>

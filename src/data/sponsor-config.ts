@@ -12,7 +12,7 @@ export const sponsorConfig: {
   hero: {
     header: "Hero",
     emoji: "🦸",
-    size: 90,
+    size: 84,
     hasName: true,
     hasCard: true,
     columnSize: 110,
