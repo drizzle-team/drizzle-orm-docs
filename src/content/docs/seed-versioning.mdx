@@ -4,10 +4,24 @@ import Callout from "@mdx/Callout.astro";
 
 # Versioning
 
-|     |     api version  |   npm version    |     changes                             |
+`drizzle-seed` uses versioning to manage outputs for static and dynamic data. To ensure true 
+determinism, ensure that values remain unchanged when using the same `seed` number. If changes are made to 
+static data sources or dynamic data generation logic, the version will be updated, allowing
+you to choose between sticking with the previous version or using the latest.
+
+You can upgrade to the latest `drizzle-seed` version for new features, such as additional
+generators, while maintaining deterministic outputs with a previous version if needed. This
+is particularly useful when you need to rely on existing deterministic data while accessing new functionality.
+
+```ts
+await seed(db, schema, { version: '2' });
+```
+
+## History
+|     |     api version  |   npm version    |     Changed generators                             |
 | :-: | :--------------: | :--------------: | :-------------:                         |
 |     |  `v1`            | `0.1.1`          |                                         |
-|     | `v2`(LTS)        | `0.2.1`          |`string`, `interval({ isUnique: true })` |
+|     |  `v2 (LTS) `       | `0.2.1`          |`string()`, `interval({ isUnique: true })` |
 
 <Callout collapsed="How it works under the hood?">
 > This is not an actual API change; it is just an example of how we will proceed with `drizzle-seed` versioning.
@@ -42,17 +56,14 @@ await seed(db, schema, { version: '1' });
 </Callout>
 
 ## Version 2
+#### Unique `interval` generator was changed
 
-- Unique `interval` generator was changed
-
-**Reason for upgrade:**
+<Callout title='Reason for upgrade'>
 An older version of the generator could produce intervals like `1 minute 60 seconds` and `2 minutes 0 seconds`, treating them as distinct intervals.
 However, when the `1 minute 60 seconds` interval is inserted into a PostgreSQL database, it is automatically converted to `2 minutes 0 seconds`. As a result, attempting to insert the `2 minutes 0 seconds` interval into a unique column afterwards will cause an error
-##
+</Callout>
 
-**You will be affected by changes in unique `interval` generator**
-
-If your table includes a unique column of type `interval`:
+You will be affected, if your table includes a unique column of type `interval`:
 <Tabs items={['PostgreSQL']}>
 <Tab>
 ```ts
@@ -75,7 +86,7 @@ main();
 </Tab>
 </Tabs>
 
-If you use the unique `interval` generator in your seeding script, as shown in the script below:
+You will be affected, if you use the unique `interval` generator in your seeding script, as shown in the script below:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
 ```ts
@@ -193,19 +204,13 @@ main();
 </Tab>
 </Tabs>
 
-##
+#### `string` generators were changed: both non-unique and unique
 
-- Both non-unique and unique `string` generators were changed
-
-**Reason to upgrade:**
-
+<Callout title='Reason to upgrade'>
 Ability to generate a unique string based on the length of the text column (e.g., `varchar(20)`)
+</Callout>
 
-##
-
-**You will be affected by changes in the `string` generator**
-
-If your table includes a column of a text-like type with a maximum length parameter or a unique column of a text-like type:
+You will be affected, if your table includes a column of a text-like type with a maximum length parameter or a unique column of a text-like type:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
 ```ts
@@ -282,7 +287,7 @@ main();
 </Tab>
 </Tabs>
 
-If you use the `string` generator in your seeding script, as shown in the script below:
+You will be affected, if you use the `string` generator in your seeding script, as shown in the script below:
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite']}>
 <Tab>
 ```ts
