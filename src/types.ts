@@ -22,6 +22,11 @@ declare global {
   }
 }
 
+interface SponsorCSS extends CSSProperties {
+  "max-width"?: string;
+  "aspect-ratio"?: string | number;
+}
+
 export interface ISponsor {
   tier: {
     name: string;
@@ -38,8 +43,8 @@ export interface ISponsor {
   createdAt: string;
   isActive: boolean;
   imageType?: ImageType;
-  lightStyle?: CSSProperties;
-  darkStyle?: CSSProperties;
+  lightStyle?: SponsorCSS;
+  darkStyle?: SponsorCSS;
 }
 
 export enum ImageType {
