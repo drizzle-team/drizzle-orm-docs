@@ -37,6 +37,13 @@ const toasts = [
             <span class="toast-title">{toast.title}</span>
             <span class="toast-description">{toast.description}</span>
           </div>
+          <div class="black-friday-wrap">
+            <div class="black-friday">
+              christmas
+              <br />
+              deal
+            </div>
+          </div>
         </div>
       </a>
     ))
@@ -226,21 +233,17 @@ const toasts = [
     transform: translateY(-50%);
   }
 
-  html.dark .black-friday {
-    background-color: #fff;
-    color: #000;
-  }
-
   .black-friday {
     transform: rotateZ(45deg);
-    font-size: 8px;
+    font-size: 7px;
     text-transform: uppercase;
-    font-weight: 700;
-    background-color: #111;
+    font-weight: 800;
+    background-color: #ff4545;
     color: #fff;
-    padding: 3px;
+    padding: 2px;
     border-radius: 3px;
     line-height: normal;
+    text-align: center;
   }
 
   @media screen and (max-height: 742px) {
@@ -248,14 +251,12 @@ const toasts = [
       display: none;
     }
   }
-  
+
   @media screen and (max-height: 704px) {
     body:not(:has(#banner)) .toasts-wrap {
       display: none;
     }
   }
-
-
 </style>
 <style is:global>
   .toast-icon svg {
