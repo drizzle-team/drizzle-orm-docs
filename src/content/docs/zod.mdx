@@ -160,6 +160,33 @@ const userInsertSchema = createInsertSchema(users, {
 });
 ```
 
+**Use case: Type coercion**
+
+```ts copy
+import { pgTable, timestamp } from 'drizzle-orm/pg-core';
+import { createSchemaFactory } from 'drizzle-zod';
+import { z } from 'zod';
+
+const users = pgTable('users', {
+  ...,
+  createdAt: timestamp().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({
+  // This configuration will only coerce dates. Set `coerce` to `true` to coerce all data types or specify others
+  coerce: {
+    date: true
+  }
+});
+
+const userInsertSchema = createInsertSchema(users);
+// The above is the same as this:
+const userInsertSchema = z.object({
+  ...,
+  createdAt: z.coerce.date()
+});
+```
+
 ### Data type reference
 
 ```ts
