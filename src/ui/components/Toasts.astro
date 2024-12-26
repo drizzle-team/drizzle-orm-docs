@@ -242,6 +242,20 @@ const toasts = [
     border-radius: 3px;
     line-height: normal;
   }
+
+  @media screen and (max-height: 742px) {
+    body:has(#banner) .toasts-wrap {
+      display: none;
+    }
+  }
+  
+  @media screen and (max-height: 704px) {
+    body:not(:has(#banner)) .toasts-wrap {
+      display: none;
+    }
+  }
+
+
 </style>
 <style is:global>
   .toast-icon svg {
