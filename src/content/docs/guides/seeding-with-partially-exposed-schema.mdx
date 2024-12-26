@@ -70,6 +70,7 @@ await seed(db, { bloodPressure, users });
 - You can [refine](/docs/guides/seeding-with-partially-exposed-tables#refining-the-userid-column-generator) the `userId` column generator;
 
 ## Example 2
+
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 ```ts
@@ -126,12 +127,12 @@ import { bloodPressure } from './schema.ts';
 async function main() {
   const db = drizzle(...);
   await seed(db, { bloodPressure }).refine((funcs) => ({
-  bloodPressure: {
-    columns: {
-      userId: funcs.valuesFromArray({ values: [1, 2] })
+    bloodPressure: {
+      columns: {
+        userId: funcs.valuesFromArray({ values: [1, 2] })
+      }
     }
-  }
-}))
+  }));
 }
 main();
 

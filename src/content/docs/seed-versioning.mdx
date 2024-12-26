@@ -1,6 +1,7 @@
 import Tab from "@mdx/Tab.astro";
 import Tabs from "@mdx/Tabs.astro";
 import Callout from "@mdx/Callout.astro";
+import TableWrapper from "@mdx/TableWrapper.astro";
 
 # Versioning
 
@@ -18,10 +19,12 @@ await seed(db, schema, { version: '2' });
 ```
 
 ## History
-|     |     api version  |   npm version    |     Changed generators                             |
-| :-: | :--------------: | :--------------: | :-------------:                         |
-|     |  `v1`            | `0.1.1`          |                                         |
-|     |  `v2 (LTS) `       | `0.2.1`          |`string()`, `interval({ isUnique: true })` |
+<TableWrapper>
+|          api version  |   npm version    |     Changed generators                             |
+|  :-------------- | :-------------- | :-------------                         |
+|       `v1`            | `0.1.1`          |                                         |
+|       `v2 (LTS) `       | `0.2.1`          |`string()`, `interval({ isUnique: true })` |
+</TableWrapper>
 
 <Callout collapsed="How it works under the hood?">
 > This is not an actual API change; it is just an example of how we will proceed with `drizzle-seed` versioning.
