@@ -279,17 +279,24 @@ export const asideSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      width: "48px",
+      height: "100%",
       filter: "brightness(0.3) grayscale(1)",
       background:
-        'url("/svg/upstash-icon-dark-bg.svg") 0% 0% / cover no-repeat content-box',
+        'url("/svg/upstash-dark-bg.svg") center / contain no-repeat content-box',
       padding: "6px",
+      width: "fit-content",
+      "aspect-ratio": 4.55,
+      "max-width": "initial",
     },
     lightStyle: {
-      filter: "brightness(0.8) grayscale(1)",
+      height: "100%",
+      filter: "brightness(0.8) grayscale(1) opacity(0.45)",
       background:
-        'url("/svg/upstash-icon-white-bg.svg") 0% 0% / cover no-repeat content-box',
+        'url("/svg/upstash-white-bg.svg") center / contain no-repeat content-box',
       padding: "6px",
+      width: "fit-content",
+      "aspect-ratio": 4.55,
+      "max-width": "initial",
     },
   },
   {
