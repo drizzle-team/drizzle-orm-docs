@@ -446,5 +446,27 @@ export const customSponsors: ISponsor[] = [
     darkStyle: {
       filter: "invert(1)",
     },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "mooncake.dev",
+      name: "Mooncake",
+      avatarUrl: "/images/mooncake.png",
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+    darkStyle: {
+      filter: "invert(1)",
+      padding: "9px",
+    },
+    lightStyle: {
+      padding: "9px",
+    }
   }
 ];
