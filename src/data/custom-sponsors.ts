@@ -454,7 +454,7 @@ export const customSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "mooncake.dev",
+      login: "driz.link/mooncake",
       name: "Mooncake",
       avatarUrl: "/images/mooncake.png",
     },
