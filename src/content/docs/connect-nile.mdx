@@ -1,0 +1,86 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import Steps from '@mdx/Steps.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+
+# Drizzle \<\> Nile
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- Nile Database - [website](https://thenile.dev)
+- Drizzle PostgreSQL drivers - [docs](/docs/get-started-postgresql)
+</Prerequisites>
+
+According to the **[official website](https://thenile.dev)**, Nile is PostgreSQL re-engineered for multi-tenant apps.
+
+Checkout official **[Nile + Drizzle Quickstart](https://www.thenile.dev/docs/getting-started/languages/drizzle)** and **[Migration](https://www.thenile.dev/docs/getting-started/schema_migrations/drizzle) docs.
+
+You can use Nile with any of Drizzle's Postgres drivers, we'll be showing the use of `Postgres.js` below.
+
+#### Step 1 - Install packages
+
+<Npm>
+drizzle-orm postgres
+-D drizzle-kit
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js'
+
+const db = drizzle(process.env.NILEDB_URL);
+
+const response = await db.select().from(...);
+```
+
+If you need to provide your existing driver:
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const client = postgres(process.env.NILEDB_URL)
+const db = drizzle({ client });
+
+const response = await db.select().from(...);
+```
+
+Nile provides virtual tenant databases, when you set the tenant context, Nile will direct your queries to the virtual database for this particular tenant and all queries will apply to that tenant (i.e. `select * from table` will result records only for this tenant). To set the tenant context via Drizzle:
+
+```typescript copy filename="index.ts"
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const client = postgres(process.env.NILEDB_URL)
+const db = drizzle({ client });
+// Storing tenant in the context is usually done by a Middleware
+const tenantContext = new AsyncLocalStorage<string | undefined>();
+
+function tenantDB<T>(cb: (tx: any) => T | Promise<T>): Promise<T> {
+  return db.transaction(async (tx) => {
+    const tenantId = tenantContext.getStore();
+    if (tenantId) {
+      await tx.execute(sql`set nile.tenant_id = '${sql.raw(tenantId)}'`);
+    } else {
+      await tx.execute(sql`reset nile.tenant_id`);
+    }
+    return cb(tx);
+  }) as Promise<T>;
+}
+
+const response = await tenantDB(async (tx) => {
+    // No need for a "where" clause here
+    return await tx.select().from();
+});
+```
+
+#### What's next?
+
+<WhatsNextPostgres/>
+
+
+
