@@ -151,6 +151,27 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "Nile",
+        path: {
+          existing: "/docs/get-started/nile-existing",
+          new: "/docs/get-started/nile-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/nile.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/nile.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
     ],
   },
   {
