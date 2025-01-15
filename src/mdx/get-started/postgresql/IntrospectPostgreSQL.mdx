@@ -32,12 +32,9 @@ export const users = pgTable("users", {
 	name: varchar({ length: 255 }).notNull(),
 	age: integer().notNull(),
 	email: varchar({ length: 255 }).notNull(),
-},
-(table) => {
-	return {
-		usersEmailUnique: unique("users_email_unique").on(table.email),
-	}
-});
+}, (table) => [
+	unique("users_email_unique").on(table.email)
+]);
 ```
 
 Learn more about introspection in the [documentation](/docs/drizzle-kit-pull).

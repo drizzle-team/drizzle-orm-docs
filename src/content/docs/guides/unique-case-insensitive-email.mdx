@@ -35,10 +35,10 @@ Drizzle has simple and flexible API, which lets you easily create such an index 
       name: text('name').notNull(),
       email: text('email').notNull(),
     },
-    (table) => ({
-   // emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
-      emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(lower(table.email)),
-    }),
+    (table) => [
+      // uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
+      uniqueIndex('emailUniqueIndex').on(lower(table.email)),
+    ],
   );
 
   // custom lower function
@@ -98,10 +98,10 @@ Drizzle has simple and flexible API, which lets you easily create such an index 
       name: varchar('name', { length: 255 }).notNull(),
       email: varchar('email', { length: 255 }).notNull(),
     },
-    (table) => ({
-   // emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(sql`(lower(${table.email}))`),
-      emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(lower(table.email)),
-    }),
+    (table) => [
+      // uniqueIndex('emailUniqueIndex').on(sql`(lower(${table.email}))`),
+      uniqueIndex('emailUniqueIndex').on(lower(table.email)),
+    ]
   );
 
   // custom lower function
@@ -166,10 +166,10 @@ Drizzle has simple and flexible API, which lets you easily create such an index 
       name: text('name').notNull(),
       email: text('email').notNull(),
     },
-    (table) => ({
-      // emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
-      emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(lower(table.email)),
-    }),
+    (table) => [
+      // uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
+      uniqueIndex('emailUniqueIndex').on(lower(table.email)),
+    ]
   );
 
   // custom lower function

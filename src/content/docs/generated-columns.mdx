@@ -127,9 +127,9 @@ Generated columns can be especially useful for:
           (): SQL => sql`to_tsvector('english', ${test.content})`
         ),
       },
-      (t) => ({
-        idx: index("idx_content_search").using("gin", t.contentSearch),
-      })
+      (t) => [
+        index("idx_content_search").using("gin", t.contentSearch)
+      ]
     );
     ```
     ```sql {4}

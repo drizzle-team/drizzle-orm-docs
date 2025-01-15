@@ -58,11 +58,11 @@ Let's take a few examples of `pg_vector` indexes from the `pg_vector` docs and t
 
 const table = pgTable('items', {
     embedding: vector({ dimensions: 3 })
-}, (table) => ({
-    l2: index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops'))
-    ip: index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops'))
-    cosine: index('cosine_index').using('hnsw', table.embedding.op('vector_cosine_ops'))
-}))
+}, (table) => [
+  index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops'))
+  index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops'))
+  index('cosine_index').using('hnsw', table.embedding.op('vector_cosine_ops'))
+])
 ```
 
 #### L1 distance, Hamming distance and Jaccard distance - added in pg_vector 0.7.0 version
@@ -74,11 +74,11 @@ const table = pgTable('items', {
 
 const table = pgTable('table', {
     embedding: vector({ dimensions: 3 })
-}, (table) => ({
-    l1: index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops'))
-    hamming: index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops'))
-    bit: index('bit_jaccard_index').using('hnsw', table.embedding.op('bit_jaccard_ops'))
-}))
+}, (table) => [
+  index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops'))
+  index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops'))
+  index('bit_jaccard_index').using('hnsw', table.embedding.op('bit_jaccard_ops'))
+])
 ```
 
 #### Helper Functions
@@ -192,7 +192,7 @@ With the available Drizzle indexes API, you should be able to write any indexes 
 
 const table = pgTable('table', {
   	geo: geometry({ type: 'point' }),
-}, (table) => ({
-    gist: index('custom_idx').using('gist', table.geo)
-}))
+}, (table) => [
+  index('custom_idx').using('gist', table.geo)
+])
 ```

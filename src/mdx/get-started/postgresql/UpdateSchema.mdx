@@ -10,10 +10,7 @@ export const users = pgTable("users", {
 	age: integer().notNull(),
 	email: varchar({ length: 255 }).notNull(),
   phone: varchar(),
-},
-(table) => {
-	return {
-		usersEmailUnique: unique("users_email_unique").on(table.email),
-	}
-});
+}, (table) => [
+	unique("users_email_unique").on(table.email)
+]);
 ```
