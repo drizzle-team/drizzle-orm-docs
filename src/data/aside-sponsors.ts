@@ -333,6 +333,31 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
+      login: "driz.link/praha",
+      name: "PrAha",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2023-06-11T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "brightness(10) grayscale(1) opacity(0.3)",
+      background:
+        'url("/svg/praha-dark.svg") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      filter: "invert(0.6) brightness(0) opacity(0.3)",
+      background: 'url("/svg/praha-light.svg") 0% 0% / cover no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
       login: "driz.link/mooncake",
       name: "Mooncake",
       avatarUrl:
@@ -354,20 +379,4 @@ export const asideSponsors: ISponsor[] = [
         'url("/images/mooncake.png") 0% 0% / contain no-repeat content-box',
     },
   },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/sponsor",
-      name: "Sponsor",
-      avatarUrl:
-      '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-08-13T16:35:56Z",
-    isActive: true,
-    imageType: ImageType.IMAGE,
-  }
 ];
