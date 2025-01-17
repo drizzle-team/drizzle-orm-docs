@@ -342,7 +342,7 @@ export const asideSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      filter: "brightness(10) grayscale(1) opacity(0.3)",
+      filter: "brightness(2) grayscale(1) opacity(0.3)",
       background:
         'url("/svg/praha-dark.svg") 0% 0% / cover no-repeat content-box',
     },
