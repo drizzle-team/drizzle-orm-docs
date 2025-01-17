@@ -206,6 +206,7 @@ but supports limited number of databases (MySQL is not supported)
 
   const pool = new Pool({ connectionString: process.env.DB_URL });
   const adapter = new PrismaPg(pool);
+  // DB clients
   const prisma = new PrismaClient({ adapter });
   const dbDrizzle = drizzle({ client: pool });
 
