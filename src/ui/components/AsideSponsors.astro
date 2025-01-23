@@ -4,7 +4,10 @@ import { asideSponsors } from "@/data/aside-sponsors";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
-    return acc + `${key === "minWidth" ? "min-width" : key}: ${style[key as keyof CSSProperties]};`;
+    return (
+      acc +
+      `${key === "minWidth" ? "min-width" : key}: ${style[key as keyof CSSProperties]};`
+    );
   }, "");
 };
 
@@ -73,7 +76,12 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
       <div class="aside-sponsors__row">
         {slice.map((sponsor) => (
           <a
-            class="aside-sponsors__sponsor"
+            class:list={[
+              "aside-sponsors__sponsor",
+              ["Mooncake", "Sponsor"].includes(sponsor.sponsorEntity.name)
+                ? "aside-sponsors__sponsor--hide"
+                : "",
+            ]}
             href={`https://${sponsor.sponsorEntity.login}`}
             target="_blank"
             rel={sponsor.followLink ? "" : "nofollow"}
@@ -415,6 +423,17 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
 
   .aside-sponsors__sponsor:hover .popover {
     opacity: 1;
+  }
+
+  @media screen and (max-height: 935px) {
+    body:not(:has(#banner)) .aside-sponsors__row:has(.aside-sponsors__sponsor--hide) {
+      display: none;
+    }
+  }
+  @media screen and (max-height: 975px) {
+    body:has(#banner) .aside-sponsors__row:has(.aside-sponsors__sponsor--hide) {
+      display: none;
+    }
   }
 
   @media screen and (max-height: 902px) {

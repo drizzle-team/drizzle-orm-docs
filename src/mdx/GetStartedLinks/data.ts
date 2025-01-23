@@ -160,15 +160,9 @@ export const getStartedItems: GetStartedItems = [
         icon: {
           light: {
             path: "/public/svg/nile.svg",
-            style: {
-              width: 26,
-            },
           },
           dark: {
             path: "/public/svg/nile.svg",
-            style: {
-              width: 26,
-            },
           },
         },
       },
