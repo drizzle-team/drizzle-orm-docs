@@ -14,8 +14,8 @@ import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
-import CreateTable from '@mdx/get-started/sqlite/CreateTable.mdx';
-import ConnectBun from '@mdx/get-started/sqlite/ConnectBun.mdx';
+import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx';
+import ConnectBun from '@mdx/get-started/postgresql/ConnectBun.mdx';
 
 <Breadcrumbs/>
 
@@ -23,7 +23,7 @@ import ConnectBun from '@mdx/get-started/sqlite/ConnectBun.mdx';
 
 <Prerequisites>  
   - **bun** - javaScript all-in-one toolkit - [read here](https://bun.sh/)
-  - **bun:sqlite** - native implementation of a high-performance SQLite3 driver - [read here](https://bun.sh/docs/api/sqlite)
+  - **Bun SQL** - native bindings for working with PostgreSQL databases - [read here](https://bun.sh/docs/api/sql)
 </Prerequisites>
 
 <FileStructure />
@@ -36,14 +36,7 @@ import ConnectBun from '@mdx/get-started/sqlite/ConnectBun.mdx';
 
 #### Step 2 - Setup connection variables
 
-<SetupEnv env_variable='DB_FILE_NAME' />
-
-<Callout type='info' title='important'>
-For example, if you want to create an SQLite database file in the root of your project for testing purposes, you can use this example:
-```plaintext copy
-DB_FILE_NAME=mydb.sqlite
-```
-</Callout>
+<SetupEnv env_variable='DATABASE_URL' />
 
 #### Step 3 - Connect Drizzle ORM to the database
 
@@ -55,7 +48,7 @@ DB_FILE_NAME=mydb.sqlite
 
 #### Step 5 - Setup Drizzle config file
 
-<SetupConfig dialect='sqlite' env_variable='DB_FILE_NAME'/>
+<SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
 
 #### Step 6 - Applying changes to the database
 
@@ -63,7 +56,7 @@ DB_FILE_NAME=mydb.sqlite
 
 #### Step 7 - Seed and Query the database
 
-<QueryDatabase dialect='bun-sqlite' env_variable='DB_FILE_NAME'/>
+<QueryDatabase dialect='bun-sql' env_variable='DATABASE_URL'/>
 
 #### Step 8 - Run index.ts file
 

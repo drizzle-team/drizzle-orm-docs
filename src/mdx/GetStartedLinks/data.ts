@@ -166,6 +166,27 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "Bun SQL",
+        path: {
+          existing: "/docs/get-started/bun-sql-existing",
+          new: "/docs/get-started/bun-sql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/bun.svg",
+            style: {
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/bun.svg",
+            style: {
+              width: 20,
+            },
+          },
+        },
+      },
     ],
   },
   {
