@@ -471,6 +471,49 @@ select "id", "name", "age" from sq;
 ```
 </Section>
 
+You can also provide `insert`, `update` and `delete` statements inside `with`
+
+<Section>
+```typescript copy
+const sq = db.$with('sq').as(
+    db.insert(users).values({ name: 'John' }).returning(),
+);
+
+const result = await db.with(sq).select().from(sq);
+```
+```sql
+with "sq" as (insert into "users" ("id", "name") values (default, 'John') returning "id", "name") 
+select "id", "name" from "sq"
+```
+</Section>
+
+<Section>
+```typescript copy
+const sq = db.$with('sq').as(
+    db.update(users).set({ age: 25 }).where(eq(users.name, 'John')).returning(),
+);
+const result = await db.with(sq).select().from(sq);
+```
+```sql
+with "sq" as (update "users" set "age" = 25 where "users"."name" = 'John' returning "id", "name", "age") 
+select "id", "name", "age" from "sq"
+```
+</Section>
+
+<Section>
+```typescript copy
+const sq = db.$with('sq').as(
+  db.delete(users).where(eq(users.name, 'John')).returning(),
+);
+
+const result = await db.with(sq).select().from(sq);
+```
+```sql
+with "sq" as (delete from "users" where "users"."name" = $1 returning "id", "name", "age") 
+select "id", "name", "age" from "sq"
+```
+</Section>
+
 To select arbitrary SQL values as fields in a CTE and reference them in other CTEs or in the main query,
 you need to add aliases to them:
 ```typescript copy
