@@ -44,9 +44,9 @@ This is how you can create table with `geometry` datatype and spatial index in D
       name: text('name').notNull(),
       location: geometry('location', { type: 'point', mode: 'xy', srid: 4326 }).notNull(),
     },
-    (t) => ({
-      spatialIndex: index('spatial_index').using('gist', t.location),
-    }),
+    (t) => [
+      index('spatial_index').using('gist', t.location),
+    ]
   );
   ```
   </CodeTab>

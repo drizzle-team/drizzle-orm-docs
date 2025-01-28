@@ -287,11 +287,9 @@ export const orderDetails = pgTable(
       .references(() => products.id, { onDelete: 'restrict', onUpdate: 'cascade' }),
     quantity: integer('quantity').notNull(),
   },
-  (table) => {
-    return {
-      orderDetailsPkey: primaryKey({ columns: [table.orderId, table.productId], name: 'order_details_pkey' }),
-    };
-  },
+  (table) => [
+    primaryKey({ columns: [table.orderId, table.productId], name: 'order_details_pkey' })
+  ]
 );
 ```
 

@@ -39,11 +39,9 @@ export const usersTable = sqliteTable(
     age: integer().notNull(),
     email: text().notNull(),
   },
-  (table) => {
-    return {
-      emailUnique: uniqueIndex("users_table_email_unique").on(table.email),
-    };
-  }
+  (table) => [
+    uniqueIndex("users_table_email_unique").on(table.email)
+  ]
 );
 ```
 

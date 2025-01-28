@@ -45,13 +45,11 @@ export const usersTable = mysqlTable(
     age: int().notNull(),
     email: varchar({ length: 255 }).notNull(),
   },
-  (table) => {
-    return {
-      usersTableId: primaryKey({ columns: [table.id], name: 'users_table_id' }),
-      id: unique('id').on(table.id),
-      usersTableEmailUnique: unique('users_table_email_unique').on(table.email),
-    };
-  },
+  (table) => [
+    primaryKey({ columns: [table.id], name: 'users_table_id' }),
+    unique('id').on(table.id),
+    unique('users_table_email_unique').on(table.email),
+  ],
 );
 ```
 

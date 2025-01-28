@@ -203,13 +203,12 @@ Make sure to create indices for the columns that you use for cursor to make quer
 import { index, ...imports } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
-// columns declaration
+  // columns declaration
 },
-(t) => ({
-  firstNameIndex: index('first_name_index').on(t.firstName).asc(),
-  firstNameAndIdIndex: index('first_name_and_id_index').on(t.firstName, t.id).asc(),
-}),
-);
+(t) => [
+  index('first_name_index').on(t.firstName).asc(),
+  index('first_name_and_id_index').on(t.firstName, t.id).asc(),
+]);
 ```
 
 ```sql

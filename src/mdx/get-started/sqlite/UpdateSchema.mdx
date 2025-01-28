@@ -18,10 +18,8 @@ export const usersTable = sqliteTable(
     email: text().notNull(),
     phone: text(),
   },
-  (table) => {
-    return {
-      emailUnique: uniqueIndex("users_table_email_unique").on(table.email),
-    };
-  }
+  (table) => [
+    uniqueIndex("users_table_email_unique").on(table.email)
+  ]
 );
 ```

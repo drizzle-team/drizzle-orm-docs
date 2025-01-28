@@ -354,11 +354,9 @@ export const users = table(
     invitee: t.integer().references((): AnyPgColumn => users.id),
     role: rolesEnum().default("guest"),
   },
-  (table) => {
-    return {
-      emailIndex: t.uniqueIndex("email_idx").on(table.email),
-    };
-  }
+  (table) => [
+    t.uniqueIndex("email_idx").on(table.email)
+  ]
 );
 
 export const posts = table(
@@ -369,12 +367,10 @@ export const posts = table(
     title: t.varchar({ length: 256 }),
     ownerId: t.integer("owner_id").references(() => users.id),
   },
-  (table) => {
-    return {
-      slugIndex: t.uniqueIndex("slug_idx").on(table.slug),
-      titleIndex: t.index("title_idx").on(table.title),
-    };
-  }
+  (table) => [
+    t.uniqueIndex("slug_idx").on(table.slug),
+    t.index("title_idx").on(table.title),
+  ]
 );
 
 export const comments = table("comments", {
@@ -399,11 +395,9 @@ export const users = table(
     invitee: t.int().references((): AnyMySqlColumn => users.id),
     role: t.mysqlEnum(["guest", "user", "admin"]).default("guest"),
   },
-  (table) => {
-    return {
-      emailIndex: t.uniqueIndex("email_idx").on(table.email),
-    };
-  }
+  (table) => [
+    t.uniqueIndex("email_idx").on(table.email)
+  ]
 );
 
 export const posts = table(
@@ -414,12 +408,10 @@ export const posts = table(
     title: t.varchar({ length: 256 }),
     ownerId: t.int("owner_id").references(() => users.id),
   },
-  (table) => {
-    return {
-      slugIndex: t.uniqueIndex("slug_idx").on(table.slug),
-      titleIndex: t.index("title_idx").on(table.title),
-    };
-  }
+  (table) => [
+    t.uniqueIndex("slug_idx").on(table.slug),
+    t.index("title_idx").on(table.title),
+  ]
 );
 
 export const comments = table("comments", {
@@ -444,11 +436,9 @@ export const users = table(
     invitee: t.int().references((): AnySQLiteColumn => users.id),
     role: t.text().$type<"guest" | "user" | "admin">().default("guest"),
   },
-  (table) => {
-    return {
-      emailIndex: t.uniqueIndex("email_idx").on(table.email),
-    };
-  }
+  (table) => [
+    t.uniqueIndex("email_idx").on(table.email)
+  ]
 );
 
 export const posts = table(
@@ -459,12 +449,10 @@ export const posts = table(
     title: t.text(),
     ownerId: t.int("owner_id").references(() => users.id),
   },
-  (table) => {
-    return {
-      slugIndex: t.uniqueIndex("slug_idx").on(table.slug),
-      titleIndex: t.index("title_idx").on(table.title),
-    };
-  }
+  (table) => [
+    t.uniqueIndex("slug_idx").on(table.slug),
+    t.index("title_idx").on(table.title),
+  ]
 );
 
 export const comments = table("comments", {

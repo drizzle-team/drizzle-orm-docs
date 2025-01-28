@@ -216,9 +216,9 @@ export const usersToGroups = pgTable(
       .notNull()
       .references(() => groups.id),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.userId, t.groupId] }),
-  }),
+  (t) => [
+		primaryKey({ columns: [t.userId, t.groupId] })
+	],
 );
 
 export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
@@ -357,16 +357,15 @@ export const posts = pgTable('posts', {
 	id: serial('id').primaryKey(),
 	name: text('name'),
 	author: integer('author').notNull(),
-}, (table) => ({
-		fk: foreignKey({
-			name: "author_fk",
-			columns: [table.author],
-			foreignColumns: [users.id],
-		})
-			.onDelete('cascade')
-			.onUpdate('cascade')
-	}),
-);
+}, (table) => [
+	foreignKey({
+		name: "author_fk",
+		columns: [table.author],
+		foreignColumns: [users.id],
+	})
+		.onDelete('cascade')
+		.onUpdate('cascade')
+]);
 ```
 
 ### Disambiguating relations
