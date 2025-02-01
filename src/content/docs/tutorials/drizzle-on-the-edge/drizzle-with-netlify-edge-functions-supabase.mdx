@@ -19,11 +19,6 @@ drizzle-orm
 -D drizzle-kit
 </Npm>
 
-- You should have installed the [postgres](https://www.npmjs.com/package/postgres) package. 
-<Npm>
-  postgres
-</Npm>
-
 - You should have installed the `dotenv` package for managing environment variables. If you use Node.js `v20.6.0` or later, there is no need to install it because Node.js natively supports `.env` files. Read more about it [here](https://nodejs.org/en/blog/release/v20.6.0#built-in-env-file-support).
 <Npm>
   dotenv
@@ -34,6 +29,10 @@ drizzle-orm
   @netlify/edge-functions
 </Npm>
 </Prerequisites>
+
+<Callout type="warning">
+These installed packages are used only to create table in the database in [Create a table](#create-a-table), [Setup Drizzle config file](#setup-drizzle-config-file) and [Apply changes to the database](#apply-changes-to-the-database) steps. These packages do not affect the code running inside Netlify Edge Functions. We will use `import_map.json` to import the necessary packages for the Edge Functions.
+</Callout>
 
 <Steps>
 #### Create a new Supabase project
@@ -168,7 +167,7 @@ export default async (request: Request, context: Context) => {
 ```
 
 <Callout type="warning">
-You might see a red underline under the imports if you're using VS Code and answered `Yes` on using settings for `Deno` and `Edge Functions`. The Edge Function will still execute.
+You might see a red underline under the imports if you're using VS Code. The Edge Function will still execute. To get rid of the red underline, you can configure VS Code to use Edge Functions in the next step.
 </Callout>
 
 #### Test your code locally
@@ -178,6 +177,9 @@ Run the following command to start the Netlify dev server:
 ```bash copy
 netlify dev
 ```
+
+When you first run the command it will suggest to configure VS Code to use Edge Functions. Click `Yes` to configure it. `settings.json` file will be created in the `.vscode` directory.
+If you still see red underlines, you can restart the Deno Language Server.
 
 Open your browser and navigate to the route `/user`. You should see the user data returned from the Neon database:
 
