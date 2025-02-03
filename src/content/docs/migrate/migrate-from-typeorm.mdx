@@ -307,14 +307,12 @@ export const orderDetails = pgTable(
       .references(() => products.id),
     quantity: integer('quantity').notNull(),
   },
-  (table) => {
-    return {
-      pkE08Ee153Eb9C98Ee497C1D1287E: primaryKey({
-        columns: [table.orderId, table.productId],
-        name: 'PK_e08ee153eb9c98ee497c1d1287e',
-      }),
-    };
-  },
+  (table) => [
+    primaryKey({
+      columns: [table.orderId, table.productId],
+      name: 'PK_e08ee153eb9c98ee497c1d1287e',
+    })
+  ],
 );
 ```
 
