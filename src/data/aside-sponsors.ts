@@ -384,6 +384,39 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
+      login: "driz.link/sqlitecloud",
+      name: "SQLite Cloud",
+      avatarUrl:
+        `<svg version="1.1" id="Artwork" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 793.8 871.5" style="enable-background:new 0 0 793.8 871.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F5640C;}
+</style>
+<g>
+	<path class="st0" d="M396.9,356.1H227.2c-16.6,0-30-13.4-30-30v-99.8c0-16.6,13.4-30,30-30h139.7c16.6,0,30,13.4,30,30V356.1z"/>
+	<path class="st0" d="M566.6,515.8H396.9V356.1h169.7c16.5,0,29.9,13.4,29.9,29.9v99.8C596.5,502.4,583.1,515.8,566.6,515.8z"/>
+	<path class="st0" d="M366.9,675.6H227.2c-16.5,0-29.9-13.4-29.9-29.9v-99.8c0-16.5,13.4-29.9,29.9-29.9h169.7v129.8
+		C396.9,662.1,383.5,675.6,366.9,675.6z"/>
+</g>
+</svg>`,
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "grayscale(1) brightness(2) opacity(0.2)",
+    },
+    lightStyle: {
+      filter: "grayscale(1) opacity(0.6) invert(0.1)",
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
       login: "driz.link/mooncake",
       name: "Mooncake",
       avatarUrl:
@@ -404,21 +437,5 @@ export const asideSponsors: ISponsor[] = [
       background:
         'url("/images/mooncake.png") 0% 0% / contain no-repeat content-box',
     },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/sponsor",
-      name: "Sponsor",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-08-13T16:35:56Z",
-    isActive: true,
-    imageType: ImageType.IMAGE,
   }
 ];
