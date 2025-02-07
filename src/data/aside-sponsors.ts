@@ -384,8 +384,8 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/sqlitecloud",
-      name: "SQLite Cloud",
+      login: "driz.link/replit",
+      name: "Replit",
       avatarUrl:
         `<svg version="1.1" id="Artwork" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 793.8 871.5" style="enable-background:new 0 0 793.8 871.5;" xml:space="preserve">
