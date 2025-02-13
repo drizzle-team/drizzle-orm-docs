@@ -44,7 +44,7 @@ import { sql } from "drizzle-orm";
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	int1: integer().default(10)
+	int1: integer().default(10),
 	int2: integer().default(sql`'10'::int`)
 });
 
@@ -85,7 +85,7 @@ import { sql } from "drizzle-orm";
 import { smallint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	smallint1: smallint().default(10)
+	smallint1: smallint().default(10),
 	smallint2: smallint().default(sql`'10'::smallint`)
 });
 ```
@@ -133,7 +133,7 @@ import { sql } from "drizzle-orm";
 import { bigint, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-	bigint1: bigint().default(10)
+	bigint1: bigint().default(10),
 	bigint2: bigint().default(sql`'10'::bigint`)
 });
 ```
