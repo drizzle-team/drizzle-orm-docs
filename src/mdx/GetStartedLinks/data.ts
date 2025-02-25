@@ -190,6 +190,36 @@ export const getStartedItems: GetStartedItems = [
     ],
   },
   {
+    title: "Gel",
+    items: [
+      {
+        name: "Gel",
+        path: {
+          existing: "FOR EXISTING",
+          new: "FOR NEW",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/gel_light.svg",
+            style: {
+              "style": "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+          dark: {
+            path: "/public/svg/gel_dark.svg",
+            style: {
+              "style": "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+        },
+      },
+    ]
+  },
+  {
     title: "MySQL",
     items: [
       {

@@ -149,16 +149,18 @@ export const databases: {
     },
     sponsorUrl: "https://driz.link/tembo",
   },
-  EdgeDB: {
+  Gel: {
     imageSrc: {
-      lightThemeSrc: "/public/svg/edb_logo_small.svg",
-      darkThemeSrc: "/public/svg/edb_logo_small.svg",
+      lightThemeSrc: "/public/svg/gel_transparent.svg",
+      darkThemeSrc: "/public/svg/gel_transparent.svg",
     },
     lightStyle: {
-      width: 26,
+      width: 36,
+      height: 36,
     },
     darkStyle: {
-      width: 26,
+      width: 36,
+      height: 36,
     },
     sponsorUrl: "https://driz.link/edgedb",
   },
