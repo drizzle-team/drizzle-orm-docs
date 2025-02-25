@@ -195,14 +195,14 @@ export const getStartedItems: GetStartedItems = [
       {
         name: "Gel",
         path: {
-          existing: "FOR EXISTING",
-          new: "FOR NEW",
+          existing: "/docs/get-started/gel-existing",
+          new: "/docs/get-started/gel-new",
         },
         icon: {
           light: {
             path: "/public/svg/gel_light.svg",
             style: {
-              "style": "border-radius: 5px",
+              style: "border-radius: 5px",
               width: 34,
               height: 34,
             },
@@ -210,14 +210,14 @@ export const getStartedItems: GetStartedItems = [
           dark: {
             path: "/public/svg/gel_dark.svg",
             style: {
-              "style": "border-radius: 5px",
+              style: "border-radius: 5px",
               width: 34,
               height: 34,
             },
           },
         },
       },
-    ]
+    ],
   },
   {
     title: "MySQL",
@@ -310,7 +310,7 @@ export const getStartedItems: GetStartedItems = [
             },
           },
         },
-      }
+      },
     ],
   },
   {
