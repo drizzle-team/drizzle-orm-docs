@@ -23,12 +23,12 @@ We've made sure you have both the best-in-class developer experience and perform
 <CodeTabs items={["index.ts", "schema.ts"]}>
 	<CodeTab>
 	```typescript copy /schema/3
-	import * as schema from './schema';
+	import { relations } from './schema';
 	import { drizzle } from 'drizzle-orm/...';
 
-	const db = drizzle({ schema });
+	const db = drizzle({ relations });
 
-	const result = await db._query.users.findMany({
+	const result = await db.query.users.findMany({
 		with: {
 			posts: true			
 		},
@@ -55,182 +55,147 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 	</CodeTab>
 
-	```typescript copy
-	import { integer, serial, text, pgTable } from 'drizzle-orm/pg-core';
-	import { relations } from 'drizzle-orm';
-
-	export const users = pgTable('users', {
-		id: serial('id').primaryKey(),
-		name: text('name').notNull(),
-	});
-
-	export const usersRelations = relations(users, ({ many }) => ({
-		posts: many(posts),
-	}));
-
-	export const posts = pgTable('posts', {
-		id: serial('id').primaryKey(),
-		content: text('content').notNull(),
-		authorId: integer('author_id').notNull(),
-	});
-
-	export const postsRelations = relations(posts, ({ one }) => ({
-		author: one(users, { fields: [posts.authorId], references: [users.id] }),
-	}));
+	```typescript {15-25} copy
+    import { defineRelations } from "drizzle-orm";
+    import * as p from "drizzle-orm/pg-core";
+    
+    export const posts = p.pgTable("posts", {
+      id: p.integer().primaryKey(),
+      content: p.text().notNull(),
+      authorId: p.integer("author_id").notNull(),
+    });
+    
+    export const users = p.pgTable("users", {
+      id: p.integer().primaryKey(),
+      name: p.text().notNull(),
+    });
+    
+    export const relations = defineRelations({ users, posts }, (r) => ({
+      posts: {
+        author: r.one.users({
+          from: r.posts.authorId,
+          to: r.users.id,
+        }),
+      },
+      users: {
+        posts: r.many.users(),
+      },
+    }));
 	```
 </CodeTabs>
-
-⚠️ If you have SQL schema declared in multiple files you can do it like that
-<CodeTabs items={["index.ts", "schema1.ts", "schema2.ts"]}>
-	```typescript copy /schema/3
-	import * as schema1 from './schema1';
-	import * as schema2 from './schema2';
-	import { drizzle } from 'drizzle-orm/...';
-
-	const db = drizzle({ schema: { ...schema1, ...schema2 } });
-
-	const result = await db._query.users.findMany({
-		with: {
-			posts: true			
-		},
-	});
-	```
-	
-	```ts
-	// schema declaration in the first file
-	```
-	```ts
-	// schema declaration in the second file
-	```
-</CodeTabs>
-
-
-## Modes
-Drizzle relational queries always generate exactly one SQL statement to run on the database and it has certain caveats. 
-To have best in class support for every database out there we've introduced **`modes`**.  
-
-Drizzle relational queries use lateral joins of subqueries under the hood and for now PlanetScale does not support them.
-
-When using **mysql2** driver with regular **MySQL** database — you should specify `mode: "default"`
-When using **mysql2** driver with **PlanetScale** — you need to specify `mode: "planetscale"`
-
-```ts copy
-import * as schema from './schema';
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
-
-const connection = await mysql.createConnection({
-  uri: process.env.PLANETSCALE_DATABASE_URL,
-});
-
-const db = drizzle({ client: connection, schema, mode: 'planetscale' });
-```
 
 ## Querying
 Relational queries are an extension to Drizzle's original **[query builder](/docs/select)**.
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
-initialization and then just use the `db._query` API.
+initialization and then just use the `db.query` API.
 <Callout type="info" emoji="ℹ️">
 	`drizzle` import path depends on the **[database driver](/docs/connect-overview)** you're using.
 </Callout>
-<CodeTabs items={["index.ts", "schema.ts"]}>
+<CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
 <CodeTab>
 ```ts
-import * as schema from './schema';
+import { relations } from './relations';
 import { drizzle } from 'drizzle-orm/...';
 
-const db = drizzle({ schema });
+const db = drizzle({ relations });
 
-await db._query.users.findMany(...);
-```
-```ts
-// if you have schema in multiple files
-import * as schema1 from './schema1';
-import * as schema2 from './schema2';
-import { drizzle } from 'drizzle-orm/...';
-
-const db = drizzle({ schema: { ...schema1, ...schema2 } });
-
-await db._query.users.findMany(...);
+await db.query.users.findMany(...);
 ```
 </CodeTab>
 ```typescript copy
-	import { type AnyPgColumn, boolean, integer, pgTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { type AnyPgColumn, boolean, integer, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
-	import { relations } from 'drizzle-orm';
+export const users = pgTable('users', {
+	id: integer().primaryKey(),
+	name: text().notNull(),
+	invitedBy: integer('invited_by').references((): AnyPgColumn => users.id),
+});
 
-	export const users = pgTable('users', {
-		id: serial('id').primaryKey(),
-		name: text('name').notNull(),
-		invitedBy: integer('invited_by').references((): AnyPgColumn => users.id),
-	});
+export const groups = pgTable('groups', {
+	id: integer().primaryKey(),
+	name: text().notNull(),
+	description: text(),
+});
 
-	export const usersRelations = relations(users, ({ one, many }) => ({
-		invitee: one(users, { fields: [users.invitedBy], references: [users.id] }),
-		usersToGroups: many(usersToGroups),
-		posts: many(posts),
-	}));
+export const usersToGroups = pgTable('users_to_groups', {
+	id: integer().primaryKey(),
+	userId: integer('user_id').notNull().references(() => users.id),
+	groupId: integer('group_id').notNull().references(() => groups.id),
+}, (t) => [
+	primaryKey(t.userId, t.groupId)
+]);
 
-	export const groups = pgTable('groups', {
-		id: serial('id').primaryKey(),
-		name: text('name').notNull(),
-		description: text('description'),
-	});
+export const posts = pgTable('posts', {
+	id: integer().primaryKey(),
+	content: text().notNull(),
+	authorId: integer('author_id').references(() => users.id),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
-	export const groupsRelations = relations(groups, ({ many }) => ({
-		usersToGroups: many(usersToGroups),
-	}));
+export const comments = pgTable('comments', {
+	id: integer().primaryKey(),
+	content: text().notNull(),
+	creator: integer().references(() => users.id),
+	postId: integer('post_id').references(() => posts.id),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
-	export const usersToGroups = pgTable('users_to_groups', {
-		id: serial('id').primaryKey(),
-		userId: integer('user_id').notNull().references(() => users.id),
-		groupId: integer('group_id').notNull().references(() => groups.id),
-	}, (t) => [
-		primaryKey(t.userId, t.groupId)
-	]);
+export const commentLikes = pgTable('comment_likes', {
+	id: integer().primaryKey(),
+	creator: integer().references(() => users.id),
+	commentId: integer('comment_id').references(() => comments.id),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+```
+```typescript copy
+import { defineRelations } from 'drizzle-orm';
+import * as schema from './schema';
 
-	export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
-		group: one(groups, { fields: [usersToGroups.groupId], references: [groups.id] }),
-		user: one(users, { fields: [usersToGroups.userId], references: [users.id] }),
-	}));
-
-	export const posts = pgTable('posts', {
-		id: serial('id').primaryKey(),
-		content: text('content').notNull(),
-		authorId: integer('author_id').references(() => users.id),
-		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-	});
-
-	export const postsRelations = relations(posts, ({ one, many }) => ({
-		author: one(users, { fields: [posts.authorId], references: [users.id] }),
-		comments: many(comments),
-	}));
-
-	export const comments = pgTable('comments', {
-		id: serial('id').primaryKey(),
-		content: text('content').notNull(),
-		creator: integer('creator').references(() => users.id),
-		postId: integer('post_id').references(() => posts.id),
-		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-	});
-
-	export const commentsRelations = relations(comments, ({ one, many }) => ({
-		post: one(posts, { fields: [comments.postId], references: [posts.id] }),
-		author: one(users, { fields: [comments.creator], references: [users.id] }),
-		likes: many(commentLikes),
-	}));
-
-	export const commentLikes = pgTable('comment_likes', {
-		id: serial('id').primaryKey(),
-		creator: integer('creator').references(() => users.id),
-		commentId: integer('comment_id').references(() => comments.id),
-		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-	});
-
-	export const commentLikesRelations = relations(commentLikes, ({ one }) => ({
-		comment: one(comments, { fields: [commentLikes.commentId], references: [comments.id] }),
-		author: one(users, { fields: [commentLikes.creator], references: [users.id] }),
-	}));
+export const relations = defineRelations(schema, (r) => ({
+    users: {
+      invitee: r.one.users({
+        from: r.users.invitedBy,
+        to: r.users.id,
+      }),
+      groups: r.many.groups({
+        from: r.users.id.through(r.usersToGroups.userId),
+        to: r.groups.id.through(r.usersToGroups.groupId),
+      }),
+      posts: r.many.posts(),
+    },
+    groups: {
+      users: r.many.users(),
+    },
+    posts: {
+      author: r.one.users({
+        from: r.posts.authorId,
+        to: r.users.id,
+      }),
+      comments: r.many.comments(),
+    },
+    comments: {
+      post: r.one.posts({
+        from: r.comments.postId,
+        to: r.posts.id,
+      }),
+      author: r.one.users({
+        from: r.comments.creator,
+        to: r.users.id,
+      }),
+      likes: r.many.commentLikes(),
+    },
+    commentLikes: {
+      comment: r.one.comments({
+        from: r.commentLikes.commentId,
+        to: r.comments.id,
+      }),
+      author: r.one.users({
+        from: r.commentLikes.creator,
+        to: r.users.id,
+      }),
+    },
+  })
+);
 ```
 </CodeTabs>
 
@@ -238,7 +203,7 @@ Drizzle provides `.findMany()` and `.findFirst()` APIs.
 ### Find many
 <Section>
 ```typescript copy
-const users = await db._query.users.findMany();
+const users = await db.query.users.findMany();
 ```
 ```ts
 // result type
@@ -257,7 +222,7 @@ const result: {
 </Callout>
 <Section>
 ```typescript copy
-const user = await db._query.users.findFirst();
+const user = await db.query.users.findFirst();
 ```
 ```ts
 // result type
@@ -276,7 +241,7 @@ const result: {
 
 **Getting all posts with comments:**
 ```typescript copy
-const posts = await db._query.posts.findMany({
+const posts = await db.query.posts.findMany({
 	with: {
 		comments: true,
 	},
@@ -285,7 +250,7 @@ const posts = await db._query.posts.findMany({
 
 **Getting first post with comments:**
 ```typescript copy
-const post = await db._query.posts.findFirst({
+const post = await db.query.posts.findFirst({
 	with: {
 		comments: true,
 	},
@@ -297,7 +262,7 @@ For any nested `with` queries Drizzle will infer types using [Core Type API](/do
   
 **Get all users with posts. Each post should contain a list of comments:**
 ```typescript copy
-const users = await db._query.users.findMany({
+const users = await db.query.users.findMany({
 	with: {
 		posts: {
 			with: {
@@ -319,7 +284,7 @@ const users = await db._query.users.findMany({
 
 **Get all posts with just `id`, `content` and include `comments`:**
 ```typescript copy
-const posts = await db._query.posts.findMany({
+const posts = await db.query.posts.findMany({
 	columns: {
 		id: true,
 		content: true,
@@ -332,7 +297,7 @@ const posts = await db._query.posts.findMany({
 
 **Get all posts without `content`:**
 ```typescript copy
-const posts = await db._query.posts.findMany({
+const posts = await db.query.posts.findMany({
 	columns: {
 		content: false,
 	},
@@ -349,7 +314,7 @@ all fields apart from `name` would be excluded anyways.
 **Exclude and Include fields in the same query:**
 <Section>
 ```typescript copy
-const users = await db._query.users.findMany({
+const users = await db.query.users.findMany({
 	columns: {
 		name: true,
 		id: false //ignored
@@ -367,7 +332,7 @@ const users: {
 **Only include columns from nested relations:**
 <Section>
 ```typescript copy
-const res = await db._query.users.findMany({
+const res = await db.query.users.findMany({
 	columns: {},
 	with: {
 		posts: true
@@ -388,7 +353,7 @@ const res: {
 ### Nested partial fields select
 Just like with **[`partial select`](#partial-select)**, you can include or exclude columns of nested relations:
 ```typescript copy
-const posts = await db._query.posts.findMany({
+const posts = await db.query.posts.findMany({
 	columns: {
 		id: true,
 		content: true,
@@ -410,44 +375,202 @@ relational queries API lets you define filters and conditions with the list of o
 You can either import them from `drizzle-orm` or use from the callback syntax:
 <Section>
 ```typescript copy
-import { eq } from 'drizzle-orm';
-
-const users = await db._query.users.findMany({
-	where: eq(users.id, 1)
-})
+const users = await db.query.users.findMany({
+	where: {
+		id: 1
+	}
+});
 ```
 ```ts copy
-const users = await db._query.users.findMany({
-	where: (users, { eq }) => eq(users.id, 1),
-})
+const users = await db.query.users.findMany({
+	where: {
+		id: 1
+	}
+});
 ```
 </Section>
 
 Find post with `id=1` and comments that were created before particular date:
 ```typescript copy
-await db._query.posts.findMany({
-	where: (posts, { eq }) => (eq(posts.id, 1)),
-	with: {
-		comments: {
-			where: (comments, { lt }) => lt(comments.createdAt, new Date()),
-		},
-	},
+await db.query.posts.findMany({
+    where: {
+      id: 1,
+    },
+    with: {
+      comments: {
+        where: {
+          createdAt: { lt: new Date() },
+        },
+      },
+    },
+  });
+```
+
+**List of all filter operators**
+```ts
+where: {
+    OR: [],
+    NOT: {},
+    RAW: (table) => sql`${table.id} = 1`,
+
+	// `id` - is a column key
+    id: {
+      eq: 1,
+      ne: 1,
+      gt: 1,
+      gte: 1,
+      lt: 1,
+      lte: 1,
+      in: [1],
+      notIn: [1],
+      like: "",
+      ilike: "",
+      notLike: "",
+      notIlike: "",
+      isNull: true,
+      isNotNull: true,
+    },
+},
+```
+
+**Examples**
+<CodeTabs items={["simple eq", "using AND", "using OR", "using NOT", "complex example using RAW"]}>
+<CodeTab>
+```ts
+const response = db.query.users.findMany({
+  where: {
+    age: 15,
+  },
 });
 ```
+```sql {3}
+select "users"."id" as "id", "users"."name" as "name"
+from "users" 
+where ("users"."age" = $1)
+```
+</CodeTab>
+<CodeTab>
+```ts
+const response = db.query.users.findMany({
+  where: {
+    age: 15,
+    name: 'John'
+  },
+});
+```
+```sql {3}
+select "users"."id" as "id", "users"."name" as "name"
+from "users" 
+where ("users"."age" = $1 and "users"."name" = $2)
+```
+</CodeTab>
+<CodeTab>
+```ts
+const response = await db.query.users.findMany({
+  where: {
+    OR: [
+      {
+        id: {
+          gt: 10,
+        },
+      },
+	  {
+		name: {
+          like: "John%",
+        },
+	  }
+    ],
+  },
+});
+```
+```sql {3}
+select "users"."id" as "id", "users"."name" as "name" 
+from "users" 
+where ("users"."id" > $1 or "users"."name" like $2)
+```
+</CodeTab>
+<CodeTab>
+```ts
+const response = db.query.users.findMany({
+  where: {
+    NOT: {
+      id: {
+        gt: 10,
+      },
+    },
+    name: {
+      like: "John%",
+    },
+  },
+});
+```
+```sql {3}
+select "users"."id" as "id", "users"."name" as "name" 
+from "users" 
+where (not "users"."id" > $1 and "users"."name" like $2)
+```
+</CodeTab>
+<CodeTab>
+```ts
+// schema.ts
+import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+  id: integer("id").primaryKey(),
+  name: text("name"),
+  email: text("email").notNull(),
+  age: integer("age"),
+  createdAt: timestamp("created_at").defaultNow(),
+  lastLogin: timestamp("last_login"),
+  subscriptionEnd: timestamp("subscription_end"),
+  lastActivity: timestamp("last_activity"),
+  preferences: jsonb("preferences"),      // JSON column for user settings/preferences
+  interests: text("interests").array(),     // Array column for user interests
+});
+```
+```ts
+const response = db.query.users.findMany({
+  where: {
+    AND: [
+      {
+        OR: [
+          { RAW: (table) => sql`LOWER(${table.name}) LIKE 'john%'` },
+          { name: { ilike: "jane%" } },
+        ],
+      },
+      {
+        OR: [
+          { RAW: (table) => sql`${table.preferences}->>'theme' = 'dark'` },
+          { RAW: (table) => sql`${table.preferences}->>'theme' IS NULL` },
+        ],
+      },
+      { RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` },
+    ],
+  },
+});
+```
+```sql
+```
+</CodeTab>
+</CodeTabs>
+
+### Relations Filters
+
+// TODO
 
 ### Limit & Offset
 Drizzle ORM provides `limit` & `offset` API for queries and for the nested entities.
   
 **Find 5 posts:**
 ```typescript copy
-await db._query.posts.findMany({
+await db.query.posts.findMany({
 	limit: 5,
 });
 ```
 
 **Find posts and get 3 comments at most:**
 ```typescript copy
-await db._query.posts.findMany({
+await db.query.posts.findMany({
 	with: {
 		comments: {
 			limit: 3,
@@ -457,15 +580,15 @@ await db._query.posts.findMany({
 ```
 
 <Callout type="warning" emoji="⚠️">
-  `offset` is only available for top level query.
+  `offset` is now can be used in with tables as well!
 </Callout>
 ```typescript 
-await db._query.posts.findMany({
+await db.query.posts.findMany({
 	limit: 5,
 	offset: 2, // correct ✅
 	with: {
 		comments: {
-			offset: 3, // incorrect ❌
+			offset: 3, // correct ✅
 			limit: 3,
 		},
 	},
@@ -474,12 +597,12 @@ await db._query.posts.findMany({
 
 Find posts with comments from the 5th to the 10th post:
 ```typescript copy
-await db._query.posts.findMany({
-	limit: 5,
-  offset: 5,
+await db.query.posts.findMany({
 	with: {
 		comments: true,
 	},
+  limit: 5,
+  offset: 5,
 });
 ```
 
@@ -491,29 +614,24 @@ You can use same ordering **[core API](/docs/select#order-by)** or use
 
 <Section>
 ```typescript copy
-import { desc, asc } from 'drizzle-orm';
-
-await db._query.posts.findMany({
-	orderBy: [asc(posts.id)],
-});
-```
-```typescript copy
-await db._query.posts.findMany({
-	orderBy: (posts, { asc }) => [asc(posts.id)],
+await db.query.posts.findMany({
+  orderBy: {
+    id: "asc",
+  },
 });
 ```
 </Section>
 
 **Order by `asc` + `desc`:**
 ```typescript copy
-await db._query.posts.findMany({
-	orderBy: (posts, { asc }) => [asc(posts.id)],
-	with: {
-		comments: {
-			orderBy: (comments, { desc }) => [desc(comments.id)],
-		},
-	},
-});
+  await db.query.posts.findMany({
+    orderBy: { id: "asc" },
+    with: {
+      comments: {
+        orderBy: { id: "desc" },
+      },
+    },
+  });
 ```
 
 ### Include custom fields
@@ -527,14 +645,14 @@ It's useful when you need to retrieve data and apply additional functions to it.
 ```typescript copy {5}
 import { sql } from 'drizzle-orm';
 
-await db._query.users.findMany({
+await db.query.users.findMany({
 	extras: {
 		loweredName: sql`lower(${users.name})`.as('lowered_name'),
 	},
 })
 ```
 ```typescript copy {3}
-await db._query.users.findMany({
+await db.query.users.findMany({
 	extras: {
 		loweredName: (users, { sql }) => sql`lower(${users.name})`.as('lowered_name'),
 	},
@@ -553,7 +671,7 @@ you can use the following query with the Drizzle relational query builder.
 
 <Section>
 ```typescript copy
-const res = await db._query.users.findMany({
+const res = await db.query.users.findMany({
 	extras: {
 		fullName: sql<string>`concat(${users.name}, " ", ${users.name})`.as('full_name'),
 	},
@@ -590,7 +708,7 @@ const res: {
 To retrieve all posts with comments and add an additional field to calculate the size of the post content and the size of each comment content:
 <Section>
 ```typescript copy
-const res = await db._query.posts.findMany({
+const res = await db.query.posts.findMany({
 	extras: (table, { sql }) => ({
 		contentLength: (sql<number>`length(${table.content})`).as('content_length'),
 	}),
@@ -634,14 +752,14 @@ using the Drizzle relational query builder.
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-	with: {
-		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
-		},
-	},
-}).prepare('query_name');
+const prepared = db.query.users.findMany({
+    where: { id: { eq: sql.placeholder("id") } },
+    with: {
+      posts: {
+        where: { id: 1 },
+      },
+    },
+}).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ id: 1 });
 ```
@@ -650,14 +768,14 @@ const usersWithPosts = await prepared.execute({ id: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-	with: {
-		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
-		},
-	},
-}).prepare();
+const prepared = db.query.users.findMany({
+    where: { id: { eq: sql.placeholder("id") } },
+    with: {
+      posts: {
+        where: { id: 1 },
+      },
+    },
+}).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ id: 1 });
 ```
@@ -666,14 +784,14 @@ const usersWithPosts = await prepared.execute({ id: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
-	with: {
-		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
-		},
-	},
-}).prepare();
+const prepared = db.query.users.findMany({
+    where: { id: { eq: sql.placeholder("id") } },
+    with: {
+      posts: {
+        where: { id: 1 },
+      },
+    },
+}).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ id: 1 });
 ```
@@ -687,13 +805,13 @@ const usersWithPosts = await prepared.execute({ id: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	with: {
-		posts: {
-			limit: placeholder('limit'),
-		},
-	},
-}).prepare('query_name');
+const prepared = db.query.users.findMany({
+    with: {
+      posts: {
+        limit: sql.placeholder("limit"),
+      },
+    },
+  }).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ limit: 1 });
 ```
@@ -702,13 +820,13 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	with: {
-		posts: {
-			limit: placeholder('limit'),
-		},
-	},
-}).prepare();
+const prepared = db.query.users.findMany({
+    with: {
+      posts: {
+        limit: sql.placeholder("limit"),
+      },
+    },
+  }).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ limit: 1 });
 ```
@@ -717,13 +835,13 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	with: {
-		posts: {
-			limit: placeholder('limit'),
-		},
-	},
-}).prepare();
+const prepared = db.query.users.findMany({
+    with: {
+      posts: {
+        limit: sql.placeholder("limit"),
+      },
+    },
+  }).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ limit: 1 });
 ```
@@ -737,8 +855,8 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	offset: placeholder('offset'),
+const prepared = db.query.users.findMany({
+	offset: sql.placeholder('offset'),
 	with: {
 		posts: true,
 	},
@@ -751,8 +869,8 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	offset: placeholder('offset'),
+const prepared = db.query.users.findMany({
+	offset: sql.placeholder('offset'),
 	with: {
 		posts: true,
 	},
@@ -765,8 +883,8 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	offset: placeholder('offset'),
+const prepared = db.query.users.findMany({
+	offset: sql.placeholder('offset'),
 	with: {
 		posts: true,
 	},
@@ -783,17 +901,19 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	limit: placeholder('uLimit'),
-	offset: placeholder('uOffset'),
-	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
-	with: {
-		posts: {
-			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-			limit: placeholder('pLimit'),
-		},
-	},
-}).prepare('query_name');
+const prepared = db.query.users.findMany({
+    limit: sql.placeholder("uLimit"),
+    offset: sql.placeholder("uOffset"),
+    where: {
+      OR: [{ id: { eq: sql.placeholder("id") } }, { id: 3 }],
+    },
+    with: {
+      posts: {
+        where: { id: { eq: sql.placeholder("pid") } },
+        limit: sql.placeholder("pLimit"),
+      },
+    },
+}).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
 ```
@@ -802,17 +922,19 @@ const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	limit: placeholder('uLimit'),
-	offset: placeholder('uOffset'),
-	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
-	with: {
-		posts: {
-			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-			limit: placeholder('pLimit'),
-		},
-	},
-}).prepare();
+const prepared = db.query.users.findMany({
+    limit: sql.placeholder("uLimit"),
+    offset: sql.placeholder("uOffset"),
+    where: {
+      OR: [{ id: { eq: sql.placeholder("id") } }, { id: 3 }],
+    },
+    with: {
+      posts: {
+        where: { id: { eq: sql.placeholder("pid") } },
+        limit: sql.placeholder("pLimit"),
+      },
+    },
+}).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
 ```
@@ -821,17 +943,19 @@ const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1
 <Tab>
 <Section>
 ```ts copy
-const prepared = db._query.users.findMany({
-	limit: placeholder('uLimit'),
-	offset: placeholder('uOffset'),
-	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
-	with: {
-		posts: {
-			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-			limit: placeholder('pLimit'),
-		},
-	},
-}).prepare();
+const prepared = db.query.users.findMany({
+    limit: sql.placeholder("uLimit"),
+    offset: sql.placeholder("uOffset"),
+    where: {
+      OR: [{ id: { eq: sql.placeholder("id") } }, { id: 3 }],
+    },
+    with: {
+      posts: {
+        where: { id: { eq: sql.placeholder("pid") } },
+        limit: sql.placeholder("pLimit"),
+      },
+    },
+}).prepare("query_name");
 
 const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1, id: 2, pid: 6 });
 ```
