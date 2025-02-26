@@ -84,27 +84,27 @@ const port = 3000;
 const client = new Client('postgres://postgres:postgres@localhost:5432/postgres');
 
 app.post('/query', async (req, res) => {
-	const { sql, params, method } = req.body;
+  const { sql, params, method } = req.body;
 
-	// prevent multiple queries
-	const sqlBody = sql.replace(/;/g, '');
+  // prevent multiple queries
+  const sqlBody = sql.replace(/;/g, '');
 
-    try {
-        const result = await client.query({
-            text: sqlBody,
-            values: params,
-            rowMode: method === 'all' ? 'array': undefined,
-        });
-		res.send(result.rows);
-	} catch (e: any) {
-		res.status(500).json({ error: e });
-	}
+  try {
+    const result = await client.query({
+      text: sqlBody,
+      values: params,
+      rowMode: method === 'all' ? 'array': undefined,
+    });
+    res.send(result.rows);
+  } catch (e: any) {
+    res.status(500).json({ error: e });
+  }
 
-	res.status(500).json({ error: 'Unknown method value' });
+  res.status(500).json({ error: 'Unknown method value' });
 });
 
 app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
+  console.log(`Example app listening on port ${port}`);
 });
 ```
 </Section>
@@ -138,10 +138,10 @@ const main = async () => {
     const connection = await mysql.createConnection('mysql://root:mysql@127.0.0.1:5432/drizzle');
 
     app.post('/query', async (req, res) => {
-    	const { sql, params, method } = req.body;
+      const { sql, params, method } = req.body;
 
       // prevent multiple queries
-    	const sqlBody = sql.replace(/;/g, '');
+      const sqlBody = sql.replace(/;/g, '');
 
       try {
             const result = await connection.query({
@@ -155,20 +155,20 @@ const main = async () => {
                     return next();
                 },
             });
-    	} catch (e: any) {
-    		res.status(500).json({ error: e });
-    	}
+      } catch (e: any) {
+        res.status(500).json({ error: e });
+      }
 
-    	if (method === 'all') {
-    		res.send(result[0]);
-    	} else if (method === 'execute') {
-    		res.send(result);
-    	}
-    	res.status(500).json({ error: 'Unknown method value' });
+      if (method === 'all') {
+        res.send(result[0]);
+      } else if (method === 'execute') {
+        res.send(result);
+      }
+      res.status(500).json({ error: 'Unknown method value' });
     });
 
     app.listen(port, () => {
-    	console.log(`Example app listening on port ${port}`);
+      console.log(`Example app listening on port ${port}`);
     });
 }
 
@@ -205,15 +205,15 @@ type ResponseType = { rows: any[][] | any[] }[];
 const db = drizzle(async (sql, params, method) => {
   // single queries logic. Same as in code above
 }, async (queries: { sql: string, params: any[], method: 'all' | 'run' | 'get' | 'values'}[]) => {
-		try {
-			const result: ResponseType = await axios.post('http://localhost:3000/batch', { queries });
+    try {
+      const result: ResponseType = await axios.post('http://localhost:3000/batch', { queries });
 
-			return result;
-		} catch (e: any) {
-			console.error('Error from sqlite proxy server:', e);
-			throw e;
-		}
-	});
+      return result;
+    } catch (e: any) {
+      console.error('Error from sqlite proxy server:', e);
+      throw e;
+    }
+  });
 ```
 
 And then you can use `db.batch([])` method, that will proxy all queries

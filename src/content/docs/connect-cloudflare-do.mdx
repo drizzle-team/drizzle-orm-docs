@@ -6,7 +6,7 @@ import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 
-# Drizzle \<\> Cloudflare D1
+# Drizzle \<\> Cloudflare Durable Objects SQLite
 
 <Prerequisites>
 - Database [connection basics](/docs/connect-overview) with Drizzle
@@ -72,19 +72,31 @@ export class MyDurableObject extends DurableObject {
 		super(ctx, env);
 		this.storage = ctx.storage;
 		this.db = drizzle(this.storage, { logger: false });
+
+		// Make sure all migrations complete before accepting queries.
+		// Otherwise you will need to run `this.migrate()` in any function
+		// that accesses the Drizzle database `this.db`.
+		ctx.blockConcurrencyWhile(async () => {
+			await this._migrate();
+		});
 	}
 
-    async migrate() {
-        migrate(this.db, migrations);
-    }
+	async insertAndList(user: typeof usersTable.$inferInsert) {
+		await this.insert(user);
+		return this.select();
+	}
 
 	async insert(user: typeof usersTable.$inferInsert) {
-        await this.db.insert(usersTable).values(user);
-    }
+		await this.db.insert(usersTable).values(user);
+	}
 
 	async select() {
-        return this.db.select().from(usersTable);
-    }
+		return this.db.select().from(usersTable);
+	}
+
+	async _migrate() {
+		migrate(this.db, migrations);
+	}
 }
 
 export default {
@@ -99,8 +111,20 @@ export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
 		const id: DurableObjectId = env.MY_DURABLE_OBJECT.idFromName('durable-object');
 		const stub = env.MY_DURABLE_OBJECT.get(id);
-		await stub.migrate();
 
+		// Option A - Maximum performance.
+		// Prefer to bundle all the database interaction within a single Durable Object call
+		// for maximum performance, since database access is fast within a DO.
+		const usersAll = await stub.insertAndList({
+			name: 'John',
+			age: 30,
+			email: 'john@example.com',
+		});
+		console.log('New user created. Getting all users from the database: ', users);
+
+		// Option B - Slow but maybe useful sometimes for debugging.
+		// You can also directly call individual Drizzle queries if they are exposed
+		// but keep in mind every query is a round-trip to the Durable Object instance.
 		await stub.insert({
 			name: 'John',
 			age: 30,
@@ -111,8 +135,8 @@ export default {
 		const users = await stub.select();
 		console.log('Getting all users from the database: ', users);
 
-        return new Response();
-    }
+		return Response.json(users);
+	}
 }
 ```
 
