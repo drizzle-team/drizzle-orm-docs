@@ -152,7 +152,7 @@ An example of a `one-to-one` relation between users and users, where a user can 
 
 ```typescript copy {10-17}
 import { pgTable, serial, text, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { defineRelations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
 	id: integer().primaryKey(),
@@ -174,7 +174,7 @@ Another example would be a user having a profile information stored in separate 
 
 ```typescript copy {15-22}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { defineRelations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
 	id: integer().primaryKey(),
@@ -207,7 +207,7 @@ Example of `one-to-many` relation between users and posts they've written:
 
 ```typescript copy {15-25}
 import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { defineRelations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
 	id: integer('id').primaryKey(),
@@ -277,7 +277,7 @@ they have to be explicitly defined and store associations between related tables
 
 Example of `many-to-many` relation between users and groups we are using `through` to bypass junction table selection and directly select many `groups` for each `user`.
 ```typescript copy {27-39}
-import { relations } from 'drizzle-orm';
+import { defineRelations } from 'drizzle-orm';
 import { integer, pgTable, primaryKey, serial, text } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
