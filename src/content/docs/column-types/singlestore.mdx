@@ -560,6 +560,62 @@ CREATE TABLE `table` (
 
 ## ---
 
+### vector
+
+<Section>
+```typescript
+import { singlestoreTable, vector } from "drizzle-orm/singlestore-core";
+
+const table = singlestoreTable('table', {
+	embedding: vector("embedding", { dimensions: 10 }),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`embedding` vector(10)
+);
+```
+</Section>
+
+You can specify `elementType` in order to change what element type the vector
+consists of. This can be one of `I8`, `I16`, `I32`, `I64`, `F32`, or `F64`
+
+<Section>
+```typescript
+import { singlestoreTable, vector } from "drizzle-orm/singlestore-core";
+
+const table = singlestoreTable('table', {
+	embedding: vector("embedding", { dimensions: 10, elementType: 'I8' }),
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`embedding` vector(10, 'I8')
+);
+```
+</Section>
+
+###### Helper functions
+
+There are two helper functions useful for vector search queries in SingleStore:
+
+<Section>
+```typescript
+import { dotProduct, euclideanDistance } from 'drizzle-orm/singlestore-core/expressions';
+
+euclideanDistance(table.column, [3, 1, 2]);
+dotProduct(table.column, [3, 1, 2]);
+```
+```sql
+table.column <-> '[3, 1, 2]'
+table.column <*> '[3, 1, 2]`
+```
+</Section>
+
+## ---
+
 ### Customizing data type
 
 Every column builder has a `.$type()` method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
