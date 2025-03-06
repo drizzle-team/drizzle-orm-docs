@@ -567,7 +567,7 @@ CREATE TABLE `table` (
 import { singlestoreTable, vector } from "drizzle-orm/singlestore-core";
 
 const table = singlestoreTable('table', {
-	embedding: vector("embedding", { dimensions: 10 }),
+	embedding: vector('embedding', { dimensions: 10 }),
 });
 ```
 
@@ -586,7 +586,7 @@ consists of. This can be one of `I8`, `I16`, `I32`, `I64`, `F32`, or `F64`
 import { singlestoreTable, vector } from "drizzle-orm/singlestore-core";
 
 const table = singlestoreTable('table', {
-	embedding: vector("embedding", { dimensions: 10, elementType: 'I8' }),
+	embedding: vector('embedding', { dimensions: 10, elementType: 'I8' }),
 });
 ```
 
