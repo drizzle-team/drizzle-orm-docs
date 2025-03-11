@@ -11,6 +11,8 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 
 <Prerequisites>  
   - **Relations Fundamentals** - get familiar with the concepts of foreign key constraints, soft relations, database normalization, etc - [read here](/docs/rqb-fundamentals)
+  - **Declare schema** - get familiar with how to define drizzle schemas - [read here](/docs/sql-schema-declaration)
+  - **Database connection** - get familiar with how to connect to database using drizzle - [read here](/docs/get-started-postgresql)
 </Prerequisites>
 
 The sole purpose of Drizzle relations is to let you query your relational data in the most simple and concise way:
@@ -278,16 +280,16 @@ they have to be explicitly defined and store associations between related tables
 Example of `many-to-many` relation between users and groups we are using `through` to bypass junction table selection and directly select many `groups` for each `user`.
 ```typescript copy {27-39}
 import { defineRelations } from 'drizzle-orm';
-import { integer, pgTable, primaryKey, serial, text } from 'drizzle-orm/pg-core';
+import { integer, pgTable, primaryKey, text } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name'),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 export const groups = pgTable('groups', {
-  id: serial('id').primaryKey(),
-  name: text('name'),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 export const usersToGroups = pgTable(
@@ -457,6 +459,296 @@ export const relations = defineRelations(schema,(r) => ({
 
 ## ---
 
+### Performance
+
+When working with relations in Drizzle ORM, especially in applications with 
+significant data or complex queries, optimizing database performance is crucial.  
+Indexes play a vital role in speeding up data retrieval, particularly when querying 
+related data. This section outlines recommended indexing strategies for each type 
+of relationship defined using Drizzle ORM.
+
+##### One-to-one Relationships
+
+In a one-to-one relationship, like the "user invites user" example or the
+"user has profile info" example, the key performance consideration is efficient joining 
+of the related tables.
+
+<Callout>
+For optimal performance in one-to-one relationships, you should create an index 
+on the foreign key column in the table that is being referenced 
+(the "target" table in the relation).
+</Callout>
+
+<Callout collapsed='Why it is important'>
+When you query data with related one-to-one information, Drizzle performs a JOIN operation. An index on the foreign key column allows the database to quickly 
+locate the related row in the target table, significantly speeding up the join process.
+</Callout>
+
+**Example:**
+```typescript
+import * as p from 'drizzle-orm/pg-core';
+import { defineRelations } from 'drizzle-orm';
+
+export const users = p.pgTable('users', {
+	id: p.integer().primaryKey(),
+	name: p.text(),
+});
+
+export const profileInfo = p.pgTable('profile_info', {
+	id: p.integer().primaryKey(),
+	userId: p.integer('user_id').references(() => users.id),
+	metadata: p.jsonb(),
+});
+
+export const relations = defineRelations({ users, profileInfo }, (r) => ({
+	users: {
+		profileInfo: r.one.profileInfo({
+			from: r.users.id,
+			to: r.profileInfo.userId,
+		})
+	}
+}));
+```
+
+To optimize queries fetching user data along with their profile information, 
+you should create an index on the `userId` column in the `profile_info` table.
+
+```typescript {13-15,21}
+import * as p from 'drizzle-orm/pg-core';
+import { defineRelations } from 'drizzle-orm';
+
+export const users = p.pgTable('users', {
+	id: p.integer().primaryKey(),
+	name: p.text(),
+});
+
+export const profileInfo = pgTable('profile_info', {
+	id: p.integer().primaryKey(),
+	userId: p.integer('user_id').references(() => users.id),
+	metadata: p.jsonb(),
+}, (table) => [
+  p.index('profile_info_user_id_idx').on(table.userId)
+]);
+
+export const relations = defineRelations({ users, profileInfo }, (r) => ({
+	users: {
+		profileInfo: r.one.profileInfo({
+			from: r.users.id,
+			to: r.profileInfo.userId,
+		})
+	}
+}));
+```
+```sql
+CREATE INDEX idx_profile_info_user_id ON profile_info (user_id);
+```
+
+#### One-to-many Relationships
+
+Similar to one-to-one relationships, one-to-many relations benefit significantly 
+from indexing to optimize join operations. Consider the "users and posts" example where one user can have many posts.
+
+<Callout>
+For one-to-many relationships, create an index on the foreign key column in the table that represents the "many" side of the relationship (the table with the foreign key referencing the "one" side).
+</Callout>
+
+<Callout collapsed='Why it is important'>
+When you fetch a user with their posts or posts with their authors, joins are performed.
+Indexing the foreign key (`authorId` in `posts` table) allows the database to efficiently 
+retrieve all posts associated with a given user or quickly find the author of a post.
+</Callout>
+
+**Example:**
+```typescript
+import * as p from "drizzle-orm/pg-core";
+import { defineRelations } from 'drizzle-orm';
+
+export const users = p.pgTable('users', {
+	id: p.integer().primaryKey(),
+	name: p.text(),
+});
+
+export const posts = p.pgTable('posts', {
+	id: p.integer().primaryKey(),
+	content: p.text(),
+	authorId: p.integer('author_id'),
+});
+
+export const relations = defineRelations({ users, posts }, (r) => ({
+  posts: {
+    author: r.one.users({
+      from: r.posts.authorId,
+      to: r.users.id,
+    }),
+  },
+  users: {
+    posts: r.many.posts(),
+  },
+}));
+```
+
+To optimize queries involving users and their posts, create an index on the `authorId` column in the `posts` table.
+
+```typescript {13-15}
+import * as p from "drizzle-orm/pg-core";
+import { defineRelations } from 'drizzle-orm';
+
+export const users = p.pgTable('users', {
+	id: p.integer().primaryKey(),
+	name: p.text(),
+});
+
+export const posts = p.pgTable('posts', {
+	id: p.integer().primaryKey(),
+	content: p.text(),
+	authorId: p.integer('author_id'),
+}, (t) => [
+  index('posts_author_id_idx').on(table.authorId)
+]);
+
+export const relations = defineRelations({ users, posts }, (r) => ({
+  posts: {
+    author: r.one.users({
+      from: r.posts.authorId,
+      to: r.users.id,
+    }),
+  },
+  users: {
+    posts: r.many.posts(),
+  },
+}));
+```
+```sql
+CREATE INDEX idx_posts_author_id ON posts (author_id);
+```
+
+#### Many-to-many Relationships
+
+Many-to-many relationships, implemented using junction tables, require a slightly 
+more nuanced indexing strategy to ensure optimal query performance. 
+Consider the "users and groups" example with the `usersToGroups` junction table.
+
+<Callout>
+For many-to-many relationships, it is generally recommended to create the following 
+indexes on the junction table:
+1.  **Index on each foreign key column individually:** This optimizes queries that 
+filter or join based on a single side of the relationship 
+(e.g., finding all groups for a user OR all users in a group).
+2.  **Composite index on both foreign key columns together:** This is crucial for 
+efficiently resolving the many-to-many relationship itself. It speeds up queries that need to find the connections between both entities.
+</Callout>
+
+<Callout collapsed='Why it is important'>
+When querying many-to-many relations, especially when using `through` in Drizzle ORM, the database needs to efficiently navigate the junction table.
+
+- Indexes on individual foreign key columns (`userId`, `groupId` in `usersToGroups`) help when you are querying from one side to find the other (e.g., "find groups for a user").
+- The composite index on `(userId, groupId)` in `usersToGroups` is particularly important for quickly finding all relationships defined in the junction table. This is used when Drizzle ORM resolves the `many-to-many` relation to fetch related entities.
+</Callout>
+
+**Example:**
+
+In the "users and groups" example, the `usersToGroups` junction table connects `users` and `groups`.
+
+```typescript
+import { defineRelations } from 'drizzle-orm';
+import * as p from 'drizzle-orm/pg-core';
+
+export const users = p.pgTable('users', {
+  id: p.integer().primaryKey(),
+  name: p.text(),
+});
+
+export const groups = p.pgTable('groups', {
+  id: p.integer().primaryKey(),
+  name: p.text(),
+});
+
+export const usersToGroups = p.pgTable(
+  'users_to_groups',
+  {
+    userId: p.integer('user_id')
+      .notNull()
+      .references(() => users.id),
+    groupId: p.integer('group_id')
+      .notNull()
+      .references(() => groups.id),
+  },
+  (t) => [p.primaryKey({ columns: [t.userId, t.groupId] })],
+);
+
+export const relations = defineRelations({ users, groups, usersToGroups },
+  (r) => ({
+    users: {
+      groups: r.many.groups({
+        from: r.users.id.through(r.usersToGroups.userId),
+        to: r.groups.id.through(r.usersToGroups.groupId),
+      }),
+    },
+    groups: {
+      participants: r.many.users(),
+    },
+  })
+);
+```
+
+To optimize queries for users and groups, create indexes on `usersToGroups` table as follows:
+
+```typescript {26-28}
+import { defineRelations } from 'drizzle-orm';
+import * as p from 'drizzle-orm/pg-core';
+
+export const users = p.pgTable('users', {
+  id: p.integer().primaryKey(),
+  name: p.text(),
+});
+
+export const groups = p.pgTable('groups', {
+  id: p.integer().primaryKey(),
+  name: p.text(),
+});
+
+export const usersToGroups = p.pgTable(
+  'users_to_groups',
+  {
+    userId: p.integer('user_id')
+      .notNull()
+      .references(() => users.id),
+    groupId: p.integer('group_id')
+      .notNull()
+      .references(() => groups.id),
+  },
+  (t) => [
+    p.primaryKey({ columns: [t.userId, t.groupId] }),
+    p.index('users_to_groups_user_id_idx').on(table.userId),
+    p.index('users_to_groups_group_id_idx').on(table.groupId),
+    p.index('users_to_groups_composite_idx').on(table.userId, table.groupId),
+  ],
+);
+
+export const relations = defineRelations({ users, groups, usersToGroups },
+  (r) => ({
+    users: {
+      groups: r.many.groups({
+        from: r.users.id.through(r.usersToGroups.userId),
+        to: r.groups.id.through(r.usersToGroups.groupId),
+      }),
+    },
+    groups: {
+      participants: r.many.users(),
+    },
+  })
+);
+```
+```sql
+CREATE INDEX idx_users_to_groups_user_id ON users_to_groups (user_id);
+CREATE INDEX idx_users_to_groups_group_id ON users_to_groups (group_id);
+CREATE INDEX idx_users_to_groups_composite ON users_to_groups (userId, groupId);
+```
+
+By applying these indexing strategies, you can significantly improve the performance of your Drizzle ORM applications when working with relational data, especially as your data volume grows and your queries become more complex. Remember to choose the indexes that best suit your specific query patterns and application needs.
+
+## ---
+
 ### Foreign keys
 
 You might've noticed that `relations` look similar to foreign keys — they even have a `references` property. So what's the difference?
@@ -471,47 +763,52 @@ What this means is `relations` and foreign keys can be used together, but they a
 You can define `relations` without using foreign keys (and vice versa), which allows them to be used with databases that do not support foreign keys.
 
 The following two examples will work exactly the same in terms of querying the data using Drizzle relational queries.
+
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
 ```ts {15}
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+export const users = p.pgTable("users", {
+  id: p.integer().primaryKey(),
+  name: p.text(),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
-	}),
+export const profileInfo = p.pgTable("profile_info", {
+  id: p.integer().primaryKey(),
+  userId: p.integer("user_id"),
+  metadata: p.jsonb(),
+});
+
+export const relations = defineRelations({ users, profileInfo }, (r) => ({
+  users: {
+    profileInfo: r.one.profileInfo({
+      from: r.users.id,
+      to: r.profileInfo.userId,
+    }),
+  },
 }));
-
-export const profileInfo = pgTable('profile_info', {
-	id: serial('id').primaryKey(),
-	userId: integer("user_id"),
-	metadata: jsonb("metadata"),
-});
 ```
 </CodeTab>
 <CodeTab>
 ```ts {15}
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+export const users = p.pgTable("users", {
+  id: p.integer().primaryKey(),
+  name: p.text(),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profileInfo: one(users, {
-		fields: [profileInfo.userId],
-		references: [users.id],
-	}),
+export const profileInfo = p.pgTable("profile_info", {
+  id: p.integer().primaryKey(),
+  userId: p.integer("user_id").references(() => users.id),
+  metadata: p.jsonb(),
+});
+
+export const relations = defineRelations({ users, profileInfo }, (r) => ({
+  users: {
+    profileInfo: r.one.profileInfo({
+      from: r.users.id,
+      to: r.profileInfo.userId,
+    }),
+  },
 }));
-
-export const profileInfo = pgTable('profile_info', {
-	id: serial('id').primaryKey(),
-	userId: integer("user_id").references(() => users.id),
-	metadata: jsonb("metadata"),
-});
 ```
 </CodeTab>
 </CodeTabs>
