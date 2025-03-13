@@ -411,6 +411,9 @@ where: {
 
 	// `id` - is a column key
     id: {
+      OR: [],
+      AND: [],
+      NOT: {},
       eq: 1,
       ne: 1,
       gt: 1,
@@ -613,7 +616,7 @@ await db.query.posts.findMany({
 ```
 
 <Callout type="warning" emoji="⚠️">
-  `offset` is now can be used in with tables as well!
+  `offset` now can be used in with tables as well!
 </Callout>
 ```typescript 
 await db.query.posts.findMany({
@@ -644,6 +647,10 @@ Drizzle provides API for ordering in the relational query builder.
 
 You can use same ordering **[core API](/docs/select#order-by)** or use
 `order by` operator from the callback with no imports.  
+
+<Callout title='important'>
+When you use multiple `orderBy` statements in the same table, they will be included in the query in the same order in which you added them
+</Callout>
 
 <Section>
 ```typescript copy
@@ -706,7 +713,7 @@ you can use the following query with the Drizzle relational query builder.
 ```typescript copy
 const res = await db.query.users.findMany({
 	extras: {
-		fullName: sql<string>`concat(${users.name}, " ", ${users.name})`,
+		fullName: (users, { sql }) => sql<string>`concat(${users.name}, " ", ${users.name})`,
 	},
 	with: {
 		usersToGroups: {
@@ -742,13 +749,13 @@ To retrieve all posts with comments and add an additional field to calculate the
 <Section>
 ```typescript copy
 const res = await db.query.posts.findMany({
-	extras: (table, { sql }) => ({
-		contentLength: (sql<number>`length(${table.content})`),
-	}),
+	extras: {
+		contentLength: (table, { sql }) => sql<number>`length(${table.content})`,
+	},
 	with: {
 		comments: {
 			extras: {
-				commentSize: sql<number>`length(${comments.content})`,
+				commentSize: (table, { sql }) => sql<number>`length(${table.content})`,
 			},
 		},
 	},
@@ -788,7 +795,7 @@ await db.query.users.findMany({
     posts: true
   },
   extras: {
-    totalPostsCount: (table) => db.$count(posts, eq(posts.authorId, t.id)),
+    totalPostsCount: (table) => db.$count(posts, eq(posts.authorId, table.id)),
   }
 });
 ```
