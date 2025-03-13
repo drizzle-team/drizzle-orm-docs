@@ -488,13 +488,13 @@ const usersWithPosts = await db.query.usersTable.findMany({
   where: {
     id: {
       gt: 10
+    },
+    posts: {
+      content: {
+        like: 'M%'
+      }
     }
   },
-  posts: {
-    content: {
-      like: 'M%'
-    }
-  }
 });
 ```
 </Callout>

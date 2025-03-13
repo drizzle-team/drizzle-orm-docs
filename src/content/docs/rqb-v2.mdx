@@ -409,8 +409,11 @@ where: {
     NOT: {},
     RAW: (table) => sql`${table.id} = 1`,
 
-	// `id` - is a column key
-    id: {
+    // filter by relations
+    [relation]: {},
+
+	  // filter by columns
+    [column]: {
       OR: [],
       AND: [],
       NOT: {},
@@ -572,14 +575,14 @@ const usersWithPosts = await db.query.usersTable.findMany({
   where: {
     id: {
       gt: 10
+    },
+    posts: {
+      content: {
+        like: 'M%'
+      }
     }
   },
-  posts: {
-    content: {
-      like: 'M%'
-    }
-  }
-})
+});
 ```
 
 **Example:** Get all `users` with posts, only if user has at least 1 post
