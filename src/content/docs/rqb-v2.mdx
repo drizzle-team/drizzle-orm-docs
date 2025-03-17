@@ -677,6 +677,19 @@ await db.query.posts.findMany({
   });
 ```
 
+You can also use custom `sql` in order by statement:
+
+```typescript copy
+await db.query.posts.findMany({
+  orderBy: (t) => sql`${t.id} asc`,
+  with: {
+    comments: {
+      orderBy: (t, { desc }) => desc(t.id),
+    },
+  },
+});
+```
+
 ### Include custom fields
 Relational query API lets you add custom additional fields. 
 It's useful when you need to retrieve data and apply additional functions to it.
