@@ -160,13 +160,17 @@ CREATE TABLE `table` (
 import { decimal, singlestoreTable } from "drizzle-orm/mysql-core";
 
 const table = singlestoreTable('table', {
-	decimal: decimal()
+	decimal: decimal(),
+	decimalNum: decimal({ scale: 30, mode: 'number' }),
+	decimalBig: decimal({ scale: 30, mode: 'bigint' }),
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
 	`decimal` decimal,
+	`decimalNum` decimal(30),
+	`decimalBig` decimal(30),
 );
 ```
 </Section>

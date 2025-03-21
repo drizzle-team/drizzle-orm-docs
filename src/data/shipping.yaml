@@ -1,4 +1,211 @@
+2025-03:
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.41.0'>v0.41.0</a> release</b>
+
+    <ul>
+    <li>`bigint`, `number` modes for `SQLite`, `MySQL`, `PostgreSQL`, `SingleStore` `decimal` & `numeric` column types</li>
+    <li>Changed behavior of `sql-js` query preparation</li>
+    <li>Fixed `MySQL`, `SingleStore` `varchar` allowing not specifying `length` in config</li>
+    <li>Fixed `MySQL`, `SingleStore` `binary`, `varbinary` data\\type mismatches</li>
+    <li>Fixed `numeric`\\`decimal` data\\type mismatches</li>
+    <li>Fixed `drizzle-studio` + `AWS Data Api` connection issue</li>
+    <li>Fixed `isConfig` utility function checking types of wrong fields</li>
+    <li>Enabled `supportBigNumbers` in auto-created `mysql2` driver instances</li>
+    <li>Fixed custom schema tables querying in RQBv1</li>
+    <li>Removed in-driver mapping for postgres types</li>
+    <li>Fixed `SQLite` `buffer`-mode `blob` sometimes returning `number[]`</li>
+    </ul>
+  - | 
+    <b>Drizzle Studio updates:</b>
+
+    <ul>
+    <li>Added new setting option for expanding subviews.</li>
+    <li>Added date and time pickers.</li>
+    <li>New settings option for pagination by page or limit offset.</li>
+    <li>Improved error handling for INSERT/UPDATE/DELETE statements in data table.</li>
+    <li>Added column type to header cell.</li>
+    <li>Added export in xlsx format.</li>
+    <li>Added callback on bug report button click.</li>
+    <li>Added ability to customize the error page.</li>
+    <li>Added css variable for run query button color.</li>
+    <li>Fixed issues with rowid.</li>
+    <li>Improved SQL console with snippet system.</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.40.1'>v0.40.1</a> release</b>
+
+    <ul>
+    <li>Updates to neon-http for @neondatabase/serverless@1.0.0. Starting from this version, drizzle-orm will be compatible with both @neondatabase/serverless <1.0 and >1.0</li>
+    </ul>
+
+2025-02:
+  - | 
+    <b>Drizzle Studio updates:</b>
+
+    <ul>
+    <li>Added the ability to create/alter tables.</li>
+    <li>Added the ability to create/alter views.</li>
+    <li>Added the ability to refresh db schema.</li>
+    <li>Improved dropdowns.</li>
+    <li>Improved style customization.</li>
+    <li>Added filter by entity type (table/view).</li>
+    <li>Revised dependency tree and reduced bundle size.</li>
+    <li>Added database metadata to bug report.</li>
+    <li>Added range selection with copy/paste capability.</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.40.0'>v0.40.0</a> release</b>
+
+    <ul>
+    <li>Drizzle is getting a new Gel dialect with its own types and Gel-specific logic. In this first iteration, almost all query-building features have been copied from the PostgreSQL dialect since Gel is fully PostgreSQL-compatible. The only change in this iteration is the data types. The Gel dialect has a different set of available data types, and all mappings for these types have been designed to avoid any extra conversions on Drizzle's side. This means you will insert and select exactly the same data as supported by the Gel protocol.</li>
+    </ul>
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.30.5'>v0.30.5</a> release</b>
+
+    <ul>
+    <li>Drizzle is getting a new Gel dialect with its own types and Gel-specific logic. Kit is getting new "gel" dialect option</li>
+    </ul>
+
+2025-01:
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.39.1'>v0.39.1</a> release</b>
+
+    <ul>
+    <li>Fixed SQLite onConflict clauses being overwritten instead of stacked</li>
+    <li>Added view support to aliasedTable()</li>
+    <li>Fixed sql builder prefixing aliased views and tables with their schema</li>
+    </ul>
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.30.4'>v0.30.4</a> release</b>
+
+    <ul>
+    <li>Fix bug that generates incorrect syntax when introspect in mysql</li>
+    <li>Fix a bug that caused incorrect syntax output when introspect in unsigned columns</li>
+    </ul>
+  - | 
+    <ul>
+    <b>Bug Fixes</b>
+    <li>Allow INSERT in CTEs (WITH clauses)]</li>
+    <li>Support Raw SQL in CTE Query Builder]</li>
+    <li>Include pre-defined database objects related to Neon Identity in drizzle-orm]</li>
+    <li>$count is undefined on withReplicas]</li>
+    <li>get[Materialized]ViewName, ie getTableName but for (materialized) views.]</li>
+    <li>$count API error with vercel-postgres]</li>
+    <li>Cannot use schema.coerce on refining drizzle-zod types]</li>
+    <li>Type Coercion in drizzle-zod]</li>
+    <li>The inferred type of X cannot be named without a reference ... </li>
+    <li>drizzle-zod excessively deep and possibly infinite types]</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.39.0'>v0.39.0</a> release</b>
+
+    <ul>
+    <li>You can now use the new Bun SQL driver released in Bun v1.2.0 with Drizzle</li>
+    <li>WITH now supports INSERT, UPDATE, DELETE and raw sql template</li>
+    <li>New tables in /neon import</li>
+    <li>Added getViewName util function</li>
+    </ul>
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.30.3'>v0.30.3</a> release</b>
+
+    <ul>
+    <li>As SingleStore did not support certain DDL statements before this release, you might encounter an error indicating that some schema changes cannot be applied due to a database issue. Starting from this version, drizzle-kit will detect such cases and initiate table recreation with data transfer between the tables</li>
+    </ul>
+
 2024-12:
+  - |
+    <b>drizzle-seed <a href='https://github.com/drizzle-team/drizzle-orm/blob/main/changelogs/drizzle-seed/0.3.0.md'>v0.3.0</a> release</b>
+
+    <ul>
+    <li>The seed function can now accept Drizzle Relations objects and treat them as foreign key constraints</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.38.3'>v0.38.3</a> release</b>
+
+    <ul>
+    <li>Fix incorrect deprecation detection for table declarations</li>
+    <li>SingleStore dialect support for all validator packages</li>
+    </ul>
+  - |
+    <b>drizzle-seed <a href='https://github.com/drizzle-team/drizzle-orm/blob/main/changelogs/drizzle-seed/0.2.1.md'>v0.2.1</a> release</b>
+
+    <ul>
+    <li>We are introducing a new parameter, version, to the seed function options. This parameter, which controls generator versioning, has been added to make it easier to update deterministic generators in the future.</li>
+    <li>interval unique generator was changed and upgraded to v2</li>
+    <li>string generators were changed and upgraded to v2</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.38.2'>v0.38.2</a> release</b>
+
+    <ul>
+    <li>New features for MySQL users: USE INDEX, FORCE INDEX and IGNORE INDEX for MySQL</li>
+    </ul>
+  - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.30.1'>v0.30.1</a> release</b>
+
+    <ul>
+    <li>New command: drizzle-kit export</li>
+    </ul>
+  - |
+    <b>drizzle-seed <a href='https://github.com/drizzle-team/drizzle-orm/blob/main/changelogs/drizzle-seed/0.1.3.md'>v0.1.3</a> release</b>
+
+    <ul>
+    <li>Added support for postgres uuid columns</li>
+    <li>Added support for postgres array columns</li>
+    <li>Added support for cyclic tables. You can now seed tables with cyclic relations.</li>
+    </ul>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: reset fails with a syntax error if using a - in pgTableCreator to prefix tables</li>
+    <li>seeding a table with columns that have .default(sql``) will result in an error</li>
+    </ul>
+  - |
+    ORM bug fixes
+
+    <ul>
+    <li>[FEATURE]: publish packages un-minified</li>
+    <li>Don't allow unknown keys in drizzle-zod refinement</li>
+    <li>[BUG]:drizzle-zod not working with pgSchema</li>
+    <li>Add createUpdateSchema to drizzle-zod</li>
+    <li>[BUG]:drizzle-zod produces wrong type</li>
+    <li>[BUG]:Drizzle-zod:Boolean and Serial types from Schema are defined as enum<unknown> when using CreateInsertSchema and CreateSelectSchema</li>
+    <li>[BUG]: Drizzle typebox enum array wrong schema and type</li>
+    <li>[BUG]:drizzle-zod not working with pgSchema</li>
+    <li>[BUG]: drizzle-zod not parsing arrays correctly</li>
+    <li>[BUG]: Drizzle typebox not supporting array</li>
+    <li>[FEATURE]: Export factory functions from drizzle-zod to allow usage with extended Zod classes</li>
+    <li>[FEATURE]: Add support for new pipe syntax for drizzle-valibot</li>
+    <li>[BUG]: drizzle-zod's createInsertSchema() can't handle column of type vector</li>
+    <li>[BUG]: drizzle-typebox fails to map geometry column to type-box schema</li>
+    <li>[BUG]: drizzle-valibot does not provide types for returned schemas</li>
+    <li>[BUG]: Drizzle-typebox types SQLite real field to string</li>
+    <li>[BUG]: drizzle-zod: documented usage generates type error with exactOptionalPropertyTypes</li>
+    <li>[BUG]: drizzle-zod does not respect/count db type range</li>
+    <li>[BUG]: drizzle-zod not overriding optional</li>
+    <li>[BUG]:drizzle-zod doesn't accept custom id value</li>
+    <li>[FEATURE]: Support for Database Views in Drizzle Zod</li>
+    <li>[BUG]: drizzle-valibot return type any</li>
+    <li>[BUG]: drizzle-zod Type generation results in undefined types</li>
+    <li>[BUG]: GeneratedAlwaysAs</li>
+    <li>[FEATURE]: $inferSelect on a view</li>
+    <li>[BUG]:Can't infer props from view in schema</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.38.0'>v0.38.0</a> release</b>
+
+    <ul>
+    <li>Added new function getViewSelectedFields</li>
+    <li>Added $inferSelect function to views</li>
+    <li>Added InferSelectViewModel type for views</li>
+    <li>Added isView function</li>
+    </ul>
+  - | 
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.30.0'>v0.30.0</a> release</b>
+
+    Starting from this update, the PostgreSQL dialect will align with the behavior of all other dialects. 
+    It will no longer include IF NOT EXISTS, $DO, or similar statements, which could cause 
+    incorrect DDL statements to not fail when an object already exists in the database and should actually fail.
   - | 
     <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.29.0'>v0.29.0</a> release</b>
     and <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.37.0'>v0.37.0</a> release</b>
