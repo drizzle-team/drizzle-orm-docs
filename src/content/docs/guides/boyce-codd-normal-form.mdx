@@ -7,20 +7,22 @@ import Section from "@mdx/Section.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 
-Boyce-Codd Normal Form (BCNF) is a stricter form of normalization than Third Normal Form (3NF). While 3NF focuses on the relationship between non-prime attributes and candidate keys, BCNF goes a step further and addresses potential redundancies even when 3NF is achieved. The goal is to eliminate all redundancy that can be detected through functional dependencies.
+Boyce-Codd Normal Form (BCNF) is a stricter form of normalization than Third Normal Form (3NF). While 3NF focuses on the relationship between non-prime attributes and candidate keys, BCNF goes a step further by addressing potential redundancies even when 3NF is achieved. The goal is to eliminate all redundancy that can be detected through functional dependencies.
+
+In practice, you barely see tables in 3NF that violate BCNF. However, it's important to understand the concept of BCNF.
 
 ## Key concepts
 
 1. A `Candidate key` is a minimal set of attributes that can uniquely identify each row in a table. There can be multiple candidate keys in a table.
 2. A `Non-prime` attribute is a column that isn't part of any candidate key.
 3. A `Super key` is a candidate key or a superset of a candidate key.
-4. A `Functional dependency` is a relationship between two attributes in a table.
+4. A `Functional dependency` is a relationship between two sets of attributes in a table, where the value of one set uniquely determines the value of another.
 
 ## The BCNF Rule
 
 To achieve BCNF, table should already be in 3NF and must satisfy the following condition:
 
-Every non-trivial functional dependency in a table (A -> B) must be a dependency on a super key. In simpler terms, the left-hand side of any functional dependency (the determinant) must be able to uniquely identify a row.
+For every non-trivial functional dependency X -> Y, the determinant (X) must be a super key. In simpler terms, the left-hand side of any functional dependency must uniquely determine the entire row in the table.
 
 ## Example
 
@@ -29,77 +31,71 @@ We have a table `professors_courses` with the following schema:
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-      import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
-      
-      export const professorsCourses = pgTable('professors_courses', {
-        professorId: integer('professor_id'),
-        course: varchar('course').notNull(),
-        professorOffice: varchar('professor_office').notNull(),
-      }, (t) => [
-        primaryKey({columns: [t.professorId, t.course] })
-      ]);
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const enrollments = pgTable('enrollments',{
+      studentId: integer('student_id').notNull(),
+      courseName: varchar('course_name').notNull(),
+      professor: varchar('professor').notNull(),
+    }, (t) => [
+      primaryKey({columns: [t.studentId, t.courseName]})
+    ])
    ```
   </CodeTab>
   <CodeTab>
-  ```sql
-      CREATE TABLE "professors_courses" (
-      	"professor_id" integer,
-      	"course" varchar NOT NULL,
-      	"professor_office" varchar NOT NULL,
-      	CONSTRAINT "professors_courses_professor_id_course_pk" PRIMARY KEY("professor_id","course")
-      );
-  ```
+    ```sql
+    CREATE TABLE "enrollments" (
+    	"student_id" integer NOT NULL,
+    	"course_name" varchar NOT NULL,
+    	"professor" varchar NOT NULL,
+    	CONSTRAINT "enrollments_student_id_course_name_pk" PRIMARY KEY("student_id","course_name")
+    );
+    ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-      +--------------+----------------+-------------------+
-      | professors_courses                                |
-      +--------------+----------------+-------------------+
-      | professor_id | course         | professor_office  |
-      +--------------+----------------+-------------------+
-      | 1            | CS101          | Sci 100           |
-      | 1            | CS201          | Sci 100           |
-      | 2            | CS101          | Arts 200          |
-      | 3            | Math101        | Math 300          |
-      | 3            | Math201        | Math 300          |
-      | 4            | Physics101     | Phys 101          |
-      | 2            | History101     | Arts 200          |
-      +--------------+----------------+-------------------+
+    +--------------+-------------------------+-------------------+
+    | enrollments                                                |
+    +--------------+-------------------------+-------------------+
+    | student_id   | course_name             | professor         |
+    +--------------+-------------------------+-------------------+
+    | 101          | Introduction to Physics | Dr. Smith         |
+    | 102          | Introduction to Physics | Dr. Jones         |
+    | 103          | Calculus I              | Dr. Brown         |
+    | 101          | Calculus I              | Dr. Brown         |
+    | 104          | Linear Algebra          | Dr. Davis         |
+    +--------------+-------------------------+-------------------+
   ```
   </CodeTab>
 </CodeTabs>
 
-1. A professor can teach multiple courses.
+1. A professor can teach only one course.
 2. Each course can be taught by multiple professors.
-3. A professor can have only one office.
+3. A student can enroll in multiple courses.
+4. A course can have multiple students enrolled.
 
 ### Functional Dependencies
 
-A professor's Id and the course they teach uniquely determine their office.
-
-`{professor_id, course} -> professor_office`
-
-A professor's Id uniquely determines their office
-
-`professor_id -> professor_office`
+1. `student_id, course_name -> professor`
+2. `professor -> course_name`
 
 ### Candidate keys
 
-`{professor_id, course}` is the only candidate key. We need both to uniquely identify a row because a professor can teach many courses, and a course can be taught by many professors.
+`student_id, course_name` is the only candidate key. We need both to uniquely identify a row because a student can enroll in many courses, and a course can have many students.
 
-`professor_office` is a non-prime attribute because it's not part of the candidate key.
+`professor` is a non-prime attribute because it's not part of the candidate key.
 
 ### 3NF Analysis
 
-The non-prime attribute `professor_office` depends on every candidate key (every = only in this case). `professor_id` is a prime attribute. There is no transitive dependency.
+The non-prime attribute `professor` depends on every candidate key (every = only in this case). `course_name` is a prime attribute. There is no transitive dependency.
 
 ### BCNF Analysis
 
 The relation is not in BCNF because of this functional dependency:
 
-`professor_id -> professor_office`
+`professor -> course_name`
 
-The left-hand side (`professor_id`) is not a super key. It's only part of the candidate key. This dependency violates the BCNF rule. This means we have redundancy: the professor's office is repeated for every course they teach.
+The left-hand side (`professor`) is not a super key. `professor` is a non-prime attribute and `course_name` is a prime attribute. This dependency violates the BCNF rule.
 
 ### Solution
 
@@ -108,55 +104,54 @@ We need to split the table to eliminate the problematic dependency. We create tw
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-      import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
-      export const professors = pgTable('professors', {
-        professorId: integer('professor_id').primaryKey(),
-        professorOffice: varchar('professor_office').notNull(),
-      })
+    export const studentsProfessors = pgTable('students_professors', {
+      studentId: integer('student_id').notNull(),
+      professorId: integer('professor_id').notNull().references(() => professors.id, { onDelete: 'cascade' }),
+    }, (t) => [
+      primaryKey({ columns: [t.studentId, t.professorId] })
+    ]);
 
-      export const professorsCourses = pgTable('professors_courses', {
-        course: varchar('course'),
-        professorId: integer('professor_id').notNull().references(() => professors.professorId, { onDelete: 'cascade' }),
-      }, (t) => [
-        primaryKey({columns: [t.course, t.professorId] })
-      ]);
-
+    export const professors = pgTable('professors', {
+      id: integer().notNull().primaryKey(),
+      professor: varchar().notNull(),
+      courseName: varchar('course_name').notNull()
+    });
     ```
   </CodeTab>
   <CodeTab>
   ```sql
-      CREATE TABLE "professors" (
-	      "professor_id" integer PRIMARY KEY NOT NULL,
-	      "professor_office" varchar NOT NULL
-      );
+    CREATE TABLE "professors" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"professor" varchar NOT NULL,
+    	"course_name" varchar NOT NULL
+    );
 
-      CREATE TABLE "professors_courses" (
-      	"course" varchar,
-      	"professor_id" integer NOT NULL,
-      	CONSTRAINT "professors_courses_course_professor_id_pk" PRIMARY KEY("course","professor_id")
-      );
+    CREATE TABLE "students_professors" (
+    	"student_id" integer NOT NULL,
+    	"professor_id" integer NOT NULL,
+    	CONSTRAINT "students_professors_student_id_professor_id_pk" PRIMARY KEY("student_id","professor_id")
+    );
 
-      ALTER TABLE "professors_courses" ADD CONSTRAINT "professors_courses_professor_id_professors_professor_id_fk" FOREIGN KEY ("professor_id") REFERENCES "public"."professors"("professor_id") ON DELETE cascade ON UPDATE no action;
+    ALTER TABLE "students_professors" ADD CONSTRAINT "students_professors_professor_id_professors_id_fk" FOREIGN KEY ("professor_id") REFERENCES "public"."professors"("id") ON DELETE cascade ON UPDATE no action;
   ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-      +--------------+-------------------+   +----------------+--------------+
-      | professors                       |   | professors_courses            |
-      +--------------+-------------------+   +----------------+--------------+
-      | professor_id | professor_office  |   | course         | professor_id |
-      +--------------+-------------------+   +----------------+--------------+
-      | 1            | Sci 100           |   | CS101          | 1            |
-      | 2            | Arts 200          |   | CS201          | 1            |
-      | 3            | Math 300          |   | CS101          | 2            |
-      | 4            | Phys 101          |   | Math101        | 3            |
-      +--------------+-------------------+   | Math201        | 3            |
-                                             | Physics101     | 4            |
-                                             | History101     | 2            |
-                                             +----------------+--------------+
++--------------+---------------+-------------------------+    +------------+--------------+
+| professors                                             |    | students_professors       |
++--------------+---------------+-------------------------+    +------------+--------------+
+| professor_id | professor     | course_name             |    | student_id | professor_id |
++--------------+---------------+-------------------------+    +------------+--------------+
+| 1            | Dr. Smith     | Introduction to Physics |    | 101        | 1            |
+| 2            | Dr. Jones     | Introduction to Physics |    | 102        | 2            |
+| 3            | Dr. Brown     | Calculus I              |    | 103        | 3            |
+| 4            | Dr. Davis     | Linear Algebra          |    | 101        | 3            |
++--------------+---------------+-------------------------+    | 104        | 4            |
+                                                                +------------+--------------+
   ```
   </CodeTab>
 </CodeTabs>
 
-Now, both tables are in BCNF. The problematic dependency is isolated in the `professors` table, and the determinant (`professor_id`) is a super key. In `professors_courses` table there are no non-trivial functional dependencies other than the primary key itself. The redundancy is removed. If a professor's office changes, we only need to update it in one place (the `professors` table).
+Now, both tables are in BCNF. 
