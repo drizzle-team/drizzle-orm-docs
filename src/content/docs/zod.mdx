@@ -515,7 +515,7 @@ sqlite.blob({ mode: 'json' });
 sqlite.text({ mode: 'json' });
 
 // Schema
-const self = z.lazy(() => z.union([z.union([z.string(), z.number(), z.boolean(), z.null()]), z.array(self), z.record(self)]));
+z.union([z.union([z.string(), z.number(), z.boolean(), z.null()]), z.record(z.any()), z.array(z.any())]);
 ```
 
 ```ts

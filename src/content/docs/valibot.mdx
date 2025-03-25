@@ -409,7 +409,7 @@ pipe(bigint(), minValue(-9_223_372_036_854_775_808n), maxValue(9_223_372_036_854
 mysql.bigint({ mode: 'bigint', unsigned: true });
 
 // Schema
-pipe(bigint(), minValue(0), maxValue(18_446_744_073_709_551_615n)); // unsigned 64-bit integer lower and upper limit
+pipe(bigint(), minValue(0n), maxValue(18_446_744_073_709_551_615n)); // unsigned 64-bit integer lower and upper limit
 ```
 
 ```ts
@@ -467,7 +467,7 @@ sqlite.blob({ mode: 'json' });
 sqlite.text({ mode: 'json' });
 
 // Schema
-const self = union([union([string(), number(), boolean(), null()]), array(lazy(() => self)), record(string(), lazy(() => self))]);
+union([union([string(), number(), boolean(), null_()]), array(any()), record(string(), any())]);
 ```
 
 ```ts

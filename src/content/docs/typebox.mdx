@@ -499,8 +499,7 @@ Type.Recursive((self) => Type.Union([Type.Union([Type.String(), Type.Number(), T
 sqlite.blob({ mode: 'buffer' });
 
 // Schema
-TypeRegistry.Set('Buffer', (_, value) => value instanceof Buffer); // drizzle-typebox runs this method to add it to Typebox's type system
-{ [Kind]: 'Buffer', type: 'buffer' }; // The Typebox schema
+t.Union([t.Union([t.String(), t.Number(), t.Boolean(), t.Null()]), t.Array(t.Any()), t.Record(t.String(), t.Any())]);
 ```
 
 ```ts
