@@ -518,6 +518,30 @@ export const customSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
+      login: "driz.link/sentry",
+      name: "Sentry",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-01-23T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      background:
+        'url("/svg/sentry-dark.svg") 0% 0% / cover no-repeat content-box',
+    },
+    lightStyle: {
+      background:
+        'url("/svg/sentry-light.svg") 0% 0% / cover no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
       login: "driz.link/mooncake",
       name: "Mooncake",
       avatarUrl: "/images/mooncake.png",
