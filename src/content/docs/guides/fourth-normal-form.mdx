@@ -1,0 +1,147 @@
+---
+title: Fourth Normal Form (4NF)
+slug: fourth-normal-form
+---
+
+import Section from "@mdx/Section.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- You should be familiar with [BCNF](/docs/guides/boyce-codd-normal-form)
+</Prerequisites>
+
+The Fourth Normal Form (4NF) is a level of database normalization where a table is already in BCNF, and for every non-trivial multivalued dependency, the determinant must be a super key. The goal is to eliminate redundant data and maintain data consistency.
+
+## Key concepts
+
+A Multi-valued Dependency (MVD) is a type of dependency that exists in a relation with at least three attributes A, B, and C if, for each value of A, the set of possible values of B associated with A and the set of possible values of C associated with A are independent of each other. This means that the values of B associated with A are not determined by the values of C associated with A, and vice versa. Essentially, for a given A, you can combine any value from the set of B values with any value from the set of C values.
+
+## Example
+
+We have a table `courses_instructors_textbooks` with the following schema:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const coursesInstructorsTextbooks = pgTable("courses_instructors_textbooks", {
+      courseId: integer("course_id"),
+      instructor: varchar("instructor"),
+      textbook: varchar("textbook"),
+    }, (t) => [
+      primaryKey({ columns: [t.courseId, t.instructor, t.textbook] }),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "courses_instructors_textbooks" (
+    	"course_id" integer,
+    	"instructor" varchar,
+    	"textbook" varchar,
+    	CONSTRAINT "courses_instructors_textbooks_course_id_instructor_textbook_pk" PRIMARY KEY("course_id","instructor","textbook")
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +--------------+-------------------------+---------------------+
+    | courses_instructors_textbooks                                |
+    +--------------+-------------------------+---------------------+
+    | course_id    | instructor               | textbook           |
+    +--------------+-------------------------+---------------------+
+    | CS101        | Dr. Smith                | "Database Design"  |
+    | CS101        | Dr. Smith                | "Algorithms"       |
+    | CS101        | Dr. Johnson              | "Database Design"  |
+    | CS101        | Dr. Johnson              | "Data Structures"  |
+    | CS102        | Dr. Williams             | "Machine Learning" |
+    | CS102        | Dr. Williams             | "AI Concepts"      |
+    +--------------+-------------------------+---------------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+1. Course can be taught by multiple instructors.
+2. Each course can have multiple textbooks.
+
+### Multi-valued Dependencies
+
+1. `course_id ->> instructor`
+2. `course_id ->> textbook`
+
+### Candidate keys
+
+`course_id, instructor, textbook` is the only candidate key. We need all three to uniquely identify a row because a course can have multiple instructors and textbooks.
+
+### BCNF Analysis
+
+The table is in BCNF because there is no functional dependency where the determinant is not a super key (There are no functional dependencies at all in this case).
+
+### 4NF Analysis
+
+Table is not in 4NF because the multi-valued dependencies are not trivial. The determinant `course_id` is not a super key.
+
+This leads to:
+1. Information duplication.
+2. Insertion anomalies. If a new instructor or textbook needs to be added for a course, we would need to insert multiple rows to account for all the combinations of instructors and textbooks for that course.
+
+### Solution
+
+We need to split the table into two tables: `courses_instructors` and `courses_textbooks`:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const coursesInstructors = pgTable("courses_instructors", {
+      courseId: integer("course_id"),
+      instructor: varchar("instructor"),
+    }, (t) => [
+      primaryKey({columns: [t.courseId, t.instructor]}),
+    ]);
+
+    export const coursesTextbooks = pgTable("courses_textbooks", {
+      courseId: integer("course_id"),
+      textbook: varchar("textbook"),
+    }, (t) => [
+      primaryKey({columns: [t.courseId, t.textbook]}),
+    ]);
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+    CREATE TABLE "courses_instructors" (
+    	"course_id" integer,
+    	"instructor" varchar,
+    	CONSTRAINT "courses_instructors_course_id_instructor_pk" PRIMARY KEY("course_id","instructor")
+    );
+
+    CREATE TABLE "courses_textbooks" (
+    	"course_id" integer,
+    	"textbook" varchar,
+    	CONSTRAINT "courses_textbooks_course_id_textbook_pk" PRIMARY KEY("course_id","textbook")
+    );
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +--------------+-------------------------+   +--------------+---------------------+
+    | courses_instructors                    |   | courses_textbooks                  |
+    +--------------+-------------------------+   +--------------+---------------------+
+    | course_id    | instructor              |   | course_id    | textbook            |
+    +--------------+-------------------------+   +--------------+---------------------+
+    | CS101        | Dr. Smith               |   | CS101        | "Database Design"   |
+    | CS101        | Dr. Johnson             |   | CS101        | "Algorithms"        |
+    | CS102        | Dr. Williams            |   | CS101        | "Data Structures"   |
+    +--------------+-------------------------+   | CS102        | "Machine Learning"  |
+                                                 | CS102        | "AI Concepts"       |
+                                                 +--------------+---------------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+Now, the tables are free from multi-valued dependencies. We have achieved 4NF.

@@ -38,7 +38,7 @@ We have a table `professors_courses` with the following schema:
       courseName: varchar('course_name').notNull(),
       professor: varchar('professor').notNull(),
     }, (t) => [
-      primaryKey({columns: [t.studentId, t.courseName]})
+      primaryKey({ columns: [t.studentId, t.courseName] })
     ])
    ```
   </CodeTab>
@@ -97,6 +97,11 @@ The relation is not in BCNF because of this functional dependency:
 
 The left-hand side (`professor`) is not a super key. `professor` is a non-prime attribute and `course_name` is a prime attribute. This dependency violates the BCNF rule.
 
+This leads to:
+1. Information duplication.
+2. Update anomalies. If the name of a course taught by a professor changes, we would need to update multiple rows to reflect the change.
+3. Deletion anomalies. If students drop a course, we would lose information about the course and the professor.
+
 ### Solution
 
 We need to split the table to eliminate the problematic dependency. We create two tables:
@@ -154,4 +159,4 @@ We need to split the table to eliminate the problematic dependency. We create tw
   </CodeTab>
 </CodeTabs>
 
-Now, both tables are in BCNF. 
+We have achieved BCNF by splitting the table into two tables: `professors` and `students_professors`. Now, the tables are free from functional dependencies that violate BCNF.
