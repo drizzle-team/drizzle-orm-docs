@@ -17,6 +17,7 @@ In practice, you barely see tables in 3NF that violate BCNF. However, it's impor
 2. A `Non-prime` attribute is a column that isn't part of any candidate key.
 3. A `Super key` is a candidate key or a superset of a candidate key.
 4. A `Functional dependency` is a relationship between two sets of attributes in a table, where the value of one set uniquely determines the value of another.
+5. A functional dependency `X -> Y` in a relation `R` is considered trivial if the set of attributes `Y` is a subset of (or equal to) the set of attributes `X`.
 
 ## The BCNF Rule
 
@@ -69,7 +70,7 @@ We have a table `professors_courses` with the following schema:
   </CodeTab>
 </CodeTabs>
 
-1. A professor can teach only one course.
+1. Each professor is assigned to teach only one specific course subject.
 2. Each course can be taught by multiple professors.
 3. A student can enroll in multiple courses.
 4. A course can have multiple students enrolled.
@@ -83,11 +84,11 @@ We have a table `professors_courses` with the following schema:
 
 `student_id, course_name` is the only candidate key. We need both to uniquely identify a row because a student can enroll in many courses, and a course can have many students.
 
-`professor` is a non-prime attribute because it's not part of the candidate key.
+`professor` is a non-prime attribute because it's not part of any candidate key.
 
 ### 3NF Analysis
 
-The non-prime attribute `professor` depends on every candidate key (every = only in this case). `course_name` is a prime attribute. There is no transitive dependency.
+The non-prime attribute `professor` depends on every candidate key (every = only in this case). `course_name` is a prime attribute because it is part of the only candidate key `student_id, course_name`. There is no transitive dependency.
 
 ### BCNF Analysis
 

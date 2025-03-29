@@ -21,6 +21,7 @@ In practice, 5NF is rarely used in database design.
 1. A `Join Dependency` (JD) is a constraint that specifies that table `R` can be split into several smaller tables `R1, R2,..., Rk` and by performing a natural join on these tables, the original table `R` can be reconstructed without any loss of information and no false information (spurious rows) is created during the process.
 2. A `Lossless/Non-Loss Decomposition` is a decomposition when all the sub-relations do the natural join and the obtained table is equal to the original table.
 3. A `Natural Join` is a join operation that is used to combine two relations based on all common attributes. 
+4. A JD denoted as `*(R1, R2, ..., Rk)` on a relation `R` is considered trivial if at least one of the components `Ri` (where `i` is between `1` and `k`) is equal to the set of all attributes of the original relation `R`. In simple terms: A join dependency is trivial if one of the parts you're joining already is the whole original table.
 
 ## Example
 
@@ -76,20 +77,21 @@ We have a table `agent_inventory` with the following schema:
 1. An `Agent` can be authorized to source products from multiple `Suppliers`.
 2. An `Agent` can be authorized to offer multiple `Item types`.
 3. A `Supplier` can manufacture multiple `Item types`.
-4. The business operates under a specific constraint: An `Agent` must offer a specific `Item type` from a specific `Supplier` if and only if the following three conditions are all true:
+4. The core business constraint: An `Agent` must offer a specific `Item type` from a specific `Supplier` if and only if the following three conditions are all true:
    - The `Agent` is authorized to source products from that `Supplier`.
    - The `Agent` is authorized to offer that `Item type`.
    - The `Supplier` is known to manufacture that `Item type`.
 
-This means that: An `Agent` has certain `Suppliers` and certain `Item types` in their repertoire. If supplier `S1` and supplier `S2` are in their repertoire, and item type `I` is in their repertoire, then (assuming supplier `S1` and supplier `S2` both manufacture item type `I`), the agent must offer items of item type `I` those manufactured by supplier `S1` and those manufactured by supplier `S2`.
+**Illustrative Consequence**: An `Agent` has certain `Suppliers` and certain `Item types` in their repertoire. If supplier `S1` and supplier `S2` are in their repertoire, and item type `I` is in their repertoire, then (assuming supplier `S1` and supplier `S2` both manufacture item type `I`), the agent must offer items of item type `I` those manufactured by supplier `S1` and those manufactured by supplier `S2`.
+You cannot have all the component relationships true without the corresponding combined record existing in the `agent_inventory` table. It's this enforced combination based on the component parts that leads to the Join Dependency.
 
 ### Candidate Keys
 
-`Agent, Supplier, Item type` is the only candidate key. All three attributes are required to uniquely identify a specific assignment row.
+`agent, supplier, item_type` is the only candidate key. All three attributes are required to uniquely identify a specific assignment row.
 
 ### Join Dependency
 
-`*( {Agent, Supplier}, {Agent, Item Type}, {Supplier, Item Type} )` is a non-trivial join dependency. This means that the table can be decomposed into smaller tables without losing any information.
+`*( {agent, supplier}, {agent, item_type}, {supplier, item_type} )` is a non-trivial join dependency. This means that the table can be decomposed into smaller tables without losing any information.
 
 ### 4NF Analysis
 
@@ -97,7 +99,7 @@ The table is in 4NF because there are no non-trivial multivalued dependencies. F
 
 ### 5NF Analysis
 
-The table is not in 5NF because it contains non-trivial join dependency. This join is not implied by the candidate key.
+The table is not in 5NF because it contains non-trivial join dependency. This join dependency is not implied by the candidate key `agent, supplier, item_type` because none of the components in the JD (`{agent, supplier}`, `{agent, item_type}`, `{supplier, item_type}`) are superkeys of the original `agent_inventory` table.
 
 This leads to:
 1. Redundancy.
@@ -191,18 +193,45 @@ We need to split the table into three tables: `agent_suppliers`, `agent_item_typ
 
 To retrieve the data in a format equivalent to the original `agent_inventory` table we can execute this query:
 
-```sql
-SELECT
-    ats.Agent,
-    ats.Supplier,
-    ati.Item_Type
-FROM
-    agent_suppliers AS ats
-INNER JOIN
-    agent_item_types AS ati ON ats.agent = ati.agent
-INNER JOIN
-    supplier_item_types AS syt ON ats.supplier = syt.supplier
-                           AND ati.item_Type = syt.item_Type
+<Section>
+```ts
+const db = drizzle(...);
+
+const results = await db
+  .select({
+    agent: agentSuppliers.agent,
+    supplier: agentSuppliers.supplier,
+    itemType: agentItemTypes.itemType,
+  })
+  .from(agentSuppliers)
+  .innerJoin(
+    agentItemTypes,
+    eq(agentSuppliers.agent, agentItemTypes.agent)
+  )
+  .innerJoin(
+    supplierItemTypes,
+    and(
+      eq(agentSuppliers.supplier, supplierItemTypes.supplier),
+      eq(agentItemTypes.itemType, supplierItemTypes.itemType)
+    )
+  );
 ```
 
-By storing each fundamental relationship independently, we have achieved Fifth Normal Form (5NF), ensuring that the data is free from the update anomalies associated with that specific join dependency and represents the underlying business rule in the most granular way.
+```sql
+SELECT
+    "agent_suppliers"."agent",
+    "agent_suppliers"."supplier",
+    "agent_item_types"."item_type"
+FROM
+    "agent_suppliers"
+INNER JOIN
+    "agent_item_types"
+    ON "agent_suppliers"."agent" = "agent_item_types"."agent"
+INNER JOIN
+    "supplier_item_types"
+    ON "agent_suppliers"."supplier" = "supplier_item_types"."supplier"
+   AND "agent_item_types"."item_type" = "supplier_item_types"."item_type";
+```
+</Section>
+
+Decomposing the table into `agent_suppliers`, `agent_item_types`, and `supplier_item_types` achieves 5NF. Each table now represents a single fundamental relationship from the core business rule. This eliminates the specific join dependency that caused redundancy and update anomalies in the original table.

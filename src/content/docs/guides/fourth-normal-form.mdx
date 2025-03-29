@@ -18,6 +18,8 @@ The Fourth Normal Form (4NF) is a level of database normalization where a table 
 
 A `Multi-valued Dependency` (MVD) is a type of dependency that exists in a relation with at least three attributes A, B, and C if, for each value of A, the set of possible values of B associated with A and the set of possible values of C associated with A are independent of each other. This means that the values of B associated with A are not determined by the values of C associated with A, and vice versa. Essentially, for a given A, you can combine any value from the set of B values with any value from the set of C values.
 
+`Multi-valued Dependency` `X ->> Y` in a relation `R` is considered trivial if `Y` is a subset of `X` or `X` and `Y` together make up all the attributes of the relation.
+
 ## Example
 
 We have a table `courses_instructors_textbooks` with the following schema:
@@ -25,43 +27,43 @@ We have a table `courses_instructors_textbooks` with the following schema:
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
     export const coursesInstructorsTextbooks = pgTable("courses_instructors_textbooks", {
-      courseId: integer("course_id"),
+      courseName: varchar("course_name"),
       instructor: varchar("instructor"),
       textbook: varchar("textbook"),
     }, (t) => [
-      primaryKey({ columns: [t.courseId, t.instructor, t.textbook] }),
+      primaryKey({ columns: [t.courseName, t.instructor, t.textbook] }),
     ]);
    ```
   </CodeTab>
   <CodeTab>
     ```sql
     CREATE TABLE "courses_instructors_textbooks" (
-    	"course_id" integer,
+    	"course_name" varchar,
     	"instructor" varchar,
     	"textbook" varchar,
-    	CONSTRAINT "courses_instructors_textbooks_course_id_instructor_textbook_pk" PRIMARY KEY("course_id","instructor","textbook")
+    	CONSTRAINT "courses_instructors_textbooks_course_name_instructor_textbook_pk" PRIMARY KEY("course_name","instructor","textbook")
     );
     ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +-----------+----------------+-------------------+
-    | courses_instructors_textbooks                  |
-    +-----------+----------------+-------------------+
-    | course_id | instructor     | textbook          |
-    +-----------+----------------+-------------------+
-    | CS101     | Dr. Smith      | Database Design   |
-    | CS101     | Dr. Smith      | Algorithms        |
-    | CS101     | Dr. Smith      | Data Structures   |
-    | CS101     | Dr. Johnson    | Database Design   |
-    | CS101     | Dr. Johnson    | Algorithms        |
-    | CS101     | Dr. Johnson    | Data Structures   |
-    | CS102     | Dr. Williams   | Machine Learning  |
-    | CS102     | Dr. Williams   | AI Concepts       |
-    +-----------+----------------+-------------------+
+    +-----------+----------------+--------------------+
+    | courses_instructors_textbooks                   |
+    +-------------+----------------+------------------+
+    | course_name | instructor     | textbook         |
+    +-------------+----------------+------------------+
+    | CS101       | Dr. Smith      | Database Design  |
+    | CS101       | Dr. Smith      | Algorithms       |
+    | CS101       | Dr. Smith      | Data Structures  |
+    | CS101       | Dr. Johnson    | Database Design  |
+    | CS101       | Dr. Johnson    | Algorithms       |
+    | CS101       | Dr. Johnson    | Data Structures  |
+    | CS102       | Dr. Williams   | Machine Learning |
+    | CS102       | Dr. Williams   | AI Concepts      |
+    +-----------+----------------+--------------------+
   ```
   </CodeTab>
 </CodeTabs>
@@ -72,12 +74,12 @@ We have a table `courses_instructors_textbooks` with the following schema:
 
 ### Multi-valued Dependencies
 
-1. `course_id ->> instructor`
-2. `course_id ->> textbook`
+1. `course_name ->> instructor`
+2. `course_name ->> textbook`
 
 ### Candidate keys
 
-`course_id, instructor, textbook` is the only candidate key. We need all three to uniquely identify a row because a course can have multiple instructors and textbooks.
+`course_name, instructor, textbook` is the only candidate key. We need all three to uniquely identify a row because a course can have multiple instructors and textbooks.
 
 ### BCNF Analysis
 
@@ -85,7 +87,7 @@ The table is in BCNF because there are no non-trivial FDs where the determinant 
 
 ### 4NF Analysis
 
-Table is not in 4NF because the multi-valued dependencies are not trivial. The determinant `course_id` is not a super key.
+Table is not in 4NF because the multi-valued dependencies are not trivial. The determinant `course_name` is not a super key.
 
 This leads to:
 1. Information duplication.
@@ -99,35 +101,35 @@ We need to split the table into two tables: `courses_instructors` and `courses_t
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
     export const coursesInstructors = pgTable("courses_instructors", {
-      courseId: integer("course_id"),
+      courseName: varchar("course_name"),
       instructor: varchar("instructor"),
     }, (t) => [
-      primaryKey({columns: [t.courseId, t.instructor]}),
+      primaryKey({columns: [t.courseName, t.instructor]}),
     ]);
 
     export const coursesTextbooks = pgTable("courses_textbooks", {
-      courseId: integer("course_id"),
+      courseName: varchar("course_name"),
       textbook: varchar("textbook"),
     }, (t) => [
-      primaryKey({columns: [t.courseId, t.textbook]}),
+      primaryKey({columns: [t.courseName, t.textbook]}),
     ]);
     ```
   </CodeTab>
   <CodeTab>
   ```sql
     CREATE TABLE "courses_instructors" (
-    	"course_id" integer,
+    	"course_name" varchar,
     	"instructor" varchar,
-    	CONSTRAINT "courses_instructors_course_id_instructor_pk" PRIMARY KEY("course_id","instructor")
+    	CONSTRAINT "courses_instructors_course_name_instructor_pk" PRIMARY KEY("course_name","instructor")
     );
 
     CREATE TABLE "courses_textbooks" (
-    	"course_id" integer,
+    	"course_name" varchar,
     	"textbook" varchar,
-    	CONSTRAINT "courses_textbooks_course_id_textbook_pk" PRIMARY KEY("course_id","textbook")
+    	CONSTRAINT "courses_textbooks_course_name_textbook_pk" PRIMARY KEY("course_name","textbook")
     );
   ```
   </CodeTab>
@@ -136,7 +138,7 @@ We need to split the table into two tables: `courses_instructors` and `courses_t
     +--------------+-------------------------+   +--------------+-------------------+
     | courses_instructors                    |   | courses_textbooks                |
     +--------------+-------------------------+   +--------------+-------------------+
-    | course_id    | instructor              |   | course_id    | textbook          |
+    | course_name  | instructor              |   | course_name  | textbook          |
     +--------------+-------------------------+   +--------------+-------------------+
     | CS101        | Dr. Smith               |   | CS101        | Database Design   |
     | CS101        | Dr. Johnson             |   | CS101        | Algorithms        |
