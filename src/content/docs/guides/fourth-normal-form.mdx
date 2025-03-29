@@ -16,7 +16,7 @@ The Fourth Normal Form (4NF) is a level of database normalization where a table 
 
 ## Key concepts
 
-A Multi-valued Dependency (MVD) is a type of dependency that exists in a relation with at least three attributes A, B, and C if, for each value of A, the set of possible values of B associated with A and the set of possible values of C associated with A are independent of each other. This means that the values of B associated with A are not determined by the values of C associated with A, and vice versa. Essentially, for a given A, you can combine any value from the set of B values with any value from the set of C values.
+A `Multi-valued Dependency` (MVD) is a type of dependency that exists in a relation with at least three attributes A, B, and C if, for each value of A, the set of possible values of B associated with A and the set of possible values of C associated with A are independent of each other. This means that the values of B associated with A are not determined by the values of C associated with A, and vice versa. Essentially, for a given A, you can combine any value from the set of B values with any value from the set of C values.
 
 ## Example
 
@@ -48,24 +48,27 @@ We have a table `courses_instructors_textbooks` with the following schema:
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +--------------+-------------------------+---------------------+
-    | courses_instructors_textbooks                                |
-    +--------------+-------------------------+---------------------+
-    | course_id    | instructor               | textbook           |
-    +--------------+-------------------------+---------------------+
-    | CS101        | Dr. Smith                | "Database Design"  |
-    | CS101        | Dr. Smith                | "Algorithms"       |
-    | CS101        | Dr. Johnson              | "Database Design"  |
-    | CS101        | Dr. Johnson              | "Data Structures"  |
-    | CS102        | Dr. Williams             | "Machine Learning" |
-    | CS102        | Dr. Williams             | "AI Concepts"      |
-    +--------------+-------------------------+---------------------+
+    +-----------+----------------+-------------------+
+    | courses_instructors_textbooks                  |
+    +-----------+----------------+-------------------+
+    | course_id | instructor     | textbook          |
+    +-----------+----------------+-------------------+
+    | CS101     | Dr. Smith      | Database Design   |
+    | CS101     | Dr. Smith      | Algorithms        |
+    | CS101     | Dr. Smith      | Data Structures   |
+    | CS101     | Dr. Johnson    | Database Design   |
+    | CS101     | Dr. Johnson    | Algorithms        |
+    | CS101     | Dr. Johnson    | Data Structures   |
+    | CS102     | Dr. Williams   | Machine Learning  |
+    | CS102     | Dr. Williams   | AI Concepts       |
+    +-----------+----------------+-------------------+
   ```
   </CodeTab>
 </CodeTabs>
 
 1. Course can be taught by multiple instructors.
 2. Each course can have multiple textbooks.
+3. The set of instructors assigned to teach a specific course is independent of the set of textbooks required for that same course. Knowing an instructor for a course tells you nothing specific about which textbook is used (beyond the list of all possible textbooks for that course), and vice-versa.
 
 ### Multi-valued Dependencies
 
@@ -78,7 +81,7 @@ We have a table `courses_instructors_textbooks` with the following schema:
 
 ### BCNF Analysis
 
-The table is in BCNF because there is no functional dependency where the determinant is not a super key (There are no functional dependencies at all in this case).
+The table is in BCNF because there are no non-trivial FDs where the determinant is not a superkey.
 
 ### 4NF Analysis
 
@@ -87,6 +90,7 @@ Table is not in 4NF because the multi-valued dependencies are not trivial. The d
 This leads to:
 1. Information duplication.
 2. Insertion anomalies. If a new instructor or textbook needs to be added for a course, we would need to insert multiple rows to account for all the combinations of instructors and textbooks for that course.
+3. Deletion anomalies. If an instructor stops teaching a course, multiple rows (one for each textbook associated with the course) must be deleted.
 
 ### Solution
 
@@ -129,19 +133,19 @@ We need to split the table into two tables: `courses_instructors` and `courses_t
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +--------------+-------------------------+   +--------------+---------------------+
-    | courses_instructors                    |   | courses_textbooks                  |
-    +--------------+-------------------------+   +--------------+---------------------+
-    | course_id    | instructor              |   | course_id    | textbook            |
-    +--------------+-------------------------+   +--------------+---------------------+
-    | CS101        | Dr. Smith               |   | CS101        | "Database Design"   |
-    | CS101        | Dr. Johnson             |   | CS101        | "Algorithms"        |
-    | CS102        | Dr. Williams            |   | CS101        | "Data Structures"   |
-    +--------------+-------------------------+   | CS102        | "Machine Learning"  |
-                                                 | CS102        | "AI Concepts"       |
-                                                 +--------------+---------------------+
+    +--------------+-------------------------+   +--------------+-------------------+
+    | courses_instructors                    |   | courses_textbooks                |
+    +--------------+-------------------------+   +--------------+-------------------+
+    | course_id    | instructor              |   | course_id    | textbook          |
+    +--------------+-------------------------+   +--------------+-------------------+
+    | CS101        | Dr. Smith               |   | CS101        | Database Design   |
+    | CS101        | Dr. Johnson             |   | CS101        | Algorithms        |
+    | CS102        | Dr. Williams            |   | CS101        | Data Structures   |
+    +--------------+-------------------------+   | CS102        | Machine Learning  |
+                                                 | CS102        | AI Concepts       |
+                                                 +--------------+-------------------+
   ```
   </CodeTab>
 </CodeTabs>
 
-Now, the tables are free from multi-valued dependencies. We have achieved 4NF.
+Now, the tables are free from the non-trivial multi-valued dependencies that violated 4NF in the original table. We have achieved 4NF by storing each independent relationship separately.

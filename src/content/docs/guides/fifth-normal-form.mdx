@@ -1,0 +1,208 @@
+---
+title: Fifth Normal Form (5NF)
+slug: fifth-normal-form
+---
+
+import Section from "@mdx/Section.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- You should be familiar with [4NF](/docs/guides/fourth-normal-form)
+</Prerequisites>
+
+The Fifth Normal Form (5NF), also known as `Project-Join Normal Form` (PJ/NF) is a level of database normalization where a table is already in 4NF, and every non-trivial join dependency in that table is implied by the candidate keys. The goal is to eliminate redundancy caused by join dependencies and to ensure that relations are decomposed into smaller components without any loss of data.
+
+In practice, 5NF is rarely used in database design.
+
+## Key concepts
+
+1. A `Join Dependency` (JD) is a constraint that specifies that table `R` can be split into several smaller tables `R1, R2,..., Rk` and by performing a natural join on these tables, the original table `R` can be reconstructed without any loss of information and no false information (spurious rows) is created during the process.
+2. A `Lossless/Non-Loss Decomposition` is a decomposition when all the sub-relations do the natural join and the obtained table is equal to the original table.
+3. A `Natural Join` is a join operation that is used to combine two relations based on all common attributes. 
+
+## Example
+
+We have a table `agent_inventory` with the following schema:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const agentInventory = pgTable("agent_inventory", {
+      agent: varchar(),
+      supplier: varchar(),
+      itemType: varchar("item_type"),
+    }, (t) => [
+      primaryKey({columns: [t.agent, t.supplier, t.itemType]}),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "agent_inventory" (
+    	"agent" varchar,
+    	"supplier" varchar,
+    	"item_type" varchar,
+    	CONSTRAINT "agent_inventory_agent_supplier_item_type_pk" PRIMARY KEY("agent","supplier","item_type")
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +-------------+-------------+--------------+
+    | agent_inventory                          |
+    +-------------+-------------+--------------+
+    | agent       | supplier    | item_type    |
+    +-------------+-------------+--------------+
+    | Anna Bell   | GearUp      | Scanner      |
+    | Anna Bell   | Innovate    | Scanner      |
+    | Anna Bell   | Innovate    | Projector    |
+    | Chris Day   | Innovate    | Projector    |
+    | Chris Day   | ProServe    | Projector    |
+    | Chris Day   | ProServe    | Webcam       |
+    | Chris Day   | ProServe    | Dock         |
+    | Helen Fox   | GearUp      | Scanner      |
+    | Helen Fox   | GearUp      | Webcam       |
+    | Helen Fox   | ProServe    | Webcam       |
+    | Helen Fox   | ProServe    | Dock         |
+    +-------------+-------------+--------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+1. An `Agent` can be authorized to source products from multiple `Suppliers`.
+2. An `Agent` can be authorized to offer multiple `Item types`.
+3. A `Supplier` can manufacture multiple `Item types`.
+4. The business operates under a specific constraint: An `Agent` must offer a specific `Item type` from a specific `Supplier` if and only if the following three conditions are all true:
+   - The `Agent` is authorized to source products from that `Supplier`.
+   - The `Agent` is authorized to offer that `Item type`.
+   - The `Supplier` is known to manufacture that `Item type`.
+
+This means that: An `Agent` has certain `Suppliers` and certain `Item types` in their repertoire. If supplier `S1` and supplier `S2` are in their repertoire, and item type `I` is in their repertoire, then (assuming supplier `S1` and supplier `S2` both manufacture item type `I`), the agent must offer items of item type `I` those manufactured by supplier `S1` and those manufactured by supplier `S2`.
+
+### Candidate Keys
+
+`Agent, Supplier, Item type` is the only candidate key. All three attributes are required to uniquely identify a specific assignment row.
+
+### Join Dependency
+
+`*( {Agent, Supplier}, {Agent, Item Type}, {Supplier, Item Type} )` is a non-trivial join dependency. This means that the table can be decomposed into smaller tables without losing any information.
+
+### 4NF Analysis
+
+The table is in 4NF because there are no non-trivial multivalued dependencies. For example, `Helen Fox` sources from `GearUp` and `ProServe`, and she offers `Webcam`, `Scanners` and `Docks`. However, she doesn't offer `GearUp` `Docks`, nor does she offer `ProServe` `Scanners`. The allowed combinations are specific and don't show the independence required for MVDs based on single attributes.
+
+### 5NF Analysis
+
+The table is not in 5NF because it contains non-trivial join dependency. This join is not implied by the candidate key.
+
+This leads to:
+1. Redundancy.
+2. Deletion Anomalies: Changing a single underlying fact (e.g., a supplier stops making an item type) may require updating multiple rows in the `agent_inventory` table. For instance, if `ProServe` stopped making `Docks`, rows for both `Chris Day` and `Helen Fox` would need deletion.
+3. Insertion Anomalies: If underlying facts change such that the rule dictates a new row should exist (e.g., if `Chris Day` starts handling `GearUp` suppliers, and `GearUp` makes `Scanners`, which `Chris Day` already handles, the rule implies (`Chris Day`, `GearUp`, `Scanner`) must be inserted), the single-table structure doesn't automatically enforce this insertion based on the component facts.
+
+### Solution
+
+We need to split the table into three tables: `agent_suppliers`, `agent_item_types`, and `supplier_item_types`:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+      import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+      export const agentSuppliers = pgTable("agent_suppliers", {
+        agent: varchar(),
+        supplier: varchar(),
+      }, (t) => [
+        primaryKey({columns: [t.agent, t.supplier]}),
+      ]);
+
+      export const agentItemTypes = pgTable("agent_item_types", {
+        agent: varchar(),
+        itemType: varchar("item_type"),
+      }, (t) => [
+        primaryKey({columns: [t.agent, t.itemType]}),
+      ]);
+
+      export const supplierItemTypes = pgTable("supplier_item_types", {
+        supplier: varchar(),
+        itemType: varchar("item_type"),
+      }, (t) => [
+        primaryKey({columns: [t.supplier, t.itemType]}),
+      ]);
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+    CREATE TABLE "agent_item_types" (
+    	"agent" varchar,
+    	"item_type" varchar,
+    	CONSTRAINT "agent_item_types_agent_item_type_pk" PRIMARY KEY("agent","item_type")
+    );
+
+    CREATE TABLE "agent_suppliers" (
+    	"agent" varchar,
+    	"supplier" varchar,
+    	CONSTRAINT "agent_suppliers_agent_supplier_pk" PRIMARY KEY("agent","supplier")
+    );
+
+    CREATE TABLE "supplier_item_types" (
+    	"supplier" varchar,
+    	"item_type" varchar,
+    	CONSTRAINT "supplier_item_types_supplier_item_type_pk" PRIMARY KEY("supplier","item_type")
+    );
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +-----------+----------+   +-----------+-----------+
+    | agent_suppliers      |   | agent_item_types      |
+    +-----------+----------+   +-----------+-----------+
+    | agent     | supplier |   | agent     | item_type |
+    +-----------+----------+   +-----------+-----------+
+    | Anna Bell | GearUp   |   | Anna Bell | Scanner   |
+    | Anna Bell | Innovate |   | Anna Bell | Projector |
+    | Chris Day | Innovate |   | Chris Day | Projector |
+    | Chris Day | ProServe |   | Chris Day | Webcam    |
+    | Helen Fox | GearUp   |   | Chris Day | Dock      |
+    | Helen Fox | ProServe |   | Helen Fox | Scanner   |
+    +-----------+----------+   | Helen Fox | Webcam    |
+                               | Helen Fox | Dock      |
+                               +-----------+-----------+
+    +----------+-----------+
+    | supplier_item_types  |
+    +----------+-----------+
+    | supplier | item_type |
+    +----------+-----------+
+    | GearUp   | Scanner   |
+    | GearUp   | Webcam    |
+    | Innovate | Scanner   |
+    | Innovate | Projector |
+    | ProServe | Projector |
+    | ProServe | Webcam    |
+    | ProServe | Dock      |
+    +----------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+To retrieve the data in a format equivalent to the original `agent_inventory` table we can execute this query:
+
+```sql
+SELECT
+    ats.Agent,
+    ats.Supplier,
+    ati.Item_Type
+FROM
+    agent_suppliers AS ats
+INNER JOIN
+    agent_item_types AS ati ON ats.agent = ati.agent
+INNER JOIN
+    supplier_item_types AS syt ON ats.supplier = syt.supplier
+                           AND ati.item_Type = syt.item_Type
+```
+
+By storing each fundamental relationship independently, we have achieved Fifth Normal Form (5NF), ensuring that the data is free from the update anomalies associated with that specific join dependency and represents the underlying business rule in the most granular way.
