@@ -7,6 +7,7 @@ import Section from "@mdx/Section.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
 
 <Prerequisites>
 - You should be familiar with [BCNF](/docs/guides/boyce-codd-normal-form)
@@ -149,5 +150,9 @@ We need to split the table into two tables: `courses_instructors` and `courses_t
   ```
   </CodeTab>
 </CodeTabs>
+
+<Callout type="warning">
+You should also add foreign key constraints on the `course_name` column in both the `courses_instructors` and `courses_textbooks` tables. These constraints should reference the `course_name` primary key column in a `courses` table (or equivalent table defining courses).
+</Callout>
 
 Now, the tables are free from the non-trivial multi-valued dependencies that violated 4NF in the original table. We have achieved 4NF by storing each independent relationship separately.

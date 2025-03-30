@@ -6,6 +6,7 @@ slug: boyce-codd-normal-form
 import Section from "@mdx/Section.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
 
 Boyce-Codd Normal Form (BCNF) is a stricter form of normalization than Third Normal Form (3NF). While 3NF focuses on the relationship between non-prime attributes and candidate keys, BCNF goes a step further by addressing potential redundancies even when 3NF is achieved. The goal is to eliminate all redundancy that can be detected through functional dependencies.
 
@@ -27,81 +28,78 @@ For every non-trivial functional dependency X -> Y, the determinant (X) must be 
 
 ## Example
 
-We have a table `professors_courses` with the following schema:
+We have a table `classroom_assignment` with the following schema:
 
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";   
 
-    export const enrollments = pgTable('enrollments',{
-      studentId: integer('student_id').notNull(),
-      courseName: varchar('course_name').notNull(),
-      professor: varchar('professor').notNull(),
+    export const classroomAssignment = pgTable("classroom_assignment", {
+      roomNumber: varchar("room_number", { length: 10 }).notNull(),
+      professor: varchar("professor", { length: 100 }).notNull(),
+      course: varchar("course", { length: 100 }).notNull(),
     }, (t) => [
-      primaryKey({ columns: [t.studentId, t.courseName] })
-    ])
+      primaryKey({ columns: [t.roomNumber, t.course] }),
+    ]);
    ```
   </CodeTab>
   <CodeTab>
     ```sql
-    CREATE TABLE "enrollments" (
-    	"student_id" integer NOT NULL,
-    	"course_name" varchar NOT NULL,
-    	"professor" varchar NOT NULL,
-    	CONSTRAINT "enrollments_student_id_course_name_pk" PRIMARY KEY("student_id","course_name")
+    CREATE TABLE "classroom_assignment" (
+    	"room_number" varchar(10) NOT NULL,
+    	"professor" varchar(100) NOT NULL,
+    	"course" varchar(100) NOT NULL,
+    	CONSTRAINT "classroom_assignment_room_number_course_pk" PRIMARY KEY("room_number","course")
     );
     ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +--------------+-------------------------+-------------------+
-    | enrollments                                                |
-    +--------------+-------------------------+-------------------+
-    | student_id   | course_name             | professor         |
-    +--------------+-------------------------+-------------------+
-    | 101          | Introduction to Physics | Dr. Smith         |
-    | 102          | Introduction to Physics | Dr. Jones         |
-    | 103          | Calculus I              | Dr. Brown         |
-    | 101          | Calculus I              | Dr. Brown         |
-    | 104          | Linear Algebra          | Dr. Davis         |
-    +--------------+-------------------------+-------------------+
+    +--------------+----------------+-----------+
+    | classroom_assignment                      |
+    +--------------+----------------+-----------+
+    | room_number  | professor      | course    |
+    +--------------+----------------+-----------+
+    | A101         | Dr. Smith      | CS101     |
+    | B202         | Dr. Jones      | CS101     |
+    | A101         | Dr. Smith      | CS102     |
+    | C303         | Dr. Brown      | CS103     |
+    +--------------+----------------+-----------+
   ```
   </CodeTab>
 </CodeTabs>
 
-1. Each professor is assigned to teach only one specific course subject.
-2. Each course can be taught by multiple professors.
-3. A student can enroll in multiple courses.
-4. A course can have multiple students enrolled.
+1. Each professor is assigned exactly one room and teaches all their assigned courses from that specific room.
+2. A professor may teach multiple courses, and a course may be taught by multiple professors.
+3. A specific course offering in a particular room is taught by exactly one professor.
 
 ### Functional Dependencies
 
-1. `student_id, course_name -> professor`
-2. `professor -> course_name`
+1. `room_number, course -> professor`
+2. `professor, course -> room_number`
+3. `professor -> room_number`
 
 ### Candidate keys
 
-`student_id, course_name` is the only candidate key. We need both to uniquely identify a row because a student can enroll in many courses, and a course can have many students.
-
-`professor` is a non-prime attribute because it's not part of any candidate key.
+The table has two candidate keys: `room_number, course` and `professor, course`. Each of these can uniquely determine all attributes in the table.
 
 ### 3NF Analysis
 
-The non-prime attribute `professor` depends on every candidate key (every = only in this case). `course_name` is a prime attribute because it is part of the only candidate key `student_id, course_name`. There is no transitive dependency.
+Since every attribute in this table is part of at least one candidate key, there are no non-prime attributes. This means no transitive dependencies exist, so the table is in 3NF.
 
 ### BCNF Analysis
 
 The relation is not in BCNF because of this functional dependency:
 
-`professor -> course_name`
+`professor -> room_number`
 
-The left-hand side (`professor`) is not a super key. `professor` is a non-prime attribute and `course_name` is a prime attribute. This dependency violates the BCNF rule.
+The left-hand side (`professor`) is not a super key. Both `room_number` and `professor` are prime attributes because they are part of candidate keys. This dependency violates the BCNF rule.
 
 This leads to:
 1. Information duplication.
-2. Update anomalies. If the name of a course taught by a professor changes, we would need to update multiple rows to reflect the change.
-3. Deletion anomalies. If students drop a course, we would lose information about the course and the professor.
+2. Update anomalies. If a professor's assigned room changes, we must update multiple rows to reflect the change.
+3. Deletion anomalies. If all courses taught by a professor are removed, we lose information about the professor's room assignment.
 
 ### Solution
 
@@ -110,54 +108,53 @@ We need to split the table to eliminate the problematic dependency. We create tw
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
-    export const studentsProfessors = pgTable('students_professors', {
-      studentId: integer('student_id').notNull(),
-      professorId: integer('professor_id').notNull().references(() => professors.id, { onDelete: 'cascade' }),
-    }, (t) => [
-      primaryKey({ columns: [t.studentId, t.professorId] })
-    ]);
-
-    export const professors = pgTable('professors', {
-      id: integer().notNull().primaryKey(),
-      professor: varchar().notNull(),
-      courseName: varchar('course_name').notNull()
+    export const professorRoom = pgTable("professor_room", {
+      professor: varchar("professor", { length: 100 }).notNull().primaryKey(),
+      roomNumber: varchar("room_number", { length: 10 }).notNull(),
     });
+
+    export const courseProfessor = pgTable("course_professor", {
+      course: varchar("course", { length: 100 }).notNull(),
+      professor: varchar("professor", { length: 100 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.course, t.professor] }),
+    ]);
     ```
   </CodeTab>
   <CodeTab>
   ```sql
-    CREATE TABLE "professors" (
-    	"id" integer PRIMARY KEY NOT NULL,
-    	"professor" varchar NOT NULL,
-    	"course_name" varchar NOT NULL
+    CREATE TABLE "course_professor" (
+    	"course" varchar(100) NOT NULL,
+    	"professor" varchar(100) NOT NULL,
+    	CONSTRAINT "course_professor_course_professor_pk" PRIMARY KEY("course","professor")
     );
 
-    CREATE TABLE "students_professors" (
-    	"student_id" integer NOT NULL,
-    	"professor_id" integer NOT NULL,
-    	CONSTRAINT "students_professors_student_id_professor_id_pk" PRIMARY KEY("student_id","professor_id")
+    CREATE TABLE "professor_room" (
+    	"professor" varchar(100) PRIMARY KEY NOT NULL,
+    	"room_number" varchar(10) NOT NULL
     );
-
-    ALTER TABLE "students_professors" ADD CONSTRAINT "students_professors_professor_id_professors_id_fk" FOREIGN KEY ("professor_id") REFERENCES "public"."professors"("id") ON DELETE cascade ON UPDATE no action;
   ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-+--------------+---------------+-------------------------+    +------------+--------------+
-| professors                                             |    | students_professors       |
-+--------------+---------------+-------------------------+    +------------+--------------+
-| professor_id | professor     | course_name             |    | student_id | professor_id |
-+--------------+---------------+-------------------------+    +------------+--------------+
-| 1            | Dr. Smith     | Introduction to Physics |    | 101        | 1            |
-| 2            | Dr. Jones     | Introduction to Physics |    | 102        | 2            |
-| 3            | Dr. Brown     | Calculus I              |    | 103        | 3            |
-| 4            | Dr. Davis     | Linear Algebra          |    | 101        | 3            |
-+--------------+---------------+-------------------------+    | 104        | 4            |
-                                                                +------------+--------------+
+    +--------------+---------------+   +--------------+---------------+   
+    | professor_room               |   | course_professor             |
+    +--------------+---------------+   +--------------+---------------+
+    | professor    |  room_number  |   | course       | professor     |
+    +--------------+---------------+   +--------------+---------------+
+    | Dr. Smith    | A101          |   | CS101        | Dr. Smith     |
+    | Dr. Jones    | B202          |   | CS101        | Dr. Jones     |
+    | Dr. Brown    | C303          |   | CS102        | Dr. Smith     |
+    +--------------+---------------+   | CS103        | Dr. Brown     |
+                                       +--------------+---------------+
   ```
   </CodeTab>
 </CodeTabs>
 
-We have achieved BCNF by splitting the table into two tables: `professors` and `students_professors`. Now, the tables are free from functional dependencies that violate BCNF.
+<Callout type="warning">
+You should also add a foreign key constraint to the `course_professor` table to reference the `professor` in the `professor_room` table.
+</Callout>
+
+We have achieved BCNF by splitting the table into two tables: `professor_room` and `course_professor`. Now, the tables are free from functional dependencies that violate BCNF.

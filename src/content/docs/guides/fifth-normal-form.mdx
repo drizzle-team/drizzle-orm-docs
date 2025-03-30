@@ -7,6 +7,7 @@ import Section from "@mdx/Section.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
 
 <Prerequisites>
 - You should be familiar with [4NF](/docs/guides/fourth-normal-form)
@@ -190,6 +191,10 @@ We need to split the table into three tables: `agent_suppliers`, `agent_item_typ
   ```
   </CodeTab>
 </CodeTabs>
+
+<Callout type="warning">
+You should also add foreign key constraints on the relevant columns in the `agent_item_types`, `agent_suppliers`, and `supplier_item_types` tables. These constraints should reference the primary key columns in the respective tables (or equivalent tables defining agents, suppliers, and item types).
+</Callout>
 
 To retrieve the data in a format equivalent to the original `agent_inventory` table we can execute this query:
 
