@@ -17,7 +17,7 @@ If you declare an entity within a schema, query builder will prepend schema name
   <Tab>
     <Section>
     ```ts copy {3,5,7}
-    import { serial, text, pgTable, pgSchema } from "drizzle-orm/pg-core";
+    import { serial, text, pgSchema } from "drizzle-orm/pg-core";
 
     export const mySchema = pgSchema("my_schema");
 
@@ -47,7 +47,7 @@ If you declare an entity within a schema, query builder will prepend schema name
   <Tab>
     <Section>
     ```ts {3,5}
-    import { int, text, mysqlTable, mysqlSchema } from "drizzle-orm/mysql-core";
+    import { int, text, mysqlSchema } from "drizzle-orm/mysql-core";
 
     export const mySchema = mysqlSchema("my_schema")
 
@@ -72,7 +72,7 @@ If you declare an entity within a schema, query builder will prepend schema name
   <Tab>
     <Section>
     ```ts {3,5}
-    import { int, text, mysqlTable, singlestoreSchema } from "drizzle-orm/singlestore-core";
+    import { int, text, singlestoreSchema } from "drizzle-orm/singlestore-core";
 
     export const mySchema = singlestoreSchema("my_schema")
 
