@@ -160,14 +160,59 @@ export const getStartedItems: GetStartedItems = [
         icon: {
           light: {
             path: "/public/svg/nile.svg",
-            style: {
-              width: 26,
-            },
           },
           dark: {
             path: "/public/svg/nile.svg",
+          },
+        },
+      },
+      {
+        name: "Bun SQL",
+        path: {
+          existing: "/docs/get-started/bun-sql-existing",
+          new: "/docs/get-started/bun-sql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/bun.svg",
             style: {
-              width: 26,
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/bun.svg",
+            style: {
+              width: 20,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    title: "Gel",
+    items: [
+      {
+        name: "Gel",
+        path: {
+          existing: "/docs/get-started/gel-existing",
+          new: "/docs/get-started/gel-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/gel_light.svg",
+            style: {
+              style: "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+          dark: {
+            path: "/public/svg/gel_dark.svg",
+            style: {
+              style: "border-radius: 5px",
+              width: 34,
+              height: 34,
             },
           },
         },
@@ -265,7 +310,7 @@ export const getStartedItems: GetStartedItems = [
             },
           },
         },
-      }
+      },
     ],
   },
   {

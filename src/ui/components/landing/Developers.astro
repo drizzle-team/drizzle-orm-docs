@@ -135,7 +135,15 @@ const shipping = fillMonthsGaps(shippingData);
               <ul class="week-details">
                 {value?.map((string) => (
                   <li class="week-text">
-                    <div set:html={addNofollowToExternalLinks(string.replaceAll('</ul>\n', '</ul>'))}/>
+                    <div
+                      set:html={
+                        addNofollowToExternalLinks(
+                          string
+                            .replaceAll('</ul>\n', '</ul>')
+                            .replace(/`([^`]+)`/g, '<code>$1</code>')
+                        )
+                      }
+                    />
                   </li>
                 ))}
               </ul>
@@ -454,7 +462,7 @@ const shipping = fillMonthsGaps(shippingData);
         display: block;
         height: 10px;
         position: absolute;
-        background: linear-gradient(to bottom, #f6f6f7 , 80%, transparent);
+        background: linear-gradient(to bottom, #f6f6f7 30%, rgba(246,246,247,0) 100%);
         flex-shrink: 0;
         z-index: 1;
         top: 0;
@@ -468,7 +476,7 @@ const shipping = fillMonthsGaps(shippingData);
         display: block;
         height: 10px;
         position: absolute;
-        background: linear-gradient(to top, #f6f6f7, 80%, transparent);
+        background: linear-gradient(to top, #f6f6f7 30%, rgba(246, 246, 247, 0) 100%);
         flex-shrink: 0;
         z-index: 1;
         bottom: 0;
@@ -482,11 +490,11 @@ const shipping = fillMonthsGaps(shippingData);
     }
 
     html.dark .week-details-wrap::before {
-        background: linear-gradient(to bottom, #1c1c1c, 70%, transparent);
+        background: linear-gradient(to bottom, #1c1c1c 30%, rgba(246, 246, 247, 0) 100%);
     }
 
     html.dark .week-details-wrap::after {
-        background: linear-gradient(to top, #1c1c1c, 70%, transparent);
+        background: linear-gradient(to top, #1c1c1c 30%, rgba(246, 246, 247, 0) 100%);
     }
 
     .week-text {

@@ -233,11 +233,9 @@ export const getMonthLabel = (startDate: string): string => {
   const start = new Date(startDate);
   const now = new Date();
 
-  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const inputMonthStart = new Date(start.getFullYear(), start.getMonth(), 1);
 
-  const diffTime = currentMonthStart.getTime() - inputMonthStart.getTime();
-  const diffMonths = Math.floor(diffTime / (30 * 24 * 60 * 60 * 1000));
+  const diffMonths = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
 
   if (diffMonths === 0) {
     return "this month";
