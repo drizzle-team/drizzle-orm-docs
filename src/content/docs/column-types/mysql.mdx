@@ -115,6 +115,20 @@ CREATE TABLE `table` (
 
 We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type 
 
+<Callout type="warning">
+Using an external mysql2 client, ensure that `supportBigNumbers` and `bigNumberStrings` are enabled.
+Without enabling these options may result in data loss or unexpected errors due to inaccurate handling of large numbers.
+
+```ts copy
+const connection = mysql.createPool({
+  ...
+  supportBigNumbers: true,
+  bigNumberStrings: true,
+});
+export const db = drizzle(connection);
+```
+</Callout>
+
 ## ---
 
 ### real
