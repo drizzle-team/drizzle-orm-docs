@@ -127,7 +127,7 @@ or update a record without adding a value to this field.
 
       ```sql
       CREATE TABLE IF NOT EXISTS "table" (
-        "integer" integer NOT NULL,
+        "integer" integer NOT NULL
       );
       ```
     </Section>
@@ -145,7 +145,7 @@ or update a record without adding a value to this field.
 
       ```sql
       CREATE TABLE `table` (
-        `int` int NOT NULL,
+        `int` int NOT NULL
       );
       ```
     </Section>
@@ -179,7 +179,7 @@ or update a record without adding a value to this field.
 
       ```sql
       CREATE TABLE `table` (
-        `int` int NOT NULL,
+        `int` int NOT NULL
       );
       ```
     </Section>
@@ -232,7 +232,7 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
 
       ```sql
       CREATE TABLE IF NOT EXISTS "composite_example" (
-	    "id" integer,
+	      "id" integer,
         "name" text,
         CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
         CONSTRAINT "custom_name" UNIQUE("id","name")
@@ -249,9 +249,9 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       );
 
       CREATE TABLE IF NOT EXISTS "user_nulls_example" (
-	    "id" integer,
-	    CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
-	    CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
+        "id" integer,
+        CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
+        CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
       );
       ```
     </Section>
@@ -291,10 +291,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       );
 
       CREATE TABLE `composite_example` (
-	    `id` int,
-	    `name` varchar(256),
-	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
-	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+        `id` int,
+        `name` varchar(256),
+        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
       );
       ```
     </Section>
@@ -378,10 +378,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       );
 
       CREATE TABLE `composite_example` (
-	    `id` int,
-	    `name` varchar(256),
-	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
-	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+        `id` int,
+        `name` varchar(256),
+        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
       );
       ```
     </Section>
@@ -514,11 +514,11 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
       ```sql
       CREATE TABLE IF NOT EXISTS "user" (
-        "id" serial PRIMARY KEY,
+        "id" serial PRIMARY KEY
       );
 
       CREATE TABLE IF NOT EXISTS "table" (
-        "cuid" text PRIMARY KEY,
+        "cuid" text PRIMARY KEY
       );
       ```
     </Section>
@@ -566,11 +566,11 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
       ```sql
       CREATE TABLE `user` (
-          `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+        `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
       );
 
       CREATE TABLE `pet` (
-          `id` integer PRIMARY KEY AUTOINCREMENT
+        `id` integer PRIMARY KEY AUTOINCREMENT
       )
       ```
     </Section>
@@ -641,7 +641,7 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       CREATE TABLE IF NOT EXISTS "books_to_authors" (
         "author_id" integer,
         "book_id" integer,
-        PRIMARY KEY("book_id","author_id"),
+        PRIMARY KEY("book_id","author_id")
       );
 
       ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");

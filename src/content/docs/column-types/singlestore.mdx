@@ -29,7 +29,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`int` int,
+	`int` int
 );
 ```
 </Section>
@@ -47,7 +47,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`tinyint` tinyint,
+	`tinyint` tinyint
 );
 ```
 </Section>
@@ -65,7 +65,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`smallint` smallint,
+	`smallint` smallint
 );
 ```
 </Section>
@@ -83,7 +83,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`mediumint` mediumint,
+	`mediumint` mediumint
 );
 ```
 </Section>
@@ -108,7 +108,7 @@ bigint('...', { mode: 'number' | 'bigint', unsigned: true })
 ```sql
 CREATE TABLE `table` (
 	`bigint` bigint,
-	`bigintUnsigned` bigint unsigned,
+	`bigintUnsigned` bigint unsigned
 );
 ```
 </Section>
@@ -130,7 +130,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`real` real,
+	`real` real
 );
 ```
 </Section>
@@ -148,7 +148,7 @@ const table = singlestoreTable('table', {
 ```sql
 CREATE TABLE `table` (
 	`realPrecision` real(1),
-	`realPrecisionScale` real(1, 1),
+	`realPrecisionScale` real(1, 1)
 );
 ```
 </Section>
@@ -170,7 +170,7 @@ const table = singlestoreTable('table', {
 CREATE TABLE `table` (
 	`decimal` decimal,
 	`decimalNum` decimal(30),
-	`decimalBig` decimal(30),
+	`decimalBig` decimal(30)
 );
 ```
 </Section>
@@ -188,7 +188,7 @@ const table = singlestoreTable('table', {
 ```sql
 CREATE TABLE `table` (
 	`decimalPrecision` decimal(1),
-	`decimalPrecisionScale` decimal(1, 1),
+	`decimalPrecisionScale` decimal(1, 1)
 );
 ```
 </Section>
@@ -206,7 +206,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`double` double,
+	`double` double
 );
 ```
 </Section>
@@ -224,7 +224,7 @@ const table = singlestoreTable('table', {
 ```sql
 CREATE TABLE `table` (
 	`doublePrecision` double(1),
-	`doublePrecisionScale` double(1, 1),
+	`doublePrecisionScale` double(1, 1)
 );
 ```
 </Section>
@@ -242,7 +242,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`float` float,
+	`float` float
 );
 ```
 </Section>
@@ -265,7 +265,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`serial` serial AUTO_INCREMENT,
+	`serial` serial AUTO_INCREMENT
 );
 ```
 </Section>
@@ -285,7 +285,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`binary` binary,
+	`binary` binary
 );
 ```
 </Section>
@@ -303,7 +303,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`varbinary` varbinary(2),
+	`varbinary` varbinary(2)
 );
 ```
 </Section>
@@ -323,7 +323,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`char` char,
+	`char` char
 );
 ```
 </Section>
@@ -344,7 +344,7 @@ varchar: varchar({ length: 6, enum: ["value1", "value2"] })
 
 ```sql
 CREATE TABLE `table` (
-	`varchar` varchar(2),
+	`varchar` varchar(2)
 );
 ```
 </Section>
@@ -367,7 +367,7 @@ text: text({ enum: ["value1", "value2"] });
 
 ```sql
 CREATE TABLE `table` (
-	`text` text,
+	`text` text
 );
 ```
 </Section>
@@ -387,7 +387,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`boolean` boolean,
+	`boolean` boolean
 );
 ```
 </Section>
@@ -407,7 +407,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`date` date,
+	`date` date
 );
 ```
 </Section>
@@ -427,7 +427,7 @@ datetime('...', { mode: 'date' | "string"}),
 
 ```sql
 CREATE TABLE `table` (
-	`datetime` datetime,
+	`datetime` datetime
 );
 ```
 </Section>
@@ -463,7 +463,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`year` year,
+	`year` year
 );
 ```
 </Section>
@@ -483,7 +483,7 @@ timestamp('...', { mode: 'date' | "string"}),
 
 ```sql
 CREATE TABLE `table` (
-	`timestamp` timestamp,
+	`timestamp` timestamp
 );
 ```
 </Section>
@@ -499,7 +499,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`timestamp` timestamp DEFAULT (now()),
+	`timestamp` timestamp DEFAULT (now())
 );
 ```
 </Section>
@@ -520,7 +520,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`json` json,
+	`json` json
 );
 ```
 </Section>
@@ -553,7 +553,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`popularity` enum('unknown','known','popular'),
+	`popularity` enum('unknown','known','popular')
 );
 ```
 </Section>
@@ -591,7 +591,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`int` int NOT NULL,
+	`int` int NOT NULL
 );
 ```
 </Section>
@@ -617,7 +617,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`int` int DEFAULT 3,
+	`int` int DEFAULT 3
 );
 ```
 </Section>
@@ -672,7 +672,7 @@ const table = singlestoreTable('table', {
 
 ```sql
 CREATE TABLE `table` (
-	`int` int PRIMARY KEY NOT NULL,
+	`int` int PRIMARY KEY NOT NULL
 );
 ```
 </Section>
