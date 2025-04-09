@@ -1,25 +1,39 @@
 import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
+import Callout from '@mdx/Callout.astro'
 
 # Common way of defining custom types
 
 ## Examples
 
-The best way to see how `customType` definition is working is to check how existing data types in postgres and mysql could be defined using `customType` function from Drizzle ORM.
+The best way to see how `customType` definition is working is to check how existing data types
+could be defined using `customType` function from Drizzle ORM.
 
 
-<Tabs items={['Postgres Data Types', 'MySql Data Types']}>
-  <Tab>
+<Callout title='info'>
+Each dialect exposes `customType` function 
 
-**Serial**
+```ts
+import { customType } from 'drizzle-orm/pg-core';
+...
+import { customType } from 'drizzle-orm/mysql-core';
+...
+import { customType } from 'drizzle-orm/sqlite-core';
+...
+import { customType } from 'drizzle-orm/gel-core';
+...
+import { customType } from 'drizzle-orm/singlestore-core';
+```
+</Callout>
 
+**Integer**
 ```typescript copy
 import { customType } from 'drizzle-orm/pg-core';
 
-const customSerial = customType<{ data: number; notNull: true; default: true }>(
+const customSerial = customType<{ data: number; }>(
   {
     dataType() {
-      return 'serial';
+      return 'integer';
     },
   },
 );
@@ -103,112 +117,15 @@ const usersTable = pgTable('users', {
     .default(sql`now()`),
 });
 ```
-  </Tab>
-  <Tab>
 
-**Serial**
 
-```typescript copy
-import { customType } from 'drizzle-orm/mysql-core';
-
-const customInt = customType<{ data: number; notNull: false; default: false }>(
-  {
-    dataType() {
-      return 'int';
-    },
-  },
-);
-```
-
-**Text**
-
-```typescript copy
-import { customType } from 'drizzle-orm/mysql-core';
-
-const customText = customType<{ data: string }>({
-  dataType() {
-    return 'text';
-  },
-});
-```
-
-**Boolean**
-
-```typescript copy
-import { customType } from 'drizzle-orm/mysql-core';
-
-const customBoolean = customType<{ data: boolean }>({
-  dataType() {
-    return 'boolean';
-  },
-  fromDriver(value) {
-    if (typeof value === 'boolean') {
-      return value;
-    }
-    return value === 1;
-  },
-});
-```
-
-**Json**
-
-```typescript copy
-import { customType } from 'drizzle-orm/mysql-core';
-
-const customJson = <TData>(name: string) =>
-  customType<{ data: TData; driverData: string }>({
-    dataType() {
-      return 'json';
-    },
-    toDriver(value: TData): string {
-      return JSON.stringify(value);
-    },
-  })(name);
-```
-
-**Timestamp**
-
-```typescript copy
-import { customType } from 'drizzle-orm/mysql-core';
-
-const customTimestamp = customType<
-  { data: Date; driverData: string; config: { fsp: number } }
->({
-  dataType(config) {
-    const precision = typeof config.fsp !== 'undefined'
-      ? ` (${config.fsp})`
-      : '';
-    return `timestamp${precision}`;
-  },
-  fromDriver(value: string): Date {
-    return new Date(value);
-  },
-});
-```
-
-Usage for all types will be same as defined functions in Drizzle ORM. For example:
-
-```typescript copy
-const usersTable = mysqlTable('userstest', {
-  id: customInt('id').primaryKey(),
-  name: customText('name').notNull(),
-  verified: customBoolean('verified').notNull().default(false),
-  jsonb: customJson<string[]>('jsonb'),
-  createdAt: customTimestamp('created_at', { fsp: 2 }).notNull().default(
-    sql`now()`,
-  ),
-});
-```
-
-  </Tab>
-</Tabs>
 
 ## TS-doc for type definitions 
 
 You can check ts-doc for `types` and `param` definition.
 
 ```typescript
-export type CustomTypeValues = {
+export interface CustomTypeValues = {
   /**
    * Required type for custom column, that will infer proper type model
    *
@@ -221,9 +138,23 @@ export type CustomTypeValues = {
   data: unknown;
 
   /**
+ 	 * Type helper, that represents what type database driver is returning for specific database data type
+ 	 *
+ 	 * Needed only in case driver's output and input for type differ
+ 	 *
+ 	 * Defaults to {@link driverData}
+ 	 */
+ 	driverOutput?: unknown;
+
+  /**
    * Type helper, that represents what type database driver is accepting for specific database data type
    */
   driverData?: unknown;
+
+  /**
+ 	 * Type helper, that represents what type field returns after being aggregated to JSON for Relational Queries
+ 	 */
+ 	jsonData?: unknown;
 
   /**
    * What config type should be used for {@link CustomTypeParams} `dataType` generation
@@ -288,7 +219,7 @@ export interface CustomTypeParams<T extends CustomTypeValues> {
   dataType: (config: T['config']) => string;
 
   /**
-   * Optional mapping function, between user input and driver
+   * Optional mapping function, between user input and what database driver will provide to the database
    * @example
    * For example, when using jsonb we need to map JS/TS object to string before writing to database
    * ```
@@ -300,7 +231,7 @@ export interface CustomTypeParams<T extends CustomTypeValues> {
   toDriver?: (value: T['data']) => T['driverData'];
 
   /**
-   * Optional mapping function, that is responsible for data mapping from database to JS/TS code
+   * Optional mapping function, that is used for transforming data returned by driver to desired column's output format
    * @example
    * For example, when using timestamp we need to map string Date representation to JS Date
    * ```
@@ -308,7 +239,104 @@ export interface CustomTypeParams<T extends CustomTypeValues> {
    *  return new Date(value);
    * },
    * ```
+   * 
+   * It'll cause the returned data to change from:
+ 	 * ```
+ 	 * {
+ 	 * 	customField: "2025-04-07T03:25:16.635Z";
+ 	 * }
+ 	 * ```
+ 	 * to:
+ 	 * ```
+ 	 * {
+ 	 * 	customField: new Date("2025-04-07T03:25:16.635Z");
+ 	 * }
+ 	 * ```
    */
   fromDriver?: (value: T['driverData']) => T['data'];
+
+  	/**
+ 	 * Optional mapping function, that is used for transforming data returned by transofmed to JSON in database data to desired format
+ 	 *
+ 	 * Used by [relational queries](https://orm.drizzle.team/docs/rqb-v2)
+ 	 *
+ 	 * Defaults to {@link fromDriver} function
+ 	 * @example
+ 	 * For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb-v2) or [JSON functions](https://orm.drizzle.team/docs/json-functions), the result field will be returned as it's string representation, as opposed to bigint from regular query
+ 	 * To handle that, we need a separate function to handle such field's mapping:
+ 	 * ```
+ 	 * fromJson(value: string): bigint {
+ 	 * 	return BigInt(value);
+ 	 * },
+ 	 * ```
+ 	 *
+ 	 * It'll cause the returned data to change from:
+ 	 * ```
+ 	 * {
+ 	 * 	customField: "5044565289845416380";
+ 	 * }
+ 	 * ```
+ 	 * to:
+ 	 * ```
+ 	 * {
+ 	 * 	customField: 5044565289845416380n;
+ 	 * }
+ 	 * ```
+ 	 */
+ 	fromJson?: (value: T['jsonData']) => T['data'];
+
+  	/**
+ 	 * Optional selection modifier function, that is used for modifying selection of column inside [JSON functions](https://orm.drizzle.team/docs/json-functions)
+ 	 *
+ 	 * Additional mapping that could be required for such scenarios can be handled using {@link fromJson} function
+ 	 *
+ 	 * Used by [relational queries](https://orm.drizzle.team/docs/rqb-v2)
+ 	 * @example
+ 	 * For example, when using bigint we need to cast field to text to preserve data integrity
+ 	 * ```
+ 	 * forJsonSelect(identifier: SQL, sql: SQLGenerator, arrayDimensions?: number): SQL {
+ 	 * 	return sql`${identifier}::text`
+ 	 * },
+ 	 * ```
+ 	 *
+ 	 * This will change query from:
+ 	 * ```
+ 	 * SELECT
+ 	 * 	row_to_json("t".*)
+ 	 * 	FROM
+ 	 * 	(
+ 	 * 		SELECT
+ 	 * 		"table"."custom_bigint" AS "bigint"
+ 	 * 		FROM
+ 	 * 		"table"
+ 	 * 	) AS "t"
+ 	 * ```
+ 	 * to:
+ 	 * ```
+ 	 * SELECT
+ 	 * 	row_to_json("t".*)
+ 	 * 	FROM
+ 	 * 	(
+ 	 * 		SELECT
+ 	 * 		"table"."custom_bigint"::text AS "bigint"
+ 	 * 		FROM
+ 	 * 		"table"
+ 	 * 	) AS "t"
+ 	 * ```
+ 	 *
+ 	 * Returned by query object will change from:
+ 	 * ```
+ 	 * {
+ 	 * 	bigint: 5044565289845416000; // Partial data loss due to direct conversion to JSON format
+ 	 * }
+ 	 * ```
+ 	 * to:
+ 	 * ```
+ 	 * {
+ 	 * 	bigint: "5044565289845416380"; // Data is preserved due to conversion of field to text before JSON-ification
+ 	 * }
+ 	 * ```
+ 	 */
+ 	forJsonSelect?: (identifier: SQL, sql: SQLGenerator, arrayDimensions?: number) => SQL;
 }
 ```
