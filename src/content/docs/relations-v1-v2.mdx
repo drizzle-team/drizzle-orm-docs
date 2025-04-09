@@ -166,6 +166,32 @@ export const relations = defineRelations(schema, (r) => ({
 ```
 </Callout>
 
+**New `optional` option**
+
+`optional: false` at the type level makes the `author` key in the `posts` object required. 
+This should be used when you are certain that this specific entity will always exist.
+
+<Callout title="❌ v1">
+Was not supported in v1
+</Callout>
+
+<Callout title='✅ v2'>
+```ts {9}
+import { defineRelations } from "drizzle-orm";
+import * as schema from "./schema";
+
+export const relations = defineRelations(schema, (r) => ({
+  users: {
+    posts: r.many.posts({
+      from: r.users.id,
+      to: r.posts.authorId,
+      optional: false,
+    }),
+  },
+}));
+```
+</Callout>
+
 **No modes in `drizzle()`**
 
 We found a way to use the same strategy for all MySQL dialects, so there's no need to specify them
@@ -254,6 +280,99 @@ export const relations = defineRelations(schema, (r) => ({
   },
 }));
 ```
+</Callout>
+
+**`custom types` new functions**
+
+There are a few new function were added to custom types, so you can control how data is mapped on Relational Queries v2:
+
+<Callout collapsed='fromJson'>
+Optional mapping function, that is used for transforming data returned by transformed to JSON in database data to desired format
+For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb-v2) or [JSON functions](https://orm.drizzle.team/docs/json-functions), the result field will be returned as it's string representation, as opposed to bigint from regular query
+To handle that, we need a separate function to handle such field's mapping:
+```ts
+fromJson(value: string): bigint {
+	return BigInt(value);
+},
+```
+It'll cause the returned data to change from:
+```ts
+{
+	customField: "5044565289845416380";
+}
+```
+to:
+```ts
+{
+	customField: 5044565289845416380n;
+}
+```
+</Callout> 
+<Callout collapsed='forJsonSelect'>
+Optional selection modifier function, that is used for modifying selection of column inside [JSON functions](https://orm.drizzle.team/docs/json-functions)
+Additional mapping that could be required for such scenarios can be handled using fromJson function
+Used by [relational queries](https://orm.drizzle.team/docs/rqb-v2)
+
+For example, when using bigint we need to cast field to text to preserve data integrity
+```ts
+forJsonSelect(identifier: SQL, sql: SQLGenerator, arrayDimensions?: number): SQL {
+	return sql`${identifier}::text`
+},
+```
+This will change query from:
+```sql
+SELECT
+	row_to_json("t".*)
+	FROM
+	(
+		SELECT
+		"table"."custom_bigint" AS "bigint"
+		FROM
+		"table"
+	) AS "t"
+```
+to:
+```sql
+SELECT
+	row_to_json("t".*)
+	FROM
+	(
+		SELECT
+		"table"."custom_bigint"::text AS "bigint"
+		FROM
+		"table"
+	) AS "t"
+```
+Returned by query object will change from:
+```ts
+{
+	bigint: 5044565289845416000; // Partial data loss due to direct conversion to JSON format
+}
+```
+to:
+```ts
+{
+	bigint: "5044565289845416380"; // Data is preserved due to conversion of field to text before JSON-ification
+}
+```
+</Callout>
+
+<Callout title='✅ v2'>
+```ts
+const customBytes = customType<{
+ 	data: Buffer;
+ 	driverData: Buffer;
+ 	jsonData: string;
+ }>({
+ 	dataType: () => 'bytea',
+ 	fromJson: (value) => {
+ 		return Buffer.from(value.slice(2, value.length), 'hex');
+ 	},
+ 	forJsonSelect: (identifier, sql, arrayDimensions) =>
+ 		sql`${identifier}::text${sql.raw('[]'.repeat(arrayDimensions ?? 0))}`,
+ });
+```
+
 </Callout>
 
 ##### What is new?
