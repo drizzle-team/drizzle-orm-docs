@@ -18,108 +18,95 @@ const heroSponsors = asideSponsors.filter(
 const goldSponsors = asideSponsors.filter(
   ({ tier }) => tier.name === "$1000 a month",
 );
-
-const slicedSponsors = [];
-
-for (let i = 0; i < goldSponsors.length - 1; i += 2) {
-  let items = goldSponsors.slice(i, i + 2);
-  slicedSponsors.push(items);
-}
 ---
 
 <div class="aside-sponsors__wrap">
-  {
-    heroSponsors.map((sponsor) => (
-      <div class="aside-sponsors__row">
-        <a
-          class:list={[
-            "aside-sponsors__sponsor",
-            "aside-sponsors__hero-sponsor",
-          ]}
-          href={`https://${sponsor.sponsorEntity.login}`}
-          target="_blank"
-          rel={sponsor.followLink ? "" : "nofollow"}
-        >
-          <div class="aside-sponsors__sponsor-wrap">
-            <div
-              class="aside-sponsors__sponsor-image"
-              id="aside-sponsors-img-wrapper"
-            >
-              <img
-                class="aside-sponsors__light-img"
-                loading="lazy"
-                src={
-                  "data:image/svg+xml;base64," +
-                  btoa(sponsor.sponsorEntity.avatarUrl)
-                }
-                style={getStyleString(sponsor.lightStyle || {})}
-              />
-              <img
-                class="aside-sponsors__dark-img"
-                loading="lazy"
-                src={
-                  "data:image/svg+xml;base64," +
-                  btoa(sponsor.sponsorEntity.avatarUrl)
-                }
-                alt={sponsor.sponsorEntity.name || sponsor.sponsorEntity.login}
-                style={getStyleString(sponsor.darkStyle || {})}
-              />
-            </div>
-          </div>
-          {!!sponsor.popover && <div class="popover">{sponsor.popover}</div>}
-        </a>
-      </div>
-    ))
-  }
-  {
-    slicedSponsors.map((slice) => (
-      <div class="aside-sponsors__row">
-        {slice.map((sponsor) => (
-          <a
-            class:list={[
-              "aside-sponsors__sponsor",
-              ["Mooncake", "Sponsor"].includes(sponsor.sponsorEntity.name)
-                ? "aside-sponsors__sponsor--hide"
-                : "",
-            ]}
-            href={`https://${sponsor.sponsorEntity.login}`}
-            target="_blank"
-            rel={sponsor.followLink ? "" : "nofollow"}
+  <div class="aside-sponsors__hero">
+    {heroSponsors.map((sponsor) => (
+      <a
+        class:list={[
+          "aside-sponsors__sponsor",
+          "aside-sponsors__hero-sponsor",
+        ]}
+        href={`https://${sponsor.sponsorEntity.login}`}
+        target="_blank"
+        rel={sponsor.followLink ? "" : "nofollow"}
+      >
+        <div class="aside-sponsors__sponsor-wrap">
+          <div
+            class="aside-sponsors__sponsor-image"
+            id="aside-sponsors-img-wrapper"
           >
-            <div class="aside-sponsors__sponsor-wrap">
-              <div
-                class="aside-sponsors__sponsor-image"
-                id="aside-sponsors-img-wrapper"
-              >
-                <img
-                  class="aside-sponsors__light-img"
-                  loading="lazy"
-                  src={
-                    "data:image/svg+xml;base64," +
-                    btoa(sponsor.sponsorEntity.avatarUrl)
-                  }
-                  style={getStyleString(sponsor.lightStyle || {})}
-                />
-                <img
-                  class="aside-sponsors__dark-img"
-                  loading="lazy"
-                  src={
-                    "data:image/svg+xml;base64," +
-                    btoa(sponsor.sponsorEntity.avatarUrl)
-                  }
-                  alt={
-                    sponsor.sponsorEntity.name || sponsor.sponsorEntity.login
-                  }
-                  style={getStyleString(sponsor.darkStyle || {})}
-                />
-              </div>
-            </div>
-            {!!sponsor.popover && <div class="popover">{sponsor.popover}</div>}
-          </a>
-        ))}
-      </div>
-    ))
-  }
+            <img
+              class="aside-sponsors__light-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              style={getStyleString(sponsor.lightStyle || {})}
+            />
+            <img
+              class="aside-sponsors__dark-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              alt={sponsor.sponsorEntity.name || sponsor.sponsorEntity.login}
+              style={getStyleString(sponsor.darkStyle || {})}
+            />
+          </div>
+        </div>
+        {!!sponsor.popover && <div class="popover">{sponsor.popover}</div>}
+      </a>
+    ))}
+  </div>
+  <div class="aside-sponsors__gold">
+    {goldSponsors.map((sponsor) => (
+      <a
+        class:list={[
+          "aside-sponsors__sponsor",
+          ["Sponsor"].includes(sponsor.sponsorEntity.name)
+            ? "aside-sponsors__sponsor--hide"
+            : "",
+        ]}
+        href={`https://${sponsor.sponsorEntity.login}`}
+        target="_blank"
+        rel={sponsor.followLink ? "" : "nofollow"}
+      >
+        <div class="aside-sponsors__sponsor-wrap">
+          <div
+            class="aside-sponsors__sponsor-image"
+            id="aside-sponsors-img-wrapper"
+          >
+            <img
+              class="aside-sponsors__light-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              style={getStyleString(sponsor.lightStyle || {})}
+            />
+            <img
+              class="aside-sponsors__dark-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              alt={
+                sponsor.sponsorEntity.name || sponsor.sponsorEntity.login
+              }
+              style={getStyleString(sponsor.darkStyle || {})}
+            />
+          </div>
+        </div>
+        {!!sponsor.popover && <div class="popover">{sponsor.popover}</div>}
+      </a>
+    ))}
+  </div>
 </div>
 <script is:inline type="module">
   import {
@@ -163,27 +150,41 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     initial-value: 132deg;
     inherits: false;
   }
-  html.dark .aside-sponsors__header {
-    color: #a8a8a8;
+
+  .aside-sponsors__hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
   }
 
-  .aside-sponsors__header {
-    align-items: center;
-    border-radius: 2px;
-    display: flex;
-    margin-right: auto;
-    margin-bottom: 4px;
-    font-size: 10px;
-    gap: 4px;
-    text-transform: uppercase;
-    color: #555;
+  .aside-sponsors__hero .aside-sponsors__sponsor:first-child {
+      border-radius: 4px 4px 0 0;
   }
 
-  .aside-sponsors__header svg {
-    fill: #fd7776;
-    color: #fd7776;
-    height: 10px;
-    width: 10px;
+  .aside-sponsors__hero .aside-sponsors__sponsor:first-child .aside-sponsors__sponsor-wrap {
+      border-radius: 4px 4px 0 0;
+  }
+
+  .aside-sponsors__gold {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+  }
+
+  .aside-sponsors__gold .aside-sponsors__sponsor:nth-last-child(2) {
+      border-radius: 0 0 0 4px;
+  }
+
+  .aside-sponsors__gold .aside-sponsors__sponsor:nth-last-child(2) .aside-sponsors__sponsor-wrap {
+      border-radius: 0 0 0 4px;
+  }
+
+  .aside-sponsors__gold .aside-sponsors__sponsor:last-child {
+      border-radius: 0 0 4px 0;
+  }
+
+  .aside-sponsors__gold .aside-sponsors__sponsor:last-child .aside-sponsors__sponsor-wrap {
+      border-radius: 0 0 4px 0;
   }
 
   html.dark .aside-sponsors__dark-img {
@@ -211,73 +212,6 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     min-width: 210px;
   }
 
-  .aside-sponsors__row {
-    display: flex;
-    gap: 4px;
-  }
-
-  .aside-sponsors__row:first-child .aside-sponsors__sponsor-wrap:only-child {
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-
-  .aside-sponsors__row:first-child > .aside-sponsors__sponsor-wrap:first-child {
-    border-top-left-radius: 4px;
-  }
-
-  .aside-sponsors__row:first-child > .aside-sponsors__sponsor:first-child {
-    border-top-left-radius: 5px;
-  }
-
-  .aside-sponsors__row:first-child
-    > .aside-sponsors__sponsor:last-child
-    .aside-sponsors__sponsor-wrap {
-    border-top-right-radius: 4px;
-  }
-
-  .aside-sponsors__row:first-child > .aside-sponsors__sponsor:last-child {
-    border-top-right-radius: 5px;
-  }
-
-  .aside-sponsors__row:last-child
-    > .aside-sponsors__sponsor:only-child
-    .aside-sponsors__sponsor-wrap {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-  }
-
-  .aside-sponsors__row:last-child
-    > .aside-sponsors__sponsor:first-child
-    .aside-sponsors__sponsor-wrap {
-    border-bottom-left-radius: 4px;
-  }
-
-  .aside-sponsors__row:last-child > .aside-sponsors__sponsor:first-child {
-    border-bottom-left-radius: 5px;
-  }
-
-  .aside-sponsors__row:last-child
-    > .aside-sponsors__sponsor:last-child
-    .aside-sponsors__sponsor-wrap {
-    border-bottom-right-radius: 4px;
-  }
-
-  .aside-sponsors__row:last-child > .aside-sponsors__sponsor:last-child {
-    border-bottom-right-radius: 5px;
-  }
-
-  .aside-sponsors__sponsor {
-    height: 74px;
-  }
-
-  .aside-sponsors__row > .aside-sponsors__sponsor:only-child {
-  }
-
-  .aside-sponsors__row
-    > .aside-sponsors__sponsor:only-child
-    > .aside-sponsors__sponsor-image {
-    max-width: 124px;
-  }
 
   .aside-sponsors__sponsor {
     position: relative;
@@ -287,10 +221,7 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     justify-content: center;
     overflow: hidden;
     margin: -1px;
-  }
-
-  .aside-sponsors__sponsor {
-    position: relative;
+    height: 74px;
   }
 
   html.dark .aside-sponsors__sponsor::before {
@@ -302,7 +233,6 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
     width: 240px;
     height: 240px;
     background-image: url("../../assets/images/light-gradient.png");
@@ -425,29 +355,7 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
     opacity: 1;
   }
 
-  @media screen and (max-height: 935px) {
-    body:not(:has(#banner)) .aside-sponsors__row:has(.aside-sponsors__sponsor--hide) {
-      display: none;
-    }
-  }
-  @media screen and (max-height: 975px) {
-    body:has(#banner) .aside-sponsors__row:has(.aside-sponsors__sponsor--hide) {
-      display: none;
-    }
-  }
-
-  @media screen and (max-height: 902px) {
-    body:has(#banner) .aside-sponsors__sponsor {
-      height: 62px;
-    }
-
-    body:has(#banner) .aside-sponsors__sponsor-image {
-      height: 40px;
-      width: 40px;
-    }
-  }
-
-  @media screen and (max-height: 860px) {
+  @media screen and (max-height: 1012px) {
     body:not(:has(#banner)) .aside-sponsors__sponsor {
       height: 62px;
     }
@@ -456,5 +364,31 @@ for (let i = 0; i < goldSponsors.length - 1; i += 2) {
       height: 40px;
       width: 40px;
     }
+  }
+
+  @media screen and (max-height: 891px) {
+      .aside-sponsors__sponsor--hide {
+          display: none;
+      }
+
+      .aside-sponsors__gold {
+         grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .aside-sponsors__gold .aside-sponsors__sponsor:nth-last-child(2) .aside-sponsors__sponsor-wrap {
+          border-radius: 0 0 4px 0;
+      }
+
+      .aside-sponsors__gold .aside-sponsors__sponsor:nth-last-child(2) {
+          border-radius: 0 0 4px 0;
+      }
+
+      .aside-sponsors__gold .aside-sponsors__sponsor:nth-last-child(4) .aside-sponsors__sponsor-wrap {
+          border-radius: 0 0 0 4px;
+      }
+
+      .aside-sponsors__gold .aside-sponsors__sponsor:nth-last-child(4) {
+          border-radius: 0 0 0 4px;
+      }
   }
 </style>

@@ -52,7 +52,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"int1" integer DEFAULT 10
+	"int1" integer DEFAULT 10,
 	"int2" integer DEFAULT '10'::int
 );
 ```
@@ -92,7 +92,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"smallint1" smallint DEFAULT 10
+	"smallint1" smallint DEFAULT 10,
 	"smallint2" smallint DEFAULT '10'::smallint
 );
 ```
@@ -140,7 +140,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"bigint1" bigint DEFAULT 10
+	"bigint1" bigint DEFAULT 10,
 	"bigint2" bigint DEFAULT '10'::bigint
 );
 ```
@@ -164,7 +164,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"serial" serial NOT NULL,
+	"serial" serial NOT NULL
 );
 ```
 </Section>
@@ -185,7 +185,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"smallserial" smallserial NOT NULL,
+	"smallserial" smallserial NOT NULL
 );
 ```
 </Section>
@@ -208,7 +208,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"bigserial" bigserial NOT NULL,
+	"bigserial" bigserial NOT NULL
 );
 ```
 </Section>
@@ -232,7 +232,7 @@ export const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"boolean" boolean,
+	"boolean" boolean
 );
 ```
 </Section>
@@ -285,7 +285,7 @@ text: text({ enum: ["value1", "value2"] })
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"text" text,
+	"text" text
 );
 ```
 </Section>
@@ -315,7 +315,7 @@ varchar: varchar({ enum: ["value1", "value2"] }),
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"varchar1" varchar,
-	"varchar2" varchar(256),
+	"varchar2" varchar(256)
 );
 ```
 </Section>
@@ -345,7 +345,7 @@ char: char({ enum: ["value1", "value2"] }),
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
 	"char1" char,
-	"char2" char(256),
+	"char2" char(256)
 );
 ```
 </Section>
@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 	"numeric2" numeric(100),
 	"numeric3" numeric(100, 20),
 	"numericNum" numeric,
-	"numericBig" numeric,
+	"numericBig" numeric
 );
 ```
 </Section>
@@ -399,7 +399,7 @@ import { real, pgTable } from "drizzle-orm/pg-core";
 const table = pgTable('table', {
 	real1: real(),
 	real2: real().default(10.10),
-	real2: real().default(sql`'10.10'::real`),
+	real3: real().default(sql`'10.10'::real`),
 });
 ```
 
@@ -407,7 +407,7 @@ const table = pgTable('table', {
 CREATE TABLE IF NOT EXISTS "table" (
 	"real1" real,
 	"real2" real default 10.10,
-	"real2" real default '10.10'::real
+	"real3" real default '10.10'::real
 );
 ```
 </Section>
@@ -434,7 +434,7 @@ const table = pgTable('table', {
 CREATE TABLE IF NOT EXISTS "table" (
 	"double1" double precision,
 	"double2" double precision default 10.10,
-	"double3" double precision default '10.10'::double precision,
+	"double3" double precision default '10.10'::double precision
 );
 ```
 </Section>
@@ -463,7 +463,7 @@ const table = pgTable('table', {
 CREATE TABLE IF NOT EXISTS "table" (
 	"json1" json,
 	"json2" json default '{"foo": "bar"}'::json,
-	"json3" json default '{"foo": "bar"}'::json,
+	"json3" json default '{"foo": "bar"}'::json
 );
 ```
 </Section>
@@ -500,7 +500,7 @@ const table = pgTable('table', {
 CREATE TABLE IF NOT EXISTS "table" (
 	"jsonb1" jsonb,
 	"jsonb2" jsonb default '{"foo": "bar"}'::jsonb,
-	"jsonb3" jsonb default '{"foo": "bar"}'::jsonb,
+	"jsonb3" jsonb default '{"foo": "bar"}'::jsonb
 );
 ```
 </Section>
@@ -535,7 +535,7 @@ const table = pgTable('table', {
   time1: time(),
   time2: time({ withTimezone: true }),
   time3: time({ precision: 6 }),
-	time4: time({ precision: 6, withTimezone: true })
+  time4: time({ precision: 6, withTimezone: true })
 });
 ```
 
@@ -544,7 +544,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 	"time1" time,
 	"time2" time with timezone,
 	"time3" time(6),
-	"time4" time(6) with timezone,
+	"time4" time(6) with timezone
 );
 ```
 </Section>
@@ -571,7 +571,7 @@ CREATE TABLE IF NOT EXISTS "table" (
 	"timestamp1" timestamp,
 	"timestamp2" timestamp (6) with time zone,
 	"timestamp3" timestamp default now(),
-	"timestamp4" timestamp default now(),
+	"timestamp4" timestamp default now()
 );
 ```
 </Section>
@@ -630,7 +630,7 @@ const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"date" date,
+	"date" date
 );
 ```
 </Section>
@@ -664,7 +664,7 @@ const table = pgTable('table', {
 CREATE TABLE IF NOT EXISTS "table" (
 	"interval1" interval,
 	"interval2" interval day,
-	"interval3" interval(6) month,
+	"interval3" interval(6) month
 );
 ```
 </Section>
@@ -694,7 +694,7 @@ const items = pgTable('items', {
 ```sql
 CREATE TABLE IF NOT EXISTS "items" (
 	"point" point,
-	"pointObj" point,
+	"pointObj" point
 );
 ```
 </Section>
@@ -722,7 +722,7 @@ const items = pgTable('items', {
 ```sql
 CREATE TABLE IF NOT EXISTS "items" (
 	"line" line,
-	"lineObj" line,
+	"lineObj" line
 );
 ```
 </Section>
@@ -751,7 +751,7 @@ export const table = pgTable('table', {
 CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
 
 CREATE TABLE IF NOT EXISTS "table" (
-	"mood" mood,
+	"mood" mood
 );
 ```
 </Section>
@@ -898,7 +898,7 @@ const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"integer" integer NOT NULL,
+	"integer" integer NOT NULL
 );
 ```
 </Section>
@@ -918,7 +918,7 @@ const table = pgTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL
 );
 ```
 </Section>

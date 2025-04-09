@@ -229,7 +229,7 @@ const table = sqliteTable('table', {
 CREATE TABLE `table` (
 	`numeric` numeric,
 	`numericNum` numeric,
-	`numericBig` numeric,
+	`numericBig` numeric
 );
 ```
 </Section>
@@ -290,7 +290,7 @@ const table = sqliteTable('table', {
 ```
 ```sql
 CREATE TABLE `table` (
-	`int1` integer DEFAULT 42
+	`int1` integer DEFAULT 42,
 	`int2` integer DEFAULT (abs(42))
 );
 ```
@@ -312,8 +312,8 @@ const table = sqliteTable("table", {
 
 ```sql
 CREATE TABLE `table` (
-	`time` text DEFAULT (CURRENT_TIME)
-	`date` text DEFAULT (CURRENT_DATE)
+	`time` text DEFAULT (CURRENT_TIME),
+	`date` text DEFAULT (CURRENT_DATE),
 	`timestamp` text DEFAULT (CURRENT_TIMESTAMP)
 );
 ```
