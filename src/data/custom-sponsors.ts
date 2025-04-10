@@ -209,30 +209,30 @@ export const customSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
   },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/hydraso",
-      name: "Hydra",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      background:
-        'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      background:
-        'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
-    },
-  },
+  // {
+  //   tier: {
+  //     name: "$1000 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/hydraso",
+  //     name: "Hydra",
+  //     avatarUrl:
+  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+  //   },
+  //   createdAt: "2024-06-07T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  //   darkStyle: {
+  //     background:
+  //       'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
+  //   },
+  //   lightStyle: {
+  //     background:
+  //       'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
+  //   },
+  // },
   {
     tier: {
       name: "$1000 a month",
@@ -534,6 +534,22 @@ export const customSponsors: ISponsor[] = [
       background:
         'url("/svg/sentry-light.svg") 0% 0% / cover no-repeat content-box',
     },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sevalla",
+      name: "Sevalla",
+      avatarUrl:
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.54035 3C4.58508 3 3 4.58508 3 6.54035V17.4596C3 19.4149 4.58508 21 6.54035 21H17.4596C19.4149 21 21 19.4149 21 17.4596V6.54035C21 4.58508 19.4149 3 17.4596 3H6.54035ZM9.97653 6.76172V8.88275H8.06248V10.7451C8.06248 11.1365 8.2078 11.2601 8.30213 11.3403C8.32714 11.3615 8.34854 11.3798 8.36274 11.3991L9.95776 13.036H8.06248V15.1349H9.95776V17.2559H14.0297V15.1349H9.95776V13.036H13.5262C14.0204 13.036 14.0204 13.6346 14.0204 13.9081V15.1349H15.9344V13.2725C15.9344 12.8811 15.7891 12.7575 15.6947 12.6773C15.6697 12.6561 15.6483 12.6378 15.6341 12.6185L14.0204 10.9816H15.9375L15.9344 8.88275H14.0297L14.0204 10.9816H10.4707C9.97653 10.9816 9.97653 10.383 9.97653 10.1095V8.88275H14.0297V6.76172H9.97653Z" fill="#F97316"/></svg>',
+    },
+    createdAt: "2025-01-23T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.SVG,
   },
   {
     tier: {

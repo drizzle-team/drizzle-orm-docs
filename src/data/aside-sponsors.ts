@@ -131,32 +131,32 @@ export const asideSponsors: ISponsor[] = [
         'url("/svg/nuxt-green.svg") 0% 0% / cover no-repeat content-box',
     },
   },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/hydraso",
-      name: "Hydra",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "brightness(0.5) grayscale(1)",
-      background:
-        'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      filter: "invert(0.6)",
-      background:
-        'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
-    },
-  },
+  // {
+  //   tier: {
+  //     name: "$1000 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/hydraso",
+  //     name: "Hydra",
+  //     avatarUrl:
+  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+  //   },
+  //   createdAt: "2024-06-07T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  //   darkStyle: {
+  //     filter: "brightness(0.5) grayscale(1)",
+  //     background:
+  //       'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
+  //   },
+  //   lightStyle: {
+  //     filter: "invert(0.6)",
+  //     background:
+  //       'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
+  //   },
+  // },
   {
     tier: {
       name: "$1000 a month",
@@ -438,6 +438,30 @@ export const asideSponsors: ISponsor[] = [
       filter: "invert(0.6)",
       background:
         'url("/svg/sentry-light.svg") 0% 0% / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sevalla",
+      name: "Sevalla",
+      avatarUrl:
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.72047 0C2.11344 0 0 2.11344 0 4.72047V19.2795C0 21.8866 2.11344 24 4.72047 24H19.2795C21.8866 24 24 21.8866 24 19.2795V4.72047C24 2.11344 21.8866 0 19.2795 0H4.72047ZM9.30204 5.01563V7.84367H6.74998V10.3268C6.74998 10.8487 6.94373 11.0134 7.06951 11.1204C7.10285 11.1487 7.13139 11.173 7.15031 11.1988L9.27702 13.3814H6.74998V16.1798H9.27702V19.0078H14.7063V16.1798H9.27702V13.3814H14.035C14.6938 13.3814 14.6938 14.1795 14.6938 14.5441V16.1798H17.2458V13.6967C17.2458 13.1748 17.0521 13.0101 16.9263 12.9031C16.893 12.8747 16.8644 12.8505 16.8455 12.8247L14.6938 10.6421H17.25L17.2458 7.84367H14.7063L14.6938 10.6421H9.96088C9.30204 10.6421 9.30204 9.84395 9.30204 9.47935V7.84367H14.7063V5.01563H9.30204Z" fill="#F97316"/></svg>',
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      padding: "4px",
+      filter: "brightness(0.5) grayscale(1)",
+    },
+    lightStyle: {
+      padding: "4px",
+      filter: "grayscale(1) brightness(1.2)",
     },
   },
   {
