@@ -33,9 +33,7 @@ const formattedText = (text?: string) => {
                     </div>
                     <div class="tweet-content">
                       {formattedText(t.text) && (
-                        <div class="tweet-content_text">
-                          <Fragment set:html={formattedText(t.text)} />
-                        </div>
+                        <div class="tweet-content_text"><Fragment set:html={formattedText(t.text)} /></div>
                       )}
                       {t.tweetImage && (
                         <Image
@@ -65,9 +63,7 @@ const formattedText = (text?: string) => {
                   </div>
                   <div class="tweet-content">
                     {formattedText(t.text) && (
-                      <div class="tweet-content_text">
-                        <Fragment set:html={formattedText(t.text)} />
-                      </div>
+                      <div class="tweet-content_text"><Fragment set:html={formattedText(t.text)} /></div>
                     )}
                     {t.tweetImage && (
                       <Image

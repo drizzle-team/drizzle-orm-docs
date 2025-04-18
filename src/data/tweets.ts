@@ -24,6 +24,7 @@ import silvenon from "@/assets/images/tweets/silvenon.jpg";
 import silvenonTweet from "@/assets/images/tweets/silvenonTweet.webp";
 import spacesexdragon from "@/assets/images/tweets/spacesexdragon.jpg";
 import spacesexdragonTweet from "@/assets/images/tweets/spacesexdragonTweet.jpg";
+import brodaNoel from "@/assets/images/tweets/brodaNoel.jpg";
 
 // Tweet images
 
@@ -174,5 +175,12 @@ export const tweets: ITweet[] = [
     login: "spacesexdragon",
     href: "https://x.com/spacesexdragon/status/1843381135134675236",
     tweetImage: spacesexdragonTweet,
+  },
+  {
+    avatar: brodaNoel,
+    name: "Broda Noel",
+    login: "BrodaNoel",
+    text: "Is this a joke? Because if this is a joke, it's really really really bad joke, because now I'm fucking hating @DrizzleORM without even knowing who they are.\nI mean, this is not a good marketing strategy if this was a marketing-joke.\nAnd if it's actually true, I'll hate them more.",
+    href: "https://x.com/BrodaNoel/status/1913248949252616287",
   },
 ];
