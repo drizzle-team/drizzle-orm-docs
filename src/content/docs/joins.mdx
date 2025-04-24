@@ -7,7 +7,7 @@ Join clause in SQL is used to combine 2 or more tables, based on related columns
 Drizzle ORM joins syntax is a balance between the SQL-likeness and type safety.
 
 ## Join types
-Drizzle ORM has APIs for `INNER JOIN`, `FULL JOIN`, `LEFT JOIN` and `RIGHT JOIN`.
+Drizzle ORM has APIs for `INNER JOIN [LATERAL]`, `FULL JOIN`, `LEFT JOIN [LATERAL]`, `RIGHT JOIN`, `CROSS JOIN [LATERAL]`.
 Lets have a quick look at examples based on below table schemas:
 ```typescript copy
 export const users = pgTable('users', {
@@ -46,6 +46,31 @@ const result: {
 ```
 </Section>
 
+### Left Join Lateral
+<Section>
+```typescript copy
+const subquery = db.select().from(pets).where(gte(users.age, 16)).as('userPets')
+const result = await db.select().from(users).leftJoinLateral(subquery, sql`true`)
+```
+```sql
+select ... from "users" left join lateral (select ... from "pets" where "users"."age" >= 16) "userPets" on true
+```
+```typescript
+// result type
+const result: {
+    user: {
+        id: number;
+        name: string;
+    };
+    userPets: {
+        id: number;
+        name: string;
+        ownerId: number;
+    } | null;
+}[];
+```
+</Section>
+
 ### Right Join
 <Section>
 ```typescript copy
@@ -69,6 +94,7 @@ const result: {
 }[];
 ```
 </Section>
+
 ### Inner Join
 <Section>
 ```typescript copy
@@ -92,6 +118,32 @@ const result: {
 }[];
 ```
 </Section>
+
+### Inner Join Lateral
+<Section>
+```typescript copy
+const subquery = db.select().from(pets).where(gte(users.age, 16)).as('userPets')
+const result = await db.select().from(users).innerJoinLateral(subquery, sql`true`)
+```
+```sql
+select ... from "users" inner join lateral (select ... from "pets" where "users"."age" >= 16) "userPets" on true
+```
+```typescript
+// result type
+const result: {
+    user: {
+        id: number;
+        name: string;
+    };
+    userPets: {
+        id: number;
+        name: string;
+        ownerId: number;
+    };
+}[];
+```
+</Section>
+
 ### Full Join
 <Section>
 ```typescript copy
@@ -112,6 +164,55 @@ const result: {
         name: string;
         ownerId: number;
     } | null;
+}[];
+```
+</Section>
+
+### Cross Join
+<Section>
+```typescript copy
+const result = await db.select().from(users).crossJoin(pets)
+```
+```sql
+select ... from "users" cross join "pets"
+```
+```typescript
+// result type
+const result: {
+    user: {
+        id: number;
+        name: string;
+    };
+    pets: {
+        id: number;
+        name: string;
+        ownerId: number;
+    };
+}[];
+```
+</Section>
+
+### Cross Join Lateral
+<Section>
+```typescript copy
+const subquery = db.select().from(pets).where(gte(users.age, 16)).as('userPets')
+const result = await db.select().from(users).crossJoinLateral(subquery)
+```
+```sql
+select ... from "users" cross join lateral (select ... from "pets" where "users"."age" >= 16) "userPets"
+```
+```typescript
+// result type
+const result: {
+    user: {
+        id: number;
+        name: string;
+    };
+    userPets: {
+        id: number;
+        name: string;
+        ownerId: number;
+    };
 }[];
 ```
 </Section>
