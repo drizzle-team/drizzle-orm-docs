@@ -1,16 +1,20 @@
+import Callout from '@mdx/Callout.astro';
+
 # Cache
 
-By default, Drizzle sends every query straight to your database with no hidden actions or caching - you can always see exactly 
-what runs. If you need caching, just enable the `cache` option to control when to read from or 
-write to `cache` and how entries are invalidated after updates. This runs like a `beforeQuery` 
-hook before each query executes. Drizzle also includes several built-in caching strategies you can use out of the box.
+Drizzle sends every query straight to your database by default. There are no hidden actions, no automatic caching 
+or invalidation - you'll always see exactly what runs. If you want caching, you must opt in.
 
-To enable caching, add `cache` callbacks to your Drizzle setup or pick one of the built-in options. 
-For example, you can use the `upstashCache()` helper we created in collaboration with the Upstash team.
+By default, Drizzle uses a `explicit` caching strategy (i.e. `global: false`), so nothing is ever cached unless you ask. 
+This prevents surprises or hidden performance traps in your application. 
+Alternatively, you can flip on `all` caching (`global: true`) so that every select will look in cache first.
+
+
 
 ## Upstash Integration
 
-Using upstash cache with drizzle
+Drizzle ships a built-in Upstash cache helper. It supports everything except keepTtl, pxat, exat, and raw px (use ex instead).
+
 ```ts
 import { upstashCache } from 'drizzle-orm/cache/upstash';
 import { drizzle } from 'drizzle-orm/...';
@@ -48,29 +52,27 @@ const db = drizzle(process.env.DB_URL!, {
 })
 ```
 
-These are all the possible config values that Drizzle supports with the cache layer
+Upstash cache will only use 2 of all cache options:
+
+`ex` - to define and expire time for a query
+
+`hexOptions` - define how hex expire will work
+<Callout title='hex options'>
+`NX` -- For each specified field, set expiration only when the field has no expiration.
+
+`XX` -- For each specified field, set expiration only when the field has an existing expiration.
+
+`GT` -- For each specified field, set expiration only when the new expiration is greater than current one.
+
+`LT` -- For each specified field, set expiration only when the new expiration is less than current one.
+</Callout>
+
 ```ts
 export type CacheConfig = {
     /**
      * expire time, in seconds (a positive integer)
      */
     ex?: number;
-    /**
-     * expire time, in milliseconds (a positive integer).
-     */
-    px?: number;
-    /**
-     * Unix time at which the key will expire, in seconds (a positive integer).
-     */
-    exat?: number;
-    /**
-     * Unix time at which the key will expire, in milliseconds (a positive integer)
-     */
-    pxat?: number;
-    /**
-     * Retain the time to live associated with the key.
-     */
-    keepTtl?: boolean;
     /**
      * Set an expiration (TTL or time to live) on one or more fields of a given hash key.
      * Used for HEXPIRE command
@@ -117,9 +119,24 @@ const res = await db.select().from(users).$withCache()
 // give a query custom cache key instead of hashing query+params under the hood
 .$withCache({ tag: 'custom_key' })
 
-// disable auto-invalidation for this query, if you are fine with eventual consistency for this specific query
+// disable auto-invalidation for this query, if you are fine with eventual consistency for this specific query(Eventual consistency explained below)
 .$withCache({ autoInvalidate: false })
 ```
+
+<Callout>
+**Eventual consistency example**
+
+Imagine you cache a select on `usersTable` with a 3-second TTL:
+
+``` ts
+const recent = await db
+  .select().from(usersTable)
+  .$withCache({ config: { ex: 3 }, autoInvalidate: false });
+```
+
+If someone else runs `db.insert(usersTable)...` immediately, that mutation won`t clear your cache.
+You`ll keep seeing the old data for up to 3 seconds, which is classic eventual consistency.
+</Callout>
 
 **Case 2: Drizzle with `global: true` option**
 
