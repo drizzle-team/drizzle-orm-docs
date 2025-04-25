@@ -184,6 +184,24 @@ await db.$cache?.invalidate({ tags: ['custom_key', 'custom_key1'] });
 This example shows how to plug in a custom `cache` in Drizzle: you provide functions to fetch data from cache, 
 store results back into cache, and invalidate entries whenever a mutation runs.
 
+Cache extension provides this set of config options
+```ts
+export type CacheConfig = {
+  /** expire time, in seconds */
+  ex?: number;
+  /** expire time, in milliseconds */
+  px?: number;
+  /** Unix time (sec) at which the key will expire */
+  exat?: number;
+  /** Unix time (ms) at which the key will expire */
+  pxat?: number;
+  /** retain existing TTL when updating a key */
+  keepTtl?: boolean;
+  /** options for HEXPIRE (hash-field TTL) */
+  hexOptions?: 'NX' | 'XX' | 'GT' | 'LT' | 'nx' | 'xx' | 'gt' | 'lt';
+};
+```
+
 ```ts
 const db = drizzle(process.env.DB_URL!, { cache: new TestGlobalCache() })
 ```
