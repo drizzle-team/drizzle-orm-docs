@@ -168,19 +168,19 @@ You can also use cache instance from a `db` to invalidate specific tables or tag
 
 ```ts
 // Invalidate all queries that use the `users` table. You can do this with the Drizzle instance.
-await db.$cache?.invalidate({ tables: users });
+await db.$cache.invalidate({ tables: users });
 // or
-await db.$cache?.invalidate({ tables: [users, posts] });
+await db.$cache.invalidate({ tables: [users, posts] });
 
 // Invalidate all queries that use the `usersTable`. You can do this by using just the table name.
-await db.$cache?.invalidate({ tables: "usersTable" });
+await db.$cache.invalidate({ tables: "usersTable" });
 // or
-await db.$cache?.invalidate({ tables: ["usersTable", "postsTable"] });
+await db.$cache.invalidate({ tables: ["usersTable", "postsTable"] });
 
 // You can also invalidate custom tags defined in any previously executed select queries.
-await db.$cache?.invalidate({ tags: "custom_key" });
+await db.$cache.invalidate({ tags: "custom_key" });
 // or
-await db.$cache?.invalidate({ tags: ["custom_key", "custom_key1"] });
+await db.$cache.invalidate({ tags: ["custom_key", "custom_key1"] });
 ```
 
 ## Custom cache
