@@ -303,3 +303,41 @@ export class TestGlobalCache extends Cache {
   }
 }
 ```
+
+## Limitations
+
+#### Queries that won't be handled by the `cache` extension:
+
+- Using cache with raw queries, such as:
+
+```ts
+db.execute(sql`select 1`);
+```
+
+- Using cache with `batch` feature in `d1` and `libsql`
+
+```ts
+db.batch([
+    db.insert(users).values(...),
+    db.update(users).set(...).where()
+])
+```
+
+- Using cache in transactions
+```ts
+await db.transaction(async (tx) => {
+  await tx.update(accounts).set(...).where(...);
+  await tx.update...
+});
+```
+
+#### Limitations that are temporary and will be handled soon:
+
+- Using cache with Drizzle Relational Queries
+```ts
+await db.query.users.findMany();
+```
+
+- Using cache with `better-sqlite3`, `Durable Objects`, `expo sqlite`
+- Using cache with AWS Data API drivers
+- Using cache with views
