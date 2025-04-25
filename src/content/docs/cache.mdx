@@ -2,131 +2,140 @@ import Callout from '@mdx/Callout.astro';
 
 # Cache
 
-Drizzle sends every query straight to your database by default. There are no hidden actions, no automatic caching 
-or invalidation - you'll always see exactly what runs. If you want caching, you must opt in.
+By default, Drizzle queries your database directly with no hidden logic, no automatic caching, or unexpected invalidation. Caching is opt-in by default to give you full control over how and when to use it.
 
-By default, Drizzle uses a `explicit` caching strategy (i.e. `global: false`), so nothing is ever cached unless you ask. 
-This prevents surprises or hidden performance traps in your application. 
-Alternatively, you can flip on `all` caching (`global: true`) so that every select will look in cache first.
+Use the `cache` option when initializing your Drizzle instance to enable caching. Caching logic runs like a `beforeQuery` hook, it executes right before the query.
 
+Drizzle supports any caching layer via custom `cache` callbacks and also includes multiple built-in strategies. For example, the `upstashCache()` helper - built in collaboration with the Upstash team - makes it easy to integrate a fast, cloud-based Redis cache with minimal setup.
 
+## Quickstart
 
-## Upstash Integration
+### Upstash integration
 
-Drizzle ships a built-in Upstash cache helper. It supports everything except keepTtl, pxat, exat, and raw px (use ex instead).
+Drizzle provides an `upstashCache()` helper out of the box. By default, this uses Upstash Redis with automatic configuration if environment variables are set.
 
 ```ts
-import { upstashCache } from 'drizzle-orm/cache/upstash';
-import { drizzle } from 'drizzle-orm/...';
+import { upstashCache } from "drizzle-orm/cache/upstash";
+import { drizzle } from "drizzle-orm/...";
 
-const db = drizzle(process.env.DB_URL!, { cache: upstashCache() })
+const db = drizzle(process.env.DB_URL!, {
+  cache: upstashCache(),
+});
 ```
 
-Define cache credentials, but no cache will be used globally for all queries
+You can also explicitly define your Upstash credentials, enable global caching for all queries by default or pass custom caching options:
+
 ```ts
-import { upstashCache } from 'drizzle-orm/cache/upstash';
-import { drizzle } from 'drizzle-orm/...';
+import { upstashCache } from "drizzle-orm/cache/upstash";
+import { drizzle } from "drizzle-orm/...";
 
-const db = drizzle(process.env.DB_URL!, { 
-    cache: upstashCache({ url: '', token: '' }) 
-})
+const db = drizzle(process.env.DB_URL!, {
+  cache: upstashCache({
+    // 👇 Redis credentials (optional — can also be pulled from env vars)
+    url: '<UPSTASH_URL>',
+    token: '<UPSTASH_TOKEN>',
+
+    // 👇 Enable caching for all queries by default (optional)
+    global: true,
+
+    // 👇 Default cache behavior (optional)
+    config: { ex: 60 }
+  })
+});
 ```
 
-Define cache credentials, and the cache will be used globally for all queries
-```ts
-import { upstashCache } from 'drizzle-orm/cache/upstash';
-import { drizzle } from 'drizzle-orm/...';
+## Cache config reference
 
-const db = drizzle(process.env.DB_URL!, { 
-    cache: upstashCache({ url: '', token: '', global: true }) 
-})
-```
-
-Define cache credentials with custom config values to be used for all queries, unless overridden
-```ts
-import { upstashCache } from 'drizzle-orm/cache/upstash';
-import { drizzle } from 'drizzle-orm/...';
-
-const db = drizzle(process.env.DB_URL!, { 
-    cache: upstashCache({ url: '', token: '', global: true, config: {} }) 
-})
-```
-
-Upstash cache will only use 2 of all cache options:
-
-`ex` - to define and expire time for a query
-
-`hexOptions` - define how hex expire will work
-<Callout title='hex options'>
-`NX` -- For each specified field, set expiration only when the field has no expiration.
-
-`XX` -- For each specified field, set expiration only when the field has an existing expiration.
-
-`GT` -- For each specified field, set expiration only when the new expiration is greater than current one.
-
-`LT` -- For each specified field, set expiration only when the new expiration is less than current one.
-</Callout>
+Drizzle supports the following cache config options:
 
 ```ts
 export type CacheConfig = {
-    /**
-     * expire time, in seconds (a positive integer)
-     */
-    ex?: number;
-    /**
-     * Set an expiration (TTL or time to live) on one or more fields of a given hash key.
-     * Used for HEXPIRE command
-     */
-    hexOptions?: 'NX' | 'nx' | 'XX' | 'xx' | 'GT' | 'gt' | 'LT' | 'lt';
+  /**
+   * Expiration in seconds (positive integer)
+   */
+  ex?: number;
+  /**
+   * Expiration in milliseconds (positive integer)
+   */
+  px?: number;
+  /**
+   * Expire at specific Unix time (in seconds, positive integer)
+   */
+  exat?: number;
+  /**
+   * Expire at specific Unix time (in milliseconds, positive integer)
+   */
+  pxat?: number;
+  /**
+   * Retain existing TTL
+   */
+  keepTtl?: boolean;
+  /**
+   * Set an expiration (TTL or time to live) on one or more fields of a given hash key.
+   * Used for HEXPIRE command
+   */
+  hexOptions?: "NX" | "nx" | "XX" | "xx" | "GT" | "gt" | "LT" | "lt";
 };
 ```
 
 ## Cache usage examples
 
-Once you've provided all the necessary instructions to the Drizzle database instance, you can now use the cache with Drizzle
+Once you've configured caching, here's how the cache behaves:
 
-**Case 1: Drizzle with `global: false` option**
+**Case 1: Drizzle with `global: false` (default, opt-in caching)**
 
 ```ts
-import { upstashCache } from 'drizzle-orm/cache/upstash';
-import { drizzle } from 'drizzle-orm/...';
+import { upstashCache } from "drizzle-orm/cache/upstash";
+import { drizzle } from "drizzle-orm/...";
 
-const db = drizzle(process.env.DB_URL!, { cache: upstashCache({ url: '', token: '' }) })
+const db = drizzle(process.env.DB_URL!, {
+  // 👇 `global: true` is not passed, false by default
+  cache: upstashCache({ url: "", token: "" }),
+});
 ```
 
-In this case, the current query won't use the cache
+In this case, the following query won't read from cache
 
 ```ts
-const res = await db.select().from(users)
+const res = await db.select().from(users);
 
-// However, any mutate operation will trigger the onMutate function in the cache
-// and attempt to invalidate queries that used the tables involved in this mutation query.
-await db.insert(users).value({ email: 'cacheman@upstash.com' })
+// Any mutate operation will still trigger the cache's onMutate handler
+// and attempt to invalidate any cached queries that involved the affected tables
+await db.insert(users).value({ email: "cacheman@upstash.com" });
 ```
 
-If you want the query to actually use the cache, you need to call `.$withCache()`
+To make this query read from the cache, call `.$withCache()`
 
 ```ts
-const res = await db.select().from(users).$withCache()
+const res = await db.select().from(users).$withCache();
 ```
 
 `.$withCache` has a set of options you can use to manage and configure this specific query strategy
 
 ```ts
-// rewrite the global config options for this specific query
+// rewrite the config for this specific query
 .$withCache({ config: {} })
 
-// give a query custom cache key instead of hashing query+params under the hood
+// give this query a custom cache key (instead of hashing query+params under the hood)
 .$withCache({ tag: 'custom_key' })
 
-// disable auto-invalidation for this query, if you are fine with eventual consistency for this specific query(Eventual consistency explained below)
+// turn off auto-invalidation for this query
+// note: this leads to eventual consistency (explained below)
 .$withCache({ autoInvalidate: false })
 ```
 
 <Callout>
 **Eventual consistency example**
 
-Imagine you cache a select on `usersTable` with a 3-second TTL:
+This example is only relevant if you manually set `autoInvalidate: false`. By default, `autoInvalidate` is enabled. 
+
+You might want to turn off `autoInvalidate` if:
+- your data doesn't change often, and slight staleness is acceptable (e.g. product listings, blog posts)
+- you handle cache invalidation manually
+
+In those cases, turning it off can reduce unnecessary cache invalidation. However, in most cases, we recommend keeping the default enabled.
+
+Example: Imagine you cache the following query on `usersTable` with a 3-second TTL:
 
 ``` ts
 const recent = await db
@@ -134,33 +143,34 @@ const recent = await db
   .$withCache({ config: { ex: 3 }, autoInvalidate: false });
 ```
 
-If someone else runs `db.insert(usersTable)...` immediately, that mutation won`t clear your cache.
-You`ll keep seeing the old data for up to 3 seconds, which is classic eventual consistency.
+If someone runs `db.insert(usersTable)...` the cache won't be invalidated immediately. For up to 3 seconds, you'll keep seeing the old data until it eventually becomes consistent.
 </Callout>
 
 **Case 2: Drizzle with `global: true` option**
 
 ```ts
-import { upstashCache } from 'drizzle-orm/cache/upstash';
-import { drizzle } from 'drizzle-orm/...';
+import { upstashCache } from "drizzle-orm/cache/upstash";
+import { drizzle } from "drizzle-orm/...";
 
-const db = drizzle(process.env.DB_URL!, { cache: upstashCache({ url: '', token: '', global: true }) })
+const db = drizzle(process.env.DB_URL!, {
+  cache: upstashCache({ url: "", token: "", global: true }),
+});
 ```
 
-In this case, the current query will use the cache
+In this case, the following query will read from cache
 
 ```ts
-const res = await db.select().from(users)
+const res = await db.select().from(users);
 ```
 
-If you want the query to disable cache for some specific query, you need to call `.$withCache(false)`
+If you want to disable cache for this specific query, call `.$withCache(false)`
 
 ```ts
-// cache is disabled for this query
-const res = await db.select().from(users).$withCache(false)
+// disable cache for this query
+const res = await db.select().from(users).$withCache(false);
 ```
 
-You can also use cache instance from a `db` to force invalidate specific tables or tags you've defined previously
+You can also use cache instance from a `db` to invalidate specific tables or tags
 
 ```ts
 // Invalidate all queries that use the `users` table. You can do this with the Drizzle instance.
@@ -169,20 +179,19 @@ await db.$cache?.invalidate({ tables: users });
 await db.$cache?.invalidate({ tables: [users, posts] });
 
 // Invalidate all queries that use the `usersTable`. You can do this by using just the table name.
-await db.$cache?.invalidate({ tables: 'usersTable' });
+await db.$cache?.invalidate({ tables: "usersTable" });
 // or
-await db.$cache?.invalidate({ tables: ['usersTable' , 'postsTable' ] });
+await db.$cache?.invalidate({ tables: ["usersTable", "postsTable"] });
 
 // You can also invalidate custom tags defined in any previously executed select queries.
-await db.$cache?.invalidate({ tags: 'custom_key' });
+await db.$cache?.invalidate({ tags: "custom_key" });
 // or
-await db.$cache?.invalidate({ tags: ['custom_key', 'custom_key1'] });
+await db.$cache?.invalidate({ tags: ["custom_key", "custom_key1"] });
 ```
 
 ## Custom cache
 
-This example shows how to plug in a custom `cache` in Drizzle: you provide functions to fetch data from cache, 
-store results back into cache, and invalidate entries whenever a mutation runs.
+This example shows how to plug in a custom `cache` in Drizzle: you provide functions to fetch data from the cache, store results back into cache, and invalidate entries whenever a mutation runs.
 
 Cache extension provides this set of config options
 ```ts
@@ -203,11 +212,11 @@ export type CacheConfig = {
 ```
 
 ```ts
-const db = drizzle(process.env.DB_URL!, { cache: new TestGlobalCache() })
+const db = drizzle(process.env.DB_URL!, { cache: new TestGlobalCache() });
 ```
 
 ```ts
-import Keyv from 'keyv';
+import Keyv from "keyv";
 
 export class TestGlobalCache extends Cache {
   private globalTtl: number = 1000;
@@ -223,14 +232,14 @@ export class TestGlobalCache extends Cache {
   // - 'explicit': The cache is used only when .$withCache() is added to a query.
   // - 'all': All queries are cached globally.
   // The default behavior is 'explicit'.
-  override strategy(): 'explicit' | 'all' {
-    return 'all';
+  override strategy(): "explicit" | "all" {
+    return "all";
   }
 
   // This function accepts query and parameters that cached into key param,
   // allowing you to retrieve response values for this query from the cache.
   override async get(key: string): Promise<any[] | undefined> {
-    const res = await this.kv.get(key) ?? undefined;
+    const res = (await this.kv.get(key)) ?? undefined;
     return res;
   }
 
@@ -240,9 +249,14 @@ export class TestGlobalCache extends Cache {
   // - 'tables': An array of tables involved in the select queries. This information is needed for cache invalidation.
   //
   // For example, if a query uses the "users" and "posts" tables, you can store this information. Later, when the app executes
-  // any mutation statements on these tables, you can remove the corresponding key from the cache. 
+  // any mutation statements on these tables, you can remove the corresponding key from the cache.
   // If you're okay with eventual consistency for your queries, you can skip this option.
-  override async put(key: string, response: any, tables: string[], config?: CacheConfig): Promise<void> {
+  override async put(
+    key: string,
+    response: any,
+    tables: string[],
+    config?: CacheConfig,
+  ): Promise<void> {
     await this.kv.set(key, response, config ? config.ex : this.globalTtl);
     for (const table of tables) {
       const keys = this.usedTablesPerKey[table];
@@ -254,21 +268,34 @@ export class TestGlobalCache extends Cache {
     }
   }
 
-  // This function is called when insert, update, or delete statements are executed. 
+  // This function is called when insert, update, or delete statements are executed.
   // You can either skip this step or invalidate queries that used the affected tables.
   //
   // The function receives an object with two keys:
   // - 'tags': Used for queries labeled with a specific tag, allowing you to invalidate by that tag.
-  // - 'tables': The actual tables affected by the insert, update, or delete statements, 
+  // - 'tables': The actual tables affected by the insert, update, or delete statements,
   //   helping you track which tables have changed since the last cache update.
-  override async onMutate(params: { tags: string | string[], tables: string | string[] | Table<any> | Table<any>[]}): Promise<void> {
-    const tagsArray = params.tags ? Array.isArray(params.tags) ? params.tags : [params.tags] : [];
-    const tablesArray = params.tables ? Array.isArray(params.tables) ? params.tables : [params.tables] : [];
+  override async onMutate(params: {
+    tags: string | string[];
+    tables: string | string[] | Table<any> | Table<any>[];
+  }): Promise<void> {
+    const tagsArray = params.tags
+      ? Array.isArray(params.tags)
+        ? params.tags
+        : [params.tags]
+      : [];
+    const tablesArray = params.tables
+      ? Array.isArray(params.tables)
+        ? params.tables
+        : [params.tables]
+      : [];
 
     const keysToDelete = new Set<string>();
 
     for (const table of tablesArray) {
-      const tableName = is(table, Table) ? getTableName(table) : table as string;
+      const tableName = is(table, Table)
+        ? getTableName(table)
+        : (table as string);
       const keys = this.usedTablesPerKey[tableName] ?? [];
       for (const key of keys) keysToDelete.add(key);
     }
@@ -281,7 +308,9 @@ export class TestGlobalCache extends Cache {
       for (const key of keysToDelete) {
         await this.kv.delete(key);
         for (const table of tablesArray) {
-          const tableName = is(table, Table) ? getTableName(table) : table as string;
+          const tableName = is(table, Table)
+            ? getTableName(table)
+            : (table as string);
           this.usedTablesPerKey[tableName] = [];
         }
       }
