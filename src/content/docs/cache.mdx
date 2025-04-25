@@ -2,11 +2,12 @@ import Callout from '@mdx/Callout.astro';
 
 # Cache
 
-By default, Drizzle queries your database directly with no hidden logic, no automatic caching, or unexpected invalidation. Caching is opt-in by default to give you full control over how and when to use it.
+Drizzle sends every query straight to your database by default. There are no hidden actions, no automatic caching 
+or invalidation - you'll always see exactly what runs. If you want caching, you must opt in.
 
-Use the `cache` option when initializing your Drizzle instance to enable caching. Caching logic runs like a `beforeQuery` hook, it executes right before the query.
-
-Drizzle supports any caching layer via custom `cache` callbacks and also includes multiple built-in strategies. For example, the `upstashCache()` helper - built in collaboration with the Upstash team - makes it easy to integrate a fast, cloud-based Redis cache with minimal setup.
+By default, Drizzle uses a `explicit` caching strategy (i.e. `global: false`), so nothing is ever cached unless you ask. 
+This prevents surprises or hidden performance traps in your application. 
+Alternatively, you can flip on `all` caching (`global: true`) so that every select will look in cache first.
 
 ## Quickstart
 
@@ -46,7 +47,7 @@ const db = drizzle(process.env.DB_URL!, {
 
 ## Cache config reference
 
-Drizzle supports the following cache config options:
+Drizzle supports the following cache config options for Upstash:
 
 ```ts
 export type CacheConfig = {
@@ -54,22 +55,6 @@ export type CacheConfig = {
    * Expiration in seconds (positive integer)
    */
   ex?: number;
-  /**
-   * Expiration in milliseconds (positive integer)
-   */
-  px?: number;
-  /**
-   * Expire at specific Unix time (in seconds, positive integer)
-   */
-  exat?: number;
-  /**
-   * Expire at specific Unix time (in milliseconds, positive integer)
-   */
-  pxat?: number;
-  /**
-   * Retain existing TTL
-   */
-  keepTtl?: boolean;
   /**
    * Set an expiration (TTL or time to live) on one or more fields of a given hash key.
    * Used for HEXPIRE command
