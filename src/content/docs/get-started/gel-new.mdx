@@ -135,7 +135,7 @@ export const users = gelTable("users", {
 ]);
 ```
 
-#### Step 6 - Connect Drizzle ORM to the database
+#### Step 7 - Connect Drizzle ORM to the database
 
 Create a `index.ts` file in the `src` directory and initialize the connection:
 
@@ -147,7 +147,7 @@ const gelClient = createClient();
 const db = drizzle({ client: gelClient });
 ```
 
-#### Step 7 - Query the database
+#### Step 8 - Query the database
 
 ```typescript copy filename="src/index.ts"
 import { eq } from "drizzle-orm";
@@ -194,6 +194,6 @@ async function main() {
 main();
 ```
 
-#### Step 8 - Run index.ts file
+#### Step 9 - Run index.ts file
 
 <RunFile/>
