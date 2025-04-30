@@ -91,7 +91,7 @@ Now you should have this file structure
 ```
 </Callout>
 
-#### Step 4 - Install **gel** package
+#### Step 4 - Install required packages
 <Npm>
   drizzle-orm gel
   -D drizzle-kit tsx
@@ -120,8 +120,7 @@ drizzle-kit pull
 
 Here is an example of the generated schema.ts file:
 
-```ts
-// drizzle/schema.ts
+```typescript filename="drizzle/schema.ts"
 import { gelTable, uniqueIndex, uuid, smallint, text } from "drizzle-orm/gel-core"
 import { sql } from "drizzle-orm"
 
@@ -139,7 +138,7 @@ export const users = gelTable("users", {
 
 Create a `index.ts` file in the `src` directory and initialize the connection:
 
-```typescript copy
+```typescript copy filename="src/index.ts"
 import { drizzle } from "drizzle-orm/gel";
 import { createClient } from "gel";
 
