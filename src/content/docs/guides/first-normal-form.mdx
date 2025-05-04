@@ -1,0 +1,294 @@
+---
+title: First Normal Form (1NF)
+slug: first-normal-form
+---
+
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
+
+The First Normal Form (1NF) is the first step in the normalization process of a database. It ensures that every column in a table contains only atomic values, and that the table has unique column names and no repeating groups.
+
+## Key Concepts
+
+1. Atomic Values Only: Each column should contain indivisible values — no lists, arrays, or nested records.
+2. Consistent Data Types: Every value in a column must be of the same type (e.g., all integers or all strings).
+3. Unique Rows: Every row should be uniquely identifiable, typically using a primary key.
+4. Distinct Column Names: No duplicate column names, each column represents a single attribute.
+5. Order Independence: The order of rows or columns does not affect the table's meaning or function.
+6. No Repeating Groups: Avoid multiple columns storing the same type of data (e.g., `skill1`, `skill2`, `skill3`).
+
+## The 1NF Rule
+
+To achieve 1NF, a table must satisfy the following conditions:
+
+- Every column contains only atomic values.
+- All entries in a column are of the same type.
+- Columns have unique names.
+- Rows are uniquely identifiable.
+- There's no meaningful dependence on the order of data.
+- There are no repeating groups.
+
+## Example with Atomicity Violation
+
+The following table violates **1NF** because the `courses` column contains multiple values in a single field (e.g., "Math, Physics"). This breaks the atomicity rule.
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, varchar, text } from "drizzle-orm/pg-core";
+
+    export const students = pgTable("students", {
+      id: integer("id").notNull().primaryKey(),
+      name: varchar("name", { length: 255 }).notNull(),
+      courses: text("courses").notNull(),
+    });
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "students" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"name" varchar(255) NOT NULL,
+    	"courses" text NOT NULL
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +---------------------------------------------+
+    | students                                    |
+    +---------+-----------+-----------------------+
+    | id      | name      | courses               |
+    +---------+-----------+-----------------------+
+    | 1       | Alice     | Math, Physics         |
+    | 2       | Bob       | Literature            |
+    | 3       | Charlie   | Math, Chemistry, Art  |
+    | 4       | Andrew    | Chemistry, Literature |
+    +---------+-----------+-----------------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+To bring the table into **1NF**, we separate `courses` into a standalone table and use a join table (`enrollments`) to represent the many-to-many relationship between `students` and `courses`.
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const students = pgTable("students", {
+      id: integer("id").notNull().primaryKey(),
+      name: varchar("name", { length: 255 }).notNull(),
+    });
+
+    export const courses = pgTable("courses", {
+      id: integer("id").notNull().primaryKey(),
+      name: varchar("name", { length: 255 }).notNull().unique(),
+    });
+
+    export const enrollments = pgTable("enrollments", {
+      studentId: integer("student_id")
+        .notNull()
+        .references(() => students.id, { onDelete: "cascade" }),
+      courseId: integer("course_id")
+        .notNull()
+        .references(() => courses.id, { onDelete: "cascade" }),
+    }, (t) => [
+      primaryKey({ columns: [t.studentId, t.courseId] }),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "courses" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"name" varchar(255) NOT NULL,
+    	CONSTRAINT "courses_name_unique" UNIQUE("name")
+    );
+    --> statement-breakpoint
+    CREATE TABLE "enrollments" (
+    	"student_id" integer NOT NULL,
+    	"course_id" integer NOT NULL,
+    	CONSTRAINT "enrollments_student_id_course_id_pk" PRIMARY KEY("student_id","course_id")
+    );
+    --> statement-breakpoint
+    CREATE TABLE "students" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"name" varchar(255) NOT NULL
+    );
+    --> statement-breakpoint
+    ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_student_id_students_id_fk" FOREIGN KEY ("student_id") REFERENCES "public"."students"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+    ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE cascade ON UPDATE no action;
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+  +---------------------+       +-----------------------+
+  | students            |       | courses               |
+  +---------+-----------+       +---------+-------------+
+  | id      | name      |       | id      | name        |
+  +---------+-----------+       +---------+-------------+
+  | 1       | Alice     |       | 1       | Math        |
+  | 2       | Bob       |       | 2       | Physics     |
+  | 3       | Charlie   |       | 3       | Literature  |
+  | 4       | Andrew    |       | 4       | Chemistry   |
+  +---------+-----------+       | 5       | Art         |
+                                +---------+-------------+
+  
+
+  +-------------------------+
+  | enrollments             |
+  +------------+------------+
+  | student_id | course_id  |
+  +------------+------------+
+  | 1          | 1          |
+  | 1          | 2          |
+  | 2          | 3          |
+  | 3          | 1          |
+  | 3          | 4          |
+  | 3          | 5          |
+  | 4          | 4          |
+  | 4          | 3          |
+  +------------+------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+With this structure:
+- Each course is stored once in the `courses` table.
+- Relationships are clearly defined in the `enrollments` table.
+- All values are atomic, satisfying the **1NF** requirement.
+
+## Example with Repeating Groups Violation
+
+This structure violates **1NF** because it uses repeating groups — multiple columns (`skill1`, `skill2`, `skill3`) to store the same kind of data: skills.
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+
+    export const employees = pgTable("employees", {
+      id: integer("id").notNull().primaryKey(),
+      name: varchar("name", { length: 255 }).notNull(),
+      skill1: varchar("skill1", { length: 255 }),
+      skill2: varchar("skill2", { length: 255 }),
+      skill3: varchar("skill3", { length: 255 })
+    });
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "employees" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"name" varchar(255) NOT NULL,
+    	"skill1" varchar(255),
+    	"skill2" varchar(255),
+    	"skill3" varchar(255)
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+  +---------------------------------------------------------+
+  | employees                                               |
+  +---------+-----------+-----------+-----------+-----------+
+  | id      | name      | skill1    | skill2    | skill3    |
+  +---------+-----------+-----------+-----------+-----------+
+  | 1       | Alice     | SQL       | Python    | NULL      |
+  | 2       | Bob       | Java      | NULL      | NULL      |
+  | 3       | Charlie   | Excel     | HTML      | SQL       |
+  +---------+-----------+-----------+-----------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+We need to eliminate the repeating skill columns and store each skill as a separate record, using a new table to link `employees` to their `skills`.
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const employees = pgTable("employees", {
+      id: integer("id").notNull().primaryKey(),
+      name: varchar("name", { length: 255 }).notNull(),
+    });
+
+    export const skills = pgTable("skills", {
+      id: integer("id").notNull().primaryKey(),
+      name: varchar("name", { length: 255 }).notNull().unique(),
+    });
+
+    export const employeeSkills = pgTable("employee_skills", {
+      employeeId: integer("employee_id")
+        .notNull()
+        .references(() => employees.id, { onDelete: "cascade" }),
+      skillId: integer("skill_id")
+        .notNull()
+        .references(() => skills.id, { onDelete: "cascade" }),
+    }, (table) => [
+      primaryKey({ columns: [table.employeeId, table.skillId] }),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "employee_skills" (
+    	"employee_id" integer NOT NULL,
+    	"skill_id" integer NOT NULL,
+    	CONSTRAINT "employee_skills_employee_id_skill_id_pk" PRIMARY KEY("employee_id","skill_id")
+    );
+    --> statement-breakpoint
+    CREATE TABLE "employees" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"name" varchar(255) NOT NULL
+    );
+    --> statement-breakpoint
+    CREATE TABLE "skills" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"name" varchar(255) NOT NULL,
+    	CONSTRAINT "skills_name_unique" UNIQUE("name")
+    );
+    --> statement-breakpoint
+    ALTER TABLE "employee_skills" ADD CONSTRAINT "employee_skills_employee_id_employees_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."employees"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+    ALTER TABLE "employee_skills" ADD CONSTRAINT "employee_skills_skill_id_skills_id_fk" FOREIGN KEY ("skill_id") REFERENCES "public"."skills"("id") ON DELETE cascade ON UPDATE no action;
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+  +---------------------+             +-----------------+
+  | employees           |             | skills          |
+  +---------+-----------+             +----+------------+
+  | id      | name      |             | id | name       |
+  +---------+-----------+             +----+------------+
+  | 1       | Alice     |             | 1  | SQL        |
+  | 2       | Bob       |             | 2  | Python     |
+  | 3       | Charlie   |             | 3  | Java       |
+  +---------+-----------+             | 4  | Excel      |
+                                      | 5  | Power BI   |
+                                      +----+------------+
+  
+  +-------------------------+
+  | employee_skills         |
+  +-------------+-----------+
+  | employee_id | skill_id  |
+  +-------------+-----------+
+  | 1           | 1         |
+  | 1           | 2         |
+  | 2           | 3         |
+  | 3           | 4         |
+  | 3           | 5         |
+  | 3           | 1         |
+  +-------------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+With this structure:
+- Each skill is stored once in the `skills` table.
+- Relationships between `employees` and `skills` are clearly defined in the `employee_skills` table.
+- Repeating groups are eliminated, and each column represents a single attribute - satisfying the **1NF** requirement.
+
+In practice, most **1NF** rules - like having unique column names, consistent data types, unique rows (via primary keys), and order independence are either enforced automatically by the database system or are built into standard SQL table design. Because of that, we don't show examples of those rules in this guide.
