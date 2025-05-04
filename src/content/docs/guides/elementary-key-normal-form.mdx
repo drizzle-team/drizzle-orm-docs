@@ -1,0 +1,260 @@
+---
+title: Elementary Key Normal Form (EKNF)
+slug: elementary-key-normal-form
+---
+
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+
+Elementary key normal form (EKNF) is a subtle enhancement on Third Normal Form. It aims to eliminate certain types of redundancy and update anomalies that can still exist in **3NF** when a table has multiple overlapping candidate keys. EKNF is stricter than 3NF, but more flexible than BCNF. It is useful in situations where enforcing BCNF would lead to the loss of some original dependencies.
+
+## Key concepts
+
+1. Multiple overlapping candidate keys means that a table has more than one candidate key, and those keys share some of the same attributes.
+2. Elementary attribute is an attribute that is part of a candidate key but not a whole candidate key on its own.
+
+## The EKNF Rule
+
+To achieve EKNF, table should already be in 3NF and must satisfy the following condition:
+
+Every non-trivial functional dependency X → A in the relation satisfies at least one of the following:
+
+- `X` is a candidate key.
+- `A` is an elementary attribute of a candidate key.
+
+## Example
+
+When a table has already been brought to 3NF, the next step is often to normalize it to BCNF to eliminate remaining anomalies.
+However, decomposing to BCNF could discard some original functional dependencies, potentially making it impossible to enforce certain business rules.
+
+For example, we have a table `classroom_assignment` with the following schema:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";   
+
+    export const classroomAssignment = pgTable("classroom_assignment", {
+      professor: varchar("professor", { length: 100 }).notNull(),
+      course: varchar("course", { length: 100 }).notNull(),
+      room: varchar("room", { length: 10 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.professor, t.course] }),
+    ]);
+    ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "classroom_assignment" (
+    	"professor" varchar(100) NOT NULL,
+    	"course" varchar(100) NOT NULL,
+    	"room" varchar(10) NOT NULL,
+    	CONSTRAINT "classroom_assignment_professor_course_pk" PRIMARY KEY("professor","course")
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +----------------------------------------------+
+    | classroom_assignment                         |
+    +--------------+-------------------+-----------+
+    | professor    | course            | room      |
+    +--------------+-------------------+-----------+
+    | Prof. Smith  | Cybersecurity     | Room 101  |
+    | Prof. Smith  | Web Development   | Room 102  |
+    | Prof. Brown  | Database Systems  | Room 103  |
+    | Prof. Brown  | Web Development   | Room 104  |
+    | Prof. Brown  | Cybersecurity     | Room 101  |
+    +--------------+-------------------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+### Business rules
+
+1. Each room is specialized to a particular course.
+2. Professors can teach multiple courses.
+3. A professor can be assigned to multiple rooms for different courses.
+
+### Functional Dependencies
+
+1. `professor, course -> room`. A given professor teaching a given course is assigned to a specific room.
+2. `room -> course`. Each room is dedicated to a single course. So knowing the room alone is enough to know the course
+
+### Candidate keys
+
+The table has two candidate keys: `professor, course` and `professor, room`. Each of these can uniquely determine all attributes in the table. These keys overlap on the `professor` attribute.
+
+### 3NF Analysis
+
+Since every attribute in this table is part of at least one candidate key, there are no non-prime attributes. This means no transitive dependencies exist, so the table is in 3NF.
+
+### BCNF Analysis
+
+The relation is not in BCNF because of this functional dependency:
+
+`room -> course`
+
+The left-hand side (`room`) is not a super key. Both `room` and `course` are prime attributes because they are part of candidate keys. This dependency violates the BCNF rule.
+
+This leads to:
+1. Information duplication.
+2. Update anomalies. For example, suppose someone mistakenly updates one of `Prof. Brown` records to assign a different course to `Room 101`.
+`Prof. Fuller - Operating Systems - Room 101`. Now `Room 101` appears in two rows: one with course `Cybersecurity` (for `Prof. Smith`) and one with `Operating Systems` (for `Prof. Brown`). This contradicts the rule that `Room 101` should have only one course. 
+3. Delete anomalies. If we delete the row `Prof. Smith - Web Development - Room 102`, we lose information that `Room 102` is assigned to `Web Development`. If we later want to assign `Room 102` to another professor, we won't know which course it is dedicated to.
+
+### BCNF Decomposition
+
+We need to split the table to eliminate the problematic dependency. We create two tables:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";   
+
+    export const rooms = pgTable("rooms", {
+      room: varchar("room", { length: 10 }).notNull().primaryKey(),
+      course: varchar("course", { length: 100 }).notNull(),
+    });
+
+    export const professorRooms = pgTable("professor_rooms", {
+      professor: varchar("professor", { length: 100 }).notNull(),
+      room: varchar("room", { length: 10 }).notNull().references(() => rooms.room),
+    }, (t) => [
+      primaryKey({ columns: [t.professor, t.room] })
+    ]);
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+  CREATE TABLE "professor_rooms" (
+  	"professor" varchar(100) NOT NULL,
+  	"room" varchar(10) NOT NULL,
+  	CONSTRAINT "professor_rooms_professor_room_pk" PRIMARY KEY("professor","room")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "rooms" (
+  	"room" varchar(10) PRIMARY KEY NOT NULL,
+  	"course" varchar(100) NOT NULL
+  );
+  --> statement-breakpoint
+  ALTER TABLE "professor_rooms" ADD CONSTRAINT "professor_rooms_room_rooms_room_fk" FOREIGN KEY ("room") REFERENCES "public"."rooms"("room") ON DELETE no action ON UPDATE no action;
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +------------------------------+   +--------------------------+   
+    | rooms                        |   | professor_rooms          |
+    +-----------+------------------+   +--------------+-----------+
+    | room      |  course          |   | professor    | room      |
+    +-----------+------------------+   +--------------+-----------+
+    | Room 101  | Cybersecurity    |   | Prof. Smith  | Room 101  |
+    | Room 102  | Web Development  |   | Prof. Smith  | Room 102  |
+    | Room 103  | Database Systems |   | Prof. Brown  | Room 101  |
+    | Room 104  | Web Development  |   | Prof. Brown  | Room 103  |
+    +-----------+------------------+   | Prof. Brown  | Room 104  |
+                                       +--------------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+We have achieved BCNF by splitting the table into two tables: `rooms` and `professor_rooms`. Now, the tables are both in BCNF. But does this BCNF design preserve our original FDs?
+
+### Dependency Preservation Check
+
+1. `room -> course` is preserved directly in the `rooms` table.
+2. `professor, course -> room`. In the original table, `professor, course` was a candidate key, so it always mapped to a single room and as it was a primary key, it prevents professor teaching the same course twice.
+In the new design, we can still derive that relationship by joining the two tables, but it is not enforced as a single functional dependency in either table. In fact, a professor could be assigned to the same course in two different rooms without any single table catching it.
+In the `professor_rooms` table, the combination `professor, room` is unique, but nothing stops a professor from occupying two different rooms. Meanwhile, the `rooms` table allows the same course in multiple rooms (since its primary key is `room`, not `course`). Together, this means a professor could have two entries in `professor_rooms` (two rooms) that, via the `rooms` table, both correspond to the same course. So, we lost the original functional dependency.
+
+In summary, the fully normalized BCNF design eliminates the room/course redundancy but fails to preserve the `professor, course -> room` dependency, allowing a new kind of inconsistency.
+
+In such situations, we can use EKNF. It allows overlapping candidate keys and preserves all functional dependencies, while still avoiding anomalies, at the cost of not being completely BCNF.
+
+## EKNF Decomposition
+
+The idea is to allow a certain dependency (like `room -> course`) to remain, but control it through constraints and a schema design rather than pure decomposition. In our example, we want to maintain both rules:
+
+1. `room -> course`
+2. `professor, course -> room`
+
+The EKNF design will look like a hybrid of the original and the BCNF approach:
+
+- Keep a relation that is like the original table (to directly enforce `professor, course -> room` via a candidate key).
+- Also include a separate relation for the `room -> course` mapping (to have a single source-of-truth for each room's course).
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { foreignKey, pgTable, primaryKey, unique, varchar } from "drizzle-orm/pg-core";   
+
+    export const rooms = pgTable("rooms", {
+      room: varchar("room", { length: 10 }).notNull().primaryKey(),
+      course: varchar("course", { length: 100 }).notNull(),
+    }, (t) => [
+      unique().on(t.room, t.course), // We need this unique constraint to set composite foreign key in classroom_assignment table
+    ]);
+
+    export const classroomAssignment = pgTable("classroom_assignment", {
+      professor: varchar("professor", { length: 100 }).notNull(),
+      course: varchar("course", { length: 100 }).notNull(),
+      room: varchar("room", { length: 10 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.professor, t.course] }),
+      foreignKey({
+        columns: [t.room, t.course],
+        foreignColumns: [rooms.room, rooms.course],
+
+      }).onDelete('cascade').onUpdate('cascade'),
+    ]);
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+  CREATE TABLE "classroom_assignment" (
+  	"professor" varchar(100) NOT NULL,
+  	"course" varchar(100) NOT NULL,
+  	"room" varchar(10) NOT NULL,
+  	CONSTRAINT "classroom_assignment_professor_course_pk" PRIMARY KEY("professor","course")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "rooms" (
+  	"room" varchar(10) PRIMARY KEY NOT NULL,
+  	"course" varchar(100) NOT NULL,
+  	CONSTRAINT "rooms_room_course_unique" UNIQUE("room","course")
+  );
+  --> statement-breakpoint
+  ALTER TABLE "classroom_assignment" ADD CONSTRAINT "classroom_assignment_room_course_rooms_room_course_fk" FOREIGN KEY ("room","course") REFERENCES "public"."rooms"("room","course") ON DELETE cascade ON UPDATE cascade;
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+  +------------------------------+   
+  | rooms                        |
+  +-----------+------------------+
+  | room      |  course          |
+  +-----------+------------------+
+  | Room 101  | Cybersecurity    |
+  | Room 102  | Web Development  |
+  | Room 103  | Database Systems |
+  | Room 104  | Web Development  |
+  +-----------+------------------+
+
+  +----------------------------------------------+
+  | classroom_assignment                         |
+  +--------------+-------------------+-----------+
+  | professor    | course            | room      |
+  +--------------+-------------------+-----------+
+  | Prof. Smith  | Cybersecurity     | Room 101  |
+  | Prof. Smith  | Web Development   | Room 102  |
+  | Prof. Brown  | Database Systems  | Room 103  |
+  | Prof. Brown  | Web Development   | Room 104  |
+  | Prof. Brown  | Cybersecurity     | Room 101  |
+  +--------------+-------------------+-----------+                              
+  ```
+  </CodeTab>
+</CodeTabs>
+
+Crucially, we add a referential integrity constraint. The pair `room, course` in `classroom_assignment` must match an entry in the `rooms` table. So, this EKNF design preserves both original FDs as enforceable constraints while avoiding anomalies.
+
+It's worth noting that EKNF is not commonly listed in practical normalization steps (BCNF is usually the next step after 3NF). However, this example demonstrates its value for cases where BCNF is not dependency-preserving.
