@@ -6,7 +6,7 @@ slug: elementary-key-normal-form
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 
-Elementary key normal form (EKNF) is a subtle enhancement on Third Normal Form. It aims to eliminate certain types of redundancy and update anomalies that can still exist in **3NF** when a table has multiple overlapping candidate keys. EKNF is stricter than 3NF, but more flexible than BCNF. It is useful in situations where enforcing BCNF would lead to the loss of some original dependencies.
+**Elementary key normal form (EKNF)** is a subtle enhancement on **Third Normal Form**. It aims to eliminate certain types of redundancy and update anomalies that can still exist in **3NF** when a table has multiple overlapping candidate keys. **EKNF** is stricter than **3NF**, but more flexible than **BCNF**. It is useful in situations where enforcing **BCNF** would lead to the loss of some original dependencies.
 
 ## Key concepts
 
@@ -15,7 +15,7 @@ Elementary key normal form (EKNF) is a subtle enhancement on Third Normal Form. 
 
 ## The EKNF Rule
 
-To achieve EKNF, table should already be in 3NF and must satisfy the following condition:
+To achieve **EKNF**, table should already be in **3NF** and must satisfy the following condition:
 
 Every non-trivial functional dependency X → A in the relation satisfies at least one of the following:
 
@@ -24,8 +24,8 @@ Every non-trivial functional dependency X → A in the relation satisfies at lea
 
 ## Example
 
-When a table has already been brought to 3NF, the next step is often to normalize it to BCNF to eliminate remaining anomalies.
-However, decomposing to BCNF could discard some original functional dependencies, potentially making it impossible to enforce certain business rules.
+When a table has already achieved **3NF**, the next step is often to normalize it to **BCNF** to eliminate remaining anomalies.
+However, decomposing to **BCNF** could discard some original functional dependencies, potentially making it impossible to enforce certain business rules.
 
 For example, we have a table `classroom_assignment` with the following schema:
 
@@ -79,7 +79,7 @@ For example, we have a table `classroom_assignment` with the following schema:
 ### Functional Dependencies
 
 1. `professor, course -> room`. A given professor teaching a given course is assigned to a specific room.
-2. `room -> course`. Each room is dedicated to a single course. So knowing the room alone is enough to know the course
+2. `room -> course`. Each room is dedicated to a single course. So knowing the room alone is enough to know the course.
 
 ### Candidate keys
 
@@ -87,20 +87,19 @@ The table has two candidate keys: `professor, course` and `professor, room`. Eac
 
 ### 3NF Analysis
 
-Since every attribute in this table is part of at least one candidate key, there are no non-prime attributes. This means no transitive dependencies exist, so the table is in 3NF.
+Since every attribute in this table is part of at least one candidate key, there are no non-prime attributes. This means no transitive dependencies exist, so the table is in **3NF**.
 
 ### BCNF Analysis
 
-The relation is not in BCNF because of this functional dependency:
+The relation is not in **BCNF** because of this functional dependency:
 
 `room -> course`
 
-The left-hand side (`room`) is not a super key. Both `room` and `course` are prime attributes because they are part of candidate keys. This dependency violates the BCNF rule.
+The left-hand side (`room`) is not a super key. Both `room` and `course` are prime attributes because they are part of candidate keys. This dependency violates the **BCNF** rule.
 
 This leads to:
 1. Information duplication.
-2. Update anomalies. For example, suppose someone mistakenly updates one of `Prof. Brown` records to assign a different course to `Room 101`.
-`Prof. Fuller - Operating Systems - Room 101`. Now `Room 101` appears in two rows: one with course `Cybersecurity` (for `Prof. Smith`) and one with `Operating Systems` (for `Prof. Brown`). This contradicts the rule that `Room 101` should have only one course. 
+2. Update anomalies. For example, suppose someone mistakenly updates one of `Prof. Brown` records to assign a different course to `Room 101` (`Prof. Brown - Operating Systems - Room 101`). Now `Room 101` appears in two rows: one with course `Cybersecurity` (for `Prof. Smith`) and one with `Operating Systems` (for `Prof. Brown`). This contradicts the rule that `Room 101` should have only one course. 
 3. Delete anomalies. If we delete the row `Prof. Smith - Web Development - Room 102`, we lose information that `Room 102` is assigned to `Web Development`. If we later want to assign `Room 102` to another professor, we won't know which course it is dedicated to.
 
 ### BCNF Decomposition
@@ -115,11 +114,11 @@ We need to split the table to eliminate the problematic dependency. We create tw
     export const rooms = pgTable("rooms", {
       room: varchar("room", { length: 10 }).notNull().primaryKey(),
       course: varchar("course", { length: 100 }).notNull(),
-    });
+});
 
     export const professorRooms = pgTable("professor_rooms", {
       professor: varchar("professor", { length: 100 }).notNull(),
-      room: varchar("room", { length: 10 }).notNull().references(() => rooms.room),
+      room: varchar("room", { length: 10 }).notNull().references(() => rooms.room, { onDelete: 'cascade', onUpdate: 'cascade' }),
     }, (t) => [
       primaryKey({ columns: [t.professor, t.room] })
     ]);
@@ -138,7 +137,7 @@ We need to split the table to eliminate the problematic dependency. We create tw
   	"course" varchar(100) NOT NULL
   );
   --> statement-breakpoint
-  ALTER TABLE "professor_rooms" ADD CONSTRAINT "professor_rooms_room_rooms_room_fk" FOREIGN KEY ("room") REFERENCES "public"."rooms"("room") ON DELETE no action ON UPDATE no action;
+  ALTER TABLE "professor_rooms" ADD CONSTRAINT "professor_rooms_room_rooms_room_fk" FOREIGN KEY ("room") REFERENCES "public"."rooms"("room") ON DELETE cascade ON UPDATE cascade;
   ```
   </CodeTab>
   <CodeTab>
@@ -158,18 +157,20 @@ We need to split the table to eliminate the problematic dependency. We create tw
   </CodeTab>
 </CodeTabs>
 
-We have achieved BCNF by splitting the table into two tables: `rooms` and `professor_rooms`. Now, the tables are both in BCNF. But does this BCNF design preserve our original FDs?
+We have achieved **BCNF** by splitting the table into two tables: `rooms` and `professor_rooms`. Now, the tables are both in **BCNF**. But does this **BCNF** design preserve our original FDs?
 
 ### Dependency Preservation Check
 
 1. `room -> course` is preserved directly in the `rooms` table.
 2. `professor, course -> room`. In the original table, `professor, course` was a candidate key, so it always mapped to a single room and as it was a primary key, it prevents professor teaching the same course twice.
+
 In the new design, we can still derive that relationship by joining the two tables, but it is not enforced as a single functional dependency in either table. In fact, a professor could be assigned to the same course in two different rooms without any single table catching it.
+
 In the `professor_rooms` table, the combination `professor, room` is unique, but nothing stops a professor from occupying two different rooms. Meanwhile, the `rooms` table allows the same course in multiple rooms (since its primary key is `room`, not `course`). Together, this means a professor could have two entries in `professor_rooms` (two rooms) that, via the `rooms` table, both correspond to the same course. So, we lost the original functional dependency.
 
-In summary, the fully normalized BCNF design eliminates the room/course redundancy but fails to preserve the `professor, course -> room` dependency, allowing a new kind of inconsistency.
+In summary, the fully normalized **BCNF** design eliminates the room/course redundancy but fails to preserve the `professor, course -> room` dependency, allowing a new kind of inconsistency.
 
-In such situations, we can use EKNF. It allows overlapping candidate keys and preserves all functional dependencies, while still avoiding anomalies, at the cost of not being completely BCNF.
+In such situations, we can use **EKNF**. It allows overlapping candidate keys and preserves all functional dependencies, while still avoiding anomalies, at the cost of not being completely **BCNF**.
 
 ## EKNF Decomposition
 
@@ -178,7 +179,7 @@ The idea is to allow a certain dependency (like `room -> course`) to remain, but
 1. `room -> course`
 2. `professor, course -> room`
 
-The EKNF design will look like a hybrid of the original and the BCNF approach:
+The **EKNF** design will look like a hybrid of the original and the **BCNF** approach:
 
 - Keep a relation that is like the original table (to directly enforce `professor, course -> room` via a candidate key).
 - Also include a separate relation for the `room -> course` mapping (to have a single source-of-truth for each room's course).
@@ -255,6 +256,6 @@ The EKNF design will look like a hybrid of the original and the BCNF approach:
   </CodeTab>
 </CodeTabs>
 
-Crucially, we add a referential integrity constraint. The pair `room, course` in `classroom_assignment` must match an entry in the `rooms` table. So, this EKNF design preserves both original FDs as enforceable constraints while avoiding anomalies.
+Crucially, we add a referential integrity constraint. The pair `room, course` in `classroom_assignment` must match an entry in the `rooms` table. So, this **EKNF** design preserves both original FDs as enforceable constraints while avoiding anomalies.
 
-It's worth noting that EKNF is not commonly listed in practical normalization steps (BCNF is usually the next step after 3NF). However, this example demonstrates its value for cases where BCNF is not dependency-preserving.
+It's worth noting that **EKNF** is not commonly listed in practical normalization steps (**BCNF** is usually the next step after **3NF**). However, this example demonstrates its value for cases where **BCNF** is not dependency-preserving.
