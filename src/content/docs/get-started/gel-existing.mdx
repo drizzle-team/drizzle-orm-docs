@@ -25,7 +25,6 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 <Prerequisites>
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
   - **gel-js** - package for querying your Gel database - [read here](https://github.com/geldata/gel-js)
-  - **gel** - cli tool to manage your Gel database - [read here](https://docs.geldata.com/reference/cli)
 </Prerequisites>
 
 Drizzle has native support for Gel connections with the `gel` client.
@@ -47,13 +46,13 @@ This is the basic file structure of the project. In the `src` directory, we have
  └ 📜 tsconfig.json
 ```
 
-#### Step 4 - Install **gel** package
+#### Step 1 - Install required packages
 <Npm>
   drizzle-orm gel
   -D drizzle-kit tsx
 </Npm>
 
-#### Step 5 - Setup Drizzle config file
+#### Step 2 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -67,7 +66,7 @@ export default defineConfig({
 });
 ```
 
-#### Step 6 - Pull Gel types to Drizzle schema
+#### Step 3 - Pull Gel types to Drizzle schema
 
 Pull your database schema:
 <Npx>
@@ -76,8 +75,7 @@ drizzle-kit pull
 
 Here is an example of the generated schema.ts file:
 
-```ts
-// drizzle/schema.ts
+```typescript filename="drizzle/schema.ts"
 import { gelTable, uniqueIndex, uuid, smallint, text } from "drizzle-orm/gel-core"
 import { sql } from "drizzle-orm"
 
@@ -91,11 +89,11 @@ export const users = gelTable("users", {
 ]);
 ```
 
-#### Step 6 - Connect Drizzle ORM to the database
+#### Step 4 - Connect Drizzle ORM to the database
 
 Create a `index.ts` file in the `src` directory and initialize the connection:
 
-```typescript copy
+```typescript copy filename="src/index.ts"
 import { drizzle } from "drizzle-orm/gel";
 import { createClient } from "gel";
 
@@ -103,7 +101,7 @@ const gelClient = createClient();
 const db = drizzle({ client: gelClient });
 ```
 
-#### Step 7 - Query the database
+#### Step 5 - Query the database
 
 ```typescript copy filename="src/index.ts"
 import { eq } from "drizzle-orm";
@@ -150,6 +148,6 @@ async function main() {
 main();
 ```
 
-#### Step 8 - Run index.ts file
+#### Step 6 - Run index.ts file
 
 <RunFile/>
