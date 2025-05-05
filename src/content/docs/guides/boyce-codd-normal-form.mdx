@@ -6,155 +6,201 @@ slug: boyce-codd-normal-form
 import Section from "@mdx/Section.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
-import Callout from '@mdx/Callout.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
 
-Boyce-Codd Normal Form (BCNF) is a stricter form of normalization than Third Normal Form (3NF). While 3NF focuses on the relationship between non-prime attributes and candidate keys, BCNF goes a step further by addressing potential redundancies even when 3NF is achieved. The goal is to eliminate all redundancy that can be detected through functional dependencies.
+<Prerequisites>
+- You should be familiar with [3NF](/docs/guides/third-normal-form)
+- You should be familiar with [EKNF](/docs/guides/elementary-key-normal-form)
+</Prerequisites>
 
-In practice, you barely see tables in 3NF that violate BCNF. However, it's important to understand the concept of BCNF.
+**Boyce-Codd Normal Form (BCNF)** is a stricter form of normalization than **Third Normal Form**. While **3NF** focuses on the relationship between non-prime attributes and candidate keys, **BCNF** goes a step further by addressing potential redundancies even when **3NF** is achieved. The goal is to eliminate all redundancy that can be detected through functional dependencies.
+
+In practice, you barely see tables in **3NF** that violate **BCNF**. However, it's important to understand the concept of **BCNF**.
 
 ## Key concepts
 
-1. A `Candidate key` is a minimal set of attributes that can uniquely identify each row in a table. There can be multiple candidate keys in a table.
-2. A `Non-prime` attribute is a column that isn't part of any candidate key.
-3. A `Super key` is a candidate key or a superset of a candidate key.
-4. A `Functional dependency` is a relationship between two sets of attributes in a table, where the value of one set uniquely determines the value of another.
-5. A functional dependency `X -> Y` in a relation `R` is considered trivial if the set of attributes `Y` is a subset of (or equal to) the set of attributes `X`.
+1. A `Super key` is a candidate key or a superset of a candidate key.
+2. A functional dependency `X -> Y` in a relation `R` is considered trivial if the set of attributes `Y` is a subset of (or equal to) the set of attributes `X`.
 
 ## The BCNF Rule
 
-To achieve BCNF, table should already be in 3NF and must satisfy the following condition:
+To achieve **BCNF**, table should already be in **3NF** and must satisfy the following condition:
 
 For every non-trivial functional dependency X -> Y, the determinant (X) must be a super key. In simpler terms, the left-hand side of any functional dependency must uniquely determine the entire row in the table.
 
 ## Example
 
-We have a table `classroom_assignment` with the following schema:
+We have a table `room_reservations` with the following schema:
 
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";   
+    import { integer, pgTable, primaryKey, unique, varchar } from "drizzle-orm/pg-core";
 
-    export const classroomAssignment = pgTable("classroom_assignment", {
-      roomNumber: varchar("room_number", { length: 10 }).notNull(),
-      professor: varchar("professor", { length: 100 }).notNull(),
-      course: varchar("course", { length: 100 }).notNull(),
+    export const roomReservations = pgTable("room_reservations", {
+      room: integer("room").notNull(),
+      startTime: varchar("start_time", { length: 5 }).notNull(),
+      endTime: varchar("end_time", { length: 5 }).notNull(),
+      rateType: varchar("rate_type", { length: 20 }).notNull(),
     }, (t) => [
-      primaryKey({ columns: [t.roomNumber, t.course] }),
+      primaryKey({ columns: [t.room, t.startTime] }),
+      unique().on(t.room, t.endTime),
+      unique().on(t.rateType, t.startTime),
+      unique().on(t.rateType, t.endTime),
     ]);
    ```
   </CodeTab>
   <CodeTab>
     ```sql
-    CREATE TABLE "classroom_assignment" (
-    	"room_number" varchar(10) NOT NULL,
-    	"professor" varchar(100) NOT NULL,
-    	"course" varchar(100) NOT NULL,
-    	CONSTRAINT "classroom_assignment_room_number_course_pk" PRIMARY KEY("room_number","course")
+    CREATE TABLE "room_reservations" (
+    	"room" integer NOT NULL,
+    	"start_time" varchar(5) NOT NULL,
+    	"end_time" varchar(5) NOT NULL,
+    	"rate_type" varchar(20) NOT NULL,
+    	CONSTRAINT "room_reservations_room_start_time_pk" PRIMARY KEY("room","start_time"),
+    	CONSTRAINT "room_reservations_room_end_time_unique" UNIQUE("room","end_time"),
+    	CONSTRAINT "room_reservations_rate_type_start_time_unique" UNIQUE("rate_type","start_time"),
+    	CONSTRAINT "room_reservations_rate_type_end_time_unique" UNIQUE("rate_type","end_time")
     );
     ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +--------------+----------------+-----------+
-    | classroom_assignment                      |
-    +--------------+----------------+-----------+
-    | room_number  | professor      | course    |
-    +--------------+----------------+-----------+
-    | A101         | Dr. Smith      | CS101     |
-    | B202         | Dr. Jones      | CS101     |
-    | A101         | Dr. Smith      | CS102     |
-    | C303         | Dr. Brown      | CS103     |
-    +--------------+----------------+-----------+
+  +------------------------------------------------+
+  | room_reservations                              |
+  +------------+------------+----------+-----------+
+  | room_number| start_time | end_time | rate_type |
+  +------------+------------+----------+-----------+
+  | 101        | 08:00      | 09:00    | SAVER     |
+  | 101        | 09:30      | 10:30    | SAVER     |
+  | 101        | 12:00      | 13:30    | STANDARD  |
+  | 101        | 14:00      | 15:30    | STANDARD  |
+  | 201        | 10:00      | 11:30    | DELUXE-B  |
+  | 201        | 11:30      | 13:30    | DELUXE-B  |
+  | 201        | 15:00      | 16:30    | DELUXE-A  |
+  +------------+------------+----------+-----------+
   ```
   </CodeTab>
 </CodeTabs>
 
-1. Each professor is assigned exactly one room and teaches all their assigned courses from that specific room.
-2. A professor may teach multiple courses, and a course may be taught by multiple professors.
-3. A specific course offering in a particular room is taught by exactly one professor.
+### Business rules
+
+1. Each row in this table represents a hotel room reservation. For simplicity, assume the hotel has two rooms: `Room 101` (a standard room) and `Room 201` (a deluxe suite).
+2. A booking is defined by the `room` and the time period (`start_time` to `end_time`) for which that room is reserved. No room can have overlapping bookings (only one reservation per room at a given time).
+3. Additionally, each booking has a `rate_type`. There are four distinct rate types in this example, each implying a specific guest status (membership level):
+- `SAVER` - for `Room 101` bookings made by loyalty members (member discount rate)
+- `STANDARD` - for `Room 101` bookings made by non-members (regular rate)
+- `DELUXE-A` - for `Room 201` bookings made by members (premium room, member rate)
+- `DELUXE-B` - for `Room 201` bookings made by non-members (premium room, standard/non-member rate)
 
 ### Functional Dependencies
 
-1. `room_number, course -> professor`
-2. `professor, course -> room_number`
-3. `professor -> room_number`
+1. `room, start_time -> end_time, rate_type`
+2. `room, end_time -> start_time, rate_type`
+3. `rate_type, start_time -> room, end_time`
+4. `rate_type, end_time -> room, start_time`
+5. `rate_type -> room`. Each rate type is associated with exactly one room. From the business rules, we see that a given rate code implies a specific room (e.g. any `SAVER` rate booking is always for `Room 101`, and any `DELUXE-B` booking is always for `Room 201`). Formally, this means rate type functionally determines room.
 
 ### Candidate keys
 
-The table has two candidate keys: `room_number, course` and `professor, course`. Each of these can uniquely determine all attributes in the table.
+The candidate keys for this table are:
+1. `room, start_time`
+2. `room, end_time`
+3. `rate_type, start_time`
+4. `rate_type, end_time`
+
+Even though in the sample data each `start_time` and `end_time` happens to be unique across all bookings, we cannot treat `start_time` or `end_time` alone as a key because on another day two different rooms could have bookings that begin or end at the same time. That is why a combination of attributes is needed to uniquely identify a booking.
 
 ### 3NF Analysis
 
-Since every attribute in this table is part of at least one candidate key, there are no non-prime attributes. This means no transitive dependencies exist, so the table is in 3NF.
+Since every attribute in this table is part of at least one candidate key, there are no non-prime attributes. This means no transitive dependencies exist, so the table is in **3NF**.
 
 ### BCNF Analysis
 
-The relation is not in BCNF because of this functional dependency:
+The relation is not in **BCNF** because of this functional dependency:
 
-`professor -> room_number`
+`rate_type -> room`
 
-The left-hand side (`professor`) is not a super key. Both `room_number` and `professor` are prime attributes because they are part of candidate keys. This dependency violates the BCNF rule.
+The left-hand side (`rate_type`) is not a super key. Both `rate_type` and `room` are prime attributes because they are part of candidate keys. This dependency violates the **BCNF** rule.
 
 This leads to:
 1. Information duplication.
-2. Update anomalies. If a professor's assigned room changes, we must update multiple rows to reflect the change.
-3. Deletion anomalies. If all courses taught by a professor are removed, we lose information about the professor's room assignment.
+2. Update anomalies. If the hotel changes which room a given rate code applies to, multiple rows would need updating.
+3. Deletion anomalies. If a `DELUXE-A` booking is deleted, the information about which room that rate code applies to would be lost.
 
-### Solution
+### BCNF Decomposition
 
 We need to split the table to eliminate the problematic dependency. We create two tables:
 
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { boolean, foreignKey, integer, pgTable, primaryKey, unique, varchar } from "drizzle-orm/pg-core";
 
-    export const professorRoom = pgTable("professor_room", {
-      professor: varchar("professor", { length: 100 }).notNull().primaryKey(),
-      roomNumber: varchar("room_number", { length: 10 }).notNull(),
-    });
-
-    export const courseProfessor = pgTable("course_professor", {
-      course: varchar("course", { length: 100 }).notNull(),
-      professor: varchar("professor", { length: 100 }).notNull(),
+    export const rateTypes = pgTable("rate_types", {
+      rateType: varchar("rate_type", { length: 20 }).notNull().primaryKey(),
+      room: integer("room").notNull(),
+      memberFlag: boolean("member_flag").notNull(),
     }, (t) => [
-      primaryKey({ columns: [t.course, t.professor] }),
+      unique().on(t.room, t.memberFlag),
+    ]);
+
+    export const reservations = pgTable("reservations", {
+      room: integer("room").notNull(),
+      startTime: varchar("start_time", { length: 5 }).notNull(),
+      endTime: varchar("end_time", { length: 5 }).notNull(),
+      memberFlag: boolean("member_flag").notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.room, t.startTime] }),
+      foreignKey({
+        columns: [t.room, t.memberFlag],
+        foreignColumns: [rateTypes.room, rateTypes.memberFlag],
+      }).onDelete("cascade").onUpdate("cascade"),
+      unique().on(t.room, t.endTime),
     ]);
     ```
   </CodeTab>
   <CodeTab>
   ```sql
-    CREATE TABLE "course_professor" (
-    	"course" varchar(100) NOT NULL,
-    	"professor" varchar(100) NOT NULL,
-    	CONSTRAINT "course_professor_course_professor_pk" PRIMARY KEY("course","professor")
-    );
-
-    CREATE TABLE "professor_room" (
-    	"professor" varchar(100) PRIMARY KEY NOT NULL,
-    	"room_number" varchar(10) NOT NULL
-    );
+  CREATE TABLE "rate_types" (
+  	"rate_type" varchar(20) PRIMARY KEY NOT NULL,
+  	"room" integer NOT NULL,
+  	"member_flag" boolean NOT NULL,
+  	CONSTRAINT "rate_types_room_member_flag_unique" UNIQUE("room","member_flag")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "reservations" (
+  	"room" integer NOT NULL,
+  	"start_time" varchar(5) NOT NULL,
+  	"end_time" varchar(5) NOT NULL,
+  	"member_flag" boolean NOT NULL,
+  	CONSTRAINT "reservations_room_start_time_pk" PRIMARY KEY("room","start_time"),
+  	CONSTRAINT "reservations_room_end_time_unique" UNIQUE("room","end_time")
+  );
+  --> statement-breakpoint
+  ALTER TABLE "reservations" ADD CONSTRAINT "reservations_room_member_flag_rate_types_room_member_flag_fk" FOREIGN KEY ("room","member_flag") REFERENCES "public"."rate_types"("room","member_flag") ON DELETE cascade ON UPDATE cascade;
   ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +--------------+---------------+   +--------------+---------------+   
-    | professor_room               |   | course_professor             |
-    +--------------+---------------+   +--------------+---------------+
-    | professor    |  room_number  |   | course       | professor     |
-    +--------------+---------------+   +--------------+---------------+
-    | Dr. Smith    | A101          |   | CS101        | Dr. Smith     |
-    | Dr. Jones    | B202          |   | CS101        | Dr. Jones     |
-    | Dr. Brown    | C303          |   | CS102        | Dr. Smith     |
-    +--------------+---------------+   | CS103        | Dr. Brown     |
-                                       +--------------+---------------+
+  +-----------------------------------+       +---------------------------------------------+
+  | rate_types                        |       | reservations                                |
+  +-------------+------+--------------+       +------+------------+----------+--------------+
+  | rate_type   | room | member_flag  |       | room | start_time | end_time | member_flag  |
+  +-------------+------+--------------+       +------+------------+----------+--------------+
+  | SAVER       | 101  | true         |       | 101  | 08:00      | 09:00    | true         |
+  | STANDARD    | 101  | false        |       | 101  | 09:30      | 10:30    | true         |
+  | DELUXE-A    | 201  | true         |       | 101  | 12:00      | 13:30    | false        |
+  | DELUXE-B    | 201  | false        |       | 101  | 14:00      | 15:30    | false        |
+  +-------------+------+--------------+       | 201  | 10:00      | 11:30    | false        |
+                                              | 201  | 11:30      | 13:30    | false        |
+                                              | 201  | 15:00      | 16:30    | true         |
+                                              +------+------------+----------+--------------+
   ```
   </CodeTab>
 </CodeTabs>
 
-<Callout type="warning">
-You should also add a foreign key constraint to the `course_professor` table to reference the `professor` in the `professor_room` table.
-</Callout>
+The dependency `rate_type -> room` is fully enforced in this table (and is no longer a problem, because `rate_type` is a candidate key here). The table also has another candidate key `room, member_flag`, since each combination of room and membership status determines a unique rate type.
+`rate_type` is no longer stored in `reservations` table, so the redundancy is gone. Instead, the combination of `room` and `member_flag` for a reservation can be used to lookup the `rate_type` from the `rate_types` table when needed.
 
-We have achieved BCNF by splitting the table into two tables: `professor_room` and `course_professor`. Now, the tables are free from functional dependencies that violate BCNF.
+Both tables are now in **BCNF**. For every functional dependency in each table, the left-hand side is a super key.
