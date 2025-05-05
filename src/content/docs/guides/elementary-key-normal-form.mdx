@@ -5,8 +5,14 @@ slug: elementary-key-normal-form
 
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
 
-**Elementary key normal form (EKNF)** is a subtle enhancement on **Third Normal Form**. It aims to eliminate certain types of redundancy and update anomalies that can still exist in **3NF** when a table has multiple overlapping candidate keys. **EKNF** is stricter than **3NF**, but more flexible than **BCNF**. It is useful in situations where enforcing **BCNF** would lead to the loss of some original dependencies.
+<Prerequisites>
+- You should be familiar with [3NF](/docs/guides/third-normal-form)
+- You should be familiar with [BCNF](/docs/guides/boyce-codd-normal-form)
+</Prerequisites>
+
+**Elementary key normal form (EKNF)** is a subtle enhancement on **Third Normal Form**. It aims to eliminate certain types of redundancy and update anomalies that can still exist in **3NF** when a table has multiple overlapping candidate keys. **EKNF** is stricter than **3NF**, but more flexible than **BCNF**. It is useful in situations where enforcing **BCNF** would lead to the loss of some original dependencies that are important for the business logic of the application.
 
 ## Key concepts
 
@@ -258,4 +264,4 @@ The **EKNF** design will look like a hybrid of the original and the **BCNF** app
 
 Crucially, we add a referential integrity constraint. The pair `room, course` in `classroom_assignment` must match an entry in the `rooms` table. So, this **EKNF** design preserves both original FDs as enforceable constraints while avoiding anomalies.
 
-It's worth noting that **EKNF** is not commonly listed in practical normalization steps (**BCNF** is usually the next step after **3NF**). However, this example demonstrates its value for cases where **BCNF** is not dependency-preserving.
+It's worth noting that **EKNF** is not commonly listed in practical normalization steps (**BCNF** is usually the next step after **3NF**). However, this example demonstrates its value for cases where **BCNF** is not dependency-preserving, but we need to maintain certain dependencies for business logic.

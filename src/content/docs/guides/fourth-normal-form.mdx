@@ -13,7 +13,7 @@ import Callout from '@mdx/Callout.astro';
 - You should be familiar with [BCNF](/docs/guides/boyce-codd-normal-form)
 </Prerequisites>
 
-The Fourth Normal Form (4NF) is a level of database normalization where a table is already in BCNF, and for every non-trivial multivalued dependency, the determinant must be a super key. The goal is to eliminate redundant data and maintain data consistency.
+**The Fourth Normal Form (4NF)** is a level of database normalization where a table is already in **BCNF**, and for every non-trivial multivalued dependency, the determinant must be a super key. The goal is to eliminate redundant data and maintain data consistency.
 
 ## Key concepts
 
@@ -31,40 +31,42 @@ We have a table `courses_instructors_textbooks` with the following schema:
     import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
     export const coursesInstructorsTextbooks = pgTable("courses_instructors_textbooks", {
-      courseName: varchar("course_name"),
-      instructor: varchar("instructor"),
-      textbook: varchar("textbook"),
+      courseName: varchar("course_name", { length: 255 }).notNull(),
+      instructor: varchar("instructor", { length: 255 }).notNull(),
+      textbook: varchar("textbook", { length: 255 }).notNull(),
     }, (t) => [
-      primaryKey({ columns: [t.courseName, t.instructor, t.textbook] }),
+      primaryKey({ columns: [t.courseName, t.instructor, t.textbook],
+        name: "pk_courses_instructors_textbooks",
+       }),
     ]);
    ```
   </CodeTab>
   <CodeTab>
     ```sql
     CREATE TABLE "courses_instructors_textbooks" (
-    	"course_name" varchar,
-    	"instructor" varchar,
-    	"textbook" varchar,
-    	CONSTRAINT "courses_instructors_textbooks_course_name_instructor_textbook_pk" PRIMARY KEY("course_name","instructor","textbook")
+    	"course_name" varchar(255) NOT NULL,
+    	"instructor" varchar(255) NOT NULL,
+    	"textbook" varchar(255) NOT NULL,
+    	CONSTRAINT "pk_courses_instructors_textbooks" PRIMARY KEY("course_name","instructor","textbook")
     );
     ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +-----------+----------------+--------------------+
-    | courses_instructors_textbooks                   |
-    +-------------+----------------+------------------+
-    | course_name | instructor     | textbook         |
-    +-------------+----------------+------------------+
-    | CS101       | Dr. Smith      | Database Design  |
-    | CS101       | Dr. Smith      | Algorithms       |
-    | CS101       | Dr. Smith      | Data Structures  |
-    | CS101       | Dr. Johnson    | Database Design  |
-    | CS101       | Dr. Johnson    | Algorithms       |
-    | CS101       | Dr. Johnson    | Data Structures  |
-    | CS102       | Dr. Williams   | Machine Learning |
-    | CS102       | Dr. Williams   | AI Concepts      |
-    +-----------+----------------+--------------------+
+  +-------------------------------------------------+
+  | courses_instructors_textbooks                   |
+  +-------------+----------------+------------------+
+  | course_name | instructor     | textbook         |
+  +-------------+----------------+------------------+
+  | CS101       | Dr. Smith      | Database Design  |
+  | CS101       | Dr. Smith      | Algorithms       |
+  | CS101       | Dr. Smith      | Data Structures  |
+  | CS101       | Dr. Johnson    | Database Design  |
+  | CS101       | Dr. Johnson    | Algorithms       |
+  | CS101       | Dr. Johnson    | Data Structures  |
+  | CS102       | Dr. Williams   | Machine Learning |
+  | CS102       | Dr. Williams   | AI Concepts      |
+  +-----------+------------------+------------------+
   ```
   </CodeTab>
 </CodeTabs>
@@ -84,18 +86,18 @@ We have a table `courses_instructors_textbooks` with the following schema:
 
 ### BCNF Analysis
 
-The table is in BCNF because there are no non-trivial FDs where the determinant is not a superkey.
+The table is in **BCNF** because there are no non-trivial FDs where the determinant is not a superkey.
 
 ### 4NF Analysis
 
-Table is not in 4NF because the multi-valued dependencies are not trivial. The determinant `course_name` is not a super key.
+Table is not in **4NF** because the multi-valued dependencies are not trivial. The determinant `course_name` is not a super key.
 
 This leads to:
 1. Information duplication.
 2. Insertion anomalies. If a new instructor or textbook needs to be added for a course, we would need to insert multiple rows to account for all the combinations of instructors and textbooks for that course.
 3. Deletion anomalies. If an instructor stops teaching a course, multiple rows (one for each textbook associated with the course) must be deleted.
 
-### Solution
+### 4NF Decomposition
 
 We need to split the table into two tables: `courses_instructors` and `courses_textbooks`:
 
@@ -105,48 +107,48 @@ We need to split the table into two tables: `courses_instructors` and `courses_t
     import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
     export const coursesInstructors = pgTable("courses_instructors", {
-      courseName: varchar("course_name"),
-      instructor: varchar("instructor"),
+      courseName: varchar("course_name", { length: 255 }).notNull(),
+      instructor: varchar("instructor", { length: 255 }).notNull(),
     }, (t) => [
-      primaryKey({columns: [t.courseName, t.instructor]}),
+      primaryKey({ columns: [t.courseName, t.instructor] }),
     ]);
 
     export const coursesTextbooks = pgTable("courses_textbooks", {
-      courseName: varchar("course_name"),
-      textbook: varchar("textbook"),
+      courseName: varchar("course_name", { length: 255 }).notNull(),
+      textbook: varchar("textbook", { length: 255 }).notNull(),
     }, (t) => [
-      primaryKey({columns: [t.courseName, t.textbook]}),
+      primaryKey({ columns: [t.courseName, t.textbook] }),
     ]);
     ```
   </CodeTab>
   <CodeTab>
   ```sql
-    CREATE TABLE "courses_instructors" (
-    	"course_name" varchar,
-    	"instructor" varchar,
-    	CONSTRAINT "courses_instructors_course_name_instructor_pk" PRIMARY KEY("course_name","instructor")
-    );
-
-    CREATE TABLE "courses_textbooks" (
-    	"course_name" varchar,
-    	"textbook" varchar,
-    	CONSTRAINT "courses_textbooks_course_name_textbook_pk" PRIMARY KEY("course_name","textbook")
-    );
+  CREATE TABLE "courses_instructors" (
+  	"course_name" varchar(255) NOT NULL,
+  	"instructor" varchar(255) NOT NULL,
+  	CONSTRAINT "courses_instructors_course_name_instructor_pk" PRIMARY KEY("course_name","instructor")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "courses_textbooks" (
+  	"course_name" varchar(255) NOT NULL,
+  	"textbook" varchar(255) NOT NULL,
+  	CONSTRAINT "courses_textbooks_course_name_textbook_pk" PRIMARY KEY("course_name","textbook")
+  );
   ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +--------------+-------------------------+   +--------------+-------------------+
-    | courses_instructors                    |   | courses_textbooks                |
-    +--------------+-------------------------+   +--------------+-------------------+
-    | course_name  | instructor              |   | course_name  | textbook          |
-    +--------------+-------------------------+   +--------------+-------------------+
-    | CS101        | Dr. Smith               |   | CS101        | Database Design   |
-    | CS101        | Dr. Johnson             |   | CS101        | Algorithms        |
-    | CS102        | Dr. Williams            |   | CS101        | Data Structures   |
-    +--------------+-------------------------+   | CS102        | Machine Learning  |
-                                                 | CS102        | AI Concepts       |
-                                                 +--------------+-------------------+
+  +----------------------------------------+   +----------------------------------+
+  | courses_instructors                    |   | courses_textbooks                |
+  +--------------+-------------------------+   +--------------+-------------------+
+  | course_name  | instructor              |   | course_name  | textbook          |
+  +--------------+-------------------------+   +--------------+-------------------+
+  | CS101        | Dr. Smith               |   | CS101        | Database Design   |
+  | CS101        | Dr. Johnson             |   | CS101        | Algorithms        |
+  | CS102        | Dr. Williams            |   | CS101        | Data Structures   |
+  +--------------+-------------------------+   | CS102        | Machine Learning  |
+                                               | CS102        | AI Concepts       |
+                                               +--------------+-------------------+
   ```
   </CodeTab>
 </CodeTabs>
@@ -155,4 +157,4 @@ We need to split the table into two tables: `courses_instructors` and `courses_t
 You should also add foreign key constraints on the `course_name` column in both the `courses_instructors` and `courses_textbooks` tables. These constraints should reference the `course_name` primary key column in a `courses` table (or equivalent table defining courses).
 </Callout>
 
-Now, the tables are free from the non-trivial multi-valued dependencies that violated 4NF in the original table. We have achieved 4NF by storing each independent relationship separately.
+Now, the tables are free from the non-trivial multi-valued dependencies that violated **4NF** in the original table. We have achieved **4NF** by storing each independent relationship separately.

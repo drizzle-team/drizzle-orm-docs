@@ -13,9 +13,9 @@ import Callout from '@mdx/Callout.astro';
 - You should be familiar with [4NF](/docs/guides/fourth-normal-form)
 </Prerequisites>
 
-The Fifth Normal Form (5NF), also known as `Project-Join Normal Form` (PJ/NF) is a level of database normalization where a table is already in 4NF, and every non-trivial join dependency in that table is implied by the candidate keys. The goal is to eliminate redundancy caused by join dependencies and to ensure that relations are decomposed into smaller components without any loss of data.
+**The Fifth Normal Form (5NF)**, also known as **Project-Join Normal Form (PJ/NF)** is a level of database normalization where a table is already in **4NF**, and every non-trivial join dependency in that table is implied by the candidate keys. The goal is to eliminate redundancy caused by join dependencies and to ensure that relations are decomposed into smaller components without any loss of data.
 
-In practice, 5NF is rarely used in database design.
+In practice, **5NF** is rarely used in database design.
 
 ## Key concepts
 
@@ -34,27 +34,27 @@ We have a table `agent_inventory` with the following schema:
     import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
     export const agentInventory = pgTable("agent_inventory", {
-      agent: varchar(),
-      supplier: varchar(),
-      itemType: varchar("item_type"),
+      agent: varchar("agent", { length: 255 }).notNull(),
+      supplier: varchar("supplier", { length: 255 }).notNull(),
+      itemType: varchar("item_type", { length: 255 }).notNull(),
     }, (t) => [
-      primaryKey({columns: [t.agent, t.supplier, t.itemType]}),
+      primaryKey({ columns: [t.agent, t.supplier, t.itemType] }),
     ]);
    ```
   </CodeTab>
   <CodeTab>
     ```sql
     CREATE TABLE "agent_inventory" (
-    	"agent" varchar,
-    	"supplier" varchar,
-    	"item_type" varchar,
+    	"agent" varchar(255) NOT NULL,
+    	"supplier" varchar(255) NOT NULL,
+    	"item_type" varchar(255) NOT NULL,
     	CONSTRAINT "agent_inventory_agent_supplier_item_type_pk" PRIMARY KEY("agent","supplier","item_type")
     );
     ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +-------------+-------------+--------------+
+    +------------------------------------------+
     | agent_inventory                          |
     +-------------+-------------+--------------+
     | agent       | supplier    | item_type    |
@@ -96,72 +96,72 @@ You cannot have all the component relationships true without the corresponding c
 
 ### 4NF Analysis
 
-The table is in 4NF because there are no non-trivial multivalued dependencies. For example, `Helen Fox` sources from `GearUp` and `ProServe`, and she offers `Webcam`, `Scanners` and `Docks`. However, she doesn't offer `GearUp` `Docks`, nor does she offer `ProServe` `Scanners`. The allowed combinations are specific and don't show the independence required for MVDs based on single attributes.
+The table is in **4NF** because there are no non-trivial multivalued dependencies. For example, `Helen Fox` sources from `GearUp` and `ProServe`, and she offers `Webcam`, `Scanners` and `Docks`. However, she doesn't offer `GearUp` `Docks`, nor does she offer `ProServe` `Scanners`. The allowed combinations are specific and don't show the independence required for MVDs based on single attributes.
 
 ### 5NF Analysis
 
-The table is not in 5NF because it contains non-trivial join dependency. This join dependency is not implied by the candidate key `agent, supplier, item_type` because none of the components in the JD (`{agent, supplier}`, `{agent, item_type}`, `{supplier, item_type}`) are superkeys of the original `agent_inventory` table.
+The table is not in **5NF** because it contains non-trivial join dependency. This join dependency is not implied by the candidate key `agent, supplier, item_type` because none of the components in the JD (`{agent, supplier}`, `{agent, item_type}`, `{supplier, item_type}`) are superkeys of the original `agent_inventory` table.
 
 This leads to:
 1. Redundancy.
 2. Deletion Anomalies: Changing a single underlying fact (e.g., a supplier stops making an item type) may require updating multiple rows in the `agent_inventory` table. For instance, if `ProServe` stopped making `Docks`, rows for both `Chris Day` and `Helen Fox` would need deletion.
 3. Insertion Anomalies: If underlying facts change such that the rule dictates a new row should exist (e.g., if `Chris Day` starts handling `GearUp` suppliers, and `GearUp` makes `Scanners`, which `Chris Day` already handles, the rule implies (`Chris Day`, `GearUp`, `Scanner`) must be inserted), the single-table structure doesn't automatically enforce this insertion based on the component facts.
 
-### Solution
+### 5NF Decomposition
 
 We need to split the table into three tables: `agent_suppliers`, `agent_item_types`, and `supplier_item_types`:
 
 <CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
   <CodeTab>
     ```ts
-      import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 
-      export const agentSuppliers = pgTable("agent_suppliers", {
-        agent: varchar(),
-        supplier: varchar(),
-      }, (t) => [
-        primaryKey({columns: [t.agent, t.supplier]}),
-      ]);
+    export const agentSuppliers = pgTable("agent_suppliers", {
+      agent: varchar("agent", { length: 255 }).notNull(),
+      supplier: varchar("supplier", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.agent, t.supplier] }),
+    ]);
 
-      export const agentItemTypes = pgTable("agent_item_types", {
-        agent: varchar(),
-        itemType: varchar("item_type"),
-      }, (t) => [
-        primaryKey({columns: [t.agent, t.itemType]}),
-      ]);
+    export const agentItemTypes = pgTable("agent_item_types", {
+      agent: varchar("agent", { length: 255 }).notNull(),
+      itemType: varchar("item_type", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.agent, t.itemType] }),
+    ]);
 
-      export const supplierItemTypes = pgTable("supplier_item_types", {
-        supplier: varchar(),
-        itemType: varchar("item_type"),
-      }, (t) => [
-        primaryKey({columns: [t.supplier, t.itemType]}),
-      ]);
+    export const supplierItemTypes = pgTable("supplier_item_types", {
+      supplier: varchar("supplier", { length: 255 }).notNull(),
+      itemType: varchar("item_type", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.supplier, t.itemType] }),
+    ]);
     ```
   </CodeTab>
   <CodeTab>
   ```sql
-    CREATE TABLE "agent_item_types" (
-    	"agent" varchar,
-    	"item_type" varchar,
-    	CONSTRAINT "agent_item_types_agent_item_type_pk" PRIMARY KEY("agent","item_type")
-    );
-
-    CREATE TABLE "agent_suppliers" (
-    	"agent" varchar,
-    	"supplier" varchar,
-    	CONSTRAINT "agent_suppliers_agent_supplier_pk" PRIMARY KEY("agent","supplier")
-    );
-
-    CREATE TABLE "supplier_item_types" (
-    	"supplier" varchar,
-    	"item_type" varchar,
-    	CONSTRAINT "supplier_item_types_supplier_item_type_pk" PRIMARY KEY("supplier","item_type")
-    );
+  CREATE TABLE "agent_item_types" (
+  	"agent" varchar(255) NOT NULL,
+  	"item_type" varchar(255) NOT NULL,
+  	CONSTRAINT "agent_item_types_agent_item_type_pk" PRIMARY KEY("agent","item_type")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "agent_suppliers" (
+  	"agent" varchar(255) NOT NULL,
+  	"supplier" varchar(255) NOT NULL,
+  	CONSTRAINT "agent_suppliers_agent_supplier_pk" PRIMARY KEY("agent","supplier")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "supplier_item_types" (
+  	"supplier" varchar(255) NOT NULL,
+  	"item_type" varchar(255) NOT NULL,
+  	CONSTRAINT "supplier_item_types_supplier_item_type_pk" PRIMARY KEY("supplier","item_type")
+  );
   ```
   </CodeTab>
   <CodeTab>
   ```plaintext
-    +-----------+----------+   +-----------+-----------+
+    +----------------------+   +-----------------------+
     | agent_suppliers      |   | agent_item_types      |
     +-----------+----------+   +-----------+-----------+
     | agent     | supplier |   | agent     | item_type |
@@ -175,7 +175,7 @@ We need to split the table into three tables: `agent_suppliers`, `agent_item_typ
     +-----------+----------+   | Helen Fox | Webcam    |
                                | Helen Fox | Dock      |
                                +-----------+-----------+
-    +----------+-----------+
+    +----------------------+
     | supplier_item_types  |
     +----------+-----------+
     | supplier | item_type |
@@ -239,4 +239,4 @@ INNER JOIN
 ```
 </Section>
 
-Decomposing the table into `agent_suppliers`, `agent_item_types`, and `supplier_item_types` achieves 5NF. Each table now represents a single fundamental relationship from the core business rule. This eliminates the specific join dependency that caused redundancy and update anomalies in the original table.
+Decomposing the table into `agent_suppliers`, `agent_item_types`, and `supplier_item_types` achieves **5NF**. Each table now represents a single fundamental relationship from the core business rule. This eliminates the specific join dependency that caused redundancy and update anomalies in the original table.
