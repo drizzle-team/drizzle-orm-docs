@@ -58,23 +58,36 @@ export default defineConfig({
 ```bash copy
 npx drizzle-kit studio
 ```
+
+You can launch studio with `port` cli flag to customise process port and `verbose` flag for extended SQL statements logging
+```bash
+npx drizzle-kit studio --port 3000 --verbose
+```
+
+By default, Drizzle Studio will be launched on the `https://local.drizzle.studio` host, and studio server will be launched on 127.0.0.1 host but you can specify any host you want
+```bash
+npx drizzle-kit studio --host 0.0.0.0
+```
 </Tab>
 <Tab>
 ```bash copy
 pnpm drizzle-kit studio
+```
+
+You can launch studio with `port` cli flag to customise process port and `verbose` flag for extended SQL statements logging
+```bash
+pnpm drizzle-kit studio --port 3000 --verbose
+```
+
+By default, Drizzle Studio will be launched on the `https://local.drizzle.studio` host, and studio server will be launched on 127.0.0.1 host but you can specify any host you want
+```bash
+pnpm drizzle-kit studio --host 0.0.0.0
 ```
 </Tab>
 <Tab>
 ```bash copy
 yarn drizzle-kit studio
 ```
-</Tab>
-<Tab>
-```bash copy
-bunx drizzle-kit studio
-```
-</Tab>
-</Tabs>
 
 You can launch studio with `port` cli flag to customise process port and `verbose` flag for extended SQL statements logging
 ```bash
@@ -85,6 +98,23 @@ By default, Drizzle Studio will be launched on the `https://local.drizzle.studio
 ```bash
 yarn drizzle-kit studio --host 0.0.0.0
 ```
+</Tab>
+<Tab>
+```bash copy
+bunx drizzle-kit studio
+```
+
+You can launch studio with `port` cli flag to customise process port and `verbose` flag for extended SQL statements logging
+```bash
+bunx drizzle-kit studio --port 3000 --verbose
+```
+
+By default, Drizzle Studio will be launched on the `https://local.drizzle.studio` host, and studio server will be launched on 127.0.0.1 host but you can specify any host you want
+```bash
+bunx drizzle-kit studio --host 0.0.0.0
+```
+</Tab>
+</Tabs>
 </Steps>
 
 
