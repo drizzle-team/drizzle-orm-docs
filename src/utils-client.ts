@@ -111,7 +111,7 @@ export const sponsorsHandler = async () => {
     }
   });
 
-  gold = gold.filter((s) => s.sponsorEntity.login !== "samalberto25")
+  gold = gold.filter((s) => s.sponsorEntity.login !== "samalberto25" && s.sponsorEntity.login !== "lokalise");
 
   superhero = superhero.filter((s) => filterFunc(s));
   hero = hero.filter((s) => filterFunc(s));

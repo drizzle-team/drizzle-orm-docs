@@ -51,7 +51,7 @@ Generated columns can be especially useful for:
 
     #### Drizzle side
     In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
-    that will generate this column data do you
+    that will generate this column data for you.
 
     #### Features 
     This function can accept generated expression in 3 ways:
@@ -80,7 +80,7 @@ Generated columns can be especially useful for:
     ```
     ```sql
     CREATE TABLE IF NOT EXISTS "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello "world"!) STORED,
+	    "gen_name" text GENERATED ALWAYS AS (hello "world"!) STORED
     );
     ```
     </CodeTab>
@@ -98,7 +98,7 @@ Generated columns can be especially useful for:
     ```sql
     CREATE TABLE IF NOT EXISTS "test" (
 	    "first_name" text,
-	    "gen_name" text GENERATED ALWAYS AS (hi, "test"."first_name"!) STORED,
+	    "gen_name" text GENERATED ALWAYS AS (hi, "test"."first_name"!) STORED
     );
     ```
     </CodeTab>
@@ -127,9 +127,9 @@ Generated columns can be especially useful for:
           (): SQL => sql`to_tsvector('english', ${test.content})`
         ),
       },
-      (t) => ({
-        idx: index("idx_content_search").using("gin", t.contentSearch),
-      })
+      (t) => [
+        index("idx_content_search").using("gin", t.contentSearch)
+      ]
     );
     ```
     ```sql {4}
@@ -191,7 +191,7 @@ Generated columns can be especially useful for:
     ```
     ```sql
     CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS (hello "world"!) VIRTUAL,
+	    `gen_name` text GENERATED ALWAYS AS (hello "world"!) VIRTUAL
     );
     ```
     </CodeTab>
@@ -209,8 +209,8 @@ Generated columns can be especially useful for:
     ```
     ```sql
     CREATE TABLE `test` (
-	  `first_name` text,
-    	`gen_name` text GENERATED ALWAYS AS (hi, `test`.`first_name`!) VIRTUAL,
+    	`first_name` text,
+    	`gen_name` text GENERATED ALWAYS AS (hi, `test`.`first_name`!) VIRTUAL
     );
     ```
     </CodeTab>
@@ -291,7 +291,7 @@ Generated columns can be especially useful for:
     ```
     ```sql
     CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS (hello "world"!) VIRTUAL,
+	    `gen_name` text GENERATED ALWAYS AS (hello "world"!) VIRTUAL
     );
     ```
 
@@ -308,7 +308,7 @@ Generated columns can be especially useful for:
     ```sql
     CREATE TABLE `test` (
 	    `first_name` text,
-	    `gen_name` text GENERATED ALWAYS AS (hi, "first_name"!) VIRTUAL,
+	    `gen_name` text GENERATED ALWAYS AS (hi, "first_name"!) VIRTUAL
     );
     ```
 

@@ -3,7 +3,7 @@
 ### Drizzle Kit V1
 - [x] `generated` columns support [beta branch]
 - [x] Brocli integration to Drizzle Kit
-- [ ] Generated SQL migration strict mode without `try catches` and `if not exists`
+- [x] Generated SQL migration strict mode without `try catches` and `if not exists`
 - [x] Drizzle Kit goes OSS steam 🎉
 - [x] PostgreSQL enums alternations improvements
 - [x] PostgreSQL RLS support
@@ -17,12 +17,12 @@
 - [x] `generated` columns support [beta branch]
 - [x] MySQL `.$returningIds()` 
 - [ ] `NODE_ENV` support for embedded `.env` consumer
-- [ ] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`
+- [x] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`
 - [x] Table declarations with `(t) => ` callback to optionally omit column type imports
 - [ ] Down migrations, better rollbacks and improvements to `migrate` experience in Drizzle Kit
 - [x] Optional database aliases for columns in table declarations -> `id: serial()`
 - [x] PostgreSQL RLS support
-- [ ] Relational Queries V2 API
+- [x] Relational Queries V2 API
 - [x] `drizzle('pg', ...)` driver instantiation to lower the entrance learning curve
 - [ ] CockroachDB support (supported with strict SQL migrations)
 - [x] Native seeding

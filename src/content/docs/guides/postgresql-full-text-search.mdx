@@ -69,10 +69,9 @@ As for now, Drizzle doesn't support `tsvector` type natively, so you need to con
       id: serial('id').primaryKey(),
       title: text('title').notNull(),
     },
-    (table) => ({
-      titleSearchIndex: index('title_search_index')
-      .using('gin', sql`to_tsvector('english', ${table.title})`),
-    }),
+    (table) => [
+      index('title_search_index').using('gin', sql`to_tsvector('english', ${table.title})`),
+    ]
   );
   ```
   </CodeTab>
@@ -235,15 +234,15 @@ To implement full-text search on multiple columns, you can create index on multi
       title: text('title').notNull(),
       description: text('description').notNull(),
     },
-    (table) => ({
-      searchIndex: index('search_index').using(
+    (table) => [
+      index('search_index').using(
         'gin',
         sql`(
             setweight(to_tsvector('english', ${table.title}), 'A') ||
             setweight(to_tsvector('english', ${table.description}), 'B')
         )`,
       ),
-    }),
+    ],
   );
   ```
   </CodeTab>

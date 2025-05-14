@@ -131,32 +131,32 @@ export const asideSponsors: ISponsor[] = [
         'url("/svg/nuxt-green.svg") 0% 0% / cover no-repeat content-box',
     },
   },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/hydraso",
-      name: "Hydra",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "brightness(0.5) grayscale(1)",
-      background:
-        'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      filter: "invert(0.6)",
-      background:
-        'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
-    },
-  },
+  // {
+  //   tier: {
+  //     name: "$1000 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/hydraso",
+  //     name: "Hydra",
+  //     avatarUrl:
+  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+  //   },
+  //   createdAt: "2024-06-07T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  //   darkStyle: {
+  //     filter: "brightness(0.5) grayscale(1)",
+  //     background:
+  //       'url("/images/hydra-orange.png") 0% 0% / cover no-repeat content-box',
+  //   },
+  //   lightStyle: {
+  //     filter: "invert(0.6)",
+  //     background:
+  //       'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
+  //   },
+  // },
   {
     tier: {
       name: "$1000 a month",
@@ -243,23 +243,27 @@ export const asideSponsors: ISponsor[] = [
     sponsorEntity: {
       __typename: "Organization",
       login: "driz.link/edgedb",
-      name: "EdgeDB",
+      name: "Gel",
       avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="154" viewBox="0 0 200 154" fill="none">
+          <path d="M0 68.6C0 90.4 17.8499 108 39.9594 108C61.8661 108 79.9189 90.4 79.9189 68.6C79.9189 47 61.8661 29.2 39.9594 29.2C17.8499 29.2 0 47 0 68.6ZM171.197 14C171.197 6.6 177.485 0 185.396 0C193.306 0 200 6.6 200 14V94C200 101.4 193.306 108 185.396 108C177.485 108 171.197 101.4 171.197 94V14ZM10.5477 127.6C12.1704 141.4 23.7323 154 39.9594 154C55.9838 154 67.9513 141.4 69.574 127.6C71.8053 107.6 53.3469 114.2 39.9594 114.2C26.572 114.2 8.31643 107.6 10.5477 127.6ZM139.351 74.2C140.771 71 144.422 69 151.521 69C162.677 68.8 167.14 61.6 161.258 50.2C157.201 42.4 150.913 36.4 142.394 32.6C122.312 23.8 98.5801 32.8 89.6552 52.6C80.7302 72.2 89.6552 95.6 109.939 104.6C118.458 108.2 126.978 108.8 135.7 106.6C148.276 103.2 150.913 95 143.408 86.8C138.742 81.4 137.728 77.6 139.351 74.2Z" fill="url(#paint0_linear_59_46)"/>
+          <defs>
+          <linearGradient id="paint0_linear_59_46" x1="250.254" y1="0" x2="250.254" y2="154" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFC800"/>
+          <stop offset="1" stop-color="#FF4800"/>
+          </linearGradient>
+          </defs>
+        </svg>`,
     },
     createdAt: "2024-06-07T13:32:16Z",
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
       filter: "grayscale(1) brightness(2) opacity(0.3)",
-      background:
-        'url("/svg/edb_logo_light.svg") center / contain no-repeat content-box',
       minWidth: "calc(100% + 16px)"
     },
     lightStyle: {
-      filter: "grayscale(1) opacity(0.6)",
-      background:
-        'url("/svg/edb_logo_dark.svg") center / contain no-repeat content-box',
+      filter: "grayscale(1) brightness(0.5) opacity(0.4)",
       minWidth: "calc(100% + 16px)"
     },
   },
@@ -342,13 +346,122 @@ export const asideSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      filter: "brightness(10) grayscale(1) opacity(0.3)",
+      filter: "brightness(2) grayscale(1) opacity(0.3)",
       background:
         'url("/svg/praha-dark.svg") 0% 0% / cover no-repeat content-box',
     },
     lightStyle: {
       filter: "invert(0.6) brightness(0) opacity(0.3)",
       background: 'url("/svg/praha-light.svg") 0% 0% / cover no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/lokalise",
+      name: "Lokalise",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/lokalise-dark.svg") 0% 0% / contain no-repeat content-box',
+    },
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/lokalise-light.svg") 0% 0% / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/replit",
+      name: "Replit",
+      avatarUrl:
+        `<svg version="1.1" id="Artwork" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 793.8 871.5" style="enable-background:new 0 0 793.8 871.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F5640C;}
+</style>
+<g>
+	<path class="st0" d="M396.9,356.1H227.2c-16.6,0-30-13.4-30-30v-99.8c0-16.6,13.4-30,30-30h139.7c16.6,0,30,13.4,30,30V356.1z"/>
+	<path class="st0" d="M566.6,515.8H396.9V356.1h169.7c16.5,0,29.9,13.4,29.9,29.9v99.8C596.5,502.4,583.1,515.8,566.6,515.8z"/>
+	<path class="st0" d="M366.9,675.6H227.2c-16.5,0-29.9-13.4-29.9-29.9v-99.8c0-16.5,13.4-29.9,29.9-29.9h169.7v129.8
+		C396.9,662.1,383.5,675.6,366.9,675.6z"/>
+</g>
+</svg>`,
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "grayscale(1) brightness(2) opacity(0.2)",
+    },
+    lightStyle: {
+      filter: "grayscale(1) opacity(0.6) invert(0.1)",
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sentry",
+      name: "Sentry",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/sentry-dark.svg") 0% 0% / contain no-repeat content-box',
+    },
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/sentry-light.svg") 0% 0% / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sevalla",
+      name: "Sevalla",
+      avatarUrl:
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.72047 0C2.11344 0 0 2.11344 0 4.72047V19.2795C0 21.8866 2.11344 24 4.72047 24H19.2795C21.8866 24 24 21.8866 24 19.2795V4.72047C24 2.11344 21.8866 0 19.2795 0H4.72047ZM9.30204 5.01563V7.84367H6.74998V10.3268C6.74998 10.8487 6.94373 11.0134 7.06951 11.1204C7.10285 11.1487 7.13139 11.173 7.15031 11.1988L9.27702 13.3814H6.74998V16.1798H9.27702V19.0078H14.7063V16.1798H9.27702V13.3814H14.035C14.6938 13.3814 14.6938 14.1795 14.6938 14.5441V16.1798H17.2458V13.6967C17.2458 13.1748 17.0521 13.0101 16.9263 12.9031C16.893 12.8747 16.8644 12.8505 16.8455 12.8247L14.6938 10.6421H17.25L17.2458 7.84367H14.7063L14.6938 10.6421H9.96088C9.30204 10.6421 9.30204 9.84395 9.30204 9.47935V7.84367H14.7063V5.01563H9.30204Z" fill="#F97316"/></svg>',
+    },
+    createdAt: "2024-06-07T13:32:16Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      padding: "4px",
+      filter: "brightness(0.5) grayscale(1)",
+    },
+    lightStyle: {
+      padding: "4px",
+      filter: "grayscale(1) brightness(1.2)",
     },
   },
   {
@@ -378,5 +491,21 @@ export const asideSponsors: ISponsor[] = [
       background:
         'url("/images/mooncake.png") 0% 0% / contain no-repeat content-box',
     },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sponsor",
+      name: "Sponsor",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
   },
 ];

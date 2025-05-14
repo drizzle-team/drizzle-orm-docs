@@ -127,7 +127,7 @@ or update a record without adding a value to this field.
 
       ```sql
       CREATE TABLE IF NOT EXISTS "table" (
-        "integer" integer NOT NULL,
+        "integer" integer NOT NULL
       );
       ```
     </Section>
@@ -145,7 +145,7 @@ or update a record without adding a value to this field.
 
       ```sql
       CREATE TABLE `table` (
-        `int` int NOT NULL,
+        `int` int NOT NULL
       );
       ```
     </Section>
@@ -179,7 +179,7 @@ or update a record without adding a value to this field.
 
       ```sql
       CREATE TABLE `table` (
-        `int` int NOT NULL,
+        `int` int NOT NULL
       );
       ```
     </Section>
@@ -216,23 +216,23 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       export const composite = pgTable('composite_example', {
         id: integer('id'),
         name: text('name'),
-      }, (t) => [{
-        unq: unique().on(t.id, t.name),
-        unq2: unique('custom_name').on(t.id, t.name)
-      }]);
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
 
       // In Postgres 15.0+ NULLS NOT DISTINCT is available
       // This example demonstrates both available usages
       export const userNulls = pgTable('user_nulls_example', {
         id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
-      }, (t) => [{
-        unq: unique().on(t.id).nullsNotDistinct()
-      }]);
+      }, (t) => [
+        unique().on(t.id).nullsNotDistinct()
+      ]);
       ```
 
       ```sql
       CREATE TABLE IF NOT EXISTS "composite_example" (
-	    "id" integer,
+	      "id" integer,
         "name" text,
         CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
         CONSTRAINT "custom_name" UNIQUE("id","name")
@@ -249,9 +249,9 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       );
 
       CREATE TABLE IF NOT EXISTS "user_nulls_example" (
-	    "id" integer,
-	    CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
-	    CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
+        "id" integer,
+        CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
+        CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
       );
       ```
     </Section>
@@ -273,10 +273,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       export const composite = mysqlTable('composite_example', {
         id: int('id'),
         name: varchar('name', { length: 256 }),
-      }, (t) => ({
-        unq: unique().on(t.id, t.name),
-        unq2: unique('custom_name').on(t.id, t.name)
-      }));
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
       ```
 
       ```sql
@@ -291,10 +291,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       );
 
       CREATE TABLE `composite_example` (
-	    `id` int,
-	    `name` varchar(256),
-	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
-	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+        `id` int,
+        `name` varchar(256),
+        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
       );
       ```
     </Section>
@@ -316,10 +316,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       export const composite = sqliteTable('composite_example', {
         id: int('id'),
         name: text('name'),
-      }, (t) => ({
-        unq: unique().on(t.id, t.name),
-        unq2: unique('custom_name').on(t.id, t.name)
-      }));
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
       ```
 
       ```sql
@@ -360,10 +360,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       export const composite = singlestoreTable('composite_example', {
         id: int('id'),
         name: varchar('name', { length: 256 }),
-      }, (t) => ({
-        unq: unique().on(t.id, t.name),
-        unq2: unique('custom_name').on(t.id, t.name)
-      }));
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
       ```
 
       ```sql
@@ -378,10 +378,10 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       );
 
       CREATE TABLE `composite_example` (
-	    `id` int,
-	    `name` varchar(256),
-	    CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
-	    CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+        `id` int,
+        `name` varchar(256),
+        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
       );
       ```
     </Section>
@@ -411,9 +411,9 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
           username: text().notNull(),
           age: integer(),
         },
-        (table) => [{
-          checkConstraint: check("age_check1", sql`${table.age} > 21`),
-        }]
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`),
+        ]
       );
       ```
       ```sql
@@ -440,9 +440,9 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
           username: text().notNull(),
           age: int(),
         },
-        (table) => ({
-          checkConstraint: check("age_check1", sql`${table.age} > 21`),
-        })
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`)
+        ]
       );
       ```
       ```sql
@@ -469,9 +469,9 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
           username: text().notNull(),
           age: int(),
         },
-        (table) => ({
-          checkConstraint: check("age_check1", sql`${table.age} > 21`),
-        })
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`)
+        ]
       );
       ```
       ```sql
@@ -514,11 +514,11 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
       ```sql
       CREATE TABLE IF NOT EXISTS "user" (
-        "id" serial PRIMARY KEY,
+        "id" serial PRIMARY KEY
       );
 
       CREATE TABLE IF NOT EXISTS "table" (
-        "cuid" text PRIMARY KEY,
+        "cuid" text PRIMARY KEY
       );
       ```
     </Section>
@@ -566,11 +566,11 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
       ```sql
       CREATE TABLE `user` (
-          `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+        `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
       );
 
       CREATE TABLE `pet` (
-          `id` integer PRIMARY KEY AUTOINCREMENT
+        `id` integer PRIMARY KEY AUTOINCREMENT
       )
       ```
     </Section>
@@ -628,12 +628,11 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       export const booksToAuthors = pgTable("books_to_authors", {
         authorId: integer("author_id"),
         bookId: integer("book_id"),
-      }, (table) => {
-        return [{
-          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
-          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
-        }];
-      });
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+      ]);
       ```
 
       ```sql {6, 9}
@@ -642,7 +641,7 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       CREATE TABLE IF NOT EXISTS "books_to_authors" (
         "author_id" integer,
         "book_id" integer,
-        PRIMARY KEY("book_id","author_id"),
+        PRIMARY KEY("book_id","author_id")
       );
 
       ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");
@@ -668,12 +667,11 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       export const booksToAuthors = mysqlTable("books_to_authors", {
         authorId: int("author_id"),
         bookId: int("book_id"),
-      }, (table) => {
-        return {
-          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
-          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
-        };
-      });
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] })
+      ]);
       ```
 
       ```sql {6}
@@ -706,12 +704,11 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       export const bookToAuthor = sqliteTable("book_to_author", {
         authorId: integer("author_id"),
         bookId: integer("book_id"),
-      }, (table) => {
-        return {
-          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
-          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
-        };
-      });
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] })
+      ]);
       ```
       ```sql {6}
       ...
@@ -743,12 +740,11 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       export const booksToAuthors = singlestoreTable("books_to_authors", {
         authorId: int("author_id"),
         bookId: int("book_id"),
-      }, (table) => {
-        return {
-          pk: primaryKey({ columns: [table.bookId, table.authorId] }),
-          pkWithCustomName: primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
-        };
-      });
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+      ]);
       ```
 
       ```sql {6}
@@ -850,15 +846,13 @@ set return type for reference callback or use a standalone `foreignKey` operator
       id: serial("id"),
       name: text("name"),
       parentId: integer("parent_id"),
-    }, (table) => {
-      return [{
-        parentReference: foreignKey({
-          columns: [table.parentId],
-          foreignColumns: [table.id],
-          name: "custom_fk"
-        }),
-      }];
-    });
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
     ```
 
   </Tab>
@@ -877,15 +871,13 @@ set return type for reference callback or use a standalone `foreignKey` operator
       id: int("id").primaryKey().autoincrement(),
       name: text("name"),
       parentId: int("parent_id")
-    }, (table) => {
-      return {
-        parentReference: foreignKey({
-          columns: [table.parentId],
-          foreignColumns: [table.id],
-          name: "custom_fk"
-        }),
-      };
-    });
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
     ```
 
   </Tab>
@@ -904,15 +896,13 @@ set return type for reference callback or use a standalone `foreignKey` operator
       id: integer("id").primaryKey({ autoIncrement: true }),
       name: text("name"),
       parentId: integer("parent_id"),
-    }, (table) => {
-      return {
-        parentReference: foreignKey({
-          columns: [table.parentId],
-          foreignColumns: [table.id],
-          name: "custom_fk"
-        }),
-      };
-    });
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
     ```
 
   </Tab>
@@ -929,25 +919,21 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
     export const user = pgTable("user", {
       firstName: text("firstName"),
       lastName: text("lastName"),
-    }, (table) => {
-      return {
-        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
-      };
-    });
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
 
     export const profile = pgTable("profile", {
       id: serial("id").primaryKey(),
       userFirstName: text("user_first_name"),
       userLastName: text("user_last_name"),
-    }, (table) => {
-      return [{
-        userReference: foreignKey({
-          columns: [table.userFirstName, table.userLastName],
-          foreignColumns: [user.firstName, user.lastName]
-          name: "custom_fk"
-        })
-      }]
-    })
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_fk"
+      })
+    ])
     ```
 
   </Tab>
@@ -958,25 +944,21 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
     export const user = mysqlTable("user", {
       firstName: text("firstName"),
       lastName: text("lastName"),
-    }, (table) => {
-      return {
-        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
-      };
-    });
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
 
     export const profile = mysqlTable("profile", {
       id: int("id").autoincrement().primaryKey(),
       userFirstName: text("user_first_name"),
       userLastName: text("user_last_name"),
-    }, (table) => {
-      return {
-        userReference: foreignKey({
-          columns: [table.userFirstName, table.userLastName],
-          foreignColumns: [user.firstName, user.lastName],
-          name: "custom_name"
-        })
-      }
-    });
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_name"
+      })
+    ]);
     ```
 
   </Tab>
@@ -987,25 +969,21 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
     export const user = sqliteTable("user", {
       firstName: text("firstName"),
       lastName: text("lastName"),
-    }, (table) => {
-      return {
-        pk: primaryKey({ columns: [table.firstName, table.lastName]}),
-      };
-    });
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
 
     export const profile = sqliteTable("profile", {
       id: integer("id").primaryKey({ autoIncrement: true }),
       userFirstName: text("user_first_name"),
       userLastName: text("user_last_name"),
-    }, (table) => {
-      return {
-        userReference: foreignKey({
-          columns: [table.userFirstName, table.userLastName],
-          foreignColumns: [user.firstName, user.lastName],
-          name: "custom_name"
-        })
-      }
-    });
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_name"
+      })
+    ]);
     ```
 
   </Tab>
@@ -1028,12 +1006,10 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
       id: serial("id").primaryKey(),
       name: text("name"),
       email: text("email"),
-    }, (table) => {
-      return {
-        nameIdx: index("name_idx").on(table.name),
-        emailIdx: uniqueIndex("email_idx").on(table.email),
-      };
-    });
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email)
+    ]);
     ```
     ```sql {5-6}
     CREATE TABLE "user" (
@@ -1078,12 +1054,10 @@ index('name')
       id: int("id").primaryKey().autoincrement(),
       name: text("name"),
       email: text("email"),
-    }, (table) => {
-      return {
-        nameIdx: index("name_idx").on(table.name),
-        emailIdx: uniqueIndex("email_idx").on(table.email),
-      };
-    });
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
     ```
     ```sql {5-6}
     CREATE TABLE `user` (
@@ -1118,12 +1092,10 @@ index('name')
       id: integer("id").primaryKey({ autoIncrement: true }),
       name: text("name"),
       email: text("email"),
-    }, (table) => {
-      return {
-        nameIdx: index("name_idx").on(table.name),
-        emailIdx: uniqueIndex("email_idx").on(table.email),
-      };
-    });
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
     ```
     ```sql {5-6}
     CREATE TABLE `user` (
@@ -1153,12 +1125,10 @@ index('name')
       id: int("id").primaryKey().autoincrement(),
       name: text("name"),
       email: text("email"),
-    }, (table) => {
-      return {
-        nameIdx: index("name_idx").on(table.name),
-        emailIdx: uniqueIndex("email_idx").on(table.email),
-      };
-    });
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
     ```
     ```sql {5-6}
     CREATE TABLE `user` (
