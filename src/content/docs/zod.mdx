@@ -14,7 +14,7 @@ drizzle-zod
 <Callout type="warning">
 This documentation is for `drizzle-zod@0.6.0` and higher
 
-You must also have Drizzle ORM v0.36.0 or greater and Zod v3.0.0 or greater installed.
+You must also have Drizzle ORM v0.36.0 or greater and Zod v3.25.1 or greater installed.
 </Callout>
 
 ### Select schema
@@ -110,10 +110,10 @@ Each create schema function accepts an additional optional parameter that you ca
 ```ts copy
 import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const users = pgTable('users', {
-  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  id: integer().primaryKey(),
   name: text().notNull(),
   bio: text(),
   preferences: json()
@@ -165,7 +165,7 @@ const userInsertSchema = createInsertSchema(users, {
 ```ts copy
 import { pgTable, timestamp } from 'drizzle-orm/pg-core';
 import { createSchemaFactory } from 'drizzle-zod';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const users = pgTable('users', {
   ...,
