@@ -1,3 +1,103 @@
+2025-05:
+ - | 
+    <b>Drizzle ORM pre-release features:</b>
+
+    List of features that are currently in open beta and will soon go live.
+
+    <ul>
+    <li>Fully updated alternation engine for drizzle-kit. This change also increased drizzle-kit tests from 600 to 3000+ so far and is growing</li>
+    <li>MSSQL Support</li>
+    <li>CockroachDB Support</li>
+    </ul>
+ - | 
+    <b>Drizzle Studio updates:</b>
+
+    <ul>
+    <li>Fixed saving bug in json cell editor.</li>
+    <li>Fixed resizing of columns in Safari browser.</li>
+    <li>Fixed a bug where FK constraints were not displayed if CHECK constraints existed.</li>
+    </ul>
+ - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.44.0'>v0.44.0</a> release</b>
+
+    <ul>
+    <li><b>Error handling</b></li>
+    Starting from this version, we've introduced a new DrizzleQueryError that wraps all errors from database drivers and provides a set of useful information:
+    <li>Cache layer support. Sponsored by Upstash</li>
+    </ul>
+ - |
+    <b>`drizzle-zod` v0.8.1 release</b>
+
+    This version was released to resolve several compatibility issues with the ZodObject type, which were fixed in drizzle-orm@0.8.1, so version 0.8.0 was skipped
+
+    <ul>
+    <li>Support for Zod v4: Starting with this release, drizzle-zod now requires Zod v3.25.1 or later</li>
+    <li>TS language server performance improvements</li>
+    </ul>
+ - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.31.1'>v0.31.1</a> release</b>
+
+    <ul>
+    <li>Fixed `drizzle-kit` pull bugs when using Gel extensions</li>
+    </ul>
+  
+2025-04:
+ - | 
+    <b>Drizzle ORM Beta branch:</b>
+
+    <ul>
+    <li>Relational Queries V2 released in Beta!</li>
+    </ul>
+ - | 
+    <b>Drizzle Studio updates:</b>
+
+    <ul>
+    <li>Added fontSize settings option.</li>
+    <li>Added a multiline editor.</li>
+    <li>Changed JSON editor ui.</li>
+    <li>Fixed incorrect bigserial value handling.</li>
+    </ul>
+ - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.43.1'>v0.43.1</a> release</b>
+
+    <ul>
+    <li>Fixed incorrect types of schema enums in PostgreSQL</li>
+    </ul>
+ - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.43.0'>v0.43.0</a> release</b>
+
+    <ul>
+    <li>Added cross join</li>
+    <li>Added lateral left, inner, cross joins to PostgreSQL, MySQL, Gel, SingleStore</li>
+    <li>Added drizzle connection attributes to SingleStore's driver instances</li>
+    <li>Removed unsupported by dialect full join from MySQL select api</li>
+    <li>Forced Gel columns to always have explicit schema & table prefixes due to potential errors caused by lack of such prefix in subquery's selection when there's already a column bearing same name in context</li>
+    <li>Added missing export for PgTextBuilderInitial type</li>
+    <li>Removed outdated IfNotImported type check from SingleStore driver initializer</li>
+    <li>Fixed incorrect type inference for insert and update models with non-strict tsconfigs</li>
+    <li>Fixed invalid spelling of nowait flag</li>
+    </ul>
+ - |
+    <b>Kit <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.31.0'>v0.31.0</a> release</b>
+
+    <ul>
+    <li>Enum DDL improvements</li>
+    <li>`esbuild` version upgrade</li>
+    <li>[[BUG]: Error on Malformed Array Literal](https://github.com/drizzle-team/drizzle-orm/issues/2715)</li>
+    <li>[[BUG]: Postgres drizzle-kit: Error while pulling indexes from a table with json/jsonb deep field index](https://github.com/drizzle-team/drizzle-orm/issues/2744)</li>
+    <li>[goog-vulnz flags CVE-2024-24790 in esbuild 0.19.7](https://github.com/drizzle-team/drizzle-orm/issues/4045)</li>
+    </ul>
+ - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.42.0'>v0.42.0</a> release</b>
+
+    <ul>
+    <li>Duplicate imports removal. When importing from drizzle-orm using custom loaders, you may encounter issues such as: `SyntaxError: The requested module 'drizzle-orm' does not provide an export named 'eq'`</li>
+    <li>`pgEnum` and `mysqlEnum`` now can accept both strings and TS enums</li>
+    <li>Make inArray accept ReadonlyArray as a value</li>
+    <li>Pass row type parameter to @planetscale/database's execute</li>
+    <li>New InferEnum type</li>
+    </ul>
+
 2025-03:
   - |
     <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.41.0'>v0.41.0</a> release</b>
