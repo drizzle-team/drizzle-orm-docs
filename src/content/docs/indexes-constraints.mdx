@@ -20,7 +20,7 @@ then the default value of the column is `NULL`.
 An explicit `DEFAULT` clause may specify that the default value is `NULL`,
 a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
     ```typescript
@@ -36,7 +36,7 @@ a string constant, a blob constant, a signed-number, or any constant expression 
     ```
 
     ```sql
-    CREATE TABLE IF NOT EXISTS "table" (
+    CREATE TABLE "table" (
       "integer1" integer DEFAULT 42,
       "integer2" integer DEFAULT '42'::integer,
       "uuid1" uuid DEFAULT gen_random_uuid(),
@@ -105,6 +105,25 @@ a string constant, a blob constant, a signed-number, or any constant expression 
     ```
     </Section>
   </Tab>
+  <Tab>
+    <Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { int, time, mssqlTable } from "drizzle-orm/mssql-core";
+    
+    const table = mssqlTable("table", {
+      int: int().default(42),
+      description: text().default(`This is your dashboard!`),
+    });
+    ```
+    ```sql
+    CREATE TABLE [table] (
+      [int] int DEFAULT 42,
+      [description] text DEFAULT 'This is your dashboard!'
+    );
+    ```
+    </Section>
+  </Tab>
 </Tabs>
 
 ### Not null
@@ -114,7 +133,7 @@ By default, a column can hold **NULL** values. The `NOT NULL` constraint enforce
 This enforces a field to always contain a value, which means that you cannot insert a new record,
 or update a record without adding a value to this field.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -126,7 +145,7 @@ or update a record without adding a value to this field.
       ```
 
       ```sql
-      CREATE TABLE IF NOT EXISTS "table" (
+      CREATE TABLE "table" (
         "integer" integer NOT NULL
       );
       ```
@@ -167,7 +186,7 @@ or update a record without adding a value to this field.
     </Section>
 
   </Tab>
-    <Tab>
+  <Tab>
     <Section>
       ```typescript
       import { int, singlestoreTable } from "drizzle-orm/singlestore-core";
@@ -180,6 +199,23 @@ or update a record without adding a value to this field.
       ```sql
       CREATE TABLE `table` (
         `int` int NOT NULL
+      );
+      ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, mssqlTable } from "drizzle-orm/mssql-core";
+
+      const table = mssqlTable('table', {
+        int: int().notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE [table] (
+        [int] int NOT NULL
       );
       ```
     </Section>
@@ -199,7 +235,7 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
   You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
 </Callout>
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -231,24 +267,24 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       ```
 
       ```sql
-      CREATE TABLE IF NOT EXISTS "composite_example" (
+      CREATE TABLE "composite_example" (
 	      "id" integer,
         "name" text,
         CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
         CONSTRAINT "custom_name" UNIQUE("id","name")
       );
 
-      CREATE TABLE IF NOT EXISTS "table" (
+      CREATE TABLE "table" (
       	"id" integer,
       	CONSTRAINT "custom_name" UNIQUE("id")
       );
 
-      CREATE TABLE IF NOT EXISTS "user" (
+      CREATE TABLE "user" (
       	"id" integer,
       	CONSTRAINT "user_id_unique" UNIQUE("id")
       );
 
-      CREATE TABLE IF NOT EXISTS "user_nulls_example" (
+      CREATE TABLE "user_nulls_example" (
         "id" integer,
         CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
         CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
@@ -387,6 +423,52 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
     </Section>
 
   </Tab>
+  <Tab>
+    <Callout type='warning'>
+    With MSSQL you can't create unique constraint on `text`, `ntext`, `varchar(max)`, `nvarchar(max)`
+    </Callout>
+    <Section>
+      ```typescript
+      import { int, varchar, unique, mssqlTable } from "drizzle-orm/mssql-core";
+
+      export const user = mssqlTable('user', {
+        id: int().unique(),
+      });
+
+      export const table = mssqlTable('table', {
+        id: int().unique('custom_name'),
+      });
+
+      export const composite = mssqlTable('composite_example', {
+        id: int(),
+        name: varchar({ length: 256 }),
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
+      ```
+
+      ```sql
+      CREATE TABLE [user] (
+      	[id] int,
+      	CONSTRAINT [user_id_key] UNIQUE([id])
+      );
+
+      CREATE TABLE [table] (
+      	[id] int,
+      	CONSTRAINT [custom_name] UNIQUE([id])
+      );
+
+      CREATE TABLE [composite_example] (
+        [id] int,
+        [name] varchar(256),
+        CONSTRAINT [composite_example_id_name_key] UNIQUE([id],[name]),
+        CONSTRAINT [custom_name] UNIQUE([id],[name])
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Check
@@ -397,7 +479,7 @@ If you define a `CHECK` constraint on a column it will allow only certain values
 
 If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -417,7 +499,7 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
       );
       ```
       ```sql
-      CREATE TABLE IF NOT EXISTS "users" (
+      CREATE TABLE "users" (
 	      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	      "username" text NOT NULL,
 	      "age" integer,
@@ -488,6 +570,35 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
   <Tab>
     Currently not supported in SingleStore
   </Tab>
+<Tab>
+    <Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, mssqlTable, text } from "drizzle-orm/mssql-core";
+
+      export const users = mssqlTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: integer(),
+        },
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`),
+        ]
+      );
+      ```
+      ```sql
+      CREATE TABLE [users] (
+	      [id] int PRIMARY KEY,
+	      [username] text NOT NULL,
+	      [age] integer,
+	      CONSTRAINT [age_check1] CHECK ([users].[age] > 21)
+      );
+      ```
+    </Section>
+
+  </Tab> 
 </Tabs>
 
 ### Primary Key
@@ -497,7 +608,7 @@ Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.
 
 A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
       ```typescript copy
@@ -513,11 +624,11 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
       ```
 
       ```sql
-      CREATE TABLE IF NOT EXISTS "user" (
+      CREATE TABLE "user" (
         "id" serial PRIMARY KEY
       );
 
-      CREATE TABLE IF NOT EXISTS "table" (
+      CREATE TABLE "table" (
         "cuid" text PRIMARY KEY
       );
       ```
@@ -602,6 +713,25 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
     </Section>
 
   </Tab>
+  <Tab>
+    <Section>
+      ```typescript
+      import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+
+      export const user = mssqlTable("user", {
+        id: int().primaryKey(),
+      })
+      ```
+
+      ```sql
+      CREATE TABLE [user] (
+        [id] int,
+        CONSTRAINT [user_pkey] PRIMARY KEY [id]
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Composite Primary Key
@@ -609,7 +739,7 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
 
 Drizzle ORM provides a standalone `primaryKey` operator for that:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
       ```typescript copy {18, 19}
@@ -638,7 +768,7 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       ```sql {6, 9}
       ...
 
-      CREATE TABLE IF NOT EXISTS "books_to_authors" (
+      CREATE TABLE "books_to_authors" (
         "author_id" integer,
         "book_id" integer,
         PRIMARY KEY("book_id","author_id")
@@ -759,6 +889,43 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
     </Section>
 
   </Tab>
+  <Tab>
+    <Section>
+      ```typescript {18, 19}
+      import { int, text, primaryKey, mssqlTable } from "drizzle-orm/mssql-core";
+
+      export const user = mssqlTable("user", {
+        id: int().primaryKey(),
+        name: text(),
+      });
+
+      export const book = mssqlTable("book", {
+        id: int().primaryKey(),
+        name: text(),
+      });
+
+      export const booksToAuthors = mssqlTable("books_to_authors", {
+        authorId: int("author_id"),
+        bookId: int("book_id"),
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+      ]);
+      ```
+
+      ```sql {6}
+      ...
+
+      CREATE TABLE [books_to_authors] (
+        [author_id] int,
+        [book_id] int,
+        CONSTRAINT [custom_name] PRIMARY KEY([book_id], [author_id])
+      );
+      ```
+    </Section>
+
+  </Tab>
 </Tabs>
 
 ### Foreign key
@@ -770,7 +937,7 @@ The table with the foreign key is called the child table, and the table with the
 Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     ```typescript copy {11}
     import { serial, text, integer, pgTable } from "drizzle-orm/pg-core";
@@ -825,12 +992,29 @@ You can declare them in a column declaration statement:
   <Tab>
     Currently not supported in SingleStore
   </Tab>
+  <Tab>
+    ```typescript {11}
+    import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      id: int().primaryKey(),
+      name: text(),
+    });
+
+    export const book = mssqlTable("book", {
+      id: int().primaryKey(),
+      name: text(),
+      authorId: int("author_id").references(() => user.id)
+    });
+    ```
+
+  </Tab>
 </Tabs>
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     ```typescript copy {6,16-19}
     import { serial, text, integer, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
@@ -909,9 +1093,33 @@ set return type for reference callback or use a standalone `foreignKey` operator
   <Tab>
     Currently not supported in SingleStore
   </Tab>
+    <Tab>
+    ```typescript {6,16-19}
+    import { int, text, foreignKey, mssqlTable, AnyMsSQLColumn } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      id: int().primaryKey(),
+      name: text(),
+      parentId: int("parent_id").references((): AnyMsSQLColumn => user.id)
+    });
+
+    //or
+    export const user = mssqlTable("user", {
+      id: int().primaryKey(),
+      name: text(),
+      parentId: int("parent_id"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
+    ```
+  </Tab>
 </Tabs>
 To declare multicolumn foreign keys you can use a dedicated `foreignKey` operator:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     ```typescript copy {4-5,14-15,18-21}
     import { serial, text, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
@@ -990,13 +1198,38 @@ To declare multicolumn foreign keys you can use a dedicated `foreignKey` operato
   <Tab>
     Currently not supported in SingleStore
   </Tab>
+  <Tab>
+    ```typescript copy {4-5,14-15,18-21}
+    import { int, text, primaryKey, foreignKey, mssqlTable, AnyMsSqlColumn } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      firstName: text(),
+      lastName: text(),
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
+
+    export const profile = mssqlTable("profile", {
+      id: int().primaryKey(),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_name"
+      })
+    ]);
+    ```
+
+  </Tab>
 </Tabs>
 
 ## Indexes
 
 Drizzle ORM provides API for both `index` and `unique index` declaration:
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
   <Tab>
     <Section>
     ```typescript copy {9-10}
@@ -1139,5 +1372,42 @@ index('name')
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
+  </Tab>
+  <Tab>
+    <Section>
+    ```typescript copy {8-9}
+    import { int, text, index, uniqueIndex, mssqlTable } from "drizzle-orm/mssql-core";
+
+    export const user = mysqlTable("user", {
+      id: int().primaryKey(),
+      name: text(),
+      email: text(),
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
+    ```
+    ```sql {5-6}
+    CREATE TABLE [user] (
+      ...
+    );
+
+    CREATE INDEX [name_idx] ON [user] ([name]);
+    CREATE UNIQUE INDEX [email_idx] ON [user] ([email]);
+    ```
+    </Section>
+
+    <Callout type='warning'>
+    With MSSQL you can't create unique index on `text`, `ntext`, `varchar(max)`, `nvarchar(max)`
+    </Callout>
+
+    Drizzle ORM provides set of params for index creation:
+
+    ```typescript
+    // Index declaration reference
+    index("name")
+      .on(table.name)
+      .where(sql``)
+    ```
   </Tab>
 </Tabs>
