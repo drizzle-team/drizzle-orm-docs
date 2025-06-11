@@ -471,8 +471,8 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/mooncake",
-      name: "Mooncake",
+      login: "driz.link/gibsonai",
+      name: "GibsonAI",
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
@@ -480,16 +480,14 @@ export const asideSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      padding: "4px",
       filter: "grayscale(1) brightness(2) opacity(0.2)",
       background:
-        'url("/images/mooncake-white.png") 0% 0% / contain no-repeat content-box',
+        'url("/svg/gibsonai-dark.svg") 0% 0% / contain no-repeat content-box',
     },
     lightStyle: {
-      padding: "4px",
       filter: "grayscale(1) opacity(0.4)",
       background:
-        'url("/images/mooncake.png") 0% 0% / contain no-repeat content-box',
+        'url("/svg/gibsonai-light.svg") 0% 0% / contain no-repeat content-box',
     },
   },
   {
