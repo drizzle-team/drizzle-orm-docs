@@ -38,7 +38,7 @@ Then, you can use it like this:
 
 ```ts copy {4,6}
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite/next";
+import { openDatabaseSync } from "expo-sqlite";
 
 const expoDb = openDatabaseSync("db.db");
 
@@ -110,7 +110,7 @@ Then you need to import `migrations.js` file in your `App.tsx` file from `./driz
 
 ```ts copy {4,11}
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite/next";
+import { openDatabaseSync } from "expo-sqlite";
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from './drizzle/migrations';
 
