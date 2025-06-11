@@ -1,0 +1,98 @@
+import CenteredLayout from "@/ui/CenteredLayout.astro";
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Steps from '@mdx/Steps.astro';
+import Npm from "@mdx/Npm.astro";
+import Npx from "@mdx/Npx.astro";
+import f from "@mdx/RowCodeWrap.astro"
+
+<CenteredLayout isStudio={true} customTitle="Meet Drizzle Studio">
+# Meet Drizzle Gateway
+
+## Docker quick start
+<Steps>
+
+#### Create a named docker volume
+```shell
+docker volume create drizzle-gate
+```
+
+#### Run the container
+```shell
+docker run -d \
+  --name drizzle-gate \
+  --restart always \
+  -p 4983:4983 \
+  -e PORT=4983 \ # Set the port for Drizzle Gateway (optional)
+  -e STORE_PATH=./app \ # Set your store path here (optional)
+  -e MASTERPASS=your_master_password \ # Set your master password here (optional)
+  -v drizzle-gate:/app \
+  ghcr.io/drizzle-team/gateway:latest
+```
+
+</Steps>
+
+## Binary quick start
+<Steps>
+#### Create a directory for the binary and set permissions
+```shell
+mkdir drizzle-gateway
+cd drizzle-gateway
+```
+
+#### Download the latest release depending on your OS and architecture
+linux-arm64
+```shell
+curl -Lo start https://pub-e240a4fd7085425baf4a7951e7611520.r2.dev/drizzle-gateway-0.1.1-linux-arm64
+```
+linux-x64
+```shell
+curl -Lo start https://pub-e240a4fd7085425baf4a7951e7611520.r2.dev/drizzle-gateway-0.1.1-linux-x64
+```
+macos-arm64
+```shell
+curl -Lo start https://pub-e240a4fd7085425baf4a7951e7611520.r2.dev/drizzle-gateway-0.1.1-macos-arm64
+```
+macos-x64
+```shell
+curl -Lo start https://pub-e240a4fd7085425baf4a7951e7611520.r2.dev/drizzle-gateway-0.1.1-macos-x64
+```
+
+#### Make the binary executable
+```shell
+chmod +x start
+```
+
+#### Run the binary
+```shell
+./start
+```
+</Steps>
+
+## Usage
+Once Drizzle Gateway is running, you can access it via the web interface at `http://localhost:4983`.
+You can connect to your databases, run queries, and manage your data through the intuitive UI.
+
+## What's next?
+We're going to massively improve and extend Drizzle Gateway in the upcoming months!   
+Subscribe on [Twitter](https://twitter.com/DrizzleORM) and welcome to our [Discord](https://driz.link/discord)
+
+## Changelog
+
+**0.1.1**
+
+- Added the ability to create/alter/drop schemas.
+- Added the ability to create/alter tables.
+- Added the ability to create/alter views.
+- Added the ability to create enums.
+- Added uuid, cidr, inet, macaddr and macaddr8 data types.
+- Added range selection with copy/paste capability.
+- Added new setting option for expanding subviews.
+- Added datepicker and timepicker.
+- Improved error handling for INSERT/UPDATE/DELETE.
+- Added a multiline editor.
+- Added error handling in schema management.
+- Added a new setting option for pagination by page.
+- Added column type to header cell.
+
+</CenteredLayout>
