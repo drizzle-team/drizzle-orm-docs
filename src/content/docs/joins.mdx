@@ -305,7 +305,7 @@ Lets say you need to fetch users with their parents:
 ```typescript copy
 import { user } from "./schema";
 
-const parent = aliasedTable(user, "parent")
+const parent = alias(user, "parent");
 const result = db
   .select()
   .from(user)
