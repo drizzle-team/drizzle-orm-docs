@@ -12,7 +12,7 @@ It natively supports mostly every query feature and capability of every dialect,
 and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
 
 For the following examples, let's assume you have a `users` table defined like this:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL', 'CockroachDB']}>
 <Tab>
 ```typescript
 import { pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -54,6 +54,28 @@ export const users = singlestoreTable('users', {
   id: int('id').primaryKey(),
   name: text('name').notNull(),
   age: int('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { mssqlTable, int, text } from 'drizzle-orm/mssql-core';
+
+export const users = pgTable('users', {
+  id: int().primaryKey(),
+  name: text().notNull(),
+  age: int(),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { cockroachTable, int4, text } from 'drizzle-orm/cockroach-core';
+
+export const users = pgTable('users', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
+  age: int4(),
 });
 ```
 </Tab>
@@ -177,7 +199,7 @@ select distinct on ("name") "name" from "users" order by "name";
 ### Advanced select
 Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
 
-Sneak peek of advanced partial select, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/include-or-exclude-columns).
+Sneak peek of advanced partial select, for more detailed advanced usage examples - see our [dedicated guide](/docs/guides/include-or-exclude-columns).
 <CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
 ```ts
 import { getTableColumns, sql } from 'drizzle-orm';
@@ -334,7 +356,7 @@ select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
 ### Advanced filters
 In combination with TypeScript, Drizzle APIs provide you powerful and flexible ways to combine filters in queries.
 
-Sneak peek of conditional filtering, for more detailed advaced usage examples - see our [dedicated guide](/docs/guides/conditional-filters-in-query).
+Sneak peek of conditional filtering, for more detailed advanced usage examples - see our [dedicated guide](/docs/guides/conditional-filters-in-query).
 <CodeTabs items={["example 1", "example 2"]}>
 ```ts
 const searchPosts = async (term?: string) => {
@@ -435,9 +457,9 @@ select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 </Section>
 
 ### Advanced pagination
-Powered by TypeScript, Drizzle APIs let you implement all possible SQL paginations and sorting approaches.
+Powered by TypeScript, Drizzle APIs let you implement all possible SQL pagination and sorting approaches.
 
-Sneak peek of advanced pagination, for more detailed advaced 
+Sneak peek of advanced pagination, for more detailed advanced 
 usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination) 
 and [cursor pagination](/docs/guides/cursor-based-pagination) guides.
 
@@ -865,7 +887,7 @@ db
 
 ### Iterator
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false, 'SingleStore[WIP]': false, 'MSSQL': true }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false, 'SingleStore[WIP]': false, 'MSSQL': true, 'CockroachDB[WIP]': false }} />
 
 If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
 
@@ -894,7 +916,7 @@ for await (const row of iterator) {
 
 The `USE INDEX` hint suggests to the optimizer which indexes to consider when processing the query. The optimizer is not forced to use these indexes but will prioritize them if they are suitable.
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {
@@ -922,7 +944,7 @@ await db.select()
 
 The `IGNORE INDEX` hint tells the optimizer to avoid using specific indexes for the query. MySQL will consider all other indexes (if any) or perform a full table scan if necessary.
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {
@@ -951,7 +973,7 @@ await db.select()
 
 The `FORCE INDEX` hint forces the optimizer to use the specified index(es) for the query. If the specified index cannot be used, MySQL will not fall back to other indexes; it might resort to a full table scan instead.
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false  }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {

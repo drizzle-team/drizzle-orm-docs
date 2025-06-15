@@ -8,7 +8,7 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 ## Type API
 To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
 <Tab>
 ```ts
 import { serial, text, pgTable } from 'drizzle-orm/pg-core';
@@ -109,6 +109,26 @@ type SelectUser = InferSelectModel<typeof users>;
 type InsertUser = InferInsertModel<typeof users>;
 ```
 </Tab>
+<Tab>
+```ts
+import { int4, text, cockroachTable } from 'drizzle-orm/cockroach-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = cockroachTable('users', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
+});
+
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
+// or
+type SelectUser = typeof users._.$inferSelect;
+type InsertUser = typeof users._.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+</Tab>
 </Tabs>
 
 
@@ -151,10 +171,10 @@ const db = drizzle({ logger: new MyLogger() });
 
 
 ## Multi-project schema
-**Table creator** API lets you define customise table names.  
+**Table creator** API lets you define customize table names.  
 It's very useful when you need to keep schemas of different projects in one database.
 
-<CodeTabs items={["PostgreSQL","MySQL","SQLite","SingleStore","MSSQL"]}>
+<CodeTabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
 ```ts {3}
 import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
 
@@ -205,6 +225,16 @@ const users = mssqlTable('users', {
   name: text().notNull(),
 });
 ```
+```ts {3}
+import { int4, text, cockroachTableCreator } from 'drizzle-orm/cockroach-core';
+
+const pgTable = cockroachTableCreator((name) => `project1_${name}`);
+
+const users = pgTable('users', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
+});
+```
 </CodeTabs>
 ```ts {10}
 import { defineConfig } from "drizzle-kit";
@@ -245,7 +275,7 @@ const query = db
 If you have some complex queries to execute and `drizzle-orm` can't handle them yet,
 you can use the `db.execute` method to execute raw `parametrized` queries.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL', 'CockroachDB']}>
     <Tab>
     ```ts
     const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
@@ -286,13 +316,19 @@ you can use the `db.execute` method to execute raw `parametrized` queries.
     const res = await db.execute(statement);
     ```
     </Tab>
+    <Tab>
+    ```ts
+    const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+    const res = await db.execute(statement)
+    ```
+    </Tab>
 </Tabs>
 
 
 ## Standalone query builder
 Drizzle ORM provides a standalone query builder that allows you to build queries
 without creating a database instance and get generated SQL.
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL"]}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL", "CockroachDB"]}>
     <Tab>
         ```typescript copy
         import { QueryBuilder } from 'drizzle-orm/pg-core';
@@ -343,13 +379,23 @@ without creating a database instance and get generated SQL.
         const { sql, params } = query.toSQL();
         ```
     </Tab>
+    <Tab>
+        ```typescript copy
+        import { QueryBuilder } from 'drizzle-orm/cockroach-core';
+
+        const qb = new QueryBuilder();
+
+        const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+        const { sql, params } = query.toSQL();
+        ```
+    </Tab>
 </Tabs>
 
 ## Get typed table columns
 You can get a typed table columns map,
 very useful when you need to omit certain columns upon selection.
 
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL"]}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
@@ -465,10 +511,33 @@ very useful when you need to omit certain columns upon selection.
         ```
       </CodeTabs>
   </Tab>
+  <Tab>
+      <CodeTabs items={["index.ts", "schema.ts"]}>
+        ```ts
+        import { getTableColumns } from "drizzle-orm";
+        import { user } from "./schema";
+
+        const { password, role, ...rest } = getTableColumns(user);
+
+        await db.select({ ...rest }).from(users);
+        ```
+        ```ts
+        import { int4, text, pgTable } from "drizzle-orm/cockroach-core";
+
+        export const user = pgTable("user", {
+          id: int4().primaryKey(),
+          name: text(),
+          email: text(),
+          password: text(),
+          role: text().$type<"admin" | "customer">(),
+        });
+        ```
+      </CodeTabs>
+  </Tab>
 </Tabs>
 
 ## Get table information
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL"]}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
     ```ts copy
     import { getTableConfig, pgTable } from 'drizzle-orm/pg-core';
@@ -551,6 +620,23 @@ very useful when you need to omit certain columns upon selection.
     schema,
   } = getTableConfig(table);
   ```
+  </Tab>
+  <Tab>
+    ```ts copy
+    import { getTableConfig, cockroachTable } from 'drizzle-orm/cockroach-core';
+
+    export const table = cockroachTable(...);
+
+    const {
+      columns,
+      indexes,
+      foreignKeys,
+      checks,
+      primaryKeys,
+      name,
+      schema,
+    } = getTableConfig(table);
+    ```
   </Tab>
 </Tabs>
 

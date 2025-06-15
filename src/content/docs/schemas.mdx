@@ -6,12 +6,12 @@ import Callout from '@mdx/Callout.astro';
 
 # Table schemas
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': false, 'SingleStore': true, 'MSSQL': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': true, 'SQLite': false, 'SingleStore': true, 'MSSQL': true, 'CockroachDB': true }} />
 
 If you declare an entity within a schema, query builder will prepend schema names in queries:<br/>
 `select * from "schema"."users"`
 
-<Tabs items={['PostgreSQL', 'MySQL', "SQLite", "SingleStore", 'MSSQL']}>
+<Tabs items={['PostgreSQL', 'MySQL', "SQLite", "SingleStore", 'MSSQL', 'CockroachDB']}>
   <Tab>
     <Section>
     ```ts copy {3,5,7}
@@ -107,6 +107,36 @@ If you declare an entity within a schema, query builder will prepend schema name
     CREATE TABLE [my_schema].[users] (
       [id] int PRIMARY KEY,
       [name] text
+    );
+    ```
+    </Section>
+  </Tab>
+  <Tab>
+    <Section>
+    ```ts copy {3,5,7}
+    import { int4, text, cockroachSchema } from "drizzle-orm/cockroach-core";
+
+    export const mySchema = cockroachSchema("my_schema");
+
+    export const colors = mySchema.enum('colors', ['red', 'green', 'blue']);
+
+    export const mySchemaUsers = mySchema.table('users', {
+      id: int4().primaryKey(),
+      name: text(),
+      color: colors().default('red'),
+    });
+
+    
+    ```
+    ```sql
+    CREATE SCHEMA "my_schema";
+
+    CREATE TYPE "my_schema"."colors" AS ENUM ('red', 'green', 'blue');
+
+    CREATE TABLE "my_schema"."users" (
+      "id" serial PRIMARY KEY,
+      "name" text,
+      "color" "my_schema"."colors" DEFAULT 'red'
     );
     ```
     </Section>

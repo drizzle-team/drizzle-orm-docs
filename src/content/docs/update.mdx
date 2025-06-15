@@ -22,7 +22,7 @@ await db.update(users)
 
 ### Limit
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true, 'MSSQL': false, 'CockroachDB': false }} />
 
 Use `.limit()` to add `limit` clause to the query - for example:
 <Section>
@@ -57,7 +57,7 @@ update "users" set "verified" = $1 order by "name" asc, "name2" desc;
 </Section>
 
 ### Returning
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false , 'SingleStore': false, 'MSSQL': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false , 'SingleStore': false, 'MSSQL': false, 'CockroachDB': true }} />
 You can update a row and get it back in PostgreSQL and SQLite:
 ```typescript copy
 const updatedUserId: { updatedId: number }[] = await db.update(users)
@@ -143,7 +143,7 @@ returning "id"
 
 ## Update ... from
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': true, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': true, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': true }} />
 
 As the SQLite documentation mentions:
 
@@ -190,7 +190,7 @@ from "cities" "c"
 ```
 </Section>
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'MySQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': true }} />
 
 In Postgres, you can also return columns from the joined tables.
 <Section>

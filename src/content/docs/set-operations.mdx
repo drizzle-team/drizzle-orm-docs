@@ -14,7 +14,7 @@ Combine all results from two query blocks into a single result, omitting any dup
 
 Get all names from customers and users tables without duplicates.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -302,6 +302,64 @@ Get all names from customers and users tables without duplicates.
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { union } from 'drizzle-orm/cockroach-core'
+    import { users, customers } from './schema'
+
+    const allNamesForUserQuery = db.select({ name: users.name }).from(users);
+
+    const result = await union(
+		allNamesForUserQuery,
+		db.select({ name: customers.name }).from(customers)
+	).limit(10);
+    ```
+    ```sql
+    (select "name" from "sellers")
+    union
+    (select "name" from "customers")
+    limit $1
+    ```
+    </CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { users, customers } from './schema'
+
+    const result = await db
+      .select({ name: users.name })
+      .from(users)
+      .union(db.select({ name: customers.name }).from(customers))
+      .limit(10);
+    ```
+    ```sql
+    (select "name" from "sellers")
+    union
+    (select "name" from "customers")
+    limit $1
+    ```
+	</CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int4, cockroachTable, text, varchar } from "drizzle-orm/cockroach-core";
+
+    const users = cockroachTable('sellers', {
+        id: int4().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        address: text(),
+    });
+    
+    const customers = cockroachTable('customers', {
+        id: int4().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        city: text(),
+        email: varchar({ length: 256 }).notNull()
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Union All
@@ -312,7 +370,7 @@ representing in-store sales. In this case, you want to combine the data from bot
 single result set. Since there might be duplicate transactions, 
 you want to keep all the records and not eliminate duplicates.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -596,6 +654,62 @@ you want to keep all the records and not eliminate duplicates.
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { unionAll } from 'drizzle-orm/cockroach-core'
+    import { onlineSales, inStoreSales } from './schema'
+
+    const onlineTransactions = db.select({ transaction: onlineSales.transactionId }).from(onlineSales);
+    const inStoreTransactions = db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales);
+
+    const result = await unionAll(onlineTransactions, inStoreTransactions);
+    ```
+    ```sql
+    select "transaction_id" from "online_sales"
+    union all
+    select "transaction_id" from "in_store_sales"
+    ```
+    </CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { onlineSales, inStoreSales } from './schema'
+
+    const result = await db
+      .select({ transaction: onlineSales.transactionId })
+      .from(onlineSales)
+      .unionAll(
+        db.select({ transaction: inStoreSales.transactionId }).from(inStoreSales)
+      );
+    ```
+    ```sql
+    select "transaction_id" from "online_sales"
+    union all
+    select "transaction_id" from "in_store_sales"
+    ```
+	</CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int4, cockroachTable, text, timestamp, varchar } from "drizzle-orm/cockroach-core";
+
+    const onlineSales = cockroachTable('online_sales', {
+        transactionId: int4('transaction_id').primaryKey(),
+        productId: int4('product_id').unique(),
+        quantitySold: int4('quantity_sold'),
+        saleDate: timestamp('sale_date', { mode: 'date' }),
+    });
+    
+    const inStoreSales = cockroachTable('in_store_sales', {
+        transactionId: int4('transaction_id').primaryKey(),
+        productId: int4('product_id').unique(),
+        quantitySold: int4('quantity_sold'),
+        saleDate: timestamp('sale_date', { mode: 'date' }),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Intersect
@@ -609,7 +723,7 @@ enrollments of the same course by the same student.
 In this scenario, you want to find courses that are common between the two departments but don't want 
 to count the same course multiple times even if multiple students from the same department are enrolled in it.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -860,6 +974,56 @@ to count the same course multiple times even if multiple students from the same 
     </CodeTab>
   </CodeTabs>
   </Tab>
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { intersect } from 'drizzle-orm/cockroach-core'
+    import { depA, depB } from './schema'
+
+    const departmentACourses = db.select({ courseName: depA.courseName }).from(depA);
+    const departmentBCourses = db.select({ courseName: depB.courseName }).from(depB);
+
+    const result = await intersect(departmentACourses, departmentBCourses);
+    ```
+    ```sql
+    select "course_name" from "department_a_courses"
+    intersect
+    select "course_name" from "department_b_courses"
+    ```
+	</CodeTab>
+    <CodeTab>
+    ```typescript copy
+    import { depA, depB } from './schema'
+
+    const result = await db
+      .select({ courseName: depA.courseName })
+      .from(depA)
+      .intersect(db.select({ courseName: depB.courseName }).from(depB));
+    ```
+    ```sql
+    select "course_name" from "department_a_courses"
+    intersect
+    select "course_name" from "department_b_courses"
+    ```
+    </CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int4, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
+
+    const depA = cockroachTable('department_a_courses', {
+        studentId: int4('student_id'),
+        courseName: varchar('course_name').notNull(),
+    });
+    
+    const depB = cockroachTable('department_b_courses', {
+        studentId: int4('student_id'),
+        courseName: varchar('course_name').notNull(),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Intersect All
@@ -874,7 +1038,7 @@ In this scenario, you want to find products that are ordered by both regular cus
 but you want to retain the quantity information, even if the same product is ordered multiple 
 times by different customers.
 
-<Tabs items={["PostgreSQL", "MySQL", "SingleStore"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLlite", "SingleStore", "MSSQL" ,"CockroachDB"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -1012,7 +1176,80 @@ times by different customers.
   </CodeTabs>
   </Tab>
   <Tab>
+  Not supported by SQLite
+  </Tab> 
+  <Tab>
   Not supported by SingleStore
+  </Tab> 
+  <Tab>
+  Not supported by MSSQL
+  </Tab> 
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { intersectAll } from 'drizzle-orm/cockroach-core'
+    import { regularCustomerOrders, vipCustomerOrders } from './schema'
+
+    const regularOrders = db.select({ 
+        productId: regularCustomerOrders.productId,
+        quantityOrdered: regularCustomerOrders.quantityOrdered }
+    ).from(regularCustomerOrders);
+
+    const vipOrders = db.select({ 
+        productId: vipCustomerOrders.productId,
+        quantityOrdered: vipCustomerOrders.quantityOrdered }
+    ).from(vipCustomerOrders);
+
+    const result = await intersectAll(regularOrders, vipOrders);
+    ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    intersect all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    ```
+	</CodeTab>
+    ```ts copy
+    import { regularCustomerOrders, vipCustomerOrders } from './schema'
+
+    const result = await db
+        .select({
+          productId: regularCustomerOrders.productId,
+          quantityOrdered: regularCustomerOrders.quantityOrdered,
+        })
+        .from(regularCustomerOrders)
+        .intersectAll(
+          db
+            .select({
+              productId: vipCustomerOrders.productId,
+              quantityOrdered: vipCustomerOrders.quantityOrdered,
+            })
+            .from(vipCustomerOrders)
+        );
+    ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    intersect all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    ```
+    <CodeTab>
+	```typescript copy
+    import { int4, cockroachTable } from "drizzle-orm/cockroach-core";
+
+    const regularCustomerOrders = cockroachTable('regular_customer_orders', {
+        customerId: int4('customer_id').primaryKey(),
+        productId: int4('product_id').notNull(),
+        quantityOrdered: int4('quantity_ordered').notNull(),
+    });
+    
+    const vipCustomerOrders = cockroachTable('vip_customer_orders', {
+        customerId: int4('customer_id').primaryKey(),
+        productId: int4('product_id').notNull(),
+        quantityOrdered: int4('quantity_ordered').notNull(),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
   </Tab> 
 </Tabs>
 
@@ -1027,7 +1264,7 @@ In this scenario, you want to identify the projects that are exclusive to one de
 not shared with the other department. You don't want to count the same project 
 multiple times, even if multiple employees from the same department are assigned to it.
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -1278,6 +1515,56 @@ multiple times, even if multiple employees from the same department are assigned
     </CodeTab>
   </CodeTabs>
   </Tab> 
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { except } from 'drizzle-orm/cockroach-core'
+    import { depA, depB } from './schema'
+
+    const departmentACourses = db.select({ courseName: depA.projectsName }).from(depA);
+    const departmentBCourses = db.select({ courseName: depB.projectsName }).from(depB);
+
+    const result = await except(departmentACourses, departmentBCourses);
+    ```
+    ```sql
+    select "projects_name" from "department_a_projects"
+    except
+    select "projects_name" from "department_b_projects"
+    ```
+	</CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { depA, depB } from './schema'
+
+    const result = await db
+        .select({ courseName: depA.projectsName })
+        .from(depA)
+        .except(db.select({ courseName: depB.projectsName }).from(depB));
+    ```
+    ```sql
+    select "projects_name" from "department_a_projects"
+    except
+    select "projects_name" from "department_b_projects"
+    ```
+    </CodeTab>
+    <CodeTab>
+	```typescript copy
+    import { int4, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
+
+    const depA = cockroachTable('department_a_projects', {
+        employeeId: int4('employee_id'),
+        projectsName: varchar('projects_name').notNull(),
+    });
+    
+    const depB = cockroachTable('department_b_projects', {
+        employeeId: int4('employee_id'),
+        projectsName: varchar('projects_name').notNull(),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>
 
 ### Except All
@@ -1290,7 +1577,7 @@ In this case, you want to keep track of the quantity of each product, even if it
 In this scenario, you want to find products that are exclusively ordered by regular customers and not 
 ordered by VIP customers. You want to retain the quantity information, even if the same product is ordered multiple times by different regular customers.
 
-<Tabs items={["PostgreSQL", "MySQL", "SingleStore"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
   <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
 	<CodeTab>
@@ -1428,6 +1715,81 @@ ordered by VIP customers. You want to retain the quantity information, even if t
   </CodeTabs>
   </Tab> 
   <Tab>
+  Not supported by SQLite
+  </Tab>
+  <Tab>
   Not supported by SingleStore
   </Tab>
+  <Tab>
+  Not supported by MSSQL
+  </Tab>
+  <Tab>
+  <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    import { exceptAll } from 'drizzle-orm/cockroach-core'
+    import { regularCustomerOrders, vipCustomerOrders } from './schema'
+
+    const regularOrders = db.select({ 
+        productId: regularCustomerOrders.productId,
+        quantityOrdered: regularCustomerOrders.quantityOrdered }
+    ).from(regularCustomerOrders);
+
+    const vipOrders = db.select({ 
+        productId: vipCustomerOrders.productId,
+        quantityOrdered: vipCustomerOrders.quantityOrdered }
+    ).from(vipCustomerOrders);
+
+    const result = await exceptAll(regularOrders, vipOrders);
+    ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    except all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    ```
+	</CodeTab>
+    <CodeTab>
+    ```ts copy
+    import { regularCustomerOrders, vipCustomerOrders } from './schema'
+ 
+    const result = await db
+        .select({
+          productId: regularCustomerOrders.productId,
+          quantityOrdered: regularCustomerOrders.quantityOrdered,
+        })
+        .from(regularCustomerOrders)
+        .exceptAll(
+          db
+            .select({
+              productId: vipCustomerOrders.productId,
+              quantityOrdered: vipCustomerOrders.quantityOrdered,
+            })
+            .from(vipCustomerOrders)
+        );
+    ```
+    ```sql
+    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    except all
+    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    ```
+    </CodeTab>
+	<CodeTab>
+	```typescript copy
+    import { int4, cockroachTable } from "drizzle-orm/cockroach-core";
+
+    const regularCustomerOrders = cockroachTable('regular_customer_orders', {
+        customerId: int4('customer_id').primaryKey(),
+        productId: int4('product_id').notNull(),
+        quantityOrdered: int4('quantity_ordered').notNull(),
+    });
+    
+    const vipCustomerOrders = cockroachTable('vip_customer_orders', {
+        customerId: int4('customer_id').primaryKey(),
+        productId: int4('product_id').notNull(),
+        quantityOrdered: int4('quantity_ordered').notNull(),
+    });
+    ```
+    </CodeTab>
+  </CodeTabs>
+  </Tab> 
 </Tabs>

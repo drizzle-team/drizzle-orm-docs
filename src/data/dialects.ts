@@ -62,4 +62,16 @@ export const dialects: ICards = {
     description: "Collection of nodejs modules to interact with MSSQL",
     href: "/mssql",
   },
+  cockroach: {
+    title: "CockroachDB",
+    imageSrc: "",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    description: "Collection of nodejs modules to interact with CockroachDB",
+    href: "/cockroach",
+  },
 };
