@@ -424,6 +424,64 @@ export const getStartedItems: GetStartedItems = [
     ],
   },
   {
+    title: "MSSQL",
+    items: [
+      {
+        name: "MSSQL",
+        path: {
+          existing: "/docs/get-started/mssql-existing",
+          new: "/docs/get-started/mssql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/mssql-light.png",
+            style: {
+              style: "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+          dark: {
+            path: "/public/svg/mssql-dark.png",
+            style: {
+              style: "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    title: "CockroachDB",
+    items: [
+      {
+        name: "CockroachDB",
+        path: {
+          existing: "/docs/get-started/cockroach-existing",
+          new: "/docs/get-started/cockroach-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/cockroachdb-light.png",
+            style: {
+              style: "border-radius: 5px",
+              width: "24px",
+            },
+          },
+          dark: {
+            path: "/public/svg/cockroachdb-dark.png",
+            style: {
+              style: "border-radius: 5px",
+              width: "24px",
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
     title: "Native SQLite",
     items: [
       {
