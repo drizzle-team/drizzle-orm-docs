@@ -437,7 +437,7 @@ export const customSponsors: ISponsor[] = [
   },
   {
     tier: {
-      name: "$1000 a month",
+      name: "$250 a month",
       isOneTime: false,
     },
     sponsorEntity: {
@@ -573,5 +573,20 @@ export const customSponsors: ISponsor[] = [
       background:
         'url("/svg/gibsonai-light.svg") 0% 0% / contain no-repeat content-box',
     },
+  },
+    {
+    tier: {
+      name: "$100 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/solidhour",
+      name: "Solid Hour",
+      avatarUrl: "/images/solidhour.png",
+    },
+    createdAt: "2023-06-11T12:32:16Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
   },
 ];
