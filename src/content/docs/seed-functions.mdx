@@ -1,4 +1,6 @@
 import Callout from '@mdx/Callout.astro';
+import Tab from "@mdx/Tab.astro";
+import Tabs from "@mdx/Tabs.astro";
 
 # Generators
 
@@ -45,11 +47,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates values from given array
 
-|  | param      | default                   | type
-|:-| :--------  | :--------                 | :--------
-|  |`values`    |--                         |`any[]` \| `{ weight: number; values: any[] }[]`
-|  |`isUnique`  |database column uniqueness |`boolean`
-|  |`arraySize` |--                         |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`values`    |--                           |`any[]` \| `{ weight: number; values: any[] }[]`
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 
 <rem025 />
@@ -107,7 +109,7 @@ Generates numbers with a floating point within the given range
 
 |  | param      | default                                                                                               | type
 |:-| :--------  | :--------                                                                                             | :--------
-|  |`isUnique`  |database column uniqueness                                                                             |`boolean`
+|  |`isUnique`  |`database column uniqueness`                                                                           |`boolean`
 |  |`precision` |`100`                                                                                                  |`number`
 |  |`maxValue`  |``` `precision * 1000` if isUnique equals false``` ``` `precision * count` if isUnique equals true```  |`number`
 |  |`minValue`  |`-maxValue`                                                                                            |`number`
@@ -152,7 +154,7 @@ Generates integers within the given range
 
 |  | param      | default                                                                            | type
 |:-| :--------  | :--------                                                                          | :--------
-|  |`isUnique`  |database column uniqueness                                                          |`boolean`
+|  |`isUnique`  |`database column uniqueness`                                                        |`boolean`
 |  |`maxValue`  |``` `1000` if isUnique equals false``` ``` `count * 10` if isUnique equals true```  |`number \| bigint`
 |  |`minValue`  |`-maxValue`                                                                         |`number \| bigint`
 |  |`arraySize` |--                                                                                  |`number`
@@ -401,10 +403,10 @@ Generates time intervals.
 
 Example of a generated value: `1 year 12 days 5 minutes`
 
-|  | param      | default            | type
-|:-| :--------  | :--------          | :--------
-|  |`isUnique`  | column uniqueness  |`boolean`
-|  |`arraySize` |--                  |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 ```ts 
@@ -432,10 +434,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates random strings
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 ```ts 
@@ -488,10 +490,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates a person's first name
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 ```ts 
@@ -519,10 +521,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates a person's last name
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 ```ts 
@@ -550,10 +552,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates a person's full name
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 ```ts 
@@ -687,10 +689,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates country's names
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 
@@ -719,10 +721,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates city's names
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 
@@ -751,9 +753,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates street address
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 
@@ -810,10 +813,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates postal codes
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 
@@ -870,10 +873,10 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates random company's names
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`isUnique`  |--          |`boolean`
-|  |`arraySize` |--          |`number`
+|  | param      | default                     | type
+|:-| :--------  | :--------                   | :--------
+|  |`isUnique`  |`database column uniqueness` |`boolean`
+|  |`arraySize` |--                           |`number`
 
 <rem025 />
 
@@ -935,7 +938,7 @@ Generates 2D points within specified ranges for x and y coordinates.
 
 |  | param       | default                                                                                 | type
 |:-| :--------   | :--------                                                                               | :--------
-|  |`isUnique`   |database column uniqueness                                                               |`boolean`
+|  |`isUnique`   |`database column uniqueness`                                                             |`boolean`
 |  |`maxXValue`  |``` `10 * 1000` if isUnique equals false``` ``` `10 * count` if isUnique equals true```  |`number`
 |  |`minXValue`  |`-maxXValue`                                                                             |`number`
 |  |`maxYValue`  |``` `10 * 1000` if isUnique equals false``` ``` `10 * count` if isUnique equals true```  |`number`
@@ -988,7 +991,7 @@ line equation: a*x + b*y + c = 0
 
 |  | param       | default                                                                                 | type
 |:-| :--------   | :--------                                                                               | :--------
-|  |`isUnique`   |database column uniqueness                                                               |`boolean`
+|  |`isUnique`   |`database column uniqueness`                                                             |`boolean`
 |  |`maxAValue`  |``` `10 * 1000` if isUnique equals false``` ``` `10 * count` if isUnique equals true```  |`number`
 |  |`minAValue`  |`-maxAValue`                                                                             |`number`
 |  |`maxBValue`  |``` `10 * 1000` if isUnique equals false``` ``` `10 * count` if isUnique equals true```  |`number`
@@ -1029,6 +1032,270 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
         // number of elements in each one-dimensional array. 
         // (If specified, arrays will be generated.)
         arraySize: 3
+      }),
+    },
+  },
+}));
+
+```
+
+### `bitString`
+
+<rem025 />
+Generates bit strings based on specified parameters.
+
+|  | param       | default                                                                                 | type
+|:-| :--------   | :--------                                                                               | :--------
+|  |`isUnique`   |`database column uniqueness`                                                             |`boolean`
+|  |`dimensions` |`database column bit-length`                                                             |`number`
+|  |`arraySize`  |--                                                                                       |`number`
+<rem025 />
+
+```ts 
+import { seed } from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  bitStringTable: {
+    columns: {
+      bit: funcs.bitString({
+        // desired length of each bit string (e.g., `dimensions = 3` produces values like `'010'`).
+        dimensions: 12,
+
+        // property that controls if generated values gonna be unique or not;
+        isUnique: true,
+
+        // number of elements in each one-dimensional array (If specified, arrays will be generated);
+        arraySize: 3,
+      }),
+    },
+  },
+}));
+
+```
+
+### `inet`
+
+<rem025 />
+Generates ip addresses based on specified parameters.
+
+|  | param       | default                                                                                 | type
+|:-| :--------   | :--------                                                                               | :--------
+|  |`isUnique`   |`database column uniqueness`                                                             |`boolean`
+|  |`arraySize`  |--                                                                                       |`number`
+|  |`ipAddress`  |`'ipv4'`                                                                                 |`'ipv4' \| 'ipv6'`
+|  |`includeCidr`|`true`                                                                                   |`boolean`
+<rem025 />
+
+```ts 
+import { seed } from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  inetTable: {
+    columns: {
+      inet: funcs.inet({
+        // property that controls if generated values gonna be unique or not;
+        isUnique: true,
+
+        // number of elements in each one-dimensional array (If specified, arrays will be generated);
+        arraySize: 3,
+
+        // type of IP address to generate — either "ipv4" or "ipv6";
+        ipAddress: "ipv4",
+
+        // determines whether generated IPs include a CIDR suffix.
+        includeCidr: true,
+      }),
+    },
+  },
+}));
+```
+
+### `geometry`
+
+<rem025 />
+Generates geometry objects based on the given parameters.
+
+<Callout title='warnings'>
+<Tabs items={['arraySize', 'srid']}>
+<Tab>
+Currently, if you set arraySize to a value greater than 1 
+or try to insert more than one `geometry point` element into a `geometry(point, 0)[]` column in PostgreSQL or CockroachDB via drizzle-orm, 
+you’ll encounter an error.
+
+This bug is already in the backlog.
+
+<Callout title="❌">
+```ts {13}
+import { seed } from "drizzle-seed";
+import { geometry, pgTable } from 'drizzle-orm/pg-core';
+
+const geometryTable = pgTable('geometry_table', {
+	geometryArray: geometry('geometry_array', { type: 'point', srid: 0 }).array(3),
+});
+
+await seed(db, { geometryTable }, { count: 1000 }).refine((funcs) => ({
+  geometryTable: {
+    columns: {
+      geometryArray: funcs.geometry({
+        // currently arraySize with values > 1 are not supported
+        arraySize: 3,
+      }),
+    },
+  },
+}));
+```
+</Callout>
+
+<Callout title='✅'>
+```ts {13}
+import { seed } from "drizzle-seed";
+import { geometry, pgTable } from 'drizzle-orm/pg-core';
+
+const geometryTable = pgTable('geometry_table', {
+	geometryArray: geometry('geometry_array', { type: 'point', srid: 0 }).array(1),
+});
+
+await seed(db, { geometryTable }, { count: 1000 }).refine((funcs) => ({
+  geometryTable: {
+    columns: {
+      geometryArray: funcs.geometry({
+        // will work as expected
+        arraySize: 1,
+      }),
+    },
+  },
+}));
+```
+</Callout>
+</Tab>
+
+<Tab>
+Currently, if you set the SRID of a `geometry(point)` column to anything other than 0 (for example, 4326) in your drizzle-orm table declaration, 
+you’ll encounter an error during the seeding process.
+
+This bug is already in the backlog.
+
+<Callout title="❌">
+```ts {5}
+import { seed } from "drizzle-seed";
+import { geometry, pgTable } from 'drizzle-orm/pg-core';
+
+const geometryTable = pgTable('geometry_table', {
+	geometryColumn: geometry('geometry_column', { type: 'point', srid: 4326 }),
+});
+
+await seed(db, { geometryTable }, { count: 1000 }).refine((funcs) => ({
+  geometryTable: {
+    columns: {
+      geometryColumn: funcs.geometry({
+        srid: 4326,
+      }),
+    },
+  },
+}));
+```
+</Callout>
+
+<Callout title='✅'>
+```ts {5}
+import { seed } from "drizzle-seed";
+import { geometry, pgTable } from 'drizzle-orm/pg-core';
+
+const geometryTable = pgTable('geometry_table', {
+	geometryColumn: geometry('geometry_column', { type: 'point', srid: 0 }),
+});
+
+await seed(db, { geometryTable }, { count: 1000 }).refine((funcs) => ({
+  geometryTable: {
+    columns: {
+      geometryColumn: funcs.geometry({
+        srid: 4326,
+      }),
+    },
+  },
+}));
+```
+</Callout>
+</Tab>
+</Tabs>
+</Callout>
+
+|  | param          | default                                                                                 | type
+|:-| :--------      | :--------                                                                               | :--------
+|  |`isUnique`      |`database column uniqueness`                                                             |`boolean`
+|  |`arraySize`     |--                                                                                       |`number`
+|  |`type`          |`'point'`                                                                                |`'point'`
+|  |`srid`          |`4326`                                                                                   |`4326 \| 3857`
+|  |`decimalPlaces` |`6`                                                                                      |`1 \| 2 \| 3 \| 4 \| 5 \| 6 \| 7`
+<rem025 />
+
+```ts 
+import { seed } from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  geometryTable: {
+    columns: {
+      geometryPointTuple: funcs.geometry({
+        // property that controls if generated values gonna be unique or not;
+        isUnique: true,
+
+        // number of elements in each one-dimensional array (If specified, arrays will be generated);
+        arraySize: 1,
+
+        // geometry type to generate; currently only `'point'` is supported;
+        type: "point",
+
+        // Spatial Reference System Identifier: determines what type of point will be generated - either `4326` or `3857`;
+        srid: 4326,
+
+        // number of decimal places for points when `srid` is `4326` (e.g., `decimalPlaces = 3` produces values like `'point(30.723 46.482)'`).
+        decimalPlaces: 5,
+      }),
+    },
+  },
+}));
+
+```
+
+### `vector`
+
+<rem025 />
+Generates vectors based on the provided parameters.
+
+|  | param          | default                                                      | type
+|:-| :--------      | :--------                                                    | :--------
+|  |`isUnique`      |`database column uniqueness`                                  |`boolean`
+|  |`arraySize`     |--                                                            |`number`
+|  |`decimalPlaces` |`2`                                                           |`number`
+|  |`dimensions`    |`database column’s dimensions`                                |`number`
+|  |`minValue`      |`-1000`                                                       |`number`
+|  |`maxValue`      |`1000`                                                        |`number`
+<rem025 />
+
+```ts 
+import { seed } from "drizzle-seed";
+
+await seed(db, schema, { count: 1000 }).refine((funcs) => ({
+  vectorTable: {
+    columns: {
+      vector: funcs.vector({
+        // property that controls if generated values gonna be unique or not;
+        isUnique: true,
+
+        // number of elements in each one-dimensional array (If specified, arrays will be generated);
+        arraySize: 3,
+
+        // number of decimal places for each vector element (e.g., `decimalPlaces = 3` produces values like `1.123`);
+        decimalPlaces: 5,
+
+        // number of elements in each generated vector (e.g., `dimensions = 3` produces values like `[1,2,3]`);
+        dimensions: 12,
+
+        // minimum allowed value for each vector element;
+        minValue: -100,
+
+        // maximum allowed value for each vector element.
+        maxValue: 100,
       }),
     },
   },
