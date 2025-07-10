@@ -1,15 +1,34 @@
+---
+import SearchIcon from "@/assets/icons/SearchIcon.astro";
+---
+
 <div class="nav_search-wrap">
   <div class="search-wrap--centered" id="docsearch"></div>
   <div id="custom-button" class="nav_ai-btn"></div>
 </div>
+<button class="mobile-search-button" id="mobile-search-btn" aria-label="Search">
+  <SearchIcon />
+  Search
+</button>
 <script type="module" is:inline data-astro-rerun>
-  docsearch({
+  const docSearchInstance = docsearch({
     container: '#docsearch',
     appId: "MXZNUT59HV",
     apiKey: "7c390e262ac8858df0b6624d01d9dfef",
     indexName: "orm-drizzle",
     placeholder: "Search documentation...",
   });
+
+  const mobileSearchBtn = document.getElementById('mobile-search-btn');
+  if (mobileSearchBtn) {
+    mobileSearchBtn.addEventListener('click', () => {
+      // Trigger the DocSearch modal by clicking the hidden search button
+      const searchButton = document.querySelector('.DocSearch-Button');
+      if (searchButton) {
+        searchButton.click();
+      }
+    });
+  }
 
   let themeName = localStorage.getItem('theme');
   if(themeName === 'system') {
@@ -72,10 +91,45 @@
     border-radius: 4px;
   }
 
+  .mobile-search-button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px 8px 8px;
+    height: 36px;
+    background-color: #f0f0f0;
+    border: 1px solid rgba(33,39,46,.12);
+    border-radius: 8px;
+    cursor: pointer;
+    color: #909090;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-search-button:hover {
+    color: #000;
+    border-color: #b8bfc8;
+  }
+
+  html[class~=dark] .mobile-search-button {
+    background-color: #1c1c1c;
+    border-color: #292929;
+    color: #909090;
+  }
+
+  html[class~=dark] .mobile-search-button:hover {
+    background-color: #1a1a1a;
+    color: #c8c9ca;
+    border-color: #c8c9ca;
+  }
+
   @media screen and (max-width: 768px) {
     .nav_search-wrap {
       display: none;
     }
     
+    .mobile-search-button {
+      display: flex;
+    }
   }
 </style>
