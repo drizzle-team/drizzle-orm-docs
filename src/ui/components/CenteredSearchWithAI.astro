@@ -1,6 +1,12 @@
 <div class="nav_search-wrap">
   <div class="search-wrap--centered" id="docsearch"></div>
-  <div id="custom-button" class="nav_ai-btn"></div>
+  <button id="ask-ai-button" class="nav_ai-btn" data-inkeep-sidebar-chat-trigger>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ai-icon">
+      <path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.797 1.797 0 0 1 1.262.147A10.955 10.955 0 0 0 12 23" opacity="0.5"/>
+      <path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/>
+    </svg>
+    <span>Ask AI</span>
+  </button>
 </div>
 <script type="module" is:inline data-astro-rerun>
   docsearch({
@@ -11,46 +17,72 @@
     placeholder: "Search documentation...",
   });
 
-  let themeName = localStorage.getItem('theme');
-  if(themeName === 'system') {
-    themeName = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
-  }
+  // Inkeep Sidebar Initialization
+  const initializeInkeepSidebar = () => {
+    // Only initialize if Inkeep is loaded and container exists
+    if (typeof Inkeep === 'undefined' || !document.getElementById('ikp-sidebar-chat-target')) {
+      return;
+    }
 
-  const properties = {
-    stylesheetUrls: ['/inkeep-styles.css'],
-    chatButtonType: 'ICON_TEXT',
-    isPositionFixed: false,
-    baseSettings: {
-      apiKey: '4f4da4a5733032ef8ff23e3b7906954877fd0ee54d58d1e0',
-      integrationId: 'clpbm8p9y002ns601vbbswj5i',
-      organizationId: 'clog94xy50001s601yapu7swn',
-      organizationDisplayName: 'Drizzle ORM',
-      primaryBrandColor: '#FFFFFF',
-      theme: {
+    let themeName = localStorage.getItem('theme');
+    if(themeName === 'system') {
+      themeName = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+
+    const config = {
+      baseSettings: {
+        apiKey: '133604981aac855cac18d398251e01f28433cdf98918ad8d',
+        organizationDisplayName: 'Drizzle ORM',
+        primaryBrandColor: '#FFFFFF',
+        styles: [
+          {
+            key: "custom-styles",
+            type: "link",
+            value: "/inkeep-styles.css",
+          },
+        ],
         colorMode: {
+          sync: {
+            target: document.documentElement,
+            attributes: ["class"],
+            isDarkMode: (attributes) => attributes["class"]?.includes("dark"),
+          },
           forcedColorMode: themeName,
         },
       },
-    },
-    style: {visibility: 'visible'},
-    modalSettings: {
-      areOpenHotKeysDisabled: true,
-    },
-    aiChatSettings: {
-      botAvatarSrcUrl: '/svg/drizzle.svg',
+      aiChatSettings: {
+        aiAssistantAvatar: '/svg/drizzle.svg',
+      },
+      position: 'right',
+      defaultWidth: 420,
+      minWidth: 250,
+      maxWidth: 600,
+      defaultOpen: false,
+      autoCloseThreshold: 0.7,
+      triggerSelector: '[data-inkeep-sidebar-chat-trigger]',
+    };
+
+    // Clean container and reinitialize every time
+    try {
+      const container = document.getElementById('ikp-sidebar-chat-target');
+      if (container) {
+        // Clear any leftover DOM elements from previous widget
+        container.innerHTML = '';
+        console.log('Container cleared, children count:', container.children.length);
+      }
+      
+      // Always create fresh widget (no update method)
+      window.inkeepWidget = Inkeep.SidebarChat("#ikp-sidebar-chat-target", config);
+      console.log('Inkeep sidebar reinitialized with component');
+    } catch (e) {
+      console.log('Inkeep initialization error:', e);
     }
-  }
+  };
 
-  //@ts-ignore
-  const inkeepWidget = Inkeep().embed({
-    componentType: "ChatButton",
-    targetElement: document.getElementById("custom-button"),
-    properties,
-  });
-
-  window.inkeepWidget = inkeepWidget;
+  // Initialize with a small delay to ensure Inkeep CDN is loaded
+  setTimeout(initializeInkeepSidebar, 100);
 </script>
 <style>
   .nav_search-wrap {
@@ -61,21 +93,55 @@
     max-width: 420px;
   }
 
-  html[class~=dark] .nav_ai-btn {
-    background-color: #1c1c1c;
-  }
-
   .nav_ai-btn {
     width: 108px;
     height: 33px;
     background-color: #F4F4F4;
     border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .nav_ai-btn:hover {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+
+  .nav_ai-btn:active {
+    background-color: #d1d5db;
+  }
+
+  .ai-icon {
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+  }
+
+  html[class~=dark] .nav_ai-btn {
+    background-color: #1c1c1c;
+    color: #9ca3af;
+  }
+
+  html[class~=dark] .nav_ai-btn:hover {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+
+  html[class~=dark] .nav_ai-btn:active {
+    background-color: #4b5563;
   }
 
   @media screen and (max-width: 768px) {
     .nav_search-wrap {
       display: none;
     }
-    
   }
 </style>

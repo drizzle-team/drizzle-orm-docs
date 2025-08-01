@@ -15,7 +15,8 @@ const defaultDescription =
   <meta charset="UTF-8" />
   <meta name="robots" content="index,follow" />
   <link rel="sitemap" href="/sitemap-index.xml" />
-  <ViewTransitions />
+  <!-- Disable ViewTransitions to prevent CORS issues with Inkeep sidebar -->
+  <!-- <ViewTransitions /> -->
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -122,10 +123,11 @@ const defaultDescription =
     });
   </script>
   <script
-    is:inline
     type="module"
-    src="https://unpkg.com/@inkeep/widgets-embed@0.2.237/dist/embed.js"
+    src="https://cdn.jsdelivr.net/npm/@inkeep/cxkit-js@^0.5.11/dist/embed.js"
+    crossorigin="anonymous"
     defer></script>
+  
   <script
     is:inline
     defer

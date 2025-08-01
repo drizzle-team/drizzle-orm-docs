@@ -37,6 +37,9 @@ const pageHasDialects = Object.keys(dialects).includes(
     description={description}
   />
   <body class="banner-shown">
+    <!-- Inkeep Sidebar Chat Container (Global) -->
+    <div id="ikp-sidebar-chat-target"></div>
+    
     <MDXStyles />
     <Banner />
     <Header />
@@ -64,6 +67,42 @@ const pageHasDialects = Object.keys(dialects).includes(
       </div>
     </main>
     <style is:global>
+      /* Ensure Inkeep sidebar container is positioned correctly */
+      #ikp-sidebar-chat-target {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: 100vh !important;
+        z-index: 10000 !important;
+        pointer-events: none !important;
+      }
+      
+      /* Allow pointer events on the actual sidebar content */
+      #ikp-sidebar-chat-target > * {
+        pointer-events: auto !important;
+        z-index: 10001 !important;
+      }
+      
+      /* Ensure sidebar appears above all other elements including headers */
+      #ikp-sidebar-chat-target [data-inkeep-sidebar],
+      #ikp-sidebar-chat-target .inkeep-sidebar,
+      #ikp-sidebar-chat-target div[style*="position: fixed"] {
+        z-index: 10002 !important;
+        position: fixed !important;
+      }
+      
+      /* Ensure sidebar backdrop/overlay appears correctly */
+      #ikp-sidebar-chat-target [data-inkeep-backdrop],
+      #ikp-sidebar-chat-target .inkeep-backdrop {
+        z-index: 9999 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+      }
+
       .fixed-container {
         position: fixed;
         left: 0;

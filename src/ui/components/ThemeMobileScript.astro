@@ -35,12 +35,10 @@
         themeName = theme;
       }
       if (window.inkeepWidget) {
-        window.inkeepWidget.render({
+        window.inkeepWidget.update({
           baseSettings: {
-            theme: {
-              colorMode: {
-                forcedColorMode: themeName,
-              },
+            colorMode: {
+              forcedColorMode: themeName,
             },
           },
         });
