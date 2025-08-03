@@ -14,7 +14,7 @@ import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx'
 import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
-import QueryXata from '@mdx/get-started/postgresql/QueryXata.mdx';
+import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
 import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 <Breadcrumbs/>
@@ -24,43 +24,40 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
-  - **Xata database** - [read here](https://xata.io/docs)
-  - **Xata driver** - [read here](https://xata.io/docs/sdk/typescript/overview) & [GitHub](https://github.com/xataio/client-ts)
+  - **Xata Postgres database** - [read here](https://xata.io/documentation)
 </Prerequisites>
 
 <FileStructure/>
 
-#### Step 1 - Install **@xata.io/client** package
-<InstallPackages lib='@xata.io/client'/>
+#### Step 1 - Install **postgres** package
+<InstallPackages lib='postgres'/>
 
 #### Step 2 - Setup connection variables
 
 <SetupEnv env_variable='DATABASE_URL' />
 
-#### Step 3 - Generate Xata client
+You can obtain a connection string by following the [Xata documentation](https://xata.io/documentation/getting-started).
 
-To generate the Xata client, please refer to the [Xata docs](https://xata.io/docs/getting-started/installation)
-
-#### Step 4 - Connect Drizzle ORM to the database
+#### Step 3 - Connect Drizzle ORM to the database
 
 <ConnectXata/>
 
-#### Step 5 - Create a table
+#### Step 4 - Create a table
 
 <CreateTable />
 
-#### Step 6 - Setup Drizzle config file
+#### Step 5 - Setup Drizzle config file
 
 <SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
 
-#### Step 7 - Applying changes to the database
+#### Step 6 - Applying changes to the database
 
 <ApplyChanges />
 
-#### Step 8 - Seed and Query the database
+#### Step 7 - Seed and Query the database
 
-<QueryXata />
+<QueryDatabase dialect='postgres-js' env_variable='DATABASE_URL'/>
 
-#### Step 9 - Run index.ts file
+#### Step 8 - Run index.ts file
 
 <RunFile/>
