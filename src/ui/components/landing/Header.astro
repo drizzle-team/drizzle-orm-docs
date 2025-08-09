@@ -111,30 +111,7 @@ import DBImage from "@/assets/images/landing/dbLight.svg"
         </div>
         <div id="docsearch"></div>
       </div>
-      <button id="inkeepButton" class="header-button">
-        <div class="header-button-image">
-          <div class="header-button-image-learn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.797 1.797 0 0 1 1.262.147A10.955 10.955 0 0 0 12 23" opacity="0.5"/><path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/></svg>
-          </div>
-        </div>
-        <div class="header-button-text"><span>Ask Docs</span></div>
-        <div class="header-button-arrow">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-right"
-          ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-            points="12 5 19 12 12 19"></polyline></svg
-          >
-        </div>
-      </button>
+      <!-- Inkeep chat button will be automatically added -->
     </div>
   </div>
   <div class="header-middle-container">
@@ -211,77 +188,62 @@ import DBImage from "@/assets/images/landing/dbLight.svg"
   });
 </script>
 <script type="module" is:inline data-astro-rerun>
-  const inkeepButton = document.getElementById("inkeepButton");
-
-  // Create a new div element to hold the Inkeep modal and set its id and position
-  const inkeepDiv = document.createElement("div");
-  inkeepDiv.id = "inkeepModal";
-  inkeepDiv.style.position = "absolute";
-  document.body.appendChild(inkeepDiv);
-
-  const handleClose = () => {
-    inkeepWidget.render({
-      ...config,
-      isOpen: false,
-    });
-  };
-
-  const handleOpen = () => {
-    let themeName = localStorage.getItem("theme");
-    if (themeName === "system") {
-      themeName = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+  // Initialize Inkeep Chat Button for landing page
+  function initializeInkeepLanding() {
+    let themeName = localStorage.getItem('theme');
+    if(themeName === 'system') {
+      themeName = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
     }
-    inkeepWidget.render({
-      ...config,
-      isOpen: true,
+
+    const config = {
       baseSettings: {
-        ...config.properties.baseSettings,
+        apiKey: '133604981aac855cac18d398251e01f28433cdf98918ad8d',
+        integrationId: 'clpbm8p9y002ns601vbbswj5i',
+        organizationId: 'clog94xy50001s601yapu7swn',
+        organizationDisplayName: 'Drizzle ORM',
+        primaryBrandColor: '#FFFFFF',
         theme: {
           colorMode: {
             forcedColorMode: themeName,
           },
         },
       },
-    });
-  };
-  const config = {
-    stylesheetUrls: ["/inkeep-styles.css"],
-    componentType: "CustomTrigger", // required
-    targetElement: inkeepDiv, // required
-    properties: {
-      isOpen: false, // required
-      onClose: handleClose, // required
-      onOpen: undefined,
-      baseSettings: {
-        apiKey: "4f4da4a5733032ef8ff23e3b7906954877fd0ee54d58d1e0",
-        integrationId: "clpbm8p9y002ns601vbbswj5i",
-        organizationId: "clog94xy50001s601yapu7swn",
-        organizationDisplayName: "Drizzle ORM",
-        primaryBrandColor: "#FFFFFF",
-        theme: {
-          colorMode: {
-            forcedColorMode: "dark",
-          },
-        },
-      },
       modalSettings: {
-        defaultView: "AI_CHAT",
         areOpenHotKeysDisabled: true,
+        defaultView: 'AI_CHAT',
       },
       aiChatSettings: {
-        botAvatarSrcUrl: "/svg/drizzle.svg",
+        botAvatarSrcUrl: '/svg/drizzle.svg',
+        exampleQuestions: ["How do I get started with Drizzle ORM?", "What databases does Drizzle support?", "How do I create a schema?"],
       },
-    },
-  };
+    };
 
-  // Embed the widget using the `Inkeep.embed()` function.
-  const inkeepWidget = Inkeep().embed(config);
+    // Initialize the chat button widget
+    try {
+      const widget = Inkeep.ChatButton(config);
+      window.inkeepWidget = widget;
+      console.log('Inkeep widget initialized successfully on landing page');
+    } catch (error) {
+      console.error('Failed to initialize Inkeep widget on landing page:', error);
+    }
+  }
 
-  // Add event listener to open the Inkeep modal when the button is clicked
-  inkeepButton.addEventListener("click", handleOpen);
-  window.inkeepWidget = inkeepWidget;
+  // Wait for both DOM and Inkeep script to be ready
+  function waitForInkeepLanding() {
+    if (typeof Inkeep !== 'undefined') {
+      initializeInkeepLanding();
+    } else {
+      setTimeout(waitForInkeepLanding, 100);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', waitForInkeepLanding);
+  } else {
+    waitForInkeepLanding();
+  }
 </script>
 
 <script src="./snake/index.ts"></script>
