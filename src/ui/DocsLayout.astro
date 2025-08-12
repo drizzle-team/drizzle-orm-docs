@@ -40,6 +40,8 @@ const pageHasDialects = Object.keys(dialects).includes(
     <MDXStyles />
     <Banner />
     <Header />
+    
+    <!-- Main app content -->
     <div class="fixed-container">
       <div class="fixed-elements">
         <DocsSidebar
@@ -55,6 +57,7 @@ const pageHasDialects = Object.keys(dialects).includes(
         </div>
       </div>
     </div>
+        
     <main class="documentation-container">
       <div class="documentation-content">
         {pageHasDialects && <div style="height: 52px" />}
@@ -63,6 +66,115 @@ const pageHasDialects = Object.keys(dialects).includes(
         <!-- <Footer /> -->
       </div>
     </main>
+    
+    <!-- Inkeep Sidebar Chat Target - Positioned as overlay -->
+    <div id="ikp-sidebar-chat-target" style="position: fixed; top: 0; right: 0; height: 100vh; z-index: 999;"></div>
+    
+    <!-- Inkeep Sidebar Chat Initialization -->
+    <script is:inline>
+      (function () {
+        const config = {
+          baseSettings: {
+            apiKey: "4f4da4a5733032ef8ff23e3b7906954877fd0ee54d58d1e0",
+          },
+          aiChatSettings: {
+            exampleQuestions: ["How do I get started with Drizzle ORM?", "What databases are supported?", "How do I migrate my schema?"],
+            introMessage: "👋 Hi! I'm here to help you with Drizzle ORM. Ask me anything!",
+          },
+          position: "right",
+          minWidth: 300,
+          maxWidth: 600,
+          defaultWidth: 420,
+          defaultOpen: false,
+        };
+
+        let sidebarWidget = null;
+        let isSidebarOpen = false;
+
+        const initSidebarChat = () => {
+          // Check if already initialized
+          if (window.__ikpSidebarInited) return;
+          
+          // Check if Inkeep is available
+          if (window.Inkeep && typeof window.Inkeep.SidebarChat === "function") {
+            try {
+              // Add onOpenChange callback to track sidebar state
+              const configWithCallback = {
+                ...config,
+                onOpenChange: (isOpen) => {
+                  isSidebarOpen = isOpen;
+                  console.log("Sidebar state changed:", isOpen);
+                }
+              };
+              
+              sidebarWidget = window.Inkeep.SidebarChat("#ikp-sidebar-chat-target", configWithCallback);
+              window.__ikpSidebarInited = true;
+              
+              // Add click-outside-to-close functionality
+              setupClickOutsideToClose();
+              
+              console.log("Inkeep Sidebar Chat initialized successfully");
+            } catch (error) {
+              console.error("Failed to initialize Inkeep Sidebar Chat:", error);
+            }
+          } else {
+            // Retry after a short delay if Inkeep is not available yet
+            setTimeout(initSidebarChat, 100);
+          }
+        };
+
+        const setupClickOutsideToClose = () => {
+          // Remove any existing click listener to prevent duplicates
+          document.removeEventListener('click', handleClickOutside);
+          
+          // Add new click listener
+          document.addEventListener('click', handleClickOutside);
+        };
+
+        const handleClickOutside = (event) => {
+          // Only proceed if sidebar is open
+          if (!isSidebarOpen) return;
+          
+          // Check if click was inside the sidebar or on the trigger button
+          const sidebarContainer = document.querySelector('#ikp-sidebar-chat-target');
+          const triggerButton = document.querySelector('[data-inkeep-sidebar-chat-trigger]');
+          
+          if (!sidebarContainer || !triggerButton) return;
+          
+          // If click was on trigger button or inside sidebar, don't close
+          if (triggerButton.contains(event.target) || sidebarContainer.contains(event.target)) {
+            return;
+          }
+          
+          // Check if the click was on any child elements of the sidebar
+          const sidebarElements = sidebarContainer.querySelectorAll('*');
+          for (let element of sidebarElements) {
+            if (element.contains(event.target)) {
+              return;
+            }
+          }
+          
+          // Click was outside - close the sidebar by clicking the trigger button
+          triggerButton.click();
+        };
+
+        // Initialize when DOM is ready
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initSidebarChat, { once: true });
+        } else {
+          initSidebarChat();
+        }
+        
+        // Also initialize on load and Astro page transitions
+        window.addEventListener("load", initSidebarChat, { once: true });
+        document.addEventListener("astro:page-load", initSidebarChat);
+        document.addEventListener("astro:after-swap", () => {
+          // Reset initialization flag for page transitions
+          window.__ikpSidebarInited = false;
+          initSidebarChat();
+        });
+      })();
+    </script>
     <style is:global>
       .fixed-container {
         position: fixed;
@@ -71,6 +183,14 @@ const pageHasDialects = Object.keys(dialects).includes(
         bottom: 0;
         z-index: 99;
         pointer-events: none;
+      }
+      /* Ensure the toggle button inside fixed container is clickable */
+      .fixed-container [data-inkeep-sidebar-chat-trigger] {
+        pointer-events: all;
+      }
+      /* Ensure the sidebar chat target is interactive */
+      .fixed-container #ikp-sidebar-chat-target {
+        pointer-events: all;
       }
 
       .fixed-elements {
@@ -207,7 +327,8 @@ const pageHasDialects = Object.keys(dialects).includes(
       }
     </script>
     <script is:inline>
-      const changeNpmTab = () => {
+      if (!window.changeNpmTab) {
+      window.changeNpmTab = () => {
         const packageManagers = ["npm", "yarn", "pnpm", "bun"];
 
         let packageManagerIndex = packageManagers.indexOf(packageManager);
@@ -273,8 +394,10 @@ const pageHasDialects = Object.keys(dialects).includes(
           });
         });
       };
+      }
 
-      const updateCollapsedSections = () => {
+      if (!window.updateCollapsedSections) {
+      window.updateCollapsedSections = () => {
         document
           .querySelectorAll(".nav-items-collapsable")
           .forEach((section) => {
@@ -296,8 +419,10 @@ const pageHasDialects = Object.keys(dialects).includes(
           JSON.stringify(expandedSections),
         );
       };
+      }
 
-      const scrollSidebar = () => {
+      if (!window.scrollSidebar) {
+      window.scrollSidebar = () => {
         const expandedSections = localStorage.getItem("expandedSections")
           ? JSON.parse(localStorage.getItem("expandedSections"))
           : [];
@@ -369,10 +494,11 @@ const pageHasDialects = Object.keys(dialects).includes(
           }
         }
       };
+      }
 
-      scrollSidebar();
-      updateCollapsedSections();
-      changeNpmTab();
+      if (window.scrollSidebar) scrollSidebar();
+      if (window.updateCollapsedSections) updateCollapsedSections();
+      if (window.changeNpmTab) changeNpmTab();
     </script>
     <script>
       class Rem1Element extends HTMLElement {
