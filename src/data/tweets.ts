@@ -90,12 +90,13 @@ export const tweets: ITweet[] = [
     href: "https://x.com/t3dotgg/status/1787604253860847775",
   },
   {
-    avatar: aarondfrancis,
-    name: "Aaron Francis",
-    login: "aarondfrancis",
-    text: "Y'all should just copy everything Eloquent has",
-    href: "https://x.com/aarondfrancis/status/1641145228189892613?s=20",
+    avatar: brodaNoel,
+    name: "Broda Noel",
+    login: "BrodaNoel",
+    text: "Is this a joke? Because if this is a joke, it's really really really bad joke, because now I'm fucking hating @DrizzleORM without even knowing who they are.\nI mean, this is not a good marketing strategy if this was a marketing-joke.\nAnd if it's actually true, I'll hate them more.",
+    href: "https://x.com/BrodaNoel/status/1913248949252616287",
   },
+
   {
     avatar: imfelquis,
     name: "Ofelquis Gimenes",
@@ -185,10 +186,10 @@ export const tweets: ITweet[] = [
     tweetImage: spacesexdragonTweet,
   },
   {
-    avatar: brodaNoel,
-    name: "Broda Noel",
-    login: "BrodaNoel",
-    text: "Is this a joke? Because if this is a joke, it's really really really bad joke, because now I'm fucking hating @DrizzleORM without even knowing who they are.\nI mean, this is not a good marketing strategy if this was a marketing-joke.\nAnd if it's actually true, I'll hate them more.",
-    href: "https://x.com/BrodaNoel/status/1913248949252616287",
+    avatar: aarondfrancis,
+    name: "Aaron Francis",
+    login: "aarondfrancis",
+    text: "Y'all should just copy everything Eloquent has",
+    href: "https://x.com/aarondfrancis/status/1641145228189892613?s=20",
   },
 ];
