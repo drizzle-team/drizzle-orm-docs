@@ -25,6 +25,7 @@ import silvenonTweet from "@/assets/images/tweets/silvenonTweet.webp";
 import spacesexdragon from "@/assets/images/tweets/spacesexdragon.jpg";
 import spacesexdragonTweet from "@/assets/images/tweets/spacesexdragonTweet.jpg";
 import brodaNoel from "@/assets/images/tweets/brodaNoel.jpg";
+import jacobmparis from "@/assets/images/tweets/jacobmparis.jpg";
 
 // Tweet images
 
@@ -153,6 +154,13 @@ export const tweets: ITweet[] = [
     login: "hisbvdis",
     text: `I have finally switched from @prisma to @DrizzleORM.\nIt was not easy.\nDear Drizzle Team, you have created an awesome orm with awfull documentation.\nAnyway, good for you, thanks and good luck.`,
     href: "https://x.com/hisbvdis/status/1807783878515400977",
+  },
+  {
+    avatar: jacobmparis,
+    name: "@jacobparis.com",
+    login: "jacobmparis",
+    text: "@DrizzleORM can you put me on the homepage? \ngf says it’s drizzling outside and I want to send a link to your site",
+    href: "https://x.com/jacobmparis/status/1955767013596369283",
   },
   {
     avatar: aokijs,
