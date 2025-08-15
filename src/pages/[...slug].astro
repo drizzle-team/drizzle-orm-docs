@@ -1,44 +1,149 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 
-import Link from '@mdx/Link.astro';
-import CustomHeader from '@components/CustomHeader.astro';
-import DocsLayout from '@/ui/DocsLayout.astro';
+import Link from "@mdx/Link.astro";
+import { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
+import DocsLayout from "@/ui/DocsLayout.astro";
+import CustomHeader from "@components/CustomHeader.astro";
+
+export const dialectRelatedFolder = ["tutorials", "guides"];
+export const commonFolders = ["latest-releases", "get-started"];
 
 export async function getStaticPaths() {
-  const metaFiles = import.meta.glob('../content/**/*.json');
-  const slugs: string[] = [];
-  const regex = /\.\.\/content\/(.*?)\/_meta\.json/;
-  
-  for(const meta in metaFiles) {
-    const {default: parsed} = await metaFiles[meta]() as {default: string[]};
+  const allDocsEntries = await getCollection("docs");
 
-    const metaSlug = meta.match(regex);
-    if (metaSlug) {
-      const extractedText = metaSlug[1];
+  const routes = [];
 
-      parsed.forEach((key) => {
-        if(Array.isArray(key)) {
-          slugs.push(`${extractedText}/${key[0]}`);
-        }
-      })
+  // 1. PG as default dialect
+  const pgEntries = allDocsEntries.filter((entry) =>
+    entry.slug.startsWith("pg/"),
+  );
+  routes.push(
+    ...pgEntries.map((entry) => ({
+      params: { slug: `docs/${entry.slug.replace("pg/", "")}` },
+      props: { entry, frontmatter: entry.data },
+    })),
+  );
+
+  // 2. Root-level docs files
+  const rootDocsEntries = allDocsEntries.filter(
+    (entry) =>
+      !entry.slug.includes("/") &&
+      !dialectRelatedFolder.some((folder) => entry.slug === folder),
+  );
+
+  routes.push(
+    ...rootDocsEntries.map((entry) => ({
+      params: { slug: `docs/${entry.slug}` },
+      props: { entry, frontmatter: entry.data },
+    })),
+  );
+
+  // Root docs files for other dialects
+  dialectSwitcherItems
+    .filter((d) => d.id !== "pg")
+    .forEach((dialect) => {
+      routes.push(
+        ...rootDocsEntries.map((entry) => ({
+          params: { slug: `docs/${dialect.id}/${entry.slug}` },
+          props: { entry, frontmatter: entry.data },
+        })),
+      );
+    });
+
+  // 3. tutorials, guides, latest-releases for all dialects
+  dialectRelatedFolder.forEach((folder) => {
+    // Get the folder contents
+    const folderEntries = allDocsEntries.filter((entry) =>
+      entry.slug.startsWith(`${folder}/`),
+    );
+
+    // Get the folder index page (tutorials.mdx)
+    const folderIndexEntry = allDocsEntries.find(
+      (entry) => entry.slug === folder,
+    );
+
+    // Add if exists
+    if (folderIndexEntry) {
+      routes.push({
+        params: { slug: `docs/${folder}` },
+        props: { entry: folderIndexEntry, frontmatter: folderIndexEntry.data },
+      });
     }
-  }
 
-  const docEntries = await getCollection("docs", (entry) => {
-    return slugs.includes(`docs/${entry.slug}`);
+    // Add folder entries for PG
+    routes.push(
+      ...folderEntries.map((entry) => ({
+        params: { slug: `docs/${entry.slug}` },
+        props: { entry, frontmatter: entry.data },
+      })),
+    );
+
+    // Add for other dialects
+    dialectSwitcherItems
+      .filter((d) => d.id !== "pg")
+      .forEach((dialect) => {
+        // Add folder index page
+        if (folderIndexEntry) {
+          routes.push({
+            params: { slug: `docs/${dialect.id}/${folder}` },
+            props: {
+              entry: folderIndexEntry,
+              frontmatter: folderIndexEntry.data,
+            },
+          });
+        }
+
+        routes.push(
+          ...folderEntries.map((entry) => ({
+            params: { slug: `docs/${dialect.id}/${entry.slug}` },
+            props: { entry, frontmatter: entry.data },
+          })),
+        );
+      });
   });
-  return docEntries.map(entry => ({
-    params: { slug: `docs/${entry.slug}` }, props: { entry, frontmatter: entry.data },
-  }));
+
+  // 4. Dialect-specific content
+  dialectSwitcherItems
+    .filter((d) => d.id !== "pg")
+    .forEach((dialect) => {
+      const dialectEntries = allDocsEntries.filter((entry) =>
+        entry.slug.startsWith(`${dialect.id}/`),
+      );
+      routes.push(
+        ...dialectEntries.map((entry) => ({
+          params: { slug: `docs/${entry.slug}` },
+          props: { entry, frontmatter: entry.data },
+        })),
+      );
+    });
+
+  // 5. Single dialect folders (e.g. get-started)
+  commonFolders.forEach((folder) => {
+    const folderEntries = allDocsEntries.filter((entry) =>
+      entry.slug.startsWith(`${folder}/`),
+    );
+    routes.push(
+      ...folderEntries.map((entry) => ({
+        params: { slug: `docs/${entry.slug}` },
+        props: { entry, frontmatter: entry.data },
+      })),
+    );
+  });
+
+  return routes;
 }
 
 const { entry, frontmatter } = Astro.props;
 
 const { Content, headings } = await entry.render();
-
 ---
-<DocsLayout customTitle={entry.data.title} description={frontmatter.description} headings={headings}>
+
+<DocsLayout
+  customTitle={entry.data.title}
+  description={frontmatter.description}
+  headings={headings}
+>
   {frontmatter?.title && <CustomHeader>{frontmatter.title}</CustomHeader>}
   <Content components={{ a: Link }} />
 </DocsLayout>

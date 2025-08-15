@@ -1,0 +1,220 @@
+---
+import type { SVGProps } from "@/types";
+import type { CSSProperties } from "react";
+import { dialectSwitcherItems } from "./data";
+import { extractSubDirFromSlug } from "../../utils";
+import { commonFolders } from "@/pages/[...slug].astro";
+
+interface Props {
+  slug: string;
+}
+
+const { slug = "" } = Astro.props;
+
+const subDir = extractSubDirFromSlug(slug) || "pg";
+
+const svgs = import.meta.glob("/public/svg/*.svg", {
+  query: "?raw",
+  import: "default",
+});
+
+const currentDb = dialectSwitcherItems.find(({ id }) =>
+  commonFolders.includes(subDir) ? id === "pg" : id === subDir,
+) || dialectSwitcherItems[0];
+
+const { icon } = currentDb;
+
+let svgCodeLight = "";
+let svgCodeDark = "";
+
+const isSvg =
+  icon.light.path.includes(".svg") || icon.dark.path.includes(".svg");
+
+if (isSvg) {
+  svgCodeLight = (await svgs[icon.light.path]()) as string;
+  svgCodeDark = (await svgs[icon.dark.path]()) as string;
+}
+
+const getImagePath = (src: string) => {
+  return src.replace("/public", "");
+};
+
+const getParamsString = (props?: SVGProps) => {
+  if (!props) return "";
+  return Object.entries(props).reduce((acc, [key, value]) => {
+    if (value === undefined) return acc;
+    return `${acc} ${key}="${value}"`;
+  }, "");
+};
+
+const lightStylesSVGString = svgCodeLight.replace(
+  /<svg/,
+  `<svg ${getParamsString(icon.light.style)}`,
+);
+const darkStylesSVGString = svgCodeDark.replace(
+  /<svg/,
+  `<svg ${getParamsString(icon.dark.style)}`,
+);
+---
+
+<div class="db-switcher">
+  <select
+    id="db-switcher-select"
+    style="opacity: 0; position: absolute; inset: 0; width: 100%; cursor: pointer"
+  >
+    {
+      dialectSwitcherItems.map((item) => (
+        <option
+          id={item.id}
+          value={item.id}
+          selected={item.name === currentDb?.name}
+        >
+          {item.name}
+        </option>
+      ))
+    }
+  </select>
+  <div class="img_light">
+    {isSvg && <Fragment set:html={lightStylesSVGString} />}
+    {
+      !isSvg && (
+        <img
+          class="image"
+          src={getImagePath(icon.light.path)}
+          style={{ ...(icon.light.style as CSSProperties) }}
+        />
+      )
+    }
+  </div>
+  <div class="img_dark">
+    {isSvg && <Fragment set:html={darkStylesSVGString} />}
+    {
+      !isSvg && (
+        <img
+          class="image"
+          src={getImagePath(icon.dark.path)}
+          style={{ ...(icon.dark.style as CSSProperties) }}
+        />
+      )
+    }
+  </div>
+  <span class="link-name">{currentDb.name}</span>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    style="margin: 0 4px 0 auto"
+    class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
+  >
+    <path d="m7 15 5 5 5-5"></path>
+    <path d="m7 9 5-5 5 5"></path>
+  </svg>
+</div>
+
+<style>
+  .db-switcher {
+    display: flex;
+    border: 1px solid #21272e1f;
+    border-radius: 4px;
+    align-items: center;
+    padding: 4px;
+    color: rgb(51, 65, 85);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    overflow: hidden;
+    background-color: #fafafa;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
+    flex-shrink: 0;
+    margin-bottom: -56px;
+    margin-top: 16px;
+    cursor: pointer;
+  }
+
+  html.dark .db-switcher {
+    background-color: #1a1a1a;
+    color: #c4c5c6;
+    border-color: #292929;
+  }
+
+  .db-switcher:hover {
+    border-color: #c9cbcf;
+    background-color: #f5f5f5;
+  }
+
+  html.dark .db-switcher:hover {
+    background-color: #1f1f1f;
+    border-color: #2c2c2c;
+  }
+
+  .img_light {
+    visibility: visible;
+    display: flex;
+    margin-right: 6px;
+    border: 1px solid #e0e0e0;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: white;
+  }
+
+  .img_dark {
+    visibility: hidden;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid rgb(41 41 41);
+    background: #141414;
+    width: 0;
+    height: 0;
+    margin: 0;
+  }
+
+  .image {
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+
+  html.dark .img_light {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    border: none;
+    margin: 0;
+  }
+
+  html.dark .img_dark {
+    visibility: visible;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #404040;
+    margin-right: 8px;
+  }
+</style>
+
+<script is:inline define:vars={{ dialectSwitcherItems }}>
+  document.addEventListener("astro:page-load", () => {
+    const dbSelect = document.getElementById("db-switcher-select");
+
+    dbSelect.addEventListener("change", (e) => {
+      window.location.href = dialectSwitcherItems.find(
+        ({ id }) => id === e.target.value,
+      ).path;
+    });
+  });
+</script>

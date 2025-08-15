@@ -3,6 +3,7 @@ import type { IHeading, TreeNode } from "@/types";
 import AsideSocials from "./AsideSocials.astro";
 import SidebarContentWrap from "./SidebarContentWrap.astro";
 import ThemeSelectorMobile from "./ThemeSelectorMobile.astro";
+import DialectSwitcher from "@mdx/dialect-switcher/DialectSwitcher.astro";
 
 interface Props {
   tree: TreeNode[];
@@ -17,6 +18,7 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
 
 <div class="aside invisible" id="aside">
   <div class="aside-content aside-scroll scrollbar">
+    <DialectSwitcher slug={slug!} />
     <SidebarContentWrap filteredHeadings={headings} slug={customSlug || slug} tree={tree} forLanding={forLanding} />
     <ThemeSelectorMobile />
     <AsideSocials />
@@ -128,7 +130,7 @@ document.addEventListener("astro:after-swap", mainScript);
   }
 
   .aside-scroll {
-    padding: 0 16px 0 0;
+    padding: 0 16px 16px 0;
     overscroll-behavior: contain;
   }
 
