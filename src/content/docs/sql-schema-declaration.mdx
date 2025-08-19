@@ -92,19 +92,6 @@ You can also group them in any way you like, such as creating groups for user-re
           └ 📜 products.ts
 ```
 
-In the `drizzle.config.ts` file, you need to specify the path to your schema file. With this configuration, Drizzle will 
-read from the `schema.ts` file and use this information during the migration generation process. For more information 
-about the `drizzle.config.ts` file and migrations with Drizzle, please check: [link](/docs/drizzle-config-file)
-
-```ts
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
-  schema: './src/db/schema'
-})
-```
-
 ## Shape your data schema
 
 Drizzle schema consists of several model types from database you are using. With drizzle you can specify:
