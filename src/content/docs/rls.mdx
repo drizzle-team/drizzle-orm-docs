@@ -449,6 +449,10 @@ In upcoming releases, it will be moved to drizzle-orm/supabase, allowing you to 
 Please check [Drizzle SupaSecureSlack repo](https://github.com/rphlmr/drizzle-supabase-rls)
 
 Here is an example of an implementation from this repository
+<Callout title='important'>
+If you are using `sql.raw` you must escape any special characters such as quotes, double quotes, etc. 
+</Callout>
+
 ```ts
 type SupabaseToken = {
   iss?: string;
