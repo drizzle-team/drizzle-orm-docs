@@ -147,7 +147,6 @@ export const databases: {
     darkStyle: {
       width: 24,
     },
-    sponsorUrl: "https://driz.link/tembo",
   },
   Gel: {
     imageSrc: {

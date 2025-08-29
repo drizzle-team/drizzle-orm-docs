@@ -190,34 +190,6 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/tembo",
-      name: "Tembo",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "4px",
-      filter: "grayscale(1) brightness(2) opacity(0.2)",
-      background:
-        'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
-    },
-    lightStyle: {
-      padding: "4px",
-      filter: "grayscale(1) opacity(0.5)",
-      background:
-        'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
       login: "driz.link/sqlitecloud",
       name: "SQLite Cloud",
       avatarUrl:
@@ -465,20 +437,20 @@ export const asideSponsors: ISponsor[] = [
         'url("/svg/gibsonai-light.svg") 0% 0% / contain no-repeat content-box',
     },
   },
-  // {
-  //   tier: {
-  //     name: "$1000 a month",
-  //     isOneTime: false,
-  //   },
-  //   sponsorEntity: {
-  //     __typename: "Organization",
-  //     login: "driz.link/sponsor",
-  //     name: "Sponsor",
-  //     avatarUrl:
-  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-  //   },
-  //   createdAt: "2024-08-13T16:35:56Z",
-  //   isActive: true,
-  //   imageType: ImageType.IMAGE,
-  // },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sponsor",
+      name: "Sponsor",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];

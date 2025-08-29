@@ -264,27 +264,6 @@ export const customSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/tembo",
-      name: "Tembo",
-      avatarUrl: "/images/tembo.png",
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.IMAGE,
-    darkStyle: {
-      padding: "11px",
-    },
-    lightStyle: {
-      padding: "11px",
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
       login: "driz.link/sqlitecloud",
       name: "SQLite Cloud",
       avatarUrl: `<svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
