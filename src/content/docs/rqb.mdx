@@ -187,7 +187,7 @@ await db.query.users.findMany(...);
 		userId: integer('user_id').notNull().references(() => users.id),
 		groupId: integer('group_id').notNull().references(() => groups.id),
 	}, (t) => [
-		primaryKey(t.userId, t.groupId)
+		primaryKey({ columns: [t.userId, t.groupId] })
 	]);
 
 	export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
