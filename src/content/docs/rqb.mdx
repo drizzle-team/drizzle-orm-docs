@@ -162,7 +162,7 @@ await db.query.users.findMany(...);
 	export const users = pgTable('users', {
 		id: serial('id').primaryKey(),
 		name: text('name').notNull(),
-		verified: text('verified').notNull(),
+		verified: boolean('verified').notNull(),
 		invitedBy: integer('invited_by').references((): AnyPgColumn => users.id),
 	});
 
