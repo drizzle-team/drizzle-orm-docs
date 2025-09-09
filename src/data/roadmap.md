@@ -9,13 +9,13 @@
 - [x] PostgreSQL RLS support
 - [x] `check` constraint support in Drizzle Kit
 - [x] Exposed API for programmatic access in Drizzle Kit
-- [x] `materialised views` support in Drizzle Kit
+- [x] `materialized views` support in Drizzle Kit
 - [ ] Drizzle Kit support for consuming schemas and migrations from Prisma, TypeORM and Sequelise to enrich ->Drizzle migration process
 - [ ] Drizzle Studio `mkcert` fixes for dockerised environments
 
 ### Drizzle ORM V1
 - [x] `generated` columns support [beta branch]
-- [x] MySQL `.$returningIds()` 
+- [x] MySQL `.$returningIds()`
 - [ ] `NODE_ENV` support for embedded `.env` consumer
 - [x] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`
 - [x] Table declarations with `(t) => ` callback to optionally omit column type imports
