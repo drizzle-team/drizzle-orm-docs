@@ -243,13 +243,7 @@ export class TestGlobalCache extends Cache {
     tables: string[],
     config?: CacheConfig,
   ): Promise<void> {
-    // The Keyv TTL is in milliseconds
-    // - config.ex is in seconds
-    // - config.px is in milliseconds
-    // You should implement other CacheConfig fields if you need them
-    const ttl = config
-      ? (config.px ?? (config.ex ? config.ex * 1000 : this.globalTtl))
-      : this.globalTtl;
+    const ttl = config?.px ?? (config?.ex ? config.ex * 1000 : this.globalTtl);
 
     await this.kv.set(key, response, ttl);
 
