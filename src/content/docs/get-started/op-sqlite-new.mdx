@@ -65,7 +65,7 @@ Create a `App.tsx` file in the root directory and initialize the connection:
 
 ```ts
 import { open } from '@op-engineering/op-sqlite';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { drizzle } from 'drizzle-orm/op-sqlite';
 
 const opsqliteDb = open({
   name: 'db',
@@ -119,7 +119,7 @@ module.exports = config;
 ```
 
 #### Step 7 - Update `babel` config
-```js copy filename="metro.config.js"
+```js copy filename="babel.config.js"
 module.exports = function(api) {
   api.cache(true);
   return {
