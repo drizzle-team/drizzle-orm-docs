@@ -26,6 +26,7 @@ import spacesexdragon from "@/assets/images/tweets/spacesexdragon.jpg";
 import spacesexdragonTweet from "@/assets/images/tweets/spacesexdragonTweet.jpg";
 import brodaNoel from "@/assets/images/tweets/brodaNoel.jpg";
 import jacobmparis from "@/assets/images/tweets/jacobmparis.jpg";
+import lroal from "@/assets/images/tweets/lroal.png";
 
 // Tweet images
 
@@ -191,5 +192,12 @@ export const tweets: ITweet[] = [
     login: "aarondfrancis",
     text: "Y'all should just copy everything Eloquent has",
     href: "https://x.com/aarondfrancis/status/1641145228189892613?s=20",
+  },
+  {
+    avatar: lroal,
+    name: "Lars-Erik Roald",
+    login: "lroal",
+    text: "Complete rewrites of core systems + new type system + new dialects + new migration engine = recipe for unexpected bugs. Claiming it'll fix 70% of existing bugs while introducing a whole new generation of them is peak software optimism",
+    href: "https://x.com/lroal/status/1971463955358097499",
   },
 ];
