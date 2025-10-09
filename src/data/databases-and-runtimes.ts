@@ -47,7 +47,6 @@ export const databases: {
     darkStyle: {
       width: 26,
     },
-    sponsorUrl: "https://driz.link/singlestore",
   },
   Turso: {
     imageSrc: {
