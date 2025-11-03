@@ -152,28 +152,24 @@ An alias of **[smallint.](#smallint)**
 
 ### ---
 
-### boolean
-Cockroach provides the standard SQL type boolean.
-
-<Callout>
-In CockroachDB, `BOOLEAN` is an alias for `BOOL`.
-</Callout>
+### bool
+Cockroach provides the standard SQL type bool.
 
 For more info please refer to the official Cockroach **[docs.](https://www.cockroachlabs.com/docs/stable/bool)**
 
 <Section>
 ```typescript
-import { boolean, cockroachTable } from "drizzle-orm/cockroach-core";
+import { bool, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
-	boolean: boolean()
+	boolean: bool()
 });
 
 ```
 
 ```sql
 CREATE TABLE "table" (
-	"boolean" boolean
+	"boolean" bool
 );
 ```
 </Section>
@@ -440,6 +436,92 @@ jsonb: jsonb().$type<string[]>();
 // won't compile
 jsonb: jsonb().$type<string[]>().default({});
 ```
+
+## ---
+
+### bit
+`bit`  
+
+The BIT data types store bit arrays. With BIT, the length is fixed.
+
+<br />
+
+**Size**
+
+The number of bits in a BIT value is determined as follows:
+
+| Type&nbsp;declaration		| Logical&nbsp;size	|
+|:------------------		|:--------------	|
+| BIT						| 1 bit				|
+| BIT(N)					| N bits			|
+
+<br />
+
+For more info please refer to the official CockroachDB **[docs.](https://www.cockroachlabs.com/docs/stable/bit)**
+<Section>
+```typescript
+import { sql } from "drizzle-orm";
+import { cockroachTable, bit } from "drizzle-orm/cockroach-core";
+
+export const table = cockroachTable('table', {
+	bit1: bit(),
+	bit2: bit({ length: 15 }),
+	bit3: bit({ length: 15 }).default('10011'),
+	bit4: bit({ length: 15 }).default(sql`'10011'`)
+});
+```
+```sql
+CREATE TABLE "table" (
+	"bit1" bit,
+	"bit2" bit(15),
+	"bit3" bit(15) DEFAULT '10011',
+	"bit4" bit(15) DEFAULT '10011'
+);
+
+```
+</Section>
+
+### varbit
+`varbit`
+
+The VARBIT data types store bit arrays. With VARBIT, the length can be variable.
+
+<br />
+
+**Size**
+
+The number of bits in a VARBIT value is determined as follows:
+
+| Type&nbsp;declaration		| Logical&nbsp;size													|
+|:------------------		|:--------------													|
+| VARBIT					| variable&nbsp;with&nbsp;no&nbsp;maximum							|
+| VARBIT(N)					| variable&nbsp;with&nbsp;a&nbsp;maximum&nbsp;of&nbsp;N&nbsp;bits	|
+
+<br />
+
+For more info please refer to the official CockroachDB **[docs.](https://www.cockroachlabs.com/docs/stable/bit)**
+<Section>
+```typescript
+import { sql } from "drizzle-orm";
+import { cockroachTable, bit } from "drizzle-orm/cockroach-core";
+
+export const table = cockroachTable('table', {
+	varbit1: varbit(),
+	varbit2: varbit({ length: 15 }),
+	varbit3: varbit({ length: 15 }).default('10011'),
+	varbit4: varbit({ length: 15 }).default(sql`'10011'`)
+});
+```
+```sql
+CREATE TABLE "table" (
+	"varbit1" varbit,
+	"varbit2" varbit(15),
+	"varbit3" varbit(15) DEFAULT '10011',
+	"varbit4" varbit(15) DEFAULT '10011'
+);
+```
+
+</Section>
 
 ## ---
 
