@@ -509,4 +509,28 @@ export const customSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.IMAGE,
   },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/warp",
+      name: "Warp",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      background:
+      'url("/svg/warp-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      background:
+        'url("/svg/warp-dark.svg") center / contain no-repeat content-box',
+    },
+  },
 ];

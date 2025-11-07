@@ -410,21 +410,99 @@ export const asideSponsors: ISponsor[] = [
         'url("/svg/gibsonai-light.svg") 0% 0% / contain no-repeat content-box',
     },
   },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "clerk.com",
+      name: "Clerk",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/clerk-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/clerk-dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/warp",
+      name: "Warp",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/warp-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/warp-dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "vercel.com",
+      name: "Vercel",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/vercel-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/vercel-dark.svg") center / contain no-repeat content-box',
+    },
+  },
   // Placeholder
-  // {
-  //   tier: {
-  //     name: "$1000 a month",
-  //     isOneTime: false,
-  //   },
-  //   sponsorEntity: {
-  //     __typename: "Organization",
-  //     login: "driz.link/sponsor",
-  //     name: "Sponsor",
-  //     avatarUrl:
-  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-  //   },
-  //   createdAt: "2024-08-13T16:35:56Z",
-  //   isActive: true,
-  //   imageType: ImageType.IMAGE,
-  // },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sponsor",
+      name: "Sponsor",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];

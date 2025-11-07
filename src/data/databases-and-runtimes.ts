@@ -25,6 +25,7 @@ export const databases: {
       width: 24,
       color: "#f0f0f0",
     },
+    sponsorUrl: "http://planetscale.com/",
   },
   "Vercel Postgres": {
     imageSrc: "/public/svg/vercel.svg",
