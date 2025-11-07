@@ -1,6 +1,7 @@
 ---
 import type { CSSProperties } from "react";
 import { asideSponsors } from "@/data/aside-sponsors";
+import { rotateArrayDaily } from "@/utils";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
@@ -11,13 +12,28 @@ const getStyleString = (style: CSSProperties) => {
   }, "");
 };
 
-const heroSponsors = asideSponsors.filter(
-  ({ tier }) => tier.name === "$2500 a month",
+const heroSponsors = rotateArrayDaily(
+  asideSponsors.filter(({ tier }) => tier.name === "$2500 a month")
 );
 
-const goldSponsors = asideSponsors.filter(
-  ({ tier }) => tier.name === "$1000 a month",
-);
+// Ensure placeholder sponsor is at the end
+const goldSponsors = (() => {
+  const rotated = rotateArrayDaily(
+    asideSponsors.filter(({ tier }) => tier.name === "$1000 a month")
+  );
+
+  const placeholder = rotated.find(
+    (sponsor) => sponsor.sponsorEntity.name === "Sponsor"
+  );
+
+  if (!placeholder) return rotated;
+
+  const rest = rotated.filter(
+    (sponsor) => sponsor.sponsorEntity.name !== "Sponsor"
+  );
+
+  return [...rest, placeholder];
+})();
 ---
 
 <div class="aside-sponsors__wrap">
