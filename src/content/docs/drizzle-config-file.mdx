@@ -374,9 +374,11 @@ successfully applied migrations in your database in log table named `__drizzle_m
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `{ table: string, schema: string }` |
-| default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
+| type          | `{ table: string, schema: string, prefix: Prefix }` |
+| default       | `{ table: "__drizzle_migrations", schema: "drizzle", prefix: "index" }`                    |
 | commands      | `migrate`   |
+
+Prefix Enum = "timestamp" | "index" | "none" | "supabase" | "unix"
 
 <rem025/>
 
@@ -387,6 +389,7 @@ export default defineConfig({
   migrations: {
     table: 'my-migrations-table', // `__drizzle_migrations` by default
     schema: 'public', // used in PostgreSQL only, `drizzle` by default
+    prefix: "timestamp", // <prefix>_<migration_name> `index` by default
   },
 });
 ```
