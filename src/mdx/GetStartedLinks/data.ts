@@ -421,6 +421,27 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "SQLite Cloud",
+        path: {
+          existing: "/docs/get-started/sqlite-cloud-existing",
+          new: "/docs/get-started/sqlite-cloud-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/sqlite-cloud.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/sqlite-cloud.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
     ],
   },
   {
