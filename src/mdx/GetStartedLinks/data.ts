@@ -338,10 +338,31 @@ export const getStartedItems: GetStartedItems = [
         },
       },
       {
-        name: "Turso",
+        name: "Turso Cloud",
         path: {
           existing: "/docs/get-started/turso-existing",
           new: "/docs/get-started/turso-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/new-turso.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/new-turso-light.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
+      {
+        name: "Turso Database",
+        path: {
+          existing: "/docs/get-started/turso-database-existing",
+          new: "/docs/get-started/turso-database-new",
         },
         icon: {
           light: {
