@@ -359,6 +359,27 @@ export const getStartedItems: GetStartedItems = [
         },
       },
       {
+        name: "SQLite Cloud",
+        path: {
+          existing: "/docs/get-started/sqlite-cloud-existing",
+          new: "/docs/get-started/sqlite-cloud-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/sqlite-cloud.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/sqlite-cloud.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
+      {
         name: "Turso Database",
         path: {
           existing: "/docs/get-started/turso-database-existing",
@@ -436,27 +457,6 @@ export const getStartedItems: GetStartedItems = [
           },
           dark: {
             path: "/public/svg/cloudflare.svg",
-            style: {
-              width: 26,
-            },
-          },
-        },
-      },
-      {
-        name: "SQLite Cloud",
-        path: {
-          existing: "/docs/get-started/sqlite-cloud-existing",
-          new: "/docs/get-started/sqlite-cloud-new",
-        },
-        icon: {
-          light: {
-            path: "/public/svg/sqlite-cloud.svg",
-            style: {
-              width: 26,
-            },
-          },
-          dark: {
-            path: "/public/svg/sqlite-cloud.svg",
             style: {
               width: 26,
             },
