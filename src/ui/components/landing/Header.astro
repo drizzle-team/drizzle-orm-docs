@@ -175,7 +175,6 @@ import DBImage from "@/assets/images/landing/dbLight.svg"
       <div class="team" id="gameArea">
         <canvas id="gameCanvas"></canvas>
       </div>
-      <div class="powered powered-hidden">powered by <a href="https://3310snake.com/" target="_blank">3310snake.com</a></div>
     </div>
     <div class="images" style="display: flex; justify-content: space-between; width: 100%">
       <div style="display: flex; justify-content: flex-start; align-items: end; min-width: 144px">
@@ -793,32 +792,9 @@ import DBImage from "@/assets/images/landing/dbLight.svg"
       height: 14px;
   }
 
-  .powered {
-      text-align: right;
-      font-size: 10px;
-      padding-right: 6px;
-      transition: opacity 0.2s;
-  }
-
-  .powered-hidden {
-      opacity: 0;
-      pointer-events: none;
-      cursor: default;
-  }
-
-  .powered a:hover {
-      text-decoration: underline;
-  }
-
   @media (max-width: 1024px) {
       .board-moved {
           margin-right: clamp(0px, calc(30px + (100vw - 801px)), 30px);
-      }
-
-      .powered {
-          opacity: 0;
-          pointer-events: none;
-          cursor: default;
       }
 
       .right-image-moved {

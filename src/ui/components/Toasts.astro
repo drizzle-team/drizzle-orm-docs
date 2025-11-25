@@ -26,7 +26,7 @@ const toasts = [
         data-toast={index}
         data-toast-name={toast.title}
         style={`transform: translateY(${(toasts.length - index - 1) * 100}%) scale(${1 - (toasts.length - index - 1) * 0.06});`}
-        class="toast"
+        class="toast border-highlight"
       >
         <div class="toast-content">
           <div class="toast-icon">
@@ -102,28 +102,6 @@ const toasts = [
     border-radius: 8px;
     border: 1px solid #e0e1e3;
     overflow: hidden;
-  }
-
-  html.dark .toast::before {
-    background-image: url("../../assets/images/dark-gradient.png");
-  }
-
-  .toast::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 240px;
-    height: 240px;
-    background-image: url("../../assets/images/light-gradient.png");
-    background-size: 240px 240px;
-    background-position: center center;
-    transform: rotate(45deg) scale(1.45);
-    animation: spin 10s linear infinite;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.2s;
   }
 
   .toast-text {

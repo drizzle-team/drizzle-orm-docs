@@ -25,6 +25,8 @@ import silvenonTweet from "@/assets/images/tweets/silvenonTweet.webp";
 import spacesexdragon from "@/assets/images/tweets/spacesexdragon.jpg";
 import spacesexdragonTweet from "@/assets/images/tweets/spacesexdragonTweet.jpg";
 import brodaNoel from "@/assets/images/tweets/brodaNoel.jpg";
+import jacobmparis from "@/assets/images/tweets/jacobmparis.jpg";
+import lroal from "@/assets/images/tweets/lroal.png";
 
 // Tweet images
 
@@ -89,12 +91,13 @@ export const tweets: ITweet[] = [
     href: "https://x.com/t3dotgg/status/1787604253860847775",
   },
   {
-    avatar: aarondfrancis,
-    name: "Aaron Francis",
-    login: "aarondfrancis",
-    text: "Y'all should just copy everything Eloquent has",
-    href: "https://x.com/aarondfrancis/status/1641145228189892613?s=20",
+    avatar: brodaNoel,
+    name: "Broda Noel",
+    login: "BrodaNoel",
+    text: "Is this a joke? Because if this is a joke, it's really really really bad joke, because now I'm fucking hating @DrizzleORM without even knowing who they are.\nI mean, this is not a good marketing strategy if this was a marketing-joke.\nAnd if it's actually true, I'll hate them more.",
+    href: "https://x.com/BrodaNoel/status/1913248949252616287",
   },
+
   {
     avatar: imfelquis,
     name: "Ofelquis Gimenes",
@@ -155,6 +158,13 @@ export const tweets: ITweet[] = [
     href: "https://x.com/hisbvdis/status/1807783878515400977",
   },
   {
+    avatar: jacobmparis,
+    name: "@jacobparis.com",
+    login: "jacobmparis",
+    text: "@DrizzleORM can you put me on the homepage? \ngf says it’s drizzling outside and I want to send a link to your site",
+    href: "https://x.com/jacobmparis/status/1955767013596369283",
+  },
+  {
     avatar: aokijs,
     name: "Aoki",
     login: "aokijs",
@@ -177,10 +187,17 @@ export const tweets: ITweet[] = [
     tweetImage: spacesexdragonTweet,
   },
   {
-    avatar: brodaNoel,
-    name: "Broda Noel",
-    login: "BrodaNoel",
-    text: "Is this a joke? Because if this is a joke, it's really really really bad joke, because now I'm fucking hating @DrizzleORM without even knowing who they are.\nI mean, this is not a good marketing strategy if this was a marketing-joke.\nAnd if it's actually true, I'll hate them more.",
-    href: "https://x.com/BrodaNoel/status/1913248949252616287",
+    avatar: aarondfrancis,
+    name: "Aaron Francis",
+    login: "aarondfrancis",
+    text: "Y'all should just copy everything Eloquent has",
+    href: "https://x.com/aarondfrancis/status/1641145228189892613?s=20",
+  },
+  {
+    avatar: lroal,
+    name: "Lars-Erik Roald",
+    login: "lroal",
+    text: "Complete rewrites of core systems + new type system + new dialects + new migration engine = recipe for unexpected bugs. Claiming it'll fix 70% of existing bugs while introducing a whole new generation of them is peak software optimism",
+    href: "https://x.com/lroal/status/1971463955358097499",
   },
 ];

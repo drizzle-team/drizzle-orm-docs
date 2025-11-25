@@ -91,7 +91,7 @@ export default defineConfig({
       exclude: [],
       include: []
     }
-  }
+  },
 
   breakpoints: true,
   strict: true,
@@ -247,7 +247,7 @@ export default defineConfig({
   dbCredentials: {
     url: "postgres://user:password@host:port/db",
   }
-})
+});
 ```
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -263,7 +263,7 @@ export default defineConfig({
     database: "dbname",
     ssl: true, // can be boolean | "require" | "allow" | "prefer" | "verify-full" | options from node:tls
   }
-})
+});
 ```
 </Section>
 <Section>
@@ -273,9 +273,9 @@ import { defineConfig } from 'drizzle-kit'
 export default defineConfig({
   dialect: "mysql",
   dbCredentials: {
-    url: "postgres://user:password@host:port/db",
+    url: "mysql://user:password@host:port/db",
   }
-})
+});
 ```
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -291,7 +291,7 @@ export default defineConfig({
     database: "dbname",
     ssl: "...", // can be: string | SslOptions (ssl options from mysql2 package)
   }
-})
+});
 ```
 </Section>
 ```ts
@@ -306,7 +306,7 @@ export default defineConfig({
     // or
     url: "file:sqlite.db" // file: prefix is required by libsql
   }
-})
+});
 ```
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -323,7 +323,7 @@ export default defineConfig({
     // or
     url: "file:sqlite.db", // file: prefix is required by libsql
   }
-})
+});
 ```
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -336,7 +336,7 @@ export default defineConfig({
     databaseId: "",
     token: "",
   }
-})
+});
 ```
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -360,7 +360,7 @@ export default defineConfig({
   dbCredentials: {
     url: "./database/", // database folder path
   }
-})
+});
 ```
 </CodeTabs>
 
@@ -394,7 +394,7 @@ export default defineConfig({
 ### `introspect`
 <rem025/>
 
-Cofiguration for `drizzle-kit pull` command.
+Configuration for `drizzle-kit pull` command.
 
 `casing` is responsible for in-code column keys casing
 
@@ -504,7 +504,7 @@ You can configure list of tables, schemas and extensions via `tablesFilters`, `s
 | :------------ | :-----------------   |
 | type          | `string[]` |
 | default       | `["public"]`                    |
-| commands      | `generate` `push` `pull`   |
+| commands      | `push` `pull`   |
 
 <rem025/>
 
@@ -573,7 +573,7 @@ By default, `drizzle-kit` won't manage roles for you, so you will need to enable
 ```ts
 export default defineConfig({
   dialect: "postgresql",
-  extensionsFilters: entities: {
+  entities: {
     roles: true
   }
 });

@@ -13,11 +13,11 @@ import Npx from "@mdx/Npx.astro"
 # `drizzle-kit pull`
 
 <Prerequisites>
-  - Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-  - Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration) 
-  - Database connection basics - [read here](/docs/connect-overview) 
-  - Drizzle migrations fundamentals - [read here](/docs/migrations) 
-  - Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file) docs
+- Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
+- Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration) 
+- Database connection basics - [read here](/docs/connect-overview) 
+- Drizzle migrations fundamentals - [read here](/docs/migrations) 
+- Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file) docs
 </Prerequisites>
 
 `drizzle-kit pull` lets you literally pull(introspect) your existing database schema and generate `schema.ts` drizzle schema file, 
@@ -212,16 +212,16 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | `host`              |            | Host                                                                      |
 | `port`              |            | Port                                                                      |
 | `database`          |            | Database name                                                             |
-| `config`            |            | Config file path, default is `drizzle.config.ts`                          |
+| `config`            |            | Configuration file path, default is `drizzle.config.ts`                          |
 | `introspect-casing` |            | Strategy for JS keys creation in columns, tables, etc. `preserve` `camel` |
 | `tablesFilter`      |            | Table name filter                                                         |
 | `schemaFilter`      |            | Schema name filter. Default: `["public"]`                                 |
 | `extensionsFilters` |            | Database extensions internal database filters                             |
 
 <Npx>
-drizzle-kit pull --dialect=postgresql --schema=src/schema.ts --url=postgresql://user:password@host:port/dbname
-drizzle-kit pull --dialect=postgresql --schema=src/schema.ts --driver=pglite url=database/
-drizzle-kit pull --dialect=postgresql --schema=src/schema.ts --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
+drizzle-kit pull --dialect=postgresql --url=postgresql://user:password@host:port/dbname
+drizzle-kit pull --dialect=postgresql --driver=pglite url=database/
+drizzle-kit pull --dialect=postgresql --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
 </Npx>
 
 ![](@/assets/gifs/introspect_mysql.gif)

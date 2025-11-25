@@ -1390,4 +1390,27 @@
     height: 16px;
     pointer-events: none;
   }
+
+  html.dark .border-highlight::before {
+    --gradient-0: #EE9A01;
+    --gradient-1: #2E1A00;
+  }
+  .border-highlight::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 240px;
+    height: 240px;
+    --gradient-0: #F5A015;
+    --gradient-1: #FDE1B5;
+    background-image: conic-gradient(from 0deg at 50% 50%, var(--gradient-0) 0deg, var(--gradient-1) 45deg, var(--gradient-1) 135deg, var(--gradient-0) 180deg, var(--gradient-1) 225deg, var(--gradient-1) 315deg, var(--gradient-0) 360deg);
+    background-size: 240px 240px;
+    background-position: center center;
+    transform: translate(-50%, -50%) rotate(45deg) scale(1.45);
+    animation: spin 10s linear infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
 </style>

@@ -13,16 +13,16 @@ import Dialects from "@mdx/Dialects.mdx"
 
 <Prerequisites>
 - Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
+- Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration)
 - Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
+- Drizzle migrations fundamentals - [read here](/docs/migrations)
 - Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
 </Prerequisites>
 
 
 <br/>
 
-`drizzle-kit generate` lets you generate SQL migrations based on you Drizzle schema upon declaration or on subsequent schema changes.
+`drizzle-kit generate` lets you generate SQL migrations based on your Drizzle schema upon declaration or on subsequent schema changes.
 <Callout collapsed="How it works under the hood?">
 Drizzle Kit `generate` command triggers a sequence of events:
 1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
@@ -69,7 +69,7 @@ CREATE TABLE "users" (
 
 It's designed to cover [code first](/docs/migrations) approach of managing Drizzle migrations. 
 You can apply generated migrations using [`drizzle-kit migrate`](/docs/drizzle-kit-migrate), using drizzle-orm's `migrate()`, 
-using external migration tools like bytebase or running migrations yourself directly on the database. 
+using external migration tools like [bytebase](https://www.bytebase.com/) or running migrations yourself directly on the database. 
 
 `drizzle-kit generate` command requires you to provide both `dialect` and `schema` path options, 
 you can set them either via [drizzle.config.ts](/docs/drizzle-config-file) config file or via CLI options

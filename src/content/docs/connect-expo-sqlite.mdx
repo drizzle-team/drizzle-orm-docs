@@ -21,7 +21,7 @@ drizzle-orm expo-sqlite@next
 
 ```ts
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite/next";
+import { openDatabaseSync } from "expo-sqlite";
 
 const expo = openDatabaseSync("db.db");
 const db = drizzle(expo);
@@ -32,7 +32,7 @@ await db.select().from(users);
 With `useLiveQuery` hook you can make any Drizzle query reactive:
 ```ts
 import { useLiveQuery, drizzle } from 'drizzle-orm/expo-sqlite';
-import { openDatabaseSync } from 'expo-sqlite/next';
+import { openDatabaseSync } from 'expo-sqlite';
 import { Text } from 'react-native';
 import * as schema from './schema';
 
@@ -86,14 +86,14 @@ module.exports = config;
 
 Make sure to have `dialect: 'sqlite'` and `driver: 'expo'` in Drizzle Kit config
 ```ts filename="drizzle.config.ts"
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
+export default defineConfig({
 	schema: './db/schema.ts',
 	out: './drizzle',
   dialect: 'sqlite',
 	driver: 'expo', // <--- very important
-} satisfies Config;
+});
 ```
 
 #### Generate migrations
@@ -108,7 +108,7 @@ You can run migrations on application startup using our custom `useMigrations` m
 
 ```ts filename="App.tsx"
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite/next";
+import { openDatabaseSync } from "expo-sqlite";
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from './drizzle/migrations';
 

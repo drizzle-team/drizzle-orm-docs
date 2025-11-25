@@ -168,9 +168,9 @@ const users = await selectUsers(true);
 You can use `.selectDistinct()` instead of `.select()` to retrieve only unique rows from a dataset:
 <Section>
 ```ts
-await db.selectDistinct().from(users).orderBy(usersTable.id, usersTable.name);
+await db.selectDistinct().from(users).orderBy(users.id, users.name);
 
-await db.selectDistinct({ id: users.id }).from(users).orderBy(usersTable.id);
+await db.selectDistinct({ id: users.id }).from(users).orderBy(users.id);
 ```
 ```sql
 select distinct "id", "name" from "users" order by "id", "name";
@@ -459,8 +459,8 @@ select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 ### Advanced pagination
 Powered by TypeScript, Drizzle APIs let you implement all possible SQL pagination and sorting approaches.
 
-Sneak peek of advanced pagination, for more detailed advanced 
-usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination) 
+Sneak peek of advanced pagination, for more detailed advanced
+usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination)
 and [cursor pagination](/docs/guides/cursor-based-pagination) guides.
 
 <CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>

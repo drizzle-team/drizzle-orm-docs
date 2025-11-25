@@ -157,60 +157,32 @@ export const asideSponsors: ISponsor[] = [
   //       'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
   //   },
   // },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/decocx",
-      name: "Deco.cx",
-      avatarUrl: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M6.77828 19.8642C4.2582 19.8642 2.25696 18.9006 1.07104 17.1959C-0.189006 15.417 -0.337247 12.8969 0.626315 10.2286C1.96048 6.74493 5.14764 4.59545 9.00189 4.59545H9.07601C9.07601 4.52133 9.07601 4.44721 9.07601 4.29897C9.00189 3.03893 9.81721 1.92712 11.0031 1.55652L14.4868 0.22236C14.8574 0.0741201 15.228 0 15.5986 0C16.7104 0 17.7481 0.592961 18.2669 1.63064L19.6752 4.59545C20.1199 5.48489 20.1199 6.59669 19.6011 7.41201C19.0822 8.22733 18.2669 8.67205 17.3775 8.74618C17.1551 9.1909 17.0069 9.63562 16.7845 10.0062C16.3398 11.0439 15.8951 12.0816 15.3762 13.1934C13.4491 17.1959 11.2996 19.8642 6.77828 19.8642Z" fill="#113032"/>
-        <path d="M6.77828 17.27C9.59484 17.27 11.1514 16.0099 13.0044 12.0816C14.0421 9.9321 14.8574 7.78261 15.8209 5.70725L17.0069 6.07785C17.3033 6.15197 17.5257 6.00373 17.3775 5.70725L15.8951 2.81656C15.8209 2.5942 15.5245 2.5942 15.3762 2.66832L11.8184 4.00248C11.522 4.0766 11.522 4.37309 11.8184 4.44721L12.8561 4.81781C11.9667 6.74493 10.929 9.70974 10.0396 11.5627C9.076 13.6381 8.63128 15.0464 6.92652 15.0464C5.22176 15.0464 4.9994 13.7863 5.7406 11.9333C6.55592 9.78385 7.89008 9.19089 9.37248 9.63561C9.8172 9.04265 10.1137 8.15321 10.2619 7.33789C9.8172 7.18965 9.29836 7.18965 8.85364 7.18965C6.40768 7.18965 3.96171 8.44969 2.92403 11.118C1.81223 14.6017 2.99815 17.27 6.77828 17.27Z" fill="#02F67C"/>
-        </svg>`,
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "6px",
-      filter: "grayscale(1) opacity(0.3)",
-    },
-    lightStyle: {
-      padding: "6px",
-      filter: "grayscale(1) brightness(4) opacity(0.9)",
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/tembo",
-      name: "Tembo",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "4px",
-      filter: "grayscale(1) brightness(2) opacity(0.2)",
-      background:
-        'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
-    },
-    lightStyle: {
-      padding: "4px",
-      filter: "grayscale(1) opacity(0.5)",
-      background:
-        'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
-    },
-  },
+  // {
+  //   tier: {
+  //     name: "$1000 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/decocx",
+  //     name: "Deco.cx",
+  //     avatarUrl: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+  //       <path d="M6.77828 19.8642C4.2582 19.8642 2.25696 18.9006 1.07104 17.1959C-0.189006 15.417 -0.337247 12.8969 0.626315 10.2286C1.96048 6.74493 5.14764 4.59545 9.00189 4.59545H9.07601C9.07601 4.52133 9.07601 4.44721 9.07601 4.29897C9.00189 3.03893 9.81721 1.92712 11.0031 1.55652L14.4868 0.22236C14.8574 0.0741201 15.228 0 15.5986 0C16.7104 0 17.7481 0.592961 18.2669 1.63064L19.6752 4.59545C20.1199 5.48489 20.1199 6.59669 19.6011 7.41201C19.0822 8.22733 18.2669 8.67205 17.3775 8.74618C17.1551 9.1909 17.0069 9.63562 16.7845 10.0062C16.3398 11.0439 15.8951 12.0816 15.3762 13.1934C13.4491 17.1959 11.2996 19.8642 6.77828 19.8642Z" fill="#113032"/>
+  //       <path d="M6.77828 17.27C9.59484 17.27 11.1514 16.0099 13.0044 12.0816C14.0421 9.9321 14.8574 7.78261 15.8209 5.70725L17.0069 6.07785C17.3033 6.15197 17.5257 6.00373 17.3775 5.70725L15.8951 2.81656C15.8209 2.5942 15.5245 2.5942 15.3762 2.66832L11.8184 4.00248C11.522 4.0766 11.522 4.37309 11.8184 4.44721L12.8561 4.81781C11.9667 6.74493 10.929 9.70974 10.0396 11.5627C9.076 13.6381 8.63128 15.0464 6.92652 15.0464C5.22176 15.0464 4.9994 13.7863 5.7406 11.9333C6.55592 9.78385 7.89008 9.19089 9.37248 9.63561C9.8172 9.04265 10.1137 8.15321 10.2619 7.33789C9.8172 7.18965 9.29836 7.18965 8.85364 7.18965C6.40768 7.18965 3.96171 8.44969 2.92403 11.118C1.81223 14.6017 2.99815 17.27 6.77828 17.27Z" fill="#02F67C"/>
+  //       </svg>`,
+  //   },
+  //   createdAt: "2024-06-07T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  //   darkStyle: {
+  //     padding: "6px",
+  //     filter: "grayscale(1) opacity(0.3)",
+  //   },
+  //   lightStyle: {
+  //     padding: "6px",
+  //     filter: "grayscale(1) brightness(4) opacity(0.9)",
+  //   },
+  // },
   {
     tier: {
       name: "$1000 a month",
@@ -269,7 +241,7 @@ export const asideSponsors: ISponsor[] = [
   },
   {
     tier: {
-      name: "$2500 a month",
+      name: "$1000 a month",
       isOneTime: false,
     },
     sponsorEntity: {
@@ -286,7 +258,7 @@ export const asideSponsors: ISponsor[] = [
       height: "100%",
       filter: "brightness(0.3) grayscale(1)",
       background:
-        'url("/svg/upstash-dark-bg.svg") center / contain no-repeat content-box',
+        'url("/svg/upstash-icon-dark-bg.svg") center / contain no-repeat content-box',
       padding: "6px",
       width: "fit-content",
       "aspect-ratio": 4.55,
@@ -296,63 +268,11 @@ export const asideSponsors: ISponsor[] = [
       height: "100%",
       filter: "brightness(0.8) grayscale(1) opacity(0.45)",
       background:
-        'url("/svg/upstash-white-bg.svg") center / contain no-repeat content-box',
+        'url("/svg/upstash-icon-white-bg.svg") center / contain no-repeat content-box',
       padding: "6px",
       width: "fit-content",
       "aspect-ratio": 4.55,
       "max-width": "initial",
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/singlestore",
-      name: "SingleStore",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2023-06-11T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "4px",
-      filter: "brightness(0.3)",
-      background:
-        'url("/svg/single_store_dark.svg") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      padding: "4px",
-      filter: "invert(0.6)",
-      background: 'url("/svg/single_store_light.svg") 0% 0% / cover no-repeat content-box',
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/praha",
-      name: "PrAha",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2023-06-11T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "brightness(2) grayscale(1) opacity(0.3)",
-      background:
-        'url("/svg/praha-dark.svg") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      filter: "invert(0.6) brightness(0) opacity(0.3)",
-      background: 'url("/svg/praha-light.svg") 0% 0% / cover no-repeat content-box',
     },
   },
   {
@@ -471,8 +391,8 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/mooncake",
-      name: "Mooncake",
+      login: "driz.link/gibsonai",
+      name: "GibsonAI",
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
@@ -480,18 +400,95 @@ export const asideSponsors: ISponsor[] = [
     isActive: true,
     imageType: ImageType.SVG,
     darkStyle: {
-      padding: "4px",
       filter: "grayscale(1) brightness(2) opacity(0.2)",
       background:
-        'url("/images/mooncake-white.png") 0% 0% / contain no-repeat content-box',
+        'url("/svg/gibsonai-dark.svg") 0% 0% / contain no-repeat content-box',
     },
     lightStyle: {
-      padding: "4px",
       filter: "grayscale(1) opacity(0.4)",
       background:
-        'url("/images/mooncake.png") 0% 0% / contain no-repeat content-box',
+        'url("/svg/gibsonai-light.svg") 0% 0% / contain no-repeat content-box',
     },
   },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "clerk.com",
+      name: "Clerk",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/clerk-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/clerk-dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/warp",
+      name: "Warp",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/warp-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/warp-dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "vercel.com",
+      name: "Vercel",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/vercel-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/vercel-dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  // Placeholder
   {
     tier: {
       name: "$1000 a month",

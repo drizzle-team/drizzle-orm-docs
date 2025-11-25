@@ -1,6 +1,7 @@
 ---
 import type { CSSProperties } from "react";
 import { asideSponsors } from "@/data/aside-sponsors";
+import { rotateArrayDaily } from "@/utils";
 
 const getStyleString = (style: CSSProperties) => {
   return Object.keys(style).reduce((acc, key) => {
@@ -11,13 +12,28 @@ const getStyleString = (style: CSSProperties) => {
   }, "");
 };
 
-const heroSponsors = asideSponsors.filter(
-  ({ tier }) => tier.name === "$2500 a month",
+const heroSponsors = rotateArrayDaily(
+  asideSponsors.filter(({ tier }) => tier.name === "$2500 a month")
 );
 
-const goldSponsors = asideSponsors.filter(
-  ({ tier }) => tier.name === "$1000 a month",
-);
+// Ensure placeholder sponsor is at the end
+const goldSponsors = (() => {
+  const rotated = rotateArrayDaily(
+    asideSponsors.filter(({ tier }) => tier.name === "$1000 a month")
+  );
+
+  const placeholder = rotated.find(
+    (sponsor) => sponsor.sponsorEntity.name === "Sponsor"
+  );
+
+  if (!placeholder) return rotated;
+
+  const rest = rotated.filter(
+    (sponsor) => sponsor.sponsorEntity.name !== "Sponsor"
+  );
+
+  return [...rest, placeholder];
+})();
 ---
 
 <div class="aside-sponsors__wrap">
@@ -25,7 +41,7 @@ const goldSponsors = asideSponsors.filter(
     {heroSponsors.map((sponsor) => (
       <a
         class:list={[
-          "aside-sponsors__sponsor",
+          "aside-sponsors__sponsor border-highlight",
           "aside-sponsors__hero-sponsor",
         ]}
         href={`https://${sponsor.sponsorEntity.login}`}
@@ -66,7 +82,7 @@ const goldSponsors = asideSponsors.filter(
     {goldSponsors.map((sponsor) => (
       <a
         class:list={[
-          "aside-sponsors__sponsor",
+          "aside-sponsors__sponsor border-highlight",
           ["Sponsor"].includes(sponsor.sponsorEntity.name)
             ? "aside-sponsors__sponsor--hide"
             : "",
@@ -224,27 +240,6 @@ const goldSponsors = asideSponsors.filter(
     height: 74px;
   }
 
-  html.dark .aside-sponsors__sponsor::before {
-    background-image: url("../../assets/images/dark-gradient.png");
-  }
-
-  .aside-sponsors__sponsor::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 240px;
-    height: 240px;
-    background-image: url("../../assets/images/light-gradient.png");
-    background-size: 240px 240px;
-    background-position: center center;
-    transform: rotate(45deg) scale(1.45);
-    animation: spin 10s linear infinite;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
   .aside-sponsors__sponsor:hover::before {
     opacity: 1;
   }
@@ -366,7 +361,7 @@ const goldSponsors = asideSponsors.filter(
     }
   }
 
-  @media screen and (max-height: 891px) {
+  @media screen and (max-height: 964px) {
       .aside-sponsors__sponsor--hide {
           display: none;
       }

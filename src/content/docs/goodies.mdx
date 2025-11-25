@@ -453,9 +453,9 @@ very useful when you need to omit certain columns upon selection.
         await db.select({ ...rest }).from(users);
         ```
         ```ts
-        import { integer, text, sqliteView } from "drizzle-orm/sqlite-core";
+        import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
 
-        export const user = pgTable("user", {
+        export const user = sqliteTable("user", {
           id: integer("id").primaryKey({ autoIncrement: true }),
           name: text("name"),
           email: text("email"),

@@ -1,23 +1,13 @@
 ---
-import { Image } from "astro:assets";
 import AsideArticle from "./AsidePosts.astro";
 import AsideSponsors from "./AsideSponsors.astro";
 import SmallProgressBar from "./SmallProgressBar.astro";
 import progress from "../../data/progress";
 import Toasts from "./Toasts.astro";
-import MSSQL from "@/assets/images/mssql.png";
 ---
 
 <div class="aside-right">
   <div class="aside-right__content">
-    <a
-      class="mssql-wrap"
-      target="_blank"
-      rel="norefferer nofollow"
-      href="https://mssql.drizzle.team/"
-    >
-      <Image src={MSSQL} alt="MSSQL Drizzle" />
-    </a>
     <div class="progress-wrap">
       <SmallProgressBar progress={progress} />
     </div>

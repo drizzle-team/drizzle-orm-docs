@@ -93,12 +93,12 @@ import { drizzle } from "drizzle-orm/vercel-postgres";
 const db = drizzle();
 ```
 ```ts
-import { drizzle  } from "drizzle-orm/planetscale";
+import { drizzle } from "drizzle-orm/planetscale";
 
 const db = drizzle(process.env.DATABASE_URL);
 ```
 ```ts
-import { drizzle  } from "drizzle-orm/d1";
+import { drizzle } from "drizzle-orm/d1";
 
 const db = drizzle({ connection: env.DB });
 ```
@@ -114,7 +114,7 @@ const db = drizzle("./sqlite.db");
 ```
 ```ts
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite/next";
+import { openDatabaseSync } from "expo-sqlite";
 
 const expo = openDatabaseSync("db.db");
 const db = drizzle(expo);
@@ -160,9 +160,11 @@ Feel free to check out per-driver documentations
   title='SQLite drivers'
   links={[
       ["SQLite", "/docs/get-started-sqlite"], 
-      ["Turso", "/docs/connect-turso"], 
+      ["Turso Cloud", "/docs/connect-turso"], 
+      ["Turso Database", "/docs/connect-turso-database"], 
       ["Cloudflare D1", "/docs/connect-cloudflare-d1"],
       ["Bun SQLite", "/docs/connect-bun-sqlite"],
+      ["SQLite Cloud", "/docs/connect-sqlite-cloud"],
     ]}
   />
   <LinksList 

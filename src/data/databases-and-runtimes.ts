@@ -25,6 +25,7 @@ export const databases: {
       width: 24,
       color: "#f0f0f0",
     },
+    sponsorUrl: "http://planetscale.com/",
   },
   "Vercel Postgres": {
     imageSrc: "/public/svg/vercel.svg",
@@ -47,7 +48,6 @@ export const databases: {
     darkStyle: {
       width: 26,
     },
-    sponsorUrl: "https://driz.link/singlestore",
   },
   Turso: {
     imageSrc: {
@@ -147,7 +147,6 @@ export const databases: {
     darkStyle: {
       width: 24,
     },
-    sponsorUrl: "https://driz.link/tembo",
   },
   Gel: {
     imageSrc: {
