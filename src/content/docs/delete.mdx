@@ -14,7 +14,7 @@ await db.delete(users).where(eq(users.name, 'Dan'));
 
 ### Limit
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'MySQL': true, 'SQLite': true, 'SingleStore': true, 'MSSQL': false, 'CockroachDB': false }} />
 
 Use `.limit()` to add `limit` clause to the query - for example:
 <Section>
@@ -48,8 +48,8 @@ delete from "users" where "users"."name" = $1 order by "name" asc, "name2" desc;
 ```
 </Section>
 
-### Delete with return
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false}} />
+### Returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': true }} />
 You can delete a row and get it back in PostgreSQL and SQLite:
 ```typescript copy
 const deletedUser = await db.delete(users)
@@ -60,6 +60,16 @@ const deletedUser = await db.delete(users)
 const deletedUserIds: { deletedId: number }[] = await db.delete(users)
   .where(eq(users.name, 'Dan'))
   .returning({ deletedId: users.id });
+```
+
+## Output
+<IsSupportedChipGroup chips={{ 'MSSQL': true }} />
+You can insert a row and get it back in PostgreSQL and SQLite like such:
+```typescript copy
+await db.insert(users).values({ name: "Dan" }).output();
+
+// partial return
+await db.insert(users).values({ name: "Partial Dan" }).output({ insertedId: users.id });
 ```
 
 ## WITH DELETE clause

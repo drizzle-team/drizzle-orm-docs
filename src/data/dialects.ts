@@ -35,7 +35,7 @@ export const dialects: ICards = {
     darkStyle: {
       width: 24,
     },
-    description: "Collection of nodejs modules to interact with PostgreSQL",
+    description: "Collection of nodejs modules to interact with SQLite",
     href: "/sqlite",
   },
   singlestore: {
@@ -47,7 +47,31 @@ export const dialects: ICards = {
     darkStyle: {
       width: 24,
     },
-    description: "Collection of nodejs modules to interact with PostgreSQL",
+    description: "Collection of nodejs modules to interact with SingleStore",
     href: "/singlestore",
+  },
+  mssql: {
+    title: "MSSQL",
+    imageSrc: "",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    description: "Collection of nodejs modules to interact with MSSQL",
+    href: "/mssql",
+  },
+  cockroach: {
+    title: "CockroachDB",
+    imageSrc: "",
+    lightStyle: {
+      width: 24,
+    },
+    darkStyle: {
+      width: 24,
+    },
+    description: "Collection of nodejs modules to interact with CockroachDB",
+    href: "/cockroach",
   },
 };

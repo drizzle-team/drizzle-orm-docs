@@ -7,7 +7,6 @@ import Tabs from '@mdx/Tabs.astro';
 # SQL Insert
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
 
-## Insert one row
 Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
 
 <Section>
@@ -31,8 +30,8 @@ const newUser: NewUser = { name: "Alef" };
 await insertUser(newUser);
 ```
 
-## Insert returning
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false}} />
+## returning
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': true }} />
 You can insert a row and get it back in PostgreSQL and SQLite like such:
 ```typescript copy
 await db.insert(users).values({ name: "Dan" }).returning();
@@ -41,8 +40,8 @@ await db.insert(users).values({ name: "Dan" }).returning();
 await db.insert(users).values({ name: "Partial Dan" }).returning({ insertedId: users.id });
 ```
 
-## Insert $returningId
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true }} />
+## $returningId
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true, 'MSSQL': false, 'CockroachDB': false }} />
 
 MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. There is only one way to do it for `primary keys` with `autoincrement` (or `serial`) types, where you can access `insertId` and `affectedRows` fields. We've prepared an automatic way for you to handle such cases with Drizzle and automatically receive all inserted IDs as separate objects
 
@@ -78,6 +77,16 @@ const result = await db.insert(usersTableDefFn).values([{ name: 'John' }, { name
 
 > If there is no primary keys -> type will be `{}[]` for such queries
 
+## output
+<IsSupportedChipGroup chips={{ 'MSSQL': true }} />
+You can insert a row and get it back in PostgreSQL and SQLite like such:
+```typescript copy
+await db.insert(users).values({ name: "Dan" }).output();
+
+// partial return
+await db.insert(users).values({ name: "Partial Dan" }).output({ insertedId: users.id });
+```
+
 ## Insert multiple rows
 ```typescript copy
 await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
@@ -87,7 +96,7 @@ await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
 Drizzle ORM provides simple interfaces for handling upserts and conflicts.
 
 ### On conflict do nothing
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': false, 'SingleStore': false, 'CockroachDB': true }} />
 
 `onConflictDoNothing` will cancel the insert if there's a conflict:
 
@@ -164,7 +173,7 @@ await db.insert(users)
 ```
 
 ### On duplicate key update
-<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': false, 'SQLite': false, 'MySQL': true, 'SingleStore': true, 'CockroachDB': false }} />
 
 MySQL supports [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html) instead of `ON CONFLICT` clauses. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if *any* unique index conflicts.
 

@@ -10,26 +10,15 @@ import Callout from '@mdx/Callout.astro';
 To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
 </Callout>
 
-Generated columns in SQL are a feature that allows you to create columns in a table whose values are automatically computed based on expressions involving other columns within the same table. This can help ensure data consistency, simplify database design, and improve query performance.
-
-There are two types of generated columns:
-
 1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
 
 2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
-
-Generated columns can be especially useful for:
-
-- Deriving new data from existing columns
-- Automating calculations to avoid manual updates
-- Enforcing data integrity and consistency
-- Simplifying application logic by keeping complex calculations within the database schema
 
 <Callout type="info">
     The implementation and usage of generated columns can vary significantly across different SQL databases. PostgreSQL, MySQL, and SQLite each have unique features, capabilities, and limitations when it comes to generated columns. In this section, we will explore these differences in detail to help you understand how to best utilize generated columns in each database system.
 </Callout>
 
-<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore(WIP)"]}>
+<Tabs items={["PostgreSQL", "MySQL", "SQLite", "SingleStore(WIP)", "MSSQL", "CockroachDB"]}>
   <Tab>
     #### Database side
     **Types**: `STORED` only
@@ -349,4 +338,162 @@ Generated columns can be especially useful for:
   <Tab>
   Work in Progress
   </Tab>
+<Tab>
+    #### Database side
+    **Types**: `PERSISTED`, `VIRTUAL`
+
+    **How It Works**
+    - Defined with an expression in the table schema.
+    - Virtual columns are computed during read operations.
+    - Persisted columns are computed during write operations and stored.
+
+    For more info, please check [MSSQL](https://learn.microsoft.com/en-us/sql/relational-databases/tables/specify-computed-columns-in-a-table?view=sql-server-ver17) docs
+
+    #### Drizzle side
+
+    #### Features 
+
+    **`string`**
+    <CodeTab>
+    ```ts
+    export const test = mssqlTable("test", {
+        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+    });
+    ```
+    ```sql
+    CREATE TABLE [test] (
+	    [gen_name] AS ('hello world!') VIRTUAL
+    );
+    ```
+    </CodeTab>
+
+    **`sql`** tag - if you want drizzle to escape some values for you
+
+    <CodeTab>
+    ```ts
+    export const test = mssqlTable("test", {
+        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+    });
+    ```
+    ```sql
+    CREATE TABLE [test] (
+	    [gen_name] AS ('hello "world"!') VIRTUAL
+    );
+    ```
+    </CodeTab>
+
+    **`callback`** - if you need to reference columns from a table
+
+    <CodeTab>
+    ```ts
+    export const test = mssqlTable("test", {
+        name: text("first_name"),
+        generatedName: text("gen_name").generatedAlwaysAs(
+          (): SQL => sql`hi, ${test.name}!`
+        ),
+    });
+    ```
+    ```sql
+    CREATE TABLE [test] (
+    	[first_name] text,
+    	[gen_name] AS ('hi, [test].[first_name]!') VIRTUAL
+    );
+    ```
+    </CodeTab>
+  </Tab>
+  <Tab>
+    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
+    that will generate this column data for you.
+
+    #### Features 
+    This function can accept generated expression in 3 ways:
+
+    **`string`**
+    <CodeTab>
+    ```ts
+    export const test = cockroachTable("test", {
+        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+    });
+    ```
+    ```sql
+    CREATE TABLE "test" (
+	    "gen_name" text GENERATED ALWAYS AS (hello world!) STORED
+    );
+    ```
+    </CodeTab>
+
+    **`sql`** tag - if you want drizzle to escape some values for you
+
+    <CodeTab>
+    ```ts
+    export const test = cockroachTable("test", {
+        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+    });
+    ```
+    ```sql
+    CREATE TABLE "test" (
+	    "gen_name" text GENERATED ALWAYS AS (hello "world"!) STORED
+    );
+    ```
+    </CodeTab>
+
+    **`callback`** - if you need to reference columns from a table
+    <CodeTab>
+    ```ts
+    export const test = cockroachTable("test", {
+        name: text("first_name"),
+        generatedName: text("gen_name").generatedAlwaysAs(
+          (): SQL => sql`hi, ${test.name}!`
+        ),
+    });
+    ```
+    ```sql
+    CREATE TABLE "test" (
+	    "first_name" text,
+	    "gen_name" text GENERATED ALWAYS AS (hi, "test"."first_name"!) STORED
+    );
+    ```
+    </CodeTab>
+
+    **Example** generated columns with full-text search
+   <CodeTabs items={["schema.ts"]}>
+	<CodeTab>
+	```typescript copy {17-19}
+    import { SQL, sql } from "drizzle-orm";
+    import { customType, index, int4, cockroachTable, text } from "drizzle-orm/cockroach-core";
+
+    const tsVector = customType<{ data: string }>({
+      dataType() {
+        return "tsvector";
+      },
+    });
+
+    export const test = cockroachTable(
+      "test",
+      {
+        id: int4().primaryKey().generatedAlwaysAsIdentity(),
+        content: text("content"),
+        contentSearch: tsVector("content_search", {
+          dimensions: 3,
+        }).generatedAlwaysAs(
+          (): SQL => sql`to_tsvector('english', ${test.content})`
+        ),
+      },
+      (t) => [
+        index("idx_content_search").using("gin", t.contentSearch)
+      ]
+    );
+    ```
+    ```sql {4}
+    CREATE TABLE "test" (
+    	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "test_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+    	"content" text,
+    	"content_search" "tsvector" GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
+    );
+    --> statement-breakpoint
+    CREATE INDEX "idx_content_search" ON "test" USING gin ("content_search");
+    ```
+    </CodeTab>
+   </CodeTabs>
+  </Tab> 
 </Tabs>

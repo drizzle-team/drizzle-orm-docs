@@ -32,7 +32,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"int" integer
 );
 ```
@@ -51,7 +51,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"int1" integer DEFAULT 10,
 	"int2" integer DEFAULT '10'::int
 );
@@ -73,7 +73,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"smallint" smallint
 );
 ```
@@ -91,7 +91,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"smallint1" smallint DEFAULT 10,
 	"smallint2" smallint DEFAULT '10'::smallint
 );
@@ -121,7 +121,7 @@ bigint: bigint({ mode: 'bigint' })
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"bigint" bigint
 );
 ```
@@ -139,7 +139,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"bigint1" bigint DEFAULT 10,
 	"bigint2" bigint DEFAULT '10'::bigint
 );
@@ -163,7 +163,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"serial" serial NOT NULL
 );
 ```
@@ -184,7 +184,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"smallserial" smallserial NOT NULL
 );
 ```
@@ -207,7 +207,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"bigserial" bigserial NOT NULL
 );
 ```
@@ -231,7 +231,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"boolean" boolean
 );
 ```
@@ -284,7 +284,7 @@ text: text({ enum: ["value1", "value2"] })
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"text" text
 );
 ```
@@ -313,7 +313,7 @@ varchar: varchar({ enum: ["value1", "value2"] }),
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"varchar1" varchar,
 	"varchar2" varchar(256)
 );
@@ -343,7 +343,7 @@ char: char({ enum: ["value1", "value2"] }),
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"char1" char,
 	"char2" char(256)
 );
@@ -372,7 +372,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"numeric1" numeric,
 	"numeric2" numeric(100),
 	"numeric3" numeric(100, 20),
@@ -404,7 +404,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"real1" real,
 	"real2" real default 10.10,
 	"real3" real default '10.10'::real
@@ -431,7 +431,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"double1" double precision,
 	"double2" double precision default 10.10,
 	"double3" double precision default '10.10'::double precision
@@ -460,7 +460,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"json1" json,
 	"json2" json default '{"foo": "bar"}'::json,
 	"json3" json default '{"foo": "bar"}'::json
@@ -497,7 +497,7 @@ const table = pgTable('table', {
 });
 ```
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"jsonb1" jsonb,
 	"jsonb2" jsonb default '{"foo": "bar"}'::jsonb,
 	"jsonb3" jsonb default '{"foo": "bar"}'::jsonb
@@ -521,6 +521,33 @@ jsonb: jsonb().$type<string[]>().default({});
 
 ## ---
 
+### uuid
+`uuid`
+
+The data type uuid stores Universally Unique Identifiers (UUID) as defined by RFC 4122, ISO/IEC 9834-8:2005, and related standards
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-uuid.html)**
+
+```ts
+import { uuid, pgTable } from "drizzle-orm/pg-core";
+
+const table = pgTable('table', {
+  uuid1: uuid(),
+  uuid2: uuid().defaultRandom(),
+  uuid3: uuid().default('a0ee-bc99-9c0b-4ef8-bb6d-6bb9-bd38-0a11')
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"uuid1" uuid,
+	"uuid2" uuid default gen_random_uuid(),
+	"uuid3" uuid default 'a0ee-bc99-9c0b-4ef8-bb6d-6bb9-bd38-0a11'
+);
+```
+
+## ---
+
 ### time
 `time` `timetz` `time with timezone` `time without timezone`  
 Time of day with or without time zone.
@@ -540,7 +567,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"time1" time,
 	"time2" time with timezone,
 	"time3" time(6),
@@ -567,7 +594,7 @@ const table = pgTable('table', {
 });
 ```
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"timestamp1" timestamp,
 	"timestamp2" timestamp (6) with time zone,
 	"timestamp3" timestamp default now(),
@@ -629,7 +656,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"date" date
 );
 ```
@@ -661,7 +688,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"interval1" interval,
 	"interval2" interval day,
 	"interval3" interval(6) month
@@ -692,7 +719,7 @@ const items = pgTable('items', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "items" (
+CREATE TABLE "items" (
 	"point" point,
 	"pointObj" point
 );
@@ -720,7 +747,7 @@ const items = pgTable('items', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "items" (
+CREATE TABLE "items" (
 	"line" line,
 	"lineObj" line
 );
@@ -750,7 +777,7 @@ export const table = pgTable('table', {
 ```sql
 CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
 
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"mood" mood
 );
 ```
@@ -834,7 +861,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"integer1" integer DEFAULT 42,
 	"integer2" integer DEFAULT '42'::integer,
 	"uuid1" uuid DEFAULT gen_random_uuid(),
@@ -897,7 +924,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"integer" integer NOT NULL
 );
 ```
@@ -917,7 +944,7 @@ const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"id" serial PRIMARY KEY NOT NULL
 );
 ```
