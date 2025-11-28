@@ -1,0 +1,242 @@
+---
+title: Fifth Normal Form (5NF)
+slug: fifth-normal-form
+---
+
+import Section from "@mdx/Section.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
+
+<Prerequisites>
+- You should be familiar with [4NF](/docs/guides/fourth-normal-form)
+</Prerequisites>
+
+**The Fifth Normal Form (5NF)**, also known as **Project-Join Normal Form (PJ/NF)** is a level of database normalization where a table is already in **4NF**, and every non-trivial join dependency in that table is implied by the candidate keys. The goal is to eliminate redundancy caused by join dependencies and to ensure that relations are decomposed into smaller components without any loss of data.
+
+In practice, **5NF** is rarely used in database design.
+
+## Key concepts
+
+1. A `Join Dependency` (JD) is a constraint that specifies that table `R` can be split into several smaller tables `R1, R2,..., Rk` and by performing a natural join on these tables, the original table `R` can be reconstructed without any loss of information and no false information (spurious rows) is created during the process.
+2. A `Lossless/Non-Loss Decomposition` is a decomposition when all the sub-relations do the natural join and the obtained table is equal to the original table.
+3. A `Natural Join` is a join operation that is used to combine two relations based on all common attributes. 
+4. A JD denoted as `*(R1, R2, ..., Rk)` on a relation `R` is considered trivial if at least one of the components `Ri` (where `i` is between `1` and `k`) is equal to the set of all attributes of the original relation `R`. In simple terms: A join dependency is trivial if one of the parts you're joining already is the whole original table.
+
+## Example
+
+We have a table `agent_inventory` with the following schema:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const agentInventory = pgTable("agent_inventory", {
+      agent: varchar("agent", { length: 255 }).notNull(),
+      supplier: varchar("supplier", { length: 255 }).notNull(),
+      itemType: varchar("item_type", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.agent, t.supplier, t.itemType] }),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "agent_inventory" (
+    	"agent" varchar(255) NOT NULL,
+    	"supplier" varchar(255) NOT NULL,
+    	"item_type" varchar(255) NOT NULL,
+    	CONSTRAINT "agent_inventory_agent_supplier_item_type_pk" PRIMARY KEY("agent","supplier","item_type")
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +------------------------------------------+
+    | agent_inventory                          |
+    +-------------+-------------+--------------+
+    | agent       | supplier    | item_type    |
+    +-------------+-------------+--------------+
+    | Anna Bell   | GearUp      | Scanner      |
+    | Anna Bell   | Innovate    | Scanner      |
+    | Anna Bell   | Innovate    | Projector    |
+    | Chris Day   | Innovate    | Projector    |
+    | Chris Day   | ProServe    | Projector    |
+    | Chris Day   | ProServe    | Webcam       |
+    | Chris Day   | ProServe    | Dock         |
+    | Helen Fox   | GearUp      | Scanner      |
+    | Helen Fox   | GearUp      | Webcam       |
+    | Helen Fox   | ProServe    | Webcam       |
+    | Helen Fox   | ProServe    | Dock         |
+    +-------------+-------------+--------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+1. An `Agent` can be authorized to source products from multiple `Suppliers`.
+2. An `Agent` can be authorized to offer multiple `Item types`.
+3. A `Supplier` can manufacture multiple `Item types`.
+4. The core business constraint: An `Agent` must offer a specific `Item type` from a specific `Supplier` if and only if the following three conditions are all true:
+   - The `Agent` is authorized to source products from that `Supplier`.
+   - The `Agent` is authorized to offer that `Item type`.
+   - The `Supplier` is known to manufacture that `Item type`.
+
+**Illustrative Consequence**: An `Agent` has certain `Suppliers` and certain `Item types` in their repertoire. If supplier `S1` and supplier `S2` are in their repertoire, and item type `I` is in their repertoire, then (assuming supplier `S1` and supplier `S2` both manufacture item type `I`), the agent must offer items of item type `I` those manufactured by supplier `S1` and those manufactured by supplier `S2`.
+You cannot have all the component relationships true without the corresponding combined record existing in the `agent_inventory` table. It's this enforced combination based on the component parts that leads to the Join Dependency.
+
+### Candidate Keys
+
+`agent, supplier, item_type` is the only candidate key. All three attributes are required to uniquely identify a specific assignment row.
+
+### Join Dependency
+
+`*( {agent, supplier}, {agent, item_type}, {supplier, item_type} )` is a non-trivial join dependency. This means that the table can be decomposed into smaller tables without losing any information.
+
+### 4NF Analysis
+
+The table is in **4NF** because there are no non-trivial multivalued dependencies. For example, `Helen Fox` sources from `GearUp` and `ProServe`, and she offers `Webcam`, `Scanners` and `Docks`. However, she doesn't offer `GearUp` `Docks`, nor does she offer `ProServe` `Scanners`. The allowed combinations are specific and don't show the independence required for MVDs based on single attributes.
+
+### 5NF Analysis
+
+The table is not in **5NF** because it contains non-trivial join dependency. This join dependency is not implied by the candidate key `agent, supplier, item_type` because none of the components in the JD (`{agent, supplier}`, `{agent, item_type}`, `{supplier, item_type}`) are superkeys of the original `agent_inventory` table.
+
+This leads to:
+1. Redundancy.
+2. Deletion Anomalies: Changing a single underlying fact (e.g., a supplier stops making an item type) may require updating multiple rows in the `agent_inventory` table. For instance, if `ProServe` stopped making `Docks`, rows for both `Chris Day` and `Helen Fox` would need deletion.
+3. Insertion Anomalies: If underlying facts change such that the rule dictates a new row should exist (e.g., if `Chris Day` starts handling `GearUp` suppliers, and `GearUp` makes `Scanners`, which `Chris Day` already handles, the rule implies (`Chris Day`, `GearUp`, `Scanner`) must be inserted), the single-table structure doesn't automatically enforce this insertion based on the component facts.
+
+### 5NF Decomposition
+
+We need to split the table into three tables: `agent_suppliers`, `agent_item_types`, and `supplier_item_types`:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const agentSuppliers = pgTable("agent_suppliers", {
+      agent: varchar("agent", { length: 255 }).notNull(),
+      supplier: varchar("supplier", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.agent, t.supplier] }),
+    ]);
+
+    export const agentItemTypes = pgTable("agent_item_types", {
+      agent: varchar("agent", { length: 255 }).notNull(),
+      itemType: varchar("item_type", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.agent, t.itemType] }),
+    ]);
+
+    export const supplierItemTypes = pgTable("supplier_item_types", {
+      supplier: varchar("supplier", { length: 255 }).notNull(),
+      itemType: varchar("item_type", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.supplier, t.itemType] }),
+    ]);
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```sql
+  CREATE TABLE "agent_item_types" (
+  	"agent" varchar(255) NOT NULL,
+  	"item_type" varchar(255) NOT NULL,
+  	CONSTRAINT "agent_item_types_agent_item_type_pk" PRIMARY KEY("agent","item_type")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "agent_suppliers" (
+  	"agent" varchar(255) NOT NULL,
+  	"supplier" varchar(255) NOT NULL,
+  	CONSTRAINT "agent_suppliers_agent_supplier_pk" PRIMARY KEY("agent","supplier")
+  );
+  --> statement-breakpoint
+  CREATE TABLE "supplier_item_types" (
+  	"supplier" varchar(255) NOT NULL,
+  	"item_type" varchar(255) NOT NULL,
+  	CONSTRAINT "supplier_item_types_supplier_item_type_pk" PRIMARY KEY("supplier","item_type")
+  );
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +----------------------+   +-----------------------+
+    | agent_suppliers      |   | agent_item_types      |
+    +-----------+----------+   +-----------+-----------+
+    | agent     | supplier |   | agent     | item_type |
+    +-----------+----------+   +-----------+-----------+
+    | Anna Bell | GearUp   |   | Anna Bell | Scanner   |
+    | Anna Bell | Innovate |   | Anna Bell | Projector |
+    | Chris Day | Innovate |   | Chris Day | Projector |
+    | Chris Day | ProServe |   | Chris Day | Webcam    |
+    | Helen Fox | GearUp   |   | Chris Day | Dock      |
+    | Helen Fox | ProServe |   | Helen Fox | Scanner   |
+    +-----------+----------+   | Helen Fox | Webcam    |
+                               | Helen Fox | Dock      |
+                               +-----------+-----------+
+    +----------------------+
+    | supplier_item_types  |
+    +----------+-----------+
+    | supplier | item_type |
+    +----------+-----------+
+    | GearUp   | Scanner   |
+    | GearUp   | Webcam    |
+    | Innovate | Scanner   |
+    | Innovate | Projector |
+    | ProServe | Projector |
+    | ProServe | Webcam    |
+    | ProServe | Dock      |
+    +----------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+<Callout type="warning">
+You should also add foreign key constraints on the relevant columns in the `agent_item_types`, `agent_suppliers`, and `supplier_item_types` tables. These constraints should reference the primary key columns in the respective tables (or equivalent tables defining agents, suppliers, and item types).
+</Callout>
+
+To retrieve the data in a format equivalent to the original `agent_inventory` table we can execute this query:
+
+<Section>
+```ts
+const db = drizzle(...);
+
+const results = await db
+  .select({
+    agent: agentSuppliers.agent,
+    supplier: agentSuppliers.supplier,
+    itemType: agentItemTypes.itemType,
+  })
+  .from(agentSuppliers)
+  .innerJoin(
+    agentItemTypes,
+    eq(agentSuppliers.agent, agentItemTypes.agent)
+  )
+  .innerJoin(
+    supplierItemTypes,
+    and(
+      eq(agentSuppliers.supplier, supplierItemTypes.supplier),
+      eq(agentItemTypes.itemType, supplierItemTypes.itemType)
+    )
+  );
+```
+
+```sql
+SELECT
+    "agent_suppliers"."agent",
+    "agent_suppliers"."supplier",
+    "agent_item_types"."item_type"
+FROM
+    "agent_suppliers"
+INNER JOIN
+    "agent_item_types"
+    ON "agent_suppliers"."agent" = "agent_item_types"."agent"
+INNER JOIN
+    "supplier_item_types"
+    ON "agent_suppliers"."supplier" = "supplier_item_types"."supplier"
+   AND "agent_item_types"."item_type" = "supplier_item_types"."item_type";
+```
+</Section>
+
+Decomposing the table into `agent_suppliers`, `agent_item_types`, and `supplier_item_types` achieves **5NF**. Each table now represents a single fundamental relationship from the core business rule. This eliminates the specific join dependency that caused redundancy and update anomalies in the original table.
