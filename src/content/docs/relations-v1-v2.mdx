@@ -125,6 +125,38 @@ export const relations = defineRelations(schema, (r) => ({
 ```
 </Callout>
 
+You can still separate it into different `parts`, and you can make the parts any size you want
+
+```ts
+import { defineRelations, defineRelationsPart } from 'drizzle-orm';
+import * as schema from "./schema";
+
+export const relations = defineRelations(schema, (r) => ({
+  users: {
+    invitee: r.one.users({
+      from: r.users.invitedBy,
+      to: r.users.id,
+    }),
+    posts: r.many.posts(),
+  }
+}));
+
+export const part = defineRelationsPart(schema, (r) => ({
+  posts: {
+    author: r.one.users({
+      from: r.posts.authorId,
+      to: r.users.id,
+    }),
+  }
+}));
+```
+
+and then you can provide it to the db instance
+
+```ts
+const db = drizzle(process.env.DB_URL, { relations: { ...relations, ...part } })
+```
+
 **Define `many` without `one`**
 
 In v1, if you wanted only the `many` side of a relationship, you had to specify the `one` side on the other end, 

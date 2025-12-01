@@ -146,6 +146,17 @@ Drizzle cannot perform any type casts based on the provided type generic, becaus
 If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
 </Callout>
 
+<Callout title='Info'>
+Starting from `v1.0.0-beta.1` you can use `.as()` for columns:
+
+```ts
+const result = await db.select({
+  id: users.id,
+  lowerName: users.name.as("lower"),
+}).from(users);
+```
+</Callout>
+
 ### Conditional select
 
 You can have a dynamic selection object based on some condition:
