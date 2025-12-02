@@ -12,7 +12,7 @@ It natively supports mostly every query feature and capability of every dialect,
 and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/sql) operator.
 
 For the following examples, let's assume you have a `users` table defined like this:
-<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore']}>
+<Tabs items={['PostgreSQL', 'MySQL', 'SQLite', 'SingleStore', 'MSSQL', 'CockroachDB']}>
 <Tab>
 ```typescript
 import { pgTable, serial, text } from 'drizzle-orm/pg-core';
@@ -54,6 +54,28 @@ export const users = singlestoreTable('users', {
   id: int('id').primaryKey(),
   name: text('name').notNull(),
   age: int('age'),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { mssqlTable, int, text } from 'drizzle-orm/mssql-core';
+
+export const users = pgTable('users', {
+  id: int().primaryKey(),
+  name: text().notNull(),
+  age: int(),
+});
+```
+</Tab>
+<Tab>
+```typescript
+import { cockroachTable, int4, text } from 'drizzle-orm/cockroach-core';
+
+export const users = pgTable('users', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
+  age: int4(),
 });
 ```
 </Tab>
@@ -122,6 +144,17 @@ If you specify it incorrectly (e.g. use `sql<number>` for a field that will be r
 Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
 
 If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
+</Callout>
+
+<Callout title='Info'>
+Starting from `v1.0.0-beta.1` you can use `.as()` for columns:
+
+```ts
+const result = await db.select({
+  id: users.id,
+  lowerName: users.name.as("lower"),
+}).from(users);
+```
 </Callout>
 
 ### Conditional select
@@ -364,6 +397,8 @@ await searchPosts(filters);
 ## ---
 
 ### Limit & offset
+<IsSupportedChipGroup chips={{ 'MSSQL': false }} />
+
 Use `.limit()` and `.offset()` to add `limit` and `offset` clauses to the query - for example, to implement pagination:
 <Section>
 ```typescript
@@ -373,6 +408,40 @@ await db.select().from(users).limit(10).offset(10);
 ```sql
 select "id", "name", "age" from "users" limit 10;
 select "id", "name", "age" from "users" limit 10 offset 10;
+```
+</Section>
+
+### Fetch & offset
+
+<IsSupportedChipGroup chips={{ 'MSSQL': true }} />
+
+<Callout>
+In MSSQL, `FETCH` and `OFFSET` are part of the `ORDER BY` clause, so they can only be used after the `.orderBy()` function
+</Callout>
+
+<Section>
+```typescript
+await db.select().from(users).orderBy(asc(users.id)).offset(5);
+await db.select().from(users).orderBy(asc(users.id)).offset(5).fetch(10);
+```
+```sql
+select [id], [name], [age] from [users] offset 5 rows;
+select [id], [name], [age] from [users] offset 5 rows fetch next 10 rows;
+```
+</Section>
+
+### Top
+
+<IsSupportedChipGroup chips={{ 'MSSQL': true }} />
+
+Limits the rows returned in a query result set to a specified number of rows
+
+<Section>
+```typescript
+await db.select().from(users).top(10);
+```
+```sql
+select top (10) [id], [name], [age] from [users];
 ```
 </Section>
 
@@ -399,7 +468,7 @@ select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
 </Section>
 
 ### Advanced pagination
-Powered by TypeScript, Drizzle APIs let you implement all possible SQL paginations and sorting approaches.
+Powered by TypeScript, Drizzle APIs let you implement all possible SQL pagination and sorting approaches.
 
 Sneak peek of advanced pagination, for more detailed advanced
 usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination)
@@ -829,7 +898,7 @@ db
 
 ### Iterator
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false, 'SingleStore[WIP]': false }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL[WIP]': false, 'SQLite[WIP]': false, 'SingleStore[WIP]': false, 'MSSQL': true, 'CockroachDB[WIP]': false }} />
 
 If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
 
@@ -858,7 +927,7 @@ for await (const row of iterator) {
 
 The `USE INDEX` hint suggests to the optimizer which indexes to consider when processing the query. The optimizer is not forced to use these indexes but will prioritize them if they are suitable.
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {
@@ -886,7 +955,7 @@ await db.select()
 
 The `IGNORE INDEX` hint tells the optimizer to avoid using specific indexes for the query. MySQL will consider all other indexes (if any) or perform a full table scan if necessary.
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {
@@ -915,7 +984,7 @@ await db.select()
 
 The `FORCE INDEX` hint forces the optimizer to use the specified index(es) for the query. If the specified index cannot be used, MySQL will not fall back to other indexes; it might resort to a full table scan instead.
 
-<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'MySQL': true, 'PostgreSQL': false, 'SQLite': false, 'SingleStore': false, 'MSSQL': false, 'CockroachDB': false }} />
 
 ```ts copy
 export const users = mysqlTable('users', {

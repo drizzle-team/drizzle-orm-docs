@@ -162,6 +162,26 @@ export default defineConfig({
 ```
 </CodeTabs>
 
+### Initial pull
+
+<Callout type='error'>
+This feature is available on  `1.0.0-beta.2` and higher.
+</Callout>
+
+<Npm>
+drizzle-orm@beta
+drizzle-kit@beta -D
+</Npm>
+
+<br/>
+
+You can use the `--init` flag to mark the pulled schema as an applied migration in your database, 
+so that all subsequent migrations are diffed against the initial one
+
+```shell
+npx drizzle-kit push --init
+```
+
 ### Including tables, schemas and extensions
 `drizzle-kit push` will by default manage all tables in `public` schema.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
@@ -169,7 +189,7 @@ You can configure list of tables, schemas and extensions via `tablesFilters`, `s
 |                     |                                                                                               |
 | :------------------ | :-------------------------------------------------------------------------------------------- |
 | `tablesFilter`      | `glob` based table names filter, e.g. `["users", "user_info"]` or `"user*"`. Default is `"*"` |
-| `schemaFilter`      | Schema names filter, e.g. `["public", "drizzle"]`. Default is `["public"]`                    |
+| `schemaFilter`      | `glob` based schema names filter, e.g. `["public", "drizzle"]` or `"drizzle*"`. Default is `"*"`                     |
 | `extensionsFilters` | List of installed database extensions, e.g. `["postgis"]`. Default is `[]`                    |
 <br/>
 
