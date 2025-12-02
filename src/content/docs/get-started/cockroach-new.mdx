@@ -21,6 +21,12 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 # Get Started with Drizzle and CockroachDB
 
+<Callout type='error'>
+This page explains concepts available on drizzle versions `1.0.0-beta.2` and higher.
+</Callout>
+
+<br/>
+
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
@@ -35,7 +41,10 @@ our [CockroachDB Connection](/docs/get-started-cockroach) page
 <FileStructure/>
 
 #### Step 1 - Install **node-postgres** package
-<InstallPackages lib='pg' devlib=' @types/pg'/>
+<Npm>
+  drizzle-orm@beta pg dotenv
+  -D drizzle-kit@beta tsx @types/pg
+</Npm>
 
 #### Step 2 - Setup connection variables
 

@@ -21,6 +21,12 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 
 # Get Started with Drizzle and MSSQL
 
+<Callout type='error'>
+This page explains concepts available on drizzle versions `1.0.0-beta.2` and higher.
+</Callout>
+
+<br/>
+
 <Prerequisites>
   - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
   - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
@@ -31,8 +37,11 @@ Drizzle has native support for PostgreSQL connections with the `node-mssql` driv
 
 <FileStructure/>
 
-#### Step 1 - Install **node-postgres** package
-<InstallPackages lib='mssql'/>
+#### Step 1 - Install **mssql** package
+<Npm>
+  drizzle-orm@beta mssql dotenv
+  -D drizzle-kit@beta tsx
+</Npm>
 
 #### Step 2 - Setup connection variables
 
