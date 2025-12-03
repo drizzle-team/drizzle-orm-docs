@@ -31,10 +31,7 @@ import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
 <FileStructure />
 
 #### Step 1 - Install required packages
-<Npm>
-  drizzle-orm dotenv
-  -D drizzle-kit wrangler @cloudflare/workers-types
-</Npm>
+<InstallPackages lib='wrangler'/>
 
 #### Step 2 - Setup wrangler.toml
 
@@ -69,7 +66,6 @@ fallthrough = true
 #### Step 3 - Connect Drizzle ORM to the database
 
 ```ts
-/// <reference types="@cloudflare/workers-types" />
 import { drizzle, type DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { DurableObject } from 'cloudflare:workers'
 
@@ -127,7 +123,6 @@ npx drizzle-kit generate
 You can apply migrations only from Cloudflare Workers. 
 To achieve this, let's define the migrate functionality in MyDurableObject:
 ```ts copy {4-5,17-19}
-/// <reference types="@cloudflare/workers-types" />
 import { drizzle, type DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { DurableObject } from 'cloudflare:workers'
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
@@ -152,7 +147,6 @@ export class MyDurableObject extends DurableObject {
 #### Step 8 - Migrate and Query the database
 
 ```typescript copy
-/// <reference types="@cloudflare/workers-types" />
 import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { DurableObject } from 'cloudflare:workers'
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
