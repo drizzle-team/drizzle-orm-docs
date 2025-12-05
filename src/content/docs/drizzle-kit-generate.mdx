@@ -51,12 +51,13 @@ export const users = p.pgTable("users", {
   ┌ 4. generate SQL migration and persist to file
   │    ┌─┴───────────────────────────────────────┐  
   │      📂 drizzle       
-  │      ├ 📂 _meta
-  │      └ 📜 0000_premium_mister_fear.sql
+  │      └ 📂 20242409125510_premium_mister_fear
+  │        ├ 📜 migration.sql
+  │        └ 📜 snapshot.json
   v
 ```
 ```sql
--- drizzle/0000_premium_mister_fear.sql
+-- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE "users" (
  "id" SERIAL PRIMARY KEY,
@@ -109,8 +110,9 @@ npx drizzle-kit generate --name=init
 ```plaintext {4}
 📦 <project root>
  ├ 📂 drizzle
- │ ├ 📂 _meta
- │ └ 📜 0000_init.sql 
+ │ └ 📂 20242409125510_init
+ │   ├ 📜 snapshot.json
+ │   └ 📜 migration.sql
  ├ 📂 src
  └ …
 ```
@@ -143,14 +145,13 @@ drizzle-kit generate --custom --name=seed-users
 ```plaintext {5}
 📦 <project root>
  ├ 📂 drizzle
- │ ├ 📂 _meta
- │ ├ 📜 0000_init.sql 
- │ └ 📜 0001_seed-users.sql 
+ │ ├ 📂 20242409125510_init
+ │ └ 📂 20242409125510_seed-users
  ├ 📂 src
  └ …
 ```
 ```sql
--- ./drizzle/0001_seed-users.sql
+-- ./drizzle/20242409125510_seed/migration.sql
 
 INSERT INTO "users" ("name") VALUES('Dan');
 INSERT INTO "users" ("name") VALUES('Andrew');
@@ -226,13 +227,12 @@ And it will successfully generate
 📦 <project root>
  ├ …
  ├ 📂 migrations
- │ ├ 📂 _meta
- │ ├ 📜 0000_init.sql 
- │ └ 📜 0001_seed-users.sql 
+ │ ├ 📂 20242409125510_init
+ │ └ 📂 20242409125510_seed-users
  └ …
 ```
 ```sql
--- ./drizzle/0001_seed-users.sql
+-- ./drizzle/20242409125510_seed-users/migration.sql
 
 INSERT INTO "users" ("name") VALUES('Dan');
 INSERT INTO "users" ("name") VALUES('Andrew');
