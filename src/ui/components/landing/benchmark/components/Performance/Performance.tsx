@@ -131,7 +131,7 @@ const Performance: FC<Props> = ({
             <Logo logo={selectedItems.orm} />
           </div>
           <div>
-            <div className={styles.name}>{selectedItems.orm}</div>
+            <div className={styles.name}>{selectedItems.orm.startsWith("prisma") ? 'Prisma' : selectedItems.orm}</div>
             <div className={styles.version}>
               {configurationData.orm.items[selectedItems.orm].compare_version}
             </div>
@@ -139,7 +139,7 @@ const Performance: FC<Props> = ({
         </div>
         <div style={{ display: "flex", gap: "12px" }}>
           <RuntimeSelector />
-          <JoinsSelector />
+          {selectedItems.orm === 'prisma-v5.18.0' && <JoinsSelector />}
         </div>
       </div>
       <div className={styles.block}>

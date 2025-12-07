@@ -7,10 +7,10 @@ interface Props {
 }
 
 const Logo: FC<Props> = ({ logo }) => {
-  if (logo === "drizzle") {
+  if (logo.startsWith("drizzle")) {
     return <DrizzleLogo />;
   }
-  if (logo === "prisma") {
+  if (logo.startsWith("prisma")) {
     return <PrismaIcon />;
   }
   return null;

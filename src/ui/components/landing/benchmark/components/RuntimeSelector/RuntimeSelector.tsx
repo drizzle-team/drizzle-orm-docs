@@ -6,7 +6,13 @@ import BunIcon from "@components/landing/benchmark/components/RuntimeSelector/Bu
 import NodeIcon from "@components/landing/benchmark/components/RuntimeSelector/NodeIcon";
 
 interface Item {
-  value: "node-22" | "node-18" | "node-20" | "bun";
+  value:
+    | "node-24"
+    | "node-22"
+    | "node-18"
+    | "node-20"
+    | "bun-1.3.4"
+    | "bun-1.1.25";
   name: string;
 }
 
@@ -14,17 +20,23 @@ const RuntimeSelector: FC = () => {
   const { selectedItems, setSelectedItems } = useBenchmarkContext();
   const resizerRef = useRef<HTMLDivElement | null>(null);
 
-  const items: Item[] = [
-    { value: "bun", name: "Bun v1.1.25" },
-    { value: "node-22", name: "Node 22.6.0 (Current)" },
-    { value: "node-20", name: "Node v20.16.0 (LTS)" },
-    { value: "node-18", name: "Node v18.20.4 (LTS)" },
-  ];
+  const items: Item[] =
+    selectedItems.orm === "prisma-v7.1.0"
+      ? [
+          { value: "bun-1.3.4", name: "Bun v1.3.4" },
+          { value: "node-24", name: "Node 24.6.0" },
+        ]
+      : [
+          { value: "bun-1.1.25", name: "Bun v1.1.25" },
+          { value: "node-22", name: "Node 22.6.0" },
+          { value: "node-20", name: "Node v20.16.0" },
+          { value: "node-18", name: "Node v18.20.4" },
+        ];
 
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     setSelectedItems({
       ...selectedItems,
-      runtime: e.target.value as "node-22" | "node-18" | "node-20" | "bun",
+      runtime: e.target.value as Item["value"],
     });
   };
 
@@ -45,7 +57,7 @@ const RuntimeSelector: FC = () => {
         {items.find(({ value }) => value === selectedItems.runtime)!.name}
       </div>
       <div style={{ display: "flex", alignItems: "center" }}>
-        {selectedItems.runtime === "bun" ? (
+        {selectedItems.runtime.startsWith("bun") ? (
           <div className={styles.icon}>
             <BunIcon />
           </div>
