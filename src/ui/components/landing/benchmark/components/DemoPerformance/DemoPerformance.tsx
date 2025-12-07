@@ -55,7 +55,7 @@ const DemoPerformance: FC<Props> = ({
           <div>
             <div className={styles.name}>Drizzle</div>
             <div className={styles.version}>
-              {configurationData.orm.items["prisma"].drizzle_version}
+              {configurationData.orm.items["prisma-v7.1.0"].drizzle_version}
             </div>
           </div>
         </div>
@@ -69,7 +69,7 @@ const DemoPerformance: FC<Props> = ({
           <div>
             <div className={styles.name}>Prisma</div>
             <div className={styles.version}>
-              {configurationData.orm.items["prisma"].compare_version}
+              {configurationData.orm.items["prisma-v7.1.0"].compare_version}
             </div>
           </div>
         </div>

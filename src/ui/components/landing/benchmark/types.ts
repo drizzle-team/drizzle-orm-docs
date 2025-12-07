@@ -43,10 +43,10 @@ export interface IJSONData {
 }
 
 export interface IParams {
-  orm: string;
-  dbSize: string;
-  projectType: string;
-  database: string;
+  orm: "prisma-v7.1.0" | "prisma-v5.18.0";
+  dbSize: 'micro' | 'small' | 'medium' | 'large' | 'huge' | 'extreme';
+  projectType: 'ecommerce' | 'social' | 'geo' | 'analytics';
+  database: 'postgres' | 'mysql' | 'sqlite' | 'serverless_postgres' | 'serverless_mysql' | 'serverless_sqlite';
   runtime: "node-24" | "node-22" | "node-20" | "node-18" | "bun-1.3.4" | "bun-1.1.25";
   joins: boolean;
 }

@@ -7,8 +7,8 @@ const getDemoBenchmarkData = (): null | {
   compareData: IData[];
 } => {
   return {
-    drizzleData: dataMapper(data["drizzle-bun"]),
-    compareData: dataMapper(data["prisma-bun"]),
+    drizzleData: dataMapper(data["drizzle-beta-bun"]),
+    compareData: dataMapper(data["prisma-7-bun"]),
   };
 };
 

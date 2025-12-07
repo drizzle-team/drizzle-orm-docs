@@ -11,15 +11,15 @@ interface IProps {
 
 const Configuration: FC<IProps> = ({ isOpened }) => {
   const { selectedItems, setSelectedItems } = useBenchmarkContext();
-  const [currentTab, setCurrentTab] = React.useState<string>("orm");
+  const [currentTab, setCurrentTab] = React.useState<keyof Omit<IParams, "runtime" | "joins">>("orm");
 
-  const changeTab = (tab: string) => {
+  const changeTab = (tab: keyof Omit<IParams, "runtime" | "joins">) => {
     setCurrentTab(tab);
   };
 
   const selectItem = (option: IModalInputDataItem, item: string) => {
     if (option.disabled || !selectedItems) return;
-    if (selectedItems[currentTab as keyof IParams] === item) return;
+    if (selectedItems[currentTab] === item) return;
     setSelectedItems({
       ...selectedItems,
       [currentTab]: item,
@@ -36,7 +36,9 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
     <div className={isOpened ? styles["wrap-opened"] : styles.wrap}>
       <div className={styles.tabs}>
         {Object.keys(selectedItems)
-          .filter((k) => k !== "runtime" && k !== "joins")
+          .filter(
+            (k): k is keyof Omit<IParams, "runtime" | "joins"> => k !== "runtime" && k !== "joins",
+          )
           .map((item) => (
             <button
               type="button"
@@ -53,7 +55,8 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
       <div className={styles.options}>
         {selectedItems &&
           Object.keys(data[currentTab].items).map((item) => {
-            const option = data[currentTab].items[item];
+            const items = data[currentTab].items;
+            const option = items[item as keyof typeof items] as IModalInputDataItem;
             return (
               <button
                 type="button"
@@ -64,7 +67,7 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
                 }
                 key={item}
                 onClick={() => selectItem(option, item)}
-                disabled={data[currentTab].items[item].disabled}
+                disabled={option.disabled}
               >
                 <div className={styles.text}>
                   <div className={styles.title}>
