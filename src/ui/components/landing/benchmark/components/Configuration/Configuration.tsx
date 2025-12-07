@@ -24,10 +24,10 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
       ...selectedItems,
       [currentTab]: item,
       ...(currentTab === "orm" && item === "prisma-v7.1.0"
-        ? { runtime: "bun-1.3.4" }
+        ? { runtime: "bun-1.3.4", joins: false }
         : {}),
       ...(currentTab === "orm" && item === "prisma-v5.18.0"
-        ? { runtime: "bun-1.1.25" }
+        ? { runtime: "bun-1.1.25", joins: false }
         : {}),
     });
   };
