@@ -73,7 +73,7 @@ This is how you can do it:
       .values(values)
       .onConflictDoUpdate({
         target: users.id,
-        set: { lastLogin: sql.raw(`excluded.${users.lastLogin.name}`) },
+        set: { lastLogin: sql.raw(`excluded."${users.lastLogin.name}"`) },
       });
     ```
 
@@ -83,7 +83,7 @@ This is how you can do it:
         (1, '2024-03-15T22:29:06.679Z'),
         (2, '2024-03-15T23:29:06.679Z'),
         (3, '2024-03-16T00:29:06.679Z')
-      on conflict ("id") do update set last_login = excluded.last_login;
+      on conflict ("id") do update set last_login = excluded."last_login";
     ```
   </CodeTab>
   ```ts copy
@@ -117,7 +117,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 
       return columns.reduce((acc, column) => {
         const colName = cls[column].name;
-        acc[column] = sql.raw(`excluded.${colName}`);
+        acc[column] = sql.raw(`excluded."${colName}"`);
 
         return acc;
       }, {} as Record<Q, SQL>);
@@ -156,7 +156,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
       (1, '2024-03-16T15:44:41.141Z', true),
       (2, '2024-03-16T16:44:41.141Z', true),
       (3, '2024-03-16T17:44:41.141Z', true)
-    on conflict ("id") do update set last_login = excluded.last_login, active = excluded.active;
+    on conflict ("id") do update set last_login = excluded."last_login", active = excluded."active";
     ```
   </CodeTab>
   ```ts copy
@@ -208,8 +208,8 @@ If you want to implement upsert query with `where` clause for `update` statement
     lastUpdated: new Date(),
   };
 
-  const excludedPrice = sql.raw(`excluded.${products.price.name}`);
-  const excludedStock = sql.raw(`excluded.${products.stock.name}`);
+  const excludedPrice = sql.raw(`excluded."${products.price.name}"`);
+  const excludedStock = sql.raw(`excluded."${products.stock.name}"`);
 
   await db
     .insert(products)
@@ -232,8 +232,8 @@ If you want to implement upsert query with `where` clause for `update` statement
   insert into products ("id", "title", "stock", "price", "last_updated")
     values (1, 'Phone', 10, '999.99', '2024-04-29T21:56:55.563Z')
     on conflict ("id") do update
-    set stock = excluded.stock, price = excluded.price, last_updated = excluded.last_updated
-    where (stock != excluded.stock or price != excluded.price);
+    set stock = excluded."stock", price = excluded."price", last_updated = excluded."last_updated"
+    where (stock != excluded."stock" or price != excluded."price");
   ```
   </CodeTab>
 
