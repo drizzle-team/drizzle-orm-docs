@@ -190,21 +190,49 @@ const CustomBarChart: FC<IProps> = ({
                 : styles["tooltip-wrap"]
             }
           >
-            <div className={styles.tooltip}>
-              Drizzle handled x
-              {fixedHelper(totalRequests / totalRequestsCompare, 2)} more
-              requests
-            </div>
-            {pathArray.length > 0 && isCompleted && showTooltip && (
-              <>
-                <div className={styles["success-icon-wrap"]}>
-                  <CheckIcon />
-                </div>
-                x{fixedHelper(totalRequests / totalRequestsCompare, 2)}
-              </>
+            {fixedHelper(totalRequestsCompare / totalRequests, 2) > 1 ? (
+              <div className={styles.tooltip}>
+                Drizzle handled x
+                {fixedHelper(totalRequests / totalRequestsCompare, 2)} more
+                requests
+              </div>
+            ) : fixedHelper(totalRequestsCompare / totalRequests, 2) === 1 ? (
+              <div className={styles.tooltip}>
+                Drizzle handled the same amount of requests
+              </div>
+            ) : (
+              <div className={styles.tooltip}>
+                Drizzle handled x
+                {fixedHelper(totalRequestsCompare / totalRequests, 2)} less
+                requests
+              </div>
             )}
+            {pathArray.length > 0 &&
+              isCompleted &&
+              showTooltip &&
+              fixedHelper(totalRequestsCompare / totalRequests, 2) > 1 && (
+                <>
+                  {fixedHelper(totalRequestsCompare / totalRequests, 2) > 1 ? (
+                    <div className={styles["success-icon-wrap"]}>
+                      <CheckIcon />
+                    </div>
+                  ) : fixedHelper(totalRequestsCompare / totalRequests, 2) ===
+                    1 ? (
+                    <></>
+                  ) : (
+                    <div className={styles["fail-icon-wrap"]}>
+                      <XIcon />
+                    </div>
+                  )}
+                  x{fixedHelper(totalRequests / totalRequestsCompare, 2)}
+                </>
+              )}
           </div>
-          {pathArray.length > 0 && isCompleted && showTooltip && " | "}
+          {pathArray.length > 0 &&
+            isCompleted &&
+            showTooltip &&
+            fixedHelper(totalRequestsCompare / totalRequests, 2) > 1 &&
+            " | "}
           {roundToThousand(totalRequests)}
         </div>
       </div>

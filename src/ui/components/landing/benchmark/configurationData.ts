@@ -14,6 +14,12 @@ const configurationData = {
         drizzle_version: "v0.33.0",
         compare_version: "v5.18.0",
       },
+      go: {
+        value: "Drizzle v1.0.0-beta.2 vs Go v1.25.5",
+        config_info: "Drizzle v1.0.0-beta.2 vs Go v1.25.5",
+        drizzle_version: "v1.0.0-beta.2",
+        compare_version: "v1.25.5",
+      },
       typeorm: {
         value: "Drizzle vs TypeORM",
         config_info: "Drizzle vs TypeORM",

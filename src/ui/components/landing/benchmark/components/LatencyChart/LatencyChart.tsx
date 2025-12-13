@@ -1,7 +1,7 @@
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 
 import { SVGViewBoxHeight, SVGViewBoxWidth } from "../../constants";
-import { CheckIcon } from "@/assets/icons/Icons";
+import { CheckIcon, XIcon } from "@/assets/icons/Icons";
 import type { IData } from "../../types";
 import fixedHelper from "../../utils/fixedHelper";
 import formatMs from "../../utils/formatMs";
@@ -239,17 +239,44 @@ const LatencyChart: FC<IProps> = ({
                   : styles["tooltip-wrap"]
               }
             >
-              <div className={styles.tooltip}>
-                Drizzle has x
-                {fixedHelper(
-                  +averageLatencyCompare.toFixed() / +averageLatency.toFixed(),
-                  1,
-                )}{" "}
-                times better average latency
-              </div>
-              <div className={styles["success-icon-wrap"]}>
-                <CheckIcon />
-              </div>
+              {fixedHelper(averageLatencyCompare / averageLatency, 2) > 1 ? (
+                <div className={styles.tooltip}>
+                  Drizzle has x
+                  {fixedHelper(
+                    +averageLatencyCompare.toFixed() /
+                      +averageLatency.toFixed(),
+                    1,
+                  )}{" "}
+                  times better average latency
+                </div>
+              ) : fixedHelper(averageLatencyCompare / averageLatency, 2) ===
+                1 ? (
+                <div className={styles.tooltip}>
+                  Drizzle has the same average latency
+                </div>
+              ) : (
+                <div className={styles.tooltip}>
+                  Drizzle has x
+                  {fixedHelper(
+                    +averageLatency.toFixed() /
+                      +averageLatencyCompare.toFixed(),
+                    1,
+                  )}{" "}
+                  times worse average latency
+                </div>
+              )}
+              {fixedHelper(averageLatencyCompare / averageLatency, 2) > 1 ? (
+                <div className={styles["success-icon-wrap"]}>
+                  <CheckIcon />
+                </div>
+              ) : fixedHelper(averageLatencyCompare / averageLatency, 2) ===
+                1 ? (
+                <div></div>
+              ) : (
+                <div className={styles["success-icon-wrap"]}>
+                  <XIcon />
+                </div>
+              )}
               x
               {fixedHelper(
                 +averageLatencyCompare.toFixed() / +averageLatency.toFixed(),
@@ -264,14 +291,29 @@ const LatencyChart: FC<IProps> = ({
                   : styles["tooltip-wrap"]
               }
             >
-              <div className={styles.tooltip}>
-                Drizzle has x
-                {fixedHelper(
-                  +averageP99Compare.toFixed() / +averageP99.toFixed(),
-                  1,
-                )}{" "}
-                times better p95 latency
-              </div>
+              {fixedHelper(averageP99Compare / averageP99, 2) > 1 ? (
+                <div className={styles.tooltip}>
+                  Drizzle has x
+                  {fixedHelper(
+                    +averageP99Compare.toFixed() / +averageP99.toFixed(),
+                    1,
+                  )}{" "}
+                  times better p95 latency
+                </div>
+              ) : fixedHelper(averageP99Compare / averageP99, 2) === 1 ? (
+                <div className={styles.tooltip}>
+                  Drizzle has the same p95 latency
+                </div>
+              ) : (
+                <div className={styles.tooltip}>
+                  Drizzle has x
+                  {fixedHelper(
+                    +averageP99.toFixed() / +averageP99Compare.toFixed(),
+                    1,
+                  )}{" "}
+                  times worse p95 latency
+                </div>
+              )}
               x
               {fixedHelper(
                 +averageP99Compare.toFixed() / +averageP99.toFixed(),

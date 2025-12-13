@@ -11,7 +11,8 @@ interface IProps {
 
 const Configuration: FC<IProps> = ({ isOpened }) => {
   const { selectedItems, setSelectedItems } = useBenchmarkContext();
-  const [currentTab, setCurrentTab] = React.useState<keyof Omit<IParams, "runtime" | "joins">>("orm");
+  const [currentTab, setCurrentTab] =
+    React.useState<keyof Omit<IParams, "runtime" | "joins">>("orm");
 
   const changeTab = (tab: keyof Omit<IParams, "runtime" | "joins">) => {
     setCurrentTab(tab);
@@ -23,6 +24,9 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
     setSelectedItems({
       ...selectedItems,
       [currentTab]: item,
+      ...(currentTab === "orm" && item === "go"
+        ? { runtime: "bun-1.3.4", joins: false }
+        : {}),
       ...(currentTab === "orm" && item === "prisma-v7.1.0"
         ? { runtime: "bun-1.3.4", joins: false }
         : {}),
@@ -37,7 +41,8 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
       <div className={styles.tabs}>
         {Object.keys(selectedItems)
           .filter(
-            (k): k is keyof Omit<IParams, "runtime" | "joins"> => k !== "runtime" && k !== "joins",
+            (k): k is keyof Omit<IParams, "runtime" | "joins"> =>
+              k !== "runtime" && k !== "joins",
           )
           .map((item) => (
             <button
@@ -56,7 +61,9 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
         {selectedItems &&
           Object.keys(data[currentTab].items).map((item) => {
             const items = data[currentTab].items;
-            const option = items[item as keyof typeof items] as IModalInputDataItem;
+            const option = items[
+              item as keyof typeof items
+            ] as IModalInputDataItem;
             return (
               <button
                 type="button"

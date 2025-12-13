@@ -16,7 +16,11 @@ interface Item {
   name: string;
 }
 
-const RuntimeSelector: FC = () => {
+interface Props {
+  disabled?: boolean;
+}
+
+const RuntimeSelector: FC<Props> = ({ disabled }) => {
   const { selectedItems, setSelectedItems } = useBenchmarkContext();
   const resizerRef = useRef<HTMLDivElement | null>(null);
 
@@ -26,12 +30,14 @@ const RuntimeSelector: FC = () => {
           { value: "bun-1.3.4", name: "Bun v1.3.4" },
           { value: "node-24", name: "Node 24.6.0" },
         ]
-      : [
-          { value: "bun-1.1.25", name: "Bun v1.1.25" },
-          { value: "node-22", name: "Node 22.6.0" },
-          { value: "node-20", name: "Node v20.16.0" },
-          { value: "node-18", name: "Node v18.20.4" },
-        ];
+      : selectedItems.orm === "go"
+        ? [{ value: "bun-1.3.4", name: "Bun v1.3.4" }]
+        : [
+            { value: "bun-1.1.25", name: "Bun v1.1.25" },
+            { value: "node-22", name: "Node 22.6.0" },
+            { value: "node-20", name: "Node v20.16.0" },
+            { value: "node-18", name: "Node v18.20.4" },
+          ];
 
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     setSelectedItems({
@@ -69,11 +75,16 @@ const RuntimeSelector: FC = () => {
         <select
           className={styles.button}
           onChange={handleChange}
+          disabled={disabled}
           value={selectedItems.runtime}
           style={{
             width: resizerRef.current
               ? `${resizerRef.current.offsetWidth}px`
               : "109px",
+            ...(disabled && {
+              pointerEvents: "none",
+              cursor: "not-allowed",
+            }),
           }}
         >
           {items.map((item) => (

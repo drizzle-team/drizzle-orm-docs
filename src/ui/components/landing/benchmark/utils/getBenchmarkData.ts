@@ -4,6 +4,16 @@ import dataMapper from "@components/landing/benchmark/utils/dataMapper";
 
 const variants = [
   {
+    orm: "go",
+    dbSize: "micro",
+    projectType: "ecommerce",
+    database: "postgres",
+    runtime: "bun-1.3.4",
+    joins: false,
+    drizzleData: data["drizzle-beta-bun"],
+    compareData: data["go"],
+  },
+  {
     orm: "prisma-v7.1.0",
     dbSize: "micro",
     projectType: "ecommerce",
