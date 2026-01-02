@@ -1,11 +1,136 @@
 2025-12:
   - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.8'>v1.0.0-beta.8</a> release</b>
+
+    <ul>
+    <b>Seed Features</b>
+    <li>ignore column in refinements</li>
+    <li>Added min, max parameters to time generator</li>
+    <li>Added min, max parameters to timestamp generator</li>
+    <li>Added min, max parameters to datetime generator</li>
+    <li>PostgreSQL sequences updating after seed</li>
+    </ul>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: drizzle seed doesn't work with libSQL</li>
+    <li>[BUG]: Seed UUIDs not compatible with Zod/v4</li>
+    <li>[BUG]: drizzle seed generates invalid input value (number) for enum strings (pg)</li>
+    <li>[BUG]: drizzle seed breaks serial sequence sync with Postgres serial type</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.7'>v1.0.0-beta.7</a> release</b>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: Drizzle-kit does not consider prefix when generating migrations</li>
+    <li>[BUG]: drizzle-kit push removes migration table (doesn't recognize custom migration table name)</li>
+    <li>[BUG]:Drizzle pull generate invalid autosummarize</li>
+    <li>[BUG]: drizzle-kit pull generated wrong syntax</li>
+    <li>[BUG]: [drizzle-kit] MSSQL - Foreign Key Constraints Generated via drizzle-kit generate are not scoped to the Correct Schema=</li>
+    <li>[BUG]: findFirst fails with TypeError: null is not an object (evaluating 'row[selectionItem.key]') if no results are found</li>
+    <li>Push command now respects a custom migration schema or/and table from drizzle.config and ignores them during the execution</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.6'>v1.0.0-beta.6</a> release</b>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: 1.0.0-beta.2 - drizzle-kit push does consider json (jsonb) key order relevant</li>
+    <li>[BUG]: drizzle-kit pull generates string instead of sql statement for default value</li>
+    <li>[BUG]: Failed schema with d1 table</li>
+    <li>[BUG]: drizzle-kit: push runs already applied migration</li>
+    <li>[BUG]: Drizzle-Kit detects change when Composite Primary Key Columns are in different order than in schema definition</li>
+    <li>[BUG]: drizzle-kit push always shows columns with custom types as changed even tho the type didn't change;</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.5'>v1.0.0-beta.5</a> release</b>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: error: type "serial" does not exist</li>
+    <li>[BUG]: jsonb default with boolean literals gets generated truen instead of true</li>
+    <li>[BUG]: MSSQL view incorrect syntax</li>
+    <li>Fixed blob columns in MySQL to work properly with RQB mapper</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.4'>v1.0.0-beta.4</a> release</b>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: migrations.sort in migrator.js does nothing - migrations run in wrong order on Linux</li>
+    <li>[BUG]: drizzle-kit generate not working without error</li>
+    <li>[BUG]: drizzle-kit check wrongly tries to use AWS Data API</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.3'>v1.0.0-beta.3</a> release</b>
+
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: migrations.sort in migrator.js does nothing - migrations run in wrong order on Linux</li>
+    <li>[BUG]: drizzle-kit generate not working without error</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.2'>v1.0.0-beta.2</a> release</b>
+
+    <ul>
+    <li>MySQL use/force/ingore index now accepts unique constraints</li>
+    </ul>
+    <ul>
+    <b>Bug Fixes</b>
+    <li>[BUG]: truncated tables on ALTER COLUMN statements</li>
+    <li>[BUG]: Drizzle generates incorrect SQL migration for policy permission string changes</li>
+    <li>[BUG]: Introspect PG _text type not recognized as an array</li>
+    <li>[BUG]: drizzle-kit pull fails if db includes views which are not in "tablesFilter"</li>
+    <li>[BUG]: AnySQLiteColumn in generated schema is not prefixed by "type" keyword</li>
+    <li>[BUG]: drizzle-kit generate fails with "undefined" is not valid JSON</li>
+    <li>[BUG]: Primary key migration fails when changing from one column to another</li>
+    <li>[BUG]: Operator precedence of = and IS NULL is disrespected when using eq and isNull</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.2'>v1.0.0-beta.2</a> release</b>
+
+    <ul>
+    <li>MSSQL dialect support</li>
+    <li>CockroachDB dialect support</li>
+    <li>Relational Query Parts</li>
+    <li>Folders v3 migrations</li>
+    <li>Full drizzle-kit rewrite</li>
+    <li>Added drizzle-kit pull --init</li>
+    <li>schemaFilter behavior update</li>
+    <li>.enableRLS() deprecation</li>
+    <li>MySQL new column types</li>
+    <li>164 bugs fixed</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.45.1'>v0.45.1</a> release</b>
+
+    <ul>
+    <li>Fixed pg-native Pool detection in node-postgres transactions breaking in environments with forbidden require() (#5107)</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.45.0'>v0.45.0</a> release</b>
+
+    <ul>
+    <li>Fixed pg-native Pool detection in node-postgres transactions</li>
+    <li>Allowed subqueries in select fields</li>
+    <li>Updated typo algorythm => algorithm</li>
+    <li>Fixed $onUpdate not handling SQL values (fixes #2388, tests implemented by L-Mario564 in #2911)</li>
+    <li>Fixed pg mappers not handling Date instances in bun-sql:postgresql driver responses for date, timestamp types (fixes #4493)</li>
+    </ul>
+  - |
     <b>Drizzle Studio updates</b>
 
     <ul>
     <li>Added query telemetry in the SQL console for Postgres and MySQL.</li>
     </ul>
 2025-11:
+  - |
+    <b>KIT <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.31.7'>v0.31.7</a> release</b>
+
+    <ul>
+    <li>[BUG]: Drizzle Kit push to Postgres 18 produces unecessary DROP SQL when the schema was NOT changed</li>
+    </ul>
   - |
     <b>Drizzle Studio updates</b>
 
@@ -18,6 +143,24 @@
     </ul>
 2025-10:
   - |
+    <b>KIT <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.31.6'>v0.31.6</a> release</b>
+
+    <ul>
+    <li>[BUG]: Importing drizzle-kit/api fails in ESM modules</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.44.7'>v0.44.7</a> release</b>
+
+    <ul>
+    <li>fix durable sqlite transaction return value #3746 - thanks @joaocstro</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.44.6'>v0.44.6</a> release</b>
+
+    <ul>
+    <li>feat: add $replicas reference #4874</li>
+    </ul>
+  - |
     <b>Drizzle Studio updates</b>
 
     <ul>
@@ -27,6 +170,12 @@
     </ul>
 2025-09:
   - |
+    <b>KIT <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.31.5'>v0.31.5</a> release</b>
+
+    <ul>
+    <li>Add casing support to studio configuration and related functions</li>
+    </ul>
+  - |
     <b>Drizzle Studio updates</b>
 
     <ul>
@@ -35,6 +184,21 @@
     <li>Fixed <code>BigInt</code> handling in filters.</li>
     </ul>
 2025-08:
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.44.5'>v0.44.5</a> release</b>
+
+    <ul>
+    <li>Fixed invalid usage of .one() in durable-sqlite session</li>
+    <li>Fixed spread operator related crash in sqlite blob columns</li>
+    <li>Better browser support for sqlite blob columns</li>
+    <li>Improved sqlite blob mapping</li>
+    </ul>
+  - |
+    <b>ORM <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/0.44.4'>v0.44.4</a> release</b>
+
+    <ul>
+    <li>Fix wrong DrizzleQueryError export. thanks @nathankleyn</li>
+    </ul>
   - |
     <b>Drizzle Studio updates</b>
 
