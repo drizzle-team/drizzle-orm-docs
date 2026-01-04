@@ -347,9 +347,15 @@ await db.select().from(posts)
 
 To rank the search results, you can use the `ts_rank` or `ts_rank_cd` functions and `orderBy` method:
 
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
+
 <Section>
 ```ts copy {6,7,12,13,18-20}
-import { desc, getTableColumns, sql } from 'drizzle-orm';
+import { desc, getColumns, sql } from 'drizzle-orm';
 
 const search = 'culture | Europe | Italy | adventure';
 
@@ -359,7 +365,7 @@ const matchQuery = sql`(
 
 await db
   .select({
-    ...getTableColumns(posts),
+    ...getColumns(posts),
     rank: sql`ts_rank(${matchQuery})`,
     rankCd: sql`ts_rank_cd(${matchQuery})`,
   })

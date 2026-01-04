@@ -391,18 +391,27 @@ without creating a database instance and get generated SQL.
     </Tab>
 </Tabs>
 
-## Get typed table columns
-You can get a typed table columns map,
+## Get typed columns
+You can get a typed columns map,
 very useful when you need to omit certain columns upon selection.
+
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
+
+
+<br/>
 
 <Tabs items={['PostgreSQL', 'MySQL', 'SQLite', "SingleStore", "MSSQL", "CockroachDB"]}>
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns } from "drizzle-orm";
+        import { getColumns } from "drizzle-orm";
         import { user } from "./schema";
 
-        const { password, role, ...rest } = getTableColumns(user);
+        const { password, role, ...rest } = getColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
@@ -422,10 +431,10 @@ very useful when you need to omit certain columns upon selection.
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns } from "drizzle-orm";
+        import { getColumns } from "drizzle-orm";
         import { user } from "./schema";
 
-        const { password, role, ...rest } = getTableColumns(user);
+        const { password, role, ...rest } = getColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
@@ -445,10 +454,10 @@ very useful when you need to omit certain columns upon selection.
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns } from "drizzle-orm";
+        import { getColumns } from "drizzle-orm";
         import { user } from "./schema";
 
-        const { password, role, ...rest } = getTableColumns(user);
+        const { password, role, ...rest } = getColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
@@ -468,10 +477,10 @@ very useful when you need to omit certain columns upon selection.
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns } from "drizzle-orm";
+        import { getColumns } from "drizzle-orm";
         import { user } from "./schema";
 
-        const { password, role, ...rest } = getTableColumns(user);
+        const { password, role, ...rest } = getColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
@@ -491,10 +500,10 @@ very useful when you need to omit certain columns upon selection.
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns } from "drizzle-orm";
+        import { getColumns } from "drizzle-orm";
         import { user } from "./schema";
 
-        const { password, role, ...rest } = getTableColumns(user);
+        const { password, role, ...rest } = getColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```
@@ -514,10 +523,10 @@ very useful when you need to omit certain columns upon selection.
   <Tab>
       <CodeTabs items={["index.ts", "schema.ts"]}>
         ```ts
-        import { getTableColumns } from "drizzle-orm";
+        import { getColumns } from "drizzle-orm";
         import { user } from "./schema";
 
-        const { password, role, ...rest } = getTableColumns(user);
+        const { password, role, ...rest } = getColumns(user);
 
         await db.select({ ...rest }).from(users);
         ```

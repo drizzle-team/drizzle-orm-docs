@@ -74,9 +74,15 @@ await db.insert(stores).values({
 
 To compute the distance between the objects you can use `<->` operator. This is how you can query for the nearest location by coordinates in Drizzle:
 
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
+
 <Section>
 ```ts {9, 14, 17}
-import { getTableColumns, sql } from 'drizzle-orm';
+import { getColumns, sql } from 'drizzle-orm';
 import { stores } from './schema';
 
 const point = {
@@ -88,7 +94,7 @@ const sqlDistance = sql`location <-> point(${point.x}, ${point.y})`;
 
 await db
   .select({
-    ...getTableColumns(stores),
+    ...getColumns(stores),
     distance: sql`round((${sqlDistance})::numeric, 2)`,
   })
   .from(stores)

@@ -98,10 +98,16 @@ This is how you can do it:
 
 Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in PostgreSQL and SQLite:
 
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
+
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
     ```ts copy {43,46}
-    import { SQL, getTableColumns, sql } from 'drizzle-orm';
+    import { SQL, getColumns, sql } from 'drizzle-orm';
     import { PgTable } from 'drizzle-orm/pg-core';
     import { SQLiteTable } from 'drizzle-orm/sqlite-core';
     import { users } from './schema';
@@ -113,7 +119,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
       table: T,
       columns: Q[],
     ) => {
-      const cls = getTableColumns(table);
+      const cls = getColumns(table);
 
       return columns.reduce((acc, column) => {
         const colName = cls[column].name;
@@ -357,7 +363,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
     ```ts copy {36,38}
-    import { SQL, getTableColumns, sql } from 'drizzle-orm';
+    import { SQL, getColumns, sql } from 'drizzle-orm';
     import { MySqlTable } from 'drizzle-orm/mysql-core';
     import { users } from './schema';
 
@@ -365,7 +371,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
       table: T,
       columns: Q[],
     ) => {
-      const cls = getTableColumns(table);
+      const cls = getColumns(table);
       return columns.reduce((acc, column) => {
         acc[column] = sql`values(${cls[column]})`;
         return acc;

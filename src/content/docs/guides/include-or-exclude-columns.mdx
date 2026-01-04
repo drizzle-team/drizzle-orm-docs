@@ -70,15 +70,22 @@ To include specific columns you can use `.select()` method like this:
   ```
 </Section>
 
-To include all columns with extra columns you can use `getTableColumns()` utility function like this:
+To include all columns with extra columns you can use `getColumns()` utility function like this:
+
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
+
 
 <Section>
   ```ts copy {5,6}
-  import { getTableColumns, sql } from 'drizzle-orm';
+  import { getColumns, sql } from 'drizzle-orm';
 
   await db
     .select({
-      ...getTableColumns(posts),
+      ...getColumns(posts),
       titleLength: sql<number>`length(${posts.title})`,
     })
     .from(posts);
@@ -96,13 +103,19 @@ To include all columns with extra columns you can use `getTableColumns()` utilit
   ```
 </Section>
 
-To exclude columns you can use `getTableColumns()` utility function like this:
+To exclude columns you can use `getColumns()` utility function like this:
+
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
 
 <Section>
   ```ts copy {3,5}
-  import { getTableColumns } from 'drizzle-orm';
+  import { getColumns } from 'drizzle-orm';
 
-  const { content, ...rest } = getTableColumns(posts); // exclude "content" column
+  const { content, ...rest } = getColumns(posts); // exclude "content" column
 
   await db.select({ ...rest }).from(posts); // select all other columns
   ```
@@ -122,17 +135,17 @@ This is how you can include or exclude columns with joins:
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
     ```ts copy {5,9,10,11}
-    import { eq, getTableColumns } from 'drizzle-orm';
+    import { eq, getColumns } from 'drizzle-orm';
     import { comments, posts, users } from './db/schema';
 
     // exclude "userId" and "postId" columns from "comments"
-    const { userId, postId, ...rest } = getTableColumns(comments);
+    const { userId, postId, ...rest } = getColumns(comments);
 
     await db
       .select({
         postId: posts.id, // include "id" column from "posts"
         comment: { ...rest }, // include all other columns
-        user: users, // equivalent to getTableColumns(users)
+        user: users, // equivalent to getColumns(users)
       })
       .from(posts)
       .leftJoin(comments, eq(posts.id, comments.postId))

@@ -224,8 +224,14 @@ export async function createPost(data: InsertPost) {
 
 Read more about select query in the [documentation](/docs/select).
 
+<Callout type='warning'>
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+
+If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
+</Callout>
+
 ```typescript copy filename="src/queries/select.ts" {5, 16, 41}
-import { asc, between, count, eq, getTableColumns, sql } from 'drizzle-orm';
+import { asc, between, count, eq, getColumns, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { SelectUser, usersTable, postsTable } from '../schema';
 
@@ -254,7 +260,7 @@ export async function getUsersWithPostsCount(
 > {
   return db
     .select({
-      ...getTableColumns(usersTable),
+      ...getColumns(usersTable),
       postsCount: count(postsTable.id),
     })
     .from(usersTable)
