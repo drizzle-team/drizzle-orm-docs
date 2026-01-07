@@ -1,0 +1,64 @@
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Steps from '@mdx/Steps.astro';
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+
+# Drizzle \<\> Effect Postgres
+
+<Callout type='error'>
+This page explains concepts available on drizzle versions `1.0.0-beta.9` and higher.
+
+Effect is only available for PostgreSQL right now and soon be implemented for all other dialects
+
+On how to upgrade (read more [here](/docs/upgrade-v1))
+</Callout>
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- Effect - [website](https://effect.website/docs)
+- Bun SQL - native bindings for working with PostgreSQL databases - [read here](https://bun.sh/docs/api/sql)
+- **@effect/sql-pg** - A PostgreSQL toolkit for Effect - [read here](https://effect-ts.github.io/effect/docs/sql-pg)
+</Prerequisites>
+
+Drizzle has native support for Effect PostgreSQL connections with the `@effect/sql-pg` driver
+
+#### Step 1 - Install packages
+<Npm>
+drizzle-orm effect @effect/sql-pg pg
+-D drizzle-kit
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/effect-postgres';
+import { Effect, Redacted } from 'effect';
+import { PgClient } from '@effect/sql-pg'
+import { types } from 'pg';
+
+const clientLayer = PgClient.layer({
+    url: Redacted.make(process.env.DATABASE_URL!);
+	  types: {
+		  getTypeParser: (typeId, format) => {
+			  if ([1184, 1114, 1082, 1186, 1231, 1115, 1185, 1187, 1182].includes(typeId)) { 
+          return (val: any) => val;
+        }
+			  return types.getTypeParser(typeId, format);
+		  },
+	  },
+});
+
+const program = Effect.gen(function*() {
+	const client = yield* PgClient.PgClient;
+	const db = drizzle(client, { logger: true, /*...*/ });
+});
+
+await Effect.runPromise(program).pipe(Effect.provide(clientLayer));
+```
+
+#### What's next?
+
+<WhatsNextPostgres/>
