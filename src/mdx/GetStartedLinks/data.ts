@@ -187,6 +187,28 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "PlanetScale Postgres",
+        path: {
+          existing: "/docs/get-started/planetscale-postgres-existing",
+          new: "/docs/get-started/planetscale-postgres-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/planetscale.svg",
+            style: {
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/planetscale.svg",
+            style: {
+              width: 20,
+              color: "#f0f0f0",
+            },
+          },
+        },
+      },
     ],
   },
   {

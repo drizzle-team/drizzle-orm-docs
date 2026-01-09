@@ -1,0 +1,93 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import Steps from '@mdx/Steps.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Breadcrumbs from '@mdx/Breadcrumbs.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import IntrospectPostgreSQL from '@mdx/get-started/postgresql/IntrospectPostgreSQL.mdx';
+import FileStructure from '@mdx/get-started/FileStructure.mdx';
+import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
+import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
+import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
+import TransferCode from '@mdx/get-started/TransferCode.mdx';
+import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
+import RunFile from '@mdx/get-started/RunFile.mdx';
+import ConnectPlanetScalePostgres from '@mdx/get-started/postgresql/ConnectPlanetScalePostgres.mdx'
+import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
+import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
+import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
+
+<Breadcrumbs/>
+
+# Get Started with Drizzle and PlanetScale Postgres in existing project
+
+<Prerequisites>
+  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** - package for running TypeScript files - [read here](https://tsx.is/)
+  - **PlanetScale Postgres** - PostgreSQL database platform - [read here](https://planetscale.com/docs/postgres)
+  - **node-postgres** - package for querying your PostgreSQL database - [read here](https://node-postgres.com/)
+</Prerequisites>
+
+<Callout title='PlanetScale also offers MySQL' type='info'>
+Looking for MySQL? Check out our [PlanetScale MySQL guide](/docs/get-started/planetscale-existing)
+</Callout>
+
+PlanetScale offers both MySQL (Vitess) and PostgreSQL databases. This guide covers connecting to PlanetScale Postgres using the standard `node-postgres` driver.
+
+For detailed instructions on creating a PlanetScale Postgres database and obtaining credentials, see the [PlanetScale Postgres documentation](https://planetscale.com/docs/postgres/tutorials/planetscale-postgres-drizzle).
+
+<FileStructure/>
+
+#### Step 1 - Install **node-postgres** package
+<InstallPackages lib='pg' devlib=' @types/pg'/>
+
+#### Step 2 - Setup connection variables
+
+Create a `.env` file in the root of your project and add your database connection variable:
+
+```plaintext copy
+DATABASE_URL=postgresql://{username}:{password}@{host}:{port}/postgres?sslmode=verify-full
+```
+
+<Callout title='tips'>
+You can obtain your connection credentials from the PlanetScale dashboard by navigating to your database, clicking **"Connect"**, and creating a **"Default role"**. See the [PlanetScale connection guide](https://planetscale.com/docs/postgres/tutorials/planetscale-postgres-drizzle#create-credentials-and-connect) for detailed steps.
+</Callout>
+
+#### Step 3 - Setup Drizzle config file
+
+<SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
+
+#### Step 4 - Introspect your database
+
+<IntrospectPostgreSQL/>
+
+#### Step 5 - Transfer code to your actual schema file
+
+<TransferCode/>
+
+#### Step 6 - Connect Drizzle ORM to the database
+
+<ConnectPlanetScalePostgres/>
+
+#### Step 7 - Query the database
+
+<QueryDatabase dialect='node-postgres' env_variable='DATABASE_URL'/>
+
+#### Step 8 - Run index.ts file
+
+<RunFile/>
+
+#### Step 9 - Update your table schema (optional)
+
+<UpdateSchema/>
+
+#### Step 10 - Applying changes to the database (optional)
+
+<ApplyChanges />
+
+#### Step 11 - Query the database with a new field (optional)
+
+<QueryDatabaseUpdated dialect='node-postgres' env_variable='DATABASE_URL' />
