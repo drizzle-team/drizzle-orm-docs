@@ -508,7 +508,7 @@ const db = drizzle(process.env.DB_URL, { relations: { ...relations, ...part } })
 <Callout type='warning'>
 There are a few rules you would need to follow to make sure it `defineRelationsParts` works as expected
 
-**Rule 1**: If you specify reltions with parts, when passing it to drizzle db function you would need to specify it in the right order(main relations goes first)
+**Rule 1**: If you specify relations with parts, when passing it to drizzle db function you would need to specify it in the right order(main relations goes first)
 ```ts
 // ✅
 const db = drizzle(process.env.DB_URL, { relations: { ...relations, ...part } })
