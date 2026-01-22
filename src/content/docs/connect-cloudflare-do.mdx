@@ -27,26 +27,34 @@ drizzle-orm
 
 #### Step 2 - Initialize the driver and make a query
 
-You would need to have a `wrangler.toml` file for Durable Objects database and will look something like this:
-```toml {16-18,21-24}
-#:schema node_modules/wrangler/config-schema.json
-name = "sqlite-durable-objects"
-main = "src/index.ts"
-compatibility_date = "2024-11-12"
-compatibility_flags = [ "nodejs_compat" ]
-
-# Bind a Durable Object. Durable objects are a scale-to-zero compute primitive based on the actor model.
-# Durable Objects can live for as long as needed. Use these when you need a long-running "server", such as in realtime apps.
-# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#durable-objects
-[[durable_objects.bindings]]
-name = "MY_DURABLE_OBJECT"
-class_name = "MyDurableObject"
-
-# Durable Object migrations.
-# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#migrations
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["MyDurableObject"]
+You would need to have a `wrangler.jsonc` file for Durable Objects database and will look something like this:
+```jsonc
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sqlite-durable-objects",
+  "main": "./src/index.ts",
+  "compatibility_date": "2024-11-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    // Bind a Durable Object. Durable objects are a scale-to-zero compute primitive based on the actor model.
+    // Durable Objects can live for as long as needed. Use these when you need a long-running "server", such as in realtime apps.
+    // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#durable-objects
+    "bindings": [
+      {
+        "name": "MY_DURABLE_OBJECT",
+        "class_name": "MyDurableObject"
+      }
+    ]
+  },
+  // Durable Object migrations.
+  // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#migrations
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["MyDurableObject"]
+    }
+  ]
+}
 ```
 
 Make your first Durable Objects SQLite query:
