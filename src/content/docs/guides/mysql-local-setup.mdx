@@ -47,7 +47,7 @@ mysql        latest    4e8a34aea708   2 months ago   609MB
 To start a new MySQL container, run the following command:
 
 ```bash copy
-docker run --name drizzle-mysql -e MYSQL_ROOT_PASSWORD=mypassword -d -p 3306:3306 mysql
+docker run --name drizzle-mysql -e MYSQL_ROOT_PASSWORD=mypassword -e MYSQL_DATABASE=mydrizzledb -d -p 3306:3306 mysql
 ```
 
 1. The `--name` option assigns the container the name `drizzle-mysql`.
@@ -79,7 +79,7 @@ mysql://<user>:<password>@<host>:<port>/<database>
 You should replace placeholders with your actual values. For example, for created container the url will be:
 
 ```plaintext
-mysql://root:mypassword@localhost:3306/mysql
+mysql://root:mypassword@localhost:3306/mydrizzledb
 ```
 
 Now you can connect to the database using the URL in your application.
