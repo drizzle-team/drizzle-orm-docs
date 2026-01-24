@@ -1,0 +1,154 @@
+---
+title: Third Normal Form (3NF)
+slug: third-normal-form
+---
+
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- You should be familiar with [2NF](/docs/guides/second-normal-form)
+</Prerequisites>
+
+**The Third Normal Form (3NF)** is a database normalization form that builds on the **Second Normal Form**. The primary goal of **3NF** is to eliminate transitive dependencies.
+
+## Key Concepts
+
+1. A `Transitive dependency` occurs when one attribute in a database indirectly relies on another through a third attribute, causing redundancy. For example, if A depends on B (`A -> B`) and B depends on C (`B -> C`), then A is transitively dependent on C (`A -> C`).
+2. A `Functional dependency` (`X -> Y`) in a relation `R` is considered trivial if the set of attributes `Y` is a subset of (or equal to) the set of attributes `X`.
+3. A `Super key` is a candidate key or a superset of a candidate key.
+
+## The 3NF Rule
+
+A relation is in **3NF** if it is in **2NF** and at least one of the following conditions holds in every non-trivial function dependency `X -> Y`:
+
+- `X` is a super key.
+- `Y` is a prime attribute. 
+
+## Example
+
+We have a table `course_instructors` with the following schema:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const courseInstructors = pgTable("course_instructors", {
+      course: varchar("course", { length: 255 }).notNull(),
+      semester: varchar("semester", { length: 255 }).notNull(),
+      instructor: varchar("instructor", { length: 255 }).notNull(),
+      instructorEmail: varchar("instructor_email", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.course, t.semester] })
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "course_instructors" (
+    	"course" varchar(255) NOT NULL,
+    	"semester" varchar(255) NOT NULL,
+    	"instructor" varchar(255) NOT NULL,
+    	"instructor_email" varchar(255) NOT NULL,
+    	CONSTRAINT "course_instructors_course_semester_pk" PRIMARY KEY("course","semester")
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +---------------------------------------------------------------------------------+
+    | course_instructors                                                              |
+    +--------------------+--------------+----------------+----------------------------+
+    | course             | semester     | instructor     | instructor_email           |
+    +--------------------+--------------+----------------+----------------------------+
+    | Data Structures    | Fall 2022    | Jane Robinson  | jane.robinson@example.com  |
+    | Algorithms         | Spring 2023  | Mike Green     | mike.green@example.com     |
+    | Operating Systems  | Spring 2023  | Jane Robinson  | jane.robinson@example.com  |
+    | Data Structures    | Spring 2023  | Lisa White     | lisa.white@example.com     |
+    +--------------------+--------------+----------------+----------------------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+### Functional Dependencies
+
+1. `course, semester -> instructor`.
+2. `instructor -> instructor_email`.
+3. `course, semester -> instructor_email`.
+
+### Candidate keys
+
+Only the pair of attributes `course` and `semester` can uniquely identify each row in the table. Therefore, the candidate key is `course, semester`.
+
+### 2NF Analysis
+
+The table is in **2NF** because all non-key attributes are fully functionally dependent on the entire candidate key (`course, semester`).
+
+### 3NF Analysis
+
+The table is **not in 3NF** because of the transitive dependency `instructor -> instructor_email`. The attribute `instructor_email` is dependent on `instructor`, which is not a super key.
+
+This leads to:
+
+1. Redundancy: as the same instructor's email can appear multiple times for different courses and semesters.
+2. Update anomalies: as changing an instructor's email would require updating multiple rows.
+
+### 3NF Decomposition
+
+To eliminate the transitive dependency, we can decompose the table into two separate tables:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const instructors = pgTable("instructors", {
+      instructor: varchar("instructor", { length: 255 }).notNull().primaryKey(),
+      instructorEmail: varchar("instructor_email", { length: 255 }).notNull(),
+    });
+
+    export const courseInstructors = pgTable("course_instructors", {
+      course: varchar("course", { length: 255 }).notNull(),
+      semester: varchar("semester", { length: 255 }).notNull(),
+      instructor: varchar("instructor", { length: 255 }).notNull().references(() => instructors.instructor, { onDelete: "cascade", onUpdate: "cascade" }),
+    }, (t) => [
+      primaryKey({ columns: [t.course, t.semester] })
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "course_instructors" (
+    	"course" varchar(255) NOT NULL,
+    	"semester" varchar(255) NOT NULL,
+    	"instructor" varchar(255) NOT NULL,
+    	CONSTRAINT "course_instructors_course_semester_pk" PRIMARY KEY("course","semester")
+    );
+    --> statement-breakpoint
+    CREATE TABLE "instructors" (
+    	"instructor" varchar(255) PRIMARY KEY NOT NULL,
+    	"instructor_email" varchar(255) NOT NULL
+    );
+    --> statement-breakpoint
+    ALTER TABLE "course_instructors" ADD CONSTRAINT "course_instructors_instructor_instructors_instructor_fk" FOREIGN KEY ("instructor") REFERENCES "public"."instructors"("instructor") ON DELETE cascade ON UPDATE cascade;
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+  +----------------------------------------------------+      +------------------------------------------------+
+  | course_instructors                                 |      | instructors                                    |
+  +--------------------+--------------+----------------+      +------------------+-----------------------------+
+  | Course             | Semester     | Instructor     |      | Instructor       | Email                       |
+  +--------------------+--------------+----------------+      +------------------+-----------------------------+
+  | Data Structures    | Fall 2022    | Jane Robinson  |      | Jane Robinson    | jane.robinson@example.com   |
+  | Algorithms         | Spring 2023  | Mike Green     |      | Mike Green       | mike.green@example.com      |
+  | Operating Systems  | Spring 2023  | Jane Robinson  |      | Lisa White       | lisa.white@example.com      |
+  | Data Structures    | Spring 2023  | Lisa White     |      +------------------+-----------------------------+
+  +--------------------+--------------+----------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+With this decomposition, we have eliminated the transitive dependency. The `instructor_email` is now stored in a separate table, and we have achieved **3NF**.
