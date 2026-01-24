@@ -1591,7 +1591,7 @@ index('name')
   </Tab>
   <Tab>
     <Section>
-    ```typescript copy {9-10}
+    ```typescript copy {8-9}
     import { int, text, index, uniqueIndex, singlestoreTable } from "drizzle-orm/singlestore-core";
 
     export const user = singlestoreTable("user", {
@@ -1610,6 +1610,31 @@ index('name')
 
     CREATE INDEX `name_idx` ON `user` (`name`);
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
+    ```
+    </Section>
+
+    SingleStore also supports indexes on vector columns:
+
+    <Section>
+    ```typescript copy {8-9}
+    import { int, singlestoreTable, vector, vectorIndex } from "drizzle-orm/singlestore-core";
+
+    export const embeddings = singlestoreTable("embeddings", {
+      id: int("id").primaryKey().autoincrement(),
+      embedding: vector("embedding", { dimensions: 10 }).notNull(),
+      embedding2: vector("embedding2", { dimensions: 10 }).notNull(),
+    }, (table) => [
+      vectorIndex("vIdx1").on(table.embedding),
+      vectorIndex("vIdx2", "IVF_PQ").on(table.embedding2).metricType("EUCLIDEAN_DISTANCE").nbits(16),
+    ]);
+    ```
+    ```sql {5-6}
+    CREATE TABLE `embeddings` (
+      ...
+    );
+
+    ALTER TABLE `embeddings` ADD VECTOR INDEX `vIdx1` (`embedding`) INDEX_OPTIONS '{"index_type":"AUTO"}';
+    ALTER TABLE `embeddings` ADD VECTOR INDEX `vIdx2` (`embedding2`) INDEX_OPTIONS '{"index_type":"IVF_PQ","metric_type":"EUCLIDEAN_DISTANCE","nbits":16}';
     ```
     </Section>
   </Tab>
