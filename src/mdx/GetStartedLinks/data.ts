@@ -201,7 +201,7 @@ export const getStartedItems: GetStartedItems = [
               fill: "#f0f0f0",
             }
           },
-          dark: {
+          dark: { 
             path: "/public/svg/effect.svg",
             style: {
               width: 20,
