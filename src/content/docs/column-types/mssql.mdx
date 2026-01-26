@@ -759,12 +759,12 @@ when the row is inserted as well, and the returned value will be used as the col
 </Callout>
 
 ```ts
-import { int, timestamp, text, mssqlTable } from "drizzle-orm/mssql-core";
+import { int, datetime2, text, mssqlTable } from "drizzle-orm/mssql-core";
 
 const table = mssqlTable('table', {
-	updateCounter: int().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
-	updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
-    	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
+	updateCounter: int().default(sql`1`).$onUpdateFn((): SQL => sql`${table.updateCounter} + 1`),
+	updatedAt: datetime2({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
+	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
 ```
 
