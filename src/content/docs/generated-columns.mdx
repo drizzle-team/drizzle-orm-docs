@@ -43,33 +43,39 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     that will generate this column data for you.
 
     #### Features 
-    This function can accept generated expression in 3 ways:
+    This function can accept generated expression in 2 ways:
+
+    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
+    
+    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
 
     **`string`**
     <CodeTab>
     ```ts
     export const test = pgTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
     });
     ```
     ```sql
-    CREATE TABLE IF NOT EXISTS "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello world!) STORED
+    CREATE TABLE "test" (
+	    "gen_name" text GENERATED ALWAYS AS ('hello world!') STORED
     );
     ```
     </CodeTab>
+    
+    </Callout>
 
     **`sql`** tag - if you want drizzle to escape some values for you
 
     <CodeTab>
     ```ts
     export const test = pgTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
     ```sql
-    CREATE TABLE IF NOT EXISTS "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello "world"!) STORED
+    CREATE TABLE "test" (
+	    "gen_name" text GENERATED ALWAYS AS ('hello "world"!') STORED
     );
     ```
     </CodeTab>
@@ -80,14 +86,14 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     export const test = pgTable("test", {
         name: text("first_name"),
         generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`hi, ${test.name}!`
+          (): SQL => sql`'hi, ' || ${test.name} || '!'`
         ),
     });
     ```
     ```sql
-    CREATE TABLE IF NOT EXISTS "test" (
+    CREATE TABLE "test" (
 	    "first_name" text,
-	    "gen_name" text GENERATED ALWAYS AS (hi, "test"."first_name"!) STORED
+	    "gen_name" text GENERATED ALWAYS AS ('hi, ' || "test"."first_name" || '!') STORED
     );
     ```
     </CodeTab>
@@ -122,13 +128,13 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     );
     ```
     ```sql {4}
-    CREATE TABLE IF NOT EXISTS "test" (
+    CREATE TABLE "test" (
     	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "test_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
     	"content" text,
     	"content_search" "tsvector" GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
     );
     --> statement-breakpoint
-    CREATE INDEX IF NOT EXISTS "idx_content_search" ON "test" USING gin ("content_search");
+    CREATE INDEX "idx_content_search" ON "test" USING gin ("content_search");
     ```
     </CodeTab>
    </CodeTabs>
@@ -153,56 +159,67 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     For more info, please check [MySQL Alter Generated](https://dev.mysql.com/doc/refman/8.4/en/alter-table-generated-columns.html) docs and [MySQL create generated](https://dev.mysql.com/doc/refman/8.4/en/create-table-generated-columns.html) docs
 
     #### Drizzle side
+    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
+    that will generate this column data for you.
 
     #### Features 
+    This function can accept generated expression in 2 ways:
+
+    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
+    
+    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
 
     **`string`**
     <CodeTab>
     ```ts
     export const test = mysqlTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
     });
     ```
+
     ```sql
-    CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS (hello world!) VIRTUAL
+    CREATE TABLE "test" (
+	    "gen_name" text GENERATED ALWAYS AS ('hello world!') VIRTUAL
     );
     ```
     </CodeTab>
+    
+    </Callout>
 
     **`sql`** tag - if you want drizzle to escape some values for you
 
     <CodeTab>
     ```ts
     export const test = mysqlTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
     ```sql
     CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS (hello "world"!) VIRTUAL
+	    `gen_name` text GENERATED ALWAYS AS ('hello "world"!') VIRTUAL
     );
     ```
     </CodeTab>
 
     **`callback`** - if you need to reference columns from a table
 
-    <CodeTab>
+     <CodeTab>
     ```ts
     export const test = mysqlTable("test", {
         name: text("first_name"),
         generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`hi, ${test.name}!`
+          (): SQL => sql`'hi, ' || ${test.name} || '!'`
         ),
     });
     ```
     ```sql
     CREATE TABLE `test` (
-    	`first_name` text,
-    	`gen_name` text GENERATED ALWAYS AS (hi, `test`.`first_name`!) VIRTUAL
+  	  `first_name` text,
+  	  `gen_name` text GENERATED ALWAYS AS ('hi, ' || `test`.`first_name` || '!') VIRTUAL
     );
     ```
     </CodeTab>
+
     #### Limitations
     Drizzle Kit will also have limitations for `push` command:
     1. You can't change the generated constraint expression and type using `push`. Drizzle-kit will ignore this change. To make it work, you would need to `drop the column`, `push`, and then `add a column with a new expression`. This was done due to the complex mapping from the database side, where the schema expression will be modified on the database side and, on introspection, we will get a different string. We can't be sure if you changed this expression or if it was changed and formatted by the database. As long as these are generated columns and `push` is mostly used for prototyping on a local database, it should be fast to `drop` and `create` generated columns. Since these columns are `generated`, all the data will be restored
@@ -216,22 +233,22 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
         id2: int("id2"),
         name: text("name"),
         storedGenerated: text("stored_gen").generatedAlwaysAs(
-          (): SQL => sql`${users.name} || 'hello'`,
+          (): SQL => sql`concat(${users.name}, ' ', 'hello')`,
           { mode: "stored" }
         ),
         virtualGenerated: text("virtual_gen").generatedAlwaysAs(
-          (): SQL => sql`${users.name} || 'hello'`,
+          (): SQL => sql`concat(${users.name}, ' ', 'hello')`,
           { mode: "virtual" }
         ),
-    })
+    });
     ```
     ```sql
     CREATE TABLE `users` (
-	    `id` int,
-	    `id2` int,
-	    `name` text,
-	    `stored_gen` text GENERATED ALWAYS AS (`users`.`name` || 'hello') STORED,
-	    `virtual_gen` text GENERATED ALWAYS AS (`users`.`name` || 'hello') VIRTUAL
+      `id` int,
+      `id2` int,
+      `name` text,
+      `stored_gen` text GENERATED ALWAYS AS (concat(`users`.`name`, ' ', 'hello')) STORED,
+      `virtual_gen` text GENERATED ALWAYS AS (concat(`users`.`name`, ' ', 'hello')) VIRTUAL
     );
     ```
     </CodeTab>
@@ -257,30 +274,47 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     For more info, please check [SQLite](https://www.sqlite.org/gencol.html) docs 
 
     #### Drizzle side
+    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
+    that will generate this column data for you.
 
-    #### Features
+    #### Features 
+    This function can accept generated expression in 2 ways:
+
+    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
+    
+    In versions before 1.0.0-beta.12, `.generatedAlwaysAs()` also accepted literals as expressions.
+
     **`string`**
+    <CodeTab>
     ```ts
     export const test = sqliteTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+        id: int("id").primaryKey(),
+        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
     });
     ```
+
     ```sql
     CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS (hello world!) VIRTUAL
+	    `id` integer PRIMARY KEY,
+	    `gen_name` text GENERATED ALWAYS AS ('hello world!') VIRTUAL
     );
     ```
+    </CodeTab>
+    
+    </Callout>
 
     **`sql`** tag - if you want drizzle to escape some values for you
 
     ```ts
     export const test = sqliteTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+        id: int("id").primaryKey(),
+        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
     ```sql
     CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS (hello "world"!) VIRTUAL
+      `id` integer PRIMARY KEY,
+      `gen_name` text GENERATED ALWAYS AS ('hello "world"!') VIRTUAL
     );
     ```
 
@@ -290,14 +324,14 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     export const test = sqliteTable("test", {
         name: text("first_name"),
         generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`hi, ${test.name}!`
+          (): SQL => sql`'hi,' || ${test.name} || '!'`
         ),
     });
     ```
     ```sql
     CREATE TABLE `test` (
-	    `first_name` text,
-	    `gen_name` text GENERATED ALWAYS AS (hi, "first_name"!) VIRTUAL
+      `first_name` text,
+      `gen_name` text GENERATED ALWAYS AS ('hi,' || "first_name" || '!') VIRTUAL
     );
     ```
 
@@ -308,7 +342,7 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     3. You can't change a `stored` generated expression in an existing column for the same reason as above. However, you can change a `virtual` expression.
     4. You can't change the generated constraint type from `virtual` to `stored` for the same reason as above. However, you can change from `stored` to `virtual`.
 
-   <CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTabs items={["schema.ts"]}>
 	<CodeTab>
 	```typescript copy
     export const users = sqliteTable("users", {
@@ -338,7 +372,7 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
   <Tab>
   Work in Progress
   </Tab>
-<Tab>
+  <Tab>
     #### Database side
     **Types**: `PERSISTED`, `VIRTUAL`
 
@@ -350,34 +384,44 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     For more info, please check [MSSQL](https://learn.microsoft.com/en-us/sql/relational-databases/tables/specify-computed-columns-in-a-table?view=sql-server-ver17) docs
 
     #### Drizzle side
+    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
+    that will generate this column data for you.
 
     #### Features 
+    This function can accept generated expression in 2 ways:
+
+    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
+    
+    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
 
     **`string`**
     <CodeTab>
     ```ts
     export const test = mssqlTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
     });
     ```
     ```sql
     CREATE TABLE [test] (
-	    [gen_name] AS ('hello world!') VIRTUAL
+	    [gen_name] AS ('hello world!')
     );
     ```
     </CodeTab>
+    </Callout>
 
     **`sql`** tag - if you want drizzle to escape some values for you
 
     <CodeTab>
     ```ts
     export const test = mssqlTable("test", {
+        id: int("id"),
         generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
     });
     ```
     ```sql
     CREATE TABLE [test] (
-	    [gen_name] AS ('hello "world"!') VIRTUAL
+	    [id] int,
+	    [gen_name] AS ('hello "world"!') 
     );
     ```
     </CodeTab>
@@ -389,14 +433,14 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     export const test = mssqlTable("test", {
         name: text("first_name"),
         generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`hi, ${test.name}!`
+          (): SQL => sql`concat('hi,', ' ', ${test.name}, '!')`
         ),
     });
     ```
     ```sql
     CREATE TABLE [test] (
     	[first_name] text,
-    	[gen_name] AS ('hi, [test].[first_name]!') VIRTUAL
+    	[gen_name] AS (concat('hi,', ' ', [test].[first_name], '!')) 
     );
     ```
     </CodeTab>
@@ -406,33 +450,38 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     that will generate this column data for you.
 
     #### Features 
-    This function can accept generated expression in 3 ways:
+    This function can accept generated expression in 2 ways:
+
+    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
+    
+    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
 
     **`string`**
     <CodeTab>
     ```ts
     export const test = cockroachTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`hello world!`),
+        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
     });
     ```
     ```sql
     CREATE TABLE "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello world!) STORED
+    	"gen_name" string GENERATED ALWAYS AS ('hello world!') STORED
     );
     ```
     </CodeTab>
+    </Callout>
 
     **`sql`** tag - if you want drizzle to escape some values for you
 
     <CodeTab>
     ```ts
     export const test = cockroachTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`hello "world"!`),
+        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
     ```sql
     CREATE TABLE "test" (
-	    "gen_name" text GENERATED ALWAYS AS (hello "world"!) STORED
+	    "gen_name" string GENERATED ALWAYS AS ('hello "world"!') STORED
     );
     ```
     </CodeTab>
@@ -443,14 +492,15 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     export const test = cockroachTable("test", {
         name: text("first_name"),
         generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`hi, ${test.name}!`
+          (): SQL => sql`'hi, ' || ${test.name} || '!'`
         ),
     });
     ```
+
     ```sql
     CREATE TABLE "test" (
-	    "first_name" text,
-	    "gen_name" text GENERATED ALWAYS AS (hi, "test"."first_name"!) STORED
+    	"first_name" string,
+    	"gen_name" string GENERATED ALWAYS AS ('hi, ' || "test"."first_name" || '!') STORED
     );
     ```
     </CodeTab>
@@ -486,11 +536,10 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     ```
     ```sql {4}
     CREATE TABLE "test" (
-    	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "test_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
-    	"content" text,
-    	"content_search" "tsvector" GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
+    	"id" int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+    	"content" string,
+    	"content_search" tsvector GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
     );
-    --> statement-breakpoint
     CREATE INDEX "idx_content_search" ON "test" USING gin ("content_search");
     ```
     </CodeTab>
