@@ -188,6 +188,22 @@ export const getStartedItems: GetStartedItems = [
         },
       },
       {
+        name: "Effect",
+        path: {
+          existing: "/docs/get-started/effect-postgresql-existing",
+          new: "/docs/get-started/effect-postgresql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/effect_light.svg",
+               path: "/public/svg/effect.svg",
+            style: {
+              width: 20,
+              fill: "#f0f0f0",
+            }
+          }
+        },
+        {
         name: "PlanetScale Postgres",
         path: {
           existing: "/docs/get-started/planetscale-postgres-existing",
@@ -196,6 +212,7 @@ export const getStartedItems: GetStartedItems = [
         icon: {
           light: {
             path: "/public/svg/planetscale.svg",
+
             style: {
               width: 20,
             },
