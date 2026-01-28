@@ -113,6 +113,7 @@ export const sponsorsHandler = async () => {
   });
 
   gold = gold.filter((s) => s.sponsorEntity.login !== "samalberto25" && s.sponsorEntity.login !== "lokalise");
+  hero = hero.filter((s) => s.sponsorEntity.login !== "railwayapp" && s.sponsorEntity.login !== "railway");
 
   superhero = superhero.filter((s) => filterFunc(s));
   hero = hero.filter((s) => filterFunc(s));

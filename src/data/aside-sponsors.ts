@@ -3,6 +3,35 @@ import { type ISponsor, ImageType } from "@/types";
 export const asideSponsors: ISponsor[] = [
   {
     tier: {
+      name: "$2500 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/railway",
+      name: "Railway",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-01-28T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    darkStyle: {
+      filter: "brightness(0.3)",
+      
+      background:
+      'url("/svg/railway-sidebar.svg") center / contain no-repeat content-box',
+      minWidth: "calc(100% + 128px)"
+    },
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/railway-sidebar-light.svg") center / contain no-repeat content-box',
+      minWidth: "calc(100% + 128px)"
+    },
+  },
+  {
+    tier: {
       name: "$1000 a month",
       isOneTime: false,
     },
