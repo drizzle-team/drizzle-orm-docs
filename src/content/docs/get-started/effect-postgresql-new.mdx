@@ -22,7 +22,7 @@ import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 # Get Started with Drizzle and Effect PostgreSQL
 
 <Callout type='error'>
-This page explains concepts available on drizzle versions `1.0.0-beta.9` and higher.
+This page explains concepts available on drizzle versions `1.0.0-beta.13` and higher.
 
 Effect is only available for PostgreSQL right now and soon be implemented for all other dialects
 
@@ -40,7 +40,7 @@ Drizzle has native support for Effect PostgreSQL connections with the `@effect/s
 
 <FileStructure/>
 
-#### Step 1 - Install **node-postgres** package
+#### Step 1 - Install required packages
 <InstallPackages lib='effect @effect/sql-pg pg' devlib=' @types/pg'/>
 
 #### Step 2 - Setup connection variables
@@ -75,25 +75,28 @@ Let's **update** the `src/index.ts` file with queries to create, read, update, a
 
 ```ts
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/effect-postgres';
-import { Effect, Redacted } from 'effect';
-import { PgClient } from '@effect/sql-pg'
+import * as PgDrizzle from 'drizzle-orm/effect-postgres';
+import { PgClient } from '@effect/sql-pg';
+import * as Effect from 'effect/Effect';
+import * as Redacted from 'effect/Redacted';
 import { types } from 'pg';
-import { usersTable } from './db/schema'
+import { eq } from 'drizzle-orm';
+import { usersTable } from './db/schema';
 
-const clientLayer = PgClient.layer({
-    url: Redacted.make(process.env.DATABASE_URL!);
-	  types: {
-	  	getTypeParser: (typeId, format) => {
-	  		if ([1184, 1114, 1082, 1186, 1231, 1115, 1185, 1187, 1182].includes(typeId)) return (val: any) => val;
-	  		return types.getTypeParser(typeId, format);
-	  	},
-	  },
+const PgClientLive = PgClient.layer({
+  url: Redacted.make(process.env.DATABASE_URL!),
+  types: {
+    getTypeParser: (typeId, format) => {
+      if ([1184, 1114, 1082, 1186, 1231, 1115, 1185, 1187, 1182].includes(typeId)) {
+        return (val: any) => val;
+      }
+      return types.getTypeParser(typeId, format);
+    },
+  },
 });
 
 const program = Effect.gen(function*() {
-	const client = yield* PgClient.PgClient;
-	const db = drizzle(client, { logger: true, /*...*/ });
+  const db = yield* PgDrizzle.makeWithDefaults();
 
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
@@ -127,7 +130,7 @@ const program = Effect.gen(function*() {
   console.log('User deleted!')
 });
 
-await Effect.runPromise(program).pipe(Effect.provide(clientLayer));
+Effect.runPromise(program.pipe(Effect.provide(PgClientLive)));
 ```
 
 #### Step 8 - Run index.ts file
