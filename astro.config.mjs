@@ -78,6 +78,9 @@ export default defineConfig({
       ]
     },
   },
+  redirects: {
+    "/docs": "/docs/overview"
+  },
   shikiConfig: {
     wrap: true,
     skipInline: false,
