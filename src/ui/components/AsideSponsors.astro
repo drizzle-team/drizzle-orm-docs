@@ -49,6 +49,11 @@ const goldSponsors = (() => {
         rel={sponsor.followLink ? "" : "nofollow"}
       >
         <div class="aside-sponsors__sponsor-wrap">
+          {!!sponsor.badge && (
+            <div class="aside-sponsors__top-banner">
+              <span>{sponsor.badge}</span>
+            </div>
+          )}
           <div
             class="aside-sponsors__sponsor-image"
             id="aside-sponsors-img-wrapper"
@@ -240,6 +245,10 @@ const goldSponsors = (() => {
     height: 74px;
   }
 
+  .aside-sponsors__hero-sponsor .aside-sponsors__sponsor-wrap {
+    padding-top: 16px;
+  }
+
   .aside-sponsors__sponsor:hover::before {
     opacity: 1;
   }
@@ -312,6 +321,56 @@ const goldSponsors = (() => {
 
   .aside-sponsors__sponsor {
     position: relative;
+  }
+
+  .aside-sponsors__top-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: #f1f1f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    transition: background 0.2s ease;
+  }
+
+  .aside-sponsors__top-banner span {
+    font-size: 7px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #71717a;
+    transition: color 0.2s ease;
+  }
+
+  html.dark .aside-sponsors__top-banner {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  html.dark .aside-sponsors__top-banner span {
+    color: #71717a;
+  }
+
+  .aside-sponsors__hero-sponsor:hover .aside-sponsors__top-banner {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .aside-sponsors__hero-sponsor:hover .aside-sponsors__top-banner span {
+    color: #3f3f46;
+  }
+
+  html.dark .aside-sponsors__hero-sponsor:hover .aside-sponsors__top-banner {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  html.dark .aside-sponsors__hero-sponsor:hover .aside-sponsors__top-banner span {
+    color: #d4d4d8;
   }
 
   .popover {

@@ -40,6 +40,7 @@ export interface ISponsor {
   };
   followLink?: boolean;
   popover?: string;
+  badge?: string;
   createdAt: string;
   isActive: boolean;
   imageType?: ImageType;
@@ -62,6 +63,7 @@ type ImageSrc =
 export interface ISupportingElement {
   imageSrc: ImageSrc;
   sponsorUrl?: string;
+  badge?: string;
   lightStyle?: SVGProps;
   darkStyle?: SVGProps;
 }

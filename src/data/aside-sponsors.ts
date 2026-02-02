@@ -16,6 +16,7 @@ export const asideSponsors: ISponsor[] = [
     createdAt: "2025-01-28T00:00:00Z",
     isActive: true,
     imageType: ImageType.SVG,
+    badge: "Our Cloud Partner",
     darkStyle: {
       filter: "brightness(0.3)",
       

@@ -194,6 +194,21 @@ export const databases: {
 export const runtimes: {
   [key: string]: ISupportingElement;
 } = {
+  Railway: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/railway.svg",
+      darkThemeSrc: "/public/svg/railway.svg",
+    },
+    lightStyle: {
+      width: 28,
+      filter: "invert(1)",
+    },
+    darkStyle: {
+      width: 28,
+    },
+    sponsorUrl: "https://driz.link/railway",
+    badge: "Cloud Partner",
+  },
   "Cloudflare Workers": {
     imageSrc: "/public/svg/cloudflareworker.svg",
     lightStyle: {
