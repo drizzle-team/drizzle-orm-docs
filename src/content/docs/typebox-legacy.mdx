@@ -2,17 +2,18 @@ import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
 <Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-zod` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
 
-You can still use `drizzle-zod` package but all new update will be added to Drizzle ORM directly
+You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
+
+This version of `typebox` is legacy by using `@sinclair/typebox` package
 </Callout>
 
-# zod
+# typebox-legacy
 
 ### Install the dependencies
-
 <Npm>
-zod
+drizzle-orm @sinclair/typebox
 </Npm>
 
 ### Select schema
@@ -21,7 +22,8 @@ Defines the shape of data queried from the database - can be used to validate AP
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-orm/zod';
+import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -32,25 +34,26 @@ const users = pgTable('users', {
 const userSelectSchema = createSelectSchema(users);
 
 const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Error: `age` is not returned in the above query
+const parsed: { id: number; name: string; age: number } = Value.Parse(userSelectSchema, rows[0]); // Error: `age` is not returned in the above query
 
 const rows = await db.select().from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Will parse successfully
+const parsed: { id: number; name: string; age: number } = Value.Parse(userSelectSchema, rows[0]); // Will parse successfully
 ```
 
 Views and enums are also supported.
 
 ```ts copy
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-orm/zod';
+import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
 
 const roles = pgEnum('roles', ['admin', 'basic']);
 const rolesSchema = createSelectSchema(roles);
-const parsed: 'admin' | 'basic' = rolesSchema.parse(...);
+const parsed: 'admin' | 'basic' = Value.Parse(rolesSchema, ...);
 
 const usersView = pgView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
 const usersViewSchema = createSelectSchema(usersView);
-const parsed: { id: number; name: string; age: number } = usersViewSchema.parse(...);
+const parsed: { id: number; name: string; age: number } = Value.Parse(usersViewSchema, ...);
 ```
 
 ### Insert schema
@@ -59,7 +62,8 @@ Defines the shape of data to be inserted into the database - can be used to vali
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createInsertSchema } from 'drizzle-orm/zod';
+import { createInsertSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -70,10 +74,10 @@ const users = pgTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
+const parsed: { name: string, age: number } = Value.Parse(userInsertSchema, user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
+const parsed: { name: string, age: number } = Value.Parse(userInsertSchema, user); // Will parse successfully
 await db.insert(users).values(parsed);
 ```
 
@@ -83,7 +87,8 @@ Defines the shape of data to be updated in the database - can be used to validat
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createUpdateSchema } from 'drizzle-orm/zod';
+import { createUpdateSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -94,33 +99,34 @@ const users = pgTable('users', {
 const userUpdateSchema = createUpdateSchema(users);
 
 const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Error: `id` is a generated column, it can't be updated
+const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
 
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Will parse successfully
+const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
 ### Refinements
 
-Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Zod schema will overwrite it.
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Typebox schema will overwrite it.
 
 ```ts copy
 import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-orm/zod';
-import { z } from 'zod/v4';
+import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
+import { Type } from '@sinclair/typebox';
+import { Value } from '@sinclair/typebox/value';
 
 const users = pgTable('users', {
-  id: integer().primaryKey(),
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
   name: text().notNull(),
   bio: text(),
   preferences: json()
 });
 
 const userSelectSchema = createSelectSchema(users, {
-  name: (schema) => schema.max(20), // Extends schema
-  bio: (schema) => schema.max(1000), // Extends schema before becoming nullable/optional
-  preferences: z.object({ theme: z.string() }) // Overwrites the field, including its nullability
+  name: (schema) => Type.String({ ...schema, maxLength: 20 }), // Extends schema
+  bio: (schema) => Type.String({ ...schema, maxLength: 1000 }), // Extends schema before becoming nullable/optional
+  preferences: Type.Object({ theme: Type.String() }) // Overwrites the field, including its nullability
 });
 
 const parsed: {
@@ -130,19 +136,19 @@ const parsed: {
   preferences: {
     theme: string;
   };
-} = userSelectSchema.parse(...);
+} = Value.Parse(userSelectSchema, ...);
 ```
 
 ### Factory functions
 
 For more advanced use cases, you can use the `createSchemaFactory` function.
 
-**Use case: Using an extended Zod instance**
+**Use case: Using an extended Typebox instance**
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createSchemaFactory } from 'drizzle-orm/zod';
-import { z } from '@hono/zod-openapi'; // Extended Zod instance
+import { createSchemaFactory } from 'drizzle-orm/typebox';
+import { t } from 'elysia'; // Extended Typebox instance
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -150,38 +156,11 @@ const users = pgTable('users', {
   age: integer().notNull()
 });
 
-const { createInsertSchema } = createSchemaFactory({ zodInstance: z });
+const { createInsertSchema } = createSchemaFactory({ typeboxInstance: t });
 
 const userInsertSchema = createInsertSchema(users, {
   // We can now use the extended instance
-  name: (schema) => schema.openapi({ example: 'John' })
-});
-```
-
-**Use case: Type coercion**
-
-```ts copy
-import { pgTable, timestamp } from 'drizzle-orm/pg-core';
-import { createSchemaFactory } from 'drizzle-orm/zod';
-import { z } from 'zod/v4';
-
-const users = pgTable('users', {
-  ...,
-  createdAt: timestamp().notNull()
-});
-
-const { createInsertSchema } = createSchemaFactory({
-  // This configuration will only coerce dates. Set `coerce` to `true` to coerce all data types or specify others
-  coerce: {
-    date: true
-  }
-});
-
-const userInsertSchema = createInsertSchema(users);
-// The above is the same as this:
-const userInsertSchema = z.object({
-  ...,
-  createdAt: z.coerce.date()
+  name: (schema) => t.Number({ ...schema }, { error: '`name` must be a string' })
 });
 ```
 
@@ -195,7 +174,7 @@ mysql.boolean();
 sqlite.integer({ mode: 'boolean' });
 
 // Schema
-z.boolean();
+Type.Boolean();
 ```
 
 ```ts
@@ -210,7 +189,7 @@ sqlite.integer({ mode: 'timestamp' });
 sqlite.integer({ mode: 'timestamp_ms' });
 
 // Schema
-z.date();
+Type.Date();
 ```
 
 ```ts
@@ -238,21 +217,21 @@ sqlite.numeric();
 sqlite.text({ mode: 'text' });
 
 // Schema
-z.string();
+Type.String();
 ```
 
 ```ts
 pg.bit({ dimensions: ... });
 
 // Schema
-z.string().regex(/^[01]+$/).max(dimensions);
+t.RegExp(/^[01]+$/, { maxLength: dimensions });
 ```
 
 ```ts
 pg.uuid();
 
 // Schema
-z.string().uuid();
+Type.String({ format: 'uuid' });
 ```
 
 ```ts
@@ -261,7 +240,7 @@ pg.char({ length: ... });
 mysql.char({ length: ... });
 
 // Schema
-z.string().length(length);
+Type.String({ minLength: length, maxLength: length });
 ```
 
 ```ts
@@ -272,35 +251,35 @@ mysql.varchar({ length: ... });
 sqlite.text({ mode: 'text', length: ... });
 
 // Schema
-z.string().max(length);
+Type.String({ maxLength: length });
 ```
 
 ```ts
 mysql.tinytext();
 
 // Schema
-z.string().max(255); // unsigned 8-bit integer limit
+Type.String({ maxLength: 255 }); // unsigned 8-bit integer limit
 ```
 
 ```ts
 mysql.text();
 
 // Schema
-z.string().max(65_535); // unsigned 16-bit integer limit
+Type.String({ maxLength: 65_535 }); // unsigned 16-bit integer limit
 ```
 
 ```ts
 mysql.mediumtext();
 
 // Schema
-z.string().max(16_777_215); // unsigned 24-bit integer limit
+Type.String({ maxLength: 16_777_215 }); // unsigned 24-bit integer limit
 ```
 
 ```ts
 mysql.longtext();
 
 // Schema
-z.string().max(4_294_967_295); // unsigned 32-bit integer limit
+Type.String({ maxLength: 4_294_967_295 }); // unsigned 32-bit integer limit
 ```
 
 ```ts
@@ -319,21 +298,21 @@ mysql.mysqlEnum(..., ...);
 sqlite.text({ mode: 'text', enum: ... });
 
 // Schema
-z.enum(enum);
+Type.Enum(enum);
 ```
 
 ```ts
 mysql.tinyint();
 
 // Schema
-z.number().min(-128).max(127).int(); // 8-bit integer lower and upper limit
+Type.Integer({ minimum: -128, maximum: 127 }); // 8-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.tinyint({ unsigned: true });
 
 // Schema
-z.number().min(0).max(255).int(); // unsigned 8-bit integer lower and upper limit
+Type.Integer({ minimum: 0, maximum: 255 }); // unsigned 8-bit integer lower and upper limit
 ```
 
 ```ts
@@ -343,14 +322,14 @@ pg.smallserial();
 mysql.smallint();
 
 // Schema
-z.number().min(-32_768).max(32_767).int(); // 16-bit integer lower and upper limit
+Type.Integer({ minimum: -32_768, maximum: 32_767 }); // 16-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.smallint({ unsigned: true });
 
 // Schema
-z.number().min(0).max(65_535).int(); // unsigned 16-bit integer lower and upper limit
+Type.Integer({ minimum: 0, maximum: 65_535 }); // unsigned 16-bit integer lower and upper limit
 ```
 
 ```ts
@@ -359,28 +338,28 @@ pg.real();
 mysql.float();
 
 // Schema
-z.number().min(-8_388_608).max(8_388_607); // 24-bit integer lower and upper limit
+Type.Number().min(-8_388_608).max(8_388_607); // 24-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.mediumint();
 
 // Schema
-z.number().min(-8_388_608).max(8_388_607).int(); // 24-bit integer lower and upper limit
+Type.Integer({ minimum: -8_388_608, maximum: 8_388_607 }); // 24-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.float({ unsigned: true });
 
 // Schema
-z.number().min(0).max(16_777_215); // unsigned 24-bit integer lower and upper limit
+Type.Number({ minimum: 0, maximum: 16_777_215 }); // unsigned 24-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.mediumint({ unsigned: true });
 
 // Schema
-z.number().min(0).max(16_777_215).int(); // unsigned 24-bit integer lower and upper limit
+Type.Integer({ minimum: 0, maximum: 16_777_215 }); // unsigned 24-bit integer lower and upper limit
 ```
 
 ```ts
@@ -390,14 +369,14 @@ pg.serial();
 mysql.int();
 
 // Schema
-z.number().min(-2_147_483_648).max(2_147_483_647).int(); // 32-bit integer lower and upper limit
+Type.Integer({ minimum: -2_147_483_648, maximum: 2_147_483_647 }); // 32-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.int({ unsigned: true });
 
 // Schema
-z.number().min(0).max(4_294_967_295).int(); // unsgined 32-bit integer lower and upper limit
+Type.Integer({ minimum: 0, maximum: 4_294_967_295 }); // unsgined 32-bit integer lower and upper limit
 ```
 
 ```ts
@@ -409,14 +388,14 @@ mysql.real();
 sqlite.real();
 
 // Schema
-z.number().min(-140_737_488_355_328).max(140_737_488_355_327); // 48-bit integer lower and upper limit
+Type.Number({ minimum: -140_737_488_355_328, maximum: 140_737_488_355_327 }); // 48-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.double({ unsigned: true });
 
 // Schema
-z.number().min(0).max(281_474_976_710_655); // unsigned 48-bit integer lower and upper limit
+Type.Numer({ minimum: 0, maximum: 281_474_976_710_655 }); // unsigned 48-bit integer lower and upper limit
 ```
 
 ```ts
@@ -429,14 +408,13 @@ mysql.bigserial({ mode: 'number' });
 sqlite.integer({ mode: 'number' });
 
 // Schema
-z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991).int(); // Javascript min. and max. safe integers
+Type.Integer({ minimum: -9_007_199_254_740_991, maximum: 9_007_199_254_740_991 }); // Javascript min. and max. safe integers
 ```
 
 ```ts
 mysql.serial();
 
-// Schema
-z.number().min(0).max(9_007_199_254_740_991).int(); // Javascript max. safe integer
+Type.Integer({ minimum: 0, maximum: 9_007_199_254_740_991 }); // Javascript max. safe integer
 ```
 
 ```ts
@@ -448,21 +426,21 @@ mysql.bigint({ mode: 'bigint' });
 sqlite.blob({ mode: 'bigint' });
 
 // Schema
-z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n); // 64-bit integer lower and upper limit
+Type.BigInt({ minimum: -9_223_372_036_854_775_808n, maximum: 9_223_372_036_854_775_807n }); // 64-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.bigint({ mode: 'bigint', unsigned: true });
 
 // Schema
-z.bigint().min(0).max(18_446_744_073_709_551_615n); // unsigned 64-bit integer lower and upper limit
+Type.BigInt({ minimum: 0, maximum: 18_446_744_073_709_551_615n }); // unsigned 64-bit integer lower and upper limit
 ```
 
 ```ts
 mysql.year();
 
 // Schema
-z.number().min(1_901).max(2_155).int();
+Type.Integer({ minimum: 1_901, maximum: 2_155 });
 ```
 
 ```ts
@@ -470,7 +448,7 @@ pg.geometry({ type: 'point', mode: 'tuple' });
 pg.point({ mode: 'tuple' });
 
 // Schema
-z.tuple([z.number(), z.number()]);
+Type.Tuple([Type.Number(), Type.Number()]);
 ```
 
 ```ts
@@ -478,7 +456,7 @@ pg.geometry({ type: 'point', mode: 'xy' });
 pg.point({ mode: 'xy' });
 
 // Schema
-z.object({ x: z.number(), y: z.number() });
+Type.Object({ x: Type.Number(), y: Type.Number() });
 ```
 
 ```ts
@@ -486,21 +464,21 @@ pg.halfvec({ dimensions: ... });
 pg.vector({ dimensions: ... });
 
 // Schema
-z.array(z.number()).length(dimensions);
+Type.Array(Type.Number(), { minItems: dimensions, maxItems: dimensions });
 ```
 
 ```ts
 pg.line({ mode: 'abc' });
 
 // Schema
-z.object({ a: z.number(), b: z.number(), c: z.number() });
+Type.Object({ a: Type.Number(), b: Type.Number(), c: Type.Number() });
 ```
 
 ```ts
 pg.line({ mode: 'tuple' });
 
 // Schema
-z.tuple([z.number(), z.number(), z.number()]);
+Type.Tuple([Type.Number(), Type.Number(), Type.Number()]);
 ```
 
 ```ts
@@ -513,19 +491,19 @@ sqlite.blob({ mode: 'json' });
 sqlite.text({ mode: 'json' });
 
 // Schema
-z.union([z.union([z.string(), z.number(), z.boolean(), z.null()]), z.record(z.any()), z.array(z.any())]);
+Type.Recursive((self) => Type.Union([Type.Union([Type.String(), Type.Number(), Type.Boolean(), Type.Null()]), Type.Array(self), Type.Record(Type.String(), self)]));
 ```
 
 ```ts
 sqlite.blob({ mode: 'buffer' });
 
 // Schema
-z.custom<Buffer>((v) => v instanceof Buffer);
+t.Union([t.Union([t.String(), t.Number(), t.Boolean(), t.Null()]), t.Array(t.Any()), t.Record(t.String(), t.Any())]);
 ```
 
 ```ts
 pg.dataType().array(...);
 
 // Schema
-z.array(baseDataTypeSchema).length(size);
+Type.Array(baseDataTypeSchema, { minItems: size, maxItems: size });
 ```

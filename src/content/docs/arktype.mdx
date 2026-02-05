@@ -1,21 +1,19 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-# drizzle-arktype
+<Callout type="error">
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-arktype` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
 
-`drizzle-arktype` is a plugin for **[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)** that allows you to generate **[Arktype](https://arktype.io/)** schemas from Drizzle ORM schemas.
+You can still use `drizzle-arktype` package but all new update will be added to Drizzle ORM directly
+</Callout>
+
+# arktype
 
 ### Install the dependencies
 
 <Npm>
-drizzle-arktype
+arktype
 </Npm>
-
-<Callout type="warning">
-This documentation is for `drizzle-arktype@0.1.0` and higher
-
-You must also have Drizzle ORM v0.36.0 or greater and Arktype v2.0.0 or greater installed.
-</Callout>
 
 ### Select schema
 
@@ -23,7 +21,7 @@ Defines the shape of data queried from the database - can be used to validate AP
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-arktype';
+import { createSelectSchema } from 'drizzle-orm/arktype';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -44,7 +42,7 @@ Views and enums are also supported.
 
 ```ts copy
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-arktype';
+import { createSelectSchema } from 'drizzle-orm/arktype';
 
 const roles = pgEnum('roles', ['admin', 'basic']);
 const rolesSchema = createSelectSchema(roles);
@@ -61,7 +59,7 @@ Defines the shape of data to be inserted into the database - can be used to vali
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createInsertSchema } from 'drizzle-arktype';
+import { createInsertSchema } from 'drizzle-orm/arktype';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -85,7 +83,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createUpdateSchema } from 'drizzle-arktype';
+import { createUpdateSchema } from 'drizzle-orm/arktype';
 import { parse } from 'arktype';
 
 const users = pgTable('users', {
@@ -110,7 +108,7 @@ Each create schema function accepts an additional optional parameter that you ca
 
 ```ts copy
 import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-arktype';
+import { createSelectSchema } from 'drizzle-orm/arktype';
 import { parse, pipe, maxLength, object, string } from 'arktype';
 
 const users = pgTable('users', {
