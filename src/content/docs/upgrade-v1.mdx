@@ -41,7 +41,19 @@ To migrate previous folders to a new format you would need to run
 drizzle-kit up
 </Npx>
 
-#### Step 2 - Update Relational Queries to v2
+#### Step 2 - Update validator packages imports
+
+We've stopped maintaining separate validator packages (e.g., `drizzle-zod`, `drizzle-valibot`) and moved them into the `drizzle-orm` repo. This consolidates everything into a single package and eliminates the need to manage separate peer dependencies and versioning.
+
+All packages are now available via `drizzle-orm` imports:
+
+- `drizzle-zod` -> `drizzle-orm/zod`
+- `drizzle-valibot` -> `drizzle-orm/valibot`
+- `drizzle-typebox` -> `drizzle-orm/typebox-legacy` (using `@sinclair/typebox`)
+- `drizzle-typebox` -> `drizzle-orm/typebox` (using `typebox`)
+- `drizzle-arktype` -> `drizzle-orm/arktype`
+
+#### Step 3 - Update Relational Queries to v2
 
 We've explained all the RQBv2 changes in detail, along with options for updating your codebase:
 
