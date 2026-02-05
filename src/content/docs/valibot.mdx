@@ -1,21 +1,19 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-# drizzle-valibot
+<Callout type="error">
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-valibot` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
 
-`drizzle-valibot` is a plugin for **[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)** that allows you to generate **[Valibot](https://valibot.dev/)** schemas from Drizzle ORM schemas.
+You can still use `drizzle-valibot` package but all new update will be added to Drizzle ORM directly
+</Callout>
+
+# valibot
 
 ### Install the dependencies
 
 <Npm>
-drizzle-valibot
+valibot
 </Npm>
-
-<Callout type="warning">
-This documentation is for `drizzle-valibot@0.3.0` and higher
-
-You must also have Drizzle ORM v0.36.0 or greater and Valibot v1.0.0-beta.7 or greater installed.
-</Callout>
 
 ### Select schema
 
@@ -23,7 +21,7 @@ Defines the shape of data queried from the database - can be used to validate AP
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-valibot';
+import { createSelectSchema } from 'drizzle-orm/valibot';
 import { parse } from 'valibot';
 
 const users = pgTable('users', {
@@ -45,7 +43,7 @@ Views and enums are also supported.
 
 ```ts copy
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-valibot';
+import { createSelectSchema } from 'drizzle-orm/valibot';
 import { parse } from 'valibot';
 
 const roles = pgEnum('roles', ['admin', 'basic']);
@@ -63,7 +61,7 @@ Defines the shape of data to be inserted into the database - can be used to vali
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createInsertSchema } from 'drizzle-valibot';
+import { createInsertSchema } from 'drizzle-orm/valibot';
 import { parse } from 'valibot';
 
 const users = pgTable('users', {
@@ -88,7 +86,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createUpdateSchema } from 'drizzle-valibot';
+import { createUpdateSchema } from 'drizzle-orm/valibot';
 import { parse } from 'valibot';
 
 const users = pgTable('users', {
@@ -113,7 +111,7 @@ Each create schema function accepts an additional optional parameter that you ca
 
 ```ts copy
 import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-valibot';
+import { createSelectSchema } from 'drizzle-orm/valibot';
 import { parse, pipe, maxLength, object, string } from 'valibot';
 
 const users = pgTable('users', {
