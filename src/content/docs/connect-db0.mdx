@@ -23,6 +23,19 @@ MySQL is not implemented yet (using a db0 MySQL connector will throw).
 </Callout>
 
 <Callout>
+**Correctness note (joins/aliases):**
+Drizzle expects drivers to return rows in a stable column order.
+
+db0's public API returns **object rows** for most connectors, which can collapse duplicate column names (common with joins/aliases) and make results ambiguous.
+
+For correct join/alias results, use a connector that can return **array-mode rows**:
+- SQLite: `db0/connectors/better-sqlite3` (uses `raw(true)` internally)
+- PostgreSQL: `db0/connectors/pglite` (uses `rowMode: 'array'` when available)
+
+Other connectors may throw for complex selections (or return incorrect results) when object rows can’t be mapped safely.
+</Callout>
+
+<Callout>
 **Available db0 connectors:**
 `better-sqlite3`, `bun-sqlite`, `cloudflare-d1`, `libsql`, `postgresql`, `pglite` and more.
 See the full list at [db0.unjs.io/connectors](https://db0.unjs.io/connectors).
