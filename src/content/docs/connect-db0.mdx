@@ -17,6 +17,11 @@ It provides a single `Database` interface that works across multiple database en
 Drizzle auto-detects the dialect (PostgreSQL or SQLite) from the db0 connector — no extra configuration needed.
 
 <Callout>
+**Availability:** `drizzle-orm/db0` is landing via **[drizzle-team/drizzle-orm#5296](https://github.com/drizzle-team/drizzle-orm/pull/5296)**.
+If `import { drizzle } from 'drizzle-orm/db0'` fails, your installed `drizzle-orm` version doesn’t include this driver yet (this page targets the `beta` docs track).
+</Callout>
+
+<Callout>
 Drizzle's `drizzle-orm/db0` driver currently supports db0 dialects: `sqlite` / `libsql` and `postgresql`.
 
 MySQL is not implemented yet (using a db0 MySQL connector will throw).
@@ -24,15 +29,15 @@ MySQL is not implemented yet (using a db0 MySQL connector will throw).
 
 <Callout>
 **Correctness note (joins/aliases):**
-Drizzle expects drivers to return rows in a stable column order.
+The `drizzle-orm/db0` driver expects rows in a stable column order.
 
-db0's public API returns **object rows** for most connectors, which can collapse duplicate column names (common with joins/aliases) and make results ambiguous.
+db0's public API returns **object rows** for most connectors. This can collapse duplicate column names (common with joins/aliases) and make results ambiguous.
 
-For correct join/alias results, use a connector that can return **array-mode rows**:
-- SQLite: `db0/connectors/better-sqlite3` (uses `raw(true)` internally)
-- PostgreSQL: `db0/connectors/pglite` (uses `rowMode: 'array'` when available)
+For correct join/alias results, use a connector that lets the driver read **array-mode rows**:
+- SQLite: `db0/connectors/better-sqlite3` (driver uses `raw(true)` when available)
+- PostgreSQL: `db0/connectors/pglite` (driver uses `rowMode: 'array'` when available)
 
-Other connectors may throw for complex selections (or return incorrect results) when object rows can’t be mapped safely.
+If array-mode rows aren’t available and object rows can’t be mapped safely, Drizzle throws a fail-fast error instead of returning potentially wrong data. See **[drizzle-team/drizzle-orm#5296](https://github.com/drizzle-team/drizzle-orm/pull/5296)**.
 </Callout>
 
 <Callout>
@@ -48,10 +53,25 @@ drizzle-orm db0
 -D drizzle-kit
 </Npm>
 
-You also need to install the **underlying driver package** for the db0 connector you plan to use. For example, for `db0/connectors/better-sqlite3`:
+You also need to install the **underlying driver package** for the db0 connector you plan to use. For example:
+
+For `db0/connectors/better-sqlite3`:
 
 <Npm>
 better-sqlite3
+</Npm>
+
+For `db0/connectors/postgresql`:
+
+<Npm>
+pg
+-D @types/pg
+</Npm>
+
+For `db0/connectors/pglite`:
+
+<Npm>
+@electric-sql/pglite
 </Npm>
 
 #### Step 2 - Initialize the driver and make a query
