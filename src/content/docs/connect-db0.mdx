@@ -1,0 +1,133 @@
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+
+# Drizzle \<\> db0
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- db0 (recommended `>= 0.3.4`) - [website](https://db0.unjs.io) & [GitHub](https://github.com/unjs/db0)
+</Prerequisites>
+
+According to the **[official repo](https://github.com/unjs/db0)**, db0 is a lightweight SQL connector designed to work with any compatible SQL database.
+It provides a single `Database` interface that works across multiple database engines via connectors.
+
+Drizzle auto-detects the dialect (PostgreSQL or SQLite) from the db0 connector — no extra configuration needed.
+
+<Callout>
+**Availability:** `drizzle-orm/db0` is landing via **[drizzle-team/drizzle-orm#5296](https://github.com/drizzle-team/drizzle-orm/pull/5296)**.
+If `import { drizzle } from 'drizzle-orm/db0'` fails, your installed `drizzle-orm` version doesn’t include this driver yet (this page targets the `beta` docs track).
+</Callout>
+
+<Callout>
+Drizzle's `drizzle-orm/db0` driver currently supports db0 dialects: `sqlite` / `libsql` and `postgresql`.
+
+MySQL is not implemented yet (using a db0 MySQL connector will throw).
+</Callout>
+
+<Callout>
+**Correctness note (joins/aliases):**
+The `drizzle-orm/db0` driver expects rows in a stable column order.
+
+db0's public API returns **object rows** for most connectors. This can collapse duplicate column names (common with joins/aliases) and make results ambiguous.
+
+For correct join/alias results, use a connector that lets the driver read **array-mode rows**:
+- SQLite: `db0/connectors/better-sqlite3` (driver uses `raw(true)` when available)
+- PostgreSQL: `db0/connectors/pglite` (driver uses `rowMode: 'array'` when available)
+
+If array-mode rows aren’t available and object rows can’t be mapped safely, Drizzle throws a fail-fast error instead of returning potentially wrong data. See **[drizzle-team/drizzle-orm#5296](https://github.com/drizzle-team/drizzle-orm/pull/5296)**.
+</Callout>
+
+<Callout>
+**Available db0 connectors:**
+`better-sqlite3`, `bun-sqlite`, `cloudflare-d1`, `libsql`, `postgresql`, `pglite` and more.
+See the full list at [db0.unjs.io/connectors](https://db0.unjs.io/connectors).
+</Callout>
+
+#### Step 1 - Install packages
+
+<Npm>
+drizzle-orm db0
+-D drizzle-kit
+</Npm>
+
+You also need to install the **underlying driver package** for the db0 connector you plan to use. For example:
+
+For `db0/connectors/better-sqlite3`:
+
+<Npm>
+better-sqlite3
+</Npm>
+
+For `db0/connectors/postgresql`:
+
+<Npm>
+pg
+-D @types/pg
+</Npm>
+
+For `db0/connectors/pglite`:
+
+<Npm>
+@electric-sql/pglite
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+
+<CodeTabs items={["SQLite", "PostgreSQL"]}>
+```typescript copy
+import { createDatabase } from 'db0';
+import betterSqlite3 from 'db0/connectors/better-sqlite3';
+import { drizzle } from 'drizzle-orm/db0';
+
+const db0 = createDatabase(betterSqlite3({ name: 'sqlite.db' }));
+const db = drizzle(db0);
+
+const result = await db.select().from(...);
+```
+```typescript copy
+import { createDatabase } from 'db0';
+import postgresql from 'db0/connectors/postgresql';
+import { drizzle } from 'drizzle-orm/db0';
+
+const db0 = createDatabase(postgresql({ url: process.env.DATABASE_URL }));
+const db = drizzle(db0);
+
+const result = await db.select().from(...);
+```
+</CodeTabs>
+
+If you need to provide your existing driver:
+
+```typescript copy
+import type { Database } from 'db0';
+import { drizzle } from 'drizzle-orm/db0';
+
+const db0: Database = getDb0Instance(); // your existing db0 instance
+const db = drizzle({ client: db0 });
+
+const result = await db.select().from(...);
+```
+
+#### Migrations
+
+Since db0 supports multiple dialects, make sure to import the migrator matching your connector's dialect:
+
+<CodeTabs items={["PostgreSQL", "SQLite"]}>
+```typescript copy
+import { migrate } from 'drizzle-orm/db0/pg/migrator';
+
+await migrate(db, { migrationsFolder: './drizzle' });
+```
+```typescript copy
+import { migrate } from 'drizzle-orm/db0/sqlite/migrator';
+
+await migrate(db, { migrationsFolder: './drizzle' });
+```
+</CodeTabs>
+
+#### What's next?
+
+<WhatsNextPostgres/>
