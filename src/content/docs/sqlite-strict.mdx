@@ -1,0 +1,102 @@
+import Callout from '@mdx/Callout.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+
+# SQLite STRICT Tables
+
+SQLite STRICT tables enforce column type affinity at the database level. When a table is created with the `STRICT` keyword, SQLite will reject any attempt to insert or update a value that doesn't match the declared column type, rather than silently coercing the value.
+
+## Enable STRICT mode
+
+Use the `.strict()` method to create a STRICT table:
+
+```ts
+import { sqliteTable, int, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+  age: int('age'),
+}).strict();
+```
+
+This generates:
+
+```sql
+CREATE TABLE `users` (
+  `id` integer PRIMARY KEY NOT NULL,
+  `name` text NOT NULL,
+  `age` integer
+) STRICT;
+```
+
+## Valid column types
+
+STRICT tables only allow these column types:
+
+| Type | Description |
+| :--- | :---------- |
+| `INT` or `INTEGER` | Signed integer |
+| `REAL` | Floating point |
+| `TEXT` | Text string |
+| `BLOB` | Binary data |
+| `ANY` | Any data type (no type enforcement) |
+
+<Callout type="warning">
+If you use a column type that isn't in this list (like `VARCHAR` or `BOOLEAN`), drizzle-kit will warn you during migration generation, and SQLite will reject the CREATE TABLE statement at runtime.
+</Callout>
+
+## Type enforcement behavior
+
+In a regular SQLite table, type affinity is flexible:
+
+```ts
+// Regular table - SQLite accepts this and stores "hello" as text in an integer column
+await db.execute(sql`INSERT INTO users (age) VALUES ('hello')`);
+```
+
+In a STRICT table, this would fail:
+
+```ts
+// STRICT table - SQLite rejects this with an error
+await db.execute(sql`INSERT INTO users (age) VALUES ('hello')`);
+// Error: cannot store TEXT value in INTEGER column
+```
+
+## Migrations
+
+When you add or remove `.strict()` from an existing table, Drizzle Kit will generate a table recreation migration. This is required because SQLite doesn't support `ALTER TABLE` to change the STRICT option.
+
+**Adding STRICT to existing table:**
+
+```ts
+// Before
+export const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+});
+
+// After
+export const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+}).strict();
+```
+
+This generates a `recreate_table` migration that:
+1. Creates a new table with STRICT
+2. Copies data from the old table
+3. Drops the old table
+4. Renames the new table
+
+## Introspection
+
+When using `drizzle-kit pull` to introspect an existing database, Drizzle will detect STRICT tables and include `.strict()` in the generated schema.
+
+## When to use STRICT tables
+
+STRICT tables are useful when:
+- You need strict type enforcement at the database level
+- You want to catch type mismatches early rather than having SQLite silently coerce values
+- You're building applications where data integrity is critical
+
+<Callout type="info">
+STRICT tables were added in SQLite 3.37.0 (November 2021). Make sure your SQLite version supports this feature.
+</Callout>
