@@ -6,8 +6,6 @@ slug: migration-safety-with-pgfence
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import Callout from "@mdx/Callout.astro";
-import CodeTabs from '@mdx/CodeTabs.astro';
-import CodeTab from '@mdx/CodeTab.astro';
 import Npm from "@mdx/Npm.astro";
 import Steps from "@mdx/Steps.astro";
 
@@ -54,7 +52,7 @@ This creates a new `.sql` file inside your `drizzle/` migrations folder.
 Run pgfence against the generated SQL file:
 
 ```bash copy
-npx @flvmnt/pgfence analyze drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/*.sql
 ```
 
 pgfence parses each SQL statement using PostgreSQL's actual parser and checks it against known dangerous patterns.
@@ -91,11 +89,11 @@ After running `drizzle-kit generate`, the SQL migration might look like this:
 ALTER TABLE "users" ADD COLUMN "age" integer NOT NULL DEFAULT 0;
 ```
 
-Running `npx @flvmnt/pgfence analyze drizzle/0001_add_age.sql` produces output like:
+Running `npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/0001_add_age.sql` produces output like:
 
 <Section>
 ```bash copy
-npx @flvmnt/pgfence analyze drizzle/0001_add_age.sql
+npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/0001_add_age.sql
 ```
 
 ```plaintext
@@ -182,7 +180,7 @@ jobs:
       - run: npm install
 
       - name: Analyze migrations
-        run: npx @flvmnt/pgfence analyze --ci --max-risk medium --output github drizzle/*.sql
+        run: npx --yes @flvmnt/pgfence@0.2.1 analyze --ci --max-risk medium --output github drizzle/*.sql
 ```
 
 The `--ci` flag makes pgfence exit with code 1 when any finding exceeds the `--max-risk` threshold. The `--output github` flag formats the output as a markdown summary suitable for GitHub PR comments.
@@ -197,13 +195,13 @@ pgfence supports multiple output formats that you can choose with the `--output`
 
 ```bash copy
 # Default CLI table output
-npx @flvmnt/pgfence analyze drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/*.sql
 
 # Machine-readable JSON
-npx @flvmnt/pgfence analyze --output json drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.1 analyze --output json drizzle/*.sql
 
 # GitHub PR comment markdown
-npx @flvmnt/pgfence analyze --output github drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.1 analyze --output github drizzle/*.sql
 ```
 
 ## Further reading
