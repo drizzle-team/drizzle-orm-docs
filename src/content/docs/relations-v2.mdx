@@ -981,7 +981,7 @@ export const relations = defineRelations({ users, posts }, (r) => ({
       alias: "author",
     }),
     reviewer: r.one.users({
-      from: r.posts.authorId,
+      from: r.posts.reviewerId,
       to: r.users.id,
       alias: "reviewer",
     }),
