@@ -1,0 +1,68 @@
+import Callout from '@mdx/Callout.astro';
+
+# SQLite STRICT Tables
+
+SQLite [STRICT tables](https://www.sqlite.org/stricttables.html) enforce column type affinity at the database level - SQLite rejects values that don't match the declared column type instead of silently coercing them.
+
+## Usage
+
+```ts
+import { sqliteTable, int, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+  age: int('age'),
+}).strict();
+```
+
+Generates:
+
+```sql
+CREATE TABLE `users` (
+  `id` integer PRIMARY KEY NOT NULL,
+  `name` text NOT NULL,
+  `age` integer
+) STRICT;
+```
+
+## Valid column types
+
+STRICT tables only allow these types:
+
+| Type | Description |
+| :--- | :---------- |
+| `INT` / `INTEGER` | Signed integer |
+| `REAL` | Floating point |
+| `TEXT` | Text string |
+| `BLOB` | Binary data |
+| `ANY` | Allows any type (no enforcement) |
+
+<Callout type="warning">
+Using other types (like `VARCHAR` or `BOOLEAN`) will trigger a warning during migration generation and SQLite will reject the DDL at runtime.
+</Callout>
+
+## Behavior
+
+Regular SQLite tables allow type coercion:
+
+```ts
+// Regular table - SQLite stores "hello" in an integer column
+await db.execute(sql`INSERT INTO users (age) VALUES ('hello')`);
+```
+
+STRICT tables reject mismatched types:
+
+```ts
+// STRICT table - throws error
+await db.execute(sql`INSERT INTO users (age) VALUES ('hello')`);
+// Error: cannot store TEXT value in INTEGER column
+```
+
+## Introspection
+
+`drizzle-kit pull` detects existing STRICT tables and generates `.strict()` in the schema.
+
+<Callout type="info">
+STRICT tables require SQLite 3.37.0+ (November 2021).
+</Callout>
