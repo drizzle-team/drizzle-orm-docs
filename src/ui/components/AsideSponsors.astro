@@ -12,6 +12,10 @@ const getStyleString = (style: CSSProperties) => {
   }, "");
 };
 
+const superHeroSponsors = rotateArrayDaily(
+  asideSponsors.filter(({ tier }) => tier.name === "$5000 a month")
+);
+
 const heroSponsors = rotateArrayDaily(
   asideSponsors.filter(({ tier }) => tier.name === "$2500 a month")
 );
@@ -38,6 +42,51 @@ const goldSponsors = (() => {
 
 <div class="aside-sponsors__wrap">
   <div class="aside-sponsors__hero">
+    {superHeroSponsors.map((sponsor) => (
+      <a
+        class:list={[
+          "aside-sponsors__sponsor border-highlight",
+          "aside-sponsors__hero-sponsor",
+          "aside-sponsors__superhero-sponsor",
+        ]}
+        href={`https://${sponsor.sponsorEntity.login}`}
+        target="_blank"
+        rel={sponsor.followLink ? "" : "nofollow"}
+      >
+        <div class="aside-sponsors__sponsor-wrap">
+          {!!sponsor.badge && (
+            <div class="aside-sponsors__top-banner">
+              <span>{sponsor.badge}</span>
+            </div>
+          )}
+          <div
+            class="aside-sponsors__sponsor-image"
+            id="aside-sponsors-img-wrapper"
+          >
+            <img
+              class="aside-sponsors__light-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              style={getStyleString(sponsor.lightStyle || {})}
+            />
+            <img
+              class="aside-sponsors__dark-img"
+              loading="lazy"
+              src={
+                "data:image/svg+xml;base64," +
+                btoa(sponsor.sponsorEntity.avatarUrl)
+              }
+              alt={sponsor.sponsorEntity.name || sponsor.sponsorEntity.login}
+              style={getStyleString(sponsor.darkStyle || {})}
+            />
+          </div>
+        </div>
+        {!!sponsor.popover && <div class="popover">{sponsor.popover}</div>}
+      </a>
+    ))}
     {heroSponsors.map((sponsor) => (
       <a
         class:list={[
@@ -249,6 +298,15 @@ const goldSponsors = (() => {
     padding-top: 16px;
   }
 
+  .aside-sponsors__superhero-sponsor {
+    height: 122px;
+  }
+
+  .aside-sponsors__superhero-sponsor .aside-sponsors__sponsor-image {
+    height: 96px;
+    width: 96px;
+  }
+
   .aside-sponsors__sponsor:hover::before {
     opacity: 1;
   }
@@ -334,7 +392,7 @@ const goldSponsors = (() => {
     align-items: center;
     justify-content: center;
     z-index: 10;
-    border-radius: 4px 4px 0 0;
+    border-radius: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.03);
     transition: background 0.2s ease;
   }
@@ -414,13 +472,22 @@ const goldSponsors = (() => {
       height: 62px;
     }
 
+    body:not(:has(#banner)) .aside-sponsors__superhero-sponsor {
+      height: 124px;
+    }
+
     body:not(:has(#banner)) .aside-sponsors__sponsor-image {
       height: 40px;
       width: 40px;
     }
+
+    body:not(:has(#banner)) .aside-sponsors__superhero-sponsor .aside-sponsors__sponsor-image {
+      height: 80px;
+      width: 80px;
+    }
   }
 
-  @media screen and (max-height: 964px) {
+  @media screen and (max-height: 1027px) {
       .aside-sponsors__sponsor--hide {
           display: none;
       }
