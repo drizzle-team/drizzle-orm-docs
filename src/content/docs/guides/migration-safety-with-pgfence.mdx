@@ -15,7 +15,7 @@ import Steps from "@mdx/Steps.astro";
 - [Drizzle migrations](/docs/kit-overview#running-migrations)
 </Prerequisites>
 
-When you run `drizzle-kit generate`, Drizzle creates plain SQL migration files in your `drizzle/` folder. Before applying those migrations to production, you can use [pgfence](https://pgfence.dev) to analyze them for dangerous lock patterns and get safe rewrite suggestions.
+When you run `drizzle-kit generate`, Drizzle creates plain SQL migration files in your `drizzle/` folder. Before applying those migrations to production, you can use [pgfence](https://pgfence.com) to analyze them for dangerous lock patterns and get safe rewrite suggestions.
 
 [pgfence](https://github.com/flvmnt/pgfence) is a Postgres migration safety CLI that reads your SQL files and reports:
 
@@ -52,7 +52,7 @@ This creates a new `.sql` file inside your `drizzle/` migrations folder.
 Run pgfence against the generated SQL file:
 
 ```bash copy
-npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.3 analyze drizzle/*.sql
 ```
 
 pgfence parses each SQL statement using PostgreSQL's actual parser and checks it against known dangerous patterns.
@@ -89,11 +89,11 @@ After running `drizzle-kit generate`, the SQL migration might look like this:
 ALTER TABLE "users" ADD COLUMN "age" integer NOT NULL DEFAULT 0;
 ```
 
-Running `npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/0001_add_age.sql` produces output like:
+Running `npx --yes @flvmnt/pgfence@0.2.3 analyze drizzle/0001_add_age.sql` produces output like:
 
 <Section>
 ```bash copy
-npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/0001_add_age.sql
+npx --yes @flvmnt/pgfence@0.2.3 analyze drizzle/0001_add_age.sql
 ```
 
 ```plaintext
@@ -180,13 +180,13 @@ jobs:
       - run: npm install
 
       - name: Analyze migrations
-        run: npx --yes @flvmnt/pgfence@0.2.1 analyze --ci --max-risk medium --output github drizzle/*.sql
+        run: npx --yes @flvmnt/pgfence@0.2.3 analyze --ci --max-risk medium --output github drizzle/*.sql
 ```
 
 The `--ci` flag makes pgfence exit with code 1 when any finding exceeds the `--max-risk` threshold. The `--output github` flag formats the output as a markdown summary suitable for GitHub PR comments.
 
 <Callout type="info" title="Size-aware risk scoring">
-For more accurate risk assessment, pgfence can factor in table sizes. Generate a stats snapshot from your read replica with `pgfence extract-stats` and pass it via `--stats-file pgfence-stats.json`. Tables with over 1 million rows automatically escalate risk levels. See the [pgfence docs](https://pgfence.dev) for details.
+For more accurate risk assessment, pgfence can factor in table sizes. Generate a stats snapshot from your read replica with `pgfence extract-stats` and pass it via `--stats-file pgfence-stats.json`. Tables with over 1 million rows automatically escalate risk levels. See the [pgfence docs](https://pgfence.com) for details.
 </Callout>
 
 ## Output formats
@@ -195,18 +195,18 @@ pgfence supports multiple output formats that you can choose with the `--output`
 
 ```bash copy
 # Default CLI table output
-npx --yes @flvmnt/pgfence@0.2.1 analyze drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.3 analyze drizzle/*.sql
 
 # Machine-readable JSON
-npx --yes @flvmnt/pgfence@0.2.1 analyze --output json drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.3 analyze --output json drizzle/*.sql
 
 # GitHub PR comment markdown
-npx --yes @flvmnt/pgfence@0.2.1 analyze --output github drizzle/*.sql
+npx --yes @flvmnt/pgfence@0.2.3 analyze --output github drizzle/*.sql
 ```
 
 ## Further reading
 
-- [pgfence documentation](https://pgfence.dev)
+- [pgfence documentation](https://pgfence.com)
 - [pgfence on GitHub](https://github.com/flvmnt/pgfence)
 - [pgfence on npm](https://www.npmjs.com/package/@flvmnt/pgfence)
 - [Drizzle Kit migrations](/docs/kit-overview#running-migrations)
