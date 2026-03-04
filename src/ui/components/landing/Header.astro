@@ -13,11 +13,19 @@ import LoveImage from '@/assets/images/landing/Love.png'
 import CrossOutImage from "@/assets/images/landing/CrossOut.png";
 import DBImageDark from "@/assets/images/landing/dbDark.svg"
 import DBImage from "@/assets/images/landing/dbLight.svg"
+import PlanetScaleImage from "@/assets/images/landing/planetScale.png"
+import PlanetScaleDarkImage from "@/assets/images/landing/planetScale-dark.png"
+
 ---
 <div class="header_container">
   <div class="header-left">
     <div class="title">
       ORM for you to <span class="settle">settle<Image src={CrossOutImage} alt="cross-out" class="cross-out"/><span class="ship">ship ship ship</span></span>
+    </div>
+    <div class="ps-label">
+      <span>backed by</span>
+      <Image src={PlanetScaleImage} alt="planetScale" class="img_light" />
+      <Image src={PlanetScaleDarkImage} alt="planetScale" class="img_dark" />
     </div>
     <div class="tags">
       <div class="tag">
@@ -298,6 +306,33 @@ import DBImage from "@/assets/images/landing/dbLight.svg"
   }
 </style>
 <style>
+  .ps-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #414141;
+    margin-top: 2px;
+  }
+
+  html.dark .ps-label {
+    color: #e1e3e6;
+  }
+
+  .ps-label img {
+    height: 16px;
+    width: auto;
+  }
+
+  .ps-label .img_light {
+    filter: invert(0.5);
+  }
+
+  .ps-label .img_dark {
+    filter: brightness(0.8);
+  }
+
   .header_container {
     max-width: 910px;
     margin: 144px auto 0;
