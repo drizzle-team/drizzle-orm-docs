@@ -1,29 +1,30 @@
-import { Image } from 'astro:assets';
-import roman from '@/assets/images/core/roman.jpg';
-import smm from '@/assets/images/core/smm.jpg';
-import group from '@/assets/images/core/group.jpeg';
-import alex_sherman from '@/assets/images/core/alex_sherman.jpg';
-import reka from '@/assets/images/team/reka.png'
-import andrew from '@/assets/images/core/andrew.jpeg'
-import blokh from '@/assets/images/core/blokh.jpeg'
-import dan from '@/assets/images/core/dan.jpeg'
+import { Image } from "astro:assets";
+import roman from "@/assets/images/core/roman.jpg";
+import smm from "@/assets/images/core/smm.jpg";
+import group from "@/assets/images/core/group.jpeg";
+import alex_sherman from "@/assets/images/core/alex_sherman.jpg";
+import reka from "@/assets/images/team/reka.png";
+import andrew from "@/assets/images/core/andrew.jpeg";
+import blokh from "@/assets/images/core/blokh.jpeg";
+import dan from "@/assets/images/core/dan.jpeg";
 
 # Drizzle Sustainability
 
-We've been building Drizzle since 2021, and while the project has gone through a few evolutions (and emotional breakdowns) 
+We've been building Drizzle since 2021, and while the project has gone through a few evolutions (and emotional breakdowns)
 the core idea and vision never changed.
 
 Throughout the years we've got 100+ sponsors, from awesome individuals to great companies supporting our work
 
 As of March 2026 PlanetScale hired entire Drizzle core team and becomes the biggest backer we have!
 
-They hired the whole team so we can keep working on Drizzle full-time, keep cooking on the roadmap, 
+They hired the whole team so we can keep working on Drizzle full-time, keep cooking on the roadmap,
 ship more improvements, and continue building all the ambitious stuff we've wanted to bring to the community.
 
-After a lot of great conversations with the PlanetScale team and Sam Lambert, we all came to the same conclusion: 
+After a lot of great conversations with the PlanetScale team and Sam Lambert, we all came to the same conclusion:
 the best way to make Drizzle the most sustainablest ORM on Earth was to just join forces.
 
 So now PlanetScale is our biggest sponsor, they hired us, and we get to keep doing what we love:
+
 - building for the community,
 - obsessing over DX,
 - and making SQL and Databases way to fun an easy to work with
@@ -32,84 +33,199 @@ So now PlanetScale is our biggest sponsor, they hired us, and we get to keep doi
 
 So here we are, all core drizzle team members
 
-<Image src={group} alt="group" width={600} />
-
+<Image src={group} alt="group" />
 
 #### But let's talk about each of us:
 
-- **Oleksandr Blokh** (**Alex**)
+<style>{`
+  .team-member {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
 
-Alex co-created Drizzle and helped start the Drizzle team. He's been here since 2021, when the first code was written for `drizzle-orm`
+  .team-member__info {
+    flex: 0 0 50%;
+    max-width: 50%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
 
-Now he leads core Drizzle development and works on Drizzle Studio, OneDollarStats, RubberBoots and other project
+  .team-member__name {
+    margin-top: 0 !important;
+    margin-bottom: 0.75rem;
+  }
 
-<Image src={blokh} alt="Blokh" />
+  .team-member__photo {
+    width: 100%;
+    max-width: 50%;
+    flex: 0 0 50%;
+    border-radius: 12px;
+  }
 
-Give him a sub [on X](https://x.com/_alexblokh) • [GitHub](https://github.com/AlexBlokh)
+  @media (max-width: 900px) {
+    .team-member {
+      flex-direction: column-reverse;
+      gap: 1rem;
+    }
 
-<br/>
+    .team-member__photo {
+      width: 100%;
+      max-width: 320px;
+      flex: 0 0 auto;
+      align-self: center;
+    }
 
-- **Andrii Sherman** (**Andrew**)
+    .team-member__info {
+      max-width: 100%;
+      flex: 0 0 auto;
+    }
+  }
+`}</style>
 
-Andrew is another drizzle co-creator and co-founder. Back in 2020 he wrote a drizzle orm in Java. Later, seeing the need for the same kind of tool in the 
-TypeScript world, he and Alex pivoted it to TypeScript. That's where it all started.
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">Oleksandr Blokh (Alex)</h4>
+    <p>
+      Alex co-created Drizzle and helped start the Drizzle team. He's been here
+      since 2021, when the first code was written for <code>drizzle-orm</code>.
+    </p>
+    <p>
+      Now he leads core Drizzle development and works on Drizzle Studio,
+      OneDollarStats, RubberBoots, and other projects.
+    </p>
+    <p>
+      Give him a sub <a href="https://x.com/_alexblokh">on X</a> •{" "}
+      <a href="https://github.com/AlexBlokh">GitHub</a>
+    </p>
+  </div>
+  <Image
+    class="team-member__photo"
+    src={blokh}
+    alt="Oleksandr Blokh"
+    width={400}
+  />
+</section>
 
-<Image src={andrew} alt="Andrew" width={400} />
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">Andrii Sherman (Andrew)</h4>
+    <p>
+      Andrew is another Drizzle co-creator and co-founder. Back in 2020, he
+      wrote a Drizzle ORM in Java. Later, seeing the need for the same kind of
+      tool in the TypeScript world, he and Alex pivoted it to TypeScript. That's
+      where it all started.
+    </p>
+    <p>
+      Give him a sub <a href="https://x.com/andrii_sherman">on X</a> •{" "}
+      <a href="https://github.com/AndriiSherman">GitHub</a>
+    </p>
+  </div>
+  <Image
+    class="team-member__photo"
+    src={andrew}
+    alt="Andrii Sherman"
+    width={400}
+  />
+</section>
 
-Give him a sub [on X](https://x.com/andrii_sherman) • [GitHub](https://github.com/AndriiSherman)
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">Dan Kochetov</h4>
+    <p>
+      Dan was the first to take on a full <code>drizzle-orm</code> rewrite and
+      turn it into the API you know today. He also created the first version of
+      Relational Queries.
+    </p>
+    <p>
+      Now, after a short break, Dan is back in action and ready to ship more
+      great things for Drizzle.
+    </p>
+    <p>
+      Give him a sub <a href="https://x.com/bloberenober">on X</a> •{" "}
+      <a href="https://github.com/dankochetov">GitHub</a>
+    </p>
+  </div>
+  <Image class="team-member__photo" src={dan} alt="Dan Kochetov" width={400} />
+</section>
 
-<br/>
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">Roman Nabukhotnyi (Zeus)</h4>
+    <p>
+      Roman (Zeus) is working hard to bring Drizzle Studio to you in every
+      possible form.
+    </p>
+    <p>
+      Roman is writing a lot about Drizzle Studio{" "}
+      <a href="https://x.com/nabukhotnyi">on X</a> •
+      <a href="https://github.com/RomanNabukhotnyi">GitHub</a>
+    </p>
+  </div>
+  <Image
+    class="team-member__photo"
+    src={roman}
+    alt="Roman Nabukhontyi"
+    width={400}
+  />
+</section>
 
-- **Dan Kochetov** 
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">Serhii Reka</h4>
+    <p>
+      Serhii rewrote Relational Queries, mastered TypeScript types at the
+      highest level, and continues shipping great features to the{" "}
+      <code>drizzle</code> ecosystem.
+    </p>
+    <p>
+      Give him a sub <a href="https://x.com/s_reka_">on X</a> •{" "}
+      <a href="https://github.com/Sukairo-02">GitHub</a>
+    </p>
+  </div>
+  <Image class="team-member__photo" src={reka} alt="Serhii Reka" width={400} />
+</section>
 
-Dan was the first to take on a full `drizzle-orm` rewrite and turn it into the API you know today. He also created the first version of Relational Queries
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">Oleksandr Sherman</h4>
+    <p>
+      Oleksandr ("Sania") is a <code>drizzle-kit</code> wizard. He helped
+      rewrite the
+      <code>alternation-engine</code>, the drizzle-kit test suite, and is now on
+      a mission to make sure there are 0 GitHub issues left with the{" "}
+      <code>drizzle-kit</code> tag.
+    </p>
+    <p>
+      Give him a sub <a href="https://x.com/_alex_sherman">on X</a> •{" "}
+      <a href="https://github.com/AleksandrSherman">GitHub</a>
+    </p>
+  </div>
+  <Image
+    class="team-member__photo"
+    src={alex_sherman}
+    alt="Oleksandr Sherman"
+    width={400}
+  />
+</section>
 
-Now, after a short break, Dan is back in action and ready to ship more great things for Drizzle
-
-<Image src={dan} alt="Dan" width={400} />
-
-Give him a sub [on X](https://x.com/bloberenober) • [GitHub](https://github.com/dankochetov)
-
-<br/>
-
-- **Roman Nabukhontyi** (**Zeus**): 
-
-Roman (Zeus) is working hard to bring Drizzle Studio to you in every possible form
-
-<Image src={roman} alt="Roman" width={400} />
-
-Roman is writing a lot about Drizzle Studio [on X](https://x.com/nabukhotnyi) • [GitHub](https://github.com/RomanNabukhotnyi)
-
-<br/>
-
-- **Serhii Reka** 
-
-Serhii rewrote Relational Queries, mastered TypeScript types at the highest level, and continues shipping great features to the `drizzle` ecosystem
-
-<Image src={reka} alt="Reka" width={400} />
-
-Give him a sub: [X](https://x.com/s_reka_) • [GitHub](https://github.com/Sukairo-02)
-
-<br/>
-
-- **Oleksandr Sherman**
-
-Oleksandr ("Sania") is a `drizzle-kit` wizard. He helped rewrite the `alternation-engine`, drizzle-kit test suite, and is now on 
-a mission to make sure there are 0 GitHub issues left with the `drizzle-kit` tag
-
-<Image src={alex_sherman} alt="Alex_S" width={400} />
-
-Give him a sub: [X](https://x.com/_alex_sherman) • [GitHub](https://github.com/AleksandrSherman)
-
-<br/>
-
-- **SMM manager**
-
-"I'm now professionally responsible for what used to happen on X for free" (c)
-
-<Image src={smm} alt="SMM" width={400} />
-
-Give him a sub: [X](https://x.com/DrizzleOrm)
+<section class="team-member">
+  <div class="team-member__info">
+    <h4 class="team-member__name">SMM Manager</h4>
+    <p>
+      "I'm now professionally responsible for what used to happen on X for free"
+      (c)
+    </p>
+    <p>
+      Give him a sub: <a href="https://x.com/DrizzleOrm">X</a>
+    </p>
+  </div>
+  <Image class="team-member__photo" src={smm} alt="SMM Manager" width={400} />
+</section>
 
 ## Revenue flow
 
@@ -118,6 +234,7 @@ Drizzle is not only `drizzle-orm` repository, we have a different set of product
 #### Drizzle Studio
 
 Drizzle Studio is a web based modern database browser which comes in a form of:
+
 1. [Drizzle Studio for Local Development](https://orm.drizzle.team/drizzle-studio/overview) for your Drizzle ORM projects
 2. [Drizzle Studio Chrome Extension](https://driz.link/extension) which lets you browse PlanetScale, Cloudflare D1, Vercel Postgres and AWS Data API directly in their native consoles
 3. [Drizzle Studio Gateway](https://gateway.drizzle.team) is a deployable Dockerized version of Studio on steroids, which you can put into your infrastructure and connect privately to your databases
@@ -125,7 +242,7 @@ Drizzle Studio is a web based modern database browser which comes in a form of:
 
 #### OneDollarStats
 
-As with everything we ship, analytics is a product we originally built for our own use across different commercial projects. 
+As with everything we ship, analytics is a product we originally built for our own use across different commercial projects.
 We found a way to make it this affordable and bring it to the community, so you don't need to spend a lot on web analytics.
 
 We've priced it at $1/mo with no limits for now, and we'll soon introduce usage-based pricing
@@ -138,15 +255,15 @@ Something we didn't release yet
 
 ## Drizzle LLC
 
-Drizzle is a legal entity based in Ukraine. 
+Drizzle is a legal entity based in Ukraine.
 Besides the 5 core Drizzle team members, we also have 18 more developers working with us on different production-grade apps in outsourcing and consulting.
 
 This actually helps us build Drizzle in two big ways.
 
 - First, it gives us another source of income, which means we can keep reinvesting into open-source work, testing new ideas, and pushing Drizzle forward.
-- Second, it gives us a ton of real-world experience. We work on all kinds of projects (web, mobile, desktop, etc) across different languages, with a big focus on TypeScript. 
-That also means we get hands-on experience with lots of frameworks, hosting platforms, and different ways people build and ship products.
+- Second, it gives us a ton of real-world experience. We work on all kinds of projects (web, mobile, desktop, etc) across different languages, with a big focus on TypeScript.
+  That also means we get hands-on experience with lots of frameworks, hosting platforms, and different ways people build and ship products.
 
-A big reason Drizzle became what it is today is because we never locked ourselves into building just one thing. We're constantly 
+A big reason Drizzle became what it is today is because we never locked ourselves into building just one thing. We're constantly
 working on different kinds of projects, and that gives us new ideas, a broader perspective, and the kind of experience that helps us
 build Drizzle in a way it is right now
