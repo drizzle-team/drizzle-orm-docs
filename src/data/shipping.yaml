@@ -1,3 +1,120 @@
+2026-03:
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.16'>v1.0.0-beta.16</a> release</b>
+
+    Fixed a regression for migrations we had in `beta` branch. Here is a set of important changes:
+    <ul>
+    <li>Added migration table versioning</li>
+    <li>In a new version we've added the `name` column that stores the full folder name of the migration</li>
+    <li>Matching by folder name instead of timestamps</li>
+    <li>Automatic upgrade with smart backfilling</li>
+    <li>New commutativity checks (`drizzle-kit check`)</li>
+    </ul>
+
+2026-02:
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.15'>v1.0.0-beta.15</a> release</b>
+
+    <ul>
+    <li>We've stopped maintaining separate validator packages (e.g., drizzle-zod, drizzle-valibot) and moved them into the drizzle-orm repo. This consolidates everything into a single package and eliminates the need to manage separate peer dependencies and versioning.</li>
+    <li>New validation package is available: drizzle-orm/effect-schema</li>
+    <li>Fixed sqlite select not allowing SQL.Aliased in `.orderBy(...)`, `.groupBy(...)`</li>
+    <li>Made name argument in .prepare(name) optional in Gel, Postgres, Cockroach dialects (generated automatically if not passed)</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.14'>v1.0.0-beta.14</a> release</b>
+
+    <ul>
+    <li>The migrator now applies all changes that are missing in the database. Previously the migrator only looked for local migrations with a creation date later than the last migration applied in the database</li>
+    </ul>
+
+    <b>Bug fixes</b>
+    <ul>
+    <li>[BUG]: Cache is not invalidated after table updates</li>
+    <li>[BUG]: Composite index with sort outputs a malformed SQL</li>
+    <li>[BUG]: db introspection generates broken schema.ts syntax</li>
+    <li>random property is set on Array.prototype with enumerable: true</li>
+    <li>Fixed error TS7056 appearing when using "declaration": true in defineRelations with reworked PgColumns</li>
+    <li>[BUG]: mssql transaction is not a function</li>
+    <li>Fixed an error when seeding a composite unique column that includes a foreign key</li>
+    <li>Postgres: DROP INDEX statement did not respect schema</li>
+    <li>Restricted usage of async functions in sync drivers' transactions</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.13'>v1.0.0-beta.13</a> release</b>
+
+    <ul>
+    <li>Enabled top-level await in drizzle-kit.config and schema files on Node.js by replacing require() with async loadModule() using jiti</li>
+    <li>Fixed [FEATURE]: Support Top-level await in drizzle.config.ts</li>
+    <li>Fixed [BUG]: SyntaxError: Cannot use import statement outside a module with drizzle-kit</li>
+    <li>Native Effect Logger integration</li>
+    <li>New Effect Cache configuration</li>
+    </ul>
+2026-01:
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.12'>v1.0.0-beta.12</a> release</b>
+
+    <ul>
+    <li>`.generatedAlwaysAs()` know only accepts sql`` and () => sql``</li>
+    <li>Postgresql dialect now have extra schema errors in ts files on generate and push commands:</li>
+    <li>SQLite dialect now have extra schema errors in ts files on generate and push commands:</li>
+    </ul>
+
+    <ul>
+    <b>Bug fixes</b>
+    <li>[BUG]: drizzle-kit generate silently exits with code 1</li>
+    <li>[BUG]:Unable to resolve module node:crypto</li>
+    <li>[BUG]: The package at "node_modules/.bun/drizzle-orm@1.0.0-beta.2-6565b14+35e4bda3077d71da/node_modules/drizzle-orm/migrator.js" attempted to import the Node standard library module "node:crypto". It failed because the native React runtime does not include the Node standard library.</li>
+    <li>[BUG]: Problem with backslash in check constraint</li>
+    <li>[BUG]: drizzle-kit up throws error "Cannot convert undefined or null to object"</li>
+    <li>Fixed bun-sqlite db.get(...) returning data in array mode instead of object mode</li>
+    <li>Fixed effect-postgres driver ignoring cache config option</li>
+    <li>[BUG]: Types do not allow for placeholder usage in onConflictDoUpdate.set</li>
+    <li>[BUG]: alias doesn't work with views (Postgres)</li>
+    <li>[BUG]: select()...for("...", { of: table }) uses qualified name of table</li>
+    <li>[BUG]: arrayContains() generates incorrect SQL parameters for PostgreSQL, leading to operator does not exist: text[] @> record error</li>
+    <li>[BUG]: Params not inlined for single-table selects</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.11'>v1.0.0-beta.11</a> release</b>
+
+    <ul>
+    <li>Defaulted PgTimestampString timezone offset to be +00 when value gets returned as Date instance</li>
+    <li>Pg: Cache is now used only when explicitly defined. In recent beta versions caching was still applied even when no cache was configured</li>
+    <li>Separated date and int-exclusive column methods from common pg builder (separated .defaultNow(), .generatedAlwaysAsIdentity(), .generatedByDefaultAsIdentity())</li>
+    </ul>
+
+    <b>Bug fixes</b>
+    <ul>
+    <li>[BUG]:drizzle-kit pull generates incorrect schema for functional/computed index</li>
+    <li>[BUG]: drizzle-kit pull generates invalid code for MySQL datetime with DEFAULT CURRENT_TIMESTAMP ON UPDATE</li>
+    <li>[BUG]: Drizzle-kit - push tries to delete non-public schemas by default (pscale_extensions)</li>
+    <li>[BUG]: JSON.stringify cannot serialize BigInt</li>
+    <li>Commutativity for MySQL now(N) and CURRENT_TIMESTAMP(N)</li>
+    </ul>
+
+    <ul>
+    <b>MySQL pull command:</b>
+    <li>Creation of a primary key when a column had only UNIQUE and NOT NULL</li>
+    <li>varbinary() config was ignored in a ts schema file</li>
+    <li>Foreign key column duplication when constraint names matched across multiple databases</li>
+    <li>Inconsistent casing between schema.ts and relations.ts</li>
+    <li>Cyclic references are generated as inline .references((): AnyMySqlColumn => ...) to avoid type errors for single-column references</li>
+    </ul>
+
+    <ul>
+    <b>Common:</b>
+    <li>Relation name collisions with column names during introspection. If a relation name collides with a column name - the relation is renamed to <name>Relation</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.9'>v1.0.0-beta.9</a> release</b>
+
+    <ul>
+    <li>Native @effect/sql-pg driver support </li>
+    <li>Reworked PgColumn type chain</li>
+    <li>Fixed lack of query result recalculation on pg dynamic update with joins</li>
+    <li>Switched MySQL2 default client from CallbackPool to Pool</li>
+    </ul>
 2025-12:
   - |
     <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.8'>v1.0.0-beta.8</a> release</b>
