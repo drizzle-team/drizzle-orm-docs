@@ -1,13 +1,12 @@
 import { defineConfig } from "astro/config";
+import { loadEnv } from "vite";
 import mdx from "@astrojs/mdx";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
-import yaml from '@rollup/plugin-yaml';
-import {
-  codeSnippetTransformer,
-} from './src/transformers';
+import yaml from "@rollup/plugin-yaml";
+import { codeSnippetTransformer } from "./src/transformers";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -16,11 +15,14 @@ import {
   transformerNotationErrorLevel,
   transformerMetaHighlight,
   transformerMetaWordHighlight,
-} from '@shikijs/transformers';
+} from "@shikijs/transformers";
+
+const env = loadEnv(process.env.NODE_ENV, process.cwd(), "");
+const isProd = env.PROD_BUILD === "true";
 
 // https://astro.build/config
 export default defineConfig({
-  site: import.meta.env.DEV ? "http://localhost:4321" : "https://orm.drizzle.team",
+  site: isProd ? "https://orm.drizzle.team" : "http://localhost:4321",
   build: {
     format: "file", // mandatory due to CloudFlare Pages trailing slash problem
   },
@@ -29,24 +31,26 @@ export default defineConfig({
     css: {
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler',
+          api: "modern-compiler",
         },
       },
-    }
+    },
   },
   image: {
     domains: ["img.youtube.com"],
   },
-  prefetch: import.meta.env.DEV ? undefined : {
-    prefetchAll: true,
-    defaultStrategy: "viewport",
-  },
+  prefetch: isProd
+    ? {
+        prefetchAll: true,
+        defaultStrategy: "viewport",
+      }
+    : undefined,
   integrations: [
     mdx(),
     react({
       experimentalReactChildren: true,
     }),
-    sitemap(),
+    ...(isProd ? [sitemap()] : []),
   ],
   markdown: {
     rehypePlugins: [
@@ -60,7 +64,7 @@ export default defineConfig({
             ariaHidden: true,
             tabIndex: -1,
           },
-          test: ['h2', 'h3', 'h4', 'h5'],
+          test: ["h2", "h3", "h4", "h5"],
         },
       ],
     ],
@@ -75,7 +79,7 @@ export default defineConfig({
         transformerNotationErrorLevel(),
         transformerMetaHighlight(),
         transformerMetaWordHighlight(),
-      ]
+      ],
     },
   },
   shikiConfig: {
