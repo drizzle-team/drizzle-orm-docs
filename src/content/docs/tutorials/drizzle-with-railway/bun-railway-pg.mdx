@@ -318,7 +318,7 @@ Once deployed, navigate to the `Architecture` tab in your Railway project. You s
 
 ![](@/assets/images/tutorials/8.png)
 
-<Callout type="warning" collapsed="Alternative: separate migration step for zero-downtime deployments">
+<Callout type="warning" title="Alternative: Zero-downtime migrations">
 This tutorial applies migrations at application startup using `migrate()`. This is the simplest approach and works well for most applications.
 
 If you need **zero-downtime deployments**, you may want to run migrations as a **separate step** before the new version of your app starts receiving traffic. This way you can rollback the application independently from the database changes.
