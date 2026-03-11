@@ -1,5 +1,5 @@
 ---
-title: "Drizzle with Bun, Railway and PostgreSQL"
+title: "Drizzle with Bun and PostgreSQL on Railway"
 date: "2026-03-07"
 svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>']
 ---
@@ -10,7 +10,7 @@ import Steps from "@mdx/Steps.astro";
 import Section from "@mdx/Section.astro";
 import Callout from "@mdx/Callout.astro";
 
-This tutorial demonstrates how to use Drizzle ORM with [Bun](https://bun.sh/) runtime and [Railway](https://railway.app/) PostgreSQL database.
+This tutorial demonstrates how to use Drizzle ORM with [Bun](https://bun.sh/) runtime and a PostgreSQL database, all deployed on [Railway](https://railway.app/).
 
 <Prerequisites>
   - You should have [Bun](https://bun.sh/) installed. You can install it by following the [official guide](https://bun.sh/docs/installation).
@@ -53,7 +53,7 @@ Click on the PostgreSQL service in your project, go to the `Variables` tab, and 
 postgresql://postgres:password@region.railway.app:port/railway
 ```
 
-![](@/assets/images/tutorials/5.png)
+![](@/assets/images/tutorials/3.png)
 
 <Callout type="warning">
 Railway provides two types of database connection URLs:
@@ -218,7 +218,7 @@ This is the basic file structure of the project. In the `src` directory, we have
  └ 📜 tsconfig.json
 ```
 
-## Deploy to Railway
+## Deploy the App to Railway
 
 <Steps>
 #### Apply migrations before deploying
@@ -287,9 +287,9 @@ Create a new repository on GitHub and push your code to it.
 
 In your Railway project, click the `New` button in the top right corner of the canvas and select `GitHub Repo`. Connect your GitHub account if prompted, then select the repository you just pushed.
 
-![](@/assets/images/tutorials/6.png)
+![](@/assets/images/tutorials/4.png)
 
-![](@/assets/images/tutorials/7.png)
+![](@/assets/images/tutorials/5.png)
 
 #### Configure environment variables
 
@@ -301,19 +301,67 @@ Click `Add Variable`, set the name to `DATABASE_URL`, and use the Railway variab
 The `${{Postgres.DATABASE_URL}}` reference variable automatically resolves to the **private** internal connection string at runtime, which is optimal for service-to-service communication within Railway. This is different from the public URL you use in your local `.env` file.
 </Callout>
 
-![](@/assets/images/tutorials/8.png)
+![](@/assets/images/tutorials/6.png)
 
 #### Deploy
 
 Railway will automatically deploy your application when you push to the connected branch. You can monitor the deployment in the `Deployments` tab.
 
-![](@/assets/images/tutorials/9.png)
+![](@/assets/images/tutorials/7.png)
 
 #### Verify your setup
 
 Once deployed, navigate to the `Architecture` tab in your Railway project. You should see your application service connected to the PostgreSQL database.
 
+![](@/assets/images/tutorials/8.png)
+
+</Steps>
+
+## Deploy Drizzle Studio to Railway
+
+You can deploy [Drizzle Studio](/docs/drizzle-studio/overview) alongside your application on Railway to browse and manage your database directly from the browser. You can use the [Drizzle Studio Railway template](https://railway.com/deploy/drizzle-studio-1) or follow the steps below.
+
+<Steps>
+#### Add a new service from a template
+
+In your Railway project, click the `New` button in the top right corner of the canvas and select `Template`.
+
+![](@/assets/images/tutorials/9.png)
+
+#### Select the Drizzle Studio template
+
+Search for `drizzle studio` and select the **Drizzle Studio** template by Drizzle.
+
 ![](@/assets/images/tutorials/10.png)
+
+#### Configure environment variables and deploy
+
+The template comes with two pre-configured environment variables:
+
+- `PASSCODE` - the password for secure access to your Studio instance. It defaults to `${{secret()}}`, which generates a random secret.
+- `DATABASE_URL` - the database connection string. Set it to `${{Postgres.DATABASE_URL}}` to reference your existing PostgreSQL service.
+
+Click `Deploy Template` to deploy.
+
+![](@/assets/images/tutorials/11.png)
+
+#### Find your Drizzle Studio URL
+
+Once deployed, click on the Drizzle Studio service in your project, go to the `Settings` tab, and scroll down to the `Networking` section. You will find your public domain under **Public Networking**.
+
+![](@/assets/images/tutorials/14.png)
+
+#### Browse your database with Drizzle Studio
+
+Open the Drizzle Studio URL in your browser. You should see your database tables and can browse, filter, and edit data directly.
+
+![](@/assets/images/tutorials/12.png)
+
+#### Verify your setup
+
+Navigate to the `Architecture` tab in your Railway project. You should now see three services: your application, the PostgreSQL database, and Drizzle Studio.
+
+![](@/assets/images/tutorials/13.png)
 
 </Steps>
 
