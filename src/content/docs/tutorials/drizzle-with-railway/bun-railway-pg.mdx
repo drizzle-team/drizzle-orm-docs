@@ -323,13 +323,19 @@ This tutorial applies migrations at application startup using `migrate()`. This 
 
 If you need **zero-downtime deployments**, you may want to run migrations as a **separate step** before the new version of your app starts receiving traffic. This way you can rollback the application independently from the database changes.
 
-On Railway, you can achieve this by setting a [deploy command](https://docs.railway.com/guides/build-configuration#deploy-command) that runs `drizzle-kit migrate` before starting the app:
+On Railway, you can achieve this using a [pre-deploy command](https://docs.railway.com/deployments/pre-deploy-command) — it runs between the build and deploy phases, has access to your private network and environment variables, and if it fails, the deployment will not proceed.
+
+In your service settings, scroll down to the **Deploy** section and click **Add pre-deploy step**:
+
+![](@/assets/images/tutorials/15.png)
+
+Enter the following command:
 
 ```bash copy
-bunx drizzle-kit migrate && bun src/index.ts
+bunx drizzle-kit migrate
 ```
 
-With this approach, remove the `await migrate(db)` call from your `index.ts` — migrations are handled by the deploy command instead.
+With this approach, remove the `await migrate(db)` call from your `index.ts` — migrations are handled by the pre-deploy command instead.
 
 For more details, see the [Drizzle migrations fundamentals](/docs/migrations) page.
 
