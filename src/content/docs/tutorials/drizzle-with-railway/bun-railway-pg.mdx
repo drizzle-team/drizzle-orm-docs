@@ -1,7 +1,6 @@
 ---
 title: "Drizzle with Bun and PostgreSQL on Railway"
 date: "2026-03-07"
-svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>']
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -61,7 +60,7 @@ Railway provides two types of database connection URLs:
 - **Public URL** — accessible from anywhere (your local machine, external services). Uses a TCP proxy and looks like `postgresql://postgres:password@region.railway.app:port/railway`.
 - **Private URL** — only accessible from services within the same Railway project via internal networking. Uses `*.railway.internal` hostname.
 
-For **local development and running CLI commands** (like `drizzle-kit migrate`), you must use the **public URL**. The private `*.railway.internal` hostname will not resolve from your local machine.
+For **local development** (like running `drizzle-kit push` or `drizzle-kit studio`), you must use the **public URL**. The private `*.railway.internal` hostname will not resolve from your local machine.
 </Callout>
 
 #### Setup connection string variable
@@ -73,7 +72,9 @@ DATABASE_URL=postgresql://postgres:password@region.railway.app:port/railway
 ```
 
 <Callout type="info">
-This `.env` file is for local development only. When deploying to Railway, you will configure the `DATABASE_URL` environment variable separately in the Railway dashboard using a service reference variable.
+  This `.env` file is for local development only. When deploying to Railway, you
+  will configure the `DATABASE_URL` environment variable separately in the
+  Railway dashboard using a service reference variable.
 </Callout>
 
 #### Connect Drizzle ORM to your database
@@ -120,7 +121,6 @@ export type SelectUser = typeof usersTable.$inferSelect;
 
 export type InsertPost = typeof postsTable.$inferInsert;
 export type SelectPost = typeof postsTable.$inferSelect;
-
 ```
 
 #### Setup Drizzle config file
@@ -183,8 +183,10 @@ Apply the generated migrations to the database:
 bunx drizzle-kit migrate
 ```
 
-<Callout type="warning">
-You must run `drizzle-kit migrate` before your application can query the database. Without applying migrations, the tables will not exist and your queries will fail with `relation does not exist` errors.
+<Callout type="info">
+  In this tutorial, migrations are applied automatically on application startup
+  using `migrate()` from `drizzle-orm/node-postgres/migrator`. You can also
+  apply them manually with `drizzle-kit migrate` for local testing.
 </Callout>
 
 Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
@@ -193,7 +195,12 @@ Alternatively, you can push changes directly to the database using [Drizzle kit 
 bunx drizzle-kit push
 ```
 
-<Callout type="warning">Push command is good for rapid prototyping in local development, allowing fast iterations without managing migration files. For production deployments, prefer the `generate` + `migrate` workflow to keep a versioned history of schema changes.</Callout>
+<Callout type="warning">
+  Push command is good for rapid prototyping in local development, allowing fast
+  iterations without managing migration files. For production deployments,
+  prefer the `generate` + `migrate` workflow to keep a versioned history of
+  schema changes.
+</Callout>
 
 </Steps>
 
@@ -221,45 +228,41 @@ This is the basic file structure of the project. In the `src` directory, we have
 ## Deploy the App to Railway
 
 <Steps>
-#### Apply migrations before deploying
-
-Before deploying your application, make sure the database schema is up to date. Run migrations locally using the **public** database URL in your `.env` file:
-
-```bash copy
-bunx drizzle-kit generate
-bunx drizzle-kit migrate
-```
-
-<Callout type="info">
-You need to run migrations from your local machine (or a CI/CD pipeline) using the **public** database URL. The Railway private network (`*.railway.internal`) is only accessible from services running inside the same Railway project.
-</Callout>
-
 #### Prepare your project for deployment
 
-Create an `index.ts` file as the entry point for your application. This example sets up a simple HTTP server using Bun:
+Once you've [generated your migrations](#applying-changes-to-the-database), commit the `migrations` directory to your repository — these files will be applied automatically when your app starts.
+
+Create an `index.ts` file as the entry point for your application. This example runs migrations on startup and then starts a simple HTTP server using Bun:
 
 ```typescript copy filename="src/index.ts"
-import { db } from './db';
-import { usersTable } from './schema';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { usersTable } from "./schema";
+
+const db = drizzle(process.env.DATABASE_URL!);
+
+await migrate(db);
 
 const server = Bun.serve({
   port: process.env.PORT || 3000,
   async fetch(req) {
     const url = new URL(req.url);
 
-    if (url.pathname === '/users') {
+    if (url.pathname === "/users") {
       const users = await db.select().from(usersTable);
       return new Response(JSON.stringify(users), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
-    return new Response('OK');
+    return new Response("OK");
   },
 });
 
 console.log(`Server running on port ${server.port}`);
 ```
+
+The `migrate()` function reads the SQL files from your `migrations` directory and applies any unapplied migrations to the database. It is safe to run on every startup — already applied migrations are skipped.
 
 Make sure your `package.json` has a start script:
 
@@ -314,6 +317,23 @@ Railway will automatically deploy your application when you push to the connecte
 Once deployed, navigate to the `Architecture` tab in your Railway project. You should see your application service connected to the PostgreSQL database.
 
 ![](@/assets/images/tutorials/8.png)
+
+<Callout type="warning" collapsed="Alternative: separate migration step for zero-downtime deployments">
+This tutorial applies migrations at application startup using `migrate()`. This is the simplest approach and works well for most applications.
+
+If you need **zero-downtime deployments**, you may want to run migrations as a **separate step** before the new version of your app starts receiving traffic. This way you can rollback the application independently from the database changes.
+
+On Railway, you can achieve this by setting a [deploy command](https://docs.railway.com/guides/build-configuration#deploy-command) that runs `drizzle-kit migrate` before starting the app:
+
+```bash copy
+bunx drizzle-kit migrate && bun src/index.ts
+```
+
+With this approach, remove the `await migrate(db)` call from your `index.ts` — migrations are handled by the deploy command instead.
+
+For more details, see the [Drizzle migrations fundamentals](/docs/migrations) page.
+
+</Callout>
 
 </Steps>
 
