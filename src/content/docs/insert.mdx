@@ -79,12 +79,12 @@ const result = await db.insert(usersTableDefFn).values([{ name: 'John' }, { name
 
 ## output
 <IsSupportedChipGroup chips={{ 'MSSQL': true }} />
-You can insert a row and get it back in PostgreSQL and SQLite like such:
+You can insert a row and get it back in MSSQL using `.output()`. Note that `.output()` must be called **before** `.values()`, as this mirrors the MSSQL SQL syntax where `OUTPUT` precedes the `VALUES` clause:
 ```typescript copy
-await db.insert(users).values({ name: "Dan" }).output();
+await db.insert(users).output().values({ name: "Dan" });
 
 // partial return
-await db.insert(users).values({ name: "Partial Dan" }).output({ insertedId: users.id });
+await db.insert(users).output({ insertedId: users.id }).values({ name: "Partial Dan" });
 ```
 
 ## Insert multiple rows
