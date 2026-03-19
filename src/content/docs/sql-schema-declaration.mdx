@@ -301,7 +301,7 @@ You can manage your PostgreSQL schemas with `pgSchema` and place any other model
 Define the schema you want to manage using Drizzle
 ```ts
 import { pgSchema } from "drizzle-orm/pg-core"
-
+// export schema object to include it in the migrations.
 export const customSchema = pgSchema('custom');
 ```
 
@@ -327,7 +327,7 @@ You can define them with `drizzle-orm` and use them in queries, but they won't b
 Define the schema you want to manage using Drizzle
 ```ts
 import { mysqlSchema } from "drizzle-orm/mysql-core"
-
+// export schema object to include it in the migrations.
 export const customSchema = mysqlSchema('custom');
 ```
 
