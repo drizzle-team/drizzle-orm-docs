@@ -228,8 +228,8 @@ You can also declare views using `standalone query builder`, it works exactly th
         updatedAt: integer("updated_at"),
       });
 
-      export const userView = sqliteView("user_view").as((qb) => qb.select().from(user));
-      export const customerView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
+      export const userView = sqliteView("user_view").as(qb.select().from(user));
+      export const customerView = sqliteView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
       CREATE VIEW "user_view" AS SELECT * FROM "user";
@@ -254,8 +254,8 @@ You can also declare views using `standalone query builder`, it works exactly th
         updatedAt: integer("updated_at"),
       });
 
-      export const userView = mssqlView("user_view").as((qb) => qb.select().from(user));
-      export const customerView = mssqlView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
+      export const userView = mssqlView("user_view").as(qb.select().from(user));
+      export const customerView = mssqlView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
       CREATE VIEW [user_view] AS (SELECT * FROM "user");
