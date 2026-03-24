@@ -251,6 +251,11 @@ SELECT "id", "first_name" from users;
 ```
 </Section>
 
+**Note:** The `casing` option configured in the Drizzle ORM instance only affects runtime query mapping.  
+It does not apply to `drizzle-kit` (migrations, schema generation, etc.), which uses its own configuration in `drizzle.config.ts`.  
+
+See the [`casing`](/docs/drizzle-config-file#casing) option in the drizzle config reference for more information.
+
 ### Advanced
 
 There are a few tricks you can use with Drizzle ORM. As long as Drizzle is entirely in TypeScript files, 
