@@ -1,0 +1,146 @@
+---
+title: Second Normal Form (2NF)
+slug: second-normal-form
+---
+
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- You should be familiar with [1NF](/docs/guides/first-normal-form)
+</Prerequisites>
+
+**The Second Normal Form (2NF)** is a database normalization form that builds on the **First Normal Form**. The primary goal of **2NF** is to eliminate partial dependencies. 
+
+## Key Concepts
+
+1. A `Candidate key` is a minimal set of attributes that can uniquely identify each row in a table. There can be multiple candidate keys in a table.
+2. A `Non-prime` attribute is a column that isn't part of any candidate key.
+3. A `Functional dependency` is a relationship between two sets of attributes in a table, where the value of one set uniquely determines the value of another.
+4. A `partial dependency` happens when a non-prime attribute depends on only a part of a candidate key, rather than on the entire candidate key.
+
+## The 2NF Rule
+
+To achieve **2NF**, table should already be in **1NF** and must satisfy the following condition:
+
+Table does not have any non-prime attribute that is functionally dependent on any proper subset of any candidate key of the relation. In simpler terms, all non-prime attributes must depend on the entire candidate key, not just a part of it.
+
+## Example
+
+We have a table `enrollments` with the following schema:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const enrollments = pgTable("enrollments", {
+      studentId: integer("student_id").notNull(),
+      courseId: integer("course_id").notNull(),
+      courseName: varchar("course_name", { length: 255 }).notNull(),
+    }, (t) => [
+      primaryKey({ columns: [t.studentId, t.courseId] }),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "enrollments" (
+    	"student_id" integer NOT NULL,
+    	"course_id" integer NOT NULL,
+    	"course_name" varchar(255) NOT NULL,
+    	CONSTRAINT "enrollments_student_id_course_id_pk" PRIMARY KEY("student_id","course_id")
+    );
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+    +---------------------------------------+
+    | enrollments                           |
+    +-------------+-----------+-------------+
+    | student_id  | course_id | course_name |
+    +-------------+-----------+-------------+
+    | 1           | 101       | Math        |
+    | 2           | 102       | Chemistry   |
+    | 1           | 102       | Chemistry   |
+    | 3           | 103       | Literature  |
+    +-------------+-----------+-------------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+### Functional Dependencies
+
+1. `student_id, course_id -> course_name`.
+2. `course_id -> course_name`.
+
+### Candidate keys
+
+Only the pair of attributes `student_id` and `course_id` can uniquely identify each row in the table. Therefore, the candidate key is `student_id, course_id`.
+
+### 1NF Analysis
+
+The table is in **1NF** because all attributes contain atomic values, and there are no repeating groups or arrays.
+
+### 2NF Analysis
+
+`course_name` is a non-prime attribute because it is not part of the candidate key. Moreover, it is partially dependent on `course_id`, which is a part of the candidate key `student_id, course_id`. This violates the **2NF** rule.
+
+This leads to redundancy and potential update anomalies. For example, if the course name for `course_id - 101` changes, we would need to update multiple rows.
+
+### 2NF Decomposition
+
+To eliminate the partial dependency, we can decompose the table into two separate tables:
+
+<CodeTabs items={["schema.ts", "schema.sql", "schema.txt"]}>
+  <CodeTab>
+    ```ts
+    import { integer, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+
+    export const courses = pgTable("courses", {
+      id: integer("id").notNull().primaryKey(),
+      courseName: varchar("course_name", { length: 255 }).notNull(),
+    });
+
+    export const enrollments = pgTable("enrollments", {
+      studentId: integer("student_id").notNull(),
+      courseId: integer("course_id").notNull().references(() => courses.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    }, (t) => [
+      primaryKey({ columns: [t.studentId, t.courseId] }),
+    ]);
+   ```
+  </CodeTab>
+  <CodeTab>
+    ```sql
+    CREATE TABLE "courses" (
+    	"id" integer PRIMARY KEY NOT NULL,
+    	"course_name" varchar(255) NOT NULL
+    );
+    --> statement-breakpoint
+    CREATE TABLE "enrollments" (
+    	"student_id" integer NOT NULL,
+    	"course_id" integer NOT NULL,
+    	CONSTRAINT "enrollments_student_id_course_id_pk" PRIMARY KEY("student_id","course_id")
+    );
+    --> statement-breakpoint
+    ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE cascade ON UPDATE cascade;
+    ```
+  </CodeTab>
+  <CodeTab>
+  ```plaintext
+  +-------------------+        +-------------------------+
+  | courses           |        | enrollments             |
+  +-----+-------------+        +-------------+-----------+
+  | id  | course_name |        | student_id  | course_id |
+  +-----+-------------+        +-------------+-----------+
+  | 101 | Math        |        | 1           | 101       |
+  | 102 | Chemistry   |        | 2           | 102       |
+  | 103 | Literature  |        | 1           | 102       |
+  +-----+-------------+        | 3           | 103       |
+                               +-------------+-----------+
+  ```
+  </CodeTab>
+</CodeTabs>
+
+With this decomposition `course_name` is no longer repeated in the `enrollments` table and each table is free from partial dependencies. We have achieved **2NF**.
