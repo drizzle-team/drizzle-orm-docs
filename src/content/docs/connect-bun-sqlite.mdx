@@ -12,6 +12,7 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 - Database [connection basics](/docs/connect-overview) with Drizzle
 - Bun - [website](https://bun.sh/docs)
 - Bun SQLite driver - [docs](https://bun.sh/docs/api/sqlite)
+- Use Drizzle ORM with Bun - [docs](https://bun.sh/guides/ecosystem/drizzle)
 </Prerequisites>
 
 According to the **[official website](https://bun.sh/)**, Bun is a fast all-in-one JavaScript runtime. 
@@ -43,7 +44,7 @@ import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('sqlite.db');
-const db = drizzle({ client: sqlite });
+const db = drizzle(sqlite);
 
 const result = await db.select().from(...);
 ```
@@ -54,7 +55,7 @@ import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 
 const sqlite = new Database('sqlite.db');
-const db = drizzle({ client: sqlite });
+const db = drizzle(sqlite);
 
 const result = db.select().from(users).all();
 const result = db.select().from(users).get();
