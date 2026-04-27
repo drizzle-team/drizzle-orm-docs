@@ -51,7 +51,7 @@ If you want to use **sync** APIs:
 import { drizzle } from 'drizzle-orm/node-sqlite';
 import { DatabaseSync } from 'node:sqlite';
 
-const sqlite = new Database('sqlite.db');
+const sqlite = new DatabaseSync('sqlite.db');
 const db = drizzle({ client: sqlite });
 
 const result = db.select().from(users).all();
