@@ -9,21 +9,21 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 import Section from "@mdx/Section.astro";
 import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 
-# Drizzle \<\> Netlify DB
+# Drizzle \<\> Netlify Database
 <Prerequisites>
 - Database [connection basics](/docs/connect-overview) with Drizzle
-- Netlify DB - [website](https://docs.netlify.com/build/data-and-storage/netlify-db/)
+- Netlify Database - [website](https://docs.netlify.com/build/data-and-storage/netlify-database/)
 </Prerequisites>
 
 <Callout type="warning">
-The Netlify DB driver is developed and maintained by the Netlify team.
+The Netlify Database driver is developed and maintained by the Netlify team.
 
-The Netlify DB driver is available in both `drizzle-orm@latest` and `drizzle-orm@beta`. We recommend using the beta tag
+The Netlify Database driver is available in both `drizzle-orm@latest` and `drizzle-orm@beta`. We strongly recommend using the beta tag, as it has better support for Netlify's platform-managed migrations
 </Callout>
 
-Drizzle has native support for Netlify DB connections, that intelligently selects the optimal underlying Postgres driver based on the runtime environment.
+Drizzle has native support for Netlify Database connections, that intelligently selects the optimal underlying Postgres driver based on the runtime environment.
 
-Netlify DB is a managed Postgres database. On Netlify's platform, the same application code runs in two very different contexts:
+Netlify Database is a managed Postgres database. On Netlify's platform, the same application code runs in two very different contexts:
 
 - Serverless functions: no persistent connections, best served by HTTP-based queries
 - Server mode: persistent connections via node-postgres
@@ -32,7 +32,7 @@ This adapter abstracts that decision away so consumers can write `drizzle()` onc
   
 #### Step 1 - Install packages
 <Npm>
-drizzle-orm @netlify/db
+drizzle-orm @netlify/database
 -D drizzle-kit
 </Npm>
 
@@ -41,7 +41,7 @@ drizzle-orm @netlify/db
 ```typescript
 import { drizzle } from 'drizzle-orm/netlify-db';
 
-// reads NETLIFY_DB_URL and NETLIFY_DB_DRIVER env vars
+// Connection string is set automatically by the platform
 const db = drizzle();
 
 const result = await db.execute('select 1');
