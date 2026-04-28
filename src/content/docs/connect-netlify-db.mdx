@@ -1,0 +1,70 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import Steps from '@mdx/Steps.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Section from "@mdx/Section.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+
+# Drizzle \<\> Netlify Database
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- Netlify Database - [website](https://docs.netlify.com/build/data-and-storage/netlify-database/)
+</Prerequisites>
+
+<Callout type="warning">
+The Netlify Database driver is developed and maintained by the Netlify team.
+
+The Netlify Database driver is available in both `drizzle-orm@latest` and `drizzle-orm@beta`. We strongly recommend using the beta tag, as it has better support for Netlify's platform-managed migrations
+</Callout>
+
+Drizzle has native support for Netlify Database connections, that intelligently selects the optimal underlying Postgres driver based on the runtime environment.
+
+Netlify Database is a managed Postgres database. On Netlify's platform, the same application code runs in two very different contexts:
+
+- Serverless functions: no persistent connections, best served by HTTP-based queries
+- Server mode: persistent connections via node-postgres
+
+This adapter abstracts that decision away so consumers can write `drizzle()` once and get the right driver automatically.
+  
+#### Step 1 - Install packages
+<Npm>
+drizzle-orm @netlify/database
+-D drizzle-kit
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+<CodeTabs items={["Zero config", "Connection string", "Explicit client"]}>
+```typescript
+import { drizzle } from 'drizzle-orm/netlify-db';
+
+// Connection string is set automatically by the platform
+const db = drizzle();
+
+const result = await db.execute('select 1');
+```
+<Section> 
+```typescript 
+import { drizzle } from 'drizzle-orm/netlify-db';
+
+const db = drizzle(process.env.DATABASE_URL);
+
+const result = await db.execute('select 1');
+```
+</Section> 
+```typescript
+import { drizzle } from 'drizzle-orm/netlify-db';
+
+// Explicit client — consumer controls the driver
+const db = drizzle({ client: netlifyDbClient });
+
+const result = await db.execute('select 1');
+```
+</CodeTabs>
+
+#### What's next?
+
+<WhatsNextPostgres/>
