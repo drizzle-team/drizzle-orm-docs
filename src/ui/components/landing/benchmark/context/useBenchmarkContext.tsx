@@ -50,12 +50,12 @@ export function BenchmarkProvider({ children }: BenchmarkProviderProps) {
   const [concatedDataCompare, setConcatedDataCompare] = useState<IData[]>([]);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(true);
   const [selectedItems, setSelectedItems] = useState<IParams>({
-    orm: "prisma-v7.1.0",
+    orm: "go-20260430-jit",
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
     joins: false,
-    runtime: "bun-1.3.4",
+    runtime: "bun-1.3.13-bun-sql",
   });
 
   const contextValue: BenchmarkContextProps = {
