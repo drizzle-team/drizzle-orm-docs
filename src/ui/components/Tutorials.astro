@@ -5,10 +5,12 @@ const tutorials = await getCollection("docs", ({ id }) => {
   return id.startsWith("tutorials/");
 });
 
-const formattedTutorials = tutorials.map((tutorial) => ({
-  ...tutorial,
-  slug: tutorial.slug.split("/").at(-1),
-}));
+const formattedTutorials = tutorials
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .map((tutorial) => ({
+    ...tutorial,
+    slug: tutorial.slug.split("/").at(-1),
+  }));
 ---
 
 <div class="learn__title-block">

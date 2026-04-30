@@ -1,0 +1,461 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Callout from '@mdx/Callout.astro';
+import SimpleLinkCards from '@mdx/SimpleLinkCards.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Section from '@mdx/Section.astro';
+import Flex from "@mdx/Flex.astro"
+import LinksList from "@mdx/LinksList.astro"
+
+# Drizzle Relations Fundamentals
+
+In the world of databases, especially relational databases, the concept of relations is absolutely fundamental.
+Think of "relations" as the connections and links between different pieces of data. Just like in real life, 
+where people have relationships with each other, or objects are related to categories, databases use relations to model how different 
+types of information are connected and work together.
+
+### Normalization
+Normalization is the process of organizing data in your database to reduce redundancy (duplication) and improve data integrity 
+(accuracy and consistency). Think of it like tidying up a messy filing cabinet. Instead of having all sorts of papers 
+crammed into one folder, you organize them into logical folders and categories to make everything easier to find and manage.
+
+<Callout collapsed="Why is Normalization Important?">
+- **Reduces Data Redundancy**: Imagine storing a customer's address every time they place an order. If the address changes, you'd have to update it in multiple places! Normalization helps you store information in one place and refer to it from other places, minimizing repetition.
+- **Improves Data Integrity**: Less redundancy means less chance of inconsistencies. If you update an address in one place, it's updated everywhere it's needed.
+- **Prevents Anomalies**: Normalization helps prevent issues like:
+  1. **Insertion Anomalies**: Difficulty adding new data because you're missing related information.
+  2. **Update Anomalies**: Having to update the same information in multiple rows.
+  3. **Deletion Anomalies**: Accidentally losing valuable information when you delete something seemingly unrelated.
+- **Easier to Understand and Maintain**: A normalized database is generally more logically structured and easier to understand, query, and modify.
+</Callout>
+
+Normalization is often described in terms of "normal forms" (1NF, 2NF, 3NF, and beyond). While the details can get quite technical, the core ideas are straightforward:
+
+#### 1NF (First Normal Form): `Atomic Values`
+
+**Goal**: Each column should hold a single, indivisible value. No repeating groups of data within a single cell
+
+**Example**: Instead of having a single `address` column that stores `123 Main St, City, USA`, you'd 
+break it down into separate columns: `street_address`, `city`, `state`, `zip_code`.
+
+```sql
+-- Unnormalized (violates 1NF)
+CREATE TABLE Customers_Unnormalized (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    address VARCHAR(255) -- Problem: Multiple pieces of info in one column
+);
+
+-- Normalized to 1NF
+CREATE TABLE Customers_1NF (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    street_address VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zip_code VARCHAR(10)
+);
+```
+
+#### 2NF (Second Normal Form): `Eliminate Redundant Data Dependent on Part of the Key`
+
+**Goal**: Applies when you have a table with a composite primary key (a primary key made up of two or more columns). 
+2NF ensures that all non-key attributes are fully dependent on the entire composite primary key, not just part of it.
+
+Imagine we have a table called `order_items`. This table tracks items within orders, and we use a composite primary key (`order_id`, `product_id`) 
+because a single order can have multiple of the same product (though in this simplified example, let's assume each product appears only 
+once per order for clarity, but the composite key logic still applies).
+
+<Callout collapsed="Expand for visual example">
+```sql
+CREATE TABLE OrderItems_Unnormalized (
+    order_id INT,
+    product_id VARCHAR(10),
+    product_name VARCHAR(100),
+    product_price DECIMAL(10, 2),
+    quantity INT,
+    order_date DATE,
+    PRIMARY KEY (order_id, product_id) -- Composite Primary Key
+);
+
+INSERT INTO OrderItems_Unnormalized (order_id, product_id, product_name, product_price, quantity, order_date) VALUES
+(101, 'A123', 'Laptop', 1200.00, 1, '2023-10-27'),
+(101, 'B456', 'Mouse', 25.00, 2, '2023-10-27'),
+(102, 'A123', 'Laptop', 1200.00, 1, '2023-10-28'),
+(103, 'C789', 'Keyboard', 75.00, 1, '2023-10-29');
+```
+```
++------------------------------------------------------------------------------------+
+| OrderItems_Unnormalized                                                            |
++------------------------------------------------------------------------------------+
+| PK (order_id, product_id) | product_name | product_price | quantity | order_date   |
++------------------------------------------------------------------------------------+
+| 101, A123               | Laptop       | 1200.00       | 1        | 2023-10-27     |
+| 101, B456               | Mouse        | 25.00         | 2        | 2023-10-27     |
+| 102, A123               | Laptop       | 1200.00       | 1        | 2023-10-28     |
+| 103, C789               | Keyboard     | 75.00         | 1        | 2023-10-29     |
++------------------------------------------------------------------------------------+
+```
+</Callout>
+
+**Problem**: Notice that `product_name` and `product_price` are repeated whenever the same `product_id` appears in different orders. 
+These attributes are only dependent on `product_id`, which is part of the composite primary key (`order_id`, `product_id`), but not the entire key. 
+This is a partial dependency.
+
+To achieve 2NF, we need to remove the partially dependent attributes (`product_name`, `product_price`) and place them in a separate table where they are 
+fully dependent on the primary key of that new table.
+
+<Callout collapsed="Normalization to 2NF: Visual explanation">
+```
++-------------------+     1:M     +---------------------------+
+| Products          | <---------- | OrderItems_2NF            |
++-------------------+             +---------------------------+
+| PK product_id     |             | PK (order_id, product_id) |
+| product_name      |             | quantity                  |
+| product_price     |             | order_date                |
++-------------------+             | FK product_id             |
+                                  +---------------------------+
+```
+```sql
+CREATE TABLE Products (
+    product_id VARCHAR(10) PRIMARY KEY,
+    product_name VARCHAR(100),
+    product_price DECIMAL(10, 2)
+);
+
+CREATE TABLE OrderItems_2NF (
+    order_id INT,
+    product_id VARCHAR(10),
+    quantity INT,
+    order_date DATE,
+    PRIMARY KEY (order_id, product_id), -- Composite Primary Key remains
+    FOREIGN KEY (product_id) REFERENCES Products(product_id) -- Foreign Key to Products
+);
+
+-- Insert data into Products
+INSERT INTO Products (product_id, product_name, product_price) VALUES
+('A123', 'Laptop', 1200.00),
+('B456', 'Mouse', 25.00),
+('C789', 'Keyboard', 75.00);
+
+-- Insert data into OrderItems_2NF (referencing Products)
+INSERT INTO OrderItems_2NF (order_id, product_id, quantity, order_date) VALUES
+(101, 'A123', 1, '2023-10-27'),
+(101, 'B456', 2, '2023-10-27'),
+(102, 'A123', 1, '2023-10-28'),
+(103, 'C789', 1, '2023-10-29');
+```
+</Callout>
+
+#### 3NF (Third Normal Form): `Eliminate Redundant Data Dependent on Non-Key Attributes`
+
+**Goal**: Remove data that is dependent on other non-key attributes. This is about eliminating transitive dependencies.
+
+**Problem**: Let's say we have a `suppliers` table. We store supplier information, including their `zip_code`, `city`, and `state`. `supplier_id` is the primary key.
+
+<Callout collapsed="">
+```sql
+CREATE TABLE suppliers (
+    supplier_id VARCHAR(10) PRIMARY KEY,
+    supplier_name VARCHAR(255),
+    zip_code VARCHAR(10),
+    city VARCHAR(100),
+    state VARCHAR(50)
+);
+
+INSERT INTO suppliers (supplier_id, supplier_name, zip_code, city, state) VALUES
+('S1', 'Acme Corp', '12345', 'Anytown', 'NY'),
+('S2', 'Beta Inc', '67890', 'Otherville', 'CA'),
+('S3', 'Gamma Ltd', '12345', 'Anytown', 'NY');
+```
+```
++---------------------------------------------------------------+
+| suppliers                                                     |
++---------------------------------------------------------------+
+| PK supplier_id | supplier_name | zip_code | city      | state |
++---------------------------------------------------------------+
+| S1             | Acme Corp     | 12345    | Anytown    | NY   |
+| S2             | Beta Inc      | 67890    | Otherville | CA   |
+| S3             | Gamma Ltd     | 12345    | Anytown    | NY   |
++---------------------------------------------------------------+
+```
+</Callout>
+
+**Solution**: To achieve 3NF, we remove the attributes dependent on the non-key attribute (`city`, `state` dependent on `zip_code`) and put 
+them into a separate table keyed by the non-key attribute itself (`zip_code`).
+
+<Callout collapsed="Normalization to 3NF: Visual explanation">
+```
++-------------------+     1:M     +--------------------+
+| zip_codes         | <---------- | suppliers          |
++-------------------+             +--------------------+
+| PK zip_code       |             | PK supplier_id     |
+| city              |             | supplier_name      |
+| state             |             | FK zip_code        |
++-------------------+             +--------------------+
+```
+```sql
+CREATE TABLE zip_codes (
+    zip_code VARCHAR(10) PRIMARY KEY,
+    city VARCHAR(100),
+    state VARCHAR(50)
+);
+
+CREATE TABLE suppliers (
+    supplier_id VARCHAR(10) PRIMARY KEY,
+    supplier_name VARCHAR(255),
+    zip_code VARCHAR(10), -- Foreign Key to zip_codes
+    FOREIGN KEY (zip_code) REFERENCES zip_codes(zip_code)
+);
+
+-- Insert data into zip_codes
+INSERT INTO zip_codes (zip_code, city, state) VALUES
+('12345', 'Anytown', 'NY'),
+('67890', 'Otherville', 'CA');
+
+-- Insert data into suppliers (referencing zip_codes)
+INSERT INTO suppliers (supplier_id, supplier_name, zip_code) VALUES
+('S1', 'Acme Corp', '12345'),
+('S2', 'Beta Inc', '67890'),
+('S3', 'Gamma Ltd', '12345');
+```
+</Callout>
+
+<Callout title="Good to know">
+There are additional normal forms, such as `4NF`, `5NF`, `6NF`, `EKNF`, `ETNF`, and `DKNF`. We won't cover these here, but we will create a 
+dedicated set of tutorials for them in our guides and tutorials section.
+</Callout>
+
+### Database Relationships
+#### One-to-One
+
+In a one-to-one relationship, each record in `table A` is related to at most one record in `table B`, and each record in `table B` is
+related to at most one record in `table A`. It's a very direct, exclusive pairing.
+
+<Callout collapsed="Use Cases & Examples">
+1. **User Profiles and User Account Details**: Think of a website. Each user account (in a Users table) might have exactly one user profile (in a UserProfiles table) containing more detailed information.
+2. **Employees and Parking Spaces**: An Employees table and a ParkingSpaces table. Each employee might be assigned at most one parking space, and each parking space is assigned to at most one employee.
+3. **Splitting Tables for Organization**: Sometimes, you might split a very wide table into two for better organization or security reasons, maintaining a 1-1 relationship between them.
+
+```
+Table A (One Side)      Table B (One Side)
++---------+             +---------+
+| PK (A)  | <---------> | FK (A)  | (Foreign Key referencing Table A)
+| ...     |             | ...     |
++---------+             +---------+
+```
+</Callout>
+
+
+#### One-to-Many
+
+In a one-to-many relationship, one record in `table A` can be related to many records in `table B`, but each 
+record in `table B` is related to at most one record in `table A`. Think of it as a "parent-child" relationship.
+
+<Callout collapsed="Use Cases & Examples">
+1. **Customers and Orders**: One customer can place many orders, but each order belongs to only one customer.
+2. **Authors and Books**: One author can write many books, but (let's simplify for now and say) each book is written by one primary author.
+3. **Departments and Employees**: One department can have many employees, but each employee belongs to only one department.
+
+```
+Table A (One Side)      Table B (Many Side)
++---------+             +---------+
+| PK (A)  | ----------> | FK (A)  | (Foreign Key referencing Table A)
+| ...     |             | ...     |
++---------+             +---------+
+     (One)                  (Many)
+```
+</Callout>
+
+#### Many-to-Many
+
+In a many-to-many relationship, one record in `table A` can be related to many records in `table B`, and one 
+record in `table B` can be related to many records in `table A`. It's a more complex, bidirectional relationship.
+
+<Callout collapsed="Use Cases & Examples">
+1. **Students and Courses**: One student can enroll in many courses, and one course can have many students enrolled.
+2. **Products and Categories**: One product can belong to multiple categories (e.g., a "T-shirt" can be
+in "Clothing" and "Summer Wear" categories), and one category can contain many products.
+3. **Authors and Books**: A book can be written by multiple authors, and an author can write multiple books.
+
+```
+Table A (Many Side)    Junction Table      Table B (Many Side)
++---------+          +-------------+     +---------+
+| PK (A)  | -------->| FK (A)      | <----| FK (B)  |
+| ...     |          | FK (B)      |     | ...     |
++---------+          +-------------+     +---------+
+     (Many)             (Junction)          (Many)
+```
+</Callout>
+
+Many-to-many relationships are not directly implemented with foreign keys between the two main tables. 
+Instead, you need a `junction` table (also called an associative table or bridging table). 
+This table acts as an intermediary to link records from both tables.
+
+```sql
+-- Table for Students (Many side)
+CREATE TABLE students (
+    iid INT PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+-- Table for Courses (Many side)
+CREATE TABLE courses (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    credits INT
+);
+
+-- Junction Table: Enrollments (Connects Students and Courses - M-M relationship)
+CREATE TABLE enrollments (
+    id INT PRIMARY KEY AUTO_INCREMENT, -- Optional, but good practice for junction tables
+    student_id INT,
+    course_id INT,
+    enrollment_date DATE,
+    -- Composite Foreign Keys (often part of a composite primary key or unique constraint)
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+    UNIQUE KEY (student_id, course_id) -- Prevent duplicate enrollments for the same student and course
+);
+```
+
+### Why Foreign Keys?
+
+You might think of foreign key constraints as simply a way to validate data - ensuring 
+that when you enter a value in a foreign key column, that value actually exists in the primary key 
+column of another table. And you'd be partially right! This value checking is the mechanism foreign keys use.
+
+But it's crucial to understand that this validation is not the end goal, it's the means 
+to a much larger purpose. Foreign key constraints are fundamentally about:
+
+<Callout collapsed="1. Explicitly Defining and Enforcing Relationships">
+
+We've discussed relationships like `One-to-Many` between Customers and Orders. 
+A foreign key is the SQL language's way of telling the database: 
+
+> Hey database, I want to enforce a 1-M relationship here. Every value in the customer_id column of the
+Orders table must correspond to a valid customer_id in the Customers table.
+
+It's not just a suggestion; it's a constraint the database actively enforces. 
+The database becomes relationship-aware because of the foreign key.
+</Callout>
+
+<Callout collapsed="2. Maintaining Referential Integrity">
+- This is the core of "data integrity" in the context of relationships. Referential integrity means 
+that relationships between tables remain consistent and valid over time.
+- Foreign keys prevent orphaned records. What's an orphaned record? In our Customer-Order example, 
+an order that exists in the Orders table but doesn't have a corresponding customer in the Customers 
+table would be an orphan. Foreign keys prevent this from happening (or control what happens 
+if you try to delete a customer with orders - via CASCADE, SET NULL, etc.).
+- Why is preventing orphans important? Orphaned records break the logical structure of your data. 
+If you have an order without a customer, you lose crucial context. Queries become unreliable, reports
+ become inaccurate, and your application's logic can break down.
+
+**Example**:
+```
+Without a foreign key, you could accidentally delete a customer from the Customers 
+table while their orders still exist in the Orders table. Suddenly, you have orders that point to 
+a customer that no longer exists! A foreign key constraint prevents this data inconsistency.
+```
+</Callout>
+
+<Callout collapsed="3. Facilitating Database Design and Understanding">
+- Foreign keys are not just about technical enforcement; they are also a crucial part of database design documentation.
+- When you see a foreign key in a database schema, it immediately tells you: 
+`Table 'X' is related to Table 'Y' in this way.` It's a clear visual and structural indicator of relationships.
+- This makes databases easier to understand, maintain, and evolve over time. New developers can quickly 
+grasp how different parts of the database are connected.
+</Callout>
+
+In essence, foreign key constraints are not just about checking values; they are about:
+
+1. Defining the rules of your data relationships
+2. Actively enforcing those rules at the database level
+3. Guaranteeing data integrity and consistency within those relationships
+4. Making your database more robust, reliable, and understandable
+
+### Why NOT Foreign Keys?
+
+While highly beneficial, there are some scenarios where you might reconsider or use Foreign Keys with caution. 
+These are typically edge cases and often involve trade-offs.
+
+<Callout collapsed="1. Performance Overhead in Very High-Write Environments">
+- **Scenario**: Extremely high-volume transactional systems (e.g., real-time logging, very high-frequency trading
+platforms, massive IoT data ingestion).
+- **Explanation**: Every time you insert or update data in a table with a foreign key, the database system 
+needs to perform checks to ensure referential integrity. In extremely high-write scenarios, these 
+checks can introduce a small but potentially noticeable performance overhead.
+</Callout>
+
+<Callout collapsed="2. Distributed Database Systems and Cross-Node Foreign Keys:">
+- **Scenario**: Systems where data is distributed across multiple database nodes or clusters (common in sharded databases, cloud environments, and microservices).
+- **Explanation**:  Cross-node foreign keys can introduce significant complexity and performance overhead. Validating referential integrity requires communication between nodes, leading to increased latency. Distributed transactions needed to maintain consistency are also more complex and can be less performant than local transactions. In such architectures, application-level data integrity checks or eventual consistency models might be considered alternatives.
+</Callout>
+
+<Callout collapsed="3. Legacy Systems and Data Integration with Non-Relational Data:">
+- **Scenario**: Integrating a relational database with older legacy systems or non-relational data stores (e.g., NoSQL, flat files, external APIs).
+- **Explanation**:  Legacy systems or non-relational data might not consistently adhere to the referential integrity rules enforced by foreign keys.  Imposing foreign keys in such scenarios can lead to data import issues, data inconsistencies, and might necessitate complex data transformation or application-level integrity management instead. You might need to carefully evaluate the data quality and consistency of the external sources and potentially rely on application logic or ETL processes to ensure data integrity instead of strictly enforcing foreign keys at the database level.
+</Callout>
+
+You can also check out some great explanations from the PlanetScale team in their [article](https://planetscale.com/docs/learn/operating-without-foreign-key-constraints#why-does-planetscale-not-recommend-constraints)
+
+### Polymorphic Relations
+
+Polymorphic relationships are a more advanced concept that allows a single relationship to point to 
+different types of entities or tables. It's about creating more flexible and adaptable relationships when 
+you have different kinds of data that share some commonality.
+
+Imagine you have an `activities` log. An activity could be a `comment` a `like` or a `share`.
+Each of these `activity` types has different details. Instead of creating separate tables and 
+relationships for each activity type and the things they relate to, you might use a polymorphic approach.
+
+<Callout collapsed="Common Scenarios & Examples">
+- **Comments/Reviews**: A "Comment" might be related to different types of content: articles, products, videos, etc. 
+Instead of having separate article_id, product_id, video_id columns in a Comments table, you can use a 
+polymorphic relationship.
+```
++---------------------+
+| **Comments**        |
++---------------------+
+| PK comment_id       |
+| commentable_type    | ------>  [Polymorphic Relationship]
+| commentable_id      | -------->
+| user_id             |
+| comment_text        |
+| ...                 |
++---------------------+
+          ^
+          |
++---------------------+    +---------------------+    +---------------------+
+| **Articles**        |    | **Products**        |    | **Videos**          |
++---------------------+    +---------------------+    +---------------------+
+| PK article_id       |    | PK product_id       |    | PK video_id         |
+| ...                 |    | ...                 |    | ...                 |
++---------------------+    +---------------------+    +---------------------+
+```
+- **Notifications:** A notification could be related to a user, an order, a system event, etc.
+```
++----------------------+
+| **Notifications**    |
++----------------------+
+| PK notification_id  |
+| notifiable_type     | ------>  [Polymorphic Relationship]
+| notifiable_id       | -------->
+| user_id             |
+| message             |
+| ...                  |
++----------------------+
+           ^
+           |
++---------------------+    +---------------------+    +-----------------------+
+| **Users**           |    | **Orders**          |    | **System Events**     |
++---------------------+    +---------------------+    +-----------------------+
+| PK user_id          |    | PK order_id         |    | PK event_id           |
+| ...                 |    | ...                 |    | ...                   |
++---------------------+    +---------------------+    +-----------------------+
+```
+</Callout>
+
+Polymorphic relationships are more complex and are often handled at the application level or 
+using more advanced database features (depending on the specific database system). Standard SQL doesn't 
+have direct, built-in support for enforcing polymorphic foreign key constraints in the same way as regular foreign keys.

@@ -1,21 +1,19 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-# drizzle-zod
+<Callout type="error">
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-zod` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
 
-`drizzle-zod` is a plugin for **[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)** that allows you to generate **[Zod](https://github.com/colinhacks/zod)** schemas from Drizzle ORM schemas.
+You can still use `drizzle-zod` package but all new update will be added to Drizzle ORM directly
+</Callout>
+
+# zod
 
 ### Install the dependencies
 
 <Npm>
-drizzle-zod
+zod
 </Npm>
-
-<Callout type="warning">
-This documentation is for `drizzle-zod@0.6.0` and higher
-
-You must also have Drizzle ORM v0.36.0 or greater and Zod v3.25.1 or greater installed.
-</Callout>
 
 ### Select schema
 
@@ -23,7 +21,7 @@ Defines the shape of data queried from the database - can be used to validate AP
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-zod';
+import { createSelectSchema } from 'drizzle-orm/zod';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -44,7 +42,7 @@ Views and enums are also supported.
 
 ```ts copy
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-zod';
+import { createSelectSchema } from 'drizzle-orm/zod';
 
 const roles = pgEnum('roles', ['admin', 'basic']);
 const rolesSchema = createSelectSchema(roles);
@@ -61,7 +59,7 @@ Defines the shape of data to be inserted into the database - can be used to vali
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createInsertSchema } from 'drizzle-zod';
+import { createInsertSchema } from 'drizzle-orm/zod';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -85,7 +83,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createUpdateSchema } from 'drizzle-zod';
+import { createUpdateSchema } from 'drizzle-orm/zod';
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -109,7 +107,7 @@ Each create schema function accepts an additional optional parameter that you ca
 
 ```ts copy
 import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-zod';
+import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod/v4';
 
 const users = pgTable('users', {
@@ -143,7 +141,7 @@ For more advanced use cases, you can use the `createSchemaFactory` function.
 
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
-import { createSchemaFactory } from 'drizzle-zod';
+import { createSchemaFactory } from 'drizzle-orm/zod';
 import { z } from '@hono/zod-openapi'; // Extended Zod instance
 
 const users = pgTable('users', {
@@ -164,7 +162,7 @@ const userInsertSchema = createInsertSchema(users, {
 
 ```ts copy
 import { pgTable, timestamp } from 'drizzle-orm/pg-core';
-import { createSchemaFactory } from 'drizzle-zod';
+import { createSchemaFactory } from 'drizzle-orm/zod';
 import { z } from 'zod/v4';
 
 const users = pgTable('users', {

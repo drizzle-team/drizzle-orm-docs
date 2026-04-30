@@ -34,7 +34,6 @@ const startGame = () => {
   document.getElementById("right-image")!.classList.add("right-image-moved");
   document.getElementById("score")!.classList.remove("hidden");
   document.querySelector(".board")!.classList.add("board-moved");
-  document.querySelector(".powered")!.classList.remove("powered-hidden");
 
   window.addEventListener("keydown", preventControlButtons, false);
   snakeGame.startGame();
@@ -48,9 +47,8 @@ window.addEventListener(
       const board = document.querySelector(".board");
       const score = document.querySelector("#score");
       const countdown = document.querySelector(".countdown");
-      const powered = document.querySelector(".powered");
 
-      if (board && rightImage && score && countdown && powered) {
+      if (board && rightImage && score && countdown) {
         e.preventDefault();
         snakeGame.gameOver = true;
         snakeGame.resetGame();
@@ -60,7 +58,6 @@ window.addEventListener(
         rightImage.classList.remove("right-image-moved");
         score.classList.add("hidden");
         countdown.classList.add("hidden");
-        powered.classList.add("powered-hidden");
       }
     }
   },
@@ -81,13 +78,11 @@ document.addEventListener("astro:page-load", () => {
       const board = document.querySelector(".board");
       const score = document.querySelector("#score");
       const countdown = document.querySelector(".countdown");
-      const powered = document.querySelector(".powered");
 
       board?.classList.remove("board-moved");
       rightImage?.classList.remove("right-image-moved");
       score?.classList.add("hidden");
       countdown?.classList.add("hidden");
-      powered?.classList.add("powered-hidden");
     },
     false,
   );

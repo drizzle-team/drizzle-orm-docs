@@ -14,9 +14,9 @@ import Npx from "@mdx/Npx.astro"
 # Drizzle Kit configuration file
 <Prerequisites>
 - Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
+- Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration)
 - Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
+- Drizzle migrations fundamentals - [read here](/docs/migrations)
 - Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
 </Prerequisites>
 
@@ -91,7 +91,7 @@ export default defineConfig({
       exclude: [],
       include: []
     }
-  }
+  },
 
   breakpoints: true,
   strict: true,
@@ -121,14 +121,14 @@ You can have multiple config files in the project, it's very useful when you hav
 It's very useful since you can have many separate schemas for different databases in the same project 
 and have different migration folders for them.  
   
-Migration folder contains `.sql` migration files and `_meta` folder which is used by `drizzle-kit`
+Migration folder contains folders with `.sql` migration files which is used by `drizzle-kit`
 
 <Section>
 ```plaintext {3}
 📦 <project root>
  ├ ...
  ├ 📂 drizzle
- │ ├ 📂 _meta
+ │ ├ 📂 20242409125510_premium_mister_fear
  │ ├ 📜 user.ts 
  │ ├ 📜 post.ts 
  │ └ 📜 comment.ts 
@@ -140,7 +140,7 @@ Migration folder contains `.sql` migration files and `_meta` folder which is use
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql" | "turso" | "singlestore"
+  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql" | "turso" | "singlestore" | "mssql"
   schema: "./src/schema/*",
   out: "./drizzle",
 });
@@ -273,7 +273,7 @@ import { defineConfig } from 'drizzle-kit'
 export default defineConfig({
   dialect: "mysql",
   dbCredentials: {
-    url: "postgres://user:password@host:port/db",
+    url: "mysql://user:password@host:port/db",
   }
 });
 ```
@@ -394,7 +394,7 @@ export default defineConfig({
 ### `introspect`
 <rem025/>
 
-Cofiguration for `drizzle-kit pull` command.
+Configuration for `drizzle-kit pull` command.
 
 `casing` is responsible for in-code column keys casing
 
@@ -490,11 +490,10 @@ export default defineConfig({
 ```
 
 ### `schemaFilter`
-<Callout>
-If you want to run multiple projects with one database - check out [our guide](/docs/goodies#multi-project-schema).
-</Callout>
 
-<rem025/>
+Was changed starting from `1.0.0-beta.1` version!
+
+<Callout type='warning' collapsed="How it works in 0.x versions">
 `drizzle-kit push` and `drizzle-kit pull` will by default manage all tables in `public` schema.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
@@ -504,6 +503,22 @@ You can configure list of tables, schemas and extensions via `tablesFilters`, `s
 | :------------ | :-----------------   |
 | type          | `string[]` |
 | default       | `["public"]`                    |
+| commands      | `push` `pull`   |
+
+</Callout>
+
+<Callout>
+If you want to run multiple projects with one database - check out [our guide](/docs/goodies#multi-project-schema).
+</Callout>
+
+`drizzle-kit push` and `drizzle-kit pull` will by default manage all schemas.
+
+`schemaFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
+based schema names filter, e.g. `["public", "auth"]` or `"tenant_*"`
+
+|               |                      |
+| :------------ | :-----------------   |
+| type          | `string[]` |
 | commands      | `push` `pull`   |
 
 <rem025/>

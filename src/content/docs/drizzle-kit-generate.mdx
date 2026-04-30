@@ -13,16 +13,16 @@ import Dialects from "@mdx/Dialects.mdx"
 
 <Prerequisites>
 - Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
+- Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration)
 - Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
+- Drizzle migrations fundamentals - [read here](/docs/migrations)
 - Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
 </Prerequisites>
 
 
 <br/>
 
-`drizzle-kit generate` lets you generate SQL migrations based on you Drizzle schema upon declaration or on subsequent schema changes.
+`drizzle-kit generate` lets you generate SQL migrations based on your Drizzle schema upon declaration or on subsequent schema changes.
 <Callout collapsed="How it works under the hood?">
 Drizzle Kit `generate` command triggers a sequence of events:
 1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
@@ -46,17 +46,18 @@ export const users = p.pgTable("users", {
 └─┬──────────────────────┘                  
   │                                           
   └ 1. read previous migration folders
-    2. find diff between current and previous scheama
+    2. find diff between current and previous schema
     3. prompt developer for renames if necessary
   ┌ 4. generate SQL migration and persist to file
   │    ┌─┴───────────────────────────────────────┐  
   │      📂 drizzle       
-  │      ├ 📂 _meta
-  │      └ 📜 0000_premium_mister_fear.sql
+  │      └ 📂 20242409125510_premium_mister_fear
+  │        ├ 📜 migration.sql
+  │        └ 📜 snapshot.json
   v
 ```
 ```sql
--- drizzle/0000_premium_mister_fear.sql
+-- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE "users" (
  "id" SERIAL PRIMARY KEY,
@@ -69,7 +70,7 @@ CREATE TABLE "users" (
 
 It's designed to cover [code first](/docs/migrations) approach of managing Drizzle migrations. 
 You can apply generated migrations using [`drizzle-kit migrate`](/docs/drizzle-kit-migrate), using drizzle-orm's `migrate()`, 
-using external migration tools like bytebase or running migrations yourself directly on the database. 
+using external migration tools like [bytebase](https://www.bytebase.com/) or running migrations yourself directly on the database. 
 
 `drizzle-kit generate` command requires you to provide both `dialect` and `schema` path options, 
 you can set them either via [drizzle.config.ts](/docs/drizzle-config-file) config file or via CLI options
@@ -109,8 +110,9 @@ npx drizzle-kit generate --name=init
 ```plaintext {4}
 📦 <project root>
  ├ 📂 drizzle
- │ ├ 📂 _meta
- │ └ 📜 0000_init.sql 
+ │ └ 📂 20242409125510_init
+ │   ├ 📜 snapshot.json
+ │   └ 📜 migration.sql
  ├ 📂 src
  └ …
 ```
@@ -143,20 +145,32 @@ drizzle-kit generate --custom --name=seed-users
 ```plaintext {5}
 📦 <project root>
  ├ 📂 drizzle
- │ ├ 📂 _meta
- │ ├ 📜 0000_init.sql 
- │ └ 📜 0001_seed-users.sql 
+ │ ├ 📂 20242409125510_init
+ │ └ 📂 20242409125510_seed-users
  ├ 📂 src
  └ …
 ```
 ```sql
--- ./drizzle/0001_seed-users.sql
+-- ./drizzle/20242409125510_seed/migration.sql
 
 INSERT INTO "users" ("name") VALUES('Dan');
 INSERT INTO "users" ("name") VALUES('Andrew');
 INSERT INTO "users" ("name") VALUES('Dandrew');
 ```
 </Section>
+
+### Ignore conflicts
+
+<Callout type='warning'>
+`--ignore-conflicts` available starting from `drizzle-orm@1.0.0-beta.16`
+</Callout>
+
+In case you need `generate` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
+there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
+
+```shell
+drizzle-kit generate --ignore-conflicts
+```
 
 ### Extended list of available configurations
 `drizzle-kit generate` has a list of cli-only options
@@ -226,13 +240,12 @@ And it will successfully generate
 📦 <project root>
  ├ …
  ├ 📂 migrations
- │ ├ 📂 _meta
- │ ├ 📜 0000_init.sql 
- │ └ 📜 0001_seed-users.sql 
+ │ ├ 📂 20242409125510_init
+ │ └ 📂 20242409125510_seed-users
  └ …
 ```
 ```sql
--- ./drizzle/0001_seed-users.sql
+-- ./drizzle/20242409125510_seed-users/migration.sql
 
 INSERT INTO "users" ("name") VALUES('Dan');
 INSERT INTO "users" ("name") VALUES('Andrew');

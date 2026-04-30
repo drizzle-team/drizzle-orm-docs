@@ -163,7 +163,6 @@ export class SnakeGame {
     document.getElementById("right-image")?.classList.add("right-image-moved");
     document.querySelector(".board")?.classList.add("board-moved");
     document.querySelector("#score")?.classList.remove("hidden");
-    document.querySelector(".powered")?.classList.remove("powered-hidden");
 
     const key = event.key;
     const lastDirection = this.directionQueue[this.directionQueue.length - 1];

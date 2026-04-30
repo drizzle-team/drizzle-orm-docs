@@ -1,10 +1,44 @@
 <div class="container">
   <div>
     <div class="title">Our Sponsors</div>
-    <div class="description">You help us build a better future</div>
+    <div class="description">Thanks to you, Drizzle team is rich</div>
   </div>
   <div class={"wrapper"}>
-    <div id="sponsors-scroll" class={"scroll"}></div>
+    <div id="sponsors-scroll" class={"scroll"}>
+      <div class="railway-section">
+        <header class="sponsors_header">
+          <div class="type_header">
+            <span class="emoji">🌧️</span>
+            <span>Cloud Partners</span>
+          </div>
+        </header>
+        <a
+          class="railway-banner"
+          href="https://driz.link/railway"
+          target="_blank"
+          rel="nofollow noreferrer"
+        >
+          <div class="railway-banner_content">
+            <canvas class="railway-rain" id="railway-rain-canvas"></canvas>
+            <div class="railway-banner_logo">
+              <img
+                class="railway-logo-dark"
+                src="/svg/railway-sidebar.svg"
+                alt="Railway"
+                loading="lazy"
+              />
+              <img
+                class="railway-logo-light"
+                src="/svg/railway-sidebar-light.svg"
+                alt="Railway"
+                loading="lazy"
+              />
+            </div>
+            <div class="railway-banner_badge">Our Cloud Partner</div>
+          </div>
+        </a>
+      </div>
+    </div>
     <div class={"gradient-left"}></div>
     <div class={"gradient-right"}></div>
   </div>
@@ -383,6 +417,353 @@
 
   setTimeout(() => computePopovers(), 50);
 </script>
+<script>
+  function initRailwayRain() {
+    const canvas = document.getElementById("railway-rain-canvas") as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const banner = canvas.parentElement!;
+    const bannerLink = banner.parentElement! as HTMLAnchorElement;
+    const badge = bannerLink.querySelector(".railway-banner_badge") as HTMLElement;
+
+    const dpr = window.devicePixelRatio || 1;
+    const ANGLE = -35;
+    const SIN_A = Math.sin(ANGLE * (Math.PI / 180));
+    const COS_A = Math.cos(ANGLE * (Math.PI / 180));
+    const DROP_COUNT = 60;
+
+    let isHovered = false;
+    let isVisible = false;
+    let targetOpacity = 0.12;
+    let currentOpacity = 0.12;
+    let flashOpacity = 0;
+    let nextFlashTime = 0;
+    let animId = 0;
+    let isDark = document.documentElement.classList.contains("dark");
+
+    let flickerQueue: { start: number; duration: number; intensity: number }[] = [];
+
+    interface BoltSegment {
+      x1: number; y1: number; x2: number; y2: number;
+      width: number; depth: number;
+    }
+    let boltSegments: BoltSegment[] = [];
+
+    interface Drop {
+      x: number; y: number;
+      length: number; speed: number; opacity: number;
+    }
+    let drops: Drop[] = [];
+
+    let lw = 0;
+    let lh = 0;
+
+    function resize() {
+      const rect = banner.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      lw = rect.width;
+      lh = rect.height;
+    }
+
+    function createDrop(): Drop {
+      return {
+        x: Math.random() * lw,
+        y: Math.random() * -lh,
+        length: 8 + Math.random() * 16,
+        speed: 4 + Math.random() * 6,
+        opacity: 0.2 + Math.random() * 0.5,
+      };
+    }
+
+    // Bolt generation
+    function subdivideLine(
+      x1: number, y1: number, x2: number, y2: number,
+      displacement: number, depth: number, width: number,
+      segments: BoltSegment[], iterations: number
+    ) {
+      if (iterations === 0) {
+        segments.push({ x1, y1, x2, y2, width, depth });
+        return;
+      }
+      const mx = (x1 + x2) / 2 + (Math.random() - 0.5) * displacement;
+      const my = (y1 + y2) / 2 + (Math.random() - 0.5) * displacement * 0.4;
+      subdivideLine(x1, y1, mx, my, displacement / 2, depth, width, segments, iterations - 1);
+      subdivideLine(mx, my, x2, y2, displacement / 2, depth, width, segments, iterations - 1);
+    }
+
+    function generateBranch(
+      x: number, y: number, angle: number,
+      length: number, depth: number, segments: BoltSegment[]
+    ) {
+      if (depth > 3 || length < 8) return;
+      const steps = 3 + Math.floor(Math.random() * 3);
+      const stepLen = length / steps;
+      let cx = x, cy = y;
+      const w = Math.max(0.3, 1.5 - depth * 0.4);
+      for (let i = 0; i < steps; i++) {
+        angle += (Math.random() - 0.5) * 0.6;
+        const nx = cx + Math.cos(angle) * stepLen;
+        const ny = cy + Math.sin(angle) * stepLen;
+        subdivideLine(cx, cy, nx, ny, stepLen * 0.3, depth, w, segments, 2);
+        if (Math.random() > 0.7 && depth < 3) {
+          const branchAngle = angle + (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.5);
+          generateBranch(nx, ny, branchAngle, length * 0.3, depth + 1, segments);
+        }
+        cx = nx;
+        cy = ny;
+      }
+    }
+
+    function generateBolt(): BoltSegment[] {
+      const segments: BoltSegment[] = [];
+      const startX = lw * (0.15 + Math.random() * 0.7);
+      const startY = -2;
+      const endX = startX + (Math.random() - 0.5) * lw * 0.6;
+      const endY = lh * (0.8 + Math.random() * 0.2);
+
+      const trunkPoints: { x: number; y: number }[] = [{ x: startX, y: startY }];
+      const mainSteps = 8 + Math.floor(Math.random() * 5);
+      let cx = startX, cy = startY;
+      for (let i = 1; i <= mainSteps; i++) {
+        const t = i / mainSteps;
+        cx = startX + (endX - startX) * t + (Math.random() - 0.5) * 45 * (1 - t * 0.3);
+        cy = startY + (endY - startY) * t + (Math.random() - 0.5) * 8;
+        trunkPoints.push({ x: cx, y: cy });
+      }
+
+      for (let i = 0; i < trunkPoints.length - 1; i++) {
+        const p1 = trunkPoints[i], p2 = trunkPoints[i + 1];
+        subdivideLine(p1.x, p1.y, p2.x, p2.y, 10, 0, 2.2, segments, 2);
+      }
+
+      for (let i = 1; i < trunkPoints.length - 1; i++) {
+        if (Math.random() > 0.55) {
+          const p = trunkPoints[i];
+          const next = trunkPoints[i + 1];
+          const trunkAngle = Math.atan2(next.y - p.y, next.x - p.x);
+          const side = Math.random() > 0.5 ? 1 : -1;
+          const branchAngle = trunkAngle + side * (0.3 + Math.random() * 0.7);
+          generateBranch(p.x, p.y, branchAngle, 25 + Math.random() * 50, 1, segments);
+        }
+      }
+
+      return segments;
+    }
+
+    function scheduleFlash() {
+      // randomize next flash time between 2.5s and 5s
+      nextFlashTime = performance.now() + 2500 + Math.random() * 2500;
+    }
+
+    function triggerFlicker() {
+      flickerQueue = [];
+      boltSegments = generateBolt();
+      const flickerCount = 1 + Math.floor(Math.random() * 2);
+      let offset = 0;
+      for (let i = 0; i < flickerCount; i++) {
+        const duration = 150 + Math.random() * 200;
+        const gap = 80 + Math.random() * 120;
+        const intensity = i === 0 ? 0.8 + Math.random() * 0.2 : 0.3 + Math.random() * 0.5;
+        flickerQueue.push({ start: performance.now() + offset, duration, intensity });
+        offset += duration + gap;
+      }
+    }
+
+    const themeObserver = new MutationObserver(() => {
+      isDark = document.documentElement.classList.contains("dark");
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    // pause when not visible
+    const io = new IntersectionObserver((entries) => {
+      const wasVisible = isVisible;
+      isVisible = entries[0].isIntersecting;
+      if (isVisible && !wasVisible) {
+        animId = requestAnimationFrame(draw);
+      }
+    }, { threshold: 0 });
+    io.observe(canvas);
+
+    banner.addEventListener("mouseenter", () => {
+      isHovered = true;
+      targetOpacity = 0.35;
+      scheduleFlash();
+    });
+    banner.addEventListener("mouseleave", () => {
+      isHovered = false;
+      targetOpacity = 0.12;
+      flashOpacity = 0;
+    });
+
+    function draw() {
+      if (!isVisible) return;
+
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx!.clearRect(0, 0, lw, lh);
+
+      currentOpacity += (targetOpacity - currentOpacity) * 0.06;
+
+      if (isHovered) {
+        const now = performance.now();
+        if (now >= nextFlashTime && flickerQueue.length === 0) {
+          triggerFlicker();
+          scheduleFlash();
+        }
+
+        flashOpacity = 0;
+        flickerQueue = flickerQueue.filter((f) => {
+          const elapsed = now - f.start;
+          if (elapsed < 0) return true;
+          if (elapsed > f.duration) return false;
+          const progress = elapsed / f.duration;
+          const fade = progress < 0.3 ? progress / 0.3 : 1 - (progress - 0.3) / 0.7;
+          flashOpacity = Math.max(flashOpacity, fade * f.intensity);
+          return true;
+        });
+
+        if (flashOpacity > 0 && isDark) {
+          const flashAlpha = flashOpacity * 0.08;
+          ctx!.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+          ctx!.fillRect(0, 0, lw, lh);
+
+          ctx!.lineCap = "round";
+          ctx!.lineJoin = "round";
+
+          const glowPasses = [
+            { width: 8, alpha: 0.03 },
+            { width: 4, alpha: 0.06 },
+            { width: 2, alpha: 0.1 },
+          ];
+
+          for (const pass of glowPasses) {
+            const style = `rgba(200,210,255,${flashOpacity * pass.alpha})`;
+            ctx!.beginPath();
+            ctx!.strokeStyle = style;
+            ctx!.lineWidth = pass.width;
+            for (const seg of boltSegments) {
+              if (seg.depth === 0) {
+                ctx!.moveTo(seg.x1, seg.y1);
+                ctx!.lineTo(seg.x2, seg.y2);
+              }
+            }
+            ctx!.stroke();
+
+            ctx!.beginPath();
+            ctx!.lineWidth = pass.width * 0.5;
+            for (const seg of boltSegments) {
+              if (seg.depth > 0) {
+                ctx!.moveTo(seg.x1, seg.y1);
+                ctx!.lineTo(seg.x2, seg.y2);
+              }
+            }
+            ctx!.stroke();
+          }
+
+          const trunkStyle = `rgba(255,255,255,${flashOpacity * 0.3})`;
+          ctx!.beginPath();
+          ctx!.strokeStyle = trunkStyle;
+          ctx!.lineWidth = 2.2;
+          for (const seg of boltSegments) {
+            if (seg.depth === 0) {
+              ctx!.moveTo(seg.x1, seg.y1);
+              ctx!.lineTo(seg.x2, seg.y2);
+            }
+          }
+          ctx!.stroke();
+
+          const branchStyle = `rgba(255,255,255,${flashOpacity * 0.15})`;
+          ctx!.beginPath();
+          ctx!.strokeStyle = branchStyle;
+          ctx!.lineWidth = 0.8;
+          for (const seg of boltSegments) {
+            if (seg.depth > 0) {
+              ctx!.moveTo(seg.x1, seg.y1);
+              ctx!.lineTo(seg.x2, seg.y2);
+            }
+          }
+          ctx!.stroke();
+
+          // Sync border with lightning
+          const b = Math.round(51 + flashOpacity * 204);
+          const hex = b.toString(16).padStart(2, "0");
+          const bc = `#${hex}${hex}${hex}`;
+          banner.style.borderColor = bc;
+          if (badge) badge.style.borderColor = bc;
+        } else {
+          banner.style.borderColor = "";
+          if (badge) badge.style.borderColor = "";
+        }
+      }
+
+      const color = isDark ? "255,255,255" : "0,0,0";
+      const buckets: Drop[][] = [[], [], [], [], []];
+      for (const drop of drops) {
+        drop.x += SIN_A * drop.speed;
+        drop.y += COS_A * drop.speed;
+
+        if (drop.y > lh || drop.x < 0) {
+          Object.assign(drop, createDrop());
+          if (Math.random() > 0.5) {
+            drop.y = -drop.length;
+            drop.x = Math.random() * lw;
+          } else {
+            drop.x = lw + drop.length;
+            drop.y = Math.random() * lh;
+          }
+        }
+
+        const bi = Math.min(4, (drop.opacity * 5) | 0);
+        buckets[bi].push(drop);
+      }
+
+      ctx!.lineWidth = 1;
+      ctx!.lineCap = "butt";
+      for (let bi = 0; bi < 5; bi++) {
+        const bucket = buckets[bi];
+        if (bucket.length === 0) continue;
+        const avgOpacity = (bi + 0.5) / 5;
+        ctx!.strokeStyle = `rgba(${color},${avgOpacity * currentOpacity})`;
+        ctx!.beginPath();
+        for (const drop of bucket) {
+          const dx = SIN_A * drop.length;
+          const dy = COS_A * drop.length;
+          ctx!.moveTo(drop.x, drop.y);
+          ctx!.lineTo(drop.x + dx, drop.y + dy);
+        }
+        ctx!.stroke();
+      }
+
+      animId = requestAnimationFrame(draw);
+    }
+
+    resize();
+    for (let i = 0; i < DROP_COUNT; i++) {
+      const d = createDrop();
+      d.y = Math.random() * lh;
+      drops.push(d);
+    }
+
+    if (isVisible) animId = requestAnimationFrame(draw);
+
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(banner);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      ro.disconnect();
+      io.disconnect();
+      themeObserver.disconnect();
+    };
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    initRailwayRain();
+  });
+</script>
 <style is:global>
   .card_image {
     width: 66px;
@@ -665,6 +1046,115 @@
 
   #avatar-light {
     display: block;
+  }
+
+  .railway-section {
+    flex-shrink: 0;
+    height: 100%;
+  }
+
+  .railway-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  .railway-banner_content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    width: 240px;
+    height: 144px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+
+  .railway-rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .railway-banner:hover .railway-banner_content {
+    border-color: #aaaaaa;
+  }
+
+  html[class~="dark"] .railway-banner_content {
+    background-color: #282828;
+    border: 1px solid #333333;
+    transition: border-color 0.05s;
+  }
+
+  .railway-banner_logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .railway-banner_logo img {
+    height: 80px;
+    width: auto;
+  }
+
+  .railway-logo-dark {
+    display: none;
+  }
+
+  .railway-logo-light {
+    display: block;
+  }
+
+  html[class~="dark"] .railway-logo-dark {
+    display: block;
+  }
+
+  html[class~="dark"] .railway-logo-light {
+    display: none;
+  }
+
+  .railway-banner_badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888888;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    border: 1px solid #e8e8e8;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 1;
+    transform: translateY(50%);
+    bottom: 0;
+    transition: border-color 0.2s;
+  }
+
+  .railway-banner:hover .railway-banner_badge {
+    border-color: #aaaaaa;
+  }
+
+  html[class~="dark"] .railway-banner_badge {
+    color: #999999;
+    background-color: #1c1c1c;
+    border-color: #333333;
+    transition: border-color 0.05s;
   }
 </style>
 <style>

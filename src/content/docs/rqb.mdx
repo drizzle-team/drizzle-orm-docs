@@ -8,7 +8,7 @@ import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 
 # Drizzle Queries
 
-<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': true, 'SingleStore': false }} />
+<IsSupportedChipGroup chips={{ 'PostgreSQL': true, 'SQLite': true, 'MySQL': true, 'SingleStore': true }} />
 
 Drizzle ORM is designed to be a thin typed layer on top of SQL. 
 We truly believe we've designed the best way to operate an SQL database from TypeScript and it's time to make it better.  
@@ -28,7 +28,7 @@ We've made sure you have both the best-in-class developer experience and perform
 
 	const db = drizzle({ schema });
 
-	const result = await db.query.users.findMany({
+	const result = await db._query.users.findMany({
 		with: {
 			posts: true			
 		},
@@ -89,7 +89,7 @@ We've made sure you have both the best-in-class developer experience and perform
 
 	const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
-	const result = await db.query.users.findMany({
+	const result = await db._query.users.findMany({
 		with: {
 			posts: true			
 		},
@@ -129,7 +129,7 @@ const db = drizzle({ client: connection, schema, mode: 'planetscale' });
 ## Querying
 Relational queries are an extension to Drizzle's original **[query builder](/docs/select)**.
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
-initialization and then just use the `db.query` API.
+initialization and then just use the `db._query` API.
 <Callout type="info" emoji="ℹ️">
 	`drizzle` import path depends on the **[database driver](/docs/connect-overview)** you're using.
 </Callout>
@@ -141,7 +141,7 @@ import { drizzle } from 'drizzle-orm/...';
 
 const db = drizzle({ schema });
 
-await db.query.users.findMany(...);
+await db._query.users.findMany(...);
 ```
 ```ts
 // if you have schema in multiple files
@@ -151,7 +151,7 @@ import { drizzle } from 'drizzle-orm/...';
 
 const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
-await db.query.users.findMany(...);
+await db._query.users.findMany(...);
 ```
 </CodeTab>
 ```typescript copy
@@ -162,6 +162,7 @@ await db.query.users.findMany(...);
 	export const users = pgTable('users', {
 		id: serial('id').primaryKey(),
 		name: text('name').notNull(),
+		verified: boolean('verified').notNull(),
 		invitedBy: integer('invited_by').references((): AnyPgColumn => users.id),
 	});
 
@@ -186,7 +187,7 @@ await db.query.users.findMany(...);
 		userId: integer('user_id').notNull().references(() => users.id),
 		groupId: integer('group_id').notNull().references(() => groups.id),
 	}, (t) => [
-		primaryKey(t.userId, t.groupId)
+		primaryKey({ columns: [t.userId, t.groupId] })
 	]);
 
 	export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
@@ -238,7 +239,7 @@ Drizzle provides `.findMany()` and `.findFirst()` APIs.
 ### Find many
 <Section>
 ```typescript copy
-const users = await db.query.users.findMany();
+const users = await db._query.users.findMany();
 ```
 ```ts
 // result type
@@ -257,7 +258,7 @@ const result: {
 </Callout>
 <Section>
 ```typescript copy
-const user = await db.query.users.findFirst();
+const user = await db._query.users.findFirst();
 ```
 ```ts
 // result type
@@ -276,7 +277,7 @@ const result: {
 
 **Getting all posts with comments:**
 ```typescript copy
-const posts = await db.query.posts.findMany({
+const posts = await db._query.posts.findMany({
 	with: {
 		comments: true,
 	},
@@ -285,7 +286,7 @@ const posts = await db.query.posts.findMany({
 
 **Getting first post with comments:**
 ```typescript copy
-const post = await db.query.posts.findFirst({
+const post = await db._query.posts.findFirst({
 	with: {
 		comments: true,
 	},
@@ -297,7 +298,7 @@ For any nested `with` queries Drizzle will infer types using [Core Type API](/do
   
 **Get all users with posts. Each post should contain a list of comments:**
 ```typescript copy
-const users = await db.query.users.findMany({
+const users = await db._query.users.findMany({
 	with: {
 		posts: {
 			with: {
@@ -319,7 +320,7 @@ const users = await db.query.users.findMany({
 
 **Get all posts with just `id`, `content` and include `comments`:**
 ```typescript copy
-const posts = await db.query.posts.findMany({
+const posts = await db._query.posts.findMany({
 	columns: {
 		id: true,
 		content: true,
@@ -332,7 +333,7 @@ const posts = await db.query.posts.findMany({
 
 **Get all posts without `content`:**
 ```typescript copy
-const posts = await db.query.posts.findMany({
+const posts = await db._query.posts.findMany({
 	columns: {
 		content: false,
 	},
@@ -349,7 +350,7 @@ all fields apart from `name` would be excluded anyways.
 **Exclude and Include fields in the same query:**
 <Section>
 ```typescript copy
-const users = await db.query.users.findMany({
+const users = await db._query.users.findMany({
 	columns: {
 		name: true,
 		id: false //ignored
@@ -367,7 +368,7 @@ const users: {
 **Only include columns from nested relations:**
 <Section>
 ```typescript copy
-const res = await db.query.users.findMany({
+const res = await db._query.users.findMany({
 	columns: {},
 	with: {
 		posts: true
@@ -388,7 +389,7 @@ const res: {
 ### Nested partial fields select
 Just like with **[`partial select`](#partial-select)**, you can include or exclude columns of nested relations:
 ```typescript copy
-const posts = await db.query.posts.findMany({
+const posts = await db._query.posts.findMany({
 	columns: {
 		id: true,
 		content: true,
@@ -412,12 +413,12 @@ You can either import them from `drizzle-orm` or use from the callback syntax:
 ```typescript copy
 import { eq } from 'drizzle-orm';
 
-const users = await db.query.users.findMany({
+const users = await db._query.users.findMany({
 	where: eq(users.id, 1)
 })
 ```
 ```ts copy
-const users = await db.query.users.findMany({
+const users = await db._query.users.findMany({
 	where: (users, { eq }) => eq(users.id, 1),
 })
 ```
@@ -425,7 +426,7 @@ const users = await db.query.users.findMany({
 
 Find post with `id=1` and comments that were created before particular date:
 ```typescript copy
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	where: (posts, { eq }) => (eq(posts.id, 1)),
 	with: {
 		comments: {
@@ -440,14 +441,14 @@ Drizzle ORM provides `limit` & `offset` API for queries and for the nested entit
   
 **Find 5 posts:**
 ```typescript copy
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	limit: 5,
 });
 ```
 
 **Find posts and get 3 comments at most:**
 ```typescript copy
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	with: {
 		comments: {
 			limit: 3,
@@ -460,7 +461,7 @@ await db.query.posts.findMany({
   `offset` is only available for top level query.
 </Callout>
 ```typescript 
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	limit: 5,
 	offset: 2, // correct ✅
 	with: {
@@ -474,7 +475,7 @@ await db.query.posts.findMany({
 
 Find posts with comments from the 5th to the 10th post:
 ```typescript copy
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	limit: 5,
   offset: 5,
 	with: {
@@ -493,12 +494,12 @@ You can use same ordering **[core API](/docs/select#order-by)** or use
 ```typescript copy
 import { desc, asc } from 'drizzle-orm';
 
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	orderBy: [asc(posts.id)],
 });
 ```
 ```typescript copy
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	orderBy: (posts, { asc }) => [asc(posts.id)],
 });
 ```
@@ -506,7 +507,7 @@ await db.query.posts.findMany({
 
 **Order by `asc` + `desc`:**
 ```typescript copy
-await db.query.posts.findMany({
+await db._query.posts.findMany({
 	orderBy: (posts, { asc }) => [asc(posts.id)],
 	with: {
 		comments: {
@@ -527,14 +528,14 @@ It's useful when you need to retrieve data and apply additional functions to it.
 ```typescript copy {5}
 import { sql } from 'drizzle-orm';
 
-await db.query.users.findMany({
+await db._query.users.findMany({
 	extras: {
 		loweredName: sql`lower(${users.name})`.as('lowered_name'),
 	},
 })
 ```
 ```typescript copy {3}
-await db.query.users.findMany({
+await db._query.users.findMany({
 	extras: {
 		loweredName: (users, { sql }) => sql`lower(${users.name})`.as('lowered_name'),
 	},
@@ -553,7 +554,7 @@ you can use the following query with the Drizzle relational query builder.
 
 <Section>
 ```typescript copy
-const res = await db.query.users.findMany({
+const res = await db._query.users.findMany({
 	extras: {
 		fullName: sql<string>`concat(${users.name}, " ", ${users.name})`.as('full_name'),
 	},
@@ -590,7 +591,7 @@ const res: {
 To retrieve all posts with comments and add an additional field to calculate the size of the post content and the size of each comment content:
 <Section>
 ```typescript copy
-const res = await db.query.posts.findMany({
+const res = await db._query.posts.findMany({
 	extras: (table, { sql }) => ({
 		contentLength: (sql<number>`length(${table.content})`).as('content_length'),
 	}),
@@ -634,11 +635,11 @@ using the Drizzle relational query builder.
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
+			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
 		},
 	},
 }).prepare('query_name');
@@ -650,11 +651,11 @@ const usersWithPosts = await prepared.execute({ id: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
+			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
 		},
 	},
 }).prepare();
@@ -666,11 +667,11 @@ const usersWithPosts = await prepared.execute({ id: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, 1)),
+			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
 		},
 	},
 }).prepare();
@@ -687,7 +688,7 @@ const usersWithPosts = await prepared.execute({ id: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	with: {
 		posts: {
 			limit: placeholder('limit'),
@@ -702,7 +703,7 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	with: {
 		posts: {
 			limit: placeholder('limit'),
@@ -717,7 +718,7 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	with: {
 		posts: {
 			limit: placeholder('limit'),
@@ -737,7 +738,7 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	offset: placeholder('offset'),
 	with: {
 		posts: true,
@@ -751,7 +752,7 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	offset: placeholder('offset'),
 	with: {
 		posts: true,
@@ -765,7 +766,7 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	offset: placeholder('offset'),
 	with: {
 		posts: true,
@@ -783,7 +784,7 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	limit: placeholder('uLimit'),
 	offset: placeholder('uOffset'),
 	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
@@ -802,7 +803,7 @@ const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	limit: placeholder('uLimit'),
 	offset: placeholder('uOffset'),
 	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
@@ -821,7 +822,7 @@ const usersWithPosts = await prepared.execute({ pLimit: 1, uLimit: 3, uOffset: 1
 <Tab>
 <Section>
 ```ts copy
-const prepared = db.query.users.findMany({
+const prepared = db._query.users.findMany({
 	limit: placeholder('uLimit'),
 	offset: placeholder('uOffset'),
 	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),

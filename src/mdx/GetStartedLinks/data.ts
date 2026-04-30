@@ -187,6 +187,52 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "Effect",
+        path: {
+          existing: "/docs/get-started/effect-postgresql-existing",
+          new: "/docs/get-started/effect-postgresql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/effect_light.svg",
+            style: {
+              width: 20,
+              fill: "#f0f0f0",
+            }
+          },
+          dark: { 
+            path: "/public/svg/effect.svg",
+            style: {
+              width: 20,
+              fill: "#f0f0f0",
+            }
+          }
+        },
+      },
+      {
+        name: "PlanetScale Postgres",
+        path: {
+          existing: "/docs/get-started/planetscale-postgres-existing",
+          new: "/docs/get-started/planetscale-postgres-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/planetscale.svg",
+
+            style: {
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/planetscale.svg",
+            style: {
+              width: 20,
+              color: "#f0f0f0",
+            },
+          },
+        },
+      },
     ],
   },
   {
@@ -338,10 +384,52 @@ export const getStartedItems: GetStartedItems = [
         },
       },
       {
-        name: "Turso",
+        name: "Turso Cloud",
         path: {
           existing: "/docs/get-started/turso-existing",
           new: "/docs/get-started/turso-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/new-turso.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/new-turso-light.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
+      {
+        name: "SQLite Cloud",
+        path: {
+          existing: "/docs/get-started/sqlite-cloud-existing",
+          new: "/docs/get-started/sqlite-cloud-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/sqlite-cloud.svg",
+            style: {
+              width: 26,
+            },
+          },
+          dark: {
+            path: "/public/svg/sqlite-cloud.svg",
+            style: {
+              width: 26,
+            },
+          },
+        },
+      },
+      {
+        name: "Turso Database",
+        path: {
+          existing: "/docs/get-started/turso-database-existing",
+          new: "/docs/get-started/turso-database-new",
         },
         icon: {
           light: {
@@ -417,6 +505,64 @@ export const getStartedItems: GetStartedItems = [
             path: "/public/svg/cloudflare.svg",
             style: {
               width: 26,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    title: "MSSQL",
+    items: [
+      {
+        name: "MSSQL",
+        path: {
+          existing: "/docs/get-started/mssql-existing",
+          new: "/docs/get-started/mssql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/mssql-light.png",
+            style: {
+              style: "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+          dark: {
+            path: "/public/svg/mssql-dark.png",
+            style: {
+              style: "border-radius: 5px",
+              width: 34,
+              height: 34,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    title: "CockroachDB",
+    items: [
+      {
+        name: "CockroachDB",
+        path: {
+          existing: "/docs/get-started/cockroach-existing",
+          new: "/docs/get-started/cockroach-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/cockroachdb-light.png",
+            style: {
+              style: "border-radius: 5px",
+              width: "24px",
+            },
+          },
+          dark: {
+            path: "/public/svg/cockroachdb-dark.png",
+            style: {
+              style: "border-radius: 5px",
+              width: "24px",
             },
           },
         },

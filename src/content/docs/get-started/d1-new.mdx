@@ -31,7 +31,7 @@ import ConnectLibsql from '@mdx/get-started/sqlite/ConnectLibsql.mdx';
 <FileStructure />
 
 #### Step 1 - Install required packages
-<InstallPackages lib=''/>
+<InstallPackages lib='wrangler'/>
 
 #### Step 2 - Setup wrangler.toml
 
@@ -64,11 +64,21 @@ export default {
 };
 ```
 
-#### Step 4 - Create a table
+#### Step 4 - Generate wrangler types 
+
+<Npx>
+wrangler types
+</Npx>
+
+<Callout>
+The output of this command will be a `worker-configuration.d.ts` file.
+</Callout>
+
+#### Step 5 - Create a table
 
 <CreateTable/>
 
-#### Step 5 - Setup Drizzle config file
+#### Step 6 - Setup Drizzle config file
 
 **Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
 
@@ -94,11 +104,11 @@ export default defineConfig({
 You can check [our tutorial](/docs/guides/d1-http-with-drizzle-kit) on how to get env variables from CloudFlare
 </Callout>
 
-#### Step 6 - Applying changes to the database
+#### Step 7 - Applying changes to the database
 
 <ApplyChanges />
 
-#### Step 7 - Seed and Query the database
+#### Step 8 - Seed and Query the database
 
 ```typescript copy
 import { drizzle } from 'drizzle-orm/d1';
@@ -115,6 +125,6 @@ export default {
 };
 ```
 
-#### Step 8 - Run index.ts file
+#### Step 9 - Run index.ts file
 
 <RunFile/>

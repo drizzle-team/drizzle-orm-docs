@@ -3,6 +3,64 @@ import { type ISponsor, ImageType } from "@/types";
 export const asideSponsors: ISponsor[] = [
   {
     tier: {
+      name: "$5000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/planetscale",
+      name: "PlanetScale",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-01-28T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    badge: "Our Primary backer",
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/images/planetScale-dark.png") center / contain no-repeat content-box',
+      minWidth: "176px",
+    },
+    lightStyle: {
+      filter: "invert(0.5)",
+      background:
+        'url("/images/planetScale.png") center / contain no-repeat content-box',
+      minWidth: "176px",
+    },
+  },
+  {
+    tier: {
+      name: "$2500 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/railway",
+      name: "Railway",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-01-28T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    badge: "Our Cloud Partner",
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/railway-sidebar.svg") center / contain no-repeat content-box',
+      minWidth: "calc(100% + 128px)",
+    },
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/railway-sidebar-light.svg") center / contain no-repeat content-box',
+      minWidth: "calc(100% + 128px)",
+    },
+  },
+  {
+    tier: {
       name: "$1000 a month",
       isOneTime: false,
     },
@@ -104,33 +162,6 @@ export const asideSponsors: ISponsor[] = [
       padding: "6px",
     },
   },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "hub.nuxt.com/?utm_source=drizzle-docs",
-      name: "Nuxt",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2023-06-11T13:32:16Z",
-    isActive: true,
-    followLink: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "brightness(0.4) grayscale(1)",
-      background:
-        'url("/svg/nuxt-green.svg") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      filter: "brightness(0.9) grayscale(1)",
-      background:
-        'url("/svg/nuxt-green.svg") 0% 0% / cover no-repeat content-box',
-    },
-  },
   // {
   //   tier: {
   //     name: "$1000 a month",
@@ -157,60 +188,32 @@ export const asideSponsors: ISponsor[] = [
   //       'url("/images/hydra-black.png") 0% 0% / cover no-repeat content-box',
   //   },
   // },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/decocx",
-      name: "Deco.cx",
-      avatarUrl: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M6.77828 19.8642C4.2582 19.8642 2.25696 18.9006 1.07104 17.1959C-0.189006 15.417 -0.337247 12.8969 0.626315 10.2286C1.96048 6.74493 5.14764 4.59545 9.00189 4.59545H9.07601C9.07601 4.52133 9.07601 4.44721 9.07601 4.29897C9.00189 3.03893 9.81721 1.92712 11.0031 1.55652L14.4868 0.22236C14.8574 0.0741201 15.228 0 15.5986 0C16.7104 0 17.7481 0.592961 18.2669 1.63064L19.6752 4.59545C20.1199 5.48489 20.1199 6.59669 19.6011 7.41201C19.0822 8.22733 18.2669 8.67205 17.3775 8.74618C17.1551 9.1909 17.0069 9.63562 16.7845 10.0062C16.3398 11.0439 15.8951 12.0816 15.3762 13.1934C13.4491 17.1959 11.2996 19.8642 6.77828 19.8642Z" fill="#113032"/>
-        <path d="M6.77828 17.27C9.59484 17.27 11.1514 16.0099 13.0044 12.0816C14.0421 9.9321 14.8574 7.78261 15.8209 5.70725L17.0069 6.07785C17.3033 6.15197 17.5257 6.00373 17.3775 5.70725L15.8951 2.81656C15.8209 2.5942 15.5245 2.5942 15.3762 2.66832L11.8184 4.00248C11.522 4.0766 11.522 4.37309 11.8184 4.44721L12.8561 4.81781C11.9667 6.74493 10.929 9.70974 10.0396 11.5627C9.076 13.6381 8.63128 15.0464 6.92652 15.0464C5.22176 15.0464 4.9994 13.7863 5.7406 11.9333C6.55592 9.78385 7.89008 9.19089 9.37248 9.63561C9.8172 9.04265 10.1137 8.15321 10.2619 7.33789C9.8172 7.18965 9.29836 7.18965 8.85364 7.18965C6.40768 7.18965 3.96171 8.44969 2.92403 11.118C1.81223 14.6017 2.99815 17.27 6.77828 17.27Z" fill="#02F67C"/>
-        </svg>`,
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "6px",
-      filter: "grayscale(1) opacity(0.3)",
-    },
-    lightStyle: {
-      padding: "6px",
-      filter: "grayscale(1) brightness(4) opacity(0.9)",
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/tembo",
-      name: "Tembo",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "4px",
-      filter: "grayscale(1) brightness(2) opacity(0.2)",
-      background:
-        'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
-    },
-    lightStyle: {
-      padding: "4px",
-      filter: "grayscale(1) opacity(0.5)",
-      background:
-        'url("/images/tembo.png") 0% 0% / contain no-repeat content-box',
-    },
-  },
+  // {
+  //   tier: {
+  //     name: "$1000 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/decocx",
+  //     name: "Deco.cx",
+  //     avatarUrl: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+  //       <path d="M6.77828 19.8642C4.2582 19.8642 2.25696 18.9006 1.07104 17.1959C-0.189006 15.417 -0.337247 12.8969 0.626315 10.2286C1.96048 6.74493 5.14764 4.59545 9.00189 4.59545H9.07601C9.07601 4.52133 9.07601 4.44721 9.07601 4.29897C9.00189 3.03893 9.81721 1.92712 11.0031 1.55652L14.4868 0.22236C14.8574 0.0741201 15.228 0 15.5986 0C16.7104 0 17.7481 0.592961 18.2669 1.63064L19.6752 4.59545C20.1199 5.48489 20.1199 6.59669 19.6011 7.41201C19.0822 8.22733 18.2669 8.67205 17.3775 8.74618C17.1551 9.1909 17.0069 9.63562 16.7845 10.0062C16.3398 11.0439 15.8951 12.0816 15.3762 13.1934C13.4491 17.1959 11.2996 19.8642 6.77828 19.8642Z" fill="#113032"/>
+  //       <path d="M6.77828 17.27C9.59484 17.27 11.1514 16.0099 13.0044 12.0816C14.0421 9.9321 14.8574 7.78261 15.8209 5.70725L17.0069 6.07785C17.3033 6.15197 17.5257 6.00373 17.3775 5.70725L15.8951 2.81656C15.8209 2.5942 15.5245 2.5942 15.3762 2.66832L11.8184 4.00248C11.522 4.0766 11.522 4.37309 11.8184 4.44721L12.8561 4.81781C11.9667 6.74493 10.929 9.70974 10.0396 11.5627C9.076 13.6381 8.63128 15.0464 6.92652 15.0464C5.22176 15.0464 4.9994 13.7863 5.7406 11.9333C6.55592 9.78385 7.89008 9.19089 9.37248 9.63561C9.8172 9.04265 10.1137 8.15321 10.2619 7.33789C9.8172 7.18965 9.29836 7.18965 8.85364 7.18965C6.40768 7.18965 3.96171 8.44969 2.92403 11.118C1.81223 14.6017 2.99815 17.27 6.77828 17.27Z" fill="#02F67C"/>
+  //       </svg>`,
+  //   },
+  //   createdAt: "2024-06-07T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  //   darkStyle: {
+  //     padding: "6px",
+  //     filter: "grayscale(1) opacity(0.3)",
+  //   },
+  //   lightStyle: {
+  //     padding: "6px",
+  //     filter: "grayscale(1) brightness(4) opacity(0.9)",
+  //   },
+  // },
   {
     tier: {
       name: "$1000 a month",
@@ -235,41 +238,41 @@ export const asideSponsors: ISponsor[] = [
       filter: "grayscale(1) opacity(0.6) invert(0.1)",
     },
   },
+  // {
+  //   tier: {
+  //     name: "$2500 a month",
+  //     isOneTime: false,
+  //   },
+  //   sponsorEntity: {
+  //     __typename: "Organization",
+  //     login: "driz.link/edgedb",
+  //     name: "Gel",
+  //     avatarUrl:
+  //       `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="154" viewBox="0 0 200 154" fill="none">
+  //         <path d="M0 68.6C0 90.4 17.8499 108 39.9594 108C61.8661 108 79.9189 90.4 79.9189 68.6C79.9189 47 61.8661 29.2 39.9594 29.2C17.8499 29.2 0 47 0 68.6ZM171.197 14C171.197 6.6 177.485 0 185.396 0C193.306 0 200 6.6 200 14V94C200 101.4 193.306 108 185.396 108C177.485 108 171.197 101.4 171.197 94V14ZM10.5477 127.6C12.1704 141.4 23.7323 154 39.9594 154C55.9838 154 67.9513 141.4 69.574 127.6C71.8053 107.6 53.3469 114.2 39.9594 114.2C26.572 114.2 8.31643 107.6 10.5477 127.6ZM139.351 74.2C140.771 71 144.422 69 151.521 69C162.677 68.8 167.14 61.6 161.258 50.2C157.201 42.4 150.913 36.4 142.394 32.6C122.312 23.8 98.5801 32.8 89.6552 52.6C80.7302 72.2 89.6552 95.6 109.939 104.6C118.458 108.2 126.978 108.8 135.7 106.6C148.276 103.2 150.913 95 143.408 86.8C138.742 81.4 137.728 77.6 139.351 74.2Z" fill="url(#paint0_linear_59_46)"/>
+  //         <defs>
+  //         <linearGradient id="paint0_linear_59_46" x1="250.254" y1="0" x2="250.254" y2="154" gradientUnits="userSpaceOnUse">
+  //         <stop stop-color="#FFC800"/>
+  //         <stop offset="1" stop-color="#FF4800"/>
+  //         </linearGradient>
+  //         </defs>
+  //       </svg>`,
+  //   },
+  //   createdAt: "2024-06-07T13:32:16Z",
+  //   isActive: true,
+  //   imageType: ImageType.SVG,
+  //   darkStyle: {
+  //     filter: "grayscale(1) brightness(2) opacity(0.3)",
+  //     minWidth: "calc(100% + 16px)"
+  //   },
+  //   lightStyle: {
+  //     filter: "grayscale(1) brightness(0.5) opacity(0.4)",
+  //     minWidth: "calc(100% + 16px)"
+  //   },
+  // },
   {
     tier: {
-      name: "$2500 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/edgedb",
-      name: "Gel",
-      avatarUrl:
-        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="154" viewBox="0 0 200 154" fill="none">
-          <path d="M0 68.6C0 90.4 17.8499 108 39.9594 108C61.8661 108 79.9189 90.4 79.9189 68.6C79.9189 47 61.8661 29.2 39.9594 29.2C17.8499 29.2 0 47 0 68.6ZM171.197 14C171.197 6.6 177.485 0 185.396 0C193.306 0 200 6.6 200 14V94C200 101.4 193.306 108 185.396 108C177.485 108 171.197 101.4 171.197 94V14ZM10.5477 127.6C12.1704 141.4 23.7323 154 39.9594 154C55.9838 154 67.9513 141.4 69.574 127.6C71.8053 107.6 53.3469 114.2 39.9594 114.2C26.572 114.2 8.31643 107.6 10.5477 127.6ZM139.351 74.2C140.771 71 144.422 69 151.521 69C162.677 68.8 167.14 61.6 161.258 50.2C157.201 42.4 150.913 36.4 142.394 32.6C122.312 23.8 98.5801 32.8 89.6552 52.6C80.7302 72.2 89.6552 95.6 109.939 104.6C118.458 108.2 126.978 108.8 135.7 106.6C148.276 103.2 150.913 95 143.408 86.8C138.742 81.4 137.728 77.6 139.351 74.2Z" fill="url(#paint0_linear_59_46)"/>
-          <defs>
-          <linearGradient id="paint0_linear_59_46" x1="250.254" y1="0" x2="250.254" y2="154" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#FFC800"/>
-          <stop offset="1" stop-color="#FF4800"/>
-          </linearGradient>
-          </defs>
-        </svg>`,
-    },
-    createdAt: "2024-06-07T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "grayscale(1) brightness(2) opacity(0.3)",
-      minWidth: "calc(100% + 16px)"
-    },
-    lightStyle: {
-      filter: "grayscale(1) brightness(0.5) opacity(0.4)",
-      minWidth: "calc(100% + 16px)"
-    },
-  },
-  {
-    tier: {
-      name: "$2500 a month",
+      name: "$1000 a month",
       isOneTime: false,
     },
     sponsorEntity: {
@@ -286,7 +289,7 @@ export const asideSponsors: ISponsor[] = [
       height: "100%",
       filter: "brightness(0.3) grayscale(1)",
       background:
-        'url("/svg/upstash-dark-bg.svg") center / contain no-repeat content-box',
+        'url("/svg/upstash-icon-dark-bg.svg") center / contain no-repeat content-box',
       padding: "6px",
       width: "fit-content",
       "aspect-ratio": 4.55,
@@ -296,38 +299,11 @@ export const asideSponsors: ISponsor[] = [
       height: "100%",
       filter: "brightness(0.8) grayscale(1) opacity(0.45)",
       background:
-        'url("/svg/upstash-white-bg.svg") center / contain no-repeat content-box',
+        'url("/svg/upstash-icon-white-bg.svg") center / contain no-repeat content-box',
       padding: "6px",
       width: "fit-content",
       "aspect-ratio": 4.55,
       "max-width": "initial",
-    },
-  },
-  {
-    tier: {
-      name: "$1000 a month",
-      isOneTime: false,
-    },
-    sponsorEntity: {
-      __typename: "Organization",
-      login: "driz.link/singlestore",
-      name: "SingleStore",
-      avatarUrl:
-        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-    },
-    createdAt: "2023-06-11T13:32:16Z",
-    isActive: true,
-    imageType: ImageType.SVG,
-    darkStyle: {
-      padding: "4px",
-      filter: "brightness(0.3)",
-      background:
-        'url("/svg/single_store_dark.svg") 0% 0% / cover no-repeat content-box',
-    },
-    lightStyle: {
-      padding: "4px",
-      filter: "invert(0.6)",
-      background: 'url("/svg/single_store_light.svg") 0% 0% / cover no-repeat content-box',
     },
   },
   {
@@ -365,8 +341,7 @@ export const asideSponsors: ISponsor[] = [
       __typename: "Organization",
       login: "driz.link/replit",
       name: "Replit",
-      avatarUrl:
-        `<svg version="1.1" id="Artwork" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      avatarUrl: `<svg version="1.1" id="Artwork" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 793.8 871.5" style="enable-background:new 0 0 793.8 871.5;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#F5640C;}
@@ -446,39 +421,66 @@ export const asideSponsors: ISponsor[] = [
     },
     sponsorEntity: {
       __typename: "Organization",
-      login: "driz.link/gibsonai",
-      name: "GibsonAI",
+      login: "clerk.com",
+      name: "Clerk",
       avatarUrl:
         '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
     },
-    createdAt: "2024-06-07T13:32:16Z",
+    createdAt: "2025-11-07T00:00:00Z",
     isActive: true,
     imageType: ImageType.SVG,
-    darkStyle: {
-      filter: "grayscale(1) brightness(2) opacity(0.2)",
-      background:
-        'url("/svg/gibsonai-dark.svg") 0% 0% / contain no-repeat content-box',
-    },
     lightStyle: {
-      filter: "grayscale(1) opacity(0.4)",
+      filter: "invert(0.6)",
       background:
-        'url("/svg/gibsonai-light.svg") 0% 0% / contain no-repeat content-box',
+        'url("/svg/clerk-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/clerk-dark.svg") center / contain no-repeat content-box',
     },
   },
-  // {
-  //   tier: {
-  //     name: "$1000 a month",
-  //     isOneTime: false,
-  //   },
-  //   sponsorEntity: {
-  //     __typename: "Organization",
-  //     login: "driz.link/sponsor",
-  //     name: "Sponsor",
-  //     avatarUrl:
-  //       '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
-  //   },
-  //   createdAt: "2024-08-13T16:35:56Z",
-  //   isActive: true,
-  //   imageType: ImageType.IMAGE,
-  // },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/warp",
+      name: "Warp",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2025-11-07T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "invert(0.6)",
+      background:
+        'url("/svg/warp-light.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.3)",
+      background:
+        'url("/svg/warp-dark.svg") center / contain no-repeat content-box',
+    },
+  },
+  // Placeholder
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/sponsor",
+      name: "Sponsor",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2024-08-13T16:35:56Z",
+    isActive: true,
+    imageType: ImageType.IMAGE,
+  },
 ];

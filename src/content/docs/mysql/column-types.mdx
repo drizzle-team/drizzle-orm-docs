@@ -314,6 +314,100 @@ CREATE TABLE `table` (
 
 ## ---
 
+### blob
+
+<Callout type='warning'>
+Available starting from `drizzle-orm@1.0.0-beta.2`
+</Callout>
+
+A `BLOB` is a binary large object that can hold a variable amount of data.
+<Section>
+```typescript
+import { blob, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	blob: blob()
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`blob` blob
+);
+```
+</Section>
+
+### tinyblob
+
+<Callout type='warning'>
+Available starting from `drizzle-orm@1.0.0-beta.2`
+</Callout>
+
+A `TINYBLOB` is a binary large object that can hold a variable amount of data.
+<Section>
+```typescript
+import { tinyblob, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	tinyblob: tinyblob()
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`tinyblob` tinyblob
+);
+```
+</Section>
+
+### mediumblob
+
+<Callout type='warning'>
+Available starting from `drizzle-orm@1.0.0-beta.2`
+</Callout>
+
+A `MEDIUMBLOB` is a binary large object that can hold a variable amount of data.
+<Section>
+```typescript
+import { mediumblob, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	mediumblob: mediumblob()
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`mediumblob` mediumblob
+);
+```
+</Section>
+
+### longblob
+
+<Callout type='warning'>
+Available starting from `drizzle-orm@1.0.0-beta.2`
+</Callout>
+
+A `LONGBLOB` is a binary large object that can hold a variable amount of data.
+<Section>
+```typescript
+import { longblob, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	longblob: longblob()
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`longblob` longblob
+);
+```
+</Section>
+
+## ---
+
 ### char
 
 <Section>

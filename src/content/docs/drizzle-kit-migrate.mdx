@@ -10,9 +10,9 @@ import Npx from "@mdx/Npx.astro";
 # `drizzle-kit migrate`
 <Prerequisites>
 - Get started with Drizzle and `drizzle-kit` - [read here](/docs/get-started)
-- Drizzle schema foundamentals - [read here](/docs/sql-schema-declaration)
+- Drizzle schema fundamentals - [read here](/docs/sql-schema-declaration)
 - Database connection basics - [read here](/docs/connect-overview)
-- Drizzle migrations foundamentals - [read here](/docs/migrations)
+- Drizzle migrations fundamentals - [read here](/docs/migrations)
 - Drizzle Kit [overview](/docs/kit-overview) and [config file](/docs/drizzle-config-file)
 - `drizzle-kit generate` command - [read here](/docs/drizzle-kit-generate)
 </Prerequisites>
@@ -32,9 +32,8 @@ Drizzle Kit `migrate` command triggers a sequence of events:
 <Section>
 ```plaintext
   ├ 📂 drizzle       
-  │ ├ 📂 _meta
-  │ ├ 📜 0000_premium_mister_fear.sql
-  │ └ 📜 0001_delicate_professor_xavie.sql
+  │ ├ 📂 20242409125510_premium_mister_fear
+  │ └ 📂 20242409135510_delicate_professor_xavie
   └ …
 ```
 ```plaintext
@@ -96,6 +95,19 @@ export default defineConfig({
     schema: 'public', // used in PostgreSQL only, `drizzle` by default
   },
 });
+```
+
+### Ignore conflicts
+
+<Callout type='warning'>
+`--ignore-conflicts` available starting from `drizzle-orm@1.0.0-beta.16`
+</Callout>
+
+In case you need `migrate` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
+there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
+
+```shell
+drizzle-kit migrate --ignore-conflicts
 ```
 
 ### Multiple configuration files in one project
@@ -163,8 +175,7 @@ it will generate
 📦 <project root>
  ├ …
  ├ 📂 migrations
- │ ├ 📂 _meta
- │ └ 📜 0000_init.sql 
+ │ ├ 📂 20242409125510_init
  └ …
 ```
 ```sql

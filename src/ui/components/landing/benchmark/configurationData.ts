@@ -1,26 +1,24 @@
-const configurationData: {
-  [key: string]: {
-    value: string;
-    items: {
-      [id: string]: {
-        value: string;
-        description?: string;
-        disabled?: boolean;
-        config_info?: string;
-        drizzle_version?: string;
-        compare_version?: string;
-      };
-    };
-  };
-} = {
+const configurationData = {
   orm: {
     value: "ORM",
     items: {
-      prisma: {
-        value: "Drizzle vs Prisma",
-        config_info: "Drizzle vs Prisma",
+      "prisma-v7.1.0": {
+        value: "Drizzle v1.0.0-beta.2 vs Prisma v7.1.0",
+        config_info: "Drizzle v1.0.0-beta.2 vs Prisma v7.1.0",
+        drizzle_version: "v1.0.0-beta.2",
+        compare_version: "v7.1.0",
+      },
+      "prisma-v5.18.0": {
+        value: "Drizzle v0.33.0 vs Prisma v5.18.0",
+        config_info: "Drizzle v0.33.0 vs Prisma v5.18.0",
         drizzle_version: "v0.33.0",
         compare_version: "v5.18.0",
+      },
+      go: {
+        value: "Drizzle v1.0.0-beta.2 vs Go v1.25.5",
+        config_info: "Drizzle v1.0.0-beta.2 vs Go v1.25.5",
+        drizzle_version: "v1.0.0-beta.2",
+        compare_version: "v1.25.5",
       },
       typeorm: {
         value: "Drizzle vs TypeORM",
@@ -40,22 +38,27 @@ const configurationData: {
       small: {
         value: "Small",
         disabled: true,
+        config_info: "Small database size",
       },
       medium: {
         value: "Medium",
         disabled: true,
+        config_info: "Medium database size",
       },
       large: {
         value: "Large",
         disabled: true,
+        config_info: "Large database size",
       },
       huge: {
         value: "Huge",
         disabled: true,
+        config_info: "Huge database size",
       },
       extreme: {
         value: "Extreme",
         disabled: true,
+        config_info: "Extreme database size",
       },
     },
   },
@@ -73,10 +76,12 @@ const configurationData: {
       },
       geo: {
         value: "Geo queries heavy",
+        config_info: "Geo queries heavy",
         disabled: true,
       },
       analytics: {
         value: "Analytics with time series",
+        config_info: "Analytics with time series",
         disabled: true,
       },
     },
@@ -90,26 +95,31 @@ const configurationData: {
       },
       mysql: {
         value: "MySQL",
+        config_info: "MySQL",
         disabled: true,
       },
       sqlite: {
         value: "SQLite",
+        config_info: "SQLite",
         disabled: true,
       },
       serverless_postgres: {
         value: "Serverless PostgreSQL",
+        config_info: "Serverless PostgreSQL",
         disabled: true,
       },
       serverless_mysql: {
         value: "Serverless MySQL",
+        config_info: "Serverless MySQL",
         disabled: true,
       },
       serverless_sqlite: {
         value: "Serverless SQLite",
+        config_info: "Serverless SQLite",
         disabled: true,
       },
     },
   },
-};
+} as const;
 
 export default configurationData;

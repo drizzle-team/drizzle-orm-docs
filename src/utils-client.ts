@@ -1,4 +1,5 @@
 import { customSponsors } from "@/data/custom-sponsors";
+import { rotateArrayDaily } from "@/utils";
 import { type ISponsor } from "@/types";
 
 interface AnchorProps {
@@ -112,6 +113,7 @@ export const sponsorsHandler = async () => {
   });
 
   gold = gold.filter((s) => s.sponsorEntity.login !== "samalberto25" && s.sponsorEntity.login !== "lokalise");
+  hero = hero.filter((s) => s.sponsorEntity.login !== "railwayapp" && s.sponsorEntity.login !== "railway");
 
   superhero = superhero.filter((s) => filterFunc(s));
   hero = hero.filter((s) => filterFunc(s));
@@ -130,31 +132,31 @@ export const sponsorsHandler = async () => {
   const arrays = [
     {
       name: "hero",
-      items: [...hero],
+      items: rotateArrayDaily(hero),
     },
     {
       name: "gold",
-      items: [...gold],
+      items: rotateArrayDaily(gold),
     },
     {
       name: "silver",
-      items: [...silver],
+      items: rotateArrayDaily(silver),
     },
     {
       name: "bronze",
-      items: [...bronze],
+      items: rotateArrayDaily(bronze),
     },
     {
       name: "ramen",
-      items: [...ramen],
+      items: rotateArrayDaily(ramen),
     },
     {
       name: "coffee",
-      items: [...coffee],
+      items: rotateArrayDaily(coffee),
     },
     {
       name: "past",
-      items: [...pastSponsors],
+      items: rotateArrayDaily(pastSponsors),
     },
   ];
 

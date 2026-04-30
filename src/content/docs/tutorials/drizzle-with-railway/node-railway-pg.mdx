@@ -1,0 +1,400 @@
+---
+title: "Drizzle with Node.js and PostgreSQL on Railway"
+date: "2026-03-19"
+---
+
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Npm from "@mdx/Npm.astro";
+import Steps from "@mdx/Steps.astro";
+import Section from "@mdx/Section.astro";
+import Callout from "@mdx/Callout.astro";
+
+This tutorial demonstrates how to use Drizzle ORM with [Node.js](https://nodejs.org/) and a PostgreSQL database, all deployed on [Railway](https://driz.link/railway).
+
+<Prerequisites>
+  - You should have [Node.js](https://nodejs.org/) installed. You can install it by following the [official guide](https://nodejs.org/en/download/).
+
+  - You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
+  <Npm>
+    drizzle-orm
+    -D drizzle-kit
+  </Npm>
+
+  - You should have installed the `pg` package as the PostgreSQL driver and `tsx` to run TypeScript files directly.
+  <Npm>
+    pg
+    -D @types/pg tsx
+  </Npm>
+
+  - You should have a [Railway](https://driz.link/railway) account.
+</Prerequisites>
+
+## Setup Railway and Drizzle ORM
+
+<Steps>
+#### Create a Railway project
+
+Log in to your [Railway dashboard](https://railway.app/dashboard) and click the `New Project` button.
+
+![](@/assets/images/tutorials/railway-create-service-menu.png)
+
+#### Provision a PostgreSQL database
+
+On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also use the command palette (`Cmd/Ctrl + K`) and search for PostgreSQL. Railway will provision a new PostgreSQL instance for you.
+
+![](@/assets/images/tutorials/railway-select-postgres.png)
+
+#### Get your connection string
+
+Click on the PostgreSQL service in your project, go to the `Variables` tab, and find the `DATABASE_PUBLIC_URL` variable. Copy the value — it should look similar to this:
+
+```bash
+postgresql://postgres:password@region.railway.app:port/railway
+```
+
+![](@/assets/images/tutorials/railway-postgres-variables.png)
+
+<Callout type="warning">
+Railway provides two types of database connection URLs:
+
+- **Public URL** — accessible from anywhere (your local machine, external services). Uses a TCP proxy and looks like `postgresql://postgres:password@region.railway.app:port/railway`.
+- **Private URL** — only accessible from services within the same Railway project via internal networking. Uses `*.railway.internal` hostname.
+
+For **local development** (like running `drizzle-kit push` or `drizzle-kit studio`), you must use the **public URL**. The private `*.railway.internal` hostname will not resolve from your local machine.
+</Callout>
+
+#### Setup connection string variable
+
+Create a `.env` file in the root of your project and add the `DATABASE_URL` environment variable. Use the **public** connection string from Railway:
+
+```plaintext copy
+DATABASE_URL=postgresql://postgres:password@region.railway.app:port/railway
+```
+
+<Callout type="info">
+  This `.env` file is for local development only. When deploying to Railway, you
+  will configure the `DATABASE_URL` environment variable separately in the
+  Railway dashboard using a service reference variable.
+</Callout>
+
+#### Connect Drizzle ORM to your database
+
+Create a `db.ts` file and set up your database configuration:
+
+```typescript copy filename="src/db.ts"
+import { drizzle } from "drizzle-orm/node-postgres";
+
+export const db = drizzle(process.env.DATABASE_URL!);
+```
+
+#### Create tables
+
+Create a `schema.ts` file and declare your tables:
+
+```typescript copy filename="src/schema.ts"
+import * as p from "drizzle-orm/pg-core";
+
+export const usersTable = p.pgTable("users", {
+  id: p.serial().primaryKey(),
+  name: p.text().notNull(),
+  age: p.integer().notNull(),
+  email: p.text().notNull().unique(),
+});
+
+export const postsTable = p.pgTable("posts", {
+  id: p.serial().primaryKey(),
+  title: p.text().notNull(),
+  content: p.text().notNull(),
+  userId: p
+    .integer()
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  createdAt: p.timestamp().notNull().defaultNow(),
+  updatedAt: p
+    .timestamp()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type InsertUser = typeof usersTable.$inferInsert;
+export type SelectUser = typeof usersTable.$inferSelect;
+
+export type InsertPost = typeof postsTable.$inferInsert;
+export type SelectPost = typeof postsTable.$inferSelect;
+```
+
+#### Setup Drizzle config file
+
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+
+Create a `drizzle.config.ts` file in the root of your project and add the following content:
+
+```typescript copy filename="drizzle.config.ts"
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/schema.ts",
+  out: "./migrations",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+
+#### Applying changes to the database
+
+You can generate migrations using `drizzle-kit generate` command and then run them using the `drizzle-kit migrate` command.
+
+Generate migrations:
+
+```bash copy
+npx drizzle-kit generate
+```
+
+The `generate` command only creates migration SQL files based on your schema — it does **not** apply any changes to the database. These migrations are stored in the `migrations` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+
+Example of a generated migration:
+
+```sql
+CREATE TABLE "posts" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"content" text NOT NULL,
+	"userId" integer NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "users" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"age" integer NOT NULL,
+	"email" text NOT NULL,
+	CONSTRAINT "users_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
+ALTER TABLE "posts" ADD CONSTRAINT "posts_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+```
+
+Apply the generated migrations to the database:
+
+```bash copy
+npx drizzle-kit migrate
+```
+
+<Callout type="info">
+  In this tutorial, migrations are applied automatically on application startup
+  using `migrate()` from `drizzle-orm/node-postgres/migrator`. You can also
+  apply them manually with `drizzle-kit migrate` for local testing.
+</Callout>
+
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+
+```bash copy
+npx drizzle-kit push
+```
+
+<Callout type="warning">
+  Push command is good for rapid prototyping in local development, allowing fast
+  iterations without managing migration files. For production deployments,
+  prefer the `generate` + `migrate` workflow to keep a versioned history of
+  schema changes.
+</Callout>
+
+</Steps>
+
+## Basic file structure
+
+This is the basic file structure of the project. In the `src` directory, we have database-related files including connection in `db.ts` and schema definitions in `schema.ts`.
+
+```plaintext
+📦 <project root>
+ ├ 📂 src
+ │  ├ 📜 db.ts
+ │  ├ 📜 schema.ts
+ │  └ 📜 index.ts
+ ├ 📂 migrations
+ │  ├ 📂 meta
+ │  │  ├ 📜 _journal.json
+ │  │  └ 📜 0000_snapshot.json
+ │  └ 📜 0000_optimal_the_fury.sql
+ ├ 📜 .env
+ ├ 📜 drizzle.config.ts
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+## Deploy the App to Railway
+
+<Steps>
+#### Prepare your project for deployment
+
+Once you've [generated your migrations](#applying-changes-to-the-database), commit the `migrations` directory to your repository — these files will be applied automatically when your app starts.
+
+Create an `index.ts` file as the entry point for your application. This example runs migrations on startup and then starts a simple HTTP server using Node.js:
+
+```typescript copy filename="src/index.ts"
+import { createServer } from "node:http";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { usersTable } from "./schema";
+
+const db = drizzle(process.env.DATABASE_URL!);
+
+await migrate(db, { migrationsFolder: "./migrations" });
+
+const server = createServer(async (req, res) => {
+  const url = new URL(req.url!, `http://${req.headers.host}`);
+
+  if (url.pathname === "/users") {
+    const users = await db.select().from(usersTable);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(users));
+    return;
+  }
+
+  res.writeHead(200);
+  res.end("OK");
+});
+
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+```
+
+The `migrate()` function reads the SQL files from your `migrations` directory and applies any unapplied migrations to the database. It is safe to run on every startup — already applied migrations are skipped.
+
+<Callout type="info">
+  Top-level `await` requires Node.js to treat the file as an ES module. Make
+  sure your `package.json` includes `"type": "module"`.
+</Callout>
+
+Make sure your `package.json` has the module type and a start script:
+
+```json copy filename="package.json"
+{
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  }
+}
+```
+
+#### Push your project to GitHub
+
+Railway deploys from a GitHub repository. Initialize a git repository and push your code:
+
+```bash copy
+git init
+git add .
+git commit -m "initial commit"
+```
+
+Create a new repository on GitHub and push your code to it.
+
+#### Connect your GitHub repository to Railway
+
+In your Railway project, click the `New` button in the top right corner of the canvas and select `GitHub Repo`. Connect your GitHub account if prompted, then select the repository you just pushed.
+
+![](@/assets/images/tutorials/railway-canvas-postgres-add-service.png)
+
+![](@/assets/images/tutorials/node-railway-github-repo-search.png)
+
+#### Configure environment variables
+
+In the deployed service settings, go to the `Variables` tab. Add the `DATABASE_URL` variable by referencing the PostgreSQL service variable:
+
+Click `Add Variable`, set the name to `DATABASE_URL`, and use the Railway variable reference `${{Postgres.DATABASE_URL}}` as the value.
+
+<Callout type="info">
+The `${{Postgres.DATABASE_URL}}` reference variable automatically resolves to the **private** internal connection string at runtime, which is optimal for service-to-service communication within Railway. This is different from the public URL you use in your local `.env` file.
+</Callout>
+
+![](@/assets/images/tutorials/node-railway-app-set-database-url.png)
+
+#### Deploy
+
+Railway will automatically deploy your application when you push to the connected branch. You can monitor the deployment in the `Deployments` tab.
+
+![](@/assets/images/tutorials/node-railway-deployment-successful.png)
+
+#### Verify your setup
+
+Once deployed, navigate to the `Architecture` tab in your Railway project. You should see your application service connected to the PostgreSQL database.
+
+![](@/assets/images/tutorials/node-railway-canvas-app-postgres-full.png)
+
+<Callout type="warning" title="Alternative: Zero-downtime migrations">
+This tutorial applies migrations at application startup using `migrate()`. This is the simplest approach and works well for most applications.
+
+If you need **zero-downtime deployments**, you may want to run migrations as a **separate step** before the new version of your app starts receiving traffic. This way you can rollback the application independently from the database changes.
+
+On Railway, you can achieve this using a [pre-deploy command](https://docs.railway.com/deployments/pre-deploy-command) — it runs between the build and deploy phases, has access to your private network and environment variables, and if it fails, the deployment will not proceed.
+
+In your service settings, scroll down to the **Deploy** section and click **Add pre-deploy step**:
+
+![](@/assets/images/tutorials/node-railway-app-predeploy-migrate.png)
+
+Enter the following command:
+
+```bash copy
+npx drizzle-kit migrate
+```
+
+With this approach, remove the `await migrate(db, { migrationsFolder: "./migrations" })` call from your `index.ts` — migrations are handled by the pre-deploy command instead.
+
+For more details, see the [Drizzle migrations fundamentals](/docs/migrations) page.
+
+</Callout>
+
+</Steps>
+
+## Deploy Drizzle Studio to Railway
+
+You can deploy [Drizzle Studio](/docs/drizzle-studio/overview) alongside your application on Railway to browse and manage your database directly from the browser. You can use the [Drizzle Studio Railway template](https://railway.com/deploy/drizzle-studio-1) or follow the steps below.
+
+<Steps>
+#### Add a new service from a template
+
+In your Railway project, click the `New` button in the top right corner of the canvas and select `Template`.
+
+![](@/assets/images/tutorials/node-railway-canvas-postgres-add-new-service.png)
+
+#### Select the Drizzle Studio template
+
+Search for `drizzle studio` and select the **Drizzle Studio** template by Drizzle.
+
+![](@/assets/images/tutorials/railway-template-search-drizzle-studio.png)
+
+#### Configure environment variables and deploy
+
+The template comes with two pre-configured environment variables:
+
+- `PASSCODE` - the password for secure access to your Studio instance. It defaults to `${{secret()}}`, which generates a random secret.
+- `DATABASE_URL` - the database connection string. Set it to `${{Postgres.DATABASE_URL}}` to reference your existing PostgreSQL service.
+
+Click `Deploy Template` to deploy.
+
+![](@/assets/images/tutorials/railway-drizzle-studio-template-config.png)
+
+#### Find your Drizzle Studio URL
+
+Once deployed, click on the Drizzle Studio service in your project, go to the `Settings` tab, and scroll down to the `Networking` section. You will find your public domain under **Public Networking**.
+
+![](@/assets/images/tutorials/railway-drizzle-studio-networking.png)
+
+#### Browse your database with Drizzle Studio
+
+Open the Drizzle Studio URL in your browser. You should see your database tables and can browse, filter, and edit data directly.
+
+![](@/assets/images/tutorials/drizzle-studio-posts-table.png)
+
+#### Verify your setup
+
+Navigate to the `Architecture` tab in your Railway project. You should now see three services: your application, the PostgreSQL database, and Drizzle Studio.
+
+![](@/assets/images/tutorials/node-railway-canvas-all-services.png)
+
+</Steps>

@@ -76,8 +76,8 @@ import * as p from "drizzle-orm/pg-core";
 export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
-  email: p.text().unique(), 
-};
+  email: p.text().unique(),
+});
 ```
 </Section>
 </Callout>
@@ -93,7 +93,7 @@ export const users = p.pgTable("users", {
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a **source of truth** and 
-Drizzle let's you push schema changes to the database using [`drizzle-kit push`](/docs/drizzle-kit-push) command.
+Drizzle lets you push schema changes to the database using [`drizzle-kit push`](/docs/drizzle-kit-push) command.
 
 That's the best approach for rapid prototyping and we've seen dozens of teams 
 and solo developers successfully using it as a primary migrations flow in their production applications.
@@ -106,7 +106,7 @@ export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
   email: p.text().unique(), // <--- added column
-};
+});
 ```
 ```
 Add column to `users` table                                                                          
@@ -142,7 +142,7 @@ Add column to `users` table
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
-Drizzle let's you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate)
+Drizzle lets you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate)
 and then apply them to the database with [`drizzle-kit migrate`](/docs/drizzle-kit-migrate) commands. 
 <Section>
 ```typescript filename="src/schema.ts"
@@ -151,8 +151,8 @@ import * as p from "drizzle-orm/pg-core";
 export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
-  email: p.text().unique(), 
-};
+  email: p.text().unique(),
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -205,7 +205,7 @@ CREATE TABLE "users" (
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
-Drizzle let's you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate) and then 
+Drizzle lets you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate) and then 
 you can apply them to the database during runtime of your application.
 
 This approach is widely used for **monolithic** applications when you apply database migrations 
@@ -219,8 +219,8 @@ import * as p from "drizzle-orm/pg-core";
 export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
-  email: p.text().unique(), 
-};
+  email: p.text().unique(),
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -284,7 +284,7 @@ await migrate(db);
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
-Drizzle let's you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate) and then 
+Drizzle lets you generate SQL migration files based on your schema changes with [`drizzle-kit generate`](/docs/drizzle-kit-generate) and then 
 you can apply them to the database either directly or via external migration tools.
 
 <Section>
@@ -294,8 +294,8 @@ import * as p from "drizzle-orm/pg-core";
 export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
-  email: p.text().unique(), 
-};
+  email: p.text().unique(),
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -359,7 +359,7 @@ CREATE TABLE "users" (
 
 <Callout collapsed="Expand details">
 That's a **codebase first** approach. You have your TypeScript Drizzle schema as a source of truth and 
-Drizzle let's you export SQL statements based on your schema changes with [`drizzle-kit export`](/docs/drizzle-kit-generate) and then 
+Drizzle lets you export SQL statements based on your schema changes with [`drizzle-kit export`](/docs/drizzle-kit-generate) and then 
 you can apply them to the database via [Atlas](https://atlasgo.io/guides/orms/drizzle) or other external SQL migration tools.
 
 <Section>
@@ -369,8 +369,8 @@ import * as p from "drizzle-orm/pg-core";
 export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
-  email: p.text().unique(), 
-};
+  email: p.text().unique(),
+});
 ```
 ```                                  
 ┌────────────────────────┐                  

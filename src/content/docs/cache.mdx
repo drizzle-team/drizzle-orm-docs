@@ -243,7 +243,10 @@ export class TestGlobalCache extends Cache {
     tables: string[],
     config?: CacheConfig,
   ): Promise<void> {
-    await this.kv.set(key, response, config ? config.ex : this.globalTtl);
+    const ttl = config?.px ?? (config?.ex ? config.ex * 1000 : this.globalTtl);
+
+    await this.kv.set(key, response, ttl);
+
     for (const table of tables) {
       const keys = this.usedTablesPerKey[table];
       if (keys === undefined) {
