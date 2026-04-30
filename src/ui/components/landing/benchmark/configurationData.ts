@@ -3,15 +3,15 @@ const configurationData = {
     value: "ORM",
     items: {
       "go-20260430-jit": {
-        value: "Drizzle v1.0.24 JIT vs Go v1.25.5",
-        config_info: "Drizzle v1.0.24 JIT vs Go v1.25.5",
-        drizzle_version: "v1.0.24 JIT",
+        value: "Drizzle 1.0.0-rc.1 JIT vs Go v1.25.5",
+        config_info: "Drizzle v1.0.0-rc.1 JIT vs Go v1.25.5",
+        drizzle_version: "v1.0.0-rc.1 JIT",
         compare_version: "v1.25.5",
       },
       "go-20260430-default": {
-        value: "Drizzle v1.0.24 vs Go v1.25.5",
-        config_info: "Drizzle v1.0.24 vs Go v1.25.5",
-        drizzle_version: "v1.0.24",
+        value: "Drizzle v1.0.0-rc.1 vs Go v1.25.5",
+        config_info: "Drizzle v1.0.0-rc.1 vs Go v1.25.5",
+        drizzle_version: "v1.0.0-rc.1",
         compare_version: "v1.25.5",
       },
       "prisma-v7.1.0": {
@@ -21,9 +21,9 @@ const configurationData = {
         compare_version: "v7.1.0",
       },
       "prisma-v7.1.0-20260430-jit": {
-        value: "Drizzle v1.0.24 JIT vs Prisma v7.1.0",
-        config_info: "Drizzle v1.0.24 JIT vs Prisma v7.1.0",
-        drizzle_version: "v1.0.24 JIT",
+        value: "Drizzle v1.0.0-rc.1 JIT vs Prisma v7.1.0",
+        config_info: "Drizzle v1.0.0-rc.1 JIT vs Prisma v7.1.0",
+        drizzle_version: "v1.0.0-rc.1 JIT",
         compare_version: "v7.1.0",
       },
       "prisma-v5.18.0": {
