@@ -44,7 +44,7 @@ const variants = [
     compareData: data["30042026:go"],
   },
   {
-    orm: "prisma-v7.1.0-20260430-jit",
+    orm: "prisma-v7.8.0-20260430-jit",
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",

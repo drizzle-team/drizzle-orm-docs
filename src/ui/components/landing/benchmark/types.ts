@@ -45,7 +45,7 @@ export interface IJSONData {
 export interface IParams {
   orm:
     | "prisma-v7.1.0"
-    | "prisma-v7.1.0-20260430-jit"
+    | "prisma-v7.8.0-20260430-jit"
     | "prisma-v5.18.0"
     | "go"
     | "go-20260430-jit"

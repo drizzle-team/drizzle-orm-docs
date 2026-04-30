@@ -26,11 +26,11 @@ const RuntimeSelector: FC<Props> = ({ disabled }) => {
           { value: "bun-1.3.4", name: "Bun v1.3.4" },
           { value: "node-24", name: "Node 24.6.0" },
         ]
-      : selectedItems.orm === "prisma-v7.1.0-20260430-jit"
+      : selectedItems.orm === "prisma-v7.8.0-20260430-jit"
         ? [
             {
               value: "bun-1.3.13-bun-sql",
-              name: "Bun v1.3.13 / Bun SQL",
+              name: "Bun v1.3.13 / node-postgres",
             },
           ]
         : selectedItems.orm === "go-20260430-jit" ||
