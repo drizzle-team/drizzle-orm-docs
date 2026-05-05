@@ -16,7 +16,7 @@ You can read more about it [here](/docs/sql-schema-declaration#shape-your-data-s
 
 ### integer
 
-A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending on the magnitude of the value.
+A signed integer, stored in 4 bytes with a range of -2,147,483,648 to 2,147,483,647.
 
 <Section>
 ```typescript
@@ -34,75 +34,102 @@ CREATE TABLE `table` (
 ```
 </Section>
 
+You can use `{ unsigned: true }` to create an unsigned integer with a range of 0 to 4,294,967,295.
+
+<Section>
+```typescript
+import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+const table = mysqlTable('table', {
+	intUnsigned: int({ unsigned: true })
+});
+```
+
+```sql
+CREATE TABLE `table` (
+	`intUnsigned` int unsigned
+);
+```
+</Section>
+
 ### tinyint
+
+A tiny integer, stored in 1 byte with a range of -128 to 127. Use `{ unsigned: true }` for a range of 0 to 255.
 
 <Section>
 ```typescript
 import { tinyint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	tinyint: tinyint()
+	tinyint: tinyint(),
+	tinyintUnsigned: tinyint({ unsigned: true })
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`tinyint` tinyint
+	`tinyint` tinyint,
+	`tinyintUnsigned` tinyint unsigned
 );
 ```
 </Section>
 
 ### smallint
 
+A small integer, stored in 2 bytes with a range of -32,768 to 32,767. Use `{ unsigned: true }` for a range of 0 to 65,535.
+
 <Section>
 ```typescript
 import { smallint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	smallint: smallint()
+	smallint: smallint(),
+	smallintUnsigned: smallint({ unsigned: true })
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`smallint` smallint
+	`smallint` smallint,
+	`smallintUnsigned` smallint unsigned
 );
 ```
 </Section>
 
 ### mediumint
 
+A medium integer, stored in 3 bytes with a range of -8,388,608 to 8,388,607. Use `{ unsigned: true }` for a range of 0 to 16,777,215.
+
 <Section>
 ```typescript
 import { mediumint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	mediumint: mediumint()
+	mediumint: mediumint(),
+	mediumintUnsigned: mediumint({ unsigned: true })
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`mediumint` mediumint
+	`mediumint` mediumint,
+	`mediumintUnsigned` mediumint unsigned
 );
 ```
 </Section>
 
 ### bigint
 
+A big integer, stored in 8 bytes with a range of -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807. Use `{ unsigned: true }` for a range of 0 to 18,446,744,073,709,551,615.
+
 <Section>
 ```typescript
 import { bigint, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	bigint: bigint({ mode: 'number' })
+	bigint: bigint({ mode: 'number' }),
 	bigintUnsigned: bigint({ mode: 'number', unsigned: true })
 });
-
-bigint('...', { mode: 'number' | 'bigint' });
-
-// You can also specify unsigned option for bigint
-bigint('...', { mode: 'number' | 'bigint', unsigned: true })
 ```
 
 ```sql
@@ -113,7 +140,13 @@ CREATE TABLE `table` (
 ```
 </Section>
 
-We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type 
+<Callout type='info' emoji="ℹ️">
+	We've omitted config of `M` in `bigint(M)`, since it indicates the display width of the numeric type
+</Callout> 
+
+<Callout type='info' emoji="ℹ️">
+	All integer types (`tinyint`, `smallint`, `mediumint`, `int`, `bigint`) and floating-point types (`float`, `double`) support the `unsigned` option. Unsigned types allow only non-negative values but have a larger maximum range.
+</Callout>
 
 ## ---
 
@@ -195,18 +228,22 @@ CREATE TABLE `table` (
 
 ### double
 
+A double precision floating-point number, stored in 8 bytes. Use `{ unsigned: true }` for non-negative values.
+
 <Section>
 ```typescript
 import { double, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	double: double('double')
+	double: double('double'),
+	doubleUnsigned: double({ unsigned: true })
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`double` double
+	`double` double,
+	`doubleUnsigned` double unsigned
 );
 ```
 </Section>
@@ -231,18 +268,22 @@ CREATE TABLE `table` (
 
 ### float
 
+A single precision floating-point number, stored in 4 bytes. Use `{ unsigned: true }` for non-negative values.
+
 <Section>
 ```typescript
 import { float, mysqlTable } from "drizzle-orm/mysql-core";
 
 const table = mysqlTable('table', {
-	float: float()
+	float: float(),
+	floatUnsigned: float({ unsigned: true })
 });
 ```
 
 ```sql
 CREATE TABLE `table` (
-	`float` float
+	`float` float,
+	`floatUnsigned` float unsigned
 );
 ```
 </Section>
