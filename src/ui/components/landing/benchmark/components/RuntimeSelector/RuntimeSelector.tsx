@@ -1,18 +1,13 @@
-import React, { type FC, useRef } from "react";
+import React, { type FC, useEffect, useRef, useState } from "react";
 
 import styles from "./RuntimeSelector.module.css";
 import { useBenchmarkContext } from "@components/landing/benchmark/context/useBenchmarkContext";
 import BunIcon from "@components/landing/benchmark/components/RuntimeSelector/BunIcon";
 import NodeIcon from "@components/landing/benchmark/components/RuntimeSelector/NodeIcon";
+import { type IParams } from "../../types";
 
 interface Item {
-  value:
-    | "node-24"
-    | "node-22"
-    | "node-18"
-    | "node-20"
-    | "bun-1.3.4"
-    | "bun-1.1.25";
+  value: IParams["runtime"];
   name: string;
 }
 
@@ -23,6 +18,7 @@ interface Props {
 const RuntimeSelector: FC<Props> = ({ disabled }) => {
   const { selectedItems, setSelectedItems } = useBenchmarkContext();
   const resizerRef = useRef<HTMLDivElement | null>(null);
+  const [selectWidth, setSelectWidth] = useState("109px");
 
   const items: Item[] =
     selectedItems.orm === "prisma-v7.1.0"
@@ -30,14 +26,42 @@ const RuntimeSelector: FC<Props> = ({ disabled }) => {
           { value: "bun-1.3.4", name: "Bun v1.3.4" },
           { value: "node-24", name: "Node 24.6.0" },
         ]
-      : selectedItems.orm === "go"
-        ? [{ value: "bun-1.3.4", name: "Bun v1.3.4" }]
-        : [
-            { value: "bun-1.1.25", name: "Bun v1.1.25" },
-            { value: "node-22", name: "Node 22.6.0" },
-            { value: "node-20", name: "Node v20.16.0" },
-            { value: "node-18", name: "Node v18.20.4" },
-          ];
+      : selectedItems.orm === "prisma-v7.8.0-20260430-jit"
+        ? [
+            {
+              value: "bun-1.3.13-bun-sql",
+              name: "Bun v1.3.13 / node-postgres",
+            },
+          ]
+        : selectedItems.orm === "go-20260430-jit" ||
+            selectedItems.orm === "go-20260430-default"
+          ? [
+              {
+                value: "bun-1.3.13-bun-sql",
+                name: "Bun v1.3.13 / Bun SQL",
+              },
+              {
+                value: "bun-1.3.13-node-pg",
+                name: "Bun v1.3.13 / node-postgres",
+              },
+            ]
+          : selectedItems.orm === "go"
+            ? [{ value: "bun-1.3.4", name: "Bun v1.3.4" }]
+            : [
+                { value: "bun-1.1.25", name: "Bun v1.1.25" },
+                { value: "node-22", name: "Node 22.6.0" },
+                { value: "node-20", name: "Node v20.16.0" },
+                { value: "node-18", name: "Node v18.20.4" },
+              ];
+  const selectedItem = items.find(
+    ({ value }) => value === selectedItems.runtime,
+  );
+
+  useEffect(() => {
+    if (resizerRef.current) {
+      setSelectWidth(`${resizerRef.current.offsetWidth}px`);
+    }
+  }, [selectedItem?.name]);
 
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     setSelectedItems({
@@ -60,7 +84,7 @@ const RuntimeSelector: FC<Props> = ({ disabled }) => {
           whiteSpace: "nowrap",
         }}
       >
-        {items.find(({ value }) => value === selectedItems.runtime)!.name}
+        {selectedItem?.name}
       </div>
       <div style={{ display: "flex", alignItems: "center" }}>
         {selectedItems.runtime.startsWith("bun") ? (
@@ -78,9 +102,7 @@ const RuntimeSelector: FC<Props> = ({ disabled }) => {
           disabled={disabled}
           value={selectedItems.runtime}
           style={{
-            width: resizerRef.current
-              ? `${resizerRef.current.offsetWidth}px`
-              : "109px",
+            width: selectWidth,
             ...(disabled && {
               pointerEvents: "none",
               cursor: "not-allowed",

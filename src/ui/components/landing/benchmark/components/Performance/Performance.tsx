@@ -123,7 +123,7 @@ const Performance: FC<Props> = ({
             </div>
           </div>
         </div>
-        <RuntimeSelector disabled={selectedItems.orm === "go"} />
+        {selectedItems.orm !== "go" && <RuntimeSelector />}
       </div>
       <div className={styles["compare-item-container"]}>
         <div className={styles["compare-item"]}>
@@ -134,14 +134,16 @@ const Performance: FC<Props> = ({
             <div className={styles.name}>
               {selectedItems.orm.startsWith("prisma")
                 ? "Prisma"
-                : selectedItems.orm}
+                : selectedItems.orm.startsWith("go")
+                  ? "Go"
+                  : selectedItems.orm}
             </div>
             <div className={styles.version}>
               {configurationData.orm.items[selectedItems.orm].compare_version}
             </div>
           </div>
         </div>
-        {selectedItems.orm !== "go" && (
+        {!selectedItems.orm.startsWith("go") && (
           <div style={{ display: "flex", gap: "12px" }}>
             <RuntimeSelector />
             {selectedItems.orm === "prisma-v5.18.0" && <JoinsSelector />}

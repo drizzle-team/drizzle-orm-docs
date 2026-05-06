@@ -43,7 +43,13 @@ export interface IJSONData {
 }
 
 export interface IParams {
-  orm: "prisma-v7.1.0" | "prisma-v5.18.0" | "go";
+  orm:
+    | "prisma-v7.1.0"
+    | "prisma-v7.8.0-20260430-jit"
+    | "prisma-v5.18.0"
+    | "go"
+    | "go-20260430-jit"
+    | "go-20260430-default";
   dbSize: "micro" | "small" | "medium" | "large" | "huge" | "extreme";
   projectType: "ecommerce" | "social" | "geo" | "analytics";
   database:
@@ -54,6 +60,8 @@ export interface IParams {
     | "serverless_mysql"
     | "serverless_sqlite";
   runtime:
+    | "bun-1.3.13-bun-sql"
+    | "bun-1.3.13-node-pg"
     | "node-24"
     | "node-22"
     | "node-20"
