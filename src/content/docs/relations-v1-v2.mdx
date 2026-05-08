@@ -1078,28 +1078,13 @@ export interface DrizzleConfig<
 include new types used by Relational Queries v2, so make sure to update your imports if you intend to use the older types:
 
 <Callout collapsed='A list of all removed entities'>
-- `Relation`
 - `Relations`
-- `One`
-- `Many`
 - `TableRelationsKeysOnly`
 - `ExtractTableRelationsFromSchema`
-- `ExtractObjectValues`
 - `ExtractRelationsFromTableExtraConfigSchema`
 - `getOperators`
-- `Operators`
-- `getOrderByOperators`
-- `OrderByOperators`
 - `FindTableByDBName`
-- `DBQueryConfig`
-- `TableRelationalConfig`
-- `TablesRelationalConfig`
 - `RelationalSchemaConfig`
-- `ExtractTablesWithRelations`
-- `ReturnTypeOrValue`
-- `BuildRelationResult`
-- `NonUndefinedKeysOnly`
-- `BuildQueryResult`
 - `RelationConfig`
 - `extractTablesRelationalConfig`
 - `relations`
@@ -1109,8 +1094,12 @@ include new types used by Relational Queries v2, so make sure to update your imp
 - `normalizeRelation`
 - `createTableRelationsHelpers`
 - `TableRelationsHelpers`
-- `BuildRelationalQueryResult`
-- `mapRelationalRow`
 </Callout>
 
 4. In the same manner, `${dialect}-core/query-builders/query` files were updated with RQB v2's alternatives
+
+<Callout collapsed='Examples'>
+```ts
+import { RelationalQueryBuilder, PgRelationalQuery } from 'drizzle-orm/pg-core/query-builders/query';
+```
+</Callout>
