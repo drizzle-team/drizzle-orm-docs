@@ -1,6 +1,7 @@
 import Npm from "@mdx/Npm.astro";
 import Npx from "@mdx/Npx.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from "@mdx/Callout.astro";
 
 # Upgrading to Drizzle v1 RC
 
@@ -55,8 +56,8 @@ We've explained all the RQBv2 changes in detail, along with options for updating
 - [How to migrate relations definition from v1 to v2](/docs/relations-v1-v2#how-to-migrate-relations-schema-definition-from-v1-to-v2)  
 - [How to migrate queries from v1 to v2](/docs/relations-v1-v2#how-to-migrate-queries-from-v1-to-v2)  
 
-#### Postgres only:
-##### Step 4 - Update your `schema.ts` file
+#### Additional steps for Postgres users:
+##### Step 1 - Update your `schema.ts` file
 
 We've updated `.array()` behavour and `.array()` is no longer chainable
 
@@ -72,5 +73,38 @@ Use string syntax for multidimensional arrays:
   pgTable.withRLS('users', {});
 ```
 
+
+#### Additional steps for SQLite users:
+
+SQLite — Foreign key name handling (pre-rc)
+The old `drizzle-kit` didn't pass FK names from TS schema through to generated SQL:
+
+```ts
+export const table = sqliteTable("table", {
+  column1: integer(),
+  column2: integer(),
+}, (t) => [
+  foreignKey({
+    name: "name",
+    columns: [t.column1],
+    foreignColumns: [t.column2],
+  }),
+]);
+```
+```sql
+-- Before: no name in generated SQL
+FOREIGN KEY (`timest`) REFERENCES `b`(`timest1`) ON UPDATE no action ON DELETE no action
+```
+
+New behavior:
+On `introspect`, drizzle-kit parses DDL to find the constraint name; if none is found, the default name is used.
+
+<Callout type="warning">
+After `drizzle-kit up`, the first `push` will produce a diff that recreates the table (DB has no name, TS does). **To avoid this, remove the FK name from the TS schema** - no diff will be generated.
+</Callout>
+
+<Callout type="warning">
+`drizzle-kit generate` behaves as expected; no changes needed.
+</Callout>
 
 #### Done ✅
