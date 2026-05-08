@@ -976,7 +976,7 @@ export async function migrate<
 ```
 </Callout>
 <Callout title='now'>
-```ts {3,5}
+```ts {1,2}
 export async function migrate<TRelations extends AnyRelations>(
 	db: NodePgDatabase<TRelations>,
 	config: MigrationConfig,
@@ -995,7 +995,7 @@ export class NodePgSession<
 ```
 </Callout>
 <Callout title='now'>
-```ts {3,4,6}
+```ts {2,3}
 export class NodePgSession<
 	TRelations extends AnyRelations,
 > extends PgAsyncSession<NodePgQueryResultHKT, TRelations>
@@ -1011,7 +1011,7 @@ export class NodePgTransaction<
 ```
 </Callout>
 <Callout title='now'>
-```ts {3,4,6}
+```ts {2,3}
 export class NodePgTransaction<
 	TRelations extends AnyRelations,
 > extends PgAsyncTransaction<NodePgQueryResultHKT, TRelations>
@@ -1026,7 +1026,7 @@ export class NodePgDatabase<
 ```
 </Callout>
 <Callout title='now'>
-```ts {3,4}
+```ts {2,3}
 export class NodePgDatabase<
 	TRelations extends AnyRelations = EmptyRelations,
 > extends PgAsyncDatabase<NodePgQueryResultHKT, TRelations> 
@@ -1050,7 +1050,7 @@ export interface DrizzleConfig<
 </Callout>
 
 <Callout title='now'>
-```ts {8}
+```ts {2,5}
 export interface DrizzleConfig<
 	TRelationConfigs extends AnyRelations = EmptyRelations,
 > {
