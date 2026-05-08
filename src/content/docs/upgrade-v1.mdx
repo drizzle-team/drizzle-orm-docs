@@ -55,4 +55,22 @@ We've explained all the RQBv2 changes in detail, along with options for updating
 - [How to migrate relations definition from v1 to v2](/docs/relations-v1-v2#how-to-migrate-relations-schema-definition-from-v1-to-v2)  
 - [How to migrate queries from v1 to v2](/docs/relations-v1-v2#how-to-migrate-queries-from-v1-to-v2)  
 
-#### Step 3 - Done ✅
+#### Postgres only:
+##### Step 4 - Update your `schema.ts` file
+
+We've updated `.array()` behavour and `.array()` is no longer chainable
+
+Use string syntax for multidimensional arrays:
+```ts
+  .array('[][]')
+  .array('[][][]')
+```
+
+`.enableRLS()` was deprecated - option moved to a different place:
+
+```ts
+  pgTable.withRLS('users', {});
+```
+
+
+#### Done ✅
