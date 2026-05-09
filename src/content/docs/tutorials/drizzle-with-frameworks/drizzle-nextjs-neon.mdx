@@ -102,10 +102,7 @@ Here we define the **`todo`** table with fields **`id`**, **`text`**, and **`don
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
 ```typescript copy filename="drizzle.config.ts"
-import { config } from 'dotenv';
 import { defineConfig } from "drizzle-kit";
-
-config({ path: '.env' });
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
