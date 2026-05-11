@@ -3,7 +3,7 @@ import type { SVGProps } from "@/types";
 import type { CSSProperties } from "react";
 import { dialectSwitcherItems } from "./data";
 import { extractSubDirFromSlug } from "../../utils";
-import { commonFolders } from "@/pages/[...slug].astro";
+import { commonFolders } from "@/dialect-docs";
 
 interface Props {
   slug: string;
@@ -19,7 +19,9 @@ const svgs = import.meta.glob("/public/svg/*.svg", {
 });
 
 const currentDb = dialectSwitcherItems.find(({ id }) =>
-  commonFolders.includes(subDir) ? id === "pg" : id === subDir,
+  (commonFolders as readonly string[]).includes(subDir)
+    ? id === "pg"
+    : id === subDir,
 ) || dialectSwitcherItems[0];
 
 const { icon } = currentDb;

@@ -1,0 +1,17 @@
+# Custom types
+
+SQLite exposes `customType` from `drizzle-orm/sqlite-core`.
+
+```ts
+import { customType, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = sqliteTable('users', {
+  name: customText('name').notNull(),
+});
+```

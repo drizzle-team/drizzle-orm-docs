@@ -1,0 +1,211 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+<Callout type="error">
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-valibot` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
+
+You can still use `drizzle-valibot` package but all new update will be added to Drizzle ORM directly
+</Callout>
+
+# valibot
+
+### Install the dependencies
+
+<Npm>
+valibot
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createSelectSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // Will parse successfully
+```
+
+Views are also supported.
+
+```ts copy
+import { sqliteView } from 'drizzle-orm/sqlite-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const usersView = sqliteView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = parse(usersViewSchema, ...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createInsertSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createUpdateSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { id: 5, name: 'John' };
+const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
+
+const user = { age: 35 };
+const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Will parse successfully
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Valibot schema will overwrite it.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createSelectSchema } from 'drizzle-orm/valibot';
+import { parse, pipe, maxLength, object, string } from 'valibot';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  bio: text(),
+  preferences: text({ mode: 'json' })
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => pipe(schema, maxLength(20)), // Extends schema
+  bio: (schema) => pipe(schema, maxLength(1000)), // Extends schema before becoming nullable/optional
+  preferences: object({ theme: string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string,
+  bio?: string | undefined;
+  preferences: {
+    theme: string;
+  };
+} = parse(userSelectSchema, ...);
+```
+
+### Data type reference
+
+```ts
+sqlite.integer({ mode: 'boolean' });
+
+// Schema
+boolean();
+```
+
+```ts
+sqlite.integer({ mode: 'timestamp' });
+sqlite.integer({ mode: 'timestamp_ms' });
+
+// Schema
+date();
+```
+
+```ts
+sqlite.numeric();
+sqlite.text({ mode: 'text' });
+
+// Schema
+string();
+```
+
+```ts
+sqlite.text({ mode: 'text', length: ... });
+
+// Schema
+pipe(string(), maxLength(length));
+```
+
+```ts
+sqlite.text({ mode: 'text', enum: ... });
+
+// Schema
+enum(enum);
+```
+
+```ts
+sqlite.real();
+
+// Schema
+pipe(number(), minValue(-140_737_488_355_328), maxValue(140_737_488_355_327)); // 48-bit integer lower and upper limit
+```
+
+```ts
+sqlite.integer({ mode: 'number' });
+
+// Schema
+pipe(number(), minValue(-9_007_199_254_740_991), maxValue(9_007_199_254_740_991), integer()); // Javascript min. and max. safe integers
+```
+
+```ts
+sqlite.blob({ mode: 'bigint' });
+
+// Schema
+pipe(bigint(), minValue(-9_223_372_036_854_775_808n), maxValue(9_223_372_036_854_775_807n)); // 64-bit integer lower and upper limit
+```
+
+```ts
+sqlite.blob({ mode: 'json' });
+sqlite.text({ mode: 'json' });
+
+// Schema
+union([union([string(), number(), boolean(), null_()]), array(any()), record(string(), any())]);
+```
+
+```ts
+sqlite.blob({ mode: 'buffer' });
+
+// Schema
+custom<Buffer>((v) => v instanceof Buffer);
+```
+

@@ -5,130 +5,140 @@ import Link from "@mdx/Link.astro";
 import { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
 import DocsLayout from "@/ui/DocsLayout.astro";
 import CustomHeader from "@components/CustomHeader.astro";
-
-export const dialectRelatedFolder = ["tutorials", "guides"];
-export const commonFolders = ["latest-releases", "get-started"];
+import {
+  commonFolders,
+  defaultDocsDialect,
+  dialectRelatedFolder,
+  isDocsDialectId,
+} from "@/dialect-docs";
+import pgMeta from "../content/docs/pg/_meta.json";
+import mysqlMeta from "../content/docs/mysql/_meta.json";
+import sqliteMeta from "../content/docs/sqlite/_meta.json";
+import singlestoreMeta from "../content/docs/singlestore/_meta.json";
 
 export async function getStaticPaths() {
   const allDocsEntries = await getCollection("docs");
+  type DocsEntry = (typeof allDocsEntries)[number];
+  type DocsRoute = {
+    params: { slug: string };
+    props: { entry: DocsEntry; frontmatter: DocsEntry["data"] };
+  };
 
-  const routes = [];
-
-  // 1. PG as default dialect
-  const pgEntries = allDocsEntries.filter((entry) =>
-    entry.slug.startsWith("pg/"),
+  const routes: DocsRoute[] = [];
+  const routeSlugs = new Set<string>();
+  const entriesBySlug = new Map<string, DocsEntry>(
+    allDocsEntries.map((entry) => [entry.slug, entry]),
   );
-  routes.push(
-    ...pgEntries.map((entry) => ({
-      params: { slug: `docs/${entry.slug.replace("pg/", "")}` },
+  const getMetaSlugs = (items: Array<string | string[]>): string[] =>
+    items.flatMap((item) => (Array.isArray(item) ? [`${item[0]}`] : []));
+  const metaSlugsByDialect = {
+    pg: getMetaSlugs(pgMeta),
+    mysql: getMetaSlugs(mysqlMeta),
+    sqlite: getMetaSlugs(sqliteMeta),
+    singlestore: getMetaSlugs(singlestoreMeta),
+  };
+  const metaSlugSetsByDialect = {
+    pg: new Set(metaSlugsByDialect.pg),
+    mysql: new Set(metaSlugsByDialect.mysql),
+    sqlite: new Set(metaSlugsByDialect.sqlite),
+    singlestore: new Set(metaSlugsByDialect.singlestore),
+  };
+  const getDialectMetaSlugs = (dialectId: string) =>
+    isDocsDialectId(dialectId)
+      ? metaSlugsByDialect[dialectId]
+      : [];
+  const getDialectMetaSlugSet = (dialectId: string) =>
+    isDocsDialectId(dialectId)
+      ? metaSlugSetsByDialect[dialectId]
+      : new Set<string>();
+
+  const addRoute = (slug: string, entry: DocsEntry) => {
+    if (routeSlugs.has(slug)) {
+      return;
+    }
+    routeSlugs.add(slug);
+    routes.push({
+      params: { slug },
       props: { entry, frontmatter: entry.data },
-    })),
-  );
-
-  // 2. Root-level docs files
-  const rootDocsEntries = allDocsEntries.filter(
-    (entry) =>
-      !entry.slug.includes("/") &&
-      !dialectRelatedFolder.some((folder) => entry.slug === folder),
-  );
-
-  routes.push(
-    ...rootDocsEntries.map((entry) => ({
-      params: { slug: `docs/${entry.slug}` },
-      props: { entry, frontmatter: entry.data },
-    })),
-  );
-
-  // Root docs files for other dialects
-  dialectSwitcherItems
-    .filter((d) => d.id !== "pg")
-    .forEach((dialect) => {
-      routes.push(
-        ...rootDocsEntries.map((entry) => ({
-          params: { slug: `docs/${dialect.id}/${entry.slug}` },
-          props: { entry, frontmatter: entry.data },
-        })),
-      );
     });
+  };
 
-  // 3. tutorials, guides, latest-releases for all dialects
+  const resolveDialectEntry = (dialectId: string, slug: string) => {
+    const dialectEntry = entriesBySlug.get(`${dialectId}/${slug}`);
+    if (dialectEntry) {
+      return dialectEntry;
+    }
+
+    const rootEntry = entriesBySlug.get(slug);
+    if (rootEntry) {
+      return rootEntry;
+    }
+
+    throw new Error(
+      `[docs] ${dialectId}/_meta.json references "${slug}", but neither src/content/docs/${dialectId}/${slug}.mdx nor src/content/docs/${slug}.mdx exists.`,
+    );
+  };
+
+  const addDialectMetaRoutes = (dialectId: string) => {
+    const routePrefix =
+      dialectId === defaultDocsDialect ? "docs" : `docs/${dialectId}`;
+    getDialectMetaSlugs(dialectId).forEach((slug) => {
+      addRoute(`${routePrefix}/${slug}`, resolveDialectEntry(dialectId, slug));
+    });
+  };
+
+  addDialectMetaRoutes(defaultDocsDialect);
+  dialectSwitcherItems.forEach((dialect) => {
+    if (
+      !dialect.id ||
+      dialect.id === defaultDocsDialect ||
+      !isDocsDialectId(dialect.id)
+    ) {
+      return;
+    }
+    addDialectMetaRoutes(dialect.id);
+  });
+
+  // Keep direct root docs URLs available even when they are not in PG's meta.
+  const rootDocsEntries = allDocsEntries.filter(
+    (entry) => !entry.slug.includes("/"),
+  );
+  rootDocsEntries.forEach((entry) =>
+    addRoute(`docs/${entry.slug}`, entry),
+  );
+
+  // 2. tutorials and guides for all dialects that list the folder in meta.
   dialectRelatedFolder.forEach((folder) => {
-    // Get the folder contents
     const folderEntries = allDocsEntries.filter((entry) =>
       entry.slug.startsWith(`${folder}/`),
     );
 
-    // Get the folder index page (tutorials.mdx)
-    const folderIndexEntry = allDocsEntries.find(
-      (entry) => entry.slug === folder,
-    );
-
-    // Add if exists
-    if (folderIndexEntry) {
-      routes.push({
-        params: { slug: `docs/${folder}` },
-        props: { entry: folderIndexEntry, frontmatter: folderIndexEntry.data },
-      });
-    }
-
-    // Add folder entries for PG
-    routes.push(
-      ...folderEntries.map((entry) => ({
-        params: { slug: `docs/${entry.slug}` },
-        props: { entry, frontmatter: entry.data },
-      })),
-    );
-
-    // Add for other dialects
-    dialectSwitcherItems
-      .filter((d) => d.id !== "pg")
-      .forEach((dialect) => {
-        // Add folder index page
-        if (folderIndexEntry) {
-          routes.push({
-            params: { slug: `docs/${dialect.id}/${folder}` },
-            props: {
-              entry: folderIndexEntry,
-              frontmatter: folderIndexEntry.data,
-            },
-          });
+    [defaultDocsDialect, ...dialectSwitcherItems.map((dialect) => dialect.id)]
+      .filter(
+        (dialectId): dialectId is string =>
+          !!dialectId && isDocsDialectId(dialectId),
+      )
+      .forEach((dialectId) => {
+        if (!getDialectMetaSlugSet(dialectId).has(folder)) {
+          return;
         }
 
-        routes.push(
-          ...folderEntries.map((entry) => ({
-            params: { slug: `docs/${dialect.id}/${entry.slug}` },
-            props: { entry, frontmatter: entry.data },
-          })),
-        );
-      });
-  });
+        const routePrefix =
+          dialectId === defaultDocsDialect ? "docs" : `docs/${dialectId}`;
 
-  // 4. Dialect-specific content
-  dialectSwitcherItems
-    .filter((d) => d.id !== "pg")
-    .forEach((dialect) => {
-      const dialectEntries = allDocsEntries.filter((entry) =>
-        entry.slug.startsWith(`${dialect.id}/`),
-      );
-      routes.push(
-        ...dialectEntries.map((entry) => ({
-          params: { slug: `docs/${entry.slug}` },
-          props: { entry, frontmatter: entry.data },
-        })),
-      );
+        folderEntries.forEach((entry) => {
+          const dialectEntry = entriesBySlug.get(`${dialectId}/${entry.slug}`);
+          addRoute(`${routePrefix}/${entry.slug}`, dialectEntry || entry);
+        });
+      });
     });
 
-  // 5. Single dialect folders (e.g. get-started)
+  // 3. Single shared folders (e.g. get-started) keep their direct root URLs.
   commonFolders.forEach((folder) => {
     const folderEntries = allDocsEntries.filter((entry) =>
       entry.slug.startsWith(`${folder}/`),
     );
-    routes.push(
-      ...folderEntries.map((entry) => ({
-        params: { slug: `docs/${entry.slug}` },
-        props: { entry, frontmatter: entry.data },
-      })),
-    );
+    folderEntries.forEach((entry) => addRoute(`docs/${entry.slug}`, entry));
   });
 
   return routes;

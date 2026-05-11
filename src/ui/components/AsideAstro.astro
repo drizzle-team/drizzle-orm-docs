@@ -1,5 +1,5 @@
 ---
-import { commonFolders, dialectRelatedFolder } from "@/pages/[...slug].astro";
+import { commonFolders, dialectRelatedFolder } from "@/dialect-docs";
 import type { IHeading, TreeNode } from "@/types";
 import { extractSubDirFromSlug } from "@/utils";
 
@@ -86,7 +86,12 @@ const calculateMaxHeight = (items: TreeNode[]) => {
 };
 
 const getLink = (params: string[]) => {
-  if (subDir && ![...commonFolders, ...dialectRelatedFolder].some((folder) => folder === subDir)) {
+  if (
+    subDir &&
+    !([...commonFolders, ...dialectRelatedFolder] as readonly string[]).some(
+      (folder) => folder === subDir,
+    )
+  ) {
     const sliced = params.slice(1, params.length);
     return `/docs/${subDir}/${sliced.join("/")}`;
   } else {

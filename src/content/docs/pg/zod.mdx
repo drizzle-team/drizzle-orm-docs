@@ -1,0 +1,357 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+<Callout type="error">
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-zod` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
+
+You can still use `drizzle-zod` package but all new update will be added to Drizzle ORM directly
+</Callout>
+
+# zod
+
+### Install the dependencies
+
+<Npm>
+zod
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Will parse successfully
+```
+
+Views and enums are also supported.
+
+```ts copy
+import { pgEnum, pgView } from 'drizzle-orm/pg-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const roles = pgEnum('roles', ['admin', 'basic']);
+const rolesSchema = createSelectSchema(roles);
+const parsed: 'admin' | 'basic' = rolesSchema.parse(...);
+
+const usersView = pgView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = usersViewSchema.parse(...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-orm/zod';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createUpdateSchema } from 'drizzle-orm/zod';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { id: 5, name: 'John' };
+const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Error: `id` is a generated column, it can't be updated
+
+const user = { age: 35 };
+const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Will parse successfully
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Zod schema will overwrite it.
+
+```ts copy
+import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = pgTable('users', {
+  id: integer().primaryKey(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: json()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => schema.max(20), // Extends schema
+  bio: (schema) => schema.max(1000), // Extends schema before becoming nullable/optional
+  preferences: z.object({ theme: z.string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string,
+  bio?: string | undefined;
+  preferences: {
+    theme: string;
+  };
+} = userSelectSchema.parse(...);
+```
+
+### Factory functions
+
+For more advanced use cases, you can use the `createSchemaFactory` function.
+
+**Use case: Using an extended Zod instance**
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from '@hono/zod-openapi'; // Extended Zod instance
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({ zodInstance: z });
+
+const userInsertSchema = createInsertSchema(users, {
+  // We can now use the extended instance
+  name: (schema) => schema.openapi({ example: 'John' })
+});
+```
+
+**Use case: Type coercion**
+
+```ts copy
+import { pgTable, timestamp } from 'drizzle-orm/pg-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = pgTable('users', {
+  ...,
+  createdAt: timestamp().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({
+  // This configuration will only coerce dates. Set `coerce` to `true` to coerce all data types or specify others
+  coerce: {
+    date: true
+  }
+});
+
+const userInsertSchema = createInsertSchema(users);
+// The above is the same as this:
+const userInsertSchema = z.object({
+  ...,
+  createdAt: z.coerce.date()
+});
+```
+
+### Data type reference
+
+```ts
+pg.boolean();
+
+// Schema
+z.boolean();
+```
+
+```ts
+pg.date({ mode: 'date' });
+pg.timestamp({ mode: 'date' });
+
+// Schema
+z.date();
+```
+
+```ts
+pg.date({ mode: 'string' });
+pg.timestamp({ mode: 'string' });
+pg.cidr();
+pg.inet();
+pg.interval();
+pg.macaddr();
+pg.macaddr8();
+pg.numeric();
+pg.text();
+pg.sparsevec();
+pg.time();
+
+// Schema
+z.string();
+```
+
+```ts
+pg.bit({ dimensions: ... });
+
+// Schema
+z.string().regex(/^[01]+$/).max(dimensions);
+```
+
+```ts
+pg.uuid();
+
+// Schema
+z.string().uuid();
+```
+
+```ts
+pg.char({ length: ... });
+
+// Schema
+z.string().length(length);
+```
+
+```ts
+pg.varchar({ length: ... });
+
+// Schema
+z.string().max(length);
+```
+
+```ts
+pg.text({ enum: ... });
+pg.char({ enum: ... });
+pg.varchar({ enum: ... });
+
+// Schema
+z.enum(enum);
+```
+
+```ts
+pg.smallint();
+pg.smallserial();
+
+// Schema
+z.number().min(-32_768).max(32_767).int(); // 16-bit integer lower and upper limit
+```
+
+```ts
+pg.real();
+
+// Schema
+z.number().min(-8_388_608).max(8_388_607); // 24-bit integer lower and upper limit
+```
+
+```ts
+pg.integer();
+pg.serial();
+
+// Schema
+z.number().min(-2_147_483_648).max(2_147_483_647).int(); // 32-bit integer lower and upper limit
+```
+
+```ts
+pg.doublePrecision();
+
+// Schema
+z.number().min(-140_737_488_355_328).max(140_737_488_355_327); // 48-bit integer lower and upper limit
+```
+
+```ts
+pg.bigint({ mode: 'number' });
+pg.bigserial({ mode: 'number' });
+
+// Schema
+z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991).int(); // Javascript min. and max. safe integers
+```
+
+```ts
+pg.bigint({ mode: 'bigint' });
+pg.bigserial({ mode: 'bigint' });
+
+// Schema
+z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n); // 64-bit integer lower and upper limit
+```
+
+```ts
+pg.geometry({ type: 'point', mode: 'tuple' });
+pg.point({ mode: 'tuple' });
+
+// Schema
+z.tuple([z.number(), z.number()]);
+```
+
+```ts
+pg.geometry({ type: 'point', mode: 'xy' });
+pg.point({ mode: 'xy' });
+
+// Schema
+z.object({ x: z.number(), y: z.number() });
+```
+
+```ts
+pg.halfvec({ dimensions: ... });
+pg.vector({ dimensions: ... });
+
+// Schema
+z.array(z.number()).length(dimensions);
+```
+
+```ts
+pg.line({ mode: 'abc' });
+
+// Schema
+z.object({ a: z.number(), b: z.number(), c: z.number() });
+```
+
+```ts
+pg.line({ mode: 'tuple' });
+
+// Schema
+z.tuple([z.number(), z.number(), z.number()]);
+```
+
+```ts
+pg.json();
+pg.jsonb();
+
+// Schema
+z.union([z.union([z.string(), z.number(), z.boolean(), z.null()]), z.record(z.any()), z.array(z.any())]);
+```
+
+```ts
+pg.dataType().array(...);
+
+// Schema
+z.array(baseDataTypeSchema).length(size);
+```

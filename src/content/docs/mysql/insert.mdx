@@ -1,0 +1,159 @@
+import Section from '@mdx/Section.astro';
+import Callout from '@mdx/Callout.astro';
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+
+# SQL Insert
+Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
+
+Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
+
+<Section>
+```typescript copy 
+await db.insert(users).values({ name: 'Andrew' });
+```
+```sql
+insert into `users` (`name`) values ('Andrew');
+```
+</Section>
+
+If you need insert type for a particular table you can use `typeof usersTable.$inferInsert` syntax. 
+```typescript copy 
+type NewUser = typeof users.$inferInsert;
+
+const insertUser = async (user: NewUser) => {
+  return db.insert(users).values(user);
+}
+
+const newUser: NewUser = { name: "Alef" };
+await insertUser(newUser);
+```
+
+## $returningId
+MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. There is only one way to do it for `primary keys` with `autoincrement` (or `serial`) types, where you can access `insertId` and `affectedRows` fields. We've prepared an automatic way for you to handle such cases with Drizzle and automatically receive all inserted IDs as separate objects
+
+```ts
+import { boolean, int, text, mysqlTable } from 'drizzle-orm/mysql-core';
+
+const usersTable = mysqlTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+  verified: boolean('verified').notNull().default(false),
+});
+
+
+const result = await db.insert(usersTable).values([{ name: 'John' }, { name: 'John1' }]).$returningId();
+//    ^? { id: number }[]
+```
+
+Also with Drizzle, you can specify a `primary key` with `$default` function that will generate custom primary keys at runtime. We will also return those generated keys for you in the `$returningId()` call
+
+```ts
+import { varchar, text, mysqlTable } from 'drizzle-orm/mysql-core';
+import { createId } from '@paralleldrive/cuid2';
+
+const usersTableDefFn = mysqlTable('users_default_fn', {
+  customId: varchar('id', { length: 256 }).primaryKey().$defaultFn(createId),
+  name: text('name').notNull(),
+});
+
+
+const result = await db.insert(usersTableDefFn).values([{ name: 'John' }, { name: 'John1' }]).$returningId();
+//  ^? { customId: string }[]
+```
+
+> If there is no primary keys -> type will be `{}[]` for such queries
+
+## Insert multiple rows
+```typescript copy
+await db.insert(users).values([{ name: 'Andrew' }, { name: 'Dan' }]);
+```
+
+## Upserts and conflicts
+Drizzle ORM provides simple interfaces for handling upserts and conflicts.
+
+### On duplicate key update
+MySQL supports [`ON DUPLICATE KEY UPDATE`](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html) instead of `ON CONFLICT` clauses. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if *any* unique index conflicts.
+
+Drizzle supports this through the `onDuplicateKeyUpdate` method:
+
+```typescript
+// Note that MySQL automatically determines targets based on the primary key and unique indexes
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { name: 'John' } });
+```
+
+While MySQL does not directly support doing nothing on conflict, you can perform a no-op by setting any column's value to itself and achieve the same effect:
+
+```typescript
+import { sql } from 'drizzle-orm';
+
+await db.insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { id: sql`id` } });
+```
+
+## Insert into ... select
+
+As the MySQL documentation mentions:
+
+<Callout>
+With INSERT ... SELECT, you can quickly insert many rows into a table from the result of a SELECT statement, which can select from one or many tables
+</Callout>
+
+Drizzle supports the current syntax for all dialects, and all of them share the same syntax. Let's review some common scenarios and API usage. 
+There are several ways to use select inside insert statements, allowing you to choose your preferred approach:
+
+- You can pass a query builder inside the select function.
+- You can use a query builder inside a callback.
+- You can pass an SQL template tag with any custom select query you want to use
+
+
+<Tabs items={["Query Builder", "Callback", "SQL template tag"]}>
+<Tab>
+<Section>
+```ts
+const insertedEmployees = await db
+  .insert(employees)
+  .select(
+    db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+  );
+```
+```ts
+const qb = new QueryBuilder();
+await db.insert(employees).select(
+    qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+);
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts
+await db.insert(employees).select(
+    () => db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+);
+```
+```ts
+await db.insert(employees).select(
+    (qb) => qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+);
+```
+</Section>
+</Tab>
+<Tab>
+<Section>
+```ts
+await db.insert(employees).select(
+    sql`select users.name as name from users where users.role = 'employee'`
+);
+```
+```ts
+await db.insert(employees).select(
+    () => sql`select users.name as name from users where users.role = 'employee'`
+);
+```
+</Section>
+</Tab>
+</Tabs>

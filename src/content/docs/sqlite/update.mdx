@@ -1,0 +1,135 @@
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# SQL Update
+
+```typescript copy
+await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'));
+```
+
+The object that you pass to `update` should have keys that match column names in your database schema.
+Values of `undefined` are ignored in the object: to set a column to `null`, pass `null`.
+You can pass SQL as a value to be used in the update object, like this:
+
+```typescript copy
+await db.update(users)
+  .set({ updatedAt: sql`NOW()` })
+  .where(eq(users.name, 'Dan'));
+```
+
+### Limit
+Use `.limit()` to add `limit` clause to the query - for example:
+<Section>
+```typescript
+await db.update(usersTable).set({ verified: true }).limit(2);
+```
+```sql
+update "users" set "verified" = ? limit ?;
+```
+</Section>
+
+### Order By
+Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
+<Section>
+```typescript
+import { asc, desc } from 'drizzle-orm';
+
+await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name);
+await db.update(usersTable).set({ verified: true }).orderBy(desc(usersTable.name));
+
+// order by multiple fields
+await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name, usersTable.name2);
+await db.update(usersTable).set({ verified: true }).orderBy(asc(usersTable.name), desc(usersTable.name2));
+```
+```sql
+update "users" set "verified" = ? order by "name";
+update "users" set "verified" = ? order by "name" desc;
+
+update "users" set "verified" = ? order by "name", "name2";
+update "users" set "verified" = ? order by "name" asc, "name2" desc;
+```
+</Section>
+
+### Returning
+You can update a row and get it back in SQLite:
+```typescript copy
+const updatedUserId: { updatedId: number }[] = await db.update(users)
+  .set({ name: 'Mr. Dan' })
+  .where(eq(users.name, 'Dan'))
+  .returning({ updatedId: users.id });
+```
+
+## `with update` clause
+
+<Callout>
+  Check how to use WITH statement with [select](/docs/sqlite/select#with-clause), [insert](/docs/sqlite/insert#with-insert-clause), [delete](/docs/sqlite/delete#with-delete-clause)
+</Callout>
+
+Using the `with` clause can help you simplify complex queries by splitting them into smaller subqueries called common table expressions (CTEs):
+<Section>
+```typescript copy
+const averagePrice = db.$with('average_price').as(
+        db.select({ value: sql`avg(${products.price})`.as('value') }).from(products)
+);
+
+const result = await db.with(averagePrice)
+		.update(products)
+		.set({
+			cheap: true
+		})
+		.where(lt(products.price, sql`(select * from ${averagePrice})`))
+		.returning({
+			id: products.id
+		});
+```
+```sql
+with "average_price" as (select avg("price") as "value" from "products") 
+update "products" set "cheap" = ? 
+where "products"."price" < (select * from "average_price") 
+returning "id"
+```
+</Section>
+
+## Update ... from
+As the SQLite documentation mentions:
+
+> The UPDATE-FROM idea is an extension to SQL that allows an UPDATE statement to be driven by other tables in the database. 
+The "target" table is the specific table that is being updated. With UPDATE-FROM you can join the target table 
+against other tables in the database in order to help compute which rows need updating and what 
+the new values should be on those rows
+
+Drizzle also supports this feature starting from version `drizzle-orm@0.36.3`
+
+<Section>
+```ts
+await db
+  .update(users)
+  .set({ cityId: cities.id })
+  .from(cities)
+  .where(and(eq(cities.name, 'Seattle'), eq(users.name, 'John')))
+```
+```sql
+update "users" set "city_id" = "cities"."id" 
+from "cities" 
+where ("cities"."name" = ? and "users"."name" = ?)
+
+-- params: [ 'Seattle', 'John' ]
+```
+</Section>
+
+You can also alias tables that are joined (in PG, you can also alias the updating table too).
+<Section>
+```ts
+const c = alias(cities, 'c');
+await db
+  .update(users)
+  .set({ cityId: c.id })
+  .from(c);
+```
+```sql
+update "users" set "city_id" = "c"."id" 
+from "cities" "c"
+```
+</Section>

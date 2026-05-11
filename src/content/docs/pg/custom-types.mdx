@@ -1,0 +1,17 @@
+# Custom types
+
+PostgreSQL exposes `customType` from `drizzle-orm/pg-core`.
+
+```ts
+import { customType, pgTable } from 'drizzle-orm/pg-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = pgTable('users', {
+  name: customText('name').notNull(),
+});
+```

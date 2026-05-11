@@ -1,5 +1,5 @@
 import type { IHeading, TreeNode } from "@/types";
-import { commonFolders, dialectRelatedFolder } from "./pages/[...slug].astro";
+import { defaultDocsDialect, isDocsDialectId } from "./dialect-docs";
 
 export const addNofollowToExternalLinks = (html: string): string => {
   const externalLinkPattern =
@@ -87,11 +87,6 @@ interface ContentTreeProps {
   slug?: string;
 }
 
-const extractSubDirFromFilePath = (path: string): string | null => {
-  const match = path.match(/\.\/content\/docs\/([^/]+)\/_meta\.json$/);
-  return match ? match[1] : null;
-};
-
 export const extractSubDirFromSlug = (slug: string): string | null => {
   const match = slug.match(/^docs\/([^/]+)\/.+/);
   return match ? match[1] : null;
@@ -99,37 +94,43 @@ export const extractSubDirFromSlug = (slug: string): string | null => {
 
 export const getContentTree = async (props: ContentTreeProps) => {
   const [metaFiles, mdxFiles] = await Promise.all([
-    import.meta.glob<Array<string | string[]>>("./content/**/_meta.json"),
+    import.meta.glob<{ default: Array<string | string[]> }>(
+      "./content/**/_meta.json",
+    ),
     import.meta.glob<Array<string | string[]>>("./content/**/*.mdx"),
   ]);
 
   const mdxPaths = Object.keys(mdxFiles);
   const subDirSlug = extractSubDirFromSlug(props.slug || "");
+  const currentDialect =
+    subDirSlug && isDocsDialectId(subDirSlug)
+      ? subDirSlug
+      : defaultDocsDialect;
+  const hasRootPage = (slug: string) =>
+    mdxPaths.some((path) => path.endsWith(`/content/docs/${slug}.mdx`));
+  const hasDialectPage = (dialect: string, slug: string) =>
+    mdxPaths.some((path) =>
+      path.endsWith(`/content/docs/${dialect}/${slug}.mdx`),
+    );
+  const ensureMetaItemExists = (slug: string) => {
+    if (hasDialectPage(currentDialect, slug) || hasRootPage(slug)) {
+      return;
+    }
+
+    throw new Error(
+      `[docs] ${currentDialect}/_meta.json references "${slug}", but neither src/content/docs/${currentDialect}/${slug}.mdx nor src/content/docs/${slug}.mdx exists.`,
+    );
+  };
   const filteredMetaFiles: Record<
     string,
-    () => Promise<(string | string[])[]>
+    () => Promise<{ default: (string | string[])[] }>
   > = {};
 
-  Object.entries(metaFiles).forEach(([key, p]) => {
-    const subDir = extractSubDirFromFilePath(key);
-    if (!subDir) {
-      filteredMetaFiles[key] = p;
-      return;
-    }
-    if (
-      (subDir === "pg" && !subDirSlug) ||
-      (subDir === "pg" &&
-        subDirSlug &&
-        [...commonFolders, ...dialectRelatedFolder].includes(subDirSlug))
-    ) {
-      filteredMetaFiles[key] = p;
-      return;
-    }
-    if (subDir && subDirSlug && subDir === subDirSlug) {
-      filteredMetaFiles[key] = p;
-      return;
-    }
-  });
+  const currentDialectMetaPath = `./content/docs/${currentDialect}/_meta.json`;
+  const currentDialectMeta = metaFiles[currentDialectMetaPath];
+  if (currentDialectMeta) {
+    filteredMetaFiles[currentDialectMetaPath] = currentDialectMeta;
+  }
 
   const navItems: SidebarItem[] = [];
 
@@ -145,6 +146,7 @@ export const getContentTree = async (props: ContentTreeProps) => {
 
     parsed.forEach((key, i) => {
       if (Array.isArray(key)) {
+        ensureMetaItemExists(`${key[0]}`);
         navItems.push({
           type: getTypeOfFile(`${key[0]}`),
           title: key[1],

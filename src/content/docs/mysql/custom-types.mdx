@@ -1,0 +1,17 @@
+# Custom types
+
+MySQL exposes `customType` from `drizzle-orm/mysql-core`.
+
+```ts
+import { customType, mysqlTable } from 'drizzle-orm/mysql-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = mysqlTable('users', {
+  name: customText('name').notNull(),
+});
+```
