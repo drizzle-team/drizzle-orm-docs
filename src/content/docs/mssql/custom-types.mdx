@@ -1,0 +1,17 @@
+# Custom types
+
+MSSQL exposes `customType` from `drizzle-orm/mssql-core`.
+
+```ts
+import { customType, mssqlTable } from 'drizzle-orm/mssql-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = mssqlTable('users', {
+  name: customText('name').notNull(),
+});
+```

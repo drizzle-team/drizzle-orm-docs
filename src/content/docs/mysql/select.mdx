@@ -132,10 +132,10 @@ select distinct `id` from `users` order by `id`;
 ### Advanced select
 Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
 
-Sneak peek of advanced partial select, for more detailed advanced usage examples - see our [dedicated guide](/docs/guides/include-or-exclude-columns).
+Sneak peek of advanced partial select, for more detailed advanced usage examples - see our [dedicated guide](/docs/mysql/guides/include-or-exclude-columns).
 
 <Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
+`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/mysql/upgrade-v1))
 
 If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
 </Callout>
@@ -298,7 +298,7 @@ select `id`, `name`, `age` from `users` where `id` = 42 or `name` = 'Dan';
 ### Advanced filters
 In combination with TypeScript, Drizzle APIs provide you powerful and flexible ways to combine filters in queries.
 
-Sneak peek of conditional filtering, for more detailed advanced usage examples - see our [dedicated guide](/docs/guides/conditional-filters-in-query).
+Sneak peek of conditional filtering, for more detailed advanced usage examples - see our [dedicated guide](/docs/mysql/guides/conditional-filters-in-query).
 <CodeTabs items={["example 1", "example 2"]}>
 ```ts
 const searchPosts = async (term?: string) => {
@@ -353,8 +353,8 @@ select `id`, `name`, `age` from `users` order by `name` asc, `name2` desc;
 Powered by TypeScript, Drizzle APIs let you implement all possible SQL pagination and sorting approaches.
 
 Sneak peek of advanced pagination, for more detailed advanced
-usage examples - see our dedicated [limit offset pagination](/docs/guides/limit-offset-pagination)
-and [cursor pagination](/docs/guides/cursor-based-pagination) guides.
+usage examples - see our dedicated [limit offset pagination](/docs/mysql/guides/limit-offset-pagination)
+and [cursor pagination](/docs/mysql/guides/cursor-based-pagination) guides.
 
 <CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
 ```ts

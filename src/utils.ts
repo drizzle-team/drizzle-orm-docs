@@ -1,5 +1,5 @@
 import type { IHeading, TreeNode } from "@/types";
-import { defaultDocsDialect, isDocsDialectId } from "./dialect-docs";
+import { resolveDocsDialectFromSlug } from "./dialect-docs";
 
 export const addNofollowToExternalLinks = (html: string): string => {
   const externalLinkPattern =
@@ -102,10 +102,7 @@ export const getContentTree = async (props: ContentTreeProps) => {
 
   const mdxPaths = Object.keys(mdxFiles);
   const subDirSlug = extractSubDirFromSlug(props.slug || "");
-  const currentDialect =
-    subDirSlug && isDocsDialectId(subDirSlug)
-      ? subDirSlug
-      : defaultDocsDialect;
+  const currentDialect = resolveDocsDialectFromSlug(props.slug || "");
   const hasRootPage = (slug: string) =>
     mdxPaths.some((path) => path.endsWith(`/content/docs/${slug}.mdx`));
   const hasDialectPage = (dialect: string, slug: string) =>

@@ -1,0 +1,337 @@
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# Indexes & Constraints
+
+## Constraints
+
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
+
+### Default
+
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { int, time, mssqlTable } from "drizzle-orm/mssql-core";
+    
+    const table = mssqlTable("table", {
+      int: int("int").default(42),
+      time: time("time").default(sql`cast("14:06:10" AS TIME)`),
+    });
+    ```
+    ```sql
+    CREATE TABLE [table] (
+      [int] int DEFAULT 42,
+      [time] time DEFAULT cast("14:06:10" AS TIME)
+    );
+    ```
+    </Section>
+
+### Not null
+
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
+This enforces a field to always contain a value, which means that you cannot insert a new record,
+or update a record without adding a value to this field.
+
+<Section>
+      ```typescript
+      import { int, mssqlTable } from "drizzle-orm/mssql-core";
+
+      const table = mssqlTable('table', {
+        int: int('int').notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE [table] (
+        [int] int NOT NULL
+      );
+      ```
+    </Section>
+
+### Unique
+
+The `UNIQUE` constraint ensures that all values in a column are different.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
+A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
+
+<Section>
+      ```typescript
+      import { int, varchar, unique, mssqlTable } from "drizzle-orm/mssql-core";
+
+      export const user = mssqlTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = mssqlTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = mssqlTable('composite_example', {
+        id: int('id'),
+        name: varchar('name', { length: 256 }),
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
+      ```
+
+      ```sql
+      CREATE TABLE [user] (
+      	[id] int,
+      	CONSTRAINT [user_id_unique] UNIQUE([id])
+      );
+
+      CREATE TABLE [table] (
+      	[id] int,
+      	CONSTRAINT [custom_name] UNIQUE([id])
+      );
+
+      CREATE TABLE [composite_example] (
+        [id] int,
+        [name] varchar(256),
+        CONSTRAINT [composite_example_id_name_unique] UNIQUE([id],[name]),
+        CONSTRAINT [custom_name] UNIQUE([id],[name])
+      );
+      ```
+    </Section>
+
+### Check
+
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
+If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+
+If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
+
+<Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, mssqlTable, text } from "drizzle-orm/mssql-core";
+
+      export const users = mssqlTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: int(),
+        },
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`)
+        ]
+      );
+      ```
+      ```sql
+      CREATE TABLE [users] (
+	      [id] int NOT NULL,
+	      [username] text NOT NULL,
+	      [age] int,
+	      CONSTRAINT [users_id] PRIMARY KEY([id]),
+	      CONSTRAINT [age_check1] CHECK([users].[age] > 21)
+      );
+      ```
+    </Section>
+
+### Primary Key
+
+The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
+Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
+
+A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
+<Section>
+      ```typescript
+      import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+
+      export const user = mssqlTable("user", {
+        id: int("id").identity().primaryKey(),
+      })
+
+      export const table = mssqlTable("table", {
+        cuid: text("cuid").primaryKey(),
+      })
+      ```
+
+      ```sql
+      CREATE TABLE [user] (
+        [id] int AUTO_INCREMENT PRIMARY KEY NOT NULL
+      );
+
+      CREATE TABLE [table] (
+        [cuid] text PRIMARY KEY NOT NULL
+      );
+      ```
+    </Section>
+
+### Composite Primary Key
+
+Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
+
+Drizzle ORM provides a standalone `primaryKey` operator for that:
+
+<Section>
+      ```typescript {18, 19}
+      import { int, text, primaryKey, mssqlTable } from "drizzle-orm/mssql-core";
+
+      export const user = mssqlTable("user", {
+        id: int("id").identity().primaryKey(),
+        name: text("name"),
+      });
+
+      export const book = mssqlTable("book", {
+        id: int("id").identity().primaryKey(),
+        name: text("name"),
+      });
+
+      export const booksToAuthors = mssqlTable("books_to_authors", {
+        authorId: int("author_id"),
+        bookId: int("book_id"),
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] })
+      ]);
+      ```
+
+      ```sql {6}
+      ...
+
+      CREATE TABLE `books_to_authors` (
+        `author_id` int,
+        `book_id` int,
+        PRIMARY KEY(`book_id`,`author_id`)
+      );
+      ```
+    </Section>
+
+### Foreign key
+
+The `FOREIGN KEY` constraint is used to prevent actions that would destroy links between tables.
+A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
+The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
+
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
+
+```typescript {11}
+    import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      id: int("id").primaryKey().identity(),
+      name: text("name"),
+    });
+
+    export const book = mssqlTable("book", {
+      id: int("id").primaryKey().identity(),
+      name: text("name"),
+      authorId: int("author_id").references(() => user.id)
+    });
+    ```
+
+If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
+set return type for reference callback or use a standalone `foreignKey` operator.
+
+```typescript {6,16-19}
+    import { int, text, foreignKey, AnyMsSqlColumn, mssqlTable } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      id: int("id").primaryKey().identity(),
+      name: text("name"),
+      parentId: int("parent_id").references((): AnyMsSqlColumn => user.id),
+    });
+
+    // or
+    export const user = mssqlTable("user", {
+      id: int("id").primaryKey().identity(),
+      name: text("name"),
+      parentId: int("parent_id")
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
+    ```
+
+To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
+
+```typescript copy {4-5,14-15,18-21}
+    import { int, text, primaryKey, foreignKey, mssqlTable, AnyMsSqlColumn } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
+
+    export const profile = mssqlTable("profile", {
+      id: int("id").identity().primaryKey(),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_name"
+      })
+    ]);
+    ```
+
+## Indexes
+
+Drizzle ORM provides API for both `index` and `unique index` declaration:
+
+<Section>
+    ```typescript copy {9-10}
+    import { int, text, index, uniqueIndex, mssqlTable } from "drizzle-orm/mssql-core";
+
+    export const user = mssqlTable("user", {
+      id: int("id").primaryKey().identity(),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
+    ```
+    ```sql {5-6}
+    CREATE TABLE `user` (
+      ...
+    );
+
+    CREATE INDEX `name_idx` ON `user` (`name`);
+    CREATE UNIQUE INDEX [email_idx] ON [user] ([email]);
+    ```
+    </Section>
+    <Callout type="warning" emoji="⚠️">
+      As of now `drizzle-kit` only supports index `name` and `on()` param.
+    </Callout>
+
+     Drizzle ORM provides set of all params for index creation:
+
+    ```typescript
+    // Index declaration reference
+    index("name")
+      .on(table.name)
+      .algorythm("default") // "default" | "copy" | "inplace"
+      .using("btree") // "btree" | "hash"
+      .lock("default") // "none" | "default" | "exclusive" | "shared"
+    ```

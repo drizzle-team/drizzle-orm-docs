@@ -1,0 +1,365 @@
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# Indexes & Constraints
+
+## Constraints
+
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
+
+### Default
+
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { integer, uuid, cockroachTable } from "drizzle-orm/cockroach-core";
+
+    const table = cockroachTable('table', {
+      integer1: integer('integer1').default(42),
+      integer2: integer('integer2').default(sql`'42'::integer`),
+      uuid1: uuid('uuid1').defaultRandom(),
+      uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
+    });
+    ```
+
+    ```sql
+    CREATE TABLE "table" (
+      "integer1" integer DEFAULT 42,
+      "integer2" integer DEFAULT '42'::integer,
+      "uuid1" uuid DEFAULT gen_random_uuid(),
+      "uuid2" uuid DEFAULT gen_random_uuid()
+    );
+    ```
+    </Section>
+
+### Not null
+
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
+This enforces a field to always contain a value, which means that you cannot insert a new record,
+or update a record without adding a value to this field.
+
+<Section>
+      ```typescript copy
+      import { integer, cockroachTable } from "drizzle-orm/cockroach-core";
+
+      const table = cockroachTable('table', {
+        integer: integer('integer').notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE "table" (
+        "integer" integer NOT NULL
+      );
+      ```
+    </Section>
+
+### Unique
+
+The `UNIQUE` constraint ensures that all values in a column are different.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
+A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
+
+<Section>
+      ```typescript copy
+      import { integer, text, unique, cockroachTable } from "drizzle-orm/cockroach-core";
+
+      export const user = cockroachTable('user', {
+        id: integer('id').unique(),
+      });
+
+      export const table = cockroachTable('table', {
+        id: integer('id').unique('custom_name'),
+      });
+
+      export const composite = cockroachTable('composite_example', {
+        id: integer('id'),
+        name: text('name'),
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
+
+      // In Postgres 15.0+ NULLS NOT DISTINCT is available
+      // This example demonstrates both available usages
+      export const userNulls = cockroachTable('user_nulls_example', {
+        id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
+      }, (t) => [
+        unique().on(t.id).nullsNotDistinct()
+      ]);
+      ```
+
+      ```sql
+      CREATE TABLE "composite_example" (
+	      "id" integer,
+        "name" text,
+        CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
+        CONSTRAINT "custom_name" UNIQUE("id","name")
+      );
+
+      CREATE TABLE "table" (
+      	"id" integer,
+      	CONSTRAINT "custom_name" UNIQUE("id")
+      );
+
+      CREATE TABLE "user" (
+      	"id" integer,
+      	CONSTRAINT "user_id_unique" UNIQUE("id")
+      );
+
+      CREATE TABLE "user_nulls_example" (
+        "id" integer,
+        CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
+        CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
+      );
+      ```
+    </Section>
+
+### Check
+
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
+If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+
+If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
+
+<Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, integer, cockroachTable, text, uuid } from "drizzle-orm/cockroach-core";
+
+      export const users = cockroachTable(
+        "users",
+        {
+          id: uuid().defaultRandom().primaryKey(),
+          username: text().notNull(),
+          age: integer(),
+        },
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`),
+        ]
+      );
+      ```
+      ```sql
+      CREATE TABLE "users" (
+	      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	      "username" text NOT NULL,
+	      "age" integer,
+	      CONSTRAINT "age_check1" CHECK ("users"."age" > 21)
+      );
+      ```
+    </Section>
+
+### Primary Key
+
+The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
+Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
+
+A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
+<Section>
+      ```typescript copy
+      import { serial, text, cockroachTable } from "drizzle-orm/cockroach-core";
+
+      const user = cockroachTable('user', {
+        id: serial('id').primaryKey(),
+      });
+
+      const table = cockroachTable('table', {
+        id: text('cuid').primaryKey(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE "user" (
+        "id" serial PRIMARY KEY
+      );
+
+      CREATE TABLE "table" (
+        "cuid" text PRIMARY KEY
+      );
+      ```
+    </Section>
+
+### Composite Primary Key
+
+Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
+
+Drizzle ORM provides a standalone `primaryKey` operator for that:
+
+<Section>
+      ```typescript copy {18, 19}
+      import { serial, text, integer, primaryKey, cockroachTable } from "drizzle-orm/cockroach-core";
+
+      export const user = cockroachTable("user", {
+        id: serial("id").primaryKey(),
+        name: text("name"),
+      });
+
+      export const book = cockroachTable("book", {
+        id: serial("id").primaryKey(),
+        name: text("name"),
+      });
+
+      export const booksToAuthors = cockroachTable("books_to_authors", {
+        authorId: integer("author_id"),
+        bookId: integer("book_id"),
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+      ]);
+      ```
+
+      ```sql {6, 9}
+      ...
+
+      CREATE TABLE "books_to_authors" (
+        "author_id" integer,
+        "book_id" integer,
+        PRIMARY KEY("book_id","author_id")
+      );
+
+      ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");
+      ```
+    </Section>
+
+### Foreign key
+
+The `FOREIGN KEY` constraint is used to prevent actions that would destroy links between tables.
+A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
+The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
+
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
+
+```typescript copy {11}
+    import { serial, text, integer, cockroachTable } from "drizzle-orm/cockroach-core";
+
+    export const user = cockroachTable("user", {
+      id: serial("id"),
+      name: text("name"),
+    });
+
+    export const book = cockroachTable("book", {
+      id: serial("id"),
+      name: text("name"),
+      authorId: integer("author_id").references(() => user.id)
+    });
+    ```
+
+If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
+set return type for reference callback or use a standalone `foreignKey` operator.
+
+```typescript copy {6,16-19}
+    import { serial, text, integer, foreignKey, cockroachTable, AnyPgColumn } from "drizzle-orm/cockroach-core";
+
+    export const user = cockroachTable("user", {
+      id: serial("id"),
+      name: text("name"),
+      parentId: integer("parent_id").references((): AnyPgColumn => user.id)
+    });
+
+    // or
+    export const user = cockroachTable("user", {
+      id: serial("id"),
+      name: text("name"),
+      parentId: integer("parent_id"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
+    ```
+
+To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
+
+```typescript copy {4-5,14-15,18-21}
+    import { serial, text, foreignKey, cockroachTable, AnyPgColumn } from "drizzle-orm/cockroach-core";
+
+    export const user = cockroachTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
+
+    export const profile = cockroachTable("profile", {
+      id: serial("id").primaryKey(),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_fk"
+      })
+    ])
+    ```
+
+## Indexes
+
+Drizzle ORM provides API for both `index` and `unique index` declaration:
+
+<Section>
+    ```typescript copy {9-10}
+    import { serial, text, index, uniqueIndex, cockroachTable } from "drizzle-orm/cockroach-core";
+
+    export const user = cockroachTable("user", {
+      id: serial("id").primaryKey(),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email)
+    ]);
+    ```
+    ```sql {5-6}
+    CREATE TABLE "user" (
+      ...
+    );
+
+    CREATE INDEX "name_idx" ON "user" ("name");
+    CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
+    ```
+    </Section>
+    <Callout type="warning" emoji="⚠️">
+      For versions before `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` `drizzle-kit` only supports index `name` and `on()` param.
+
+      After versions `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` all fields are supported in drizzle-kit!
+    </Callout>
+
+    Starting from 0.31.0 a new index api for Drizzle ORM provides set of all params for index creation:
+
+```ts
+// First example, with `.on()`
+index('name')
+  .on(table.column1.asc(), table.column2.nullsFirst(), ...) or .onOnly(table.column1.desc().nullsLast(), table.column2, ...)
+  .concurrently()
+  .where(sql``)
+  .with({ fillfactor: '70' })
+
+// Second Example, with `.using()`
+index('name')
+  .using('btree', table.column1.asc(), sql`lower(${table.column2})`, table.column1.op('text_ops'))
+  .where(sql``) // sql expression
+  .with({ fillfactor: '70' })
+```

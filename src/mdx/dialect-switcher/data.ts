@@ -94,27 +94,46 @@ export const dialectSwitcherItems: DialectSwitcherItem[] = [
       },
     },
   },
-  // {
-  //   id: "gel",
-  //   name: "Gel",
-  //   path: "/docs/gel/overview",
-  //   icon: {
-  //     light: {
-  //       path: "/public/svg/gel_light.svg",
-  //       style: {
-  //         style: "border-radius: 5px",
-  //         width: 32,
-  //         height: 32,
-  //       },
-  //     },
-  //     dark: {
-  //       path: "/public/svg/gel_dark.svg",
-  //       style: {
-  //         style: "border-radius: 5px",
-  //         width: 32,
-  //         height: 32,
-  //       },
-  //     },
-  //   },
-  // },
+  {
+    id: "mssql",
+    name: "MSSQL",
+    path: "/docs/mssql/overview",
+    icon: {
+      light: {
+        path: "/public/svg/mssql-light.png",
+        style: {
+          width: 20,
+          borderRadius: "4px",
+        },
+      },
+      dark: {
+        path: "/public/svg/mssql-dark.png",
+        style: {
+          width: 20,
+          borderRadius: "4px",
+        },
+      },
+    },
+  },
+  {
+    id: "cockroach",
+    name: "CockroachDB",
+    path: "/docs/cockroach/overview",
+    icon: {
+      light: {
+        path: "/public/svg/cockroachdb-light.png",
+        style: {
+          width: 20,
+          borderRadius: "4px",
+        },
+      },
+      dark: {
+        path: "/public/svg/cockroachdb-dark.png",
+        style: {
+          width: 20,
+          borderRadius: "4px",
+        },
+      },
+    },
+  },
 ];

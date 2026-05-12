@@ -1,0 +1,81 @@
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Generated Columns
+
+<Callout type="info">
+To use this feature you need `drizzle-orm@1.0.0-beta.22` or higher and a matching `drizzle-kit` beta version.
+</Callout>
+
+MSSQL supports computed columns. A computed column is calculated from an expression that can reference other columns in the same table.
+
+1. Virtual computed columns are calculated when queried and do not occupy storage space.
+
+2. Persisted computed columns store the computed value on disk and can be indexed when the expression is deterministic.
+
+For more info, see the Microsoft docs for [computed columns](https://learn.microsoft.com/en-us/sql/relational-databases/tables/specify-computed-columns-in-a-table).
+
+#### Drizzle Side
+
+In Drizzle you can specify `.generatedAlwaysAs()` on a column and pass a SQL expression.
+
+#### Virtual Computed Column
+
+<CodeTab>
+```ts
+import { SQL, sql } from "drizzle-orm";
+import { mssqlTable, varchar } from "drizzle-orm/mssql-core";
+
+export const users = mssqlTable("users", {
+  firstName: varchar("first_name", { length: 256 }),
+  lastName: varchar("last_name", { length: 256 }),
+  fullName: varchar("full_name", { length: 512 }).generatedAlwaysAs(
+    (): SQL => sql`concat(${users.firstName}, ' ', ${users.lastName})`,
+  ),
+});
+```
+
+```sql
+CREATE TABLE [users] (
+  [first_name] varchar(256),
+  [last_name] varchar(256),
+  [full_name] AS (concat([users].[first_name], ' ', [users].[last_name]))
+);
+```
+</CodeTab>
+
+#### Persisted Computed Column
+
+Use `{ mode: "stored" }` when you want SQL Server to persist the computed value.
+
+<CodeTabs items={["schema.ts", "SQL"]}>
+<CodeTab>
+```typescript copy
+import { SQL, sql } from "drizzle-orm";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
+
+export const orders = mssqlTable("orders", {
+  quantity: int("quantity"),
+  unitPrice: int("unit_price"),
+  total: int("total").generatedAlwaysAs(
+    (): SQL => sql`${orders.quantity} * ${orders.unitPrice}`,
+    { mode: "stored" },
+  ),
+});
+```
+</CodeTab>
+<CodeTab>
+```sql
+CREATE TABLE [orders] (
+  [quantity] int,
+  [unit_price] int,
+  [total] AS ([orders].[quantity] * [orders].[unit_price]) PERSISTED
+);
+```
+</CodeTab>
+</CodeTabs>
+
+#### Limitations
+
+Drizzle Kit has the same `push` limitation for MSSQL generated columns as other dialects: changing a generated expression may require dropping and recreating the column because databases can normalize generated expressions differently during introspection.

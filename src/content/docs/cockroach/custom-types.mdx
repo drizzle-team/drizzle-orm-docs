@@ -1,0 +1,17 @@
+# Custom types
+
+CockroachDB exposes `customType` from `drizzle-orm/cockroach-core`.
+
+```ts
+import { customType, cockroachTable } from 'drizzle-orm/cockroach-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = cockroachTable('users', {
+  name: customText('name').notNull(),
+});
+```

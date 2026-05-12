@@ -1,0 +1,26 @@
+import Callout from '@mdx/Callout.astro';
+
+# Sequences
+
+Sequences in CockroachDB and CockroachDB are special single-row tables created to generate unique identifiers, often used for auto-incrementing primary key values. They provide a thread-safe way to generate unique sequential values across multiple sessions.
+
+```ts
+import { cockroachSchema, pgSequence } from "drizzle-orm/cockroach-core";
+
+// No params specified
+export const customSequence = pgSequence("name");
+
+// Sequence with params
+export const customSequence = pgSequence("name", {
+      startWith: 100,
+      maxValue: 10000,
+      minValue: 100,
+      cycle: true,
+      cache: 10,
+      increment: 2
+});
+
+// Sequence in custom schema
+export const customSchema = cockroachSchema('custom_schema');
+export const customSequence = customSchema.sequence("name");
+```

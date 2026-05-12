@@ -1,0 +1,152 @@
+import Callout from '@mdx/Callout.astro';
+
+## Type API
+Use Drizzle's type helpers to infer `select` and `insert` models from a CockroachDB table schema.
+
+```ts
+import { serial, text, cockroachTable } from 'drizzle-orm/cockroach-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
+
+const users = cockroachTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
+
+type SelectUserAlt = InferSelectModel<typeof users>;
+type InsertUserAlt = InferInsertModel<typeof users>;
+```
+
+## Logging
+Enable default query logging by passing `{ logger: true }` to `drizzle`.
+
+```ts
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+const db = drizzle({ logger: true });
+```
+
+You can also provide a custom logger.
+
+```ts
+import { Logger } from 'drizzle-orm/logger';
+
+class MyLogger implements Logger {
+  logQuery(query: string, params: unknown[]): void {
+    console.log({ query, params });
+  }
+}
+
+const db = drizzle({ logger: new MyLogger() });
+```
+
+## Multi-project schema
+Use `cockroachTableCreator` to customize table names when several projects share one database.
+
+```ts
+import { serial, text, cockroachTableCreator } from 'drizzle-orm/cockroach-core';
+
+const cockroachTable = cockroachTableCreator((name) => `project1_${name}`);
+
+const users = cockroachTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+});
+```
+
+```ts
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  schema: './src/schema/*',
+  out: './drizzle',
+  dialect: 'cockroach',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+  tablesFilter: ['project1_*'],
+});
+```
+
+## Printing SQL Query
+Print generated SQL from a query with `.toSQL()`.
+
+```ts
+const query = db
+  .select({ id: users.id, name: users.name })
+  .from(users)
+  .groupBy(users.id)
+  .toSQL();
+```
+
+## Raw SQL Queries
+Use `db.execute` for raw parametrized SQL.
+
+```ts
+import { sql } from 'drizzle-orm';
+
+const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+const result = await db.execute(statement);
+```
+
+## Standalone Query Builder
+Use the CockroachDB query builder without creating a database instance.
+
+```ts
+import { QueryBuilder } from 'drizzle-orm/cockroach-core';
+
+const qb = new QueryBuilder();
+const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+const { sql, params } = query.toSQL();
+```
+
+## Get Typed Columns
+Use `getColumns` to get a typed column map, which is useful when excluding fields from a selection.
+
+<Callout type='warning'>
+`getColumns` is available starting from `drizzle-orm@1.0.0-beta.2`. For pre-1 versions, use `getTableColumns`.
+</Callout>
+
+```ts
+import { getColumns } from 'drizzle-orm';
+import { users } from './schema';
+
+const { password, role, ...rest } = getColumns(users);
+
+await db.select({ ...rest }).from(users);
+```
+
+## Get Table Information
+Use `getTableConfig` to inspect CockroachDB table metadata.
+
+```ts
+import { getTableConfig, cockroachTable } from 'drizzle-orm/cockroach-core';
+
+export const table = cockroachTable(...);
+
+const { columns, indexes, foreignKeys, checks, primaryKeys, name, schema } =
+  getTableConfig(table);
+```
+
+## Compare Object Types
+Use `is()` instead of `instanceof` to check Drizzle object types.
+
+```ts
+import { Column, is } from 'drizzle-orm';
+
+if (is(value, Column)) {
+  // value is narrowed to Column
+}
+```
+
+## Mock Driver
+Use `drizzle.mock()` when you need a typed database object without a real CockroachDB connection.
+
+```ts
+import { drizzle } from 'drizzle-orm/node-postgres';
+import * as schema from './schema';
+
+const db = drizzle.mock({ schema });
+```
