@@ -260,7 +260,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF NOT EXISTS "table" (
+CREATE TABLE "table" (
 	"bytea" bytea,
 );
 ```
@@ -783,6 +783,104 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
 
 CREATE TABLE "table" (
 	"mood" "mood"
+);
+```
+</Section>
+
+## ---
+
+### inet
+`inet`  
+The `inet` type holds an IPv4 or IPv6 host address, and optionally its subnet, all in one field
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-net-types.html#DATATYPE-INET)**
+
+<Section>
+```typescript
+import { inet, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	inet: inet(),
+	inet2: inet().default('127.0.0.1')
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"inet" inet,
+	"inet2" inet DEFAULT '127.0.0.1'
+);
+```
+</Section>
+
+### cidr
+`cidr`  
+The `cidr` type holds an IPv4 or IPv6 network specification
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-net-types.html#DATATYPE-CIDR)**
+
+<Section>
+```typescript
+import { cidr, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	cidr: cidr(),
+	cidr2: cidr().default('127.0.0.1/32')
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"cidr" cidr,
+	"cidr2" cidr DEFAULT '127.0.0.1/32'
+);
+```
+</Section>
+
+### macaddr
+`macaddr`  
+The `macaddr` type stores MAC (Media Access Control) address
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-net-types.html#DATATYPE-MACADDR)**
+
+<Section>
+```typescript
+import { macaddr, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	macaddr: macaddr(),
+	macaddr2: macaddr().default('08:00:2b:01:02:03')
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"macaddr" macaddr,
+	"macaddr2" macaddr DEFAULT '08:00:2b:01:02:03'
+);
+```
+</Section>
+
+### macaddr8
+`macaddr8`  
+The `macaddr8` type stores MAC addresses in EUI-64 format
+
+For more info please refer to the official PostgreSQL **[docs.](https://www.postgresql.org/docs/current/datatype-net-types.html#DATATYPE-MACADDR8)**
+
+<Section>
+```typescript
+import { macaddr8, pgTable } from "drizzle-orm/pg-core";
+
+export const table = pgTable('table', {
+	macaddr8: macaddr8(),
+	macaddr8_2: macaddr8().default('08:00:2b:01:02:03:04:05')
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"macaddr8" macaddr8,
+	"macaddr8_2" macaddr8 DEFAULT '08:00:2b:01:02:03:04:05'
 );
 ```
 </Section>
