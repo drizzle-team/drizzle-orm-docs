@@ -8,16 +8,20 @@ import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql) and [SQLite](/docs/sqlite/get-started-sqlite)
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
 - [Select statement](/docs/select) with [order by clause](/docs/select#order-by) and [limit & offset clauses](/docs/select#limit--offset)
 - [Relational queries](/docs/rqb) with [order by clause](/docs/rqb#order-by) and [limit & offset clauses](/docs/rqb#limit--offset)
 - [Dynamic query building](/docs/dynamic-query-building)
 </Prerequisites>
 
 This guide demonstrates how to implement `limit/offset` pagination in Drizzle:
+
+### PostgreSQL, MySQL, SQLite and Cockroach
+
+To implement a PostgreSQL, MySQL, SQLite and Cockroach SQL Limit/Offset pagination (skip to [MSSQL](/docs/guides/limit-offset-pagination#mssql)) with Drizzle you can use following example:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -272,3 +276,94 @@ await getUsers(2);
 So, if your database experiences frequently insert and delete operations in real time or you need high performance to paginate large tables, you should consider using [cursor-based](/docs/guides/cursor-based-pagination) pagination instead.
 
 To learn more about `deferred join` technique you should follow these guides: [Planetscale Pagination Guide](https://planetscale.com/blog/mysql-pagination) and [Efficient Pagination Guide by Aaron Francis](https://aaronfrancis.com/2022/efficient-pagination-using-deferred-joins).
+
+{/*TODO finish this*/}
+### MSSQL
+
+To implement an MSSQL Limit/Offset pagination with Drizzle you can use following example:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {9,10,11}
+    import { asc } from 'drizzle-orm';
+    import { users } from './schema';
+
+    const db = drizzle(...);
+
+    await db
+	  .select()
+	  .from(users)
+	  .orderBy(asc(users.id)) // order by is mandatory
+	  .offset(4) // the number of rows to skip
+	  .fetch(4) // the number of rows to fetch
+    ```
+
+    ```sql
+    select * from [users] order by [id] asc offset 5 rows fetch next 10 rows only;
+    ```
+
+    ```ts
+    // 5-8 rows returned
+    [
+      {
+        id: 5,
+        firstName: 'Beth',
+        lastName: 'Davis',
+        createdAt: 2024-03-11T20:51:46.787Z
+      },
+      {
+        id: 6,
+        firstName: 'Charlie',
+        lastName: 'Miller',
+        createdAt: 2024-03-11T21:15:46.787Z
+      },
+      {
+        id: 7,
+        firstName: 'Clara',
+        lastName: 'Wilson',
+        createdAt: 2024-03-11T21:33:46.787Z
+      },
+      {
+        id: 8,
+        firstName: 'David',
+        lastName: 'Moore',
+        createdAt: 2024-03-11T21:45:46.787Z
+      }
+    ]
+    ```
+  </CodeTab>
+  <CodeTab>
+    ```ts copy
+    import { datetime2, int, mssqlTable, text } from "drizzle-orm/mssql-core";
+
+    export const users = mssqlTable("users", {
+      id: int("id").primaryKey(),
+      firstName: text("first_name").notNull(),
+      lastName: text("last_name").notNull(),
+      createdAt: datetime2("created_at", { mode: "date" }).notNull().defaultGetDate(),
+    });
+    ```
+
+    ```plaintext
+    +----+------------+-----------+----------------------------+
+    | id | first_name | last_name |         created_at         |
+    +----+------------+-----------+----------------------------+
+    |  1 | Alice      | Johnson   | 2024-03-08 12:23:55.251797 |
+    +----+------------+-----------+----------------------------+
+    |  2 | Alex       | Smith     | 2024-03-08 12:25:55.182    |
+    +----+------------+-----------+----------------------------+
+    |  3 | Aaron      | Williams  | 2024-03-08 12:28:55.182    |
+    +----+------------+-----------+----------------------------+
+    |  4 | Brian      | Brown     | 2024-03-08 12:34:55.182    |
+    +----+------------+-----------+----------------------------+
+    |  5 | Beth       | Davis     | 2024-03-08 12:40:55.182    |
+    +----+------------+-----------+----------------------------+
+    |  6 | Charlie    | Miller    | 2024-03-08 13:04:55.182    |
+    +----+------------+-----------+----------------------------+
+    |  7 | Clara      | Wilson    | 2024-03-08 13:22:55.182    |
+    +----+------------+-----------+----------------------------+
+    |  8 | David      | Moore     | 2024-03-08 13:34:55.182    |
+    +----+------------+-----------+----------------------------+
+    ```
+  </CodeTab>
+</CodeTabs>

@@ -63,11 +63,7 @@ const darkStylesSVGString = svgCodeDark.replace(
   >
     {
       dialectSwitcherItems.map((item) => (
-        <option
-          id={item.id}
-          value={item.id}
-          selected={item.name === currentDb?.name}
-        >
+        <option value={item.id} selected={item.name === currentDb?.name}>
           {item.name}
         </option>
       ))

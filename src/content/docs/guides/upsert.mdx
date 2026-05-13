@@ -9,18 +9,22 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import Callout from "@mdx/Callout.astro";
 import CodeTab from '@mdx/CodeTab.astro';
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: false, Cockroach: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql) and [SQLite](/docs/sqlite/get-started-sqlite)
-- [Insert statement](/docs/insert), [onConflictDoUpdate method](/docs/insert#on-conflict-do-update) and [onDuplicateKeyUpdate method](/docs/insert#on-duplicate-key-update)
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
+- [Insert statement](/docs/insert), [onConflictDoUpdate method](/docs/insert#on-conflict-do-update) and [onDuplicateKeyUpdate method](/docs/mysql/insert#on-duplicate-key-update)
 - [Composite primary key](/docs/indexes-constraints#composite-primary-key)
 - [sql operator](/docs/sql)
 </Prerequisites>
 
-### PostgreSQL and SQLite
+<Callout type="warning">
+**SQL Server (MSSQL)** does not support the ***ON CONFLICT DO UPDATE*** syntax
+</Callout>
 
-To implement an upsert query in PostgreSQL and SQLite (skip to [MySQL](/docs/guides/upsert#mysql)) with Drizzle you can use `.onConflictDoUpdate()` method:
+### PostgreSQL, Cockroach and SQLite
+
+To implement an upsert query in PostgreSQL, Cockroach and SQLite (skip to [MySQL](/docs/guides/upsert#mysql)) with Drizzle you can use `.onConflictDoUpdate()` method:
 
 <Section>
 ```ts copy {8,9,10,11}
@@ -43,7 +47,7 @@ insert into users ("id", "name") values (1, 'John')
 ```
 </Section>
 
-To upsert multiple rows in one query in PostgreSQL and SQLite you can use `sql operator` and `excluded` keyword. `excluded` is a special reference that refer to the row that was proposed for insertion, but wasn't inserted because of the conflict.
+To upsert multiple rows in one query in PostgreSQL, Cockroach and SQLite you can use `sql operator` and `excluded` keyword. `excluded` is a special reference that refer to the row that was proposed for insertion, but wasn't inserted because of the conflict.
 
 This is how you can do it:
 
@@ -96,13 +100,7 @@ This is how you can do it:
   ```
 </CodeTabs>
 
-Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in PostgreSQL and SQLite:
-
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in PostgreSQL, Cockroach and SQLite:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -110,10 +108,11 @@ If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
     import { SQL, getColumns, sql } from 'drizzle-orm';
     import { PgTable } from 'drizzle-orm/pg-core';
     import { SQLiteTable } from 'drizzle-orm/sqlite-core';
+	import { CockroachTable } from "drizzle-orm/cockroach-core";
     import { users } from './schema';
 
     const buildConflictUpdateColumns = <
-      T extends PgTable | SQLiteTable,
+      T extends PgTable | CockroachTable | SQLiteTable,
       Q extends keyof T['_']['columns']
     >(
       table: T,
@@ -176,7 +175,7 @@ If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
   ```
 </CodeTabs>
 
-This is how you can implement an upsert query with multiple targets in PostgreSQL and SQLite:
+This is how you can implement an upsert query with multiple targets in PostgreSQL, Cockroach and SQLite:
 
 <Section>
 ```ts copy {8}
