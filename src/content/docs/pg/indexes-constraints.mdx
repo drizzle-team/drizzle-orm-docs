@@ -23,18 +23,18 @@ a string constant, a blob constant, a signed-number, or any constant expression 
     import { sql } from "drizzle-orm";
     import { integer, uuid, pgTable } from "drizzle-orm/pg-core";
 
-    const table = pgTable('table', {
-      integer1: integer('integer1').default(42),
-      integer2: integer('integer2').default(sql`'42'::integer`),
-      uuid1: uuid('uuid1').defaultRandom(),
-      uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
+    export const table = pgTable('table', {
+      integer1: integer().default(42),
+      integer2: integer().default(sql`24`),
+      uuid1: uuid().defaultRandom(),
+      uuid2: uuid().default(sql`gen_random_uuid()`),
     });
     ```
 
     ```sql
     CREATE TABLE "table" (
       "integer1" integer DEFAULT 42,
-      "integer2" integer DEFAULT '42'::integer,
+      "integer2" integer DEFAULT 24,
       "uuid1" uuid DEFAULT gen_random_uuid(),
       "uuid2" uuid DEFAULT gen_random_uuid()
     );
@@ -52,8 +52,8 @@ or update a record without adding a value to this field.
       ```typescript copy
       import { integer, pgTable } from "drizzle-orm/pg-core";
 
-      const table = pgTable('table', {
-        integer: integer('integer').notNull(),
+      export const table = pgTable('table', {
+        integer: integer().notNull(),
       });
       ```
 
@@ -81,16 +81,16 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       import { integer, text, unique, pgTable } from "drizzle-orm/pg-core";
 
       export const user = pgTable('user', {
-        id: integer('id').unique(),
+        id: integer().unique(),
       });
 
       export const table = pgTable('table', {
-        id: integer('id').unique('custom_name'),
+        id: integer().unique('custom_name'),
       });
 
       export const composite = pgTable('composite_example', {
-        id: integer('id'),
-        name: text('name'),
+        id: integer(),
+        name: text(),
       }, (t) => [
         unique().on(t.id, t.name),
         unique('custom_name').on(t.id, t.name)
@@ -98,36 +98,34 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
 
       // In Postgres 15.0+ NULLS NOT DISTINCT is available
       // This example demonstrates both available usages
-      export const userNulls = pgTable('user_nulls_example', {
-        id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
-      }, (t) => [
-        unique().on(t.id).nullsNotDistinct()
-      ]);
+	export const userNulls = pgTable("user_nulls_example", {
+		id: integer(),
+		id2: integer().unique("custom_name", { nulls: "not distinct" }),
+	}, (t) => [
+		unique().on(t.id).nullsNotDistinct()
+	]);
       ```
 
       ```sql
-      CREATE TABLE "composite_example" (
-	      "id" integer,
-        "name" text,
-        CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
-        CONSTRAINT "custom_name" UNIQUE("id","name")
-      );
+	CREATE TABLE "user" (
+		"id" integer UNIQUE
+	);
 
-      CREATE TABLE "table" (
-      	"id" integer,
-      	CONSTRAINT "custom_name" UNIQUE("id")
-      );
+	CREATE TABLE "table" (
+		"id" integer CONSTRAINT "custom_name" UNIQUE
+	);
+	
+	CREATE TABLE "composite_example" (
+		"id" integer,
+		"name" text,
+		CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
+		CONSTRAINT "custom_name" UNIQUE("id","name")
+	);
 
-      CREATE TABLE "user" (
-      	"id" integer,
-      	CONSTRAINT "user_id_unique" UNIQUE("id")
-      );
-
-      CREATE TABLE "user_nulls_example" (
-        "id" integer,
-        CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
-        CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
-      );
+	CREATE TABLE "user_nulls_example" (
+		"id" integer UNIQUE NULLS NOT DISTINCT,
+		"id2" integer CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT
+	);
       ```
     </Section>
 
@@ -157,12 +155,12 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
       );
       ```
       ```sql
-      CREATE TABLE "users" (
-	      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	      "username" text NOT NULL,
-	      "age" integer,
-	      CONSTRAINT "age_check1" CHECK ("users"."age" > 21)
-      );
+	  CREATE TABLE "users" (
+		"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+		"username" text NOT NULL,
+		"age" integer,
+		CONSTRAINT "age_check1" CHECK ("age" > 21)
+	  );
       ```
     </Section>
 
@@ -177,23 +175,23 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
       ```typescript copy
       import { serial, text, pgTable } from "drizzle-orm/pg-core";
 
-      const user = pgTable('user', {
+      export const user = pgTable('user', {
         id: serial('id').primaryKey(),
       });
 
-      const table = pgTable('table', {
+      export const table = pgTable('table', {
         id: text('cuid').primaryKey(),
       });
       ```
 
       ```sql
-      CREATE TABLE "user" (
-        "id" serial PRIMARY KEY
-      );
+	  CREATE TABLE "user" (
+		"id" serial PRIMARY KEY
+	  );
 
-      CREATE TABLE "table" (
-        "cuid" text PRIMARY KEY
-      );
+	  CREATE TABLE "table" (
+		"cuid" text PRIMARY KEY
+	  );
       ```
     </Section>
 
@@ -204,7 +202,7 @@ Just like `PRIMARY KEY`, composite primary key uniquely identifies each record i
 Drizzle ORM provides a standalone `primaryKey` operator for that:
 
 <Section>
-      ```typescript copy {18, 19}
+      ```typescript copy {17,19}
       import { serial, text, integer, primaryKey, pgTable } from "drizzle-orm/pg-core";
 
       export const user = pgTable("user", {
@@ -227,7 +225,7 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       ]);
       ```
 
-      ```sql {6, 9}
+      ```sql {6,9}
       ...
 
       CREATE TABLE "books_to_authors" (
@@ -249,26 +247,42 @@ The table with the foreign key is called the child table, and the table with the
 Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
-```typescript copy {11}
-    import { serial, text, integer, pgTable } from "drizzle-orm/pg-core";
+	```typescript copy {11}
+	import { serial, text, integer, pgTable } from "drizzle-orm/pg-core";
 
-    export const user = pgTable("user", {
-      id: serial("id"),
-      name: text("name"),
-    });
+	export const user = pgTable("user", {
+		id: serial("id"),
+		name: text("name"),
+	});
 
-    export const book = pgTable("book", {
-      id: serial("id"),
-      name: text("name"),
-      authorId: integer("author_id").references(() => user.id)
-    });
-    ```
+	export const book = pgTable("book", {
+		id: serial("id"),
+		name: text("name"),
+		authorId: integer("author_id").references(() => user.id)
+	});
+	```
+	```sql {12}
+	CREATE TABLE "user" (
+		"id" serial,
+		"name" text
+	);
+
+	CREATE TABLE "book" (
+		"id" serial,
+		"name" text,
+		"author_id" integer
+	);
+
+	ALTER TABLE "book" ADD CONSTRAINT "book_author_id_user_id_fkey" FOREIGN KEY ("author_id") REFERENCES "user"("id");
+	```
+
+
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
-```typescript copy {6,16-19}
-    import { serial, text, integer, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
+	```typescript copy {6,16-18}
+    import { serial, text, integer, foreignKey, pgTable, type AnyPgColumn } from "drizzle-orm/pg-core";
 
     export const user = pgTable("user", {
       id: serial("id"),
@@ -289,10 +303,19 @@ set return type for reference callback or use a standalone `foreignKey` operator
       })
     ]);
     ```
+	```sql {7}
+	CREATE TABLE "user" (
+		"id" serial,
+		"name" text,
+		"parent_id" integer
+	);
+	
+	ALTER TABLE "user" ADD CONSTRAINT "user_parent_id_user_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "user"("id");
+	```
 
 To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
 
-```typescript copy {4-5,14-15,18-21}
+```typescript copy {15-19}
     import { serial, text, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
 
     export const user = pgTable("user", {
@@ -314,45 +337,63 @@ To declare multi-column foreign keys you can use a dedicated `foreignKey` operat
       })
     ])
     ```
+	```sql {13}
+	CREATE TABLE "user" (
+		"firstName" text,
+		"lastName" text,
+		CONSTRAINT "user_pkey" PRIMARY KEY("firstName","lastName")
+	);
+
+	CREATE TABLE "profile" (
+		"id" serial PRIMARY KEY,
+		"user_first_name" text,
+		"user_last_name" text
+	);
+	
+	ALTER TABLE "profile" ADD CONSTRAINT "custom_fk" FOREIGN KEY ("user_first_name","user_last_name") REFERENCES "user"("firstName","lastName");
+	```
 
 ## Indexes
 
 Drizzle ORM provides API for both `index` and `unique index` declaration:
 
 <Section>
-    ```typescript copy {9-10}
+    ```typescript copy {8-9}
     import { serial, text, index, uniqueIndex, pgTable } from "drizzle-orm/pg-core";
 
     export const user = pgTable("user", {
-      id: serial("id").primaryKey(),
-      name: text("name"),
-      email: text("email"),
+      id: serial().primaryKey(),
+      name: text(),
+      email: text(),
     }, (table) => [
       index("name_idx").on(table.name),
       uniqueIndex("email_idx").on(table.email)
     ]);
     ```
     ```sql {5-6}
-    CREATE TABLE "user" (
-      ...
-    );
+	CREATE TABLE "user" (
+		...
+	);
 
-    CREATE INDEX "name_idx" ON "user" ("name");
-    CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
+	CREATE INDEX "name_idx" ON "user" ("name");
+	CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
     ```
-    </Section>
-    <Callout type="warning" emoji="⚠️">
-      For versions before `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` `drizzle-kit` only supports index `name` and `on()` param.
+</Section>
 
-      After versions `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` all fields are supported in drizzle-kit!
-    </Callout>
 
-    Starting from 0.31.0 a new index api for Drizzle ORM provides set of all params for index creation:
+Drizzle ORM provides a set of params for index creation:
 
 ```ts
-// First example, with `.on()`
+// `.on()`
 index('name')
-  .on(table.column1.asc(), table.column2.nullsFirst(), ...) or .onOnly(table.column1.desc().nullsLast(), table.column2, ...)
+  .on(table.column1.asc(), table.column2.nullsFirst(), ...)
+  .concurrently()
+  .where(sql``)
+  .with({ fillfactor: '70' })
+
+// `.onOnly()`
+index('name')
+  .onOnly(table.column1.asc(), table.column2.nullsFirst(), ...)
   .concurrently()
   .where(sql``)
   .with({ fillfactor: '70' })
@@ -360,6 +401,7 @@ index('name')
 // Second Example, with `.using()`
 index('name')
   .using('btree', table.column1.asc(), sql`lower(${table.column2})`, table.column1.op('text_ops'))
+  .concurrently()
   .where(sql``) // sql expression
   .with({ fillfactor: '70' })
 ```
