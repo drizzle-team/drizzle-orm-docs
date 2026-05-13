@@ -43,7 +43,8 @@ import { RDSDataClient } from '@aws-sdk/client-rds-data';
 
 const rdsClient = new RDSDataClient({ region: 'us-east-1' });
 
-const db = drizzle(rdsClient, {
+const db = drizzle({
+  client: rdsClient,
   database: process.env['DATABASE']!,
   secretArn: process.env['SECRET_ARN']!,
   resourceArn: process.env['RESOURCE_ARN']!,

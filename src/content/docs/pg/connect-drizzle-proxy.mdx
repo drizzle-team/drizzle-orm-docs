@@ -42,11 +42,11 @@ Drizzle ORM also supports simply using asynchronous callback function for execut
 
 - `sql` is a query string with placeholders.
 - `params` is an array of parameters.
-- One of the following values will set for `method` depending on the SQL statement - `run`, `all`, `values` or `get`.
+- One of the following values will set for `method` depending on the SQL statement - `all`, `execute`.
 
 Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the return value.
 
-- When the `method` is `get`, you should return a value as `{rows: string[]}`.
+- When the `method` is `execute`, you should return a value as `{rows: string[]}`.
 - Otherwise, you should return `{rows: string[][]}`.
 
 <br/>
@@ -55,6 +55,7 @@ Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the retu
 ```typescript copy
 // Example of driver implementation
 import { drizzle } from 'drizzle-orm/pg-proxy';
+import axios from "axios";
 
 const db = drizzle(async (sql, params, method) => {
   try {

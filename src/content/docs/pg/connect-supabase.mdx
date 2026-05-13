@@ -16,7 +16,7 @@ import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 
 According to the **[official website](https://supabase.com/docs)**, Supabase is an open source Firebase alternative for building secure and performant Postgres backends with minimal configuration.
 
-Checkout official **[Supabase + Drizzle](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle)** docs.
+Checkout official **[Supabase + Drizzle](https://supabase.com/docs/guides/database/drizzle)** docs.
 
 #### Step 1 - Install packages
 
@@ -46,7 +46,7 @@ const db = drizzle({ client });
 const allUsers = await db.select().from(...);
 ```
 
-If you decide to use connection pooling via Supabase (described [here](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)), and have "Transaction" pool mode enabled, then ensure to turn off prepare, as prepared statements are not supported. 
+If you decide to use connection pooling via Supabase (described [here](https://supabase.com/docs/guides/database/connecting-to-postgres#poolers)), and have "Transaction" pool mode enabled, then ensure to turn off prepare, as prepared statements are not supported. 
 
 ```typescript copy filename="index.ts"
 import { drizzle } from 'drizzle-orm/postgres-js'

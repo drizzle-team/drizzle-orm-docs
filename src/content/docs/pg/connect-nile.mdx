@@ -24,7 +24,7 @@ You can use Nile with any of Drizzle's Postgres drivers, we'll be showing the us
 #### Step 1 - Install packages
 
 <Npm>
-drizzle-orm postgres
+drizzle-orm pg
 -D drizzle-kit
 </Npm>
 
@@ -45,9 +45,11 @@ If you need to provide your existing driver:
 // Make sure to install the 'pg' package
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
 const db = drizzle({ client: pool });
 
 const response = await db.select().from(...);
