@@ -15,8 +15,9 @@ yet when you use `sql` you have to explicitly declare view columns schema.
 ### Declaring views
 
 <Section>
-      ```ts filename="schema.ts" copy {13-14}
+      ```ts filename="schema.ts" copy {14-15}
       import { pgTable, pgView, serial, text, timestamp } from "drizzle-orm/pg-core";
+      import { eq } from "drizzle-orm";
 
       export const user = pgTable("user", {
         id: serial(),
@@ -32,17 +33,18 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       export const customersView = pgView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW "user_view" AS SELECT * FROM "user";
-      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      CREATE VIEW "user_view" AS (SELECT * FROM "user");
+      CREATE VIEW "customers_view" AS (SELECT * FROM "user" WHERE "role" = 'customer');
       ```
     </Section>
 
 You can also declare views using `standalone query builder`, it works exactly the same way:
 
 <Section>
-      ```ts filename="schema.ts" copy {3, 15-16}
+      ```ts filename="schema.ts" copy {4,16-17}
       import { pgTable, pgView, serial, text, timestamp, QueryBuilder} from "drizzle-orm/pg-core";
-      
+      import { eq } from "drizzle-orm";
+
       const qb = new QueryBuilder();
 
       export const user = pgTable("user", {
@@ -59,8 +61,8 @@ You can also declare views using `standalone query builder`, it works exactly th
       export const customersView = pgView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW "user_view" AS SELECT * FROM "user";
-      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      CREATE VIEW "user_view" AS (SELECT * FROM "user");
+      CREATE VIEW "customers_view" AS (SELECT * FROM "user" WHERE "role" = 'customer');
       ```
     </Section>
 
@@ -70,14 +72,14 @@ you can directly use `sql` operator and explicitly specify view columns schema.
 
 ```ts copy
 // regular view
-const newYorkers = pgView('new_yorkers', {
+export const newYorkers = pgView('new_yorkers', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   cityId: integer('city_id').notNull(),
 }).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
 
 // materialized view
-const newYorkers = pgMaterializedView('new_yorkers', {
+export const newYorkers = pgMaterializedView('new_yorkers', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   cityId: integer('city_id').notNull(),
@@ -87,7 +89,7 @@ const newYorkers = pgMaterializedView('new_yorkers', {
 ### Declaring existing views
 When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
 `drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
-```ts
+```ts {16,23}
 export const user = pgTable("user", {
   id: serial(),
   name: text(),
@@ -124,10 +126,10 @@ like from a table, rather than being reconstructed by executing the query agains
 
 <Section>
 ```ts filename="schema.ts" copy
-const newYorkers = pgMaterializedView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
+export const newYorkers = pgMaterializedView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
 ```
 ```sql
-CREATE MATERIALIZED VIEW "new_yorkers" AS SELECT * FROM "users";
+CREATE MATERIALIZED VIEW "new_yorkers" AS (SELECT * FROM "users");
 ```
 </Section>
 
@@ -147,7 +149,7 @@ All the parameters inside the query will be inlined, instead of replaced by `$1`
 
 ```ts copy
 // regular view
-const newYorkers = pgView('new_yorkers')
+export const newYorkers = pgView('new_yorkers')
   .with({
     checkOption: 'cascaded',
     securityBarrier: true,
@@ -166,12 +168,12 @@ const newYorkers = pgView('new_yorkers')
   });
 
 // materialized view
-const newYorkers2 = pgMaterializedView('new_yorkers')
+export const newYorkers2 = pgMaterializedView('new_yorkers_2')
   .using('btree')
   .with({
     fillfactor: 90,
-    toast_tuple_target: 0.5,
-    autovacuum_enabled: true,
+    toastTupleTarget: 0.5,
+    autovacuumEnabled: true,
     ...
   })
   .tablespace('custom_tablespace')
@@ -187,4 +189,60 @@ const newYorkers2 = pgMaterializedView('new_yorkers')
       );
     return qb.with(sq).select().from(sq).where(sql`${users.homeCity} = 1`);
   });
+```
+```sql
+...
+
+CREATE VIEW "new_yorkers" 
+WITH 
+  (
+    check_option = cascaded, security_barrier = true, 
+    security_invoker = true
+  ) AS (
+    with 
+      "sq" as (
+        select 
+          "user"."id", 
+          "cities"."id" 
+        from 
+          "user" 
+          left join "cities" on "cities"."id" = "user"."homeCity" 
+        where 
+          "user"."age1" > 18
+      ) 
+    select 
+      "id", 
+      "id" 
+    from 
+      "sq" 
+    where 
+      "user"."homeCity" = 1
+  );
+  
+CREATE MATERIALIZED VIEW "new_yorkers_2" USING "btree" 
+WITH 
+  (
+    autovacuum_enabled = true, fillfactor = 90, 
+    toast_tuple_target = 0.5
+  ) TABLESPACE custom_tablespace AS (
+    with 
+      "sq" as (
+        select 
+          "user"."id", 
+          "cities"."id" 
+        from 
+          "user" 
+          left join "cities" on "cities"."id" = "user"."homeCity" 
+        where 
+          "user"."age1" > 18
+      ) 
+    select 
+      "id", 
+      "id" 
+    from 
+      "sq" 
+    where 
+      "user"."homeCity" = 1
+  ) 
+WITH NO DATA;
 ```
