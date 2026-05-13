@@ -132,7 +132,7 @@ CREATE TABLE "table" (
 import { sql } from "drizzle-orm";
 import { bigint, pgTable } from "drizzle-orm/pg-core";
 
-export const table = pgTable("table", {
+export const table = pgTable('table', {
 	bigint1: bigint({ mode: "number" }).default(10),
 	bigint2: bigint({ mode: "number" }).default(sql`10`),
 });
@@ -202,7 +202,7 @@ If you're expecting values above 2^31 but below 2^53, you can utilise `mode: 'nu
 import { bigserial, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  bigserial: bigserial({ mode: 'number' }),
+	bigserial: bigserial({ mode: 'number' }),
 });
 ```
 
@@ -338,8 +338,8 @@ The `length` parameter is optional according to PostgreSQL docs.
 import { char, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  char1: char(),
-  char2: char({ length: 256 }),
+	char1: char(),
+	char2: char({ length: 256 }),
 });
 
 // will be inferred as text: "value1" | "value2" | null
@@ -367,11 +367,11 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { numeric, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  numeric1: numeric(),
-  numeric2: numeric({ precision: 100 }),
-  numeric3: numeric({ precision: 100, scale: 20 }),
-  numericNum: numeric({ mode: 'number' }),
-  numericBig: numeric({ mode: 'bigint' }),
+	numeric1: numeric(),
+	numeric2: numeric({ precision: 100 }),
+	numeric3: numeric({ precision: 100, scale: 20 }),
+	numericNum: numeric({ mode: 'number' }),
+	numericBig: numeric({ mode: 'bigint' }),
 });
 ```
 
@@ -410,8 +410,8 @@ export const table = pgTable('table', {
 ```sql
 CREATE TABLE "table" (
 	"real1" real,
-	"real2" real default 10.1,
-	"real3" real default 10.1
+	"real2" real DEFAULT 10.1,
+	"real3" real DEFAULT 10.1
 );
 ```
 </Section>
@@ -536,9 +536,9 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { uuid, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  uuid1: uuid(),
-  uuid2: uuid().defaultRandom(),
-  uuid3: uuid().default('a0ee-bc99-9c0b-4ef8-bb6d-6bb9-bd38-0a11')
+	uuid1: uuid(),
+	uuid2: uuid().defaultRandom(),
+	uuid3: uuid().default('a0ee-bc99-9c0b-4ef8-bb6d-6bb9-bd38-0a11')
 });
 ```
 
@@ -563,10 +563,10 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 import { time, pgTable } from "drizzle-orm/pg-core";
 
 export const table = pgTable('table', {
-  time1: time(),
-  time2: time({ withTimezone: true }),
-  time3: time({ precision: 6 }),
-  time4: time({ precision: 6, withTimezone: true })
+	time1: time(),
+	time2: time({ withTimezone: true }),
+	time3: time({ precision: 6 }),
+	time4: time({ precision: 6, withTimezone: true })
 });
 ```
 
@@ -683,7 +683,7 @@ For more info please refer to the official PostgreSQL **[docs.](https://www.post
 ```typescript
 import { interval, pgTable } from "drizzle-orm/pg-core";
 
-export const table = pgTable("table", {
+export const table = pgTable('table', {
 	interval1: interval(),
 	interval2: interval({ fields: "day to second", precision: 6 }),
 	interval3: interval({ fields: "month" })
@@ -744,9 +744,9 @@ Type `line` has 2 modes for mappings from the database: `tuple` and `abc`.
 
 <Section>
 ```typescript
-const items = pgTable('items', {
- line: line(),
- lineObj: line({ mode: 'abc' }),
+export const items = pgTable('items', {
+	line: line(),
+	lineObj: line({ mode: 'abc' }),
 });
 ```
 
@@ -774,7 +774,7 @@ import { pgEnum, pgTable } from "drizzle-orm/pg-core";
 export const moodEnum = pgEnum('mood', ['sad', 'ok', 'happy']);
 
 export const table = pgTable('table', {
-  mood: moodEnum(),
+	mood: moodEnum(),
 });
 ```
 
@@ -800,9 +800,9 @@ type Data = {
 	bar: number;
 };
 
-const users = pgTable('users', {
-  id: serial().$type<UserId>().primaryKey(),
-  jsonField: json().$type<Data>(),
+export const users = pgTable('users', {
+	id: serial().$type<UserId>().primaryKey(),
+	jsonField: json().$type<Data>(),
 });
 ```
 
@@ -827,10 +827,10 @@ PostgreSQL supports identity columns as a way to automatically generate unique i
 ```ts
 import { pgTable, integer, text } from 'drizzle-orm/pg-core' 
 
-export const ingredients = pgTable("ingredients", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
-  name: text().notNull(),
-  description: text(),
+export const ingredients = pgTable('ingredients', {
+	id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
+	name: text().notNull(),
+	description: text(),
 });
 ```
 
@@ -852,7 +852,7 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 import { sql } from "drizzle-orm";
 import { integer, pgTable, uuid } from "drizzle-orm/pg-core";
 
-export const table = pgTable("table", {
+export const table = pgTable('table', {
 	integer1: integer().default(42),
 	integer2: integer().default(sql`42`),
 	uuid1: uuid().defaultRandom(),
@@ -883,7 +883,7 @@ These functions can assist you in utilizing various implementations such as `uui
 import { text, pgTable } from "drizzle-orm/pg-core";
 import { createId } from '@paralleldrive/cuid2';
 
-const table = pgTable('table', {
+export const table = pgTable('table', {
 	id: text().$defaultFn(() => createId()),
 });
 ```
@@ -903,7 +903,7 @@ when the row is inserted as well, and the returned value will be used as the col
 ```ts
 import { integer, timestamp, text, pgTable } from "drizzle-orm/pg-core";
 
-const table = pgTable('table', {
+export const table = pgTable('table', {
 	updateCounter: integer().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
 	updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
 	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
@@ -918,7 +918,7 @@ const table = pgTable('table', {
 ```typescript
 import { integer, pgTable } from "drizzle-orm/pg-core";
 
-const table = pgTable('table', {
+export const table = pgTable('table', {
 	integer: integer().notNull(),
 });
 ```
@@ -938,7 +938,7 @@ This requires that the values be both unique and not null.
 ```typescript
 import { serial, pgTable } from "drizzle-orm/pg-core";
 
-const table = pgTable('table', {
+export const table = pgTable('table', {
 	id: serial().primaryKey(),
 });
 ```
