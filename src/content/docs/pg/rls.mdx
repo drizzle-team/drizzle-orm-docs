@@ -4,31 +4,13 @@ import Callout from '@mdx/Callout.astro';
 
 With Drizzle, you can enable Row-Level Security (RLS) for any Postgres table, create policies with various options, and define and manage the roles those policies apply to.
 
-Drizzle supports a raw representation of Postgres policies and roles that can be used in any way you want. This works with popular Postgres database providers such as `Neon` and `Supabase`.
+Drizzle supports a raw representation of Postgres policies and roles that can be used in any way you want. This works with popular Postgres database providers such as `Neon` and `Supabase`.
 
 In Drizzle, we have specific predefined RLS roles and functions for RLS with both database providers, but you can also define your own logic.
 
 ## Enable RLS
 
-<Callout type='warning' collapsed="How it works in 0.x versions">
-If you just want to enable RLS on a table without adding policies, you can use `.enableRLS()`
-
-As mentioned in the PostgreSQL documentation:
-
-> If no policy exists for the table, a default-deny policy is used, meaning that no rows are visible or can be modified. 
-Operations that apply to the whole table, such as TRUNCATE and REFERENCES, are not subject to row security.
-
-```ts
-import { integer, pgTable } from 'drizzle-orm/pg-core';
-
-export const users = pgTable('users', {
-	id: integer(),
-}).enableRLS();
-```
-</Callout>
-
-Starting from `v1.0.0-beta.1` `.enableRLS()` is deprecated and 
-if you just want to enable RLS on a table without adding policies, you can use `pgTable.withRLS(...)`
+If you just want to enable RLS on a table without adding policies, you can use `pgTable.withRLS(...)`
 
 As mentioned in the PostgreSQL documentation:
 
@@ -44,7 +26,7 @@ export const users = pgTable.withRLS('users', {
 ```
 
 <Callout title='important'>
-If you add a policy to a table, RLS will be enabled automatically. So, there’s no need to explicitly enable RLS when adding policies to a table.
+If you add a policy to a table, RLS will be enabled automatically. So, there's no need to explicitly enable RLS when adding policies to a table.
 </Callout>
 
 ## Roles
@@ -57,7 +39,7 @@ import { pgRole } from 'drizzle-orm/pg-core';
 export const admin = pgRole('admin', { createRole: true, createDb: true, inherit: true });
 ```
 
-If a role already exists in your database, and you don’t want drizzle-kit to ‘see’ it or include it in migrations, you can mark the role as existing.
+If a role already exists in your database, and you don't want drizzle-kit to 'see' it or include it in migrations, you can mark the role as existing.
 
 ```ts
 import { pgRole } from 'drizzle-orm/pg-core';
@@ -127,7 +109,7 @@ export const policy = pgPolicy("authenticated role insert policy", {
 
 If you are using drizzle-kit to manage your schema and roles, there may be situations where you want to refer to roles that are not defined in your Drizzle schema. In such cases, you may want drizzle-kit to skip managing these roles without having to define each role in your drizzle schema and marking it with `.existing()`.
 
-In these cases, you can use `entities.roles` in `drizzle.config.ts`. For a complete reference, refer to the the [`drizzle.config.ts`](docs/drizzle-config-file) documentation.
+In these cases, you can use `entities.roles` in `drizzle.config.ts`. For a complete reference, refer to the the [drizzle.config.ts](/docs/drizzle-config-file) documentation.
 
 By default, `drizzle-kit` does not manage roles for you, so you will need to enable this feature in `drizzle.config.ts`.
 
@@ -238,12 +220,6 @@ export default defineConfig({
 ## RLS on views
 
 With Drizzle, you can also specify RLS policies on views. For this, you need to use `security_invoker` in the view's WITH options. Here is a small example:
-
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
 
 ```ts {5}
 ...
