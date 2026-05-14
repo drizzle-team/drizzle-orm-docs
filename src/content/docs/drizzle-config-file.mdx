@@ -374,8 +374,8 @@ successfully applied migrations in your database in log table named `__drizzle_m
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `{ table: string, schema: string }` |
-| default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
+| type          | `{ table: string, schema: string, prefix: "index" \| "timestamp" \| "supabase" \| "unix" \| "none" }` |
+| default       | `{ table: "__drizzle_migrations", schema: "drizzle", prefix: "index" }`                    |
 | commands      | `migrate`   |
 
 <rem025/>
