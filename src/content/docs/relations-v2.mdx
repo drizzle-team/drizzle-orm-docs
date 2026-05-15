@@ -10,13 +10,9 @@ import Npm from '@mdx/Npm.astro';
 
 # Drizzle relations
 
-<Callout type='error'>
-This page explains concepts available on drizzle versions `1.0.0-beta.1` and higher.
-</Callout>
-
 <Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
+drizzle-orm
+drizzle-kit -D
 </Npm>
 
 <br/>
@@ -87,7 +83,8 @@ const res = await db.select()
                     .from(posts)
                     .leftJoin(users, eq(posts.ownerId, users.id))
                     .orderBy(posts.id)
-const mappedResult =  
+
+const mappedResult = ...
 ```
 </Section>
 </CodeTabs>
@@ -128,14 +125,13 @@ For example, in the case above, only `verified authors` will be retrieved. Learn
 
 Here is a list of all fields available for `.many()` in drizzle relations
 
-```ts {3-11}
+```ts {3-10}
 const relations = defineRelations({ users, posts }, (r) => ({
 	users: {
 		feed: r.many.posts({
 			from: r.users.id,
 			to: r.posts.ownerId,
-			optional: false,
-      alias: 'custom_name',
+			alias: 'custom_name',
 			where: {
 				approved: true,
 			}
@@ -165,7 +161,7 @@ Drizzle ORM provides you an API to define `one-to-one` relations between tables 
 An example of a `one-to-one` relation between users and users, where a user can invite another (this example uses a self reference):
 
 ```typescript copy {10-17}
-import { pgTable, serial, text, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { defineRelations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
@@ -210,7 +206,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 	}
 }));
 
-const user = await db.query.posts.findFirst({ with: { profileInfo: true } });
+const user = await db.query.users.findFirst({ with: { profileInfo: true } });
 //____^? type { id: number, profileInfo: { ... } | null  }
 ```
 
@@ -220,7 +216,7 @@ Drizzle ORM provides you an API to define `one-to-many` relations between tables
 Example of `one-to-many` relation between users and posts they've written:
 
 ```typescript copy {15-25}
-import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { defineRelations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
@@ -351,36 +347,6 @@ type Response = {
 }[];
 ```
 
-<Callout type='error' title='Relational Queries v1'>
-Previously, you would need to query through a `junction` table and then map it out for every response
-
-❌ You don't need to do it now!
-```ts
-const response = await db._query.users.findMany({
-	with: {
-		usersToGroups: {
-			columns: {},
-			with: {
-				groups: true,
-			},
-		},
-	},
-});
-
-// response type
-type Response = {
-  id: number;
-  name: string | null;
-  usersToGroups: {
-    groups: {
-       id: number;
-       name: string | null;
-    }
-  }[];
-}[];
-```
-</Callout>
-
 ### Predefined filters
 
 Predefined `where` statements in Drizzle's relation definitions are a type of polymorphic relations implementation, but it's not fully it. Essentially, they allow you to
@@ -391,7 +357,6 @@ We can define a relation between `groups` and `users` so that when querying grou
 <Section>
 ```ts
 import { defineRelations } from "drizzle-orm";
-import * as p from "drizzle-orm/pg-core";
 import * as schema from './schema';
 
 export const relations = defineRelations(schema,(r) => ({
@@ -418,7 +383,6 @@ await db.query.groups.findMany({
 </Section>
 <Section>
 ```ts
-import { defineRelations } from "drizzle-orm";
 import * as p from "drizzle-orm/pg-core";
 
 export const users = p.pgTable("users", {
@@ -951,7 +915,7 @@ relations.
 
 ```ts {19,22,29,34}
 import { pgTable, integer, text } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { defineRelations } from 'drizzle-orm';
  
 export const users = pgTable('users', {
 	id: integer('id').primaryKey(),
