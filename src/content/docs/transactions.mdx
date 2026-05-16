@@ -1,5 +1,6 @@
 import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
+import Callout from '@mdx/Callout.astro';
 
 # Transactions
 
@@ -49,6 +50,10 @@ await db.transaction(async (tx) => {
   await tx.update(accounts).set({ balance: sql`${accounts.balance} + 100.00` }).where(eq(users.name, 'Andrew'));
 });
 ```
+
+<Callout type='info'>
+Throwing a regular error (e.g., `throw new Error(...)`) inside a transaction will automatically roll back the entire transaction. You do not always need to call `tx.rollback()` explicitly.
+</Callout>
 
 You can return values from the transaction:
 
