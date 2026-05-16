@@ -732,7 +732,7 @@ export const posts = p.pgTable('posts', {
 	content: p.text(),
 	authorId: p.integer('author_id'),
 }, (t) => [
-  index('posts_author_id_idx').on(table.authorId)
+  index('posts_author_id_idx').on(t.authorId)
 ]);
 
 export const relations = defineRelations({ users, posts }, (r) => ({
