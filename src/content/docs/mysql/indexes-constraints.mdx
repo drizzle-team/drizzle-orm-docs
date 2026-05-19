@@ -23,16 +23,16 @@ a string constant, a blob constant, a signed-number, or any constant expression 
     import { sql } from "drizzle-orm";
     import { int, time, mysqlTable } from "drizzle-orm/mysql-core";
     
-    const table = mysqlTable("table", {
-      int: int("int").default(42),
-      time: time("time").default(sql`cast("14:06:10" AS TIME)`),
+    export const table = mysqlTable("table", {
+      int: int().default(42),
+      time: time().default(sql`cast("14:06:10" AS TIME)`),
     });
     ```
     ```sql
-    CREATE TABLE `table` (
-      `int` int DEFAULT 42,
-      `time` time DEFAULT cast("14:06:10" AS TIME)
-    );
+	CREATE TABLE `table` (
+	  `int` int DEFAULT 42,
+	  `time` time DEFAULT (cast("14:06:10" AS TIME))
+	);
     ```
     </Section>
 
@@ -47,8 +47,8 @@ or update a record without adding a value to this field.
       ```typescript
       import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
-      const table = mysqlTable('table', {
-        int: int('int').notNull(),
+      export const table = mysqlTable('table', {
+        int: int().notNull(),
       });
       ```
 
@@ -71,21 +71,35 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
   You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
 </Callout>
 
+In MySQL, a `unique constraint` and a `unique index` are essentially the same thing.  
+Under the hood, MySQL implements a unique constraint as a unique index. 
+There is no separate constraint object like you might find in some other databases.
+```sql
+-- These three all produce the exact same result in MySQL:
+ALTER TABLE users ADD CONSTRAINT uq_email UNIQUE (email);
+ALTER TABLE users ADD UNIQUE INDEX uq_email (email);
+CREATE UNIQUE INDEX uq_email ON users(email);
+```
+
+To drop a `unique constraint`, the same syntax is used as dropping an index: `ALTER TABLE users DROP INDEX uq_email;`. There's no separate `DROP CONSTRAINT statement` for it in MySQL.
+
+That is why Drizzle always treats any `.unique()` as `UNIQUE INDEX`
+
 <Section>
       ```typescript
       import { int, varchar, unique, mysqlTable } from "drizzle-orm/mysql-core";
 
       export const user = mysqlTable('user', {
-        id: int('id').unique(),
+        id: int().unique(),
       });
 
       export const table = mysqlTable('table', {
-        id: int('id').unique('custom_name'),
+        id: int().unique('custom_name'),
       });
 
       export const composite = mysqlTable('composite_example', {
-        id: int('id'),
-        name: varchar('name', { length: 256 }),
+        id: int(),
+        name: varchar(, { length: 256 }),
       }, (t) => [
         unique().on(t.id, t.name),
         unique('custom_name').on(t.id, t.name)
@@ -93,22 +107,22 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       ```
 
       ```sql
-      CREATE TABLE `user` (
-      	`id` int,
-      	CONSTRAINT `user_id_unique` UNIQUE(`id`)
-      );
+	CREATE TABLE `user` (
+	  `id` int,
+	  CONSTRAINT `id_unique` UNIQUE INDEX(`id`)
+	);
 
-      CREATE TABLE `table` (
-      	`id` int,
-      	CONSTRAINT `custom_name` UNIQUE(`id`)
-      );
+	CREATE TABLE `table` (
+	  `id` int,
+	  CONSTRAINT `custom_name` UNIQUE INDEX(`id`)
+	);
 
-      CREATE TABLE `composite_example` (
-        `id` int,
-        `name` varchar(256),
-        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
-        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
-      );
+	CREATE TABLE `composite_example` (
+	  `id` int,
+	  `name` varchar(256),
+	  CONSTRAINT `id_name_unique` UNIQUE INDEX(`id`,`name`),
+	  CONSTRAINT `custom_name` UNIQUE INDEX(`id`,`name`)
+	);
       ```
     </Section>
 
@@ -138,13 +152,12 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
       );
       ```
       ```sql
-      CREATE TABLE `users` (
-	      `id` int NOT NULL,
-	      `username` text NOT NULL,
-	      `age` int,
-	      CONSTRAINT `users_id` PRIMARY KEY(`id`),
-	      CONSTRAINT `age_check1` CHECK(`users`.`age` > 21)
-      );
+	  CREATE TABLE `users` (
+	    `id` int PRIMARY KEY,
+	    `username` text NOT NULL,
+	    `age` int,
+	    CONSTRAINT `age_check1` CHECK(`users`.`age` > 21)
+	  );
       ```
     </Section>
 
@@ -160,22 +173,22 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
       import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
 
       export const user = mysqlTable("user", {
-        id: int("id").autoincrement().primaryKey(),
+        id: int().autoincrement().primaryKey(),
       })
 
       export const table = mysqlTable("table", {
-        cuid: text("cuid").primaryKey(),
+        cuid: text().primaryKey(),
       })
       ```
 
       ```sql
-      CREATE TABLE `user` (
-        `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL
-      );
+	  CREATE TABLE `user` (
+	    `id` int AUTO_INCREMENT PRIMARY KEY
+	  );
 
-      CREATE TABLE `table` (
-        `cuid` text PRIMARY KEY NOT NULL
-      );
+	  CREATE TABLE `table` (
+	    `cuid` text PRIMARY KEY
+	  );
       ```
     </Section>
 
@@ -195,13 +208,13 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       });
 
       export const book = mysqlTable("book", {
-        id: int("id").autoincrement().primaryKey(),
-        name: text("name"),
+        id: int().autoincrement().primaryKey(),
+        name: text(),
       });
 
       export const booksToAuthors = mysqlTable("books_to_authors", {
-        authorId: int("author_id"),
-        bookId: int("book_id"),
+        authorId: int(),
+        bookId: int(),
       }, (table) => [
         primaryKey({ columns: [table.bookId, table.authorId] }),
         // Or PK with custom name
@@ -229,17 +242,17 @@ The table with the foreign key is called the child table, and the table with the
 Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
-```typescript {11}
+	```typescript {11}
     import { int, text, mysqlTable } from "drizzle-orm/mysql-core";
 
     export const user = mysqlTable("user", {
-      id: int("id").primaryKey().autoincrement(),
-      name: text("name"),
+      id: int().primaryKey().autoincrement(),
+      name: text(),
     });
 
     export const book = mysqlTable("book", {
-      id: int("id").primaryKey().autoincrement(),
-      name: text("name"),
+      id: int().primaryKey().autoincrement(),
+      name: text(),
       authorId: int("author_id").references(() => user.id)
     });
     ```
@@ -247,19 +260,19 @@ You can declare them in a column declaration statement:
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
-```typescript {6,16-19}
-    import { int, text, foreignKey, AnyMySqlColumn, mysqlTable } from "drizzle-orm/mysql-core";
+	```typescript {6,15-19}
+    import { int, text, foreignKey, type AnyMySqlColumn, mysqlTable } from "drizzle-orm/mysql-core";
 
     export const user = mysqlTable("user", {
-      id: int("id").primaryKey().autoincrement(),
-      name: text("name"),
+      id: int().primaryKey().autoincrement(),
+      name: text(),
       parentId: int("parent_id").references((): AnyMySqlColumn => user.id),
     });
 
     // or
     export const user = mysqlTable("user", {
-      id: int("id").primaryKey().autoincrement(),
-      name: text("name"),
+      id: int().primaryKey().autoincrement(),
+      name: text(),
       parentId: int("parent_id")
     }, (table) => [
       foreignKey({
@@ -272,8 +285,8 @@ set return type for reference callback or use a standalone `foreignKey` operator
 
 To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
 
-```typescript copy {4-5,14-15,18-21}
-    import { int, text, primaryKey, foreignKey, mysqlTable, AnyMySqlColumn } from "drizzle-orm/mysql-core";
+	```typescript copy {4-5,7,15-19}
+    import { int, text, primaryKey, foreignKey, mysqlTable, type AnyMySqlColumn } from "drizzle-orm/mysql-core";
 
     export const user = mysqlTable("user", {
       firstName: text("firstName"),
@@ -283,7 +296,7 @@ To declare multi-column foreign keys you can use a dedicated `foreignKey` operat
     ]);
 
     export const profile = mysqlTable("profile", {
-      id: int("id").autoincrement().primaryKey(),
+      id: int().autoincrement().primaryKey(),
       userFirstName: text("user_first_name"),
       userLastName: text("user_last_name"),
     }, (table) => [
@@ -300,7 +313,7 @@ To declare multi-column foreign keys you can use a dedicated `foreignKey` operat
 Drizzle ORM provides API for both `index` and `unique index` declaration:
 
 <Section>
-    ```typescript copy {9-10}
+    ```typescript copy {8-9}
     import { int, text, index, uniqueIndex, mysqlTable } from "drizzle-orm/mysql-core";
 
     export const user = mysqlTable("user", {
@@ -321,9 +334,6 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
     ```
     </Section>
-    <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param.
-    </Callout>
 
      Drizzle ORM provides set of all params for index creation:
 
@@ -331,7 +341,7 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
     // Index declaration reference
     index("name")
       .on(table.name)
-      .algorythm("default") // "default" | "copy" | "inplace"
+      .algorithm("default") // "default" | "copy" | "inplace"
       .using("btree") // "btree" | "hash"
       .lock("default") // "none" | "default" | "exclusive" | "shared"
     ```
