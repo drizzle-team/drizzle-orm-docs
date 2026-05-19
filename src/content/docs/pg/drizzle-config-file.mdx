@@ -212,13 +212,45 @@ yet some vendor specific databases require a different subset of connection para
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | <Drivers/> |
+| type          | `aws-data-api`, `pglite` |
 | default        | --                    |
 | commands      | `push`, `migrate`, `pull`, `studio`  |
 
 <rem025/>
 
-<DriversExamples/>
+
+<CodeTabs items={["AWS Data API", "PGLite"]}>
+```ts {6}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/schema.ts",
+  driver: "aws-data-api",
+  dbCredentials: {
+    database: "database",
+    resourceArn: "resourceArn",
+    secretArn: "secretArn",
+  },
+});
+```
+```ts {6}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: "postgresql",
+  schema: "./src/schema.ts",
+  driver: "pglite",
+  dbCredentials: {
+    // inmemory
+    url: ":memory:"
+    
+    // or database folder
+    url: "./database/"
+  },
+});
+```
+</CodeTabs>
 
 ## ---
 
@@ -236,7 +268,7 @@ Database connection credentials in a form of `url`,
 
 <rem025/>
 
-<CodeTabs items={["PostgreSQL", "MySQL", "SQLite", "MSSQL", "Cockroach", "Turso", "Cloudflare D1", "AWS Data API", "PGLite"]}>
+<CodeTabs items={["PostgreSQL","AWS Data API", "PGLite"]}>
 <Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -265,109 +297,6 @@ export default defineConfig({
 });
 ```
 </Section>
-<Section>
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-export default defineConfig({
-  dialect: "mysql",
-  dbCredentials: {
-    url: "mysql://user:password@host:port/db",
-  }
-});
-```
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-// via connection params
-export default defineConfig({
-  dialect: "mysql",
-  dbCredentials: {
-    host: "host",
-    port: 5432,
-    user: "user",
-    password: "password",
-    database: "dbname",
-    ssl: "...", // can be: string | SslOptions (ssl options from mysql2 package)
-  }
-});
-```
-</Section>
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-export default defineConfig({
-  dialect: "sqlite",
-  dbCredentials: {
-    url: ":memory:", // inmemory database
-    // or
-    url: "sqlite.db", 
-    // or
-    url: "file:sqlite.db" // file: prefix is required by libsql
-  }
-});
-```
-<Section>
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-export default defineConfig({
-  dialect: "mssql",
-  dbCredentials: {
-    url: "mssql://username:password@host:port/database",
-  }
-});
-```
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-// via connection params
-export default defineConfig({
-  dialect: "mssql",
-  dbCredentials: {
-    database: "database",
-    password: "password",
-    port: 1433,
-    server: "server",
-    user: "user",
-    options: {
-      encrypt: true, // boolean
-      trustServerCertificate: false, // boolean
-    },
-  },
-});
-```
-</Section>
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-export default defineConfig({
-  dialect: "turso",
-  dbCredentials: {
-    url: "libsql://acme.turso.io" // remote Turso database url
-    authToken: "...",
-
-    // or if you need local db
-
-    url: ":memory:", // inmemory database
-    // or
-    url: "file:sqlite.db", // file: prefix is required by libsql
-  }
-});
-```
-```ts
-import { defineConfig } from 'drizzle-kit'
-
-export default defineConfig({
-  dialect: "sqlite",
-  driver: "d1-http",
-  dbCredentials: {
-    accountId: "",
-    databaseId: "",
-    token: "",
-  }
-});
-```
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -398,7 +327,7 @@ export default defineConfig({
 <rem025/>
 
 When running `drizzle-kit migrate` - drizzle will records about 
-successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema (schema is used in PostgreSQL only).
+successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema.
 
 `migrations` config options lets you change both migrations log `table` name and `schema`.
 
@@ -416,7 +345,7 @@ export default defineConfig({
   schema: "./src/schema.ts",
   migrations: {
     table: 'my-migrations-table', // `__drizzle_migrations` by default
-    schema: 'public', // used in PostgreSQL only, `drizzle` by default
+    schema: 'public', // `drizzle` by default
   },
 });
 ```
@@ -593,9 +522,9 @@ The `roles` option lets you:
 
 |               |                       |
 | :------------ | :-----------------    |
-| type          | `boolean \| { provider: "neon" \| "supabase", include: string[], exclude: string[]}`|
+| type          | `boolean \| { provider: "neon" \| "supabase", include: string[], exclude: string[] }`|
 | default       | `false`                  |
-| commands      | `push` `pull` `generate` |
+| commands      | `push` `pull` |
 
 <rem025/>
 
@@ -698,7 +627,7 @@ export default defineConfig({
 ### `explain`
 <rem025/>
 
-Prompts confirmation to run printed SQL statements when running `drizzle-kit push` command.
+Prints the planned SQL changes with an explanation, without applying them (dry run) when running the `drizzle-kit push` command
 
 |               |                      |
 | :------------ | :-----------------   |
@@ -724,7 +653,7 @@ Print all SQL statements during `drizzle-kit push` command.
 | :------------ | :-----------------   |
 | type          | `boolean` |
 | default       | `true`                    |
-| commands      | `generate` `pull`   |
+| commands      | `pull`   |
 
 <rem025/>
 
@@ -732,6 +661,27 @@ Print all SQL statements during `drizzle-kit push` command.
 export default defineConfig({
   dialect: "postgresql",
   verbose: false,
+});
+```
+
+### `force`
+<rem025/>
+
+Auto-accept all statements when running the `drizzle-kit push` command. 
+Use this option if you are fine with running data-loss statements on your database without being prompted for approval.
+
+|               |                      |
+| :------------ | :-----------------   |
+| type          | `boolean` |
+| default       | `false`                    |
+| commands      | `push`   |
+
+<rem025/>
+
+```ts
+export default defineConfig({
+  dialect: "postgresql",
+  force: true,
 });
 ```
 

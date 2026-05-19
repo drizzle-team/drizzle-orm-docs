@@ -26,7 +26,7 @@ import Dialects from "@mdx/Dialects.mdx"
 <Callout collapsed="How it works under the hood?">
 Drizzle Kit `export` command triggers a sequence of events:
 1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
-3. Based on json differences it will generate SQL DDL statements
+3. Based on the current json snapshot it will generate SQL DDL statements
 4. Output SQL DDL statements to console
 </Callout>
 
@@ -150,7 +150,7 @@ npx drizzle-kit export --config=./configs/drizzle.config.ts
 And it will successfully output SQL representation of drizzle schema
 ```bash
 CREATE TABLE "users" (
-        "id" serial PRIMARY KEY NOT NULL,
+        "id" serial PRIMARY KEY,
         "email" text NOT NULL,
         "name" text
 );

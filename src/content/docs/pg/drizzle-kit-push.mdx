@@ -139,13 +139,13 @@ as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have t
 <DriversExamples/>
 
 ### Including tables, schemas and extensions
-`drizzle-kit push` will by default manage all tables in `public` schema.
+`drizzle-kit push` will manage all tables and schemas by default.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
 |                     |                                                                                               |
 | :------------------ | :-------------------------------------------------------------------------------------------- |
 | `tablesFilter`      | `glob` based table names filter, e.g. `["users", "user_info"]` or `"user*"`. Default is `"*"` |
-| `schemaFilter`      | Schema names filter, e.g. `["public", "drizzle"]`. Default is `["public"]`                    |
+| `schemaFilter`      | Schema names filter, e.g. `["public", "drizzle"]`                                             |
 | `extensionsFilters` | List of installed database extensions, e.g. `["postgis"]`. Default is `[]`                    |
 <br/>
 
@@ -179,14 +179,14 @@ npx drizzle-kit push
 
 <rem025/>
 
-|           |                                                          |
-| :-------- | :---------------------------------------------------     |
-| `verbose` | print all SQL statements prior to execution              |
-| `strict`  | always ask for approval before executing SQL statements  |
-| `force`   | auto-accept all data-loss statements                     |
+|           |                                                                 |
+| :-------- | :---------------------------------------------------------------|
+| `verbose` | print all SQL statements prior to execution                     |
+| `explain` | print the planned SQL changes, without applying them (dry run)  |
+| `force`   | auto-accept all data-loss statements                            |
 <br/>
 <Npx>
-drizzle-kit push --strict --verbose --force
+drizzle-kit push --explain --verbose --force
 </Npx>
 
 <br/>

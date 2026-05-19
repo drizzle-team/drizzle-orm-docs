@@ -164,17 +164,6 @@ export default defineConfig({
 
 ### Initial pull
 
-<Callout type='error'>
-This feature is available on  `1.0.0-beta.2` and higher.
-</Callout>
-
-<Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
-</Npm>
-
-<br/>
-
 You can use the `--init` flag to mark the pulled schema as an applied migration in your database, 
 so that all subsequent migrations are diffed against the initial one
 
@@ -183,7 +172,7 @@ npx drizzle-kit push --init
 ```
 
 ### Including tables, schemas and extensions
-`drizzle-kit push` will by default manage all tables in `public` schema.
+`drizzle-kit push` will by default manage all tables in all schemas.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
 |                     |                                                                                               |
@@ -244,4 +233,5 @@ drizzle-kit pull --dialect=postgresql --driver=pglite url=database/
 drizzle-kit pull --dialect=postgresql --tablesFilter='user*' --extensionsFilters=postgis url=postgresql://user:password@host:port/dbname
 </Npx>
 
+{/* TODO update gif */}
 ![](@/assets/gifs/introspect_mysql.gif)

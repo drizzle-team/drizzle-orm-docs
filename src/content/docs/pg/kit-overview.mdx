@@ -49,7 +49,7 @@ drizzle-kit export
 | [`drizzle-kit studio`](/docs/drizzle-kit-studio)     | will connect to your database and spin up proxy server for Drizzle Studio which you can use for convenient database browsing, [see here](/docs/drizzle-kit-studio) |
 | [`drizzle-kit check`](/docs/drizzle-kit-check)       | will walk through all generate migrations and check for any race conditions(collisions) of generated migrations, [see here](/docs/drizzle-kit-check)               |
 | [`drizzle-kit up`](/docs/drizzle-kit-up)             | used to upgrade snapshots of previously generated migrations, [see here](/docs/drizzle-kit-up)                                                                     |
-| [`drizzle-kit export`](/docs/drizzle-kit-export)     | used converting TS schema into raw SQL DDL and print it out [see here](/docs/drizzle-kit-export)                                                                     |
+| [`drizzle-kit export`](/docs/drizzle-kit-export)     | used to convert a TypeScript schema into raw SQL DDL and print it out [see here](/docs/drizzle-kit-export)                                                                     |
 <br/>
 
 Drizzle Kit is configured through [drizzle.config.ts](/docs/drizzle-config-file) configuration file or via CLI params.<br/>
@@ -108,7 +108,7 @@ export default defineConfig({
   },
 
   breakpoints: true,
-  strict: true,
+  explain: true,
   verbose: true,
 });
 ```
