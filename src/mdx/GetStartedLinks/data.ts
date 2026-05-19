@@ -489,6 +489,27 @@ export const getStartedItems: GetStartedItems = [
         },
       },
       {
+        name: "Node SQLite",
+        path: {
+          existing: "/docs/get-started/node-sqlite-existing",
+          new: "/docs/get-started/node-sqlite-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/node.svg",
+            style: {
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/node.svg",
+            style: {
+              width: 20,
+            },
+          },
+        },
+      },
+      {
         name: "Cloudflare Durable Objects",
         path: {
           existing: "/docs/get-started/do-existing",

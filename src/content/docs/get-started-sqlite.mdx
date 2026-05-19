@@ -10,9 +10,9 @@ import LibsqlTabs from '@mdx/LibsqlTabs.mdx';
 
 # Drizzle \<\> SQLite
 
-Drizzle has native support for SQLite connections with the `libsql` and `better-sqlite3` drivers.
+Drizzle has native support for SQLite connections with the `libsql`, `node:sqlite` and `better-sqlite3` drivers.
   
-There are a few differences between the `libsql` and `better-sqlite3` drivers that we discovered while using both and integrating them with the Drizzle ORM. For example:
+There are a few differences between the `libsql` and `node:sqlite`/`better-sqlite3` drivers that we discovered while using both and integrating them with the Drizzle ORM. For example:
 
 At the driver level, there may not be many differences between the two, but the main one is that `libSQL` can connect to both SQLite files and `Turso` remote databases. LibSQL is a fork of SQLite that offers a bit more functionality compared to standard SQLite, such as:
 
@@ -66,6 +66,43 @@ const db = drizzle(client);
 const result = await db.execute('select 1');
 ```
 
+## node:sqlite
+#### Step 1 - Install packages
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+<CodeTabs items={["node:sqlite", "node:sqlite with config"]}>
+```typescript copy
+import { drizzle } from 'drizzle-orm/node-sqlite';
+
+const db = drizzle(process.env.DB_FILE_NAME);
+
+const result = await db.execute('select 1');
+```
+```typescript copy
+import { drizzle } from 'drizzle-orm/node-sqlite';
+
+// You can specify any property from the node-sqlite connection options
+const db =  drizzle({ connection: { path: process.env.DB_FILE_NAME }});
+
+const result = await db.execute('select 1');
+```
+</CodeTabs>
+
+If you need to provide your existing driver:
+```typescript copy
+import { drizzle } from 'drizzle-orm/node-sqlite';
+import { DatabaseSync } from 'node:sqlite';
+
+const sqlite = new DatabaseSync('sqlite.db');
+const db = drizzle({ client: sqlite });
+
+const result = await db.execute('select 1');
+```
+
 ## better-sqlite3
 #### Step 1 - Install packages
 <Npm>
@@ -78,7 +115,7 @@ drizzle-orm better-sqlite3
 ```typescript copy
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
-const db = drizzle(process.env.DATABASE_URL);
+const db = drizzle(process.env.DB_FILE_NAME);
 
 const result = await db.execute('select 1');
 ```
@@ -86,7 +123,7 @@ const result = await db.execute('select 1');
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
 // You can specify any property from the better-sqlite3 connection options
-const db =  drizzle({ connection: { source: process.env.DATABASE_URL }});
+const db =  drizzle({ connection: { source: process.env.DB_FILE_NAME }});
 
 const result = await db.execute('select 1');
 ```
