@@ -31,7 +31,7 @@ When you run Drizzle Kit `pull` command it will:
 <Section>
 ```
                                   ┌────────────────────────┐      ┌─────────────────────────┐ 
-                                  │                        │ <---  CREATE TABLE "users" (
+                                  │                        │ <---  CREATE TABLE `users` (
 ┌──────────────────────────┐      │                        │        `id` int auto_increment primary key,
 │ ~ drizzle-kit pull       │      │                        │        `name` varchar(255),
 └─┬────────────────────────┘      │        DATABASE        │        `email` varchar(255) unique
@@ -45,11 +45,15 @@ When you run Drizzle Kit `pull` command it will:
 ```typescript
 import * as p from "drizzle-orm/mysql-core";
 
-export const users = p.mysqlTable("users", {
-  id: p.int().primaryKey().autoincrement(),
-  name: p.varchar({ length: 255 }),
-  email: p.varchar({ length: 255 }).unique(), 
-};
+export const users = p.mysqlTable(
+  "users",
+  {
+    id: p.int().autoincrement().primaryKey(),
+    name: p.varchar({ length: 255 }),
+    email: p.varchar({ length: 255 }),
+  },
+  (table) => [p.uniqueIndex("email").on(table.email)]
+);
 ```
 </Section>
 </Callout>
@@ -107,38 +111,7 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-### Specifying database driver
-Drizzle Kit does not come with a pre-bundled database driver,
-it will automatically pick an available MySQL driver from your current project based on `dialect: "mysql"` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
-
-Most MySQL drivers share the same connection params. If you use an exception driver, such as AWS Data API, specify `driver` explicitly.
-
-```ts {6}
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "mysql",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-});
-```
-
 ### Initial pull
-
-<Callout type='error'>
-This feature is available on  `1.0.0-beta.2` and higher.
-</Callout>
-
-<Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
-</Npm>
-
-<br/>
 
 You can use the `--init` flag to mark the pulled schema as an applied migration in your database, 
 so that all subsequent migrations are diffed against the initial one
@@ -182,7 +155,6 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 |                     |            |                                                                           |
 | :------------------ | :--------- | :------------------------------------------------------------------------ |
 | `dialect`           | `required` | Database dialect, one of <Dialects/>                                      |
-| `driver`            |            | Driver exception, for example `aws-data-api`                              |
 | `out`               |            | Migrations output folder path, default is `./drizzle`                     |
 | `url`               |            | Database connection string                                                |
 | `user`              |            | Database user                                                             |
@@ -199,4 +171,5 @@ drizzle-kit pull --dialect=mysql --url=mysql://user:password@host:3306/dbname
 drizzle-kit pull --dialect=mysql --tablesFilter='user*' url=mysql://user:password@host:3306/dbname
 </Npx>
 
+{/* TODO update gifs */}
 ![](@/assets/gifs/introspect_mysql.gif)

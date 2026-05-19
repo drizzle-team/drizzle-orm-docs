@@ -40,7 +40,7 @@ import * as p from "drizzle-orm/mysql-core";
 export const users = p.mysqlTable("users", {
   id: p.int().primaryKey().autoincrement(),
   name: p.varchar({ length: 255 }),
-};
+});
 ```
 ```
 ┌─────────────────────┐                  
@@ -55,7 +55,7 @@ export const users = p.mysqlTable("users", {
                                        │      └──────────────────────────┘
                                        │
   ┌────────────────────────────────────┴────────────────┐
-   create table users(`id` int auto_increment primary key, `name` varchar(255));
+   create table `users` (`id` int AUTO_INCREMENT PRIMARY KEY, `name` varchar(255));
 ```
 </Section>
 </Callout>
@@ -125,26 +125,6 @@ You can have multiple config files in the project, it's very useful when you hav
  └ 📜 tsconfig.json
 ```
 
-### Specifying database driver
-Drizzle Kit does not come with a pre-bundled database driver,
-it will automatically pick an available MySQL driver from your current project based on `dialect: "mysql"` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
-
-Most MySQL drivers share the same connection params. If you use an exception driver, such as AWS Data API, specify `driver` explicitly.
-
-```ts {6}
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "mysql",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-});
-```
-
 ### Including tables
 `drizzle-kit push` will manage all MySQL tables by default.
 You can configure the list of tables via `tablesFilter`.
@@ -183,11 +163,11 @@ npx drizzle-kit push
 |           |                                                          |
 | :-------- | :---------------------------------------------------     |
 | `verbose` | print all SQL statements prior to execution              |
-| `strict`  | always ask for approval before executing SQL statements  |
+| `explain` | print the planned SQL changes, without applying them (dry run)  |
 | `force`   | auto-accept all data-loss statements                     |
 <br/>
 <Npx>
-drizzle-kit push --strict --verbose --force
+drizzle-kit push --explain --verbose --force
 </Npx>
 
 <br/>
@@ -200,7 +180,6 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | :------------------ | :--------- | :------------------------------------------------------------------------ |
 | `dialect`           | `required` | Database dialect, one of <Dialects/>                                      |
 | `schema`            | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files |
-| `driver`            |            | Driver exception, for example `aws-data-api`                              |
 | `tablesFilter`      |            | Table name filter                                                         |
 | `url`               |            | Database connection string                                                |
 | `user`              |            | Database user                                                             |
@@ -256,10 +235,10 @@ npx drizzle-kit push
 
 it will pull existing(empty) schema from the database and generate SQL migration and apply it under the hood
 ```sql
-CREATE TABLE `users`(
-  `id` int auto_increment primary key,
-  `name` varchar(255)
-)
+CREATE TABLE `users` (
+ `id` int AUTO_INCREMENT PRIMARY KEY,
+ `name` varchar(255)
+);
 ```
 
 DONE ✅

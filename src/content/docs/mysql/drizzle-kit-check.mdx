@@ -7,7 +7,7 @@ import Callout from "@mdx/Callout.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import Npm from "@mdx/Npm.astro";
 import Npx from "@mdx/Npx.astro";
-
+import Dialects from "@mdx/Dialects.mdx"
 
 # `drizzle-kit check`
 
@@ -29,12 +29,12 @@ altering database schema on different branches - read more about [migrations for
 <hr/>
 <br/>
 
-`drizzle-kit check` command requires you to specify both `dialect` and database connection credentials, 
-you can provide them either via [drizzle.config.ts](/docs/mysql/drizzle-config-file) config file or via CLI options
+`drizzle-kit check` command requires you to specify `dialect` param, 
+you can provide it either via [drizzle.config.ts](/docs/mysql/drizzle-config-file) config file or via CLI options
 
 <CodeTabs items={["With config file", "As CLI options"]}>
 <Section>
-```ts {5,8}
+```ts {5}
 // drizzle.config.ts
 import { defineConfig } from "drizzle-kit";
 
@@ -74,7 +74,7 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 <rem025/>
 |           |            |                                                                         |
 | :-------- | :--------- | :---------------------------------------------------------------------- |
-| `dialect` | `required` | Database dialect you are using. Can be `postgresql`, `mysql`, `sqlite`, or `singlestore` |
+| `dialect` | `required` | Database dialect you are using. Can be <Dialects/> |
 | `out`     |            | Migrations folder, default=`./drizzle`                                  |
 | `config`  |            | Configuration file path, default=`drizzle.config.ts`                           |
 <br/>

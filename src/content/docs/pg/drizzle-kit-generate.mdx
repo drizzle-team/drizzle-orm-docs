@@ -38,7 +38,7 @@ export const users = p.pgTable("users", {
   id: p.serial().primaryKey(),
   name: p.text(),
   email: p.text().unique(), 
-};
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -195,6 +195,7 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | :------------ | :-------   | :----------------------------------------------------------------------    |
 | `dialect`     | `required` | Database dialect, one of <Dialects/>                                       |
 | `schema`      | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files  |
+| `driver`      |            | Driver one of `aws-data-api`, `pglite`   |
 | `out`         |            | Migrations output folder, default is `./drizzle`                           |
 | `config`      |            | Configuration file path, default is `drizzle.config.ts`                    |
 | `breakpoints` |            | SQL statements breakpoints, default is `true`                              |

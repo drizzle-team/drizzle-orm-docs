@@ -26,8 +26,8 @@ import Dialects from "@mdx/Dialects.mdx"
 <Callout collapsed="How it works under the hood?">
 Drizzle Kit `export` command triggers a sequence of events:
 1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
-3. Based on json differences it will generate SQL DDL statements
-4. Output SQL DDL statements to console
+2. Based on the current json snapshot it will generate SQL DDL statements
+3. Output SQL DDL statements to console
 </Callout>
 
 It's designed to cover [codebase first](/docs/mysql/migrations) approach of managing Drizzle migrations. 
@@ -93,8 +93,7 @@ By default, Drizzle Kit outputs SQL files, but in the future, we want to support
 <rem025/>
 
 <Npx>
-drizzle-kit push --name=init
-drizzle-kit push --name=seed_users --custom
+drizzle-kit export --sql=true
 </Npx>
 
 <br/>
@@ -134,7 +133,7 @@ export default defineConfig({
 ```
 
 ```ts filename='schema.ts'
-import { mysqlTable, serial, text } from 'drizzle-orm/mysql-core'
+import { mysqlTable, int, text } from 'drizzle-orm/mysql-core'
 
 export const users = mysqlTable('users', {
 	id: int('id').primaryKey().autoincrement(),
@@ -150,8 +149,8 @@ npx drizzle-kit export --config=./configs/drizzle.config.ts
 And it will successfully output SQL representation of drizzle schema
 ```bash
 CREATE TABLE "users" (
-        `id` int auto_increment primary key not null,
-        `email` varchar(255) not null,
+        `id` int AUTO_INCREMENT PRIMARY KEY,
+        `email` varchar(255) NOT NULL,
         "name" text
 );
 ```

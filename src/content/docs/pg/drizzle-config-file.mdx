@@ -93,7 +93,6 @@ export default defineConfig({
   },
 
   breakpoints: true,
-  explain: true,
   verbose: true,
 });
 ```
@@ -156,7 +155,7 @@ Dialect of the database you're using
 | :------------ | :-----------------------------------            |
 | type        | <Dialects/>                                     |
 | default        | --                                     |
-| commands    | `generate`, `push`, `pull`, `studio`,  `migrate`, `up`, `export`, |
+| commands    | `generate`, `push`, `pull`, `studio`,  `migrate`, `up`, `export` |
 
 <rem025/>
 ```ts {4}
@@ -177,7 +176,7 @@ export default defineConfig({
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | --                    |
-| commands      | `generate`, `push`, `export`, `studio`    |
+| commands      | `generate`, `push`, `export`, `studio`  |
 
 <rem025/>
 <SchemaFilePaths />
@@ -335,7 +334,7 @@ successfully applied migrations in your database in log table named `__drizzle_m
 | :------------ | :-----------------   |
 | type          | `{ table: string, schema: string }` |
 | default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
-| commands      | `migrate`, `push`, `pull`   |
+| commands      | `migrate`, `push`, `pull` |
 
 <rem025/>
 
@@ -624,26 +623,6 @@ export default defineConfig({
 
 ## ---
 
-### `explain`
-<rem025/>
-
-Prints the planned SQL changes with an explanation, without applying them (dry run) when running the `drizzle-kit push` command
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `boolean` |
-| default       | `false`                    |
-| commands      | `push`   |
-
-<rem025/>
-
-```ts
-export default defineConfig({
-  dialect: "postgresql",
-  explain: false,
-});
-```
-
 ### `verbose`
 <rem025/>
 
@@ -652,7 +631,7 @@ Print all SQL statements during `drizzle-kit push` command.
 |               |                      |
 | :------------ | :-----------------   |
 | type          | `boolean` |
-| default       | `true`                    |
+| default       | `false`                    |
 | commands      | `pull`   |
 
 <rem025/>

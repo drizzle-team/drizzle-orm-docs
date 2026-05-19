@@ -70,19 +70,20 @@ export default defineConfig({
     url: "mysql://user:password@host:3306/dbname",
   },
 
+  tablesFilter: "*",
+
   introspect: {
     casing: "camel",
   },
 
   migrations: {
-    prefix: "timestamp",
     table: "__drizzle_migrations__",
   },
 
   breakpoints: true,
-  strict: true,
   verbose: true,
 });
+
 ```
 
 ### Multiple configuration files
@@ -126,7 +127,7 @@ Migration folder contains folders with `.sql` migration files which is used by `
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "mysql", // "mysql" | "sqlite" | "postgresql" | "turso" | "singlestore" | "mssql"
+  dialect: "mysql",
   schema: "./src/schema/*",
   out: "./drizzle",
 });
@@ -143,7 +144,7 @@ Dialect of the database you're using
 | :------------ | :-----------------------------------            |
 | type        | <Dialects/>                                     |
 | default        | --                                     |
-| commands    | `generate` `migrate` `push` `pull` `check` `up` |
+| commands    | `generate`, `push`, `pull`, `studio`,  `migrate`, `up`, `export` |
 
 <rem025/>
 ```ts {4}
@@ -164,7 +165,7 @@ export default defineConfig({
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | --                    |
-| commands      | `generate` `push`    |
+| commands      | `generate`, `push`, `export`, `studio`  |
 
 <rem025/>
 <SchemaFilePaths />
@@ -178,7 +179,7 @@ Defines output folder of your SQL migration files, json snapshots of your schema
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | `drizzle`                    |
-| commands      | `generate` `migrate` `push` `pull` `check` `up`    |
+| commands      | `generate`, `pull`, `migrate`, `check`, `up` |
 
 <rem025/>
 ```ts {4}
@@ -188,20 +189,6 @@ export default defineConfig({
   out: "./drizzle", 
 });
 ```
-
-### `driver`
-<rem025/>
-
-Drizzle Kit automatically picks an available MySQL driver from your current project based on `dialect: "mysql"`.
-Use `driver` only for supported MySQL driver exceptions, such as AWS Data API.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `"aws-data-api"` |
-| default       | --                    |
-| commands      | `migrate` `push` `pull`   |
-
-<rem025/>
 
 ```ts
 import { defineConfig } from "drizzle-kit";
@@ -229,7 +216,7 @@ Database connection credentials in a form of `url`,
 | :------------ | :-----------------   |
 | type          | union of drivers connection options |
 | default       | --                    |
-| commands      | `migrate` `push` `pull`   |
+| commands      | `push`, `pull`, `migrate`, `studio` |
 
 <rem025/>
 
@@ -277,7 +264,7 @@ successfully applied migrations in your database in log table named `__drizzle_m
 | :------------ | :-----------------   |
 | type          | `{ table: string }` |
 | default       | `{ table: "__drizzle_migrations" }`                    |
-| commands      | `migrate`   |
+| commands      | `migrate`, `push`, `pull` |
 
 <rem025/>
 
@@ -377,7 +364,7 @@ based table names filter, e.g. `["users", "user_info"]` or `"user*"`
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default       | --                    |
-| commands      | `generate` `push` `pull`   |
+| commands      | `push` `pull`  |
 
 <rem025/>
 ```ts
@@ -391,26 +378,6 @@ export default defineConfig({
 
 ## ---
 
-### `strict`
-<rem025/>
-
-Prompts confirmation to run printed SQL statements when running `drizzle-kit push` command.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `boolean` |
-| default       | `false`                    |
-| commands      | `push`   |
-
-<rem025/>
-
-```ts
-export default defineConfig({
-  dialect: "mysql",
-  strict: false,
-});
-```
-
 ### `verbose`
 <rem025/>
 
@@ -419,8 +386,8 @@ Print all SQL statements during `drizzle-kit push` command.
 |               |                      |
 | :------------ | :-----------------   |
 | type          | `boolean` |
-| default       | `true`                    |
-| commands      | `generate` `pull`   |
+| default       | `false`                    |
+| commands      | `pull`   |
 
 <rem025/>
 
@@ -451,5 +418,26 @@ that's necessary for databases that do not support multiple DDL alternation stat
 export default defineConfig({
   dialect: "mysql",
   breakpoints: false,
+});
+```
+
+### `force`
+<rem025/>
+
+Auto-accept all statements when running the `drizzle-kit push` command. 
+Use this option if you are fine with running data-loss statements on your database without being prompted for approval.
+
+|               |                      |
+| :------------ | :-----------------   |
+| type          | `boolean` |
+| default       | `false`                    |
+| commands      | `push`   |
+
+<rem025/>
+
+```ts
+export default defineConfig({
+  dialect: "mysql",
+  force: true,
 });
 ```

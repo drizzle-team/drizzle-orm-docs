@@ -38,7 +38,7 @@ export const users = p.mysqlTable("users", {
   id: p.int().primaryKey().autoincrement(),
   name: p.varchar({ length: 255 }),
   email: p.varchar({ length: 255 }).unique(), 
-};
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -60,9 +60,10 @@ export const users = p.mysqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE `users` (
- `id` int auto_increment primary key,
+ `id` int AUTO_INCREMENT PRIMARY KEY,
  `name` varchar(255),
- `email` varchar(255) unique
+ `email` varchar(255),
+ CONSTRAINT `email_unique` UNIQUE INDEX(`email`)
 );
 ```
 </Section>
@@ -107,7 +108,7 @@ You can set custom migration file names by providing `--name` CLI option
 ```shell
 npx drizzle-kit generate --name=init
 ```
-```plaintext {4}
+```plaintext {3}
 📦 <project root>
  ├ 📂 drizzle
  │ └ 📂 20242409125510_init
@@ -142,7 +143,7 @@ for DDL alternations currently not supported by Drizzle Kit or data seeding. Ext
 drizzle-kit generate --custom --name=seed-users
 ```
 <Section>
-```plaintext {5}
+```plaintext {4}
 📦 <project root>
  ├ 📂 drizzle
  │ ├ 📂 20242409125510_init
@@ -151,7 +152,7 @@ drizzle-kit generate --custom --name=seed-users
  └ …
 ```
 ```sql
--- ./drizzle/20242409125510_seed/migration.sql
+-- ./drizzle/20242409125510_seed-users/migration.sql
 
 INSERT INTO `users` (`name`) VALUES('Dan');
 INSERT INTO `users` (`name`) VALUES('Andrew');
@@ -160,10 +161,6 @@ INSERT INTO `users` (`name`) VALUES('Dandrew');
 </Section>
 
 ### Ignore conflicts
-
-<Callout type='warning'>
-`--ignore-conflicts` available starting from `drizzle-orm@1.0.0-beta.16`
-</Callout>
 
 In case you need `generate` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
 there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
@@ -236,7 +233,7 @@ npx drizzle-kit generate --config=./configs/drizzle.config.ts --name=seed-users 
 ```
 And it will successfully generate
 <Section>
-```plaintext {6}
+```plaintext {5}
 📦 <project root>
  ├ …
  ├ 📂 migrations
