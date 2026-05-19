@@ -4,7 +4,7 @@ import Callout from '@mdx/Callout.astro';
 # Table schemas
 
 If you declare an entity within a schema, query builder will prepend schema names in queries:<br/>
-``select * from `schema`.`users```
+`select * from schema.users`
 
 <Section>
     ```ts {3,5}
@@ -16,14 +16,6 @@ If you declare an entity within a schema, query builder will prepend schema name
       id: int("id").primaryKey().autoincrement(),
       name: text("name"),
     });
-    ```
-    ```sql
-    CREATE SCHEMA `my_schema`;
-
-    CREATE TABLE `my_schema`.`users` (
-      `id` serial PRIMARY KEY,
-      `name` text
-    );
     ```
     </Section>
 

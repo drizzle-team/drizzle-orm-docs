@@ -15,8 +15,9 @@ yet when you use `sql` you have to explicitly declare view columns schema.
 ### Declaring views
 
 <Section>
-      ```ts filename="schema.ts" copy {13-14}
+      ```ts filename="schema.ts" copy {14-15}
       import { text, mysqlTable, mysqlView, int, timestamp } from "drizzle-orm/mysql-core";
+      import { eq } from "drizzle-orm";
 
       export const user = mysqlTable("user", {
         id: int().primaryKey().autoincrement(),
@@ -32,16 +33,19 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       export const customersView = mysqlView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW `user_view` AS SELECT * FROM `user`;
-      CREATE VIEW `customers_view` AS SELECT * FROM `user` WHERE `role` = 'customer';
+      ...
+
+      CREATE ALGORITHM = undefined SQL SECURITY definer VIEW `customers_view` AS (select * from `user` where `user`.`role` = 'customer');
+      CREATE ALGORITHM = undefined SQL SECURITY definer VIEW `user_view` AS (select * from `user`);
       ```
     </Section>
 
 You can also declare views using `standalone query builder`, it works exactly the same way:
 
 <Section>
-      ```ts filename="schema.ts" copy {3, 15-16}
+      ```ts filename="schema.ts" copy {4,16-17}
       import { text, mysqlTable, mysqlView, int, timestamp, QueryBuilder } from "drizzle-orm/mysql-core";
+      import { eq } from "drizzle-orm";
 
       const qb = new QueryBuilder();
 
@@ -59,8 +63,10 @@ You can also declare views using `standalone query builder`, it works exactly th
       export const customersView = mysqlView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW `user_view` AS SELECT * FROM `user`;
-      CREATE VIEW `customers_view` AS SELECT * FROM `user` WHERE `role` = 'customer';
+	  ...
+
+      CREATE ALGORITHM = undefined SQL SECURITY definer VIEW `customers_view` AS (select * from `user` where `user`.`role` = 'customer');
+      CREATE ALGORITHM = undefined SQL SECURITY definer VIEW `user_view` AS (select * from `user`);
       ```
     </Section>
 
@@ -68,19 +74,35 @@ You can also declare views using `standalone query builder`, it works exactly th
 Whenever you need to declare view using a syntax that is not supported by the query builder, 
 you can directly use `sql` operator and explicitly specify view columns schema.
 
-```ts copy
+```ts copy {15}
 // regular view
-const newYorkers = mysqlView('new_yorkers', {
-  id: int('id').primaryKey().autoincrement(),
-  name: text('name').notNull(),
-  cityId: int('city_id').notNull(),
+import { eq, sql } from "drizzle-orm";
+import { int, mysqlTable, mysqlView, text, timestamp } from "drizzle-orm/mysql-core";
+
+export const users = mysqlTable("users", {
+  id: int().primaryKey().autoincrement(),
+  name: text(),
+  cityId: int("city_id"),
+});
+
+export const newYorkers = mysqlView("new_yorkers", {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  cityId: int("city_id").notNull(),
 }).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
+```
+```sql
+...
+
+CREATE ALGORITHM = undefined SQL SECURITY definer VIEW `new_yorkers` AS (select * from `users` where `users`.`city_id` = 1);
 ```
 
 ### Declaring existing views
 When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
 `drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
-```ts
+```ts {18}
+import { int, mysqlTable, mysqlView, text, timestamp } from "drizzle-orm/mysql-core";
+
 export const user = mysqlTable("user", {
   id: int().primaryKey().autoincrement(),
   name: text(),
