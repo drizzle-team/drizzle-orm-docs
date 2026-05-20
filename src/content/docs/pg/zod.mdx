@@ -1,12 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-zod` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-zod` package but all new update will be added to Drizzle ORM directly
-</Callout>
-
 # zod
 
 ### Install the dependencies
@@ -196,6 +190,13 @@ z.boolean();
 ```
 
 ```ts
+pgEnum('name', ['val1', 'val2']);
+
+// Schema
+z.enum(['val1', 'val2']);
+```
+
+```ts
 pg.date({ mode: 'date' });
 pg.timestamp({ mode: 'date' });
 
@@ -354,4 +355,11 @@ pg.dataType().array(...);
 
 // Schema
 z.array(baseDataTypeSchema).length(size);
+```
+
+```ts
+pg.bytea();
+
+// Schema
+zod.custom<Buffer>((v) => v instanceof Buffer)
 ```
