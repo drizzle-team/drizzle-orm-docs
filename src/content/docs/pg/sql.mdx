@@ -349,7 +349,7 @@ Here you can see a usage for **[`sql<T>`](/docs/sql#sqlt)**, **[`sql``.mapWith()
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select({
     id: usersTable.id,
@@ -382,7 +382,7 @@ the underlying database system provides.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 const id = 77
 
@@ -399,7 +399,7 @@ select * from "users" where "users"."id" = $1; --> [ 77 ]
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 const searchParam = "Ale"
 
@@ -420,7 +420,7 @@ available in Drizzle, but you prefer not to resort to raw SQL.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select().from(usersTable).orderBy(sql`${usersTable.id} desc nulls first`)
 ```
@@ -437,7 +437,7 @@ available in Drizzle, but you prefer not to resort to raw SQL.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select({ 
     projectId: usersTable.projectId,
@@ -447,6 +447,6 @@ await db.select({
     .having(sql`count(${usersTable.id}) > 300`)
 ```
 ```sql
-select "project_id", count("users"."id") from users group by "users"."project_id" having count("users"."id") > 300; 
+select "project_id", count("id") from "users" group by "users"."project_id" having count("users"."id") > 300
 ```
 </Section>

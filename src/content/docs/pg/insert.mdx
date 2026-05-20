@@ -4,6 +4,21 @@ import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 
 # SQL Insert
+
+<Callout type='info'>
+All the values provided to `.values()`are parameterized automatically.
+For example, this query:
+```ts
+await db.insert(users).values({ name: 'Andrew' });
+```
+will be translated to:
+```sql
+insert into "users" ("id", "name") values (default, $1) -- params: ['Andrew']
+```
+</Callout>
+
+<br/>
+
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
 
 Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
@@ -12,8 +27,9 @@ Inserting data with Drizzle is extremely straightforward and sql-like. See for y
 ```typescript copy 
 await db.insert(users).values({ name: 'Andrew' });
 ```
+
 ```sql
-insert into "users" ("name") values ("Andrew");
+insert into "users" ("id", "name", "age") values (default, 'Andrew', default)
 ```
 </Section>
 
@@ -77,14 +93,14 @@ await db.insert(users)
 as part of the conflict target (i.e. for partial indexes) or as part of the `update` clause:
 
 ```sql
-insert into employees (employee_id, name)
-values (123, 'John Doe')
-on conflict (employee_id) where name <> 'John Doe'
-do update set name = excluded.name
+insert into "employees" ("employee_id", "name") 
+values (123, 'John Doe') 
+on conflict ("employee_id") where name <> 'John Doe' 
+do update set "name" = excluded.name;
 
-insert into employees (employee_id, name)
-values (123, 'John Doe')
-on conflict (employee_id) do update set name = excluded.name
+insert into "employees" ("employee_id", "name") 
+values (123, 'John Doe') 
+on conflict ("employee_id") do update set "name" = 'John Doe' 
 where name <> 'John Doe';
 ```
 
@@ -107,8 +123,6 @@ await db.insert(employees)
     setWhere: sql`name <> 'John Doe'`
   });
 ```
-
-<hr />
 
 Upsert with composite indexes, or composite primary keys for `onConflictDoUpdate`:
 
@@ -146,37 +160,16 @@ const result = await db.with(userCount)
 ```sql
 with "user_count" as (select count(*) as "value" from "users") 
 insert into "users" ("username", "admin") 
-values ($1, ((select * from "user_count") = 0)) 
+values ('user1', ((select * from "user_count") = 0)) 
 returning "admin"
 ```
 </Section>
 
 ## Insert into ... select
 
-As the SQLite documentation mentions:
-
-<Callout>
-The second form of the INSERT statement contains a SELECT statement instead of a VALUES clause. 
-A new entry is inserted into the table for each row of data returned by executing the SELECT statement. 
-If a column-list is specified, the number of columns in the result of the SELECT must be the same as 
-the number of items in the column-list. Otherwise, if no column-list is specified, the number of 
-columns in the result of the SELECT must be the same as the number of columns in the table. 
-Any SELECT statement, including compound SELECTs and SELECT statements with ORDER BY and/or LIMIT clauses, 
-may be used in an INSERT statement of this form.
-</Callout>
-<Callout type='warning'>
-To avoid a parsing ambiguity, the SELECT statement should always contain a WHERE clause, even if that clause is simply "WHERE true", if the upsert-clause is present. Without the WHERE clause, the parser does not know if the token "ON" is part of a join constraint on the SELECT, or the beginning of the upsert-clause.
-</Callout>
-
 As the PostgreSQL documentation mentions:
 <Callout>
 A query (SELECT statement) that supplies the rows to be inserted
-</Callout>
-
-And as the MySQL documentation mentions:
-
-<Callout>
-With INSERT ... SELECT, you can quickly insert many rows into a table from the result of a SELECT statement, which can select from one or many tables
 </Callout>
 
 Drizzle supports the current syntax for all dialects, and all of them share the same syntax. Let's review some common scenarios and API usage. 
@@ -193,7 +186,7 @@ There are several ways to use select inside insert statements, allowing you to c
 const insertedEmployees = await db
   .insert(employees)
   .select(
-    db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    db.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
   )
   .returning({
     id: employees.id,
@@ -203,7 +196,7 @@ const insertedEmployees = await db
 ```ts
 const qb = new QueryBuilder();
 await db.insert(employees).select(
-    qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    qb.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 </Section>
@@ -212,12 +205,12 @@ await db.insert(employees).select(
 <Section>
 ```ts
 await db.insert(employees).select(
-    () => db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    () => db.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 ```ts
 await db.insert(employees).select(
-    (qb) => qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    (qb) => qb.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 </Section>
@@ -226,12 +219,12 @@ await db.insert(employees).select(
 <Section>
 ```ts
 await db.insert(employees).select(
-    sql`select "users"."name" as "name" from "users" where "users"."role" = 'employee'`
+    sql`select "users"."id" as "id", "users"."name" as "name" from "users" where "users"."role" = 'employee'`
 );
 ```
 ```ts
 await db.insert(employees).select(
-    () => sql`select "users"."name" as "name" from "users" where "users"."role" = 'employee'`
+    () => sql`select "users"."id" as "id", "users"."name" as "name" from "users" where "users"."role" = 'employee'`
 );
 ```
 </Section>

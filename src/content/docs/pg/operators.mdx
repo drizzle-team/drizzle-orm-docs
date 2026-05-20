@@ -1,6 +1,22 @@
 import Section from '@mdx/Section.astro';
+import Callout from "@mdx/Callout.astro";
 
 # Filter and conditional operators
+
+<Callout type='info'>
+All the values provided to filter operators and to the `sql` function are parameterized automatically.
+For example, this query:
+```ts
+await db.select().from(users).where(eq(users.id, 42));
+```
+will be translated to:
+```sql
+select "id", "name", "age" from "users" where "users"."id" = $1; -- params: [42]
+```
+</Callout>
+
+<br/>
+
 We natively support all dialect specific filter and conditional operators.
 
 You can import all filter & conditional from `drizzle-orm`:
@@ -20,7 +36,7 @@ db.select().from(table).where(eq(table.column, 5));
 ```
 
 ```sql copy
-SELECT * FROM table WHERE table.column = 5
+SELECT * FROM "table" WHERE "table"."column" = 5
 ```
 </Section>
 
@@ -32,7 +48,7 @@ db.select().from(table).where(eq(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column1 = table.column2
+SELECT * FROM "table" WHERE "table"."column1" = "table"."column2"
 ```
 </Section>
 
@@ -48,7 +64,7 @@ db.select().from(table).where(ne(table.column, 5));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column <> 5
+SELECT * FROM "table" WHERE "table"."column" <> 5
 ```
 </Section>
 
@@ -60,7 +76,7 @@ db.select().from(table).where(ne(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column1 <> table.column2
+SELECT * FROM "table" WHERE "table"."column1" <> "table"."column2"
 ```
 </Section>
 
@@ -78,7 +94,7 @@ db.select().from(table).where(gt(table.column, 5));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column > 5
+SELECT * FROM "table" WHERE "table"."column" > 5
 ```
 </Section>
 
@@ -90,7 +106,7 @@ db.select().from(table).where(gt(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column1 > table.column2
+SELECT * FROM "table" WHERE "table"."column1" > "table"."column2"
 ```
 </Section>
 
@@ -106,7 +122,7 @@ db.select().from(table).where(gte(table.column, 5));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column >= 5
+SELECT * FROM "table" WHERE "table"."column" >= 5
 ```
 </Section>
 
@@ -118,7 +134,7 @@ db.select().from(table).where(gte(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column1 >= table.column2
+SELECT * FROM "table" WHERE "table"."column1" >= "table"."column2"
 ```
 </Section>
 
@@ -134,7 +150,7 @@ db.select().from(table).where(lt(table.column, 5));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column < 5
+SELECT * FROM "table" WHERE "table"."column" < 5
 ```
 </Section>
 
@@ -146,7 +162,7 @@ db.select().from(table).where(lt(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column1 < table.column2
+SELECT * FROM "table" WHERE "table"."column1" < "table"."column2"
 ```
 </Section>
 
@@ -163,7 +179,7 @@ db.select().from(table).where(lte(table.column, 5));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column <= 5
+SELECT * FROM "table" WHERE "table"."column" <= 5
 ```
 </Section>
 
@@ -175,7 +191,7 @@ db.select().from(table).where(lte(table.column1, table.column2));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column1 <= table.column2
+SELECT * FROM "table" WHERE "table"."column1" <= "table"."column2"
 ```
 </Section>
 
@@ -194,7 +210,7 @@ db.select().from(table).where(exists(query));
 ```
 
 ```sql
-SELECT * FROM table WHERE EXISTS (SELECT * from table2)
+SELECT * FROM "table" WHERE EXISTS (SELECT * FROM "table2")
 ```
 </Section>
 
@@ -209,12 +225,11 @@ db.select().from(table).where(notExists(query));
 ```
 
 ```sql
-SELECT * FROM table WHERE NOT EXISTS (SELECT * from table2)
+SELECT * FROM "table" WHERE NOT EXISTS (SELECT * FROM "table2")
 ```
 </Section>
 
 ### isNull
-
   
 Value is `null`
 <Section>
@@ -225,7 +240,7 @@ db.select().from(table).where(isNull(table.column));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column IS NULL
+SELECT * FROM "table" WHERE ("table"."column" IS NULL)
 ```
 </Section>
 
@@ -241,7 +256,7 @@ db.select().from(table).where(isNotNull(table.column));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column IS NOT NULL
+SELECT * FROM "table" WHERE ("table"."column" IS NOT NULL)
 ```
 </Section>
 
@@ -259,7 +274,7 @@ db.select().from(table).where(inArray(table.column, [1, 2, 3, 4]));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column in (1, 2, 3, 4)
+SELECT * FROM "table" WHERE "table"."column" IN (1, 2, 3, 4)
 ```
 </Section>
 
@@ -272,7 +287,7 @@ db.select().from(table).where(inArray(table.column, query));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column IN (SELECT table2.column FROM table2)
+SELECT * FROM "table" WHERE "table"."column" IN (SELECT "table2"."column" FROM "table2")
 ```
 </Section>
 
@@ -288,7 +303,7 @@ db.select().from(table).where(notInArray(table.column, [1, 2, 3, 4]));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column NOT in (1, 2, 3, 4)
+SELECT * FROM "table" WHERE "table"."column" NOT IN (1, 2, 3, 4)
 ```
 </Section>
 
@@ -301,7 +316,7 @@ db.select().from(table).where(notInArray(table.column, query));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column NOT IN (SELECT table2.column FROM table2)
+SELECT * FROM "table" WHERE "table"."column" NOT IN (SELECT "table2"."column" FROM "table2")
 ```
 </Section>
 
@@ -319,7 +334,7 @@ db.select().from(table).where(between(table.column, 2, 7));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column BETWEEN 2 AND 7
+SELECT * FROM "table" WHERE "table"."column" BETWEEN 2 AND 7
 ```
 </Section>
 
@@ -335,7 +350,7 @@ db.select().from(table).where(notBetween(table.column, 2, 7));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7
+SELECT * FROM "table" WHERE "table"."column" NOT BETWEEN 2 AND 7
 ```
 </Section>
 
@@ -353,7 +368,23 @@ db.select().from(table).where(like(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * FROM table  WHERE table.column LIKE '%llo wor%'
+SELECT * FROM "table" WHERE "table"."column" LIKE '%llo wor%'
+```
+</Section>
+
+### notLike
+
+  
+Value is not like other value, case sensitive
+<Section>
+```typescript
+import { notLike } from "drizzle-orm";
+
+db.select().from(table).where(notLike(table.column, "%llo wor%"));
+```
+
+```sql
+SELECT * FROM "table" WHERE "table"."column" NOT LIKE '%llo wor%'
 ```
 </Section>
 
@@ -369,7 +400,7 @@ db.select().from(table).where(ilike(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column ILIKE '%llo wor%'
+SELECT * FROM "table" WHERE "table"."column" ILIKE '%llo wor%'
 ```
 </Section>
 
@@ -385,7 +416,7 @@ db.select().from(table).where(notIlike(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column NOT ILIKE '%llo wor%'
+SELECT * FROM "table" WHERE "table"."column" NOT ILIKE '%llo wor%'
 ```
 </Section>
 
@@ -404,7 +435,7 @@ db.select().from(table).where(not(eq(table.column, 5)));
 ```
 
 ```sql
-SELECT * FROM table WHERE NOT (table.column = 5)
+SELECT * FROM "table" WHERE NOT ("table"."column" = 5)
 ```
 </Section>
 
@@ -421,7 +452,7 @@ db.select().from(table).where(and(gt(table.column, 5), lt(table.column, 7)));
 ```
 
 ```sql
-SELECT * FROM table WHERE (table.column > 5 AND table.column < 7)
+SELECT * FROM "table" WHERE ("table"."column" > 5 AND "table"."column" < 7)
 ```
 </Section>
 
@@ -438,7 +469,7 @@ db.select().from(table).where(or(gt(table.column, 5), lt(table.column, 7)));
 ```
 
 ```sql
-SELECT * FROM table WHERE (table.column > 5 OR table.column < 7)
+SELECT * FROM "table" WHERE ("table"."column" > 5 OR "table"."column" < 7)
 ```
 </Section>
 

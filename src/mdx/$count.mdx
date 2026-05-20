@@ -11,7 +11,7 @@ const count = await db.$count(users, eq(users.name, "Dan")); // works with filte
 ```
 ```sql
 select count(*) from "users";
-select count(*) from "users" where "name" = 'Dan';
+select count(*) from "users" where "users"."name" = 'Dan';
 ```
 </Section>
 
@@ -24,11 +24,11 @@ const users = await db.select({
 }).from(users);
 ```
 
-usage example with [relational queries](/docs/rqb)
+usage example with [relational queries](/docs/rqb-v2)
 ```ts 
 const users = await db.query.users.findMany({
   extras: {
-    postsCount: db.$count(posts, eq(posts.authorId, users.id)),
+    postsCount: (t) => db.$count(posts, eq(posts.authorId, t.id)),
   },
 });
 ```

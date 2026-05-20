@@ -132,7 +132,7 @@ export const getContentTree = async (props: ContentTreeProps) => {
   const navItems: SidebarItem[] = [];
 
   const getTypeOfFile = (value: string): SidebarItem["type"] => {
-    if (mdxPaths.some((path) => path.includes(`/get-started/${value}`))) {
+    if (mdxPaths.some((path) => path.endsWith(`/get-started/${value}`))) {
       return "empty";
     }
     return "mdx";
