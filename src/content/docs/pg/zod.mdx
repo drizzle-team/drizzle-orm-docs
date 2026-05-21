@@ -6,7 +6,7 @@ import Callout from '@mdx/Callout.astro';
 ### Install the dependencies
 
 <Npm>
-zod
+drizzle-orm zod
 </Npm>
 
 ### Select schema
@@ -79,6 +79,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 ```ts copy
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { createUpdateSchema } from 'drizzle-orm/zod';
+import { eq } from "drizzle-orm";
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -119,12 +120,12 @@ const userSelectSchema = createSelectSchema(users, {
 });
 
 const parsed: {
-  id: number;
-  name: string,
-  bio?: string | undefined;
-  preferences: {
-    theme: string;
-  };
+    id: number;
+    name: string;
+    bio: string | null;
+    preferences: {
+        theme: string;
+    };
 } = userSelectSchema.parse(...);
 ```
 

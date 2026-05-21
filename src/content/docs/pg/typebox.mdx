@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is using new `typebox` package
-</Callout>
-
 # typebox
 
 #### Install the dependencies
@@ -61,7 +53,6 @@ const insertUserSchema = createInsertSchema(users, {
 });
 
 // Usage
-
 const isUserValid: boolean = Value.Check(insertUserSchema, {
 	name: 'John Doe',
 	email: 'johndoe@test.com',

@@ -6,7 +6,7 @@ import Callout from '@mdx/Callout.astro';
 ### Install the dependencies
 
 <Npm>
-valibot
+drizzle-orm valibot
 </Npm>
 
 ### Select schema
@@ -124,10 +124,10 @@ const userSelectSchema = createSelectSchema(users, {
 
 const parsed: {
   id: number;
-  name: string,
-  bio?: string | undefined;
+  name: string;
+  bio: string | null;
   preferences: {
-    theme: string;
+      theme: string;
   };
 } = parse(userSelectSchema, ...);
 ```

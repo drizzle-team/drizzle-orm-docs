@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is legacy by using `@sinclair/typebox` package
-</Callout>
-
 # typebox-legacy
 
 ### Install the dependencies
@@ -90,6 +82,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { createUpdateSchema } from 'drizzle-orm/typebox-legacy';
 import { Value } from '@sinclair/typebox/value';
+import { eq } from "drizzle-orm";
 
 const users = pgTable('users', {
   id: integer().generatedAlwaysAsIdentity().primaryKey(),
@@ -133,7 +126,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -161,7 +154,7 @@ const { createInsertSchema } = createSchemaFactory({ typeboxInstance: t });
 
 const userInsertSchema = createInsertSchema(users, {
   // We can now use the extended instance
-  name: (schema) => t.Number({ ...schema }, { error: '`name` must be a string' })
+  name: (schema) => t.Number({ ...schema, error: "`name` must be a string" }),
 });
 ```
 
@@ -172,6 +165,13 @@ pg.boolean();
 
 // Schema
 Type.Boolean();
+```
+
+```ts
+pgEnum('name', ['val1', 'val2']);
+
+// Schema
+Type.Enum({'val1': 'val1', 'val2': 'val2'});
 ```
 
 ```ts
@@ -333,4 +333,12 @@ pg.dataType().array(...);
 
 // Schema
 Type.Array(baseDataTypeSchema, { minItems: size, maxItems: size });
+```
+
+```ts
+pg.bytea();
+
+// Schema
+TypeRegistry.Set('Buffer', (_, value) => value instanceof Buffer);
+const bufferSchema = { [Kind]: 'Buffer', type: 'buffer' };
 ```

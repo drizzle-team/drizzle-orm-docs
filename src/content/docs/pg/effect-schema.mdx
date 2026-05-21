@@ -1,10 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Drizzle+Effect Schema integration is available starting from `drizzle-orm@1.0.0-beta.15`
-</Callout>
-
 # effect-schema
 
 Allows you to generate [effect](https://effect.website/) schemas from Drizzle ORM schemas.
@@ -20,7 +16,7 @@ Allows you to generate [effect](https://effect.website/) schemas from Drizzle OR
 ```ts
 import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-orm/effect-schema';
-import { Schema } from 'effect';
+import { Effect, Schema } from "effect";
 
 const users = pgTable('users', {
 	id: serial('id').primaryKey(),
@@ -51,7 +47,6 @@ const UserInsert = createInsertSchema(users, {
 });
 
 // Usage
-
 const program = Effect.gen(function*() {
 	const parsedUser = yield* Schema.validate(UserInsert)({
 		name: 'John Doe',
