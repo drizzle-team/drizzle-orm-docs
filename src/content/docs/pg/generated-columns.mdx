@@ -4,17 +4,7 @@ import Callout from '@mdx/Callout.astro';
 
 # Generated Columns
 
-<Callout type="info">
-To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
-</Callout>
-
-1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
-
-2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
-
-<Callout type="info">
-    The implementation and usage of generated columns can vary significantly across different SQL databases. PostgreSQL, MySQL, and SQLite each have unique features, capabilities, and limitations when it comes to generated columns. In this section, we will explore these differences in detail to help you understand how to best utilize generated columns in each database system.
-</Callout>
+Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
 
 #### Database side
     **Types**: `STORED` only
@@ -40,26 +30,6 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
 
     #### Features 
     This function can accept generated expression in 2 ways:
-
-    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
-    
-    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
-
-    **`string`**
-    <CodeTab>
-    ```ts
-    export const test = pgTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
-    });
-    ```
-    ```sql
-    CREATE TABLE "test" (
-	    "gen_name" text GENERATED ALWAYS AS ('hello world!') STORED
-    );
-    ```
-    </CodeTab>
-    
-    </Callout>
 
     **`sql`** tag - if you want drizzle to escape some values for you
 
@@ -127,9 +97,9 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     CREATE TABLE "test" (
     	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "test_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
     	"content" text,
-    	"content_search" "tsvector" GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
+    	"content_search" tsvector GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
     );
-    --> statement-breakpoint
+
     CREATE INDEX "idx_content_search" ON "test" USING gin ("content_search");
     ```
     </CodeTab>

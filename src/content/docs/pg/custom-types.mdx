@@ -2,8 +2,31 @@
 
 PostgreSQL exposes `customType` from `drizzle-orm/pg-core`.
 
+
+## Examples
+The best way to see how `customType` definition is working is to check how existing data types could be defined using `customType` function from Drizzle ORM.
+
+#### Integer
+
 ```ts
-import { customType, pgTable } from 'drizzle-orm/pg-core';
+import { customType } from 'drizzle-orm/pg-core';
+
+const customInteger = customType<{ data: number; }>(
+  {
+    dataType() {
+      return 'integer';
+    },
+  },
+);
+
+export const users = pgTable("users", {
+  id: customInteger(),
+});
+```
+
+#### Text
+```ts
+import { customType } from 'drizzle-orm/pg-core';
 
 const customText = customType<{ data: string }>({
   dataType() {
@@ -11,7 +34,30 @@ const customText = customType<{ data: string }>({
   },
 });
 
-export const users = pgTable('users', {
-  name: customText('name').notNull(),
+export const users = pgTable("users", {
+  name: customText(),
+});
+```
+
+#### Timestamp
+```ts
+import { customType } from 'drizzle-orm/pg-core';
+
+const customTimestamp = customType<{
+  data: Date;
+  driverData: string;
+  config: { withTimezone: boolean; precision?: number };
+}>({
+  dataType(config) {
+    const precision = typeof config?.precision !== "undefined" ? ` (${config.precision})` : "";
+    return `timestamp${precision}${config?.withTimezone ? " with time zone" : ""}`;
+  },
+  fromDriver(value: string): Date {
+    return new Date(value);
+  },
+});
+
+export const users = pgTable("users", {
+  createdAt: customTimestamp("created_at"),
 });
 ```

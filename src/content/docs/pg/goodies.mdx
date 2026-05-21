@@ -8,8 +8,8 @@ import { serial, text, pgTable } from 'drizzle-orm/pg-core';
 import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
 
 const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+  id: serial().primaryKey(),
+  name: text().notNull(),
 });
 
 type SelectUser = typeof users.$inferSelect;
@@ -25,13 +25,13 @@ Enable default query logging by passing `{ logger: true }` to `drizzle`.
 ```ts
 import { drizzle } from 'drizzle-orm/node-postgres';
 
-const db = drizzle({ logger: true });
+const db = drizzle(process.env.DB_URL, { logger: true });
 ```
 
 You can also provide a custom logger.
 
 ```ts
-import { Logger } from 'drizzle-orm/logger';
+import type { Logger } from 'drizzle-orm/logger';
 
 class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -39,7 +39,7 @@ class MyLogger implements Logger {
   }
 }
 
-const db = drizzle({ logger: new MyLogger() });
+const db = drizzle(process.env.DB_URL, { logger: new MyLogger() });
 ```
 
 ## Multi-project schema
@@ -50,10 +50,11 @@ import { serial, text, pgTableCreator } from 'drizzle-orm/pg-core';
 
 const pgTable = pgTableCreator((name) => `project1_${name}`);
 
-const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+export const users = pgTable('users', {
+  id: serial().primaryKey(),
+  name: text().notNull(),
 });
+
 ```
 
 ```ts
@@ -68,6 +69,12 @@ export default defineConfig({
   },
   tablesFilter: ['project1_*'],
 });
+```
+```sql
+CREATE TABLE "project1_users" (
+	"id" serial PRIMARY KEY,
+	"name" text NOT NULL
+);
 ```
 
 ## Printing SQL Query
@@ -104,10 +111,6 @@ const { sql, params } = query.toSQL();
 
 ## Get Typed Columns
 Use `getColumns` to get a typed column map, which is useful when excluding fields from a selection.
-
-<Callout type='warning'>
-`getColumns` is available starting from `drizzle-orm@1.0.0-beta.2`. For pre-1 versions, use `getTableColumns`.
-</Callout>
 
 ```ts
 import { getColumns } from 'drizzle-orm';

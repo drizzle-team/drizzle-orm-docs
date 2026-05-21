@@ -9,12 +9,12 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { boolean, jsonb, pgTable, serial, text, timestamp, withReplicas } from 'drizzle-orm/pg-core';
 
-const usersTable = pgTable('users', {
-	id: serial('id' as string).primaryKey(),
-	name: text('name').notNull(),
-	verified: boolean('verified').notNull().default(false),
-	jsonb: jsonb('jsonb').$type<string[]>(),
-	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+const usersTable = pgTable("users", {
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  verified: boolean().notNull().default(false),
+  jsonb: jsonb().$type<string[]>(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 const primaryDb = drizzle("postgres://user:password@host:port/primary_db");

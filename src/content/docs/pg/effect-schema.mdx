@@ -9,7 +9,6 @@ Allows you to generate [effect](https://effect.website/) schemas from Drizzle OR
 
 - Create a select schema for tables, views and enums.
 - Create insert and update schemas for tables.
-- Supported dialect: PostgreSQL.
 
 #### Usage
 
@@ -48,7 +47,7 @@ const UserInsert = createInsertSchema(users, {
 
 // Usage
 const program = Effect.gen(function*() {
-	const parsedUser = yield* Schema.validate(UserInsert)({
+	const parsedUser = yield* Schema.decodeUnknownEffect(UserInsert)({
 		name: 'John Doe',
 		email: 'johndoe@test.com',
 		role: 'admin',

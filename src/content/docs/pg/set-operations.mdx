@@ -29,7 +29,7 @@ Get all names from customers and users tables without duplicates.
     (select "name" from "sellers")
     union
     (select "name" from "customers")
-    limit $1
+    limit $1 -- params: [10]
     ```
     </CodeTab>
     <CodeTab>
@@ -46,20 +46,20 @@ Get all names from customers and users tables without duplicates.
     (select "name" from "sellers")
     union
     (select "name" from "customers")
-    limit $1
+    limit $1 -- params: [10]
     ```
 	</CodeTab>
     <CodeTab>
 	```typescript copy
     import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 
-    const users = pgTable('sellers', {
+    export const users = pgTable('sellers', {
         id: integer('id').primaryKey(),
         name: varchar('name', { length: 256 }).notNull(),
         address: text('address'),
     });
     
-    const customers = pgTable('customers', {
+    export const customers = pgTable('customers', {
         id: integer('id').primaryKey(),
         name: varchar('name', { length: 256 }).notNull(),
         city: text('city'),
@@ -89,9 +89,9 @@ you want to keep all the records and not eliminate duplicates.
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
     ```sql
-    select "transaction_id" from "online_sales"
+    (select "transaction_id" from "online_sales")
     union all
-    select "transaction_id" from "in_store_sales"
+    (select "transaction_id" from "in_store_sales")
     ```
     </CodeTab>
     <CodeTab>
@@ -106,23 +106,23 @@ you want to keep all the records and not eliminate duplicates.
       );
     ```
     ```sql
-    select "transaction_id" from "online_sales"
+    (select "transaction_id" from "online_sales")
     union all
-    select "transaction_id" from "in_store_sales"
+    (select "transaction_id" from "in_store_sales")
     ```
 	</CodeTab>
     <CodeTab>
 	```typescript copy
     import { integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
-    const onlineSales = pgTable('online_sales', {
+    export const onlineSales = pgTable('online_sales', {
         transactionId: integer('transaction_id').primaryKey(),
         productId: integer('product_id').unique(),
         quantitySold: integer('quantity_sold'),
         saleDate: timestamp('sale_date', { mode: 'date' }),
     });
     
-    const inStoreSales = pgTable('in_store_sales', {
+    export const inStoreSales = pgTable('in_store_sales', {
         transactionId: integer('transaction_id').primaryKey(),
         productId: integer('product_id').unique(),
         quantitySold: integer('quantity_sold'),
@@ -155,9 +155,9 @@ to count the same course multiple times even if multiple students from the same 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select "course_name" from "department_a_courses"
+    (select "course_name" from "department_a_courses")
     intersect
-    select "course_name" from "department_b_courses"
+    (select "course_name" from "department_b_courses")
     ```
 	</CodeTab>
     <CodeTab>
@@ -170,21 +170,21 @@ to count the same course multiple times even if multiple students from the same 
       .intersect(db.select({ courseName: depB.courseName }).from(depB));
     ```
     ```sql
-    select "course_name" from "department_a_courses"
+    (select "course_name" from "department_a_courses")
     intersect
-    select "course_name" from "department_b_courses"
+    (select "course_name" from "department_b_courses")
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
-    const depA = pgTable('department_a_courses', {
+    export const depA = pgTable('department_a_courses', {
         studentId: integer('student_id'),
         courseName: varchar('course_name').notNull(),
     });
     
-    const depB = pgTable('department_b_courses', {
+    export const depB = pgTable('department_b_courses', {
         studentId: integer('student_id'),
         courseName: varchar('course_name').notNull(),
     });
@@ -223,9 +223,9 @@ times by different customers.
     const result = await intersectAll(regularOrders, vipOrders);
     ```
     ```sql
-    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    (select "product_id", "quantity_ordered" from "regular_customer_orders")
     intersect all
-    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    (select "product_id", "quantity_ordered" from "vip_customer_orders")
     ```
 	</CodeTab>
     ```ts copy
@@ -247,21 +247,21 @@ times by different customers.
         );
     ```
     ```sql
-    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    (select "product_id", "quantity_ordered" from "regular_customer_orders")
     intersect all
-    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    (select "product_id", "quantity_ordered" from "vip_customer_orders")
     ```
     <CodeTab>
 	```typescript copy
     import { integer, pgTable } from "drizzle-orm/pg-core";
 
-    const regularCustomerOrders = pgTable('regular_customer_orders', {
+    export const regularCustomerOrders = pgTable('regular_customer_orders', {
         customerId: integer('customer_id').primaryKey(),
         productId: integer('product_id').notNull(),
         quantityOrdered: integer('quantity_ordered').notNull(),
     });
     
-    const vipCustomerOrders = pgTable('vip_customer_orders', {
+    export const vipCustomerOrders = pgTable('vip_customer_orders', {
         customerId: integer('customer_id').primaryKey(),
         productId: integer('product_id').notNull(),
         quantityOrdered: integer('quantity_ordered').notNull(),
@@ -293,9 +293,9 @@ multiple times, even if multiple employees from the same department are assigned
     const result = await except(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select "projects_name" from "department_a_projects"
+    (select "projects_name" from "department_a_projects")
     except
-    select "projects_name" from "department_b_projects"
+    (select "projects_name" from "department_b_projects")
     ```
 	</CodeTab>
     <CodeTab>
@@ -308,21 +308,21 @@ multiple times, even if multiple employees from the same department are assigned
         .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     ```sql
-    select "projects_name" from "department_a_projects"
+    (select "projects_name" from "department_a_projects")
     except
-    select "projects_name" from "department_b_projects"
+    (select "projects_name" from "department_b_projects")
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
-    const depA = pgTable('department_a_projects', {
+    export const depA = pgTable('department_a_projects', {
         employeeId: integer('employee_id'),
         projectsName: varchar('projects_name').notNull(),
     });
     
-    const depB = pgTable('department_b_projects', {
+    export const depB = pgTable('department_b_projects', {
         employeeId: integer('employee_id'),
         projectsName: varchar('projects_name').notNull(),
     });
@@ -359,9 +359,9 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     const result = await exceptAll(regularOrders, vipOrders);
     ```
     ```sql
-    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    (select "product_id", "quantity_ordered" from "regular_customer_orders")
     except all
-    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    (select "product_id", "quantity_ordered" from "vip_customer_orders")
     ```
 	</CodeTab>
     <CodeTab>
@@ -384,22 +384,22 @@ ordered by VIP customers. You want to retain the quantity information, even if t
         );
     ```
     ```sql
-    select "product_id", "quantity_ordered" from "regular_customer_orders"
+    (select "product_id", "quantity_ordered" from "regular_customer_orders")
     except all
-    select "product_id", "quantity_ordered" from "vip_customer_orders"
+    (select "product_id", "quantity_ordered" from "vip_customer_orders")
     ```
     </CodeTab>
 	<CodeTab>
 	```typescript copy
     import { integer, pgTable } from "drizzle-orm/pg-core";
 
-    const regularCustomerOrders = pgTable('regular_customer_orders', {
+    export const regularCustomerOrders = pgTable('regular_customer_orders', {
         customerId: integer('customer_id').primaryKey(),
         productId: integer('product_id').notNull(),
         quantityOrdered: integer('quantity_ordered').notNull(),
     });
     
-    const vipCustomerOrders = pgTable('vip_customer_orders', {
+    export const vipCustomerOrders = pgTable('vip_customer_orders', {
         customerId: integer('customer_id').primaryKey(),
         productId: integer('product_id').notNull(),
         quantityOrdered: integer('quantity_ordered').notNull(),
