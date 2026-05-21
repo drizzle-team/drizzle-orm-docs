@@ -1,0 +1,236 @@
+import Section from '@mdx/Section.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Codecs
+
+## What are codecs?
+
+Codecs are a driver-aware transform layer that sits between your JavaScript values and the database. They solve the problem of **different drivers returning and accepting data in different formats** for the same column types.
+
+## Why are they needed?
+
+1. **Driver differences** — each PG driver (`node-postgres`, `postgres-js`, `pglite`, etc.) parses and serializes types differently. Codecs normalize these differences so your app code doesn't have to care which driver you're using.
+
+2. **JSON context** — when a column is selected inside a JSON function (like `jsonAgg`, `jsonBuildObject`, or relational queries), the database returns values in JSON format which may differ from the regular format. For example, `bigint` in JSON becomes a number (losing precision). Codecs handle this by casting to text before JSON-ification (`castInJson`) and then parsing it back (`normalizeInJson`).
+
+## How codecs work
+
+Codecs have two layers: **cast** and **normalize**.
+
+```
+
+          ┌───────────────────────────────────────┐
+          │  Cast layer (DB level)                │
+          │  SELECT "bigint"::text FROM "users"   │
+          └───────────────────────────────────────┘
+ 
+          ┌────────────────────────────────────┐
+          │  Normalize layer (Code level)      │
+          │  "123" → BigInt("123") → 123n      │
+          └────────────────────────────────────┘
+```
+
+<br/>
+
+**Cast** operates at the database level — it wraps a column in a SQL `::type`
+
+**Normalize** operates at the code level — it transforms the raw value into the  type you/driver expect
+
+<br/>
+
+Both layers can have separate variants for different query contexts:
+
+For reads (SELECT):
+
+```
+SQL generation:      SELECT "col"::text FROM ...     ← cast layer modifies SQL
+                            ▼
+Database executes:   returns text representation
+                            ▼
+JS result mapping:   parseLineABC(rawValue)          ← normalize layer transforms in JS
+                            ▼
+Your code gets:      { a: 1, b: 2, c: 3 }
+```
+
+For writes (INSERT/UPDATE):
+
+```
+Your JS value:       { key: "val" }
+                            ▼
+JS param building:   JSON.stringify(value)            ← normalize layer transforms in JS
+                            ▼
+SQL generation:      INSERT ... VALUES ($1::jsonb)    ← cast layer modifies SQL
+                            ▼
+Database receives:   '{"key":"val"}' with type hint
+```
+
+<br/>
+
+Each layer operates across 3 contexts, each with scalar and array variants:
+
+```
+                        Cast (SQL)              Normalize (JS)
+                   ┌──────────────────┐    ┌──────────────────────┐
+  Regular SELECT   │ cast             │    │ normalize            │
+                   │ castArray        │    │ normalizeArray       │
+                   ├──────────────────┤    ├──────────────────────┤
+  Inside JSON      │ castInJson       │    │ normalizeInJson      │
+  (jsonAgg, RQB)   │ castArrayInJson  │    │ normalizeArrayInJson │
+                   ├──────────────────┤    ├──────────────────────┤
+  Params           │ castParam        │    │ normalizeParam       │
+  (INSERT/UPDATE)  │ castArrayParam   │    │ normalizeParamArray  │
+                   └──────────────────┘    └──────────────────────┘
+```
+
+JSON context exists because databases serialize values differently inside JSON — a `bigint` that normally comes back as a string from the driver will come back as a lossy number inside a JSON object. So codecs need separate handling: cast to `::text` in SQL before JSON wrapping, then parse the text back in JS after.
+
+<br/>
+
+| Method | When | Example SQL |
+|---|---|:---:|
+| `cast` | Column in SELECT | `"col"::text` |
+| `castArray` | Array column in SELECT | `"col"::text[]` |
+| `castInJson` | Column inside JSON functions | `"col"::text` (inside `json_agg`) |
+| `castArrayInJson` | Array column inside JSON | |
+| `castParam` | Param placeholder in INSERT/UPDATE/WHERE | `$1::date` |
+| `castArrayParam` | Array param placeholder | `$1::date[]` |
+
+<br/>
+
+| Method | When | Example |
+|---|---|:---:|
+| `normalize` | SELECT result → JS value | `"123"` → `123n` |
+| `normalizeArray` | SELECT array result → JS array | `["123", "456"]` → `[123n, 456n]` |
+| `normalizeInJson` | SELECT result inside JSON → JS | JSON `bigint` → `BigInt` |
+| `normalizeArrayInJson` | SELECT array inside JSON → JS | |
+| `normalizeParam` | JS value → driver param (INSERT/UPDATE/WHERE) | `{ key: "val" }` → `'{"key":"val"}'` |
+| `normalizeParamArray` | JS array → driver array param | `[1, 2]` → `{1,2}` (PG array literal) |
+
+<br/>
+
+## Are they enabled by default?
+
+Yes. Every driver ships default codecs. When you call `drizzle(client)`, the driver's codecs are automatically used.  
+You don't need to do anything to enable them.
+
+## How codecs work in built-in column types
+
+Every built-in PG column class declares a `codec` string identifier:
+
+```ts {3,8,11,16,21,24}
+// pg-core/columns/integer.ts
+class PgInteger extends PgColumn {
+  override readonly codec = 'int';
+}
+
+// pg-core/columns/bigint.ts  
+class PgBigInt53 extends PgColumn {
+  override readonly codec = 'bigint:number';
+}
+class PgBigInt64 extends PgColumn {
+  override readonly codec = 'bigint';
+}
+
+// pg-core/columns/line.ts
+class PgLine extends PgColumn {
+  override readonly codec = 'line';
+}
+
+// pg-core/columns/date.ts
+class PgDate extends PgColumn {
+  override readonly codec = 'date';
+}
+class PgDateString extends PgColumn {
+  override readonly codec = 'date:string';
+}
+```
+
+This identifier is a lookup key into the driver's codec map. If the driver defines transforms for that key, they're applied. If not, the value passes through untouched.
+
+For example, `integer` has codec `'int'`. The `node-postgres` codec map has **no entry** for `'int'` — integers don't need any transformation. But `bigint` has codec `'bigint'`, and node-postgres defines:
+
+```ts
+// node-postgres/codecs.ts
+bigint: {
+  normalize: BigInt,                           // SELECT: "123" → 123n
+  normalizeArray: arrayCompatNormalize(BigInt), // SELECT array: ["123"] → [123n]
+}
+```
+
+## Overriding codecs for built-in types
+
+Built-in columns (like `integer()`, `bigint()`, `date()`, `text()`, etc.) have a hardcoded `codec` string — you can't change which codec identifier a column uses. But you **can** change what that codec identifier does by overriding the driver's codec map.
+
+Every PG driver accepts a `codecs` option in `drizzle()`:
+
+```ts {3-6}
+const db = drizzle(client, {
+  codecs: {
+    "bigint:number": {
+      cast: (name) => sql`${name}::text`,
+      normalize: BigInt,
+    },
+  },
+});
+```
+
+## How codecs work in `customType()`
+
+<Callout type='info' title='Note'>
+`toDriver`/`fromDriver` on `customType` and codecs are **separate layers**. 
+`toDriver`/`fromDriver` are per-column instance transforms. Codecs are driver-level transforms and both are applied  
+On reads - `codec normalize` first → then `fromDriver`
+On writes - `toDriver` first → then `codec normalizeParam`
+</Callout>
+
+When defining a custom column type, you can specify which codec to use via the `codec` property:
+
+```ts
+import { customType } from 'drizzle-orm/pg-core';
+
+// Use an existing codec by name
+const customBigint = customType<{ data: bigint; driverData: string }>({
+  dataType() {
+    return 'bigint';
+  },
+  fromDriver(value) {
+    return value * 1000; // ← extra from driver mapping logic
+  },
+  codec: 'bigint',  // ← uses the driver's bigint codec
+});
+
+// Codec as a function (useful when codec depends on config)
+const customDataType = customType<{
+  data: number;
+  driverData: bigint | number;
+  config?: { mode: "bigint" | "number" };
+  configRequired: true;
+}>({
+  dataType() {
+    return `custom_type`;
+  },
+  fromDriver(value) {
+    return value * 1000; // ← extra from driver mapping logic
+  },
+  codec: (config) => { // ← can be dynamic based on config
+    if (!config || config.mode === "bigint") {
+      return "bigint";
+    }
+
+    return "bigint:number";
+  },
+});
+
+// No codec — skip codec transforms entirely
+const rawCustom = customType<{ data: string; driverData: string }>({
+  dataType() {
+    return 'my_type';
+  },
+  // codec is undefined by default — no codec transforms applied
+});
+```
+
+The `codec` field accepts:
+- A `string` — one of the PostgreSQL type identifiers (e.g. `'bigint'`, `'date'`, `'json'`, `'text'`, etc.)
+- A `function` `(config) => string | undefined` — dynamically resolve the codec based on the column's config
+- `undefined` (default) — no codec, values pass through as-is
