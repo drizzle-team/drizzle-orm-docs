@@ -1,7 +1,8 @@
 # Custom types
 
-PostgreSQL exposes `customType` from `drizzle-orm/pg-core`.
+Custom types let you define your own column types with custom SQL data types and JS/DB value transforms
 
+PostgreSQL exposes `customType` from `drizzle-orm/pg-core`.
 
 ## Examples
 The best way to see how `customType` definition is working is to check how existing data types could be defined using `customType` function from Drizzle ORM.
@@ -47,17 +48,82 @@ const customTimestamp = customType<{
   data: Date;
   driverData: string;
   config: { withTimezone: boolean; precision?: number };
+  configRequired: true;
 }>({
   dataType(config) {
-    const precision = typeof config?.precision !== "undefined" ? ` (${config.precision})` : "";
-    return `timestamp${precision}${config?.withTimezone ? " with time zone" : ""}`;
+    const precision = typeof config.precision !== "undefined" ? ` (${config.precision})` : "";
+    return `timestamp${precision}${config.withTimezone ? " with time zone" : ""}`;
   },
   fromDriver(value: string): Date {
     return new Date(value);
+  },
+  codec: (config) => {
+    if (config.withTimezone) return "timestamp with time zone";
+
+    return "timestamp";
   },
 });
 
 export const users = pgTable("users", {
   createdAt: customTimestamp("created_at"),
+});
+```
+
+Usage for all types will be same as defined functions in Drizzle ORM. For example:
+```ts
+const usersTable = pgTable('users', {
+  id: customInteger().primaryKey(),
+  name: customText().notNull(),
+  createdAt: customTimestamp('created_at', { withTimezone: true }).notNull()
+    .default(sql`now()`),
+});
+```
+
+### Params
+
+| Param | Required | Description |
+|---|---|---|
+| `dataType` | Yes | Defines the SQL type string. Receives `config` if defined. |
+| `toDriver` | No | Transforms JS value → driver value on INSERT/UPDATE. |
+| `fromDriver` | No | Transforms driver value → JS value on SELECT. |
+| `codec` | No | Which driver codec to use (see [Codecs](/docs/codecs) section). |
+| `fromJson` | No | **Deprecated** — use `codec` instead. Transforms value from JSON context. |
+| `forJsonSelect` | No | **Deprecated** — use `codec` instead. Modifies column selection inside JSON functions. |
+
+## Transform layers and execution order
+
+Custom types have two transform layers: column-level (`toDriver`/`fromDriver`) and driver-level ([codecs](/docs/codecs)). Both run in a specific order. You can read more on how to use codecs with customTypes [here](/docs/codecs#how-codecs-work-in-customtype)
+
+<br/>
+
+- **Writes:** (Insert/Update) `toDriver` first → codec `normalizeParam` second
+- **Reads:** (Select) codec `normalize` first → `fromDriver` second
+- If no codec is set, only `toDriver`/`fromDriver` run
+- If no `toDriver`/`fromDriver` is set, only codecs run (if defined)
+- If neither is set, values pass through untouched
+
+<br/>
+
+Use both (`toDriver`/`fromDriver` and `codecs`) when you need driver-level normalization AND column-level transformation:
+
+```ts
+// DB stores as bigint, driver returns string, codec converts to BigInt,
+// but you want a number in your app code
+const myColumn = customType<{ data: number; driverData: string }>({
+  dataType() { return 'bigint'; },
+  codec: 'bigint',           // driver "123" → BigInt(123n)
+  fromDriver(value) {        // BigInt(123n) → Number(123)
+    return Number(value);
+  },
+});
+```
+
+But often you can simplify by choosing the right codec variant:
+
+```ts
+// Same result, no fromDriver needed
+const myColumn = customType<{ data: number; driverData: string }>({
+  dataType() { return 'bigint'; },
+  codec: 'bigint:number',    // driver "123" → Number(123) directly
 });
 ```

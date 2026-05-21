@@ -183,6 +183,8 @@ On reads - `codec normalize` first → then `fromDriver`
 On writes - `toDriver` first → then `codec normalizeParam`
 </Callout>
 
+Read more about custom types [here](/docs/custom-types)
+
 When defining a custom column type, you can specify which codec to use via the `codec` property:
 
 ```ts
@@ -194,7 +196,7 @@ const customBigint = customType<{ data: bigint; driverData: string }>({
     return 'bigint';
   },
   fromDriver(value) {
-    return value * 1000; // ← extra from driver mapping logic
+    return value * 1000; // ← extra column mapping logic
   },
   codec: 'bigint',  // ← uses the driver's bigint codec
 });
@@ -210,7 +212,7 @@ const customDataType = customType<{
     return `custom_type`;
   },
   fromDriver(value) {
-    return value * 1000; // ← extra from driver mapping logic
+    return value * 1000; // ← extra column mapping logic
   },
   codec: (config) => { // ← can be dynamic based on config
     if (!config || config.mode === "bigint") {
