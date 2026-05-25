@@ -130,10 +130,10 @@ export const table = mysqlTable('table', {
 	bigintUnsigned: bigint({ mode: 'number', unsigned: true })
 });
 
-bigint('...', { mode: 'number' | 'bigint' });
+bigint("...", { mode: 'number' | 'bigint' | 'string' });
 
 // You can also specify unsigned option for bigint
-bigint('...', { mode: 'number' | 'bigint', unsigned: true })
+bigint("...", { mode: 'number' | 'bigint' | 'string', unsigned: true });
 ```
 
 ```sql

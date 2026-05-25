@@ -1,5 +1,6 @@
 import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
+import IsSupportedChipGroup from '@mdx/IsSupportedChipGroup.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -9,21 +10,17 @@ import Npm from '@mdx/Npm.astro';
 
 # Drizzle relations
 
-<Callout type='error'>
-This page explains concepts available on drizzle versions `1.0.0-beta.1` and higher.
-</Callout>
-
 <Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
+drizzle-orm
+drizzle-kit -D
 </Npm>
 
 <br/>
 
 <Prerequisites>  
-  - **Relations Fundamentals** - get familiar with the concepts of foreign key constraints, soft relations, database normalization, etc - [read here](/docs/relations-schema-declaration)
-  - **Declare schema** - get familiar with how to define drizzle schemas - [read here](/docs/cockroach/sql-schema-declaration)
-  - **Database connection** - get familiar with how to connect to database using drizzle - [read here](/docs/cockroach/get-started-cockroach)
+  - **Relations Fundamentals** - get familiar with the concepts of foreign key constraints, soft relations, database normalization, etc - [read here](/docs/mysql/relations-schema-declaration)
+  - **Declare schema** - get familiar with how to define drizzle schemas - [read here](/docs/mysql/sql-schema-declaration)
+  - **Database connection** - get familiar with how to connect to database using drizzle - [read here](/docs/mysql/get-started-mysql)
 </Prerequisites>
 
 The sole purpose of Drizzle relations is to let you query your relational data in the most simple and concise way:
@@ -31,22 +28,22 @@ The sole purpose of Drizzle relations is to let you query your relational data i
 <CodeTabs items={["Relational queries", "Select with joins"]}>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/…';
+import { drizzle } from 'drizzle-orm/mysql2';
 import { defineRelations } from 'drizzle-orm';
-import * as p from 'drizzle-orm/cockroach-core';
+import * as p from 'drizzle-orm/mysql-core';
 
-export const users = p.cockroachTable('users', {
-	id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+	id: p.int().autoincrement().primaryKey(),
 	name: p.text().notNull()
 });
 
-export const posts = p.cockroachTable('posts', {
-	id: p.integer().primaryKey(),
+export const posts = p.mysqlTable('posts', {
+	id: p.int().autoincrement().primaryKey(),
 	content: p.text().notNull(),
-	ownerId: p.integer('owner_id'),
+	ownerId: p.int('owner_id'),
 });
 
-const relations = defineRelations({ users, posts }, (r) => ({
+export const relations = defineRelations({ users, posts }, (r) => ({
 	posts: {
 		author: r.one.users({
 			from: r.posts.ownerId,
@@ -57,7 +54,7 @@ const relations = defineRelations({ users, posts }, (r) => ({
 
 const db = drizzle(client, { relations });
 
-const result = db.query.posts.findMany({
+const result = await db.query.posts.findMany({
   with: {
     author: true,
   },
@@ -67,6 +64,7 @@ const result = db.query.posts.findMany({
 [{
   id: 10,
   content: "My first post!",
+  ownerId: 14,
   author: {
     id: 1,
     name: "Alex"
@@ -76,9 +74,19 @@ const result = db.query.posts.findMany({
 </Section>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/…';
+import { drizzle } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
-import { posts, users } from './schema';
+import * as p from "drizzle-orm/mysql-core";
+
+export const users = p.mysqlTable('users', {
+	id: p.int().autoincrement().primaryKey(),
+	name: p.text().notNull()
+});
+export const posts = p.mysqlTable('posts', {
+	id: p.int().autoincrement().primaryKey(),
+	content: p.text().notNull(),
+	ownerId: p.int('owner_id'),
+});
 
 const db = drizzle(client);
 
@@ -86,7 +94,8 @@ const res = await db.select()
                     .from(posts)
                     .leftJoin(users, eq(posts.ownerId, users.id))
                     .orderBy(posts.id)
-const mappedResult =  
+
+const mappedResult = ...
 ```
 </Section>
 </CodeTabs>
@@ -121,20 +130,19 @@ This should be used when you are certain that this specific entity will always e
 - `alias` is used to add a specific alias to relationships between tables. If you have multiple identical relationships between two tables, you should 
 differentiate them using `alias`
 - `where` condition can be used for polymorphic relations. It fetches relations based on a `where` statement.
-For example, in the case above, only `verified authors` will be retrieved. Learn more about polymorphic relations [here](/docs/cockroach/relations-schema-declaration#polymorphic-relations).
+For example, in the case above, only `verified authors` will be retrieved. Learn more about polymorphic relations [here](/docs/mysql/relations-schema-declaration#polymorphic-relations).
 
 ### `many()`
 
 Here is a list of all fields available for `.many()` in drizzle relations
 
-```ts {3-11}
+```ts {3-10}
 const relations = defineRelations({ users, posts }, (r) => ({
 	users: {
 		feed: r.many.posts({
 			from: r.users.id,
 			to: r.posts.ownerId,
-			optional: false,
-      alias: 'custom_name',
+			alias: 'custom_name',
 			where: {
 				approved: true,
 			}
@@ -154,7 +162,7 @@ This should be used when you are certain that this specific entity will always e
 - `alias` is used to add a specific alias to relationships between tables. If you have multiple identical relationships between two tables, you should 
 differentiate them using `alias`
 - `where` condition can be used for polymorphic relations. It fetches relations based on a `where` statement.
-For example, in the case above, only `approved posts` will be retrieved. Learn more about polymorphic relations [here](/docs/cockroach/relations-schema-declaration#polymorphic-relations).
+For example, in the case above, only `approved posts` will be retrieved. Learn more about polymorphic relations [here](/docs/mysql/relations-schema-declaration#polymorphic-relations).
 
 ## ---
 
@@ -164,13 +172,13 @@ Drizzle ORM provides you an API to define `one-to-one` relations between tables 
 An example of a `one-to-one` relation between users and users, where a user can invite another (this example uses a self reference):
 
 ```typescript copy {10-17}
-import { cockroachTable, serial, text, boolean } from 'drizzle-orm/cockroach-core';
+import { mysqlTable, text, int } from 'drizzle-orm/mysql-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = cockroachTable('users', {
-	id: integer().primaryKey(),
+export const users = mysqlTable('users', {
+	id: int().autoincrement().primaryKey(),
 	name: text(),
-	invitedBy: integer('invited_by'),
+	invitedBy: int('invited_by'),
 });
 
 export const relations = defineRelations({ users }, (r) => ({
@@ -186,31 +194,31 @@ export const relations = defineRelations({ users }, (r) => ({
 Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
 ```typescript copy {15-22}
-import { cockroachTable, serial, text, integer, jsonb } from 'drizzle-orm/cockroach-core';
+import { mysqlTable, text, int, json } from 'drizzle-orm/mysql-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = cockroachTable('users', {
-	id: integer().primaryKey(),
-	name: text(),
+export const users = mysqlTable('users', {
+  id: int().autoincrement().primaryKey(),
+  name: text(),
 });
 
-export const profileInfo = cockroachTable('profile_info', {
-	id: serial().primaryKey(),
-	userId: integer('user_id').references(() => users.id),
-	metadata: jsonb(),
+export const profileInfo = mysqlTable('profile_info', {
+  id: int().autoincrement().primaryKey(),
+  userId: int('user_id').references(() => users.id),
+  metadata: json(),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
-	users: {
-		profileInfo: r.one.profileInfo({
-			from: r.users.id,
-			to: r.profileInfo.userId,
-		})
-	}
+  users: {
+    profileInfo: r.one.profileInfo({
+      from: r.users.id,
+      to: r.profileInfo.userId,
+    }),
+  },
 }));
 
-const user = await db.query.posts.findFirst({ with: { profileInfo: true } });
-//____^? type { id: number, profileInfo: { ... } | null  }
+const user = await db.query.users.findFirst({ with: { profileInfo: true } });
+//____^? type { id: number, name: string | null, profileInfo: { ... } | null  }
 ```
 
 ### One-to-many
@@ -219,18 +227,18 @@ Drizzle ORM provides you an API to define `one-to-many` relations between tables
 Example of `one-to-many` relation between users and posts they've written:
 
 ```typescript copy {15-25}
-import { cockroachTable, serial, text, integer } from 'drizzle-orm/cockroach-core';
+import { mysqlTable, text, int } from 'drizzle-orm/mysql-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = cockroachTable('users', {
-	id: integer('id').primaryKey(),
-	name: text('name'),
+export const users = mysqlTable('users', {
+  id: int().primaryKey(),
+  name: text(),
 });
 
-export const posts = cockroachTable('posts', {
-	id: integer('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id'),
+export const posts = mysqlTable('posts', {
+  id: int().primaryKey(),
+  content: text(),
+  authorId: int('author_id'),
 });
 
 export const relations = defineRelations({ users, posts }, (r) => ({
@@ -250,17 +258,17 @@ Now lets add comments to the posts:
 ```typescript copy {9-14,22,27-32}
 ...
 
-export const posts = cockroachTable('posts', {
-	id: integer('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id'),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey(),
+	content: text(),
+	authorId: int('author_id'),
 });
 
-export const comments = cockroachTable("comments", {
-  id: integer().primaryKey(),
+export const comments = mysqlTable('comments', {
+  id: int().autoincrement().primaryKey(),
   text: text(),
-  authorId: integer("author_id"),
-  postId: integer("post_id"),
+  authorId: int('author_id'),
+  postId: int('post_id'),
 });
 
 export const relations = defineRelations({ users, posts, comments }, (r) => ({
@@ -291,25 +299,25 @@ they have to be explicitly defined and store associations between related tables
 Example of `many-to-many` relation between users and groups we are using `through` to bypass junction table selection and directly select many `groups` for each `user`.
 ```typescript copy {27-39}
 import { defineRelations } from 'drizzle-orm';
-import { integer, cockroachTable, primaryKey, text } from 'drizzle-orm/cockroach-core';
+import { int, mysqlTable, primaryKey, text } from 'drizzle-orm/mysql-core';
 
-export const users = cockroachTable('users', {
-  id: integer().primaryKey(),
+export const users = mysqlTable('users', {
+  id: int().autoincrement().primaryKey(),
   name: text(),
 });
 
-export const groups = cockroachTable('groups', {
-  id: integer().primaryKey(),
+export const groups = mysqlTable('groups', {
+  id: int().autoincrement().primaryKey(),
   name: text(),
 });
 
-export const usersToGroups = cockroachTable(
+export const usersToGroups = mysqlTable(
   'users_to_groups',
   {
-    userId: integer('user_id')
+    userId: int('user_id')
       .notNull()
       .references(() => users.id),
-    groupId: integer('group_id')
+    groupId: int('group_id')
       .notNull()
       .references(() => groups.id),
   },
@@ -350,36 +358,6 @@ type Response = {
 }[];
 ```
 
-<Callout type='error' title='Relational Queries v1'>
-Previously, you would need to query through a `junction` table and then map it out for every response
-
-❌ You don't need to do it now!
-```ts
-const response = await db._query.users.findMany({
-	with: {
-		usersToGroups: {
-			columns: {},
-			with: {
-				groups: true,
-			},
-		},
-	},
-});
-
-// response type
-type Response = {
-  id: number;
-  name: string | null;
-  usersToGroups: {
-    groups: {
-       id: number;
-       name: string | null;
-    }
-  }[];
-}[];
-```
-</Callout>
-
 ### Predefined filters
 
 Predefined `where` statements in Drizzle's relation definitions are a type of polymorphic relations implementation, but it's not fully it. Essentially, they allow you to
@@ -390,7 +368,6 @@ We can define a relation between `groups` and `users` so that when querying grou
 <Section>
 ```ts
 import { defineRelations } from "drizzle-orm";
-import * as p from "drizzle-orm/cockroach-core";
 import * as schema from './schema';
 
 export const relations = defineRelations(schema,(r) => ({
@@ -417,29 +394,28 @@ await db.query.groups.findMany({
 </Section>
 <Section>
 ```ts
-import { defineRelations } from "drizzle-orm";
-import * as p from "drizzle-orm/cockroach-core";
+import * as p from "drizzle-orm/mysql-core";
 
-export const users = p.cockroachTable("users", {
-  id: p.integer().primaryKey(),
+export const users = p.mysqlTable("users", {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text().notNull(),
   verified: p.boolean().notNull(),
 });
 
-export const groups = p.cockroachTable("groups", {
-  id: p.integer().primaryKey(),
+export const groups = p.mysqlTable("groups", {
+  id: p.int().autoincrement().primaryKey(),
   title: p.text().notNull(),
 });
 
-export const usersToGroups = p.cockroachTable(
+export const usersToGroups = p.mysqlTable(
   "users_to_groups",
   {
     userId: p
-      .integer("user_id")
+      .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     groupId: p
-      .integer("group_id")
+      .int("group_id")
       .notNull()
       .references(() => groups.id, { onDelete: "cascade" }),
   },
@@ -614,18 +590,18 @@ locate the related row in the target table, significantly speeding up the join p
 
 **Example:**
 ```typescript
-import * as p from 'drizzle-orm/cockroach-core';
+import * as p from 'drizzle-orm/mysql-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.cockroachTable('users', {
-	id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+	id: p.int().autoincrement().primaryKey(),
 	name: p.text(),
 });
 
-export const profileInfo = p.cockroachTable('profile_info', {
-	id: p.integer().primaryKey(),
-	userId: p.integer('user_id').references(() => users.id),
-	metadata: p.jsonb(),
+export const profileInfo = p.mysqlTable('profile_info', {
+	id: p.int().autoincrement().primaryKey(),
+	userId: p.int('user_id').references(() => users.id),
+	metadata: p.json(),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -641,19 +617,19 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 To optimize queries fetching user data along with their profile information, 
 you should create an index on the `userId` column in the `profile_info` table.
 
-```typescript {13-15,21}
-import * as p from 'drizzle-orm/cockroach-core';
+```typescript {13-15}
+import * as p from 'drizzle-orm/mysql-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.cockroachTable('users', {
-	id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+	id: p.int().autoincrement().primaryKey(),
 	name: p.text(),
 });
 
-export const profileInfo = cockroachTable('profile_info', {
-	id: p.integer().primaryKey(),
-	userId: p.integer('user_id').references(() => users.id),
-	metadata: p.jsonb(),
+export const profileInfo = p.mysqlTable('profile_info', {
+	id: p.int().autoincrement().primaryKey(),
+	userId: p.int('user_id').references(() => users.id),
+	metadata: p.json(),
 }, (table) => [
   p.index('profile_info_user_id_idx').on(table.userId)
 ]);
@@ -668,7 +644,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 }));
 ```
 ```sql
-CREATE INDEX idx_profile_info_user_id ON profile_info (user_id);
+CREATE INDEX `profile_info_user_id_idx` ON `profile_info` (`user_id`);
 ```
 
 #### One-to-many Relationships
@@ -688,18 +664,18 @@ retrieve all posts associated with a given user or quickly find the author of a 
 
 **Example:**
 ```typescript
-import * as p from "drizzle-orm/cockroach-core";
+import * as p from "drizzle-orm/mysql-core";
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.cockroachTable('users', {
-	id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+	id: p.int().autoincrement().primaryKey(),
 	name: p.text(),
 });
 
-export const posts = p.cockroachTable('posts', {
-	id: p.integer().primaryKey(),
+export const posts = p.mysqlTable('posts', {
+	id: p.int().autoincrement().primaryKey(),
 	content: p.text(),
-	authorId: p.integer('author_id'),
+	authorId: p.int('author_id'),
 });
 
 export const relations = defineRelations({ users, posts }, (r) => ({
@@ -718,20 +694,20 @@ export const relations = defineRelations({ users, posts }, (r) => ({
 To optimize queries involving users and their posts, create an index on the `authorId` column in the `posts` table.
 
 ```typescript {13-15}
-import * as p from "drizzle-orm/cockroach-core";
+import * as p from "drizzle-orm/mysql-core";
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.cockroachTable('users', {
-	id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+	id: p.int().autoincrement().primaryKey(),
 	name: p.text(),
 });
 
-export const posts = p.cockroachTable('posts', {
-	id: p.integer().primaryKey(),
+export const posts = p.mysqlTable('posts', {
+	id: p.int().autoincrement().primaryKey(),
 	content: p.text(),
-	authorId: p.integer('author_id'),
+	authorId: p.int('author_id'),
 }, (t) => [
-  index('posts_author_id_idx').on(table.authorId)
+  p.index('posts_author_id_idx').on(t.authorId)
 ]);
 
 export const relations = defineRelations({ users, posts }, (r) => ({
@@ -747,7 +723,7 @@ export const relations = defineRelations({ users, posts }, (r) => ({
 }));
 ```
 ```sql
-CREATE INDEX idx_posts_author_id ON posts (author_id);
+CREATE INDEX `posts_author_id_idx` ON `posts` (`author_id`);
 ```
 
 #### Many-to-many Relationships
@@ -779,25 +755,25 @@ In the "users and groups" example, the `usersToGroups` junction table connects `
 
 ```typescript
 import { defineRelations } from 'drizzle-orm';
-import * as p from 'drizzle-orm/cockroach-core';
+import * as p from 'drizzle-orm/mysql-core';
 
-export const users = p.cockroachTable('users', {
-  id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text(),
 });
 
-export const groups = p.cockroachTable('groups', {
-  id: p.integer().primaryKey(),
+export const groups = p.mysqlTable('groups', {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text(),
 });
 
-export const usersToGroups = p.cockroachTable(
+export const usersToGroups = p.mysqlTable(
   'users_to_groups',
   {
-    userId: p.integer('user_id')
+    userId: p.int('user_id')
       .notNull()
       .references(() => users.id),
-    groupId: p.integer('group_id')
+    groupId: p.int('group_id')
       .notNull()
       .references(() => groups.id),
   },
@@ -823,33 +799,33 @@ To optimize queries for users and groups, create indexes on `usersToGroups` tabl
 
 ```typescript {26-28}
 import { defineRelations } from 'drizzle-orm';
-import * as p from 'drizzle-orm/cockroach-core';
+import * as p from 'drizzle-orm/mysql-core';
 
-export const users = p.cockroachTable('users', {
-  id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text(),
 });
 
-export const groups = p.cockroachTable('groups', {
-  id: p.integer().primaryKey(),
+export const groups = p.mysqlTable('groups', {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text(),
 });
 
-export const usersToGroups = p.cockroachTable(
+export const usersToGroups = p.mysqlTable(
   'users_to_groups',
   {
-    userId: p.integer('user_id')
+    userId: p.int('user_id')
       .notNull()
       .references(() => users.id),
-    groupId: p.integer('group_id')
+    groupId: p.int('group_id')
       .notNull()
       .references(() => groups.id),
   },
   (t) => [
     p.primaryKey({ columns: [t.userId, t.groupId] }),
-    p.index('users_to_groups_user_id_idx').on(table.userId),
-    p.index('users_to_groups_group_id_idx').on(table.groupId),
-    p.index('users_to_groups_composite_idx').on(table.userId, table.groupId),
+    p.index('users_to_groups_user_id_idx').on(t.userId),
+    p.index('users_to_groups_group_id_idx').on(t.groupId),
+    p.index('users_to_groups_composite_idx').on(t.userId, t.groupId),
   ],
 );
 
@@ -868,9 +844,9 @@ export const relations = defineRelations({ users, groups, usersToGroups },
 );
 ```
 ```sql
-CREATE INDEX idx_users_to_groups_user_id ON users_to_groups (user_id);
-CREATE INDEX idx_users_to_groups_group_id ON users_to_groups (group_id);
-CREATE INDEX idx_users_to_groups_composite ON users_to_groups (userId, groupId);
+CREATE INDEX `users_to_groups_user_id_idx` ON `users_to_groups` (`user_id`);
+CREATE INDEX `users_to_groups_group_id_idx` ON `users_to_groups` (`group_id`);
+CREATE INDEX `users_to_groups_composite_idx` ON `users_to_groups` (`user_id`,`group_id`);
 ```
 
 By applying these indexing strategies, you can significantly improve the performance of your Drizzle ORM applications when working with relational data, especially as your data volume grows and your queries become more complex. Remember to choose the indexes that best suit your specific query patterns and application needs.
@@ -895,15 +871,15 @@ The following two examples will work exactly the same in terms of querying the d
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
 ```ts {15}
-export const users = p.cockroachTable("users", {
-  id: p.integer().primaryKey(),
+export const users = p.mysqlTable("users", {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text(),
 });
 
-export const profileInfo = p.cockroachTable("profile_info", {
-  id: p.integer().primaryKey(),
-  userId: p.integer("user_id"),
-  metadata: p.jsonb(),
+export const profileInfo = p.mysqlTable("profile_info", {
+  id: p.int().autoincrement().primaryKey(),
+  userId: p.int("user_id"),
+  metadata: p.json(),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -918,15 +894,15 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 </CodeTab>
 <CodeTab>
 ```ts {15}
-export const users = p.cockroachTable("users", {
-  id: p.integer().primaryKey(),
+export const users = p.mysqlTable("users", {
+  id: p.int().autoincrement().primaryKey(),
   name: p.text(),
 });
 
-export const profileInfo = p.cockroachTable("profile_info", {
-  id: p.integer().primaryKey(),
-  userId: p.integer("user_id").references(() => users.id),
-  metadata: p.jsonb(),
+export const profileInfo = p.mysqlTable("profile_info", {
+  id: p.int().autoincrement().primaryKey(),
+  userId: p.int("user_id").references(() => users.id),
+  metadata: p.json(),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -949,19 +925,19 @@ example, if you define a `posts` table that has the `author` and `reviewer`
 relations.
 
 ```ts {19,22,29,34}
-import { cockroachTable, integer, text } from 'drizzle-orm/cockroach-core';
-import { relations } from 'drizzle-orm';
+import { mysqlTable, int, text } from 'drizzle-orm/mysql-core';
+import { defineRelations } from 'drizzle-orm';
  
-export const users = cockroachTable('users', {
-	id: integer('id').primaryKey(),
-	name: text('name'),
+export const users = mysqlTable('users', {
+	id: int().primaryKey(),
+	name: text(),
 });
 
-export const posts = cockroachTable('posts', {
-	id: integer('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id'),
-	reviewerId: integer('reviewer_id'),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey(),
+	content: text(),
+	authorId: int('author_id'),
+	reviewerId: int('reviewer_id'),
 });
  
 export const relations = defineRelations({ users, posts }, (r) => ({

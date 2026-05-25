@@ -28,7 +28,7 @@ The sole purpose of Drizzle relations is to let you query your relational data i
 <CodeTabs items={["Relational queries", "Select with joins"]}>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/…';
+import { drizzle } from 'drizzle-orm/...';
 import { defineRelations } from 'drizzle-orm';
 import * as p from 'drizzle-orm/pg-core';
 
@@ -54,7 +54,7 @@ const relations = defineRelations({ users, posts }, (r) => ({
 
 const db = drizzle(client, { relations });
 
-const result = db.query.posts.findMany({
+const result = await db.query.posts.findMany({
   with: {
     author: true,
   },
@@ -64,6 +64,7 @@ const result = db.query.posts.findMany({
 [{
   id: 10,
   content: "My first post!",
+  ownerId: 14,
   author: {
     id: 1,
     name: "Alex"
@@ -207,7 +208,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 }));
 
 const user = await db.query.users.findFirst({ with: { profileInfo: true } });
-//____^? type { id: number, profileInfo: { ... } | null  }
+//____^? type { id: number, name: string | null, profileInfo: { ... } | null  }
 ```
 
 ### One-to-many
@@ -606,7 +607,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 To optimize queries fetching user data along with their profile information, 
 you should create an index on the `userId` column in the `profile_info` table.
 
-```typescript {13-15,21}
+```typescript {13-15}
 import * as p from 'drizzle-orm/pg-core';
 import { defineRelations } from 'drizzle-orm';
 
@@ -615,7 +616,7 @@ export const users = p.pgTable('users', {
 	name: p.text(),
 });
 
-export const profileInfo = pgTable('profile_info', {
+export const profileInfo = p.pgTable('profile_info', {
 	id: p.integer().primaryKey(),
 	userId: p.integer('user_id').references(() => users.id),
 	metadata: p.jsonb(),
@@ -633,7 +634,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 }));
 ```
 ```sql
-CREATE INDEX idx_profile_info_user_id ON profile_info (user_id);
+CREATE INDEX "profile_info_user_id_idx" ON "profile_info" ("user_id");
 ```
 
 #### One-to-many Relationships
@@ -696,7 +697,7 @@ export const posts = p.pgTable('posts', {
 	content: p.text(),
 	authorId: p.integer('author_id'),
 }, (t) => [
-  index('posts_author_id_idx').on(table.authorId)
+  p.index('posts_author_id_idx').on(t.authorId)
 ]);
 
 export const relations = defineRelations({ users, posts }, (r) => ({
@@ -712,7 +713,7 @@ export const relations = defineRelations({ users, posts }, (r) => ({
 }));
 ```
 ```sql
-CREATE INDEX idx_posts_author_id ON posts (author_id);
+CREATE INDEX "posts_author_id_idx" ON "posts" ("author_id");
 ```
 
 #### Many-to-many Relationships
@@ -812,9 +813,9 @@ export const usersToGroups = p.pgTable(
   },
   (t) => [
     p.primaryKey({ columns: [t.userId, t.groupId] }),
-    p.index('users_to_groups_user_id_idx').on(table.userId),
-    p.index('users_to_groups_group_id_idx').on(table.groupId),
-    p.index('users_to_groups_composite_idx').on(table.userId, table.groupId),
+    p.index('users_to_groups_user_id_idx').on(t.userId),
+    p.index('users_to_groups_group_id_idx').on(t.groupId),
+    p.index('users_to_groups_composite_idx').on(t.userId, t.groupId),
   ],
 );
 
@@ -833,9 +834,9 @@ export const relations = defineRelations({ users, groups, usersToGroups },
 );
 ```
 ```sql
-CREATE INDEX idx_users_to_groups_user_id ON users_to_groups (user_id);
-CREATE INDEX idx_users_to_groups_group_id ON users_to_groups (group_id);
-CREATE INDEX idx_users_to_groups_composite ON users_to_groups (userId, groupId);
+CREATE INDEX "users_to_groups_user_id_idx" ON "users_to_groups" ("user_id");
+CREATE INDEX "users_to_groups_group_id_idx" ON "users_to_groups" ("group_id");
+CREATE INDEX "users_to_groups_composite_idx" ON "users_to_groups" ("user_id","group_id");
 ```
 
 By applying these indexing strategies, you can significantly improve the performance of your Drizzle ORM applications when working with relational data, especially as your data volume grows and your queries become more complex. Remember to choose the indexes that best suit your specific query patterns and application needs.
@@ -952,5 +953,3 @@ export const relations = defineRelations({ users, posts }, (r) => ({
   },
 }));
 ```
-
-### Troubleshooting
