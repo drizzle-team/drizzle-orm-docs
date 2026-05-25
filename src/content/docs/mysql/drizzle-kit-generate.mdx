@@ -178,12 +178,14 @@ drizzle-kit generate --ignore-conflicts
 | :--------     | :--------------------------------------------------- |
 | `custom`      | generate empty SQL for custom migration              |
 | `name`        | generate migration with custom name                  |
+| `ignore-conflicts` | skip commutativity conflict checks, default is `false` |
 
 <rem025/>
 
 <Npx>
 drizzle-kit generate --name=init
 drizzle-kit generate --name=seed_users --custom
+drizzle-kit generate --ignore-conflicts
 </Npx>
 
 <br/>

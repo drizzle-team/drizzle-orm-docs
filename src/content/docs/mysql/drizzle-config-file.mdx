@@ -123,7 +123,7 @@ Migration folder contains folders with `.sql` migration files which is used by `
  ├ 📜 drizzle.config.ts
  └ 📜 package.json
 ```
-```ts {5}
+```ts {6}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
@@ -190,20 +190,6 @@ export default defineConfig({
 });
 ```
 
-```ts
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "mysql",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-});
-```
-
 ## ---
 
 ### `dbCredentials`
@@ -214,26 +200,23 @@ Database connection credentials in a form of `url`,
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | union of drivers connection options |
+| type          | <Dialects/> |
 | default       | --                    |
 | commands      | `push`, `pull`, `migrate`, `studio` |
 
 <rem025/>
 
 <CodeTabs items={["Connection string", "Connection params"]}>
-<Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
   dialect: "mysql",
   dbCredentials: {
-    url: "mysql://user:password@host:3306/db",
+    url: "mysql://user:password@host:port/db",
   }
 });
 ```
-</Section>
-<Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -249,16 +232,15 @@ export default defineConfig({
   }
 });
 ```
-</Section>
 </CodeTabs>
 
 ### `migrations`
 <rem025/>
 
 When running `drizzle-kit migrate` - drizzle will records about 
-successfully applied migrations in your database in log table named `__drizzle_migrations`.
+successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema.
 
-`migrations` config options lets you change the migrations log `table` name.
+`migrations` config options lets you change both migrations log `table` name and `schema`.
 
 |               |                      |
 | :------------ | :-----------------   |
