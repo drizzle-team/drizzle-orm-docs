@@ -144,7 +144,7 @@ await db.query.users.findMany({
         }),
       },
       users: {
-        posts: r.many.users(),
+        posts: r.many.posts(),
       },
     }));
 	```
@@ -168,7 +168,7 @@ await db.query.users.findMany(...);
 ```
 </CodeTab>
 ```typescript copy
-import { type AnyPgColumn, boolean, integer, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import { type AnyPgColumn, integer, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
 	id: integer().primaryKey(),
@@ -508,7 +508,7 @@ where: {
 <CodeTabs items={["simple eq", "using AND", "using OR", "using NOT", "complex example using RAW"]}>
 <CodeTab>
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     age: 15,
   },
@@ -522,7 +522,7 @@ where ("users"."age" = 15)
 </CodeTab>
 <CodeTab>
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     age: 15,
     name: 'John'
@@ -562,7 +562,7 @@ where (("users"."id" > 10) or ("users"."name" like 'John%'))
 </CodeTab>
 <CodeTab>
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     NOT: {
       id: {
@@ -600,7 +600,7 @@ export const users = pgTable("users", {
 });
 ```
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     AND: [
       {
@@ -676,7 +676,7 @@ const usersWithPosts = await db.query.usersTable.findMany({
 
 **Example:** Get all `users` with posts, only if user has at least 1 post
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   with: {
     posts: true,
   },

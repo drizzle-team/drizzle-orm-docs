@@ -6,17 +6,6 @@ import Section from '@mdx/Section.astro';
 
 # Drizzle Queries
 
-<Callout type='error'>
-This page explains concepts available on drizzle versions `1.0.0-beta.1` and higher.
-</Callout>
-
-<Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
-</Npm>
-
-<br/>
-
 Drizzle ORM is designed to be a thin typed layer on top of SQL. 
 We truly believe we've designed the best way to operate an SQL database from TypeScript and it's time to make it better.  
   
@@ -27,18 +16,81 @@ It is an extension to the existing schema definition and query builder.
 You can opt-in to use it based on your needs. 
 We've made sure you have both the best-in-class developer experience and performance.  
 
-<CodeTabs items={["index.ts", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy /schema/3
-	import { relations } from './schema';
-	import { drizzle } from 'drizzle-orm/...';
+<Callout type="info" title='Important'>
+Inside relational queries, references to a table's columns must go through the callback parameter, not through the imported table object. 
+This applies to every clause that accepts a callback — `orderBy`, `where`.`RAW`, `extras` and `subqueries inside extras`. 
+The callback exposes the aliased table for the current query scope, which is required for correct SQL generation in nested or self-referential queries.
 
-	const db = drizzle({ relations });
+<Callout type="error" title='❌' collapsed="Example">
+```ts
+await db.query.posts.findMany({
+  orderBy: sql`${posts.id} asc`, // <- ❌ direct table usage
+  with: {
+    comments: {
+      orderBy: sql`${comments.id} desc`, // <- ❌ direct table usage
+    },
+  },
+});
+```
+```ts
+await db.query.users.findMany({
+  where: {
+    RAW: sql`${users.name} LIKE 'john%'`, // <- ❌ direct table usage
+  },
+});
+```
+```ts
+await db.query.users.findMany({
+  extras: {
+    loweredName: sql<string>`lower(${users.name})`, // <- ❌ direct table usage
+    totalPostsCount: db.$count(posts, eq(posts.authorId, users.id)),  // <- ❌ direct table usage
+  },
+});
+```
+</Callout>
+<Callout type="default" title='✅' collapsed="Example">
+```ts
+await db.query.posts.findMany({
+  orderBy: (t) => sql`${t.id} asc`, // <- ✅ callback used
+  with: {
+    comments: {
+      orderBy: (t, { desc }) => desc(t.id), // <- ✅ callback used
+    },
+  },
+});
+```
+```ts
+await db.query.users.findMany({
+  where: {
+    RAW: (t) => sql`${t.name} LIKE 'john%'`, // <- ✅ callback used
+  },
+});
+```
+```ts
+await db.query.users.findMany({
+  extras: {
+    loweredName: (t, { sql }) => sql<string>`lower(${t.name})`, // <- ✅ callback used
+    totalPostsCount: (t) => db.$count(posts, eq(posts.authorId, t.id)), // <- ✅ callback used
+  },
+});
+```
+</Callout>
+</Callout>
+
+<br/>
+
+<CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
+	<CodeTab>
+	```typescript copy
+	import { drizzle } from "drizzle-orm/mysql2";
+	import { relations } from "./relations";
+
+	const db = drizzle(process.env.DATABASE_URL, { relations });
 
 	const result = await db.query.users.findMany({
-		with: {
-			posts: true			
-		},
+	  with: {
+	    posts: true,
+	  },
 	});
 	```
 
@@ -62,22 +114,26 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 	</CodeTab>
 
-	```typescript {15-25} copy
-    import { defineRelations } from "drizzle-orm";
-    import * as t from "drizzle-orm/mysql-core";
+	```typescript copy
+    import * as p from "drizzle-orm/mysql-core";
     
-    export const posts = t.mysqlTable("posts", {
-      id: t.int().primaryKey().autoincrement(),
-      content: t.text().notNull(),
-      authorId: t.int("author_id").notNull(),
+    export const posts = p.mysqlTable("posts", {
+      id: p.int().primaryKey().autoincrement(),
+      content: p.text().notNull(),
+      authorId: p.int("author_id").notNull(),
     });
     
-    export const users = t.mysqlTable("users", {
-      id: t.int().primaryKey().autoincrement(),
-      name: t.text().notNull(),
+    export const users = p.mysqlTable("users", {
+      id: p.int().primaryKey().autoincrement(),
+      name: p.text().notNull(),
     });
-    
-    export const relations = defineRelations({ users, posts }, (r) => ({
+	```
+
+	```typescript copy
+	import { defineRelations } from "drizzle-orm";
+	import { posts, users } from "./schema";
+
+	export const relations = defineRelations({ users, posts }, (r) => ({
       posts: {
         author: r.one.users({
           from: r.posts.authorId,
@@ -85,7 +141,7 @@ We've made sure you have both the best-in-class developer experience and perform
         }),
       },
       users: {
-        posts: r.many.users(),
+        posts: r.many.posts(),
       },
     }));
 	```
@@ -94,22 +150,20 @@ We've made sure you have both the best-in-class developer experience and perform
 Relational queries are an extension to Drizzle's original **[query builder](/docs/mysql/select)**.
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
 initialization and then just use the `db.query` API.
-<Callout type="info" emoji="ℹ️">
-	`drizzle` import path depends on the **[database driver](/docs/mysql/connect-overview)** you're using.
-</Callout>
+
 <CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
 <CodeTab>
 ```ts
 import { relations } from './relations';
-import { drizzle } from 'drizzle-orm/...';
+import { drizzle } from 'drizzle-orm/mysql2';
 
-const db = drizzle({ relations });
+const db = drizzle(process.env.DATABASE_URL, { relations });
 
 await db.query.users.findMany(...);
 ```
 </CodeTab>
 ```typescript copy
-import { type AnyMySqlColumn, boolean, int, mysqlTable, primaryKey, text, timestamp } from 'drizzle-orm/mysql-core';
+import { type AnyMySqlColumn, int, mysqlTable, primaryKey, text, timestamp } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
 	id: int().primaryKey().autoincrement(),
@@ -128,7 +182,7 @@ export const usersToGroups = mysqlTable('users_to_groups', {
 	userId: int('user_id').notNull().references(() => users.id),
 	groupId: int('group_id').notNull().references(() => groups.id),
 }, (t) => [
-	primaryKey(t.userId, t.groupId)
+	primaryKey({ columns: [t.userId, t.groupId] })
 ]);
 
 export const posts = mysqlTable('posts', {
@@ -387,8 +441,13 @@ const users = await db.query.users.findMany({
 	}
 });
 ```
-```sql
-select * from users where id = 1
+```sql {6}
+select 
+	`d0`.`id` as `id`, 
+	`d0`.`name` as `name` 
+from `users` as `d0` 
+where 
+	`d0`.`id` = 1
 ```
 </Section>
 
@@ -435,7 +494,7 @@ where: {
       like: "",
       notLike: "",
       isNull: true,
-      isNotNull: true,
+      isNotNull: true
     },
 },
 ```
@@ -444,31 +503,44 @@ where: {
 <CodeTabs items={["simple eq", "using AND", "using OR", "using NOT", "complex example using RAW"]}>
 <CodeTab>
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     age: 15,
   },
 });
 ```
-```sql {3}
-select `users`.`id` as `id`, `users`.`name` as `name`
-from `users` 
-where (`users`.`age` = 15)
+```sql {8}
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	`d0`.`age` = 15;
 ```
 </CodeTab>
 <CodeTab>
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     age: 15,
     name: 'John'
   },
 });
 ```
-```sql {3}
-select `users`.`id` as `id`, `users`.`name` as `name`
-from `users` 
-where (`users`.`age` = 15 and `users`.`name` = 'John')
+```sql {9-10}
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(`d0`.`age` = 15)
+		AND (`d0`.`name` = 'John')
+	);
 ```
 </CodeTab>
 <CodeTab>
@@ -481,24 +553,32 @@ const response = await db.query.users.findMany({
           gt: 10,
         },
       },
-	  {
-		name: {
+      {
+        name: {
           like: "John%",
         },
-	  }
+      },
     ],
   },
 });
 ```
-```sql {3}
-select `users`.`id` as `id`, `users`.`name` as `name` 
-from `users` 
-where (`users`.`id` > 10 or `users`.`name` like 'John%')
+```sql {9-10}
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(`d0`.`id` > 10)
+		OR (`d0`.`name` LIKE 'John%')
+	);
 ```
 </CodeTab>
 <CodeTab>
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   where: {
     NOT: {
       id: {
@@ -511,10 +591,18 @@ const response = db.query.users.findMany({
   },
 });
 ```
-```sql {3}
-select `users`.`id` as `id`, `users`.`name` as `name` 
-from `users` 
-where (not `users`.`id` > 10 and `users`.`name` like 'John%')
+```sql {9-10}
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(not(`d0`.`id` > 10))
+		AND (`d0`.`name` LIKE 'John%')
+	);
 ```
 </CodeTab>
 <CodeTab>
@@ -523,49 +611,56 @@ where (not `users`.`id` > 10 and `users`.`name` like 'John%')
 import { int, json, mysqlTable, text, timestamp } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
-  id: int("id").primaryKey().autoincrement(),
-  name: text("name"),
-  email: text("email").notNull(),
-  age: int("age"),
+  id: int().primaryKey(),
+  name: text(),
+  email: text().notNull(),
+  age: int(),
   createdAt: timestamp("created_at").defaultNow(),
   lastLogin: timestamp("last_login"),
   subscriptionEnd: timestamp("subscription_end"),
   lastActivity: timestamp("last_activity"),
-  preferences: json("preferences"),        // JSON column for user settings/preferences
-  interests: text("interests"),            // Comma-separated user interests
+  preferences: json(), // JSON column for user settings/preferences
+  interests: json().$type<string[]>(), // Array column for user interests
 });
 ```
 ```ts
-const response = db.query.users.findMany({
-  where: {
-    AND: [
-      {
-        OR: [
-          { RAW: (table) => sql`LOWER(${table.name}) LIKE 'john%'` },
-          { name: { like: "jane%" } },
-        ],
-      },
-      {
-        OR: [
-          { RAW: (table) => sql`JSON_EXTRACT(${table.preferences}, '$.theme') = '"dark"'` },
-          { RAW: (table) => sql`JSON_EXTRACT(${table.preferences}, '$.theme') IS NULL` },
-        ],
-      },
-      { RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` },
-    ],
-  },
-});
+const response = await db.query.users.findMany({
+    where: {
+      AND: [
+        {
+          OR: [{ RAW: (table) => sql`${table.name} LIKE 'john%'` }, { name: { like: "jane%" } }],
+        },
+        { 
+			RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` 
+		},
+      ],
+    },
+  }),
 ```
 ```sql
-select `d0`.`id` as `id`, `d0`.`name` as `name`, 
-`d0`.`email` as `email`, `d0`.`age` as `age`, 
-`d0`.`created_at` as `createdAt`, `d0`.`last_login` as `lastLogin`, 
-`d0`.`subscription_end` as `subscriptionEnd`, `d0`.`last_activity` as `lastActivity`, 
-`d0`.`preferences` as `preferences`, `d0`.`interests` as `interests` 
-from `users` as `d0` 
-where ((LOWER(`d0`.`name`) LIKE 'john%' or `d0`.`name` like 'jane%') 
-and (JSON_EXTRACT(`d0`.`preferences`, '$.theme') = '"dark"' or JSON_EXTRACT(`d0`.`preferences`, '$.theme') IS NULL) 
-and `d0`.`age` BETWEEN 25 AND 35)
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`email` AS `email`,
+	`d0`.`age` AS `age`,
+	`d0`.`created_at` AS `createdAt`,
+	`d0`.`last_login` AS `lastLogin`,
+	`d0`.`subscription_end` AS `subscriptionEnd`,
+	`d0`.`last_activity` AS `lastActivity`,
+	`d0`.`preferences` AS `preferences`,
+	`d0`.`interests` AS `interests`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(
+			(
+				(`d0`.`name` LIKE 'john%')
+				OR (`d0`.`name` LIKE 'jane%')
+			)
+		)
+		AND (`d0`.`age` BETWEEN 25 AND 35)
+	);
 ```
 </CodeTab>
 </CodeTabs>
@@ -592,7 +687,7 @@ const usersWithPosts = await db.query.usersTable.findMany({
 
 **Example:** Get all `users` with posts, only if user has at least 1 post
 ```ts
-const response = db.query.users.findMany({
+const response = await db.query.users.findMany({
   with: {
     posts: true,
   },
@@ -639,7 +734,7 @@ await db.query.posts.findMany({
 });
 ```
 
-Find posts with comments from the 5th to the 10th post:
+Find posts with comments from the 6th to the 10th post:
 ```typescript copy
 await db.query.posts.findMany({
 	with: {
@@ -707,10 +802,10 @@ It's useful when you need to retrieve data and apply additional functions to it.
 import { sql } from 'drizzle-orm';
 
 await db.query.users.findMany({
-	extras: {
-		loweredName: sql`lower(${users.name})`,
-	},
-})
+  extras: {
+    loweredName: (table) => sql`lower(${table.name})`,
+  },
+});
 ```
 ```typescript copy {3}
 await db.query.users.findMany({
@@ -737,31 +832,24 @@ const res = await db.query.users.findMany({
 		fullName: (users, { sql }) => sql<string>`concat(${users.name}, " ", ${users.name})`,
 	},
 	with: {
-		usersToGroups: {
-			with: {
-				group: true,
-			},
-		},
+		groups: true,
 	},
 });
 ```
 ```ts
 // result type
 const res: {
-	id: number;
-	name: string;
-	verified: boolean;
-	invitedBy: number | null;
-	fullName: string;
-	usersToGroups: {
-			group: {
-					id: number;
-					name: string;
-					description: string | null;
-			};
-	}[];
-}[];
-
+    id: number;
+    name: string;
+    age: number | null;
+    invitedBy: number | null;
+    fullName: string;
+    groups: {
+        id: number;
+        name: string;
+        description: string | null;
+    }[];
+}[]
 ```
 </Section>
 
@@ -770,12 +858,12 @@ To retrieve all posts with comments and add an additional field to calculate the
 ```typescript copy
 const res = await db.query.posts.findMany({
 	extras: {
-		contentLength: (table, { sql }) => sql<number>`length(${table.content})`,
+		contentLength: (table, { sql }) => sql<number>`char_length(${table.content})`,
 	},
 	with: {
 		comments: {
 			extras: {
-				commentSize: (table, { sql }) => sql<number>`length(${table.content})`,
+				commentSize: (table, { sql }) => sql<number>`char_length(${table.content})`,
 			},
 		},
 	},
@@ -784,20 +872,20 @@ const res = await db.query.posts.findMany({
 ```ts
 // result type
 const res: {
-	id: number;
-	createdAt: Date;
-	content: string;
-	authorId: number | null;
-	contentLength: number;
-	comments: {
-			id: number;
-			createdAt: Date;
-			content: string;
-			creator: number | null;
-			postId: number | null;
-			commentSize: number;
-	}[];
-};
+    id: number;
+    createdAt: Date;
+    content: string;
+    authorId: number | null;
+    contentLength: number;
+    comments: {
+        id: number;
+        createdAt: Date;
+        content: string;
+        creator: number | null;
+        postId: number | null;
+        commentSize: number;
+    }[];
+}[]
 ```
 </Section>
 
@@ -820,11 +908,38 @@ await db.query.users.findMany({
 });
 ```
 ```sql
-select `d0`.`id` as `id`, `d0`.`name` as `name`,
-((select coalesce(json_arrayagg(json_object('id', `d1`.`id`, 'content', `d1`.`content`, 'authorId', `d1`.`author_id`)), json_array())
-  from `posts` as `d1` where `d0`.`id` = `d1`.`author_id`)) as `posts`,
-((select count(*) from `posts` where `posts`.`author_id` = `d0`.`id`)) as `totalPostsCount`
-from `users` as `d0`
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`,
+	(
+		(
+			SELECT
+				count(*)
+			FROM
+				`posts`
+			WHERE
+				`posts`.`author_id` = `d0`.`id`
+		)
+	) AS `totalPostsCount`,
+	`posts`.`r` AS `posts`
+FROM
+	`users` AS `d0`
+	LEFT JOIN LATERAL (
+		SELECT
+			coalesce(json_arrayagg(json_object('id', `id`, 'name', `name`, 'authorId', `authorId`)), json_array()) AS `r`
+		FROM
+			(
+				SELECT
+					`d1`.`id` AS `id`,
+					`d1`.`name` AS `name`,
+					`d1`.`author_id` AS `authorId`
+				FROM
+					`posts` AS `d1`
+				WHERE
+					`d0`.`id` = `d1`.`author_id`
+			) AS `t`
+	) AS `posts` ON TRUE;
 ```
 
 ### Prepared statements
