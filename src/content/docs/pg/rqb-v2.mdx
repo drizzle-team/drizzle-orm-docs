@@ -446,8 +446,14 @@ const users = await db.query.users.findMany({
 	}
 });
 ```
-```sql
-select * from users where id = 1
+```sql {7}
+select
+  "d0"."id" as "id",
+  "d0"."name" as "name"
+from
+  "users" as "d0"
+where
+  "d0"."id" = 1
 ```
 </Section>
 
@@ -514,10 +520,15 @@ const response = await db.query.users.findMany({
   },
 });
 ```
-```sql {3}
-select "users"."id" as "id", "users"."name" as "name"
-from "users" 
-where ("users"."age" = 15)
+```sql {8}
+select
+  "d0"."id" as "id",
+  "d0"."name" as "name",
+  "d0"."age" as "age"
+from
+  "users" as "d0"
+where
+  "d0"."age" = 15
 ```
 </CodeTab>
 <CodeTab>
@@ -529,10 +540,18 @@ const response = await db.query.users.findMany({
   },
 });
 ```
-```sql {3}
-select "users"."id" as "id", "users"."name" as "name"
-from "users" 
-where ("users"."age" = 15 and "users"."name" = 'John')
+```sql {9-10}
+select
+  "d0"."id" as "id",
+  "d0"."name" as "name",
+  "d0"."age" as "age"
+from
+  "users" as "d0"
+where
+  (
+    ("d0"."age" = 15)
+    and ("d0"."name" = 'John')
+  )
 ```
 </CodeTab>
 <CodeTab>
@@ -554,10 +573,18 @@ const response = await db.query.users.findMany({
   },
 });
 ```
-```sql {3}
-select "users"."id" as "id", "users"."name" as "name" 
-from "users" 
-where (("users"."id" > 10) or ("users"."name" like 'John%'))
+```sql {9-10}
+select
+  "d0"."id" as "id",
+  "d0"."name" as "name",
+  "d0"."age" as "age"
+from
+  "users" as "d0"
+where
+  (
+    ("d0"."id" > 10)
+    or ("d0"."name" like 'John%')
+  )
 ```
 </CodeTab>
 <CodeTab>
@@ -575,16 +602,25 @@ const response = await db.query.users.findMany({
   },
 });
 ```
-```sql {3}
-select "users"."id" as "id", "users"."name" as "name" 
-from "users" 
-where (not "users"."id" > 10 and "users"."name" like 'John%')
+```sql {9-10}
+select
+  "d0"."id" as "id",
+  "d0"."name" as "name",
+  "d0"."age" as "age"
+from
+  "users" as "d0"
+where
+  (
+    (not ("d0"."id" > 10))
+    and ("d0"."name" like 'John%')
+  )
 ```
 </CodeTab>
 <CodeTab>
 ```ts
 // schema.ts
 import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: integer("id").primaryKey(),
