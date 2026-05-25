@@ -26,7 +26,7 @@ Use `.limit()` to add `limit` clause to the query - for example:
 await db.update(usersTable).set({ verified: true }).limit(2);
 ```
 ```sql
-update `users` set `verified` = ? limit ?;
+update `users` set `verified` = true limit 2
 ```
 </Section>
 
@@ -44,11 +44,11 @@ await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name, use
 await db.update(usersTable).set({ verified: true }).orderBy(asc(usersTable.name), desc(usersTable.name2));
 ```
 ```sql
-update `users` set `verified` = ? order by `name`;
-update `users` set `verified` = ? order by `name` desc;
+update `users` set `verified` = true order by `users`.`name`;
+update `users` set `verified` = true order by `users`.`name` desc;
 
-update `users` set `verified` = ? order by `name`, `name2`;
-update `users` set `verified` = ? order by `name` asc, `name2` desc;
+update `users` set `verified` = true order by `users`.`name`, `users`.`name2`;
+update `users` set `verified` = true order by `users`.`name` asc, `users`.`name2` desc;
 ```
 </Section>
 

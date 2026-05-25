@@ -36,9 +36,10 @@ select ... from "users" left join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     pets: {
         id: number;
@@ -61,9 +62,10 @@ select ... from "users" left join lateral (select ... from "pets" where "users".
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     userPets: {
         id: number;
@@ -85,9 +87,10 @@ select ... from "users" right join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     } | null;
     pets: {
         id: number;
@@ -109,9 +112,10 @@ select ... from "users" inner join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     pets: {
         id: number;
@@ -134,9 +138,10 @@ select ... from "users" inner join lateral (select ... from "pets" where "users"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     userPets: {
         id: number;
@@ -158,9 +163,10 @@ select ... from "users" full join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     } | null;
     pets: {
         id: number;
@@ -182,9 +188,10 @@ select ... from "users" cross join "pets"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     pets: {
         id: number;
@@ -207,9 +214,10 @@ select ... from "users" cross join lateral (select ... from "pets" where "users"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     userPets: {
         id: number;
@@ -228,7 +236,7 @@ supports joins with partial select and will automatically infer return type base
 await db.select({
   userId: users.id,
   petId: pets.id,
-}).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
+}).from(users).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
 select "users"."id", "pets"."id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
@@ -309,9 +317,10 @@ Lets say you need to fetch users with their parents:
 <CodeTab>
 ```typescript copy
 import { user } from "./schema";
+import { alias } from "drizzle-orm/pg-core";
 
 const parent = alias(user, "parent");
-const result = db
+const result = await db
   .select()
   .from(user)
   .leftJoin(parent, eq(parent.id, user.parentId));
@@ -338,8 +347,8 @@ const result: {
 
 ```typescript
 export const user = pgTable("user", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
   parentId: integer("parent_id").notNull().references((): AnyPgColumn => user.id)
 });
 ```
@@ -415,8 +424,8 @@ const users = pgTable("users", {
 });
 
 const chatGroups = pgTable("chat_groups", {
-  id: integer("id").primaryKey(),
-  name: text("name"),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 const usersToChatGroups = pgTable("users_to_chat_groups", {

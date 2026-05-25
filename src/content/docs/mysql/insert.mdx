@@ -36,9 +36,9 @@ MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. T
 import { boolean, int, text, mysqlTable } from 'drizzle-orm/mysql-core';
 
 const usersTable = mysqlTable('users', {
-  id: int('id').primaryKey(),
-  name: text('name').notNull(),
-  verified: boolean('verified').notNull().default(false),
+  id: int().autoincrement().primaryKey(),
+  name: text().notNull(),
+  verified: boolean().notNull().default(false),
 });
 
 
@@ -53,8 +53,8 @@ import { varchar, text, mysqlTable } from 'drizzle-orm/mysql-core';
 import { createId } from '@paralleldrive/cuid2';
 
 const usersTableDefFn = mysqlTable('users_default_fn', {
-  customId: varchar('id', { length: 256 }).primaryKey().$defaultFn(createId),
-  name: text('name').notNull(),
+  customId: varchar({ length: 256 }).primaryKey().$defaultFn(createId),
+  name: text().notNull(),
 });
 
 
@@ -117,13 +117,13 @@ There are several ways to use select inside insert statements, allowing you to c
 const insertedEmployees = await db
   .insert(employees)
   .select(
-    db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    db.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
   );
 ```
 ```ts
 const qb = new QueryBuilder();
 await db.insert(employees).select(
-    qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    qb.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 </Section>
@@ -132,12 +132,12 @@ await db.insert(employees).select(
 <Section>
 ```ts
 await db.insert(employees).select(
-    () => db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    () => db.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 ```ts
 await db.insert(employees).select(
-    (qb) => qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    (qb) => qb.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 </Section>
@@ -146,12 +146,12 @@ await db.insert(employees).select(
 <Section>
 ```ts
 await db.insert(employees).select(
-    sql`select users.name as name from users where users.role = 'employee'`
+    sql`select users.id as id, users.name as name from users where users.role = 'employee'`
 );
 ```
 ```ts
 await db.insert(employees).select(
-    () => sql`select users.name as name from users where users.role = 'employee'`
+    () => sql`select users.id as id, users.name as name from users where users.role = 'employee'`
 );
 ```
 </Section>

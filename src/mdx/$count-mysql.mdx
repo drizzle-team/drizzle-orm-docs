@@ -10,12 +10,12 @@ const count = await db.$count(users);
 const count = await db.$count(users, eq(users.name, "Dan")); // works with filters
 ```
 ```sql
-select count(*) from "users";
-select count(*) from "users" where "users"."name" = 'Dan';
+select count(*) from `users`;
+select count(*) from `users` where `users`.`name` = 'Dan';
 ```
 </Section>
 
-It is exceptionally useful in [subqueries](/docs/select#select-from-subquery):
+It is exceptionally useful in [subqueries](/docs/mysql/select#select-from-subquery):
 
 ```ts
 const users = await db.select({
@@ -24,7 +24,7 @@ const users = await db.select({
 }).from(users);
 ```
 
-usage example with [relational queries](/docs/rqb-v2)
+usage example with [relational queries](/docs/mysql/rqb-v2)
 ```ts 
 const users = await db.query.users.findMany({
   extras: {

@@ -1,7 +1,7 @@
 import CodeTabs from '@mdx/CodeTabs.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
-import $count from '@mdx/$count.mdx';
+import $count from '@mdx/$count-pg.mdx';
 
 # SQL Select
 Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
@@ -99,7 +99,7 @@ async function selectUsers(withName: boolean) {
     .from(users);
 }
 
-const users = await selectUsers(true);
+const result = await selectUsers(true);
 ```
 
 ### Distinct select
@@ -538,7 +538,7 @@ select "age", cast(count("id") as int)
 </Section>
 
 <Callout type="info">
-`cast(... as int)` is necessary because `count()` returns `bigint` in PostgreSQL.
+`cast(... as int)` is necessary because `count()` returns `bigint`/`string` in PostgreSQL.
 Alternatively, you can use [`.mapWith(Number)`](/docs/sql#sqlmapwith) to cast the value to a number at runtime.
 
 If you need count aggregation - we recommend using our [$count](/docs/select#count) API
@@ -767,8 +767,5 @@ await db
 ```
 
 ### $count
-<$count />
 
-## ---
-
-## ---
+<$count/>
