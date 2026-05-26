@@ -54,16 +54,16 @@ Get all names from customers and users tables without duplicates.
     import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 
     export const users = pgTable('sellers', {
-        id: integer('id').primaryKey(),
-        name: varchar('name', { length: 256 }).notNull(),
-        address: text('address'),
+        id: integer().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        address: text(),
     });
     
     export const customers = pgTable('customers', {
-        id: integer('id').primaryKey(),
-        name: varchar('name', { length: 256 }).notNull(),
-        city: text('city'),
-        email: varchar('email', { length: 256 }).notNull()
+        id: integer().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        city: text(),
+        email: varchar({ length: 256 }).notNull()
     });
     ```
     </CodeTab>

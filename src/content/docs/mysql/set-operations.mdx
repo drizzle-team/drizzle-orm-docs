@@ -29,7 +29,7 @@ Get all names from customers and users tables without duplicates.
     (select `name` from `sellers`)
     union
     (select `name` from `customers`)
-    limit ?
+    limit 10
     ```
 	</CodeTab>
     <CodeTab>
@@ -46,24 +46,24 @@ Get all names from customers and users tables without duplicates.
     (select `name` from `sellers`)
     union
     (select `name` from `customers`)
-    limit ?
+    limit 10
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { int, mysqlTable, text, varchar } from "drizzle-orm/mysql-core";
 
-    const users = mysqlTable('sellers', {
-        id: int('id').primaryKey(),
-        name: varchar('name', { length: 256 }).notNull(),
-        address: text('address'),
+    export const users = mysqlTable('sellers', {
+        id: int().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        address: text(),
     });
     
-    const customers = mysqlTable('customers', {
-        id: int('id').primaryKey(),
-        name: varchar('name', { length: 256 }).notNull(),
-        city: text('city'),
-        email: varchar('email', { length: 256 }).notNull()
+    export const customers = mysqlTable('customers', {
+        id: int().primaryKey(),
+        name: varchar(, { length: 256 }).notNull(),
+        city: text(),
+        email: varchar({ length: 256 }).notNull()
     });
     ```
     </CodeTab>
@@ -89,9 +89,9 @@ you want to keep all the records and not eliminate duplicates.
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
     ```sql
-    select `transaction_id` from `online_sales`
+    (select `transaction_id` from `online_sales`)
     union all
-    select `transaction_id` from `in_store_sales`
+    (select `transaction_id` from `in_store_sales`)
     ```
     </CodeTab>
     <CodeTab>
@@ -107,22 +107,22 @@ you want to keep all the records and not eliminate duplicates.
     ```
     ```sql
     (select `transaction_id` from `online_sales`)
-    union all 
+    union all
     (select `transaction_id` from `in_store_sales`)
     ```
 	</CodeTab>
     <CodeTab>
 	```typescript copy
-    import { int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+    import { int, mysqlTable, timestamp } from "drizzle-orm/mysql-core";
 
-    const onlineSales = mysqlTable('online_sales', {
+    export const onlineSales = mysqlTable('online_sales', {
         transactionId: int('transaction_id').primaryKey(),
         productId: int('product_id').unique(),
         quantitySold: int('quantity_sold'),
         saleDate: timestamp('sale_date', { mode: 'date' }),
     });
     
-    const inStoreSales = mysqlTable('in_store_sales', {
+    export const inStoreSales = mysqlTable('in_store_sales', {
         transactionId: int('transaction_id').primaryKey(),
         productId: int('product_id').unique(),
         quantitySold: int('quantity_sold'),
@@ -155,9 +155,9 @@ to count the same course multiple times even if multiple students from the same 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select `projects_name` from `department_a_projects`
+    (select `course_name` from `department_a_courses`)
     intersect
-    select `projects_name` from `department_b_projects`
+    (select `course_name` from `department_b_courses`)
     ```
 	</CodeTab>
     <CodeTab>
@@ -170,21 +170,21 @@ to count the same course multiple times even if multiple students from the same 
       .intersect(db.select({ courseName: depB.courseName }).from(depB));
     ```
     ```sql
-    select `projects_name` from `department_a_projects`
+    (select `course_name` from `department_a_courses`)
     intersect
-    select `projects_name` from `department_b_projects`
+    (select `course_name` from `department_b_courses`)
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
 
-    const depA = mysqlTable('department_a_courses', {
+    export const depA = mysqlTable('department_a_courses', {
         studentId: int('student_id'),
         courseName: varchar('course_name', { length: 256 }).notNull(),
     });
     
-    const depB = mysqlTable('department_b_courses', {
+    export const depB = mysqlTable('department_b_courses', {
         studentId: int('student_id'),
         courseName: varchar('course_name', { length: 256 }).notNull(),
     });
@@ -223,9 +223,9 @@ times by different customers.
     const result = await intersectAll(regularOrders, vipOrders);
     ```
     ```sql
-    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    (select `product_id`, `quantity_ordered` from `regular_customer_orders`)
     intersect all
-    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    (select `product_id`, `quantity_ordered` from `vip_customer_orders`)
     ```
 	</CodeTab>
     <CodeTab>
@@ -248,22 +248,22 @@ times by different customers.
         );
     ```
     ```sql
-    select `product_id`, `quantity_ordered` from `regular_customer_orders`
-    intersect all 
-    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    (select `product_id`, `quantity_ordered` from `regular_customer_orders`)
+    intersect all
+    (select `product_id`, `quantity_ordered` from `vip_customer_orders`)
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { int, mysqlTable } from "drizzle-orm/mysql-core";
 
-    const regularCustomerOrders = mysqlTable('regular_customer_orders', {
+    export const regularCustomerOrders = mysqlTable('regular_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
         quantityOrdered: int('quantity_ordered').notNull(),
     });
     
-    const vipCustomerOrders = mysqlTable('vip_customer_orders', {
+    export const vipCustomerOrders = mysqlTable('vip_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
         quantityOrdered: int('quantity_ordered').notNull(),
@@ -295,9 +295,9 @@ multiple times, even if multiple employees from the same department are assigned
     const result = await except(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select `projects_name` from `department_a_projects`
+    (select `projects_name` from `department_a_projects`)
     except
-    select `projects_name` from `department_b_projects`
+    (select `projects_name` from `department_b_projects`)
     ```
 	</CodeTab>
     <CodeTab>
@@ -310,21 +310,21 @@ multiple times, even if multiple employees from the same department are assigned
         .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     ```sql
-    select `projects_name` from `department_a_projects`
+    (select `projects_name` from `department_a_projects`)
     except
-    select `projects_name` from `department_b_projects`
+    (select `projects_name` from `department_b_projects`)
     ```
     </CodeTab>
     <CodeTab>
 	```typescript 
     import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
 
-    const depA = mysqlTable('department_a_projects', {
+    export const depA = mysqlTable('department_a_projects', {
         employeeId: int('employee_id'),
         projectsName: varchar('projects_name', { length: 256 }).notNull(),
     });
     
-    const depB = mysqlTable('department_b_projects', {
+    export const depB = mysqlTable('department_b_projects', {
         employeeId: int('employee_id'),
         projectsName: varchar('projects_name', { length: 256 }).notNull(),
     });
@@ -361,9 +361,9 @@ ordered by VIP customers. You want to retain the quantity information, even if t
     const result = await exceptAll(regularOrders, vipOrders);
     ```
     ```sql
-    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    (select `product_id`, `quantity_ordered` from `regular_customer_orders`)
     except all
-    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    (select `product_id`, `quantity_ordered` from `vip_customer_orders`)
     ```
 	</CodeTab>
     <CodeTab>
@@ -386,20 +386,22 @@ ordered by VIP customers. You want to retain the quantity information, even if t
         );
     ```
     ```sql
-    select `product_id`, `quantity_ordered` from `regular_customer_orders`
+    (select `product_id`, `quantity_ordered` from `regular_customer_orders`)
     except all
-    select `product_id`, `quantity_ordered` from `vip_customer_orders`
+    (select `product_id`, `quantity_ordered` from `vip_customer_orders`)
     ```
     </CodeTab>
 	<CodeTab>
 	```typescript copy
-    const regularCustomerOrders = mysqlTable('regular_customer_orders', {
+	import { int, mysqlTable } from "drizzle-orm/mysql-core";
+
+    export const regularCustomerOrders = mysqlTable('regular_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
         quantityOrdered: int('quantity_ordered').notNull(),
     });
     
-    const vipCustomerOrders = mysqlTable('vip_customer_orders', {
+    export const vipCustomerOrders = mysqlTable('vip_customer_orders', {
         customerId: int('customer_id').primaryKey(),
         productId: int('product_id').notNull(),
         quantityOrdered: int('quantity_ordered').notNull(),
