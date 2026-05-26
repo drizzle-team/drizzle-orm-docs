@@ -4,20 +4,14 @@ import Callout from '@mdx/Callout.astro';
 
 # Generated Columns
 
-<Callout type="info">
-To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
-</Callout>
-
 1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
 
 2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
 
-<Callout type="info">
-    The implementation and usage of generated columns can vary significantly across different SQL databases. PostgreSQL, MySQL, and SQLite each have unique features, capabilities, and limitations when it comes to generated columns. In this section, we will explore these differences in detail to help you understand how to best utilize generated columns in each database system.
-</Callout>
-
 #### Database side
-    **Types**: `STORED`, `VIRTUAL`
+    **Types**: `VIRTUAL`, `STORED`
+
+	When no type is specified, `VIRTUAL` is used by default
 
     **How It Works**
     - Defined with an expression in the table schema.
@@ -41,38 +35,25 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     #### Features 
     This function can accept generated expression in 2 ways:
 
-    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
-    
-    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
-
-    **`string`**
-    <CodeTab>
-    ```ts
-    export const test = mysqlTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
-    });
-    ```
-
-    ```sql
-    CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS ('hello world!') VIRTUAL
-    );
-    ```
-    </CodeTab>
-    
-    </Callout>
-
     **`sql`** tag - if you want drizzle to escape some values for you
 
     <CodeTab>
-    ```ts
-    export const test = mysqlTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
+    ```ts {2,6}
+    export const test_1 = mysqlTable("test_1", {
+      generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
+    });
+    
+    export const test_2 = mysqlTable("test_2", {
+      generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`, { mode: "stored" }),
     });
     ```
-    ```sql
-    CREATE TABLE `test` (
-	    `gen_name` text GENERATED ALWAYS AS ('hello `world`!') VIRTUAL
+    ```sql {2,6}
+    CREATE TABLE `test_1` (
+        `gen_name` text GENERATED ALWAYS AS ('hello "world"!') VIRTUAL
+    );
+    
+    CREATE TABLE `test_2` (
+        `gen_name` text GENERATED ALWAYS AS ('hello "world"!') STORED
     );
     ```
     </CodeTab>
@@ -80,18 +61,28 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     **`callback`** - if you need to reference columns from a table
 
      <CodeTab>
-    ```ts
-    export const test = mysqlTable("test", {
-        name: text("first_name"),
-        generatedName: text("gen_name").generatedAlwaysAs(
-          (): SQL => sql`'hi, ' || ${test.name} || '!'`
-        ),
+    ```ts {4,10}
+    export const test_1 = mysqlTable("test_1", {
+      name: text("first_name"),
+      generatedName: text("gen_name")
+	     .generatedAlwaysAs((): SQL => sql`concat('hi, ', ${test_1.name}, '!')`),
+    });
+    
+    export const test_2 = mysqlTable("test_2", {
+      name: text("first_name"),
+      generatedName: text("gen_name")
+	     .generatedAlwaysAs((): SQL => sql`concat('hi, ', ${test_2.name}, '!')`, { mode: "stored" }),
     });
     ```
-    ```sql
-    CREATE TABLE `test` (
-  	  `first_name` text,
-  	  `gen_name` text GENERATED ALWAYS AS ('hi, ' || `test`.`first_name` || '!') VIRTUAL
+    ```sql {3,8}
+    CREATE TABLE `test_1` (
+        `first_name` text,
+        `gen_name` text GENERATED ALWAYS AS (concat('hi, ', `test_1`.`first_name`, '!')) VIRTUAL
+    );
+    
+    CREATE TABLE `test_2` (
+        `first_name` text,
+        `gen_name` text GENERATED ALWAYS AS (concat('hi, ', `test_2`.`first_name`, '!')) STORED
     );
     ```
     </CodeTab>
@@ -105,9 +96,9 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
 	<CodeTab>
 	```typescript copy
     export const users = mysqlTable("users", {
-        id: int("id"),
-        id2: int("id2"),
-        name: text("name"),
+        id: int(),
+        id2: int(),
+        name: text(),
         storedGenerated: text("stored_gen").generatedAlwaysAs(
           (): SQL => sql`concat(${users.name}, ' ', 'hello')`,
           { mode: "stored" }
