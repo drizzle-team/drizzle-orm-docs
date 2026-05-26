@@ -13,7 +13,7 @@ It has extreme performance benefits on large SQL queries.
 
 ## Prepared statement
 
-```typescript copy {3}
+	```typescript copy {3}
     const db = drizzle(...);
 
     const prepared = db.select().from(customers).prepare("statement_name");
@@ -44,5 +44,5 @@ Whenever you need to embed a dynamic runtime value - you can use the `sql.placeh
       .where(sql`lower(${customers.name}) like ${sql.placeholder('name')}`)
       .prepare("p2");
 
-    await p2.execute({ name: '%an%' }) // SELECT * FROM customers WHERE name ilike '%an%'
+    await p2.execute({ name: '%an%' }) // SELECT * FROM customers WHERE lower(name) like '%an%'
     ```
