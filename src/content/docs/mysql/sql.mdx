@@ -85,8 +85,8 @@ the interface inside mapWith is the same interface that is implemented by Column
 import { mysqlTable, int, text } from 'drizzle-orm/mysql-core';
 
 const usersTable = mysqlTable('users', {
-    id: int('id').primaryKey().autoincrement(),
-    name: text('name').notNull(),
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
 });
 
 //  at runtime this values will be mapped same as `text` column is mapped in drizzle
@@ -120,10 +120,10 @@ name for the field, making your queries more intuitive and readable.
 
 <Section>
 ```typescript
-sql`lower(usersTable.name)`.as('lower_name')
+sql`lower(${usersTable.name})`.as('lower_name')
 ```
 ```sql
-... `usersTable`.`name` as lower_name ...
+... `users`.`name` as lower_name ...
 ```
 </Section>
 
