@@ -10,9 +10,9 @@ import mysql from "mysql2/promise";
 import { boolean, int, mysqlTable, text, withReplicas } from 'drizzle-orm/mysql-core';
 
 const usersTable = mysqlTable('users', {
-	id: int('id').primaryKey().autoincrement(),
-	name: text('name').notNull(),
-	verified: boolean('verified').notNull().default(false),
+	id: int().primaryKey().autoincrement(),
+	name: text().notNull(),
+	verified: boolean().notNull().default(false),
 });
 
 const primaryClient = await mysql.createConnection({

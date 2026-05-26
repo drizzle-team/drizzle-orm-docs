@@ -1,4 +1,5 @@
 import Callout from '@mdx/Callout.astro';
+import CodeTabs from '@mdx/CodeTabs.astro';
 
 ## Type API
 Use Drizzle's type helpers to infer `select` and `insert` models from a PostgreSQL table schema.
@@ -23,15 +24,31 @@ type InsertUserAlt = InferInsertModel<typeof users>;
 Enable default query logging by passing `{ logger: true }` to `drizzle`.
 
 ```ts
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { drizzle } from "drizzle-orm/...";
 
 const db = drizzle(process.env.DB_URL, { logger: true });
+```
+
+You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
+```typescript copy
+import { DefaultLogger, type LogWriter } from "drizzle-orm/logger";
+import { drizzle } from "drizzle-orm/...";
+
+class MyLogWriter implements LogWriter {
+  write(message: string) {
+    // Write to file, stdout, etc.
+  }
+}
+
+const logger = new DefaultLogger({ writer: new MyLogWriter() });
+const db = drizzle(process.env.DB_URL, { logger });
 ```
 
 You can also provide a custom logger.
 
 ```ts
 import type { Logger } from 'drizzle-orm/logger';
+import { drizzle } from "drizzle-orm/...";
 
 class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -112,6 +129,7 @@ const { sql, params } = query.toSQL();
 ## Get Typed Columns
 Use `getColumns` to get a typed column map, which is useful when excluding fields from a selection.
 
+<CodeTabs items={["index.ts", "schema.ts"]}>
 ```ts
 import { getColumns } from 'drizzle-orm';
 import { users } from './schema';
@@ -120,6 +138,18 @@ const { password, role, ...rest } = getColumns(users);
 
 await db.select({ ...rest }).from(users);
 ```
+```ts
+import { serial, text, pgTable } from "drizzle-orm/pg-core";
+
+export const user = pgTable("user", {
+  id: serial().primaryKey(),
+  name: text(),
+  email: text(),
+  password: text(),
+  role: text().$type<"admin" | "customer">(),
+});
+```
+</CodeTabs>
 
 ## Get Table Information
 Use `getTableConfig` to inspect PostgreSQL table metadata.
