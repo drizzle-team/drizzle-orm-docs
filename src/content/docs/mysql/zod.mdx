@@ -61,10 +61,10 @@ const users = mysqlTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
+const parsed: { id?: number | undefined, name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
+const parsed: { id?: number | undefined, name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
 await db.insert(users).values(parsed);
 ```
 

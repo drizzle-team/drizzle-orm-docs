@@ -1,18 +1,12 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-valibot` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-valibot` package but all new update will be added to Drizzle ORM directly
-</Callout>
-
 # valibot
 
 ### Install the dependencies
 
 <Npm>
-valibot
+drizzle-orm valibot
 </Npm>
 
 ### Select schema
@@ -70,10 +64,10 @@ const users = mysqlTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Error: `age` is not defined
+const parsed: { id?: number | undefined, name: string, age: number } = parse(userInsertSchema, user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Will parse successfully
+const parsed: { id?: number | undefined, name: string, age: number } = parse(userInsertSchema, user); // Will parse successfully
 await db.insert(users).values(parsed);
 ```
 
@@ -85,6 +79,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 import { createUpdateSchema } from 'drizzle-orm/valibot';
 import { parse } from 'valibot';
+import { eq } from "drizzle-orm";
 
 const users = mysqlTable('users', {
   id: int().primaryKey().autoincrement(),
@@ -94,11 +89,13 @@ const users = mysqlTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Will parse successfully
+const parsed: {
+    id?: number | undefined;
+    name?: string | undefined;
+    age?: number | undefined;
+} = parse(userUpdateSchema, user); // Will parse successfully
+
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
@@ -127,7 +124,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -141,6 +138,13 @@ mysql.boolean();
 
 // Schema
 boolean();
+```
+
+```ts
+mysql.mysqlEnum('name', ['val1', 'val2']);
+
+// Schema
+enum({ val1: "val1", val2: "val2" });
 ```
 
 ```ts
@@ -166,6 +170,34 @@ string();
 ```
 
 ```ts
+mysql.tinyblob({ mode: 'string' });
+mysql.tinyblob();
+
+pipe(string(), maxLength(255))
+```
+
+```ts
+mysql.blob({ mode: 'string' });
+mysql.blob();
+
+pipe(string(), maxLength(65_535))
+```
+
+```ts
+mysql.mediumblob({ mode: 'string' });
+mysql.mediumblob();
+
+pipe(string(), maxLength(16_777_215))
+```
+
+```ts
+mysql.longblob({ mode: 'string' });
+mysql.longblob();
+
+pipe(string(), maxLength(4_294_967_295))
+```
+
+```ts
 mysql.char({ length: ... });
 
 // Schema
@@ -180,31 +212,45 @@ pipe(string(), maxLength(length));
 ```
 
 ```ts
+binary({ length: ... });
+
+// Schema
+pipe(string(), regex(/^[01]*$/), maxLength(length))
+```
+
+```ts
+mysql.varbinary({ length: ... });
+
+// Schema
+pipe(string(), regex(/^[01]*$/), maxLength(length))
+```
+
+```ts
 mysql.tinytext();
 
 // Schema
-pipe(string(), maxLength(255)); // unsigned 8-bit integer limit
+pipe(string(), maxLength(255));
 ```
 
 ```ts
 mysql.text();
 
 // Schema
-pipe(string(), maxLength(65_535)); // unsigned 16-bit integer limit
+pipe(string(), maxLength(65_535));
 ```
 
 ```ts
 mysql.mediumtext();
 
 // Schema
-pipe(string(), maxLength(16_777_215)); // unsigned 24-bit integer limit
+pipe(string(), maxLength(16_777_215));
 ```
 
 ```ts
 mysql.longtext();
 
 // Schema
-pipe(string(), maxLength(4_294_967_295)); // unsigned 32-bit integer limit
+pipe(string(), maxLength(4_294_967_295));
 ```
 
 ```ts
@@ -214,7 +260,6 @@ mysql.text({ enum: ... });
 mysql.longtext({ enum: ... });
 mysql.char({ enum: ... });
 mysql.varchar({ enum: ... });
-mysql.mysqlEnum(..., ...);
 
 // Schema
 enum(enum);
@@ -306,18 +351,45 @@ pipe(number(), minValue(0), maxValue(281_474_976_710_655)); // unsigned 48-bit i
 ```
 
 ```ts
+mysql.decimal({ mode: 'number' });
+
+// Schema
+pipe(number(), minValue(-9_007_199_254_740_991), maxValue(9_007_199_254_740_991))
+```
+
+```ts
+mysql.decimal({ mode: 'bigint' });
+
+// Schema
+pipe(bigint(), minValue(-9_223_372_036_854_775_808n), maxValue(9_223_372_036_854_775_807n))
+```
+
+```ts
+mysql.decimal({ mode: 'number', unsigned: true });
+
+// Schema
+pipe(number(), minValue(0), maxValue(9_007_199_254_740_991))
+```
+
+```ts
+mysql.decimal({ mode: 'bigint', unsigned: true });
+
+// Schema
+pipe(bigint(), minValue(0), maxValue(9_223_372_036_854_775_807n))
+```
+
+```ts
 mysql.bigint({ mode: 'number' });
-mysql.bigserial({ mode: 'number' });
 
 // Schema
 pipe(number(), minValue(-9_007_199_254_740_991), maxValue(9_007_199_254_740_991), int()); // Javascript min. and max. safe integers
 ```
 
 ```ts
-mysql.serial();
+mysql.bigint({ mode: 'number', unsigned: true });
 
 // Schema
-pipe(number(), minValue(0), maxValue(9_007_199_254_740_991), int()); // Javascript max. safe integer
+pipe(number(), minValue(0), maxValue(9_007_199_254_740_991), int()); // Javascript min. and max. safe integers
 ```
 
 ```ts
@@ -332,6 +404,13 @@ mysql.bigint({ mode: 'bigint', unsigned: true });
 
 // Schema
 pipe(bigint(), minValue(0n), maxValue(18_446_744_073_709_551_615n)); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.serial();
+
+// Schema
+pipe(number(), minValue(0), maxValue(9_007_199_254_740_991), int()); // Javascript max. safe integer
 ```
 
 ```ts
