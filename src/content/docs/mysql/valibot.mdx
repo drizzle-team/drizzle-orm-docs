@@ -375,7 +375,7 @@ pipe(number(), minValue(0), maxValue(9_007_199_254_740_991))
 mysql.decimal({ mode: 'bigint', unsigned: true });
 
 // Schema
-pipe(bigint(), minValue(0), maxValue(9_223_372_036_854_775_807n))
+pipe(bigint(), minValue(0), maxValue(18_446_744_073_709_551_615n))
 ```
 
 ```ts
@@ -390,6 +390,34 @@ mysql.bigint({ mode: 'number', unsigned: true });
 
 // Schema
 pipe(number(), minValue(0), maxValue(9_007_199_254_740_991), int()); // Javascript min. and max. safe integers
+```
+
+```ts
+mysql.bigint({ mode: 'string' });
+
+// Schema
+pipe(
+	string(),
+	regex(/^-?\d+$/),
+	transform((v) => BigInt(v)),
+	minValue(-9_223_372_036_854_775_808n),
+	maxValue(9_223_372_036_854_775_807n),
+	transform((v) => v.toString()),
+)
+```
+
+```ts
+mysql.bigint({ mode: 'string', unsigned: true });
+
+// Schema
+pipe(
+	string(),
+	regex(/^\d+$/),
+	transform((v) => BigInt(v)),
+	minValue(0n),
+	maxValue(9_223_372_036_854_775_807n),
+	transform((v) => v.toString()),
+);
 ```
 
 ```ts

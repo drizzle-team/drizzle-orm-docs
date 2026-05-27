@@ -404,6 +404,54 @@ type.keywords.number.integer.atLeast(0).atMost(9_007_199_254_740_991); // Javasc
 ```
 
 ```ts
+mysql.bigint({ mode: 'string' });
+
+// Schema
+type.string.narrow((v, ctx) => {
+	if (typeof v !== 'string') {
+		return ctx.mustBe('a string');
+	}
+	if (!(/^-?\d+$/.test(v))) {
+		return ctx.mustBe('a string representing a number');
+	}
+
+	const bigint = BigInt(v);
+	if (bigint < -9_223_372_036_854_775_808n) {
+		return ctx.mustBe('greater than');
+	}
+	if (bigint > 9_223_372_036_854_775_807n) {
+		return ctx.mustBe('less than');
+	}
+
+	return true;
+});
+```
+
+```ts
+mysql.bigint({ mode: 'string', unsigned: true });
+
+// Schema
+type.string.narrow((v, ctx) => {
+	if (typeof v !== 'string') {
+		return ctx.mustBe('a string');
+	}
+	if (!(/^\d+$/.test(v))) {
+		return ctx.mustBe('a string representing a number');
+	}
+
+	const bigint = BigInt(v);
+	if (bigint < 0) {
+		return ctx.mustBe('greater than');
+	}
+	if (bigint > 9_223_372_036_854_775_807n) {
+		return ctx.mustBe('less than');
+	}
+
+	return true;
+});
+```
+
+```ts
 mysql.bigint({ mode: 'bigint' });
 
 // Schema

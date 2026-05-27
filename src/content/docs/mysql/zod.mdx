@@ -424,7 +424,7 @@ z.number().min(0).max(9_007_199_254_740_991);
 mysql.decimal({ mode: 'bigint', unsigned: true });
 
 // Schema
-z.bigint().min(0).max(9_223_372_036_854_775_807n);
+z.bigint().min(0).max(18_446_744_073_709_551_615n);
 ```
 
 ```ts
@@ -455,7 +455,7 @@ mysql.bigint({ mode: 'string', unsigned: true });
 
 // Schema
 z.string().regex(/^\d+$/).transform(BigInt).pipe(
-	zod.bigint().gte(0n).lte(18_446_744_073_709_551_615n),
+	zod.bigint().gte(0n).lte(9_223_372_036_854_775_807n),
 ).transform(String)
 ```
 

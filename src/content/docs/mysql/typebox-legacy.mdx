@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is legacy by using `@sinclair/typebox` package
-</Callout>
-
 # typebox-legacy
 
 ### Install the dependencies
@@ -71,10 +63,10 @@ const users = mysqlTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = Value.Parse(userInsertSchema, user); // Error: `age` is not defined
+const parsed: { id?: number | undefined, name: string, age: number } = Value.Parse(userInsertSchema, user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = Value.Parse(userInsertSchema, user); // Will parse successfully
+const parsed: { id?: number | undefined, name: string, age: number } = Value.Parse(userInsertSchema, user); // Will parse successfully
 await db.insert(users).values(parsed);
 ```
 
@@ -86,6 +78,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 import { createUpdateSchema } from 'drizzle-orm/typebox-legacy';
 import { Value } from '@sinclair/typebox/value';
+import { eq } from "drizzle-orm";
 
 const users = mysqlTable('users', {
   id: int().primaryKey().autoincrement(),
@@ -95,11 +88,8 @@ const users = mysqlTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
+const parsed: { id?: number | undefined, name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
@@ -129,7 +119,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -157,7 +147,7 @@ const { createInsertSchema } = createSchemaFactory({ typeboxInstance: t });
 
 const userInsertSchema = createInsertSchema(users, {
   // We can now use the extended instance
-  name: (schema) => t.Number({ ...schema }, { error: '`name` must be a string' })
+  name: (schema) => t.Number({ ...schema, error: "`name` must be a string" })
 });
 ```
 
@@ -168,6 +158,13 @@ mysql.boolean();
 
 // Schema
 Type.Boolean();
+```
+
+```ts
+mysql.mysqlEnum('name', ['val1', 'val2']);
+
+// Schema
+Type.Enum({ 'val1': 'val1', 'val2': 'val2' });
 ```
 
 ```ts
@@ -193,6 +190,34 @@ Type.String();
 ```
 
 ```ts
+mysql.tinyblob({ mode: 'string' });
+mysql.tinyblob();
+
+Type.String({ maxLength: 255 })
+```
+
+```ts
+mysql.blob({ mode: 'string' });
+mysql.blob();
+
+Type.String({ maxLength: 65_535 })
+```
+
+```ts
+mysql.mediumblob({ mode: 'string' });
+mysql.mediumblob();
+
+Type.String({ maxLength: 16_777_215 })
+```
+
+```ts
+mysql.longblob({ mode: 'string' });
+mysql.longblob();
+
+Type.String({ maxLength: 4_294_967_295 })
+```
+
+```ts
 mysql.char({ length: ... });
 
 // Schema
@@ -204,6 +229,20 @@ mysql.varchar({ length: ... });
 
 // Schema
 Type.String({ maxLength: length });
+```
+
+```ts
+binary({ length: ... });
+
+// Schema
+Type.RegExp(/^[01]*$/, { maxLength: length })
+```
+
+```ts
+mysql.varbinary({ length: ... });
+
+// Schema
+Type.RegExp(/^[01]*$/, { maxLength: length })
 ```
 
 ```ts
@@ -241,7 +280,6 @@ mysql.text({ enum: ... });
 mysql.longtext({ enum: ... });
 mysql.char({ enum: ... });
 mysql.varchar({ enum: ... });
-mysql.mysqlEnum(..., ...);
 
 // Schema
 Type.Enum(enum);
@@ -333,16 +371,85 @@ Type.Numer({ minimum: 0, maximum: 281_474_976_710_655 }); // unsigned 48-bit int
 ```
 
 ```ts
+mysql.decimal({ mode: 'number' });
+
+// Schema
+Type.Number({ minimum: -9_007_199_254_740_991, maximum: 9_007_199_254_740_991 });
+```
+
+```ts
+mysql.decimal({ mode: 'bigint' });
+
+// Schema
+Type.BigInt({ minimum: -9_223_372_036_854_775_808n, maximum: 9_223_372_036_854_775_807n });
+```
+
+```ts
+mysql.decimal({ mode: 'number', unsigned: true });
+
+// Schema
+Type.Number({ minimum: 0, maximum: 9_007_199_254_740_991 });
+```
+
+```ts
+mysql.decimal({ mode: 'bigint', unsigned: true });
+
+// Schema
+Type.BigInt({ minimum: 0, maximum: 18_446_744_073_709_551_615n });
+```
+
+```ts
 mysql.bigint({ mode: 'number' });
-mysql.bigserial({ mode: 'number' });
 
 // Schema
 Type.Integer({ minimum: -9_007_199_254_740_991, maximum: 9_007_199_254_740_991 }); // Javascript min. and max. safe integers
 ```
 
 ```ts
-mysql.serial();
+mysql.bigint({ mode: 'number', unsigned: true });
 
+// Schema
+Type.Integer({ minimum: 0, maximum: 9_007_199_254_740_991 }); // Javascript min. and max. safe integers
+```
+
+```ts
+mysql.bigint({ mode: 'string' });
+
+// Schema
+TypeRegistry.Set('BigIntStringMode', (_, value) => {
+	if (typeof value !== 'string' || !(/^-?\d+$/.test(value))) {
+		return false;
+	}
+
+	const bigint = BigInt(value);
+	if (bigint < -9_223_372_036_854_775_808n || bigint > 9_223_372_036_854_775_807n) {
+		return false;
+	}
+
+	return true;
+});
+
+{ [Kind]: 'BigIntStringMode', type: 'string' }
+```
+
+```ts
+mysql.bigint({ mode: 'string', unsigned: true });
+
+// Schema
+TypeRegistry.Set('UnsignedBigIntStringMode', (_, value) => {
+	if (typeof value !== 'string' || !(/^\d+$/.test(value))) {
+		return false;
+	}
+
+	const bigint = BigInt(value);
+	if (bigint < 0 || bigint > 9_223_372_036_854_775_807n) {
+		return false;
+	}
+
+	return true;
+});
+
+{ [Kind]: 'UnsignedBigIntStringMode', type: 'string' }
 ```
 
 ```ts
@@ -357,6 +464,12 @@ mysql.bigint({ mode: 'bigint', unsigned: true });
 
 // Schema
 Type.BigInt({ minimum: 0, maximum: 18_446_744_073_709_551_615n }); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.serial();
+
+Type.Integer({ minimum: 0, maximum: 9_007_199_254_740_991 })
 ```
 
 ```ts
