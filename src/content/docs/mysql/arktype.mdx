@@ -1,18 +1,12 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-arktype` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-arktype` package but all new update will be added to Drizzle ORM directly
-</Callout>
-
 # arktype
 
 ### Install the dependencies
 
 <Npm>
-arktype
+drizzle-orm arktype
 </Npm>
 
 ### Select schema
@@ -22,6 +16,7 @@ Defines the shape of data queried from the database - can be used to validate AP
 ```ts copy
 import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 import { createSelectSchema } from 'drizzle-orm/arktype';
+import type { ArkErrors } from "arktype";
 
 const users = mysqlTable('users', {
   id: int().primaryKey().autoincrement(),
@@ -32,10 +27,10 @@ const users = mysqlTable('users', {
 const userSelectSchema = createSelectSchema(users);
 
 const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
 
 const rows = await db.select().from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
 ```
 
 Views are also supported.
@@ -47,7 +42,7 @@ import { createSelectSchema } from 'drizzle-orm/arktype';
 
 const usersView = mysqlView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
 const usersViewSchema = createSelectSchema(usersView);
-const parsed: { id: number; name: string; age: number } = usersViewSchema(...);
+const parsed: ArkErrors | { id: number; name: string; age: number } = usersViewSchema(...);
 ```
 
 ### Insert schema
@@ -57,6 +52,7 @@ Defines the shape of data to be inserted into the database - can be used to vali
 ```ts copy
 import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 import { createInsertSchema } from 'drizzle-orm/arktype';
+import type { ArkErrors } from "arktype";
 
 const users = mysqlTable('users', {
   id: int().primaryKey().autoincrement(),
@@ -67,10 +63,16 @@ const users = mysqlTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
+const parsed: ArkErrors | { id?: number | undefined, name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = userInsertSchema(user); // Will parse successfully
+const parsed: ArkErrors | { id?: number | undefined, name: string, age: number } = userInsertSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
 await db.insert(users).values(parsed);
 ```
 
@@ -82,6 +84,8 @@ Defines the shape of data to be updated in the database - can be used to validat
 import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 import { createUpdateSchema } from 'drizzle-orm/arktype';
 import { parse } from 'arktype';
+import { ArkErrors } from "arktype";
+import { eq } from "drizzle-orm";
 
 const users = mysqlTable('users', {
   id: int().primaryKey().autoincrement(),
@@ -91,11 +95,14 @@ const users = mysqlTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+const parsed:  ArkErrors | { id?: number | undefined, name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
@@ -106,7 +113,7 @@ Each create schema function accepts an additional optional parameter that you ca
 ```ts copy
 import { int, json, mysqlTable, text } from 'drizzle-orm/mysql-core';
 import { createSelectSchema } from 'drizzle-orm/arktype';
-import { parse, pipe, maxLength, object, string } from 'arktype';
+import { ArkErrors, type } from 'arktype';
 
 const users = mysqlTable('users', {
   id: int().primaryKey().autoincrement(),
@@ -121,7 +128,7 @@ const userSelectSchema = createSelectSchema(users, {
   preferences: object({ theme: string() }) // Overwrites the field, including its nullability
 });
 
-const parsed: {
+const parsed: ArkErrors | {
   id: number;
   name: string,
   bio?: string | undefined;
@@ -138,6 +145,13 @@ mysql.boolean();
 
 // Schema
 type.boolean;
+```
+
+```ts
+mysql.mysqlEnum('name', ['val1', 'val2']);
+
+// Schema
+type.enumerated('val1', 'val2')
 ```
 
 ```ts
@@ -163,6 +177,34 @@ type.string;
 ```
 
 ```ts
+mysql.tinyblob({ mode: 'string' });
+mysql.tinyblob();
+
+type.string.atMostLength(255)
+```
+
+```ts
+mysql.blob({ mode: 'string' });
+mysql.blob();
+
+type.string.atMostLength(65_535)
+```
+
+```ts
+mysql.mediumblob({ mode: 'string' });
+mysql.mediumblob();
+
+type.string.atMostLength(16_777_215)
+```
+
+```ts
+mysql.longblob({ mode: 'string' });
+mysql.longblob();
+
+type.string.atMostLength(4_294_967_295)
+```
+
+```ts
 mysql.char({ length: ... });
 
 // Schema
@@ -174,6 +216,20 @@ mysql.varchar({ length: ... });
 
 // Schema
 type.string.atMostLength(length);
+```
+
+```ts
+binary({ length: ... });
+
+// Schema
+type(`/^[01]{0,${length ?? "*"}}$/`)
+```
+
+```ts
+mysql.varbinary({ length: ... });
+
+// Schema
+type(`/^[01]{0,${length ?? "*"}}$/`)
 ```
 
 ```ts
@@ -211,7 +267,6 @@ mysql.text({ enum: ... });
 mysql.longtext({ enum: ... });
 mysql.char({ enum: ... });
 mysql.varchar({ enum: ... });
-mysql.mysqlEnum(..., ...);
 
 // Schema
 type.enumerated(...enum);
@@ -303,18 +358,49 @@ type.number.atLeast(0).atMost(281_474_976_710_655); // unsigned 48-bit integer l
 ```
 
 ```ts
+mysql.decimal({ mode: 'number' });
+
+// Schema
+type.number.atLeast(9_007_199_254_740_991).atMost(9_007_199_254_740_991)
+```
+
+```ts
+mysql.decimal({ mode: 'bigint' });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < -9_223_372_036_854_775_808n ? ctx.mustBe('greater than') : value > 9_223_372_036_854_775_807n ? ctx.mustBe('less than') : true
+); // 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.decimal({ mode: 'number', unsigned: true });
+
+// Schema
+type.number.atLeast(0).atMost(9_007_199_254_740_991)
+```
+
+```ts
+mysql.decimal({ mode: 'bigint', unsigned: true });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < 0n ? ctx.mustBe('greater than') : value > 18_446_744_073_709_551_615n ? ctx.mustBe('less than') : true
+); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
 mysql.bigint({ mode: 'number' });
-mysql.bigserial({ mode: 'number' });
 
 // Schema
 type.keywords.number.integer.atLeast(-9_007_199_254_740_991).atMost(9_007_199_254_740_991); // Javascript min. and max. safe integers
 ```
 
 ```ts
-mysql.serial();
+mysql.bigint({ mode: 'number', unsigned: true });
 
 // Schema
-type.keywords.number.integer.atLeast(0).atMost(9_007_199_254_740_991); // Javascript max. safe integer
+type.keywords.number.integer.atLeast(0).atMost(9_007_199_254_740_991); // Javascript min. and max. safe integers
 ```
 
 ```ts
@@ -333,6 +419,13 @@ mysql.bigint({ mode: 'bigint', unsigned: true });
 type.bigint.narrow(
   (value, ctx) => value < 0n ? ctx.mustBe('greater than') : value > 18_446_744_073_709_551_615n ? ctx.mustBe('less than') : true
 ); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.serial();
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(9_007_199_254_740_991); // Javascript max. safe integer
 ```
 
 ```ts

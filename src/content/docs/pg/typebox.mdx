@@ -14,7 +14,6 @@ Allows you to generate [typebox](https://sinclairzx81.github.io/typebox/#/) sche
 
 - Create a select schema for tables, views and enums.
 - Create insert and update schemas for tables.
-- Supported dialect: PostgreSQL.
 
 #### Usage
 
@@ -25,10 +24,10 @@ import { Type } from 'typebox';
 import { Value } from 'typebox/value';
 
 const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name').notNull(),
-	email: text('email').notNull(),
-	role: text('role', { enum: ['admin', 'user'] }).notNull(),
+	id: serial().primaryKey(),
+	name: text().notNull(),
+	email: text().notNull(),
+	role: text({ enum: ['admin', 'user'] }).notNull(),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
