@@ -93,7 +93,7 @@ const users = pgTable('users', {
 const userUpdateSchema = createUpdateSchema(users);
 
 const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
+const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // `id` will be omitted
 
 const user = { age: 35 };
 const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Will parse successfully
