@@ -117,7 +117,7 @@ You don't need to do anything to enable them.
 
 Every built-in PG column class declares a `codec` string identifier:
 
-```ts {3,8,11,16,21,24}
+```ts {3,8,11,14,19,22,27}
 // pg-core/columns/integer.ts
 class PgInteger extends PgColumn {
   override readonly codec = 'int';
@@ -130,19 +130,19 @@ class PgBigInt53 extends PgColumn {
 class PgBigInt64 extends PgColumn {
   override readonly codec = 'bigint';
 }
+class PgBigIntString extends PgColumn {
+  override readonly codec = 'bigint:string';
+}
 
 // pg-core/columns/line.ts
-class PgLine extends PgColumn {
+class PgLineABC extends PgColumn {
   override readonly codec = 'line';
 }
+class PgLineTuple extends PgColumn {
+  override readonly codec = 'line:tuple'
+}
 
-// pg-core/columns/date.ts
-class PgDate extends PgColumn {
-  override readonly codec = 'date';
-}
-class PgDateString extends PgColumn {
-  override readonly codec = 'date:string';
-}
+...
 ```
 
 This identifier is a lookup key into the driver's codec map. If the driver defines transforms for that key, they're applied. If not, the value passes through untouched.
@@ -193,12 +193,12 @@ import { customType } from 'drizzle-orm/pg-core';
 // Use an existing codec by name
 const customBigint = customType<{ data: bigint; driverData: string }>({
   dataType() {
-    return 'bigint';
+    return "bigint";
   },
-  fromDriver(value) {
-    return value * 1000; // ← extra column mapping logic
+  fromDriver(value: string) {
+    return BigInt(Number(value) * 1000); // ← extra column mapping logic
   },
-  codec: 'bigint',  // ← uses the driver's bigint codec
+  codec: "bigint", // ← uses the driver's bigint codec
 });
 
 // Codec as a function (useful when codec depends on config)
@@ -211,10 +211,11 @@ const customDataType = customType<{
   dataType() {
     return `custom_type`;
   },
-  fromDriver(value) {
-    return value * 1000; // ← extra column mapping logic
+  fromDriver(value: bigint | number) {
+    return Number(value) / 1000; // ← extra column mapping logic
   },
-  codec: (config) => { // ← can be dynamic based on config
+  codec: (config) => {
+    // ← can be dynamic based on config
     if (!config || config.mode === "bigint") {
       return "bigint";
     }
