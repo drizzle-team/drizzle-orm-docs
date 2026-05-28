@@ -75,7 +75,7 @@ const usersTable = mysqlTable("users", {
 
 ### TS-doc for type definitions
 
-You can check `ts-doc` for types and param definition
+You can check `ts-doc` for types, param definition and examples
 
 ```ts
 interface CustomTypeValues {
@@ -210,7 +210,7 @@ interface CustomTypeParams<T extends CustomTypeValues> {
    *
    * Defaults to {@link fromDriver} function
    * @example
-   * For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb-v2) or [JSON functions](https://orm.drizzle.team/docs/json-functions), the result field will be returned as it's string representation, as opposed to bigint from regular query
+   * For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb-v2) or JSON functions, the result field will be returned as it's string representation, as opposed to bigint from regular query
    * To handle that, we need a separate function to handle such field's mapping:
    * ```
    * fromJson(value: string): bigint {
@@ -233,7 +233,7 @@ interface CustomTypeParams<T extends CustomTypeValues> {
    */
   fromJson?: (value: T['jsonData']) => T['data'];
   /**
-   * Optional selection modifier function, that is used for modifying selection of column inside [JSON functions](https://orm.drizzle.team/docs/json-functions)
+   * Optional selection modifier function, that is used for modifying selection of column inside JSON functions
    *
    * Additional mapping that could be required for such scenarios can be handled using {@link fromJson} function
    *
