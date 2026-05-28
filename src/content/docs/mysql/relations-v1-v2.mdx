@@ -16,8 +16,8 @@ drizzle-kit -D
 <br/>
 
 <Prerequisites>
-- **Relations Fundamentals** - [read here](/docs/relations-schema-declaration)
-- **drizzle-kit pull** - [read here](/docs/drizzle-kit-pull)
+- **Relations Fundamentals** - [read here](/docs/mysql/relations-schema-declaration)
+- **drizzle-kit pull** - [read here](/docs/mysql/drizzle-kit-pull)
 </Prerequisites>
 
 <Callout>
@@ -57,7 +57,7 @@ export const relations = defineRelations(schema, (r) => ({
 ```ts
 // index.ts
 import { relations } from "./relations"
-import { drizzle } from "drizzle-orm/..."
+import { drizzle } from "drizzle-orm/mysql2"
 
 const db = drizzle(process.env.DATABASE_URL, { relations })
 ```
@@ -66,18 +66,18 @@ const db = drizzle(process.env.DATABASE_URL, { relations })
 
 <Callout collapsed="Schema Definition">
 ```ts copy
-import * as p from 'drizzle-orm/pg-core';
+import * as p from 'drizzle-orm/mysql-core';
 
-export const users = p.pgTable('users', {
-	id: p.integer().primaryKey(),
-	name: p.text(),
-	invitedBy: p.integer('invited_by'),
+export const users = p.mysqlTable('users', {
+  id: p.int().primaryKey(),
+  name: p.text(),
+  invitedBy: p.int('invited_by'),
 });
 
-export const posts = p.pgTable('posts', {
-	id: p.integer().primaryKey(),
-	content: p.text(),
-	authorId: p.integer('author_id'),
+export const posts = p.mysqlTable('posts', {
+  id: p.int().primaryKey(),
+  content: p.text(),
+  authorId: p.int('author_id'),
 });
 ```
 </Callout>
@@ -320,20 +320,93 @@ export const relations = defineRelations(schema, (r) => ({
 
 **`custom types` new function**
 
-There is a new [codec](/docs/codecs) function was added to custom types, so you can control how data is mapped
+There are a few new function were added to custom types, so you can control how data is mapped on Relational Queries v2:
 
-You can find out more [here](/docs/custom-types#ts-doc-for-type-definitions)
+<Callout collapsed='fromJson'>
+Optional mapping function, that is used for transforming data returned by transformed to JSON in database data to desired format
+For example, when querying bigint column via [RQB](/docs/rqb-v2) or JSON functions, the result field will be returned as it's string representation, as opposed to bigint from regular query
+To handle that, we need a separate function to handle such field's mapping:
+```ts
+fromJson(value: string): bigint {
+	return BigInt(value);
+},
+```
+It'll cause the returned data to change from:
+```ts
+{
+	customField: "5044565289845416380";
+}
+```
+to:
+```ts
+{
+	customField: 5044565289845416380n;
+}
+```
+</Callout> 
+<Callout collapsed='forJsonSelect'>
+Optional selection modifier function, that is used for modifying selection of column inside JSON functions
+Additional mapping that could be required for such scenarios can be handled using fromJson function
+Used by [relational queries](/docs/rqb-v2)
+
+For example, when using bigint we need to cast field to text to preserve data integrity
+```ts
+forJsonSelect(identifier: SQL, sql: SQLGenerator, arrayDimensions?: number): SQL {
+	return sql`${identifier}::text`
+},
+```
+This will change query from:
+```sql
+SELECT
+	row_to_json("t".*)
+	FROM
+	(
+		SELECT
+		"table"."custom_bigint" AS "bigint"
+		FROM
+		"table"
+	) AS "t"
+```
+to:
+```sql
+SELECT
+	row_to_json("t".*)
+	FROM
+	(
+		SELECT
+		"table"."custom_bigint"::text AS "bigint"
+		FROM
+		"table"
+	) AS "t"
+```
+Returned by query object will change from:
+```ts
+{
+	bigint: 5044565289845416000; // Partial data loss due to direct conversion to JSON format
+}
+```
+to:
+```ts
+{
+	bigint: "5044565289845416380"; // Data is preserved due to conversion of field to text before JSON-ification
+}
+```
+</Callout>
 
 <Callout title='✅ v2'>
 ```ts
 const customBytes = customType<{
-  data: Buffer;
-  driverData: Buffer;
-  jsonData: string;
-}>({
-  dataType: () => "bytea",
-  codec: "bytea",
-});
+ 	data: Buffer;
+ 	driverData: Buffer;
+ 	jsonData: string;
+ }>({
+ 	dataType: () => 'bytea',
+ 	fromJson: (value) => {
+ 		return Buffer.from(value.slice(2, value.length), 'hex');
+ 	},
+ 	forJsonSelect: (identifier, sql, arrayDimensions) =>
+ 		sql`${identifier}::text${sql.raw('[]'.repeat(arrayDimensions ?? 0))}`,
+ });
 ```
 
 </Callout>
@@ -348,33 +421,34 @@ You don't need to do it now!
 
 <Callout collapsed='Schema'>
 ```ts
-import * as p from "drizzle-orm/pg-core";
+import * as p from 'drizzle-orm/mysql-core';
 
-export const users = p.pgTable("users", {
-  id: p.integer().primaryKey(),
+export const users = p.mysqlTable('users', {
+  id: p.int().primaryKey(),
   name: p.text(),
   verified: p.boolean().notNull(),
 });
 
-export const groups = p.pgTable("groups", {
-  id: p.integer().primaryKey(),
+export const groups = p.mysqlTable('groups', {
+  id: p.int().primaryKey(),
   name: p.text(),
 });
 
-export const usersToGroups = p.pgTable(
-  "users_to_groups",
+export const usersToGroups = p.mysqlTable(
+  'users_to_groups',
   {
     userId: p
-      .integer("user_id")
+      .int('user_id')
       .notNull()
       .references(() => users.id),
     groupId: p
-      .integer("group_id")
+      .int('group_id')
       .notNull()
       .references(() => groups.id),
   },
-  (t) => [p.primaryKey({ columns: [t.userId, t.groupId] })]
+  (t) => [p.primaryKey({ columns: [t.userId, t.groupId] })],
 );
+
 ```
 </Callout>
 
@@ -495,47 +569,40 @@ const response = db.query.users.findMany({
 });
 ```
 
-For a complete API Reference please check our [Select Filters docs](/docs/rqb-v2#select-filters)
+For a complete API Reference please check our [Select Filters docs](/docs/mysql/rqb-v2#select-filters)
 </Callout>
 
 <Callout collapsed='Complex filter example using RAW'>
 ```ts
 // schema.ts
-import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { int, json, mysqlTable, text, timestamp } from 'drizzle-orm/mysql-core';
 
-export const users = pgTable("users", {
-  id: integer().primaryKey(),
+export const users = mysqlTable('users', {
+  id: int().primaryKey(),
   name: text(),
   email: text().notNull(),
-  age: integer(),
-  createdAt: timestamp("created_at").defaultNow(),
-  lastLogin: timestamp("last_login"),
-  subscriptionEnd: timestamp("subscription_end"),
-  lastActivity: timestamp("last_activity"),
-  preferences: jsonb(),      // JSON column for user settings/preferences
-  interests: text().array(),     // Array column for user interests
+  age: int(),
+  createdAt: timestamp('created_at').defaultNow(),
+  lastLogin: timestamp('last_login'),
+  subscriptionEnd: timestamp('subscription_end'),
+  lastActivity: timestamp('last_activity'),
+  preferences: json(), // JSON column for user settings/preferences
+  interests: json().$type<string[]>(), // Array column for user interests
 });
 ```
 ```ts
 const response = await db.query.users.findMany({
-  where: {
-    AND: [
-      {
-        OR: [
-          { RAW: (table) => sql`LOWER(${table.name}) LIKE 'john%'` },
-          { name: { ilike: "jane%" } },
-        ],
-      },
-      {
-        OR: [
-          { RAW: (table) => sql`${table.preferences}->>'theme' = 'dark'` },
-          { RAW: (table) => sql`${table.preferences}->>'theme' IS NULL` },
-        ],
-      },
-      { RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` },
-    ],
-  },
-});
+    where: {
+      AND: [
+        {
+          OR: [{ RAW: (table) => sql`${table.name} LIKE 'john%'` }, { name: { like: "jane%" } }],
+        },
+        { 
+			RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` 
+		},
+      ],
+    },
+  }),
 ```
 </Callout>
 
@@ -655,7 +722,7 @@ Change drizzle database instance creation and provide `relations` object instead
 <Callout title='Before'>
 ```ts
 import * as schema from './schema'
-import { drizzle } from 'drizzle-orm/...'
+import { drizzle } from 'drizzle-orm/mysql2'
 
 const db = drizzle('<url>', { schema })
 ```
@@ -665,7 +732,7 @@ const db = drizzle('<url>', { schema })
 ```ts
 // should be imported from a file in Step 2
 import { relations } from './relations'
-import { drizzle } from 'drizzle-orm/...'
+import { drizzle } from 'drizzle-orm/mysql2'
 
 const db = drizzle('<url>', { relations })
 ```
@@ -677,13 +744,13 @@ If you had MySQL dialect, you can remove `mode` from `drizzle()` as long as it's
 
 ##### **Option 2**: Manual migration
 
-If you want to migrate manually, you can check our [Drizzle Relations section](/docs/relations-v2) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
+If you want to migrate manually, you can check our [Drizzle Relations section](/docs/mysql/relations-v2) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
 
 #### How to migrate queries from v1 to v2
 
 ##### Migrate `where` statements
 
-You can check our [Select Filters docs](/docs/rqb-v2#select-filters) to see examples and a complete API reference.
+You can check our [Select Filters docs](/docs/mysql/rqb-v2#select-filters) to see examples and a complete API reference.
 
 With the new syntax, you can use `AND`, `OR`, `NOT`, and `RAW`, plus all the filtering operators that 
 were previously available in Relations v1.
@@ -699,14 +766,14 @@ const response = await db.query.users.findMany({
 });
 ```
 ```sql {8}
-select
-  "d0"."id" as "id",
-  "d0"."name" as "name",
-  "d0"."age" as "age"
-from
-  "users" as "d0"
-where
-  "d0"."age" = 15
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	`d0`.`age` = 15;
 ```
 </CodeTab>
 <CodeTab>
@@ -719,17 +786,17 @@ const response = await db.query.users.findMany({
 });
 ```
 ```sql {9-10}
-select
-  "d0"."id" as "id",
-  "d0"."name" as "name",
-  "d0"."age" as "age"
-from
-  "users" as "d0"
-where
-  (
-    ("d0"."age" = 15)
-    and ("d0"."name" = 'John')
-  )
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(`d0`.`age` = 15)
+		AND (`d0`.`name` = 'John')
+	);
 ```
 </CodeTab>
 <CodeTab>
@@ -752,17 +819,17 @@ const response = await db.query.users.findMany({
 });
 ```
 ```sql {9-10}
-select
-  "d0"."id" as "id",
-  "d0"."name" as "name",
-  "d0"."age" as "age"
-from
-  "users" as "d0"
-where
-  (
-    ("d0"."id" > 10)
-    or ("d0"."name" like 'John%')
-  )
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(`d0`.`id` > 10)
+		OR (`d0`.`name` LIKE 'John%')
+	);
 ```
 </CodeTab>
 <CodeTab>
@@ -781,88 +848,76 @@ const response = await db.query.users.findMany({
 });
 ```
 ```sql {9-10}
-select
-  "d0"."id" as "id",
-  "d0"."name" as "name",
-  "d0"."age" as "age"
-from
-  "users" as "d0"
-where
-  (
-    (not ("d0"."id" > 10))
-    and ("d0"."name" like 'John%')
-  )
+SELECT
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`age` AS `age`
+FROM
+	`users` AS `d0`
+WHERE
+	(
+		(not(`d0`.`id` > 10))
+		AND (`d0`.`name` LIKE 'John%')
+	);
 ```
 </CodeTab>
 <CodeTab>
 ```ts
 // schema.ts
-import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { int, json, mysqlTable, text, timestamp } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 
-export const users = pgTable("users", {
-  id: integer().primaryKey(),
+export const users = mysqlTable("users", {
+  id: int().primaryKey(),
   name: text(),
   email: text().notNull(),
-  age: integer(),
+  age: int(),
   createdAt: timestamp("created_at").defaultNow(),
   lastLogin: timestamp("last_login"),
   subscriptionEnd: timestamp("subscription_end"),
   lastActivity: timestamp("last_activity"),
-  preferences: jsonb(),      // JSON column for user settings/preferences
-  interests: text().array(),     // Array column for user interests
+  preferences: json(), // JSON column for user settings/preferences
+  interests: json().$type<string[]>(), // Array column for user interests
 });
 ```
 ```ts
 const response = await db.query.users.findMany({
-  where: {
-    AND: [
-      {
-        OR: [
-          { RAW: (table) => sql`LOWER(${table.name}) LIKE 'john%'` },
-          { name: { ilike: "jane%" } },
-        ],
-      },
-      {
-        OR: [
-          { RAW: (table) => sql`${table.preferences}->>'theme' = 'dark'` },
-          { RAW: (table) => sql`${table.preferences}->>'theme' IS NULL` },
-        ],
-      },
-      { RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` },
-    ],
-  },
-});
+    where: {
+      AND: [
+        {
+          OR: [{ RAW: (table) => sql`${table.name} LIKE 'john%'` }, { name: { like: "jane%" } }],
+        },
+        { 
+			RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` 
+		},
+      ],
+    },
+  }),
 ```
 ```sql
 SELECT
-  "d0"."id" AS "id",
-  "d0"."name" AS "name",
-  "d0"."email" AS "email",
-  "d0"."age" AS "age",
-  "d0"."created_at" AS "createdAt",
-  "d0"."last_login" AS "lastLogin",
-  "d0"."subscription_end" AS "subscriptionEnd",
-  "d0"."last_activity" AS "lastActivity",
-  "d0"."preferences" AS "preferences",
-  "d0"."interests" AS "interests"
+	`d0`.`id` AS `id`,
+	`d0`.`name` AS `name`,
+	`d0`.`email` AS `email`,
+	`d0`.`age` AS `age`,
+	`d0`.`created_at` AS `createdAt`,
+	`d0`.`last_login` AS `lastLogin`,
+	`d0`.`subscription_end` AS `subscriptionEnd`,
+	`d0`.`last_activity` AS `lastActivity`,
+	`d0`.`preferences` AS `preferences`,
+	`d0`.`interests` AS `interests`
 FROM
-  "users" AS "d0"
+	`users` AS `d0`
 WHERE
-  (
-    (
-      (
-        (LOWER("d0"."name") LIKE 'john%')
-        OR ("d0"."name" ILIKE 'jane%')
-      )
-    )
-    AND (
-      (
-        ("d0"."preferences" ->> 'theme' = 'dark')
-        OR ("d0"."preferences" ->> 'theme' IS NULL)
-      )
-    )
-    AND ("d0"."age" BETWEEN 25 AND 35)
-  )
+	(
+		(
+			(
+				(`d0`.`name` LIKE 'john%')
+				OR (`d0`.`name` LIKE 'jane%')
+			)
+		)
+		AND (`d0`.`age` BETWEEN 25 AND 35)
+	);
 ```
 </CodeTab>
 </CodeTabs>
@@ -946,7 +1001,7 @@ const response = await db.query.users.findMany({
 export async function migrate<
   TSchema extends Record<string, unknown>
 >(
-  db: NodePgDatabase<TSchema>,
+  db: MySql2Database<TSchema>,
   config: MigrationConfig,
 ) {
   ...
@@ -956,7 +1011,7 @@ export async function migrate<
 <Callout title='now'>
 ```ts {1,2}
 export async function migrate<TRelations extends AnyRelations>(
-	db: NodePgDatabase<TRelations>,
+	db: MySql2Database<TRelations>,
 	config: MigrationConfig,
 ) {
   ...
@@ -966,48 +1021,48 @@ export async function migrate<TRelations extends AnyRelations>(
 **session**
 <Callout type='error' title='before'>
 ```ts
-export class NodePgSession<
+export class MySql2Session<
 	TFullSchema extends Record<string, unknown>,
 	TSchema extends V1.TablesRelationalConfig,
-> extends PgSession<NodePgQueryResultHKT, TFullSchema, TSchema>
+> extends MySqlSession<MySqlQueryResultHKT, MySql2PreparedQueryHKT, TFullSchema, TSchema>
 ```
 </Callout>
 <Callout title='now'>
 ```ts {2,3}
-export class NodePgSession<
+export class MySql2Session<
 	TRelations extends AnyRelations,
-> extends PgAsyncSession<NodePgQueryResultHKT, TRelations>
+> extends MySqlSession<MySqlQueryResultHKT, TRelations>
 ```
 </Callout>
 **transaction**
 <Callout type='error' title='before'>
 ```ts
-export class NodePgTransaction<
+export class MySql2Transaction<
 	TFullSchema extends Record<string, unknown>,
 	TSchema extends V1.TablesRelationalConfig,
-> extends PgTransaction<NodePgQueryResultHKT, TFullSchema, TSchema>
+> extends MySqlTransaction<MySql2QueryResultHKT, MySql2PreparedQueryHKT, TFullSchema, TSchema>
 ```
 </Callout>
 <Callout title='now'>
 ```ts {2,3}
-export class NodePgTransaction<
+export class MySql2Transaction<
 	TRelations extends AnyRelations,
-> extends PgAsyncTransaction<NodePgQueryResultHKT, TRelations>
+> extends MySqlTransaction<MySql2QueryResultHKT, TRelations>
 ```
 </Callout>
 **driver**
 <Callout type='error' title='before'>
 ```ts
-export class NodePgDatabase<
+export class MySql2Database<
 	TSchema extends Record<string, unknown> = Record<string, never>,
-> extends PgDatabase<NodePgQueryResultHKT, TSchema>
+> extends MySqlDatabase<MySql2QueryResultHKT, MySql2PreparedQueryHKT, TSchema>
 ```
 </Callout>
 <Callout title='now'>
 ```ts {2,3}
-export class NodePgDatabase<
+export class MySql2Database<
 	TRelations extends AnyRelations = EmptyRelations,
-> extends PgAsyncDatabase<NodePgQueryResultHKT, TRelations> 
+> extends MySqlDatabase<MySql2QueryResultHKT, TRelations>
 ```
 </Callout>
 </Callout>
@@ -1067,6 +1122,6 @@ include new types used by Relational Queries v2, so make sure to update your imp
 
 <Callout collapsed='Examples'>
 ```ts
-import { RelationalQueryBuilder, PgRelationalQuery } from 'drizzle-orm/pg-core/query-builders/query';
+import { RelationalQueryBuilder, MySqlRelationalQuery } from 'drizzle-orm/mysql-core/query-builders/query';
 ```
 </Callout>
