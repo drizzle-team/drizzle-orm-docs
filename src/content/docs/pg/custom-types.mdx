@@ -37,7 +37,7 @@ const customText = customType<{ data: string }>({
   },
 });
 
-export const users = pgTable("users", {
+export const users = pgTable('users', {
   name: customText(),
 });
 ```
@@ -53,21 +53,21 @@ const customTimestamp = customType<{
   configRequired: false;
 }>({
   dataType(config) {
-    const precision = typeof config.precision !== "undefined" ? ` (${config.precision})` : "";
-    return `timestamp${precision}${config.withTimezone ? " with time zone" : ""}`;
+    const precision = typeof config?.precision !== 'undefined' ? ` (${config.precision})` : '';
+    return `timestamp${precision}${config?.withTimezone ? ' with time zone' : ''}`;
   },
   fromDriver(value: string): Date {
     return new Date(value);
   },
   codec: (config) => {
-    if (config.withTimezone) return "timestamp with time zone";
+    if (config?.withTimezone) return 'timestamp with time zone';
 
-    return "timestamp";
+    return 'timestamp';
   },
 });
 
-export const users = pgTable("users", {
-  createdAt: customTimestamp("created_at"),
+export const users = pgTable('users', {
+  createdAt: customTimestamp('created_at'),
 });
 ```
 

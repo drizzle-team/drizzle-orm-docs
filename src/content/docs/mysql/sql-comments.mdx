@@ -85,7 +85,7 @@ so the query string is fixed at preparation time and can't be modified afterward
 
 ```ts
 // can't be used
-const p = db.select().from().prepare();
+const p = db.select().from(users).prepare();
 // ❌
 p.comment({ key: 'val' }).execute();
 ```
@@ -94,5 +94,5 @@ Instead, add the comment before preparing the statement:
 
 ```ts
 // ✅
-db.select().from(users).comment({ key: 'val' });
+db.select().from(users).comment({ key: "val" }).prepare();
 ```
