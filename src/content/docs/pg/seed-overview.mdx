@@ -2,6 +2,8 @@ import Npm from "@mdx/Npm.astro";
 import Callout from '@mdx/Callout.astro';
 import CodeTabs from "@mdx/CodeTabs.astro";
 import Section from "@mdx/Section.astro";
+import Tab from "@mdx/Tab.astro";
+import Tabs from "@mdx/Tabs.astro";
 
 # Drizzle Seed
 
@@ -112,7 +114,7 @@ Each table can specify several properties to simplify seeding your database:
 
 <rem025 />
 
-- `columns`: Refine the default behavior of each column by specifying the required generator function.
+- `columns`: Refine the default behavior of each column by specifying the required generator function, or exclude the column from seeding by specifying `false`.
 - `count`: Specify the number of rows to insert into the database. By default, it's 10. If a global count is defined in the `seed()` options, the count defined here will override it for this specific table.
 - `with`: Define how many referenced entities to create for each parent table if you want to generate associated entities.
 
@@ -172,7 +174,28 @@ async function main() {
 main();
 ```
 
-**Example 2**: Seed the `users` table with 20 entities and add 10 `posts` for each `user` by seeding the `posts` table and creating a reference from `posts` to `users`
+**Example 2**: Seed only the `users` table, excluding the `name` column from seeding
+```ts filename='index.ts'
+import { drizzle } from "drizzle-orm/node-postgres";
+import { seed } from "drizzle-seed";
+import * as schema from './schema.ts'
+
+async function main() {
+  const db = drizzle(process.env.DATABASE_URL!);
+
+  await seed(db, { users: schema.users }).refine((f) => ({
+    users: {
+        columns: {
+            name: false, // the name column will not be seeded, allowing the database to use its default value.
+        }
+    }
+  }));
+}
+
+main();
+```
+
+**Example 3**: Seed the `users` table with 20 entities and add 10 `posts` for each `user` by seeding the `posts` table and creating a reference from `posts` to `users`
 ```ts filename='index.ts'
 import { drizzle } from "drizzle-orm/node-postgres";
 import { seed } from "drizzle-seed";
@@ -194,7 +217,7 @@ async function main() {
 main();
 ```
 
-**Example 3**: Seed the `users` table with 5 entities and populate the database with 100 `posts` without connecting them to the `users` entities. Refine `id` generation for `users` so 
+**Example 4**: Seed the `users` table with 5 entities and populate the database with 100 `posts` without connecting them to the `users` entities. Refine `id` generation for `users` so 
 that it will give any int from `10000` to `20000` and remains unique, and refine `posts` to retrieve values from a self-defined array
 ```ts filename='index.ts'
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -591,6 +614,24 @@ This means the `with` option will display all tables in the schema, and you will
 The `with` option works for one-to-many relationships. For example, if you have one `user` and many `posts`, you can use users `with` posts, but you cannot use posts `with` users
 </Callout>
 
-#### Type limitations for the third parameter in Drizzle tables:
-
-Currently, we do not have type support for the third parameter in Drizzle tables. While it will work at runtime, it will not function correctly at the type level
+#### Composite unique constraints
+- Seeding is not supported when two composite unique constraints share a column:
+```ts
+const composite = pgTable(
+  "composite_example",
+  {
+    id: integer("id").notNull(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+  },
+  (t) => [
+    unique("custom_name").on(t.id, t.name),
+    unique("custom_name1").on(t.name, t.slug),
+  ]
+);
+```
+This is allowed, however, if one of the constraints is a single-column unique constraint:
+```ts
+unique("custom_name1").on(t.name);
+```
+- You can’t use a generator that doesn’t expose an `isUnique` option in its config, unless it’s one of the always-unique generators: `intPrimaryKey`, `email`, `phoneNumber`, or `uuid`.
