@@ -35,6 +35,7 @@ drizzle-kit migrate
 drizzle-kit generate
 drizzle-kit push
 drizzle-kit pull
+drizzle-kit export
 ```
 It is designed to let you choose how to approach migrations based on your current business demands. 
 
@@ -126,8 +127,9 @@ Add column to `users` table
   └ Apply migrations to the database -------> │                          │
                                        │      └──────────────────────────┘
                                        │
-  ┌────────────────────────────────────┴──────────────┐
-   ALTER TABLE `users` ADD COLUMN `email` TEXT UNIQUE; 
+  ┌────────────────────────────────────┴───────────────────────────────┐
+   ALTER TABLE "users" ADD COLUMN "email" text;
+   ALTER TABLE "users" ADD CONSTRAINT "users_email_key" UNIQUE("email"); 
 ```
 </Section>
 </Callout>

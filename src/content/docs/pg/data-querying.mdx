@@ -34,10 +34,10 @@ await db
 	.where(eq(posts.id, 10))
 ```
 ```sql
-SELECT * 
-FROM posts
-LEFT JOIN comments ON posts.id = comments.post_id
-WHERE posts.id = 10
+SELECT *
+FROM "posts"
+LEFT JOIN "comments" ON "posts"."id" = "comments"."post_id"
+WHERE "posts"."id" = 10
 ```
 </Section>
 
@@ -52,7 +52,7 @@ and more. Let's look at more examples
 await db.insert(users).values({ email: 'user@gmail.com' })
 ```
 ```sql
-INSERT INTO users (email) VALUES ('user@gmail.com')
+INSERT INTO "users" ("email") VALUES ('user@gmail.com')
 ```
 </Section>
 <Section>
@@ -62,9 +62,9 @@ await db.update(users)
         .where(eq(users.id, 1))
 ```
 ```sql
-UPDATE users 
-SET email = 'user@gmail.com'
-WHERE users.id = 1
+UPDATE "users"
+SET "email" = 'user@gmail.com'
+WHERE "users"."id" = 1
 ```
 </Section>
 <Section>
@@ -72,7 +72,7 @@ WHERE users.id = 1
 await db.delete(users).where(eq(users.id, 1))
 ```
 ```sql
-DELETE FROM users WHERE users.id = 1
+DELETE FROM "users" WHERE "users"."id" = 1
 ```
 </Section>
 </CodeTabs>

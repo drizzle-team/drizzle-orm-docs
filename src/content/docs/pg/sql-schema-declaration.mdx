@@ -74,7 +74,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
+  dialect: 'postgresql',
   schema: './src/db/schema.ts'
 })
 ```
@@ -107,7 +107,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
+  dialect: 'postgresql',
   schema: './src/db/schema'
 })
 ```
@@ -127,9 +127,9 @@ You can also group them in any way you like, such as creating groups for user-re
 
 Drizzle schema consists of several model types from database you are using. With drizzle you can specify:
 - Tables with columns, constraints, etc.
-- Schemas(PostgreSQL only)
+- Schemas
 - Enums
-- Sequences(PostgreSQL only)
+- Sequences
 - Views
 - Materialized Views
 - etc.
@@ -139,7 +139,7 @@ Let's go one by one and check how the schema should be defined with drizzle
 #### **Tables and columns declaration** 
 
 A table in Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
-there is no such thing as a common table object in drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL or SQLite
+there is no such thing as a common table object in drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL, SQLite, etc.
 
 ![](@/assets/images/table-structure.svg)
 
@@ -202,34 +202,40 @@ SELECT "id", "first_name" from users;
 
 ### Camel and Snake casing
 
-Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models. 
-This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically 
-map `camelCase` from TypeScript to `snake_case` in the database by including one optional parameter during Drizzle database initialization
+Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models.
+This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically
+map `camelCase` from TypeScript to `snake_case` in the database via a dedicated builder.
 
-For such mapping, you can use the `casing` option in the Drizzle DB declaration. This parameter will 
-help you specify the database model naming convention and will attempt to map all JavaScript keys accordingly
+Use the `snakeCase` or `camelCase` builder from `drizzle-orm/pg-core` to declare a table whose column keys are
+automatically mapped to the chosen database naming convention
 
 <Section>
-```ts
+```ts {2,4,11,12}
 // schema.ts
-import { drizzle } from "drizzle-orm/node-postgres";
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { snakeCase, camelCase } from 'drizzle-orm/pg-core';
 
-export const users = pgTable('users', {
-  id: integer(),
-  firstName: varchar()
-})
+export const users = snakeCase.table('users', {
+  id: serial().primaryKey(),
+  fullName: text(),        // → full_name in DB
+  createdAt: timestamp(),  // → created_at in DB
+});
+
+// Available on all entity types:
+snakeCase.table / snakeCase.view / snakeCase.materializedView / snakeCase.schema
+camelCase.table / camelCase.view / camelCase.materializedView / camelCase.schema
 ```
 ```ts
 // db.ts
-const db = drizzle({ connection: process.env.DATABASE_URL, casing: 'snake_case' })
+import { drizzle } from "drizzle-orm/node-postgres";
+
+const db = drizzle({ connection: process.env.DATABASE_URL })
 ```
 ```ts
 // query.ts
 await db.select().from(users);
 ```
 ```sql
-SELECT "id", "first_name" from users;
+select "id", "full_name", "created_at" from "users"
 ```
 </Section>
 
@@ -247,7 +253,7 @@ We can define those columns in a separate file and then import and spread them a
 <Section>
 ```ts
 // columns.helpers.ts
-const timestamps = {
+export const timestamps = {
   updated_at: timestamp(),
   created_at: timestamp().defaultNow().notNull(),
   deleted_at: timestamp(),
@@ -303,7 +309,7 @@ Once you know the basics, let's define a schema example for a real project to ge
 > All examples will use `generateUniqueString`. The implementation for it will be provided after all the schema examples
 
 ```ts copy
-import { AnyPgColumn } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { pgEnum, pgTable as table } from "drizzle-orm/pg-core";
 import * as t from "drizzle-orm/pg-core";
 
