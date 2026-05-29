@@ -8,7 +8,7 @@ This page shows everything that changed from `drizzle-orm@0.x`, `drizzle-kit@0.x
 Read more on how to upgrade [here](/docs/mysql/upgrade-v1)
 </Callout>
 
-### Drizzle ORM: Breaking Changes
+## Breaking changes
 
 #### Relational Queries v1 removed
 
@@ -33,6 +33,19 @@ const relations = defineRelations(schema, (r) => ({
 }));
 ```
 
+#### Validator packages consolidated into `drizzle-orm`
+
+<Callout type="warning">
+You can still use drizzle-zod/valibot/typebox/arktype validation packages but all new update will be added to Drizzle ORM directly
+</Callout>
+
+- drizzle-zod -> drizzle-orm/zod
+- drizzle-valibot -> drizzle-orm/valibot
+- drizzle-typebox -> drizzle-orm/typebox-legacy (using @sinclair/typebox)
+- drizzle-typebox -> drizzle-orm/typebox (using typebox)
+- drizzle-arktype -> drizzle-orm/arktype
+- new `drizzle-orm/effect-schema` package added
+
 #### New Casing API
 
 The legacy `drizzle({ casing: 'camelCase' })` has been replaced with a table/view/schema-level API:
@@ -40,7 +53,7 @@ The legacy `drizzle({ casing: 'camelCase' })` has been replaced with a table/vie
 ```ts
 import { snakeCase, camelCase } from 'drizzle-orm/mysql-core';
 
-export const users = snakeCase.table("users", {
+export const users = snakeCase.table('users', {
   id: int().primaryKey().autoincrement(),
   fullName: text(),       // → full_name in DB
   createdAt: timestamp(), // → created_at in DB
@@ -62,19 +75,6 @@ camelCase.table / camelCase.view / camelCase.materializedView / camelCase.schema
 .generatedAlwaysAs(() => sql`some expression`)
 ```
 
-#### Validator packages consolidated into `drizzle-orm`
-
-<Callout type="warning">
-You can still use drizzle-zod/valibot/typebox/arktype validation packages but all new update will be added to Drizzle ORM directly
-</Callout>
-
-- drizzle-zod -> drizzle-orm/zod
-- drizzle-valibot -> drizzle-orm/valibot
-- drizzle-typebox -> drizzle-orm/typebox-legacy (using @sinclair/typebox)
-- drizzle-typebox -> drizzle-orm/typebox (using typebox)
-- drizzle-arktype -> drizzle-orm/arktype
-- new `drizzle-orm/effect-schema` package
-
 #### `getTableColumns` deprecation
 
 Use `getColumns` instead
@@ -91,7 +91,32 @@ import { getColumns } from 'drizzle-orm';
 const columns = getColumns(users);
 ```
 
-## Drizzle ORM: New features
+#### New migration folder structure (v3)
+
+**Linked discussion**: [#2832](https://github.com/drizzle-team/drizzle-orm/discussions/2832)
+
+<br/>
+
+- No more `journal.json`
+- SQL files and snapshots grouped into separate migration folders
+- `drizzle-kit drop` command removed
+
+These changes eliminate potential Git conflicts with the journal file and simplify the process of dropping or fixing conflicted migrations
+
+<Callout type="info">
+Read more on how to upgrade [here](/docs/mysql/upgrade-v1)
+</Callout>
+
+
+#### `drizzle-kit push --strict` deprecation
+
+The `--strict` flag has been removed — its behavior is now the default. `drizzle-kit push` always prompts for confirmation for data-loss statements unless the `--force` flag is passed. Use [drizzle-kit push --explain](/docs/mysql/drizzle-kit-push) to preview the SQL that would be executed before running it.
+
+#### Drizzle seed: UUID generator upgraded to v4
+
+The UUID generator now produces RFC 4122 v4 compliant UUIDs, ensuring compatibility with Zod v4 validation. Use `{ version: '1' }` to keep old behavior, or `{ version: '2' | '3' }` for newer generators.
+
+## Other features
 
 #### New data types
 
@@ -125,6 +150,14 @@ New MSSQL dialect support added. You can read more [here](/docs/mssql/get-starte
 
 New CockroachDB dialect support added. You can read more [here](/docs/cockroach/get-started-cockroach)
 
+#### New NetlifyDB driver
+
+New NetlifyDB driver support added. You can read more [here](/docs/connect-netlify-db)
+
+<Callout>
+Note: The Netlify Database driver is developed and maintained by the Netlify team.
+</Callout>
+
 #### SQLcommenter support
 
 Add custom tags to queries. Tags are appended as SQL comments at the end of each query. You can read more [here](/docs/sql-comments)
@@ -143,33 +176,6 @@ const query = db
   .from(users)
   .orderBy(asc(users.id.as('userId')));
 ```
-
-<br/>
---- 
-
-## Drizzle Kit: Breaking Changes
-
-#### New migration folder structure (v3)
-
-**Linked discussion**: [#2832](https://github.com/drizzle-team/drizzle-orm/discussions/2832)
-
-<br/>
-
-- No more `journal.json`
-- SQL files and snapshots grouped into separate migration folders
-- `drizzle-kit drop` command removed
-
-These changes eliminate potential Git conflicts with the journal file and simplify the process of dropping or fixing conflicted migrations
-
-<Callout type="info">
-Read more on how to upgrade [here](/docs/mysql/upgrade-v1)
-</Callout>
-
-#### `drizzle-kit push --strict` deprecation
-
-The `--strict` flag has been removed — its behavior is now the default. `drizzle-kit push` always prompts for confirmation for data-loss statements unless the `--force` flag is passed. Use [drizzle-kit push --explain](/docs/mysql/drizzle-kit-push) to preview the SQL that would be executed before running it.
-
-### Drizzle Kit: New Features
 
 #### Full `drizzle-kit` rewrite
 
@@ -199,15 +205,13 @@ How it works:
 
 If conflicts are found, the report tells you exactly which migrations on which branches are incompatible and which statements collide.
 
-#### `--ignore-conflicts` flag
+#### `drizzle-kit --ignore-conflicts` flag
 
 Bypasses commutativity checks when you know the conflicts are expected.
 
-#### drizzle-kit generate: migration conflict detection
+#### `drizzle-kit generate`: migration conflict detection
 
 `drizzle-kit generate` now identifies [incompatible changes](/docs/v1-upgrade#drizzle-kit-check--commutativity-check) across migration branches. Use `--ignore-conflicts` to bypass.
-
-### Drizzle Kit: Other
 
 #### Updates to the migration table
 
@@ -238,11 +242,11 @@ This means the upgrade handles all edge cases: normal single-developer projects,
 
 Previously the migrator only looked for local migrations with a creation date later than the last applied one. Now it detects and applies **every missing migration**, regardless of timestamp ordering. All migrations are matched against the full folder name (14-digit UTC timestamp + name suffix).
 
-#### Top-level `await` in config files
+#### Top-level `await` in drizzle config files
 
 Top-level `await` is now supported in `drizzle.config.ts` and schema files on Node.js.
 
-#### Build system improvements
+#### Drizzle-kit: Build system improvements
 
 - Migrated from `esbuild-register` to `tsx` loader — seamless ESM and CJS support
 - Native Bun and Deno launch support
@@ -251,17 +255,7 @@ Top-level `await` is now supported in `drizzle.config.ts` and schema files on No
 
 Only files with the following extensions are processed: `.js`, `.mjs`, `.cjs`, `.jsx`, `.ts`, `.mts`, `.cts`, `.tsx`. All other file types are ignored.
 
----
-
-### Drizzle Seed: Breaking Changes
-
-#### UUID generator upgraded to v4
-
-The UUID generator now produces RFC 4122 v4 compliant UUIDs, ensuring compatibility with Zod v4 validation. Use `{ version: '1' }` to keep old behavior, or `{ version: '2' | '3' }` for newer generators.
-
-### Drizzle Seed: New Features
-
-#### Ignore columns in refinements
+#### Drizzle Seed: Ignore columns in refinements
 
 Skip specific columns during seeding — the database default will be used instead:
 
