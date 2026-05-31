@@ -1,8 +1,3 @@
----
-test: 10
----
-export const a = 10;
-
 import Callout from '@mdx/Callout.astro';
 import Steps from '@mdx/Steps.astro';
 import CodeTab from '@mdx/CodeTab.astro';
@@ -35,6 +30,7 @@ drizzle-kit migrate
 drizzle-kit generate
 drizzle-kit push
 drizzle-kit pull
+drizzle-kit export
 ```
 It is designed to let you choose how to approach migrations based on your current business demands. 
 
@@ -58,26 +54,28 @@ Drizzle lets you pull database schema to TypeScript using [`drizzle-kit pull`](/
 
 <Section>
 ```
-                                  ┌────────────────────────┐      ┌─────────────────────────┐ 
-                                  │                        │ <---  CREATE TABLE "users" (
-┌──────────────────────────┐      │                        │        `id` int auto_increment primary key,
-│ ~ drizzle-kit pull       │      │                        │        `name` varchar(255),
-└─┬────────────────────────┘      │        DATABASE        │        `email` varchar(255) unique
-  │                               │                        │       );
-  └ Pull datatabase schema -----> │                        │
+                                  ┌────────────────────────┐      ┌─────────────────────────────────────┐ 
+                                  │                        │ <---  CREATE TABLE `users` (
+┌──────────────────────────┐      │                        │       	`id` int AUTO_INCREMENT PRIMARY KEY,
+│ ~ drizzle-kit pull       │      │                        │       	`name` text,
+└─┬────────────────────────┘      │        DATABASE        │       	`age` int,
+  │                               │                        │       	CONSTRAINT ... UNIQUE INDEX(`age`)
+  └ Pull datatabase schema -----> │                        │       );
   ┌ Generate Drizzle       <----- │                        │
   │ schema TypeScript file        └────────────────────────┘
   │
   v
 ```
 ```typescript
-import * as p from "drizzle-orm/mysql-core";
+import * as m from "drizzle-orm/mysql-core";
 
-export const users = p.mysqlTable("users", {
-  id: p.int().primaryKey().autoincrement(),
-  name: p.varchar({ length: 255 }),
-  email: p.varchar({ length: 255 }).unique(),
-});
+export const users = m.mysqlTable("users", {
+    id: m.int().primaryKey().autoincrement(),
+    name: m.text(),
+    age: m.int(),
+  },
+  (table) => [m.uniqueIndex("users_age_unique_idx").on(table.age)]
+);
 ```
 </Section>
 </Callout>
@@ -105,14 +103,14 @@ import * as p from "drizzle-orm/mysql-core";
 export const users = p.mysqlTable("users", {
   id: p.int().primaryKey().autoincrement(),
   name: p.varchar({ length: 255 }),
-  email: p.varchar({ length: 255 }).unique(), // <--- added column
+  email: p.varchar({ length: 255 }).notNull(), // <--- added column
 });
 ```
 ```
 Add column to `users` table                                                                          
-┌──────────────────────────┐                  
-│ + email: text().unique() │                  
-└─┬────────────────────────┘                  
+┌─────────────────────────────────────────────┐                  
+│ + email: varchar({ length: 255 }).notNull() │                  
+└─┬───────────────────────────────────────────┘                  
   │                                           
   v                                           
 ┌──────────────────────────┐                  
@@ -126,8 +124,8 @@ Add column to `users` table
   └ Apply migrations to the database -------> │                          │
                                        │      └──────────────────────────┘
                                        │
-  ┌────────────────────────────────────┴──────────────┐
-   ALTER TABLE `users` ADD COLUMN `email` varchar(255) unique; 
+  ┌────────────────────────────────────┴─────────────────┐
+   ALTER TABLE `users` ADD `email` varchar(255) NOT NULL; 
 ```
 </Section>
 </Callout>
@@ -174,9 +172,10 @@ export const users = p.mysqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE `users` (
- `id` int auto_increment primary key,
- `name` varchar(255),
- `email` varchar(255) unique
+	`id` int AUTO_INCREMENT PRIMARY KEY,
+	`name` varchar(255),
+	`email` varchar(255),
+	CONSTRAINT `email_unique` UNIQUE INDEX(`email`)
 );
 ```
 ```
@@ -242,9 +241,10 @@ export const users = p.mysqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE `users` (
- `id` int auto_increment primary key,
- `name` varchar(255),
- `email` varchar(255) unique
+	`id` int AUTO_INCREMENT PRIMARY KEY,
+	`name` varchar(255),
+	`email` varchar(255),
+	CONSTRAINT `email_unique` UNIQUE INDEX(`email`)
 );
 ```
 ```ts
@@ -317,9 +317,10 @@ export const users = p.mysqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE `users` (
- `id` int auto_increment primary key,
- `name` varchar(255),
- `email` varchar(255) unique
+  	`id` int AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(255),
+  `email` varchar(255),
+  CONSTRAINT `email_unique` UNIQUE INDEX(`email`)
 );
 ```
 ```
@@ -364,9 +365,9 @@ you can apply them to the database via [Atlas](https://atlasgo.io/guides/orms/dr
 
 <Section>
 ```typescript filename="src/schema.ts"
-import * as p from "drizzle-orm/mysql-core";
+import * as p from 'drizzle-orm/mysql-core';
 
-export const users = p.mysqlTable("users", {
+export const users = p.mysqlTable('users', {
   id: p.int().primaryKey().autoincrement(),
   name: p.varchar({ length: 255 }),
   email: p.varchar({ length: 255 }).unique(),
@@ -386,9 +387,10 @@ export const users = p.mysqlTable("users", {
 ```
 ```sql
 CREATE TABLE `users` (
- `id` int auto_increment primary key,
- `name` varchar(255),
- `email` varchar(255) unique
+        `id` int AUTO_INCREMENT PRIMARY KEY,
+        `name` varchar(255),
+        `email` varchar(255),
+        CONSTRAINT `email_unique` UNIQUE INDEX(`email`)
 );
 ```
 ```
