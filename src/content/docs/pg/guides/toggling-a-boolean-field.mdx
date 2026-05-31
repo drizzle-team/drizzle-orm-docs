@@ -1,0 +1,33 @@
+---
+title: SQL Toggle value
+---
+import Section from "@mdx/Section.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- [Update statement](/docs/update)
+- [Filters](/docs/operators) and [not operator](/docs/operators#not)
+</Prerequisites>
+
+To toggle a column value you can use `update().set()` method like below:
+
+<Section>
+```tsx copy {8}
+import { eq, not } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+await db
+  .update(table)
+  .set({
+    isActive: not(table.isActive),
+  })
+  .where(eq(table.id, 1));
+```
+
+```sql
+update "table" set "is_active" = not "is_active" where "id" = 1;
+```
+</Section>
