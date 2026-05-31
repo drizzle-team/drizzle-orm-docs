@@ -137,7 +137,7 @@ Let's go one by one and check how the schema should be defined with drizzle
 #### **Tables and columns declaration** 
 
 A table in Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
-there is no such thing as a common table object in Drizzle. You need to choose the MySQL table object.
+there is no such thing as a common table object in drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL, SQLite, etc.
 
 ![](@/assets/images/table-structure.svg)
 
@@ -201,34 +201,39 @@ SELECT `id`, `first_name` FROM `users`;
 ### Camel and Snake casing
 
 Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models. 
-This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically 
-map `camelCase` from TypeScript to `snake_case` in the database by including one optional parameter during Drizzle database initialization
+This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically
+map `camelCase` from TypeScript to `snake_case` in the database via a dedicated builder.
 
-For such mapping, you can use the `casing` option in the Drizzle DB declaration. This parameter will 
-help you specify the database model naming convention and will attempt to map all JavaScript keys accordingly
+Use the `snakeCase` or `camelCase` builder from `drizzle-orm/pg-core` to declare a table whose column keys are
+automatically mapped to the chosen database naming convention
 
 <Section>
-```ts
+```ts {2,4,11,12}
 // schema.ts
-import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+import { snakeCase, camelCase } from 'drizzle-orm/mysql-core';
 
-export const users = mysqlTable('users', {
-  id: int(),
-  firstName: varchar({ length: 256 })
-})
+export const users = snakeCase.table('users', {
+  id: int().primaryKey().autoincrement(),
+  fullName: text(), // → full_name in DB
+  createdAt: timestamp(), // → created_at in DB
+});
+
+// Available on all entity types:
+snakeCase.table / snakeCase.view / snakeCase.schema
+camelCase.table / camelCase.view / camelCase.schema
 ```
 ```ts
 // db.ts
 import { drizzle } from "drizzle-orm/mysql2";
 
-const db = drizzle({ connection: process.env.DATABASE_URL, casing: 'snake_case' })
+const db = drizzle({ connection: process.env.DATABASE_URL })
 ```
 ```ts
 // query.ts
 await db.select().from(users);
 ```
 ```sql
-SELECT `id`, `first_name` FROM `users`;
+select `id`, `full_name`, `created_at` from `users`;
 ```
 </Section>
 
@@ -246,7 +251,7 @@ We can define those columns in a separate file and then import and spread them a
 <Section>
 ```ts
 // columns.helpers.ts
-const timestamps = {
+export const timestamps = {
   updated_at: timestamp(),
   created_at: timestamp().defaultNow().notNull(),
   deleted_at: timestamp(),
@@ -270,7 +275,7 @@ export const posts = mysqlTable('posts', {
 
 #### **Schemas**
 
-\
+
 In MySQL, there is an entity called `Schema`, but in MySQL terms, this is equivalent to a `Database`. 
 
 You can define them with `drizzle-orm` and use them in queries, but they won't be detected by `drizzle-kit` or included in the migration flow
@@ -304,7 +309,7 @@ Once you know the basics, let's define a schema example for a real project to ge
 ```ts copy
 import { mysqlTable as table } from "drizzle-orm/mysql-core";
 import * as t from "drizzle-orm/mysql-core";
-import { AnyMySqlColumn } from "drizzle-orm/mysql-core";
+import type { AnyMySqlColumn } from "drizzle-orm/mysql-core";
 
 export const users = table(
   "users",
