@@ -52,7 +52,7 @@ const relations = defineRelations({ users, posts }, (r) => ({
 	}
 }))
 
-const db = drizzle(client, { relations });
+const db = drizzle({ client, relations });
 
 const result = await db.query.posts.findMany({
   with: {
@@ -74,11 +74,11 @@ const result = await db.query.posts.findMany({
 </Section>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/…';
+import { drizzle } from 'drizzle-orm/...';
 import { eq } from 'drizzle-orm';
 import { posts, users } from './schema';
 
-const db = drizzle(client);
+const db = drizzle({ client });
 
 const res = await db.select()
                     .from(posts)

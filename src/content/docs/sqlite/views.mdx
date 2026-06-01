@@ -17,6 +17,7 @@ yet when you use `sql` you have to explicitly declare view columns schema.
 <Section>
       ```ts filename="schema.ts" copy {13-14}
       import { integer, text, sqliteView, sqliteTable } from "drizzle-orm/sqlite-core";
+      import { eq } from 'drizzle-orm';
 
       export const user = sqliteTable("user", {
         id: integer().primaryKey({ autoIncrement: true }),
@@ -32,8 +33,8 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       export const customersView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW "user_view" AS SELECT * FROM "user";
-      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      CREATE VIEW `user_view` AS select "id", ... from "user";
+      CREATE VIEW `customers_view` AS select "id", ... from "user" where "user"."role" = 'customer';
       ```
     </Section>
 
@@ -42,6 +43,7 @@ You can also declare views using `standalone query builder`, it works exactly th
 <Section>
       ```ts filename="schema.ts" copy {3, 15-16}
       import { integer, text, sqliteView, sqliteTable, QueryBuilder } from "drizzle-orm/sqlite-core";
+      import { eq } from 'drizzle-orm';
 
       const qb = new QueryBuilder();
 
@@ -55,12 +57,12 @@ You can also declare views using `standalone query builder`, it works exactly th
         updatedAt: integer("updated_at"),
       });
 
-      export const userView = sqliteView("user_view").as((qb) => qb.select().from(user));
+      export const userView = sqliteView("user_view").as(() => qb.select().from(user));
       export const customerView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW "user_view" AS SELECT * FROM "user";
-      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      CREATE VIEW `user_view` AS select "id", ... from "user";
+      CREATE VIEW `customers_view` AS select "id", ... from "user" where "user"."role" = 'customer';
       ```
     </Section>
 

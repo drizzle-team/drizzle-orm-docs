@@ -92,23 +92,20 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       ```
 
       ```sql
-      CREATE TABLE `user` (
-	      `id` integer
+	  CREATE TABLE `user` (
+        `id` integer UNIQUE
       );
 
       CREATE TABLE `table` (
-      	`id` integer
+        `id` integer CONSTRAINT `custom_name` UNIQUE
       );
 
       CREATE TABLE `composite_example` (
-      	`id` integer,
-      	`name` text
+        `id` integer,
+        `name` text,
+        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
       );
-
-      CREATE UNIQUE INDEX `composite_example_id_name_unique` ON `composite_example` (`id`,`name`);
-      CREATE UNIQUE INDEX `custom_name` ON `composite_example` (`id`,`name`);
-      CREATE UNIQUE INDEX `custom_name` ON `table` (`id`);
-      CREATE UNIQUE INDEX `user_id_unique` ON `user` (`id`);
       ```
     </Section>
 
@@ -142,7 +139,7 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
 	      `id` integer PRIMARY KEY NOT NULL,
 	      `username` text NOT NULL,
 	      `age` integer,
-	      CONSTRAINT "age_check1" CHECK("users"."age" > 21)
+	      CONSTRAINT "age_check1" CHECK("age" > 21)
       );
       ```
     </Section>
@@ -159,21 +156,21 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
       import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
       export const user = sqliteTable("user", {
-        id: integer("id").primaryKey(),
+        id: integer().primaryKey({ autoIncrement: true }),
       })
 
       export const pet = sqliteTable("pet", {
-        id: integer("id").primaryKey(),
+        id: integer().primaryKey(),
       })
       ```
 
       ```sql
       CREATE TABLE `user` (
-        `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+        `id` integer PRIMARY KEY AUTOINCREMENT
       );
 
       CREATE TABLE `pet` (
-        `id` integer PRIMARY KEY AUTOINCREMENT
+        `id` integer PRIMARY KEY
       )
       ```
     </Section>
@@ -189,13 +186,13 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       import { integer, text, primaryKey, sqliteTable} from "drizzle-orm/sqlite-core";
 
       export const user = sqliteTable("user", {
-        id: integer("id").primaryKey({ autoIncrement: true }),
-        name: text("name"),
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
       });
 
       export const book = sqliteTable("book", {
-        id: integer("id").primaryKey({ autoIncrement: true }),
-        name: text("name"),
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
       });
 
       export const bookToAuthor = sqliteTable("book_to_author", {
@@ -227,17 +224,17 @@ The table with the foreign key is called the child table, and the table with the
 Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
-```typescript {11}
+	```typescript {11}
     import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
 
     export const user = sqliteTable("user", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
-      name: text("name"),
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
     });
 
     export const book = sqliteTable("book", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
-      name: text("name"),
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
       authorId: integer("author_id").references(() => user.id)
     });
     ```
@@ -245,20 +242,20 @@ You can declare them in a column declaration statement:
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
-```typescript {6,16-19}
-    import { integer, text, foreignKey, sqliteTable, AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+	```typescript {6,15-19}
+    import { integer, text, foreignKey, sqliteTable, type AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 
     export const user = sqliteTable("user", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
-      name: text("name"),
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
       parentId: integer("parent_id").references((): AnySQLiteColumn => user.id)
     });
 
     //or
     export const user = sqliteTable("user", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
-      name: text("name"),
-      parentId: integer("parent_id"),
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+      parentId: integer(),
     }, (table) => [
       foreignKey({
         columns: [table.parentId],
@@ -270,8 +267,8 @@ set return type for reference callback or use a standalone `foreignKey` operator
 
 To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
 
-```typescript {4-5,14-15,18-21}
-    import { integer, text, primaryKey, foreignKey, sqliteTable, AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+	```typescript {4-5,15-19}
+    import { integer, text, primaryKey, foreignKey, sqliteTable } from "drizzle-orm/sqlite-core";
 
     export const user = sqliteTable("user", {
       firstName: text("firstName"),
@@ -281,7 +278,7 @@ To declare multi-column foreign keys you can use a dedicated `foreignKey` operat
     ]);
 
     export const profile = sqliteTable("profile", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
+      id: integer().primaryKey({ autoIncrement: true }),
       userFirstName: text("user_first_name"),
       userLastName: text("user_last_name"),
     }, (table) => [
@@ -298,13 +295,13 @@ To declare multi-column foreign keys you can use a dedicated `foreignKey` operat
 Drizzle ORM provides API for both `index` and `unique index` declaration:
 
 <Section>
-    ```typescript {9-10}
+    ```typescript {8-9}
     import { integer, text, index, uniqueIndex, sqliteTable } from "drizzle-orm/sqlite-core";
 
     export const user = sqliteTable("user", {
-      id: integer("id").primaryKey({ autoIncrement: true }),
-      name: text("name"),
-      email: text("email"),
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+      email: text(),
     }, (table) => [
       index("name_idx").on(table.name),
       uniqueIndex("email_idx").on(table.email),

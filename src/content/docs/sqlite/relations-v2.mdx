@@ -18,9 +18,9 @@ drizzle-kit -D
 <br/>
 
 <Prerequisites>  
-  - **Relations Fundamentals** - get familiar with the concepts of foreign key constraints, soft relations, database normalization, etc - [read here](/docs/relations-schema-declaration)
-  - **Declare schema** - get familiar with how to define drizzle schemas - [read here](/docs/sql-schema-declaration)
-  - **Database connection** - get familiar with how to connect to database using drizzle - [read here](/docs/get-started-postgresql)
+  - **Relations Fundamentals** - get familiar with the concepts of foreign key constraints, soft relations, database normalization, etc - [read here](/docs/sqlite/relations-schema-declaration)
+  - **Declare schema** - get familiar with how to define drizzle schemas - [read here](/docs/sqlite/sql-schema-declaration)
+  - **Database connection** - get familiar with how to connect to database using drizzle - [read here](/docs/sqlite/get-started-sqlite)
 </Prerequisites>
 
 The sole purpose of Drizzle relations is to let you query your relational data in the most simple and concise way:
@@ -28,16 +28,16 @@ The sole purpose of Drizzle relations is to let you query your relational data i
 <CodeTabs items={["Relational queries", "Select with joins"]}>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/…';
+import { drizzle } from 'drizzle-orm/...';
 import { defineRelations } from 'drizzle-orm';
-import * as p from 'drizzle-orm/pg-core';
+import * as p from 'drizzle-orm/sqlite-core';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
 	id: p.integer().primaryKey(),
 	name: p.text().notNull()
 });
 
-export const posts = p.pgTable('posts', {
+export const posts = p.sqliteTable('posts', {
 	id: p.integer().primaryKey(),
 	content: p.text().notNull(),
 	ownerId: p.integer('owner_id'),
@@ -52,9 +52,9 @@ const relations = defineRelations({ users, posts }, (r) => ({
 	}
 }))
 
-const db = drizzle(client, { relations });
+const db = drizzle(process.env.DB_URL, { relations });
 
-const result = db.query.posts.findMany({
+const result = await db.query.posts.findMany({
   with: {
     author: true,
   },
@@ -64,6 +64,7 @@ const result = db.query.posts.findMany({
 [{
   id: 10,
   content: "My first post!",
+  ownerId: 14,
   author: {
     id: 1,
     name: "Alex"
@@ -73,11 +74,11 @@ const result = db.query.posts.findMany({
 </Section>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/…';
+import { drizzle } from 'drizzle-orm/...';
 import { eq } from 'drizzle-orm';
 import { posts, users } from './schema';
 
-const db = drizzle(client);
+const db = drizzle(process.env.DB_URL);
 
 const res = await db.select()
                     .from(posts)
@@ -119,7 +120,7 @@ This should be used when you are certain that this specific entity will always e
 - `alias` is used to add a specific alias to relationships between tables. If you have multiple identical relationships between two tables, you should 
 differentiate them using `alias`
 - `where` condition can be used for polymorphic relations. It fetches relations based on a `where` statement.
-For example, in the case above, only `verified authors` will be retrieved. Learn more about polymorphic relations [here](/docs/relations-schema-declaration#polymorphic-relations).
+For example, in the case above, only `verified authors` will be retrieved. Learn more about polymorphic relations [here](/docs/sqlite/relations-schema-declaration#polymorphic-relations).
 
 ### `many()`
 
@@ -151,7 +152,7 @@ This should be used when you are certain that this specific entity will always e
 - `alias` is used to add a specific alias to relationships between tables. If you have multiple identical relationships between two tables, you should 
 differentiate them using `alias`
 - `where` condition can be used for polymorphic relations. It fetches relations based on a `where` statement.
-For example, in the case above, only `approved posts` will be retrieved. Learn more about polymorphic relations [here](/docs/relations-schema-declaration#polymorphic-relations).
+For example, in the case above, only `approved posts` will be retrieved. Learn more about polymorphic relations [here](/docs/sqlite/relations-schema-declaration#polymorphic-relations).
 
 ## ---
 
@@ -161,10 +162,10 @@ Drizzle ORM provides you an API to define `one-to-one` relations between tables 
 An example of a `one-to-one` relation between users and users, where a user can invite another (this example uses a self reference):
 
 ```typescript copy {10-17}
-import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = pgTable('users', {
+export const users = sqliteTable('users', {
 	id: integer().primaryKey(),
 	name: text(),
 	invitedBy: integer('invited_by'),
@@ -183,18 +184,18 @@ export const relations = defineRelations({ users }, (r) => ({
 Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
 ```typescript copy {15-22}
-import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = pgTable('users', {
+export const users = sqliteTable('users', {
 	id: integer().primaryKey(),
 	name: text(),
 });
 
-export const profileInfo = pgTable('profile_info', {
-	id: serial().primaryKey(),
+export const profileInfo = sqliteTable('profile_info', {
+	id: integer().primaryKey({ autoIncrement: true }),
 	userId: integer('user_id').references(() => users.id),
-	metadata: jsonb(),
+	metadata: text({ mode: 'json' }),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -207,7 +208,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 }));
 
 const user = await db.query.users.findFirst({ with: { profileInfo: true } });
-//____^? type { id: number, profileInfo: { ... } | null  }
+//____^? type { id: number, name: string | null, profileInfo: { ... } | null  }
 ```
 
 ### One-to-many
@@ -216,15 +217,15 @@ Drizzle ORM provides you an API to define `one-to-many` relations between tables
 Example of `one-to-many` relation between users and posts they've written:
 
 ```typescript copy {15-25}
-import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = pgTable('users', {
+export const users = sqliteTable('users', {
 	id: integer('id').primaryKey(),
 	name: text('name'),
 });
 
-export const posts = pgTable('posts', {
+export const posts = sqliteTable('posts', {
 	id: integer('id').primaryKey(),
 	content: text('content'),
 	authorId: integer('author_id'),
@@ -247,13 +248,13 @@ Now lets add comments to the posts:
 ```typescript copy {9-14,22,27-32}
 ...
 
-export const posts = pgTable('posts', {
+export const posts = sqliteTable('posts', {
 	id: integer('id').primaryKey(),
 	content: text('content'),
 	authorId: integer('author_id'),
 });
 
-export const comments = pgTable("comments", {
+export const comments = sqliteTable("comments", {
   id: integer().primaryKey(),
   text: text(),
   authorId: integer("author_id"),
@@ -288,19 +289,19 @@ they have to be explicitly defined and store associations between related tables
 Example of `many-to-many` relation between users and groups we are using `through` to bypass junction table selection and directly select many `groups` for each `user`.
 ```typescript copy {27-39}
 import { defineRelations } from 'drizzle-orm';
-import { integer, pgTable, primaryKey, text } from 'drizzle-orm/pg-core';
+import { integer, sqliteTable, primaryKey, text } from 'drizzle-orm/sqlite-core';
 
-export const users = pgTable('users', {
+export const users = sqliteTable('users', {
   id: integer().primaryKey(),
   name: text(),
 });
 
-export const groups = pgTable('groups', {
+export const groups = sqliteTable('groups', {
   id: integer().primaryKey(),
   name: text(),
 });
 
-export const usersToGroups = pgTable(
+export const usersToGroups = sqliteTable(
   'users_to_groups',
   {
     userId: integer('user_id')
@@ -383,20 +384,20 @@ await db.query.groups.findMany({
 </Section>
 <Section>
 ```ts
-import * as p from "drizzle-orm/pg-core";
+import * as p from "drizzle-orm/sqlite-core";
 
-export const users = p.pgTable("users", {
+export const users = p.sqliteTable("users", {
   id: p.integer().primaryKey(),
   name: p.text().notNull(),
-  verified: p.boolean().notNull(),
+  verified: p.integer({ mode: 'boolean' }).notNull(),
 });
 
-export const groups = p.pgTable("groups", {
+export const groups = p.sqliteTable("groups", {
   id: p.integer().primaryKey(),
   title: p.text().notNull(),
 });
 
-export const usersToGroups = p.pgTable(
+export const usersToGroups = p.sqliteTable(
   "users_to_groups",
   {
     userId: p
@@ -579,18 +580,18 @@ locate the related row in the target table, significantly speeding up the join p
 
 **Example:**
 ```typescript
-import * as p from 'drizzle-orm/pg-core';
+import * as p from 'drizzle-orm/sqlite-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
 	id: p.integer().primaryKey(),
 	name: p.text(),
 });
 
-export const profileInfo = p.pgTable('profile_info', {
+export const profileInfo = p.sqliteTable('profile_info', {
 	id: p.integer().primaryKey(),
 	userId: p.integer('user_id').references(() => users.id),
-	metadata: p.jsonb(),
+	metadata: p.text({ mode: 'json' }),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -606,19 +607,19 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 To optimize queries fetching user data along with their profile information, 
 you should create an index on the `userId` column in the `profile_info` table.
 
-```typescript {13-15,21}
-import * as p from 'drizzle-orm/pg-core';
+```typescript {13-15}
+import * as p from 'drizzle-orm/sqlite-core';
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
 	id: p.integer().primaryKey(),
 	name: p.text(),
 });
 
-export const profileInfo = pgTable('profile_info', {
+export const profileInfo = p.sqliteTable('profile_info', {
 	id: p.integer().primaryKey(),
 	userId: p.integer('user_id').references(() => users.id),
-	metadata: p.jsonb(),
+	metadata: p.text({ mode: 'json' }),
 }, (table) => [
   p.index('profile_info_user_id_idx').on(table.userId)
 ]);
@@ -633,7 +634,7 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 }));
 ```
 ```sql
-CREATE INDEX idx_profile_info_user_id ON profile_info (user_id);
+CREATE INDEX `profile_info_user_id_idx` ON `profile_info` (`user_id`);
 ```
 
 #### One-to-many Relationships
@@ -653,15 +654,15 @@ retrieve all posts associated with a given user or quickly find the author of a 
 
 **Example:**
 ```typescript
-import * as p from "drizzle-orm/pg-core";
+import * as p from "drizzle-orm/sqlite-core";
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
 	id: p.integer().primaryKey(),
 	name: p.text(),
 });
 
-export const posts = p.pgTable('posts', {
+export const posts = p.sqliteTable('posts', {
 	id: p.integer().primaryKey(),
 	content: p.text(),
 	authorId: p.integer('author_id'),
@@ -683,20 +684,20 @@ export const relations = defineRelations({ users, posts }, (r) => ({
 To optimize queries involving users and their posts, create an index on the `authorId` column in the `posts` table.
 
 ```typescript {13-15}
-import * as p from "drizzle-orm/pg-core";
+import * as p from "drizzle-orm/sqlite-core";
 import { defineRelations } from 'drizzle-orm';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
 	id: p.integer().primaryKey(),
 	name: p.text(),
 });
 
-export const posts = p.pgTable('posts', {
+export const posts = p.sqliteTable('posts', {
 	id: p.integer().primaryKey(),
 	content: p.text(),
 	authorId: p.integer('author_id'),
 }, (t) => [
-  index('posts_author_id_idx').on(table.authorId)
+  p.index('posts_author_id_idx').on(t.authorId)
 ]);
 
 export const relations = defineRelations({ users, posts }, (r) => ({
@@ -712,7 +713,7 @@ export const relations = defineRelations({ users, posts }, (r) => ({
 }));
 ```
 ```sql
-CREATE INDEX idx_posts_author_id ON posts (author_id);
+CREATE INDEX `posts_author_id_idx` ON `posts` (`author_id`);
 ```
 
 #### Many-to-many Relationships
@@ -744,19 +745,19 @@ In the "users and groups" example, the `usersToGroups` junction table connects `
 
 ```typescript
 import { defineRelations } from 'drizzle-orm';
-import * as p from 'drizzle-orm/pg-core';
+import * as p from 'drizzle-orm/sqlite-core';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const groups = p.pgTable('groups', {
+export const groups = p.sqliteTable('groups', {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const usersToGroups = p.pgTable(
+export const usersToGroups = p.sqliteTable(
   'users_to_groups',
   {
     userId: p.integer('user_id')
@@ -788,19 +789,19 @@ To optimize queries for users and groups, create indexes on `usersToGroups` tabl
 
 ```typescript {26-28}
 import { defineRelations } from 'drizzle-orm';
-import * as p from 'drizzle-orm/pg-core';
+import * as p from 'drizzle-orm/sqlite-core';
 
-export const users = p.pgTable('users', {
+export const users = p.sqliteTable('users', {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const groups = p.pgTable('groups', {
+export const groups = p.sqliteTable('groups', {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const usersToGroups = p.pgTable(
+export const usersToGroups = p.sqliteTable(
   'users_to_groups',
   {
     userId: p.integer('user_id')
@@ -812,9 +813,9 @@ export const usersToGroups = p.pgTable(
   },
   (t) => [
     p.primaryKey({ columns: [t.userId, t.groupId] }),
-    p.index('users_to_groups_user_id_idx').on(table.userId),
-    p.index('users_to_groups_group_id_idx').on(table.groupId),
-    p.index('users_to_groups_composite_idx').on(table.userId, table.groupId),
+    p.index('users_to_groups_user_id_idx').on(t.userId),
+    p.index('users_to_groups_group_id_idx').on(t.groupId),
+    p.index('users_to_groups_composite_idx').on(t.userId, t.groupId),
   ],
 );
 
@@ -833,9 +834,9 @@ export const relations = defineRelations({ users, groups, usersToGroups },
 );
 ```
 ```sql
-CREATE INDEX idx_users_to_groups_user_id ON users_to_groups (user_id);
-CREATE INDEX idx_users_to_groups_group_id ON users_to_groups (group_id);
-CREATE INDEX idx_users_to_groups_composite ON users_to_groups (userId, groupId);
+CREATE INDEX `users_to_groups_user_id_idx` ON `users_to_groups` (`user_id`);
+CREATE INDEX `users_to_groups_group_id_idx` ON `users_to_groups` (`group_id`);
+CREATE INDEX `users_to_groups_composite_idx` ON `users_to_groups` (`user_id`,`group_id`);
 ```
 
 By applying these indexing strategies, you can significantly improve the performance of your Drizzle ORM applications when working with relational data, especially as your data volume grows and your queries become more complex. Remember to choose the indexes that best suit your specific query patterns and application needs.
@@ -860,15 +861,15 @@ The following two examples will work exactly the same in terms of querying the d
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
 ```ts {15}
-export const users = p.pgTable("users", {
+export const users = p.sqliteTable("users", {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const profileInfo = p.pgTable("profile_info", {
+export const profileInfo = p.sqliteTable("profile_info", {
   id: p.integer().primaryKey(),
   userId: p.integer("user_id"),
-  metadata: p.jsonb(),
+  metadata: p.text({ mode: 'json' }),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -883,15 +884,15 @@ export const relations = defineRelations({ users, profileInfo }, (r) => ({
 </CodeTab>
 <CodeTab>
 ```ts {15}
-export const users = p.pgTable("users", {
+export const users = p.sqliteTable("users", {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const profileInfo = p.pgTable("profile_info", {
+export const profileInfo = p.sqliteTable("profile_info", {
   id: p.integer().primaryKey(),
   userId: p.integer("user_id").references(() => users.id),
-  metadata: p.jsonb(),
+  metadata: p.text({ mode: 'json' }),
 });
 
 export const relations = defineRelations({ users, profileInfo }, (r) => ({
@@ -914,17 +915,17 @@ example, if you define a `posts` table that has the `author` and `reviewer`
 relations.
 
 ```ts {19,22,29,34}
-import { pgTable, integer, text } from 'drizzle-orm/pg-core';
+import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 import { defineRelations } from 'drizzle-orm';
  
-export const users = pgTable('users', {
-	id: integer('id').primaryKey(),
-	name: text('name'),
+export const users = sqliteTable('users', {
+	id: integer().primaryKey(),
+	name: text(),
 });
 
-export const posts = pgTable('posts', {
-	id: integer('id').primaryKey(),
-	content: text('content'),
+export const posts = sqliteTable('posts', {
+	id: integer().primaryKey(),
+	content: text(),
 	authorId: integer('author_id'),
 	reviewerId: integer('reviewer_id'),
 });

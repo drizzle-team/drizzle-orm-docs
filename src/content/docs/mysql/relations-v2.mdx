@@ -52,7 +52,7 @@ export const relations = defineRelations({ users, posts }, (r) => ({
 	}
 }))
 
-const db = drizzle(client, { relations });
+const db = drizzle({ client, relations });
 
 const result = await db.query.posts.findMany({
   with: {
@@ -88,7 +88,7 @@ export const posts = p.mysqlTable('posts', {
 	ownerId: p.int('owner_id'),
 });
 
-const db = drizzle(client);
+const db = drizzle({ client });
 
 const res = await db.select()
                     .from(posts)
