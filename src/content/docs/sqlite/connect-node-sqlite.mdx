@@ -2,7 +2,7 @@ import Npm from "@mdx/Npm.astro";
 import Callout from '@mdx/Callout.astro';
 import AnchorCards from '@mdx/AnchorCards.astro';
 import Steps from '@mdx/Steps.astro';
-import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import WhatsNextSQLite from "@mdx/WhatsNextSQLite.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 
@@ -51,7 +51,7 @@ If you want to use **sync** APIs:
 import { drizzle } from 'drizzle-orm/node-sqlite';
 import { DatabaseSync } from 'node:sqlite';
 
-const sqlite = new Database('sqlite.db');
+const sqlite = new DatabaseSync('sqlite.db');
 const db = drizzle({ client: sqlite });
 
 const result = db.select().from(users).all();
@@ -62,4 +62,4 @@ const result = db.select().from(users).run();
 
 #### What's next?
 
-<WhatsNextPostgres/>
+<WhatsNextSQLite/>

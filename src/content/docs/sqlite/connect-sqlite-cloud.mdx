@@ -7,7 +7,7 @@ import AnchorCards from '@mdx/AnchorCards.astro';
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import Section from "@mdx/Section.astro";
-import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import WhatsNextSQLite from "@mdx/WhatsNextSQLite.astro";
 
 # Drizzle \<\> SQLite Cloud
 <Prerequisites>
@@ -20,8 +20,8 @@ According to the **[official website](https://docs.sqlitecloud.io/docs/overview)
 
 #### Step 1 - Install packages
 <Npm>
-drizzle-orm@beta @sqlitecloud/drivers
--D drizzle-kit@beta
+drizzle-orm @sqlitecloud/drivers
+-D drizzle-kit
 </Npm>
 
 #### Step 2 - Initialize the driver and make a query
@@ -30,7 +30,7 @@ import { drizzle } from 'drizzle-orm/sqlite-cloud';
 
 const db = drizzle(process.env.SQLITE_CLOUD_CONNECTION_STRING);
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 
 If you need to provide your existing drivers:
@@ -42,9 +42,9 @@ import { drizzle } from 'drizzle-orm/sqlite-cloud';
 const client = new Database(process.env.SQLITE_CLOUD_CONNECTION_STRING!);
 const db = drizzle({ client });
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 
 #### What's next?
 
-<WhatsNextPostgres/>
+<WhatsNextSQLite/>

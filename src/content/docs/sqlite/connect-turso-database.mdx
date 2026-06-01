@@ -2,7 +2,7 @@ import Npm from "@mdx/Npm.astro";
 import Callout from '@mdx/Callout.astro';
 import AnchorCards from '@mdx/AnchorCards.astro';
 import Steps from '@mdx/Steps.astro';
-import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+import WhatsNextSQLite from "@mdx/WhatsNextSQLite.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import LibsqlTable from "@mdx/LibsqlTable.mdx";
@@ -21,8 +21,8 @@ Turso is the small database to power your big dreams in the age of AI.
 
 #### Step 1 - Install packages
 <Npm>
-drizzle-orm@beta @tursodatabase/database
--D drizzle-kit@beta
+drizzle-orm @tursodatabase/database
+-D drizzle-kit
 </Npm>
 
 #### Step 2 - Initialize the driver and make a query
@@ -31,7 +31,7 @@ import { drizzle } from 'drizzle-orm/tursodatabase/database';
 
 const db = drizzle('sqlite.db');
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 
 If you need to provide your existing drivers:
@@ -43,9 +43,9 @@ import { drizzle } from 'drizzle-orm/tursodatabase/database';
 const client = new Database('sqlite.db');
 const db = drizzle({ client });
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 
 #### What's next?
 
-<WhatsNextPostgres/>
+<WhatsNextSQLite/>

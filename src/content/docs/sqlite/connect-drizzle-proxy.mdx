@@ -54,6 +54,7 @@ Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the retu
 <Section>
 ```typescript copy
 import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import axios from 'axios';
 
 const db = drizzle(async (sql, params, method) => {
   try {
@@ -75,6 +76,7 @@ You will need to specify a specific callback for batch queries and handle reques
 
 ```ts
 import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import axios from 'axios';
 
 type ResponseType = { rows: any[][] | any[] }[];
 
