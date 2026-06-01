@@ -1,32 +1,27 @@
-
 import Callout from '@mdx/Callout.astro';
 import CodeTabs from '@mdx/CodeTabs.astro';
 
 ## Type API
-To retrieve a type from your table schema for `select` and `insert` queries, you can make use of our type helpers.
+Use Drizzle's type helpers to infer `select` and `insert` models from a SQLite table schema.
 
 ```ts
 import { integer, text, sqliteTable } from 'drizzle-orm/sqlite-core';
 import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
 
 const users = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
 });
 
 type SelectUser = typeof users.$inferSelect;
 type InsertUser = typeof users.$inferInsert;
-// or
-type SelectUser = typeof users._.$inferSelect;
-type InsertUser = typeof users._.$inferInsert;
-// or
-type SelectUser = InferSelectModel<typeof users>;
-type InsertUser = InferInsertModel<typeof users>;
+
+type SelectUserAlt = InferSelectModel<typeof users>;
+type InsertUserAlt = InferInsertModel<typeof users>;
 ```
 
-
 ## Logging
-To enable default query logging, just pass `{ logger: true }` to the `drizzle` initialization function:
+Enable default query logging by passing `{ logger: true }` to `drizzle`.
 ```typescript copy
 import { drizzle } from 'drizzle-orm/...'; // driver specific
 
@@ -35,7 +30,7 @@ const db = drizzle({ logger: true });
 
 You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
 ```typescript copy
-import { DefaultLogger, LogWriter } from 'drizzle-orm/logger';
+import { DefaultLogger, type LogWriter } from 'drizzle-orm/logger';
 import { drizzle } from 'drizzle-orm/...'; // driver specific
 
 class MyLogWriter implements LogWriter {
@@ -45,13 +40,14 @@ class MyLogWriter implements LogWriter {
 }
 
 const logger = new DefaultLogger({ writer: new MyLogWriter() });
-const db = drizzle({ logger });
+const db = drizzle(process.env.DB_URL, { logger });
 ```
 
-You can also create a custom logger:
-```typescript copy
-import { Logger } from 'drizzle-orm/logger';
-import { drizzle } from 'drizzle-orm/...'; // driver specific
+You can also provide a custom logger.
+
+```ts
+import type { Logger } from 'drizzle-orm/logger';
+import { drizzle } from 'drizzle-orm/...';
 
 class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -59,13 +55,11 @@ class MyLogger implements Logger {
   }
 }
 
-const db = drizzle({ logger: new MyLogger() });
+const db = drizzle(process.env.DB_URL, { logger: new MyLogger() });
 ```
 
-
 ## Multi-project schema
-**Table creator** API lets you define customize table names.  
-It's very useful when you need to keep schemas of different projects in one database.
+Use `sqliteTableCreator` to customize table names when several projects share one database.
 
 ```ts {3}
 import { integer, text, sqliteTableCreator } from 'drizzle-orm/sqlite-core';
@@ -73,8 +67,8 @@ import { integer, text, sqliteTableCreator } from 'drizzle-orm/sqlite-core';
 const sqliteTable = sqliteTableCreator((name) => `project1_${name}`);
 
 const users = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
 });
 ```
 ```ts {10}
@@ -96,10 +90,17 @@ You can apply multiple `or` filters:
 tablesFilter: ["project1_*", "project2_*"]
 ```
 
+```sql
+CREATE TABLE `project1_users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text NOT NULL
+);
+```
 
-## Printing SQL query
-You can print SQL queries with `db` instance or by using **[`standalone query builder`](#standalone-query-builder)**.
-```typescript copy
+## Printing SQL Query
+Print generated SQL from a query with `.toSQL()`.
+
+```ts
 const query = db
   .select({ id: users.id, name: users.name })
   .from(users)
@@ -112,11 +113,13 @@ const query = db
 }
 ```
 
-## Raw SQL queries execution
+## Raw SQL Queries
 If you have some complex queries to execute and `drizzle-orm` can't handle them yet,
-you can use the `db.execute` method to execute raw `parametrized` queries.
+you can use the `db.run`, `db.all`, `db.values`, `db.get` methods to execute raw `parametrized` queries.
 
 ```ts
+import { sql } from 'drizzle-orm';
+
 const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
 
 const res: unknown[] = db.all(statement)
@@ -125,11 +128,10 @@ const res: unknown[][] = db.values(statement)
 const res: Database.RunResult = db.run(statement)
 ```
 
+## Standalone Query Builder
+Use the SQLite query builder without creating a database instance.
 
-## Standalone query builder
-Drizzle ORM provides a standalone query builder that allows you to build queries
-without creating a database instance and get generated SQL.
-```typescript copy
+```ts
 import { QueryBuilder } from 'drizzle-orm/sqlite-core';
 
 const qb = new QueryBuilder();
@@ -138,43 +140,35 @@ const query = qb.select().from(users).where(eq(users.name, 'Dan'));
 const { sql, params } = query.toSQL();
 ```
 
-## Get typed columns
-You can get a typed columns map,
-very useful when you need to omit certain columns upon selection.
-
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/sqlite/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
-
-
-<br/>
+## Get Typed Columns
+Use `getColumns` to get a typed column map, which is useful when excluding fields from a selection.
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
-  ```ts
-  import { getColumns } from "drizzle-orm";
-  import { user } from "./schema";
+```ts
+import { getColumns } from "drizzle-orm";
+import { users } from "./schema";
 
-  const { password, role, ...rest } = getColumns(user);
+const { password, role, ...rest } = getColumns(users);
 
-  await db.select({ ...rest }).from(users);
-  ```
-  ```ts
-  import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
+await db.select({ ...rest }).from(users);
+```
+```ts
+import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
 
-  export const user = sqliteTable("user", {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-    name: text("name"),
-    email: text("email"),
-    password: text("password"),
-    role: text("role").$type<"admin" | "customer">(),
-  });
-  ```
+export const users = sqliteTable("users", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text(),
+  email: text(),
+  password: text(),
+  role: text().$type<"admin" | "customer">(),
+});
+```
 </CodeTabs>
 
-## Get table information
-```ts copy
+## Get Table Information
+Use `getTableConfig` to inspect SQLite table metadata.
+
+```ts
 import { getTableConfig, sqliteTable } from 'drizzle-orm/sqlite-core';
 
 export const table = sqliteTable(...);
@@ -186,20 +180,13 @@ const {
   checks,
   primaryKeys,
   name,
-  schema,
+  uniqueConstraints,
 } = getTableConfig(table);
 ```
 
-## Compare objects types (instanceof alternative)
+## Compare Object Types
+Use `is()` instead of `instanceof` to check Drizzle object types.
 
-You can check if an object is of a specific Drizzle type using the `is()` function. 
-You can use it with any available type in Drizzle.
-
-<Callout type="warning" emoji="⭐️">
-  You should always use `is()` instead of `instanceof`
-</Callout>
-
-**Few examples**
 ```ts
 import { Column, is } from 'drizzle-orm';
 
@@ -208,20 +195,12 @@ if (is(value, Column)) {
 }
 ```
 
-### Mock Driver
-This API is a successor to an undefined `drizzle({} as any)` API which we've used internally in Drizzle tests and rarely recommended to external developers. 
+## Mock Driver
+Use `drizzle.mock()` when you need a typed database object without a real PostgreSQL connection.
 
-We decided to build and expose a proper API, every `drizzle` driver now has `drizzle.mock()`:
 ```ts
 import { drizzle } from "drizzle-orm/...";
+import { relations } from "./relations";
 
-const db = drizzle.mock();
-```
-
-you can provide schema if necessary for types
-```ts
-import { drizzle } from "drizzle-orm/...";
-import * as schema from "./schema"
-
-const db = drizzle.mock({ schema });
+const db = drizzle.mock({ relations });
 ```

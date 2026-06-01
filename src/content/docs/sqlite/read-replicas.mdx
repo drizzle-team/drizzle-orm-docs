@@ -11,8 +11,8 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 
 const usersTable = sqliteTable('users', {
-	id: int('id' as string).primaryKey(),
-	name: text('name').notNull(),
+	id: int().primaryKey(),
+	name: text().notNull(),
 });
 
 const primaryDb = drizzle({ client: createClient({ url: 'DATABASE_URL', authToken: 'DATABASE_AUTH_TOKEN' }) });

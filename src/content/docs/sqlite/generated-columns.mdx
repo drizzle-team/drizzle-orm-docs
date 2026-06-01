@@ -4,17 +4,9 @@ import Callout from '@mdx/Callout.astro';
 
 # Generated Columns
 
-<Callout type="info">
-To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
-</Callout>
-
 1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
 
 2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
-
-<Callout type="info">
-    The implementation and usage of generated columns can vary significantly across different SQL databases. PostgreSQL, MySQL, and SQLite each have unique features, capabilities, and limitations when it comes to generated columns. In this section, we will explore these differences in detail to help you understand how to best utilize generated columns in each database system.
-</Callout>
 
 #### Database side
     **Types**: `STORED`, `VIRTUAL`
@@ -41,34 +33,11 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     #### Features 
     This function can accept generated expression in 2 ways:
 
-    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
-    
-    In versions before 1.0.0-beta.12, `.generatedAlwaysAs()` also accepted literals as expressions.
-
-    **`string`**
-    <CodeTab>
-    ```ts
-    export const test = sqliteTable("test", {
-        id: int("id").primaryKey(),
-        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
-    });
-    ```
-
-    ```sql
-    CREATE TABLE `test` (
-	    `id` integer PRIMARY KEY,
-	    `gen_name` text GENERATED ALWAYS AS ('hello world!') VIRTUAL
-    );
-    ```
-    </CodeTab>
-    
-    </Callout>
-
     **`sql`** tag - if you want drizzle to escape some values for you
 
     ```ts
     export const test = sqliteTable("test", {
-        id: int("id").primaryKey(),
+        id: int().primaryKey(),
         generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
@@ -96,19 +65,18 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     );
     ```
 
-    #### Limitations
-    Drizzle Kit will also have limitations for `push` and `generate` command:
-    1. You can't change the generated constraint expression with the stored type in an existing table. You would need to delete this table and create it again. This is due to SQLite limitations for such actions. We will handle this case in future releases (it will involve the creation of a new table with data migration).
-    2. You can't add a `stored` generated expression to an existing column for the same reason as above. However, you can add a `virtual` expression to an existing column.
-    3. You can't change a `stored` generated expression in an existing column for the same reason as above. However, you can change a `virtual` expression.
-    4. You can't change the generated constraint type from `virtual` to `stored` for the same reason as above. However, you can change from `stored` to `virtual`.
+    #### Behavior in Drizzle Kit
+	`push` and `generate` command:
+    1. Changing the generated expression on a `stored` column in an existing table will cause table recreation. (Changing a `virtual` expression will cause column recreation).
+    2. Adding a `stored` generated expression to an existing column will cause table recreation. (Adding a `virtual` expression to an existing column will cause column recreation).
+    3. Changing the generated mode from `virtual` to `stored` will cause table recreation. (Switching from `stored` to `virtual` will cause column recreation).
 
   <CodeTabs items={["schema.ts"]}>
 	<CodeTab>
 	```typescript copy
     export const users = sqliteTable("users", {
-      id: int("id"),
-      name: text("name"),
+      id: int(),
+      name: text(),
       storedGenerated: text("stored_gen").generatedAlwaysAs(
         (): SQL => sql`${users.name} || 'hello'`,
         { mode: "stored" }

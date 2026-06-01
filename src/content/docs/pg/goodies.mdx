@@ -179,7 +179,7 @@ Use `drizzle.mock()` when you need a typed database object without a real Postgr
 
 ```ts
 import { drizzle } from 'drizzle-orm/node-postgres';
-import * as schema from './schema';
+import { relations } from './relations';
 
-const db = drizzle.mock({ schema });
+const db = drizzle.mock({ relations });
 ```

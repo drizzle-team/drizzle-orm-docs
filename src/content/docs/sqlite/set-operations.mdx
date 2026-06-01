@@ -29,7 +29,7 @@ Get all names from customers and users tables without duplicates.
     (select "name" from "sellers")
     union 
     (select "name" from "customers")
-    limit ?
+    limit 10
     ```
 	</CodeTab>
     <CodeTab>
@@ -43,7 +43,7 @@ Get all names from customers and users tables without duplicates.
       .limit(10);
     ```
     ```sql
-    select "name" from "sellers" union select "name" from "customers" limit ?
+    select "name" from "sellers" union select "name" from "customers" limit 10
     ```
     </CodeTab>
     <CodeTab>
@@ -51,16 +51,16 @@ Get all names from customers and users tables without duplicates.
     import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
     const users = sqliteTable('sellers', {
-        id: int('id').primaryKey(),
-        name: text('name').notNull(),
-        address: text('address'),
+        id: int().primaryKey(),
+        name: text().notNull(),
+        address: text(),
     });
     
     const customers = sqliteTable('customers', {
-        id: int('id').primaryKey(),
-        name: text('name').notNull(),
-        city: text('city'),
-        email: text('email').notNull()
+        id: int().primaryKey(),
+        name: text().notNull(),
+        city: text(),
+        email: text().notNull()
     });
     ```
     </CodeTab>

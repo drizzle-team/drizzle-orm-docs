@@ -21,7 +21,7 @@ import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/...";
 
 const db = drizzle(process.env.DB_URL!, {
-  cache: upstashCache(),
+  cache: upstashCache({ token: process.env.UPSTASH_TOKEN, url: process.env.UPSTASH_URL }),
 });
 ```
 
@@ -233,6 +233,10 @@ export class TestGlobalCache extends Cache {
   // - 'key': A hashed query and parameters.
   // - 'response': An array of values returned by Drizzle from the database.
   // - 'tables': An array of tables involved in the select queries. This information is needed for cache invalidation.
+  // - 'isTag': A boolean flag indicating whether this cache entry represents a tag-based query.
+  //    When true, the entry is associated with a specific tag rather than table-level invalidation,
+  //    allowing you to invalidate cached queries by tag name. See the UpstashCache:
+  //    https://github.com/drizzle-team/drizzle-orm/blob/beta/drizzle-orm/src/cache/upstash/cache.ts for an example
   //
   // For example, if a query uses the "users" and "posts" tables, you can store this information. Later, when the app executes
   // any mutation statements on these tables, you can remove the corresponding key from the cache.
@@ -241,6 +245,7 @@ export class TestGlobalCache extends Cache {
     key: string,
     response: any,
     tables: string[],
+    isTag: boolean = false,
     config?: CacheConfig,
   ): Promise<void> {
     const ttl = config?.px ?? (config?.ex ? config.ex * 1000 : this.globalTtl);
@@ -315,7 +320,7 @@ export class TestGlobalCache extends Cache {
 - Using cache with raw queries, such as:
 
 ```ts
-db.execute(sql`select 1`);
+db.all(sql`select 1`);
 ```
 
 - Using cache with `batch` feature in `d1` and `libsql`
@@ -343,5 +348,4 @@ await db.query.users.findMany();
 ```
 
 - Using cache with `better-sqlite3`, `Durable Objects`, `expo sqlite`
-- Using cache with AWS Data API drivers
 - Using cache with views
