@@ -14,9 +14,9 @@ We have native support for all of them, yet if that's not enough for you, feel f
 <Callout title='important' type='warning'>
 All examples in this part of the documentation do not use database column name aliases, and column names are generated from TypeScript keys. 
 
-You can use database aliases in column names if you want, and you can also use the `casing` parameter to define a mapping strategy for Drizzle. 
-
+You can use database aliases in column names if you want. You can use database aliases in column names if you want, and you can also use the `casing API` to define a mapping strategy for Drizzle.
 You can read more about it [here](/docs/sqlite/sql-schema-declaration#shape-your-data-schema)
+
 </Callout>
 
 ### Integer
@@ -27,7 +27,7 @@ A signed integer, stored in `0`, `1`, `2`, `3`, `4`, `6`, or `8` bytes depending
 ```typescript
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	id: integer()
 });
 
@@ -54,7 +54,7 @@ integer({ mode: 'number' }).primaryKey({ autoIncrement: true })
 ```
 ```sql
 CREATE TABLE `table` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
+	`id` integer PRIMARY KEY AUTOINCREMENT
 );
 ```
 </Section>
@@ -67,7 +67,7 @@ A floating point value, stored as an `8-byte IEEE` floating point number.
 ```typescript
 import { real, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	real: real()
 });
 
@@ -93,7 +93,7 @@ A text string, stored using the database encoding (`UTF-8`, `UTF-16BE` or `UTF-1
 ```typescript
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	text: text()
 });
 
@@ -129,7 +129,7 @@ A blob of data, stored exactly as it was input.
 ```typescript
 import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	blob: blob()
 });
 
@@ -175,7 +175,7 @@ values in the database.
 ```typescript
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	id: integer({ mode: 'boolean' })
 });
 ```
@@ -198,7 +198,7 @@ This mode allows you to work with BigInt instances in your code, and Drizzle sto
 ```typescript
 import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	id: blob({ mode: 'bigint' })
 });
 
@@ -215,21 +215,22 @@ CREATE TABLE `table` (
 
 <Section>
 ```typescript
-import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
+import { numeric, sqliteTable } from 'drizzle-orm/sqlite-core';
 
-const table = sqliteTable('table', {
-	numeric: numeric(),
-	numericNum: numeric({ mode: 'number' }),
-	numericBig: numeric({ mode: 'bigint' }),
+export const table = sqliteTable('table', {
+  numeric: numeric(),
+  numericNum: numeric({ mode: 'number' }),
+  numericBig: numeric({ mode: 'bigint' }),
+  numericString: numeric({ mode: 'string' }),
 });
-
 ```
 
 ```sql
 CREATE TABLE `table` (
 	`numeric` numeric,
 	`numericNum` numeric,
-	`numericBig` numeric
+	`numericBig` numeric,
+	`numericString` numeric
 );
 ```
 </Section>
@@ -245,7 +246,7 @@ type Data = {
 	bar: number;
 };
 
-const users = sqliteTable('users', {
+export const users = sqliteTable('users', {
   id: integer().$type<UserId>().primaryKey(),
   jsonField: blob().$type<Data>(),
 });
@@ -255,7 +256,7 @@ const users = sqliteTable('users', {
 `NOT NULL` constraint dictates that the associated column may not contain a `NULL` value.
 <Section>
 ```typescript
-const table = sqliteTable('table', { 
+export const table = sqliteTable('table', { 
 	numInt: integer().notNull() 
 });
 ```
@@ -282,7 +283,7 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	int1: integer().default(42),
 	int2: integer().default(sql`(abs(42))`)
 });
@@ -303,7 +304,7 @@ A default value may also be one of the special case-independent keywords `CURREN
 import { sql } from "drizzle-orm";
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable("table", {
+export const table = sqliteTable("table", {
   time: text().default(sql`(CURRENT_TIME)`),
   date: text().default(sql`(CURRENT_DATE)`),
   timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
@@ -331,7 +332,7 @@ These functions can assist you in utilizing various implementations such as `uui
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 import { createId } from '@paralleldrive/cuid2';
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
 	id: text().$defaultFn(() => createId()),
 });
 ```
@@ -351,7 +352,7 @@ when the row is inserted as well, and the returned value will be used as the col
 ```ts
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
-const table = sqliteTable('table', {
+export const table = sqliteTable('table', {
     alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
 ```
