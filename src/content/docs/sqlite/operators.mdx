@@ -357,19 +357,19 @@ SELECT * FROM table  WHERE table.column LIKE '%llo wor%'
 ```
 </Section>
 
-### notIlike
+### notLike
 
   
-Value is not like some other value, case insensitive
+Value is not like some other value, case sensitive
 <Section>
 ```typescript
-import { notIlike } from "drizzle-orm";
+import { notLike } from "drizzle-orm";
 
-db.select().from(table).where(notIlike(table.column, "%llo wor%"));
+db.select().from(table).where(notLike(table.column, "%llo wor%"));
 ```
 
 ```sql
-SELECT * FROM table WHERE table.column NOT ILIKE '%llo wor%'
+SELECT * FROM table WHERE table.column NOT LIKE '%llo wor%'
 ```
 </Section>
 

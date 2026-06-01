@@ -11,13 +11,13 @@ Drizzle ORM has APIs for `INNER JOIN`, `LEFT JOIN`, `RIGHT JOIN`, `FULL JOIN`, a
 Lets have a quick look at examples based on below table schemas:
 ```typescript copy
 export const users = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
 });
 
 export const pets = sqliteTable('pets', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
   ownerId: integer('owner_id').notNull().references(() => users.id),
 })
 ```
@@ -261,8 +261,8 @@ const result: {
 
 ```typescript
 export const user = sqliteTable("user", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
   parentId: integer("parent_id").notNull().references((): AnyColumn => user.id)
 });
 ```
@@ -292,7 +292,7 @@ const result = rows.reduce<Record<number, { user: User; pets: Pet[] }>>(
     }
 
     if (pet) {
-      acc[user.id].pets.push(pet);
+      acc[user.id]!.pets.push(pet);
     }
 
     return acc;
@@ -313,13 +313,13 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
 const cities = sqliteTable('cities', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 const users = sqliteTable('users', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+  id: integer().primaryKey(),
+  name: text(),
   cityId: integer('city_id').references(() => cities.id)
 });
 
@@ -330,13 +330,13 @@ const result = db.select().from(cities).leftJoin(users, eq(cities.id, users.city
 ## Many-to-many example
 ```typescript
 const users = sqliteTable('users', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 const chatGroups = sqliteTable('chat_groups', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 const usersToChatGroups = sqliteTable('usersToChatGroups', {

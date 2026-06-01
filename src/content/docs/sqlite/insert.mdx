@@ -4,6 +4,21 @@ import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 
 # SQL Insert
+
+<Callout type='info'>
+All the values provided to `.values()`are parameterized automatically.
+For example, this query:
+```ts
+await db.insert(users).values({ id: 1, name: 'Andrew' });
+```
+will be translated to:
+```sql
+insert into "users" ("id", "name") values (?, ?) -- params: ['Andrew']
+```
+</Callout>
+
+<br/>
+
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
 
 Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
@@ -13,7 +28,7 @@ Inserting data with Drizzle is extremely straightforward and sql-like. See for y
 await db.insert(users).values({ name: 'Andrew' });
 ```
 ```sql
-insert into "users" ("name") values ("Andrew");
+insert into "users" ("name") values ('Andrew');
 ```
 </Section>
 
@@ -74,14 +89,14 @@ await db.insert(users)
 as part of the conflict target (i.e. for partial indexes) or as part of the `update` clause:
 
 ```sql
-insert into employees (employee_id, name)
-values (123, 'John Doe')
-on conflict (employee_id) where name <> 'John Doe'
-do update set name = excluded.name
+insert into "employees" ("employee_id", "name") 
+values (123, 'John Doe') 
+on conflict ("employee_id") where name <> 'John Doe' 
+do update set "name" = excluded.name;
 
-insert into employees (employee_id, name)
-values (123, 'John Doe')
-on conflict (employee_id) do update set name = excluded.name
+insert into "employees" ("employee_id", "name") 
+values (123, 'John Doe') 
+on conflict ("employee_id") do update set "name" = 'John Doe' 
 where name <> 'John Doe';
 ```
 
@@ -104,8 +119,6 @@ await db.insert(employees)
     setWhere: sql`name <> 'John Doe'`
   });
 ```
-
-<hr />
 
 Upsert with composite indexes, or composite primary keys for `onConflictDoUpdate`:
 
@@ -141,18 +154,16 @@ const result = await db.with(userCount)
 	});
 ```
 ```sql
-with "user_count" as (select count(*) as "value" from "users") 
-insert into "users" ("username", "admin") 
-values (?, ((select * from "user_count") = 0)) 
+with "user_count" as (select count(*) as "value" from "users")
+insert into "users" ("username", "admin")
+values ('user1' ((select * from "user_count") = 0))
 returning "admin"
 ```
 </Section>
 
-
 ## Insert into ... select
 
 As the SQLite documentation mentions:
-
 <Callout>
 The second form of the INSERT statement contains a SELECT statement instead of a VALUES clause. 
 A new entry is inserted into the table for each row of data returned by executing the SELECT statement. 
@@ -181,7 +192,7 @@ There are several ways to use select inside insert statements, allowing you to c
 const insertedEmployees = await db
   .insert(employees)
   .select(
-    db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    db.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
   )
   .returning({
     id: employees.id,
@@ -191,7 +202,7 @@ const insertedEmployees = await db
 ```ts
 const qb = new QueryBuilder();
 await db.insert(employees).select(
-    qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    qb.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 </Section>
@@ -200,12 +211,12 @@ await db.insert(employees).select(
 <Section>
 ```ts
 await db.insert(employees).select(
-    () => db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    () => db.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 ```ts
 await db.insert(employees).select(
-    (qb) => qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
+    (qb) => qb.select({ id: users.id, name: users.name }).from(users).where(eq(users.role, 'employee'))
 );
 ```
 </Section>
@@ -214,12 +225,12 @@ await db.insert(employees).select(
 <Section>
 ```ts
 await db.insert(employees).select(
-    sql`select "users"."name" as "name" from "users" where "users"."role" = 'employee'`
+    sql`select "users"."id" as "id", "users"."name" as "name" from "users" where "users"."role" = 'employee'`
 );
 ```
 ```ts
 await db.insert(employees).select(
-    () => sql`select "users"."name" as "name" from "users" where "users"."role" = 'employee'`
+    () => sql`select "users"."id" as "id", "users"."name" as "name" from "users" where "users"."role" = 'employee'`
 );
 ```
 </Section>
