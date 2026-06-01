@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is legacy by using `@sinclair/typebox` package
-</Callout>
-
 # typebox-legacy
 
 ### Install the dependencies
@@ -95,9 +87,6 @@ const users = sqliteTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
 const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
@@ -129,7 +118,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -184,6 +173,20 @@ sqlite.text({ mode: 'text' });
 
 // Schema
 Type.String();
+```
+
+```ts
+sqlite.numeric({ mode: 'number' });
+
+// Schema
+Type.Number({ minimum: -9_007_199_254_740_991, maximum: 9_007_199_254_740_991 }); // Javascript min. and max. safe integers
+```
+
+```ts
+sqlite.numeric({ mode: 'bigint' });
+
+// Schema
+Type.BigInt({ minimum: -9_223_372_036_854_775_808n, maximum: 9_223_372_036_854_775_807n }); // 64-bit integer lower and upper limit
 ```
 
 ```ts

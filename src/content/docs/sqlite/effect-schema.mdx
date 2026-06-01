@@ -1,10 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Drizzle+Effect Schema integration is available starting from `drizzle-orm@1.0.0-beta.15`
-</Callout>
-
 # effect-schema
 
 Allows you to generate [effect](https://effect.website/) schemas from Drizzle ORM schemas.
@@ -23,10 +19,10 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'driz
 import { Schema } from 'effect';
 
 const users = sqliteTable('users', {
-	id: integer('id').primaryKey({ autoIncrement: true }),
-	name: text('name').notNull(),
-	email: text('email').notNull(),
-	role: text('role', { enum: ['admin', 'user'] }).notNull(),
+	id: integer().primaryKey({ autoIncrement: true }),
+	name: text().notNull(),
+	email: text().notNull(),
+	role: text({ enum: ['admin', 'user'] }).notNull(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
@@ -53,7 +49,7 @@ const UserInsert = createInsertSchema(users, {
 // Usage
 
 const program = Effect.gen(function*() {
-	const parsedUser = yield* Schema.validate(UserInsert)({
+	const parsedUser = yield* Schema.decodeUnknownEffect(UserInsert)({
 		name: 'John Doe',
 		email: 'johndoe@test.com',
 		role: 'admin',

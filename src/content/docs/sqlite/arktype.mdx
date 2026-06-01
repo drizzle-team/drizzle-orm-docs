@@ -1,12 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-arktype` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-arktype` package but all new update will be added to Drizzle ORM directly
-</Callout>
-
 # arktype
 
 ### Install the dependencies
@@ -22,6 +16,7 @@ Defines the shape of data queried from the database - can be used to validate AP
 ```ts copy
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
 
 const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -32,10 +27,10 @@ const users = sqliteTable('users', {
 const userSelectSchema = createSelectSchema(users);
 
 const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
 
 const rows = await db.select().from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
 ```
 
 Views are also supported.
@@ -44,10 +39,11 @@ Views are also supported.
 import { sqliteView } from 'drizzle-orm/sqlite-core';
 import { gt } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
 
 const usersView = sqliteView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
 const usersViewSchema = createSelectSchema(usersView);
-const parsed: { id: number; name: string; age: number } = usersViewSchema(...);
+const parsed: ArkErrors | { id: number; name: string; age: number } = usersViewSchema(...);
 ```
 
 ### Insert schema
@@ -57,6 +53,7 @@ Defines the shape of data to be inserted into the database - can be used to vali
 ```ts copy
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
 
 const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -67,10 +64,16 @@ const users = sqliteTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
+const parsed: ArkErrors | { name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = userInsertSchema(user); // Will parse successfully
+const parsed: ArkErrors | { name: string, age: number } = userInsertSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
 await db.insert(users).values(parsed);
 ```
 
@@ -81,7 +84,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 ```ts copy
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createUpdateSchema } from 'drizzle-orm/arktype';
-import { parse } from 'arktype';
+import { ArkErrors } from 'arktype';
 
 const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -91,11 +94,14 @@ const users = sqliteTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+const parsed: ArkErrors | { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
@@ -106,7 +112,7 @@ Each create schema function accepts an additional optional parameter that you ca
 ```ts copy
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { createSelectSchema } from 'drizzle-orm/arktype';
-import { parse, pipe, maxLength, object, string } from 'arktype';
+import { ArkErrors, type } from 'arktype';
 
 const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -116,15 +122,15 @@ const users = sqliteTable('users', {
 });
 
 const userSelectSchema = createSelectSchema(users, {
-  name: (schema) => pipe(schema, maxLength(20)), // Extends schema
-  bio: (schema) => pipe(schema, maxLength(1000)), // Extends schema before becoming nullable/optional
-  preferences: object({ theme: string() }) // Overwrites the field, including its nullability
+  name: (schema) => schema.atMostLength(20), // Extends schema
+  bio: (schema) => type.string.atMostLength(2000), // Extends schema before becoming nullable/optional
+  preferences: type({ theme: 'string' }) // Overwrites the field, including its nullability
 });
 
-const parsed: {
+const parsed: ArkErrors | {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -154,6 +160,22 @@ sqlite.text({ mode: 'text' });
 
 // Schema
 type.string;
+```
+
+```ts
+sqlite.numeric({ mode: 'number' });
+
+// Schema
+type.number.atLeast(-9_007_199_254_740_991).atMost(9_007_199_254_740_991); // Javascript min. and max. safe integers
+```
+
+```ts
+sqlite.numeric({ mode: 'bigint' });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < -9_223_372_036_854_775_808n ? ctx.mustBe('greater than') : value > 9_223_372_036_854_775_807n ? ctx.mustBe('less than') : true
+); // 64-bit integer lower and upper limit
 ```
 
 ```ts

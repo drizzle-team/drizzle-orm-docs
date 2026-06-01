@@ -1,18 +1,12 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-zod` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-zod` package but all new update will be added to Drizzle ORM directly
-</Callout>
-
 # zod
 
 ### Install the dependencies
 
 <Npm>
-zod
+drizzle-orm zod
 </Npm>
 
 ### Select schema
@@ -90,9 +84,6 @@ const users = sqliteTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
 const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Will parse successfully
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
@@ -123,7 +114,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -205,6 +196,20 @@ sqlite.text({ mode: 'text' });
 
 // Schema
 z.string();
+```
+
+```ts
+sqlite.numeric({ mode: 'number' });
+
+// Schema
+z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991); // Javascript min. and max. safe integers
+```
+
+```ts
+sqlite.numeric({ mode: 'bigint' });
+
+// Schema
+z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n); // 64-bit integer lower and upper limit
 ```
 
 ```ts
