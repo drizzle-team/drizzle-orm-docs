@@ -30,11 +30,11 @@ When you run Drizzle Kit `pull` command it will:
 
 <Section>
 ```
-                                  ┌────────────────────────┐      ┌─────────────────────────┐ 
-                                  │                        │ <---  CREATE TABLE "users" (
-┌──────────────────────────┐      │                        │        "id" integer primary key autoincrement,
-│ ~ drizzle-kit pull       │      │                        │        "name" text,
-└─┬────────────────────────┘      │        DATABASE        │        "email" text unique
+                                  ┌────────────────────────┐      ┌───────────────────────────────────────┐ 
+                                  │                        │ <---  CREATE TABLE `users` (
+┌──────────────────────────┐      │                        │        `id` integer primary key autoincrement,
+│ ~ drizzle-kit pull       │      │                        │        `name` TEXT,
+└─┬────────────────────────┘      │        DATABASE        │        `email` TEXT UNIQUE
   │                               │                        │       );
   └ Pull datatabase schema -----> │                        │
   ┌ Generate Drizzle       <----- │                        │
@@ -46,10 +46,10 @@ When you run Drizzle Kit `pull` command it will:
 import * as p from "drizzle-orm/sqlite-core";
 
 export const users = p.sqliteTable("users", {
-  id: p.integer().primaryKey({ autoIncrement: true }),
-  name: p.text(),
-  email: p.text().unique(), 
-};
+	id: p.integer().primaryKey({ autoIncrement: true }),
+	name: p.text(),
+	email: p.text().unique(),
+});
 ```
 </Section>
 </Callout>
@@ -112,7 +112,7 @@ You can have multiple config files in the project, it's very useful when you hav
 **Expo SQLite** and **OP SQLite** are on-device(per-user) databases, there's no way to `pull` database schema from there.<br/>
 For embedded databases Drizzle provides **embedded migrations** - check out our [get started](/docs/get-started/expo-new) guide.
 </Callout>
-Drizzle Kit does not come with a pre-bundled database driver,
+Drizzle Kit does not come with a pre-bundled database driver, 
 it will automatically pick an available SQLite driver from your current project based on `dialect: "sqlite"` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
 
 For Cloudflare D1 HTTP, specify `driver: "d1-http"` explicitly.
@@ -132,17 +132,6 @@ export default defineConfig({
 ```
 
 ### Initial pull
-
-<Callout type='error'>
-This feature is available on  `1.0.0-beta.2` and higher.
-</Callout>
-
-<Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
-</Npm>
-
-<br/>
 
 You can use the `--init` flag to mark the pulled schema as an applied migration in your database, 
 so that all subsequent migrations are diffed against the initial one
@@ -169,7 +158,7 @@ import { defineConfig } from "drizzle-kit";
 export default defineConfig({
   dialect: "sqlite",
   dbCredentials: {
-    url: "./sqlite.db",
+     url: "./sqlite.db",
   },
   tablesFilter: ["*"],
 });
@@ -203,4 +192,5 @@ drizzle-kit pull --dialect=sqlite --url=./sqlite.db
 drizzle-kit pull --dialect=sqlite --tablesFilter='user*' url=./sqlite.db
 </Npx>
 
+{/* TODO update gif */}
 ![](@/assets/gifs/introspect_mysql.gif)

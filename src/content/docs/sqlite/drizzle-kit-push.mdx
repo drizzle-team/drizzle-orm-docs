@@ -40,7 +40,7 @@ import * as p from "drizzle-orm/sqlite-core";
 export const users = p.sqliteTable("users", {
   id: p.integer().primaryKey({ autoIncrement: true }),
   name: p.text(),
-};
+});
 ```
 ```
 ┌─────────────────────┐                  
@@ -54,8 +54,8 @@ export const users = p.sqliteTable("users", {
   └ Apply migrations to the database -------> │                          │
                                        │      └──────────────────────────┘
                                        │
-  ┌────────────────────────────────────┴────────────────┐
-   create table users("id" integer primary key autoincrement, name text);
+  ┌────────────────────────────────────┴───────────────────────────────────────┐
+   CREATE TABLE `users` (`id` integer PRIMARY KEY AUTOINCREMENT, `name` text );
 ```
 </Section>
 </Callout>
@@ -130,8 +130,8 @@ You can have multiple config files in the project, it's very useful when you hav
 **Expo SQLite** and **OP SQLite** are on-device(per-user) databases, there's no way to `push` migrations there.<br/>
 For embedded databases Drizzle provides **embedded migrations** - check out our [get started](/docs/get-started/expo-new) guide.
 </Callout>
-Drizzle Kit does not come with a pre-bundled database driver,
-it will automatically pick an available SQLite driver from your current project based on `dialect: "sqlite"` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
+Drizzle Kit does not come with a pre-bundled database driver, 
+it will automatically pick an available SQLite driver from your current project based on the `dialect` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
 
 For Cloudflare D1 HTTP, specify `driver: "d1-http"` explicitly.
 
@@ -184,14 +184,14 @@ npx drizzle-kit push
 
 <rem025/>
 
-|           |                                                          |
-| :-------- | :---------------------------------------------------     |
-| `verbose` | print all SQL statements prior to execution              |
-| `strict`  | always ask for approval before executing SQL statements  |
-| `force`   | auto-accept all data-loss statements                     |
+|           |                                                                 |
+| :-------- | :---------------------------------------------------------------|
+| `verbose` | print all SQL statements prior to execution                     |
+| `explain` | print the planned SQL changes, without applying them (dry run)  |
+| `force`   | auto-accept all data-loss statements                            |
 <br/>
 <Npx>
-drizzle-kit push --strict --verbose --force
+drizzle-kit push --explain --verbose --force
 </Npx>
 
 <br/>
@@ -260,9 +260,9 @@ npx drizzle-kit push
 
 it will pull existing(empty) schema from the database and generate SQL migration and apply it under the hood
 ```sql
-CREATE TABLE "users"(
-  "id" integer primary key autoincrement,
-  name text
+CREATE TABLE `users`(
+  `id` integer primary key autoincrement,
+  `name` text
 )
 ```
 

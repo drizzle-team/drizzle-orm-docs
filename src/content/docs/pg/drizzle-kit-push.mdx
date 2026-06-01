@@ -131,7 +131,7 @@ You can have multiple config files in the project, it's very useful when you hav
 For embedded databases Drizzle provides **embedded migrations** - check out our [get started](/docs/get-started/expo-new) guide.
 </Callout>
 Drizzle Kit does not come with a pre-bundled database driver, 
-it will automatically pick available database driver from your current project based on the `dialect` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
+it will automatically pick an available database driver from your current project based on the `dialect` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
 
 Mostly all drivers of the same dialect share the same set of connection params, 
 as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have to explicitly specify `driver` param.
@@ -140,7 +140,7 @@ as for exceptions like `aws-data-api`, `pglight` and `d1-http` - you will have t
 
 ### Including tables, schemas and extensions
 `drizzle-kit push` will manage all tables and schemas by default.
-You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
+You can configure list of tables, schemas and extensions via `tablesFilter`, `schemaFilter` and `extensionFilters` options.
 
 |                     |                                                                                               |
 | :------------------ | :-------------------------------------------------------------------------------------------- |
@@ -199,7 +199,7 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | :------------------ | :--------- | :------------------------------------------------------------------------ |
 | `dialect`           | `required` | Database dialect, one of <Dialects/>                                      |
 | `schema`            | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files |
-| `driver`            |            | Drivers exceptions <Drivers/>                                             |
+| `driver`            |            | Drivers exceptions, for example `aws-data-api`, `pglite`                  |
 | `tablesFilter`      |            | Table name filter                                                         |
 | `schemaFilter`      |            | Schema name filter. Default: `["public"]`                                 |
 | `extensionsFilters` |            | Database extensions internal database filters                             |

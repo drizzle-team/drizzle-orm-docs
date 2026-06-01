@@ -130,7 +130,7 @@ export default defineConfig({
     resourceArn: "resourceArn",
     secretArn: "secretArn",
   },
-};
+});
 ```
 ```ts {6}
 import { defineConfig } from "drizzle-kit";
@@ -145,7 +145,7 @@ export default defineConfig({
     // or database folder
     url: "./database/"
   },
-};
+});
 ```
 ```ts {6}
 import { defineConfig } from "drizzle-kit";
@@ -158,7 +158,7 @@ export default defineConfig({
     databaseId: "databaseId",
     token: "token",
   },
-};
+});
 ```
 </CodeTabs>
 
@@ -168,11 +168,11 @@ You can use the `--init` flag to mark the pulled schema as an applied migration 
 so that all subsequent migrations are diffed against the initial one
 
 ```shell
-npx drizzle-kit push --init
+npx drizzle-kit pull --init
 ```
 
 ### Including tables, schemas and extensions
-`drizzle-kit push` will by default manage all tables in all schemas.
+`drizzle-kit pull` will by default manage all tables in all schemas.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
 |                     |                                                                                               |
@@ -202,7 +202,7 @@ export default defineConfig({
 });
 ```
 ```shell
-npx drizzle-kit push
+npx drizzle-kit pull
 ```
 </Section>
 

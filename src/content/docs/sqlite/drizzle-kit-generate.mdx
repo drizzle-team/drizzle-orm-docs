@@ -38,7 +38,7 @@ export const users = p.sqliteTable("users", {
   id: p.integer().primaryKey({ autoIncrement: true }),
   name: p.text(),
   email: p.text().unique(), 
-};
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -59,10 +59,10 @@ export const users = p.sqliteTable("users", {
 ```sql
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
-CREATE TABLE "users" (
- "id" integer primary key autoincrement,
- "name" text,
- "email" text unique
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text,
+	`email` text UNIQUE
 );
 ```
 </Section>
@@ -153,17 +153,13 @@ drizzle-kit generate --custom --name=seed-users
 ```sql
 -- ./drizzle/20242409125510_seed/migration.sql
 
-INSERT INTO "users" ("name") VALUES('Dan');
-INSERT INTO "users" ("name") VALUES('Andrew');
-INSERT INTO "users" ("name") VALUES('Dandrew');
+INSERT INTO `users` (`name`) VALUES('Dan');
+INSERT INTO `users` (`name`) VALUES('Andrew');
+INSERT INTO `users` (`name`) VALUES('Dandrew');
 ```
 </Section>
 
 ### Ignore conflicts
-
-<Callout type='warning'>
-`--ignore-conflicts` available starting from `drizzle-orm@1.0.0-beta.16`
-</Callout>
 
 In case you need `generate` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
 there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
@@ -182,7 +178,6 @@ drizzle-kit generate --ignore-conflicts
 | `custom`      | generate empty SQL for custom migration              |
 | `name`        | generate migration with custom name                  |
 | `ignore-conflicts` | skip commutativity conflict checks, default is `false` |
-
 <rem025/>
 
 <Npx>
@@ -249,8 +244,8 @@ And it will successfully generate
 ```sql
 -- ./drizzle/20242409125510_seed-users/migration.sql
 
-INSERT INTO "users" ("name") VALUES('Dan');
-INSERT INTO "users" ("name") VALUES('Andrew');
-INSERT INTO "users" ("name") VALUES('Dandrew');
+INSERT INTO `users` (`name`) VALUES('Dan');
+INSERT INTO `users` (`name`) VALUES('Andrew');
+INSERT INTO `users` (`name`) VALUES('Dandrew');
 ```
 </Section>
