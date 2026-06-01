@@ -9,12 +9,12 @@ for example in self-referencing relationships like employees and their managers:
 
 <Section>
 ```ts copy {9}
-import { alias, mysqlTable, int, text } from "drizzle-orm/mysql-core";
+import { alias, sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 
-const employees = mysqlTable("employees", {
-  id: int().autoincrement().primaryKey(),
+const employees = sqliteTable('employees', {
+  id: integer().primaryKey({ autoIncrement: true }),
   name: text(),
-  managerId: int("manager_id"),
+  managerId: integer('manager_id'),
 });
 
 const manager = alias(employees, "manager");
@@ -27,9 +27,9 @@ await db.select({
   .leftJoin(manager, eq(employees.managerId, manager.id));
 ```
 ```sql
-select `employees`.`name`, `manager`.`name`
-from `employees`
-left join `employees` `manager` on `employees`.`manager_id` = `manager`.`id`;
+select "employees"."name", "manager"."name"
+from "employees"
+left join "employees" "manager" on "employees"."manager_id" = "manager"."id";
 ```
 </Section>
 
@@ -45,7 +45,7 @@ const result = await db.select({
 }).from(users);
 ```
 ```sql
-select `id`, `name` as `lower_name` from `users`;
+select "id", "name" as "lower_name" from "users";
 ```
 </Section>
 
@@ -59,7 +59,7 @@ const result = await db.select({
 }).from(users);
 ```
 ```sql
-select `id`, lower(`name`) as `lower_name` from `users`;
+select "id", lower("name") as "lower_name" from "users";
 ```
 </Section>
 
@@ -74,7 +74,7 @@ const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
 ```sql
-select `id`, `name`, `age` from (select `id`, `name`, `age` from `users` where `users`.`id` = 42) `sq`;
+select "id", "name" from (select "id", "name" from "users" where "users"."id" = 42) "sq";
 ```
 </Section>
 
@@ -87,10 +87,10 @@ const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
 ```sql
-select `users`.`id`, `users`.`name`, `users`.`age`, `sq`.`id`, `sq`.`name`, `sq`.`age`
-  from `users`
-  left join (select `id`, `name`, `age` from `users` where `users`.`id` = 42) `sq`
-    on `users`.`id` = `sq`.`id`;
+select "users"."id", "users"."name", "sq"."id", "sq"."name"
+  from "users"
+  left join (select "id", "name" from "users" where "users"."id" = 42) "sq"
+    on "users"."id" = "sq"."id"
 ```
 </Section>
 
@@ -105,8 +105,8 @@ const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
 const result = await db.with(sq).select().from(sq);
 ```
 ```sql
-with `sq` as (select `id`, `name`, `age` from `users` where `users`.`id` = 42)
-select `id`, `name`, `age` from `sq`;
+with "sq" as (select "id", "name" from "users" where "users"."id" = 42)
+select "id", "name" from "sq";
 ```
 </Section>
 
@@ -121,7 +121,7 @@ const sq = db.$with('sq').as(db.select({
 const result = await db.with(sq).select({ name: sq.name }).from(sq);
 ```
 ```sql
-with `sq` as (select upper(`name`) as `name` from `users`)
-select `name` from `sq`;
+with "sq" as (select upper("name") as "name" from "users")
+select "name" from "sq";
 ```
 </Section>
