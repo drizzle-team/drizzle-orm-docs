@@ -1,8 +1,3 @@
----
-test: 10
----
-export const a = 10;
-
 import Callout from '@mdx/Callout.astro';
 import Steps from '@mdx/Steps.astro';
 import CodeTab from '@mdx/CodeTab.astro';
@@ -35,6 +30,7 @@ drizzle-kit migrate
 drizzle-kit generate
 drizzle-kit push
 drizzle-kit pull
+drizzle-kit export
 ```
 It is designed to let you choose how to approach migrations based on your current business demands. 
 
@@ -58,11 +54,11 @@ Drizzle lets you pull database schema to TypeScript using [`drizzle-kit pull`](/
 
 <Section>
 ```
-                                  ┌────────────────────────┐      ┌─────────────────────────┐ 
-                                  │                        │ <---  CREATE TABLE "users" (
-┌──────────────────────────┐      │                        │        "id" integer primary key autoincrement,
-│ ~ drizzle-kit pull       │      │                        │        "name" text,
-└─┬────────────────────────┘      │        DATABASE        │        "email" text unique
+                                  ┌────────────────────────┐      ┌───────────────────────────────────────┐ 
+                                  │                        │ <---  CREATE TABLE `users` (
+┌──────────────────────────┐      │                        │        `id` integer primary key autoincrement,
+│ ~ drizzle-kit pull       │      │                        │        `name` TEXT,
+└─┬────────────────────────┘      │        DATABASE        │        `email` TEXT UNIQUE
   │                               │                        │       );
   └ Pull datatabase schema -----> │                        │
   ┌ Generate Drizzle       <----- │                        │
@@ -74,9 +70,9 @@ Drizzle lets you pull database schema to TypeScript using [`drizzle-kit pull`](/
 import * as p from "drizzle-orm/sqlite-core";
 
 export const users = p.sqliteTable("users", {
-  id: p.integer().primaryKey({ autoIncrement: true }),
-  name: p.text(),
-  email: p.text().unique(),
+	id: p.integer().primaryKey({ autoIncrement: true }),
+	name: p.text(),
+	email: p.text().unique(),
 });
 ```
 </Section>
@@ -105,13 +101,13 @@ import * as p from "drizzle-orm/sqlite-core";
 export const users = p.sqliteTable("users", {
   id: p.integer().primaryKey({ autoIncrement: true }),
   name: p.text(),
-  email: p.text().unique(), // <--- added column
+  email: p.text(), // <--- added column
 });
 ```
 ```
 Add column to `users` table                                                                          
 ┌──────────────────────────┐                  
-│ + email: text().unique() │                  
+│ + email: text()          │                  
 └─┬────────────────────────┘                  
   │                                           
   v                                           
@@ -126,8 +122,8 @@ Add column to `users` table
   └ Apply migrations to the database -------> │                          │
                                        │      └──────────────────────────┘
                                        │
-  ┌────────────────────────────────────┴──────────────┐
-   ALTER TABLE `users` ADD COLUMN "email" text unique; 
+  ┌────────────────────────────────────┴─┐
+   ALTER TABLE `users` ADD `email` text; 
 ```
 </Section>
 </Callout>
@@ -173,10 +169,10 @@ export const users = p.sqliteTable("users", {
 ```sql
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
-CREATE TABLE "users" (
- "id" integer primary key autoincrement,
- "name" text,
- "email" text unique
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text,
+	`email` text UNIQUE
 );
 ```
 ```
@@ -241,10 +237,10 @@ export const users = p.sqliteTable("users", {
 ```sql
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
-CREATE TABLE "users" (
- "id" integer primary key autoincrement,
- "name" text,
- "email" text unique
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text,
+	`email` text UNIQUE
 );
 ```
 ```ts
@@ -316,10 +312,10 @@ export const users = p.sqliteTable("users", {
 ```sql
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
-CREATE TABLE "users" (
- "id" integer primary key autoincrement,
- "name" text,
- "email" text unique
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text,
+	`email` text UNIQUE
 );
 ```
 ```
@@ -385,10 +381,10 @@ export const users = p.sqliteTable("users", {
   v
 ```
 ```sql
-CREATE TABLE "users" (
- "id" integer primary key autoincrement,
- "name" text,
- "email" text unique
+CREATE TABLE `users` (
+        `id` integer PRIMARY KEY AUTOINCREMENT,
+        `name` text,
+        `email` text UNIQUE
 );
 ```
 ```

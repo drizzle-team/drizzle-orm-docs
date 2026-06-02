@@ -8,8 +8,8 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 # Drizzle Queries + CRUD
 
 <Prerequisites>
-  - How to define your schema - [Schema Fundamentals](/docs/mysql/sql-schema-declaration)
-  - How to connect to the database - [Connection Fundamentals](/docs/mysql/connect-overview)
+  - How to define your schema - [Schema Fundamentals](/docs/sqlite/sql-schema-declaration)
+  - How to connect to the database - [Connection Fundamentals](/docs/sqlite/connect-overview)
 </Prerequisites>
 
 Drizzle gives you a few ways for querying your database and it's up to you to decide which one you'll need in your next project.
@@ -34,10 +34,10 @@ await db
 	.where(eq(posts.id, 10))
 ```
 ```sql
-SELECT *
-FROM `posts`
-LEFT JOIN `comments` ON `posts`.`id` = `comments`.`post_id`
-WHERE `posts`.`id` = 10
+SELECT * 
+FROM posts
+LEFT JOIN comments ON posts.id = comments.post_id
+WHERE posts.id = 10
 ```
 </Section>
 
@@ -52,7 +52,7 @@ and more. Let's look at more examples
 await db.insert(users).values({ email: 'user@gmail.com' })
 ```
 ```sql
-INSERT INTO `users` (`email`) VALUES ('user@gmail.com')
+INSERT INTO users (email) VALUES ('user@gmail.com')
 ```
 </Section>
 <Section>
@@ -62,9 +62,9 @@ await db.update(users)
         .where(eq(users.id, 1))
 ```
 ```sql
-UPDATE `users`
-SET `email` = 'user@gmail.com'
-WHERE `users`.`id` = 1
+UPDATE users 
+SET email = 'user@gmail.com'
+WHERE users.id = 1
 ```
 </Section>
 <Section>
@@ -72,7 +72,7 @@ WHERE `users`.`id` = 1
 await db.delete(users).where(eq(users.id, 1))
 ```
 ```sql
-DELETE FROM `users` WHERE `users`.`id` = 1
+DELETE FROM users WHERE users.id = 1
 ```
 </Section>
 </CodeTabs>
@@ -150,20 +150,20 @@ const mainQuery = await db
   <LinksList 
     title='Access your data'
     links={[
-        ["Query", "/docs/mysql/rqb-v2"], 
-        ["Select", "/docs/mysql/select"],
-        ["Insert", "/docs/mysql/insert"],
-        ["Update", "/docs/mysql/update"],
-        ["Delete", "/docs/mysql/delete"],
-        ["Filters", "/docs/mysql/operators"],
-        ["Joins", "/docs/mysql/joins"],
-        ["sql`` operator", "/docs/mysql/sql"],
+        ["Query", "/docs/sqlite/rqb-v2"], 
+        ["Select", "/docs/sqlite/select"],
+        ["Insert", "/docs/sqlite/insert"],
+        ["Update", "/docs/sqlite/update"],
+        ["Delete", "/docs/sqlite/delete"],
+        ["Filters", "/docs/sqlite/operators"],
+        ["Joins", "/docs/sqlite/joins"],
+        ["sql`` operator", "/docs/sqlite/sql"],
       ]}
   />
   <LinksList 
     title='Zero to Hero'
     links={[
-        ["Migrations", "/docs/mysql/migrations"], 
+        ["Migrations", "/docs/sqlite/migrations"], 
       ]}
   />
 </Flex>
