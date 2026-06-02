@@ -210,11 +210,11 @@ The migration table is automatically upgraded when you run `drizzle-kit up`. Two
 
 | Column | Type | v0 | v1 |
 | --- | --- | --- |:---:|
-| `id` | serial | yes | yes |
+| `id` | integer | yes | yes |
 | `hash` | text | yes | yes |
-| `created_at` | bigint | yes | yes (legacy) |
+| `created_at` | numeric | yes | yes (legacy) |
 | `name` | text | — | new |
-| `applied_at` | timestamp with time zone | — | new |
+| `applied_at` | text | — | new |
 
 Migrations are now matched by their full folder name instead of timestamps. Even if two migrations are generated within the same second, the name suffix guarantees uniqueness.
 

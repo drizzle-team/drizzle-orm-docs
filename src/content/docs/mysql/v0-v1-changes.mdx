@@ -226,7 +226,7 @@ The migration table is automatically upgraded when you run `drizzle-kit up`. Two
 | `hash` | text | yes | yes |
 | `created_at` | bigint | yes | yes (legacy) |
 | `name` | text | — | new |
-| `applied_at` | timestamp with time zone | — | new |
+| `applied_at` | timestamp | — | new |
 
 Migrations are now matched by their full folder name instead of timestamps. Even if two migrations are generated within the same second, the name suffix guarantees uniqueness.
 
