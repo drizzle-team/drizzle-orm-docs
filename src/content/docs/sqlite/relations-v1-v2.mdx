@@ -16,8 +16,8 @@ drizzle-kit -D
 <br/>
 
 <Prerequisites>
-- **Relations Fundamentals** - [read here](/docs/relations-schema-declaration)
-- **drizzle-kit pull** - [read here](/docs/drizzle-kit-pull)
+- **Relations Fundamentals** - [read here](/docs/sqlite/relations-schema-declaration)
+- **drizzle-kit pull** - [read here](/docs/sqlite/drizzle-kit-pull)
 </Prerequisites>
 
 <Callout>
@@ -66,18 +66,18 @@ const db = drizzle(process.env.DATABASE_URL, { relations })
 
 <Callout collapsed="Schema Definition">
 ```ts copy
-import * as p from 'drizzle-orm/pg-core';
+import * as p from 'drizzle-orm/sqlite-core';
 
-export const users = p.pgTable('users', {
-	id: p.integer().primaryKey(),
-	name: p.text(),
-	invitedBy: p.integer('invited_by'),
+export const users = p.sqliteTable('users', {
+  id: p.integer().primaryKey(),
+  name: p.text(),
+  invitedBy: p.integer('invited_by'),
 });
 
-export const posts = p.pgTable('posts', {
-	id: p.integer().primaryKey(),
-	content: p.text(),
-	authorId: p.integer('author_id'),
+export const posts = p.sqliteTable('posts', {
+  id: p.integer().primaryKey(),
+  content: p.text(),
+  authorId: p.integer('author_id'),
 });
 ```
 </Callout>
@@ -318,22 +318,95 @@ export const relations = defineRelations(schema, (r) => ({
 ```
 </Callout>
 
-**`custom types` new function**
+**`custom types` new functions**
 
-There is a new [codec](/docs/codecs) function was added to custom types, so you can control how data is mapped
+There are a few new function were added to custom types, so you can control how data is mapped on Relational Queries v2:
 
-You can find out more [here](/docs/custom-types#ts-doc-for-type-definitions)
+<Callout collapsed='fromJson'>
+Optional mapping function, that is used for transforming data returned by transofmed to JSON in database data to desired format
+For example, when querying blob column via [RQB](/docs/sqlite/rqb-v2) or JSON functions, the result field will be returned as it's hex string representation, as opposed to Buffer from regular query
+To handle that, we need a separate function to handle such field's mapping:
+```ts
+fromJson(value: string): Buffer {
+	return Buffer.from(value, 'hex');
+},
+```
+It'll cause the returned data to change from:
+```
+{
+	customField: "04A8...";
+}
+```
+to:
+```
+{
+	customField: Buffer([...]);
+}
+```
+</Callout> 
+<Callout collapsed='forJsonSelect'>
+Optional selection modifier function, that is used for modifying selection of column inside JSON functions
+Additional mapping that could be required for such scenarios can be handled using fromJson function
+Used by [relational queries](/docs/sqlite/rqb-v2)
+
+```ts
+forJsonSelect(identifier: SQL, sql: SQLGenerator): SQL {
+ 	return sql`cast(${identifier} as text)`
+ },
+ ```
+
+ This will change query from:
+ ``` sql
+ SELECT
+ 	json_object('bigint', `t`.`bigint`)
+ 	FROM
+ 	(
+ 		SELECT
+ 		`table`.`custom_bigint` AS "bigint"
+ 		FROM
+ 		`table`
+ 	) AS `t`
+ ```
+ to:
+ ``` sql
+ SELECT
+ 	json_object('bigint', `t`.`bigint`)
+ 	FROM
+ 	(
+ 		SELECT
+ 		cast(`table`.`custom_bigint` as text) AS `bigint`
+ 		FROM
+ 		`table`
+ 	) AS `t`
+ ```
+Returned by query object will change from:
+```ts
+{
+	bigint: 5044565289845416000; // Partial data loss due to direct conversion to JSON format
+}
+```
+to:
+```ts
+{
+	bigint: "5044565289845416380"; // Data is preserved due to conversion of field to text before JSON-ification
+}
+```
+</Callout>
 
 <Callout title='✅ v2'>
 ```ts
 const customBytes = customType<{
-  data: Buffer;
-  driverData: Buffer;
-  jsonData: string;
-}>({
-  dataType: () => "bytea",
-  codec: "bytea",
-});
+ 	data: Buffer;
+ 	driverData: Buffer;
+ 	jsonData: string;
+ }>({
+ 	dataType: () => 'custom',
+ 	fromJson: (value) => {
+ 		return Buffer.from(value.slice(2, value.length), 'hex');
+ 	},
+ 	forJsonSelect: (identifier, sql, arrayDimensions) =>
+ 		sql`cast(${identifier} as text)`,
+ });
 ```
 
 </Callout>
@@ -348,28 +421,28 @@ You don't need to do it now!
 
 <Callout collapsed='Schema'>
 ```ts
-import * as p from "drizzle-orm/pg-core";
+import * as p from 'drizzle-orm/sqlite-core';
 
-export const users = p.pgTable("users", {
+export const users = p.sqliteTable('users', {
   id: p.integer().primaryKey(),
   name: p.text(),
   verified: p.boolean().notNull(),
 });
 
-export const groups = p.pgTable("groups", {
+export const groups = p.sqliteTable('groups', {
   id: p.integer().primaryKey(),
   name: p.text(),
 });
 
-export const usersToGroups = p.pgTable(
-  "users_to_groups",
+export const usersToGroups = p.sqliteTable(
+  'users_to_groups',
   {
     userId: p
-      .integer("user_id")
+      .integer('user_id')
       .notNull()
       .references(() => users.id),
     groupId: p
-      .integer("group_id")
+      .integer('group_id')
       .notNull()
       .references(() => groups.id),
   },
@@ -495,47 +568,40 @@ const response = db.query.users.findMany({
 });
 ```
 
-For a complete API Reference please check our [Select Filters docs](/docs/rqb-v2#select-filters)
+For a complete API Reference please check our [Select Filters docs](/docs/sqlite/rqb-v2#select-filters)
 </Callout>
 
 <Callout collapsed='Complex filter example using RAW'>
 ```ts
 // schema.ts
-import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, json, sqliteTable, text, timestamp } from 'drizzle-orm/sqlite-core';
 
-export const users = pgTable("users", {
+export const users = sqliteTable('users', {
   id: integer().primaryKey(),
   name: text(),
   email: text().notNull(),
   age: integer(),
-  createdAt: timestamp("created_at").defaultNow(),
-  lastLogin: timestamp("last_login"),
-  subscriptionEnd: timestamp("subscription_end"),
-  lastActivity: timestamp("last_activity"),
-  preferences: jsonb(),      // JSON column for user settings/preferences
-  interests: text().array(),     // Array column for user interests
+  createdAt: timestamp('created_at').defaultNow(),
+  lastLogin: timestamp('last_login'),
+  subscriptionEnd: timestamp('subscription_end'),
+  lastActivity: timestamp('last_activity'),
+  preferences: text({ mode: "json" }), // JSON column for user settings/preferences
+  interests: text({ mode: "json" }).$type<string[]>(), // Array column for user interests
 });
 ```
 ```ts
 const response = await db.query.users.findMany({
-  where: {
-    AND: [
-      {
-        OR: [
-          { RAW: (table) => sql`LOWER(${table.name}) LIKE 'john%'` },
-          { name: { ilike: "jane%" } },
-        ],
-      },
-      {
-        OR: [
-          { RAW: (table) => sql`${table.preferences}->>'theme' = 'dark'` },
-          { RAW: (table) => sql`${table.preferences}->>'theme' IS NULL` },
-        ],
-      },
-      { RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` },
-    ],
-  },
-});
+    where: {
+      AND: [
+        {
+          OR: [{ RAW: (table) => sql`${table.name} LIKE 'john%'` }, { name: { like: "jane%" } }],
+        },
+        { 
+          RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` 
+        }
+      ]
+    }
+  })
 ```
 </Callout>
 
@@ -677,13 +743,13 @@ If you had MySQL dialect, you can remove `mode` from `drizzle()` as long as it's
 
 ##### **Option 2**: Manual migration
 
-If you want to migrate manually, you can check our [Drizzle Relations section](/docs/relations-v2) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
+If you want to migrate manually, you can check our [Drizzle Relations section](/docs/sqlite/relations-v2) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
 
 #### How to migrate queries from v1 to v2
 
 ##### Migrate `where` statements
 
-You can check our [Select Filters docs](/docs/rqb-v2#select-filters) to see examples and a complete API reference.
+You can check our [Select Filters docs](/docs/sqlite/rqb-v2#select-filters) to see examples and a complete API reference.
 
 With the new syntax, you can use `AND`, `OR`, `NOT`, and `RAW`, plus all the filtering operators that 
 were previously available in Relations v1.
@@ -797,19 +863,20 @@ where
 <CodeTab>
 ```ts
 // schema.ts
-import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
-export const users = pgTable("users", {
+export const users = sqliteTable("users", {
   id: integer().primaryKey(),
   name: text(),
   email: text().notNull(),
   age: integer(),
-  createdAt: timestamp("created_at").defaultNow(),
-  lastLogin: timestamp("last_login"),
-  subscriptionEnd: timestamp("subscription_end"),
-  lastActivity: timestamp("last_activity"),
-  preferences: jsonb(),      // JSON column for user settings/preferences
-  interests: text().array(),     // Array column for user interests
+  createdAt: text("created_at"),
+  lastLogin: text("last_login"),
+  subscriptionEnd: text("subscription_end"),
+  lastActivity: text("last_activity"),
+  preferences: text({ mode: "json" }), // JSON column for user settings/preferences
+  interests: text(),                   // Comma-separated user interests
 });
 ```
 ```ts
@@ -819,13 +886,7 @@ const response = await db.query.users.findMany({
       {
         OR: [
           { RAW: (table) => sql`LOWER(${table.name}) LIKE 'john%'` },
-          { name: { ilike: "jane%" } },
-        ],
-      },
-      {
-        OR: [
-          { RAW: (table) => sql`${table.preferences}->>'theme' = 'dark'` },
-          { RAW: (table) => sql`${table.preferences}->>'theme' IS NULL` },
+          { name: { like: "jane%" } },
         ],
       },
       { RAW: (table) => sql`${table.age} BETWEEN 25 AND 35` },
@@ -835,34 +896,28 @@ const response = await db.query.users.findMany({
 ```
 ```sql
 SELECT
-  "d0"."id" AS "id",
-  "d0"."name" AS "name",
-  "d0"."email" AS "email",
-  "d0"."age" AS "age",
-  "d0"."created_at" AS "createdAt",
-  "d0"."last_login" AS "lastLogin",
-  "d0"."subscription_end" AS "subscriptionEnd",
-  "d0"."last_activity" AS "lastActivity",
-  "d0"."preferences" AS "preferences",
-  "d0"."interests" AS "interests"
+	"d0"."id" AS "id",
+	"d0"."name" AS "name",
+	"d0"."email" AS "email",
+	"d0"."age" AS "age",
+	"d0"."created_at" AS "createdAt",
+	"d0"."last_login" AS "lastLogin",
+	"d0"."subscription_end" AS "subscriptionEnd",
+	"d0"."last_activity" AS "lastActivity",
+	"d0"."preferences" AS "preferences",
+	"d0"."interests" AS "interests"
 FROM
-  "users" AS "d0"
+	"users" AS "d0"
 WHERE
-  (
-    (
-      (
-        (LOWER("d0"."name") LIKE 'john%')
-        OR ("d0"."name" ILIKE 'jane%')
-      )
-    )
-    AND (
-      (
-        ("d0"."preferences" ->> 'theme' = 'dark')
-        OR ("d0"."preferences" ->> 'theme' IS NULL)
-      )
-    )
-    AND ("d0"."age" BETWEEN 25 AND 35)
-  )
+	(
+		(
+			(
+				(LOWER("d0"."name") LIKE 'john%')
+				OR ("d0"."name" LIKE 'jane%')
+			)
+		)
+		AND ("d0"."age" BETWEEN 25 AND 35)
+	)
 ```
 </CodeTab>
 </CodeTabs>
@@ -943,71 +998,79 @@ const response = await db.query.users.findMany({
 **migrator**
 <Callout type='error' title='before'>
 ```ts
-export async function migrate<
+export function migrate<
   TSchema extends Record<string, unknown>
 >(
-  db: NodePgDatabase<TSchema>,
-  config: MigrationConfig,
+	db: BetterSQLite3Database<TSchema>,
+	config: MigrationConfig,
 ) {
-  ...
+	...
 }
 ```
 </Callout>
 <Callout title='now'>
-```ts {1,2}
-export async function migrate<TRelations extends AnyRelations>(
-	db: NodePgDatabase<TRelations>,
+```ts {3,5}
+export function migrate<
+  TSchema extends Record<string, unknown>,
+  TRelations extends AnyRelations
+>(
+	db: BetterSQLite3Database<TSchema, TRelations>, // SQLiteBunDatabase, NodeSQLiteDatabase, DrizzleSqliteDODatabase, ...
 	config: MigrationConfig,
 ) {
-  ...
+	...
 }
 ```
 </Callout>
 **session**
 <Callout type='error' title='before'>
 ```ts
-export class NodePgSession<
+export class BetterSQLiteSession<
 	TFullSchema extends Record<string, unknown>,
-	TSchema extends V1.TablesRelationalConfig,
-> extends PgSession<NodePgQueryResultHKT, TFullSchema, TSchema>
+	TSchema extends TablesRelationalConfig,
+> extends SQLiteSession<'sync', RunResult, TFullSchema, TSchema>
 ```
 </Callout>
 <Callout title='now'>
-```ts {2,3}
-export class NodePgSession<
+```ts {3}
+export class BetterSQLiteSession< // SQLiteBunSession, NodeSQLiteSession, ...
+	TFullSchema extends Record<string, unknown>,
 	TRelations extends AnyRelations,
-> extends PgAsyncSession<NodePgQueryResultHKT, TRelations>
+	TSchema extends V1.TablesRelationalConfig,
+> extends SQLiteSession<'sync', RunResult, TFullSchema, TRelations, TSchema>
 ```
 </Callout>
 **transaction**
 <Callout type='error' title='before'>
 ```ts
-export class NodePgTransaction<
+export class BetterSQLiteTransaction<
 	TFullSchema extends Record<string, unknown>,
-	TSchema extends V1.TablesRelationalConfig,
-> extends PgTransaction<NodePgQueryResultHKT, TFullSchema, TSchema>
+	TSchema extends TablesRelationalConfig,
+> extends SQLiteTransaction<'sync', RunResult, TFullSchema, TSchema>
 ```
 </Callout>
 <Callout title='now'>
-```ts {2,3}
-export class NodePgTransaction<
+```ts {3}
+export class BetterSQLiteTransaction< // BunSQLiteTransaction, NodeSQLiteTransaction, ...
+	TFullSchema extends Record<string, unknown>,
 	TRelations extends AnyRelations,
-> extends PgAsyncTransaction<NodePgQueryResultHKT, TRelations>
+	TSchema extends V1.TablesRelationalConfig,
+> extends SQLiteTransaction<'sync', RunResult, TFullSchema, TRelations, TSchema>
 ```
 </Callout>
 **driver**
 <Callout type='error' title='before'>
 ```ts
-export class NodePgDatabase<
-	TSchema extends Record<string, unknown> = Record<string, never>,
-> extends PgDatabase<NodePgQueryResultHKT, TSchema>
+export class BetterSQLite3Database<
+  TSchema extends Record<string, unknown> = Record<string, never>
+> extends BaseSQLiteDatabase<'sync', RunResult, TSchema>
 ```
 </Callout>
 <Callout title='now'>
-```ts {2,3}
-export class NodePgDatabase<
+```ts {3}
+export class BetterSQLite3Database<
+	TSchema extends Record<string, unknown> = Record<string, never>,
 	TRelations extends AnyRelations = EmptyRelations,
-> extends PgAsyncDatabase<NodePgQueryResultHKT, TRelations> 
+> extends BaseSQLiteDatabase<'sync', RunResult, TSchema, TRelations>
 ```
 </Callout>
 </Callout>
@@ -1067,6 +1130,6 @@ include new types used by Relational Queries v2, so make sure to update your imp
 
 <Callout collapsed='Examples'>
 ```ts
-import { RelationalQueryBuilder, PgRelationalQuery } from 'drizzle-orm/pg-core/query-builders/query';
+import { RelationalQueryBuilder, SQLiteRelationalQuery } from 'drizzle-orm/sqlite-core/query-builders/query';
 ```
 </Callout>
