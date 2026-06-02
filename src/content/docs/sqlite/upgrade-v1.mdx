@@ -1,0 +1,44 @@
+import Npm from "@mdx/Npm.astro";
+import Npx from "@mdx/Npx.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+# Upgrading to Drizzle v1
+
+<Npm>
+drizzle-orm
+-D drizzle-kit
+</Npm>
+
+#### Step 1 - Run `drizzle-kit up`
+
+> v3 migration folder discussion: https://github.com/drizzle-team/drizzle-orm/discussions/2832  
+
+We've updated the migrations folder structure by:
+- removing `journal.json`
+- grouping SQL files and snapshots into separate migration folders
+- removing the `drizzle-kit drop` command
+
+These changes eliminate potential Git conflicts with the journal file and simplify the process of dropping or fixing conflicted migrations
+
+The drizzle-kit has been architecturally redesigned:
+- Migrated from database snapshots to DDL snapshots
+
+Commutativity checks were added:
+- Detecting non-commutative migrations across branches
+> Commutativity discussion: https://github.com/drizzle-team/drizzle-orm/discussions/5005
+
+To migrate from old structure to a new one you would need to run
+
+<Npx>
+drizzle-kit up
+</Npx>
+
+#### Step 2 - Review breaking changes
+
+You can find out the full list of breaking changes [here](/docs/sqlite/v0-v1-changes#breaking-changes) and make sure to update your code accordingly
+
+If you were using Relational Queries, you need to upgrade to v2:
+- [How to migrate relations definition from v1 to v2](/docs/sqlite/relations-v1-v2#how-to-migrate-relations-schema-definition-from-v1-to-v2)
+- [How to migrate queries from v1 to v2](/docs/sqlite/relations-v1-v2#how-to-migrate-queries-from-v1-to-v2)
+
+#### Step 3 - Done ✅
