@@ -1,16 +1,17 @@
 import Callout from '@mdx/Callout.astro';
 import CodeTabs from '@mdx/CodeTabs.astro';
 import YoutubeCards from '@mdx/YoutubeCards.astro';
+import GetStartedLinks from '@mdx/GetStartedLinks/index.astro'
 
-# Drizzle ORM  
-> Drizzle is a good friend who's there for you when necessary and doesn't bother when you need some space.
+# Drizzle ORM
 
 Drizzle ORM is a headless TypeScript ORM with a head. 🐲
+> Drizzle is a good friend who's there for you when necessary and doesn't bother when you need some space.
 
-It looks and feels simple, performs on day _1000_ of your project, 
-lets you do things your way, and is there when you need it.  
+It looks and feels simple, performs on day _1000_ of your project,\
+lets you do things your way, and is there when you need it.
 
-**It's the only ORM with both [relational](/docs/rqb-v2) and [SQL-like](/docs/select) query APIs**, 
+**It's the only ORM with both [relational](/docs/sqlite/rqb-v2) and [SQL-like](/docs/sqlite/select) query APIs**, 
 providing you the best of both worlds when it comes to accessing your relational data. 
 Drizzle is lightweight, performant, typesafe, non-lactose, gluten-free, sober, flexible and **serverless-ready by design**.
 Drizzle is not just a library, it's an experience. 🤩
@@ -43,8 +44,8 @@ Drizzle is the opposite.
 We embrace SQL and built Drizzle to be SQL-like at its core, so you can have zero to no 
 learning curve and access to the full power of SQL.  
 
-We bring all the familiar **[SQL schema](/docs/sql-schema-declaration)**, **[queries](/docs/select)**, 
-**[automatic migrations](/docs/migrations)** and **[one more thing](/docs/rqb-v2)**. ✨
+We bring all the familiar **[SQL schema](/docs/sqlite/sql-schema-declaration)**, **[queries](/docs/sqlite/select)**, 
+**[automatic migrations](/docs/sqlite/migrations)** and **[one more thing](/docs/sqlite/rqb-v2)**. ✨
 
 <CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
 ```typescript copy
@@ -57,31 +58,30 @@ await db
 ```
 ```typescript copy
 // manage your schema
-export const countries = pgTable('countries', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 256 }),
+export const countries = sqliteTable('countries', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text(),
 });
 
-export const cities = pgTable('cities', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 256 }),
+export const cities = sqliteTable('cities', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text(),
   countryId: integer('country_id').references(() => countries.id),
 });
 ```
 ```sql
 -- generate migrations
-CREATE TABLE IF NOT EXISTS "countries" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(256)
+CREATE TABLE `countries` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text
 );
 
-CREATE TABLE IF NOT EXISTS "cities" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(256),
-	"country_id" integer
+CREATE TABLE `cities` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`name` text,
+	`country_id` integer,
+	CONSTRAINT `fk_cities_country_id_countries_id_fk` FOREIGN KEY (`country_id`) REFERENCES `countries`(`id`)
 );
-
-ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN KEY ("country_id") REFERENCES "countries"("id") ON DELETE no action ON UPDATE no action;
 ```
 </CodeTabs>
 
@@ -89,7 +89,7 @@ ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fk" FOREIGN 
 We're always striving for a perfectly balanced solution, and while SQL-like does cover 100% of the needs, 
 there are certain common scenarios where you can query data in a better way.  
 
-We've built the **[Queries API](/docs/rqb-v2)** for you, so you can fetch relational nested data from the database 
+We've built the **[Queries API](/docs/sqlite/rqb-v2)** for you, so you can fetch relational nested data from the database 
 in the most convenient and performant way, and never think about joins and data mapping.  
 
 **Drizzle always outputs exactly 1 SQL query.** Feel free to use it with serverless databases and never worry about performance or roundtrip costs!
@@ -114,7 +114,7 @@ Drizzle ORM is dialect-specific, slim, performant and serverless-ready **by desi
 
 We've spent a lot of time to make sure you have best-in-class SQL dialect support, including Postgres, MySQL, and others.
 
-Drizzle operates natively through industry-standard database drivers. We support all major **[PostgreSQL](/docs/get-started-postgresql)**, **[MySQL](/docs/mysql/get-started-mysql)** or **[SQLite](/docs/sqlite/get-started-sqlite)** drivers out there, and we're adding new ones **[really fast](https://twitter.com/DrizzleORM/status/1653082492742647811?s=20)**.  
+Drizzle operates natively through industry-standard database drivers. We support all major **[PostgreSQL](/docs/get-started-postgresql)**, **[MySQL](/docs/mysql/get-started-mysql)**, **[SQLite](/docs/sqlite/get-started-sqlite)**, **[SingleStore](/docs/singlestore/get-started-singlestore)**, **[MSSQL](/docs/mssql/get-started-mssql)** or **[CockroachDB](/docs/cockroach/get-started-cockroach)** drivers out there, and we're adding new ones **[really fast](https://twitter.com/DrizzleORM/status/1653082492742647811?s=20)**.  
 
 
 ## Welcome on board!
@@ -124,7 +124,7 @@ More and more companies are adopting Drizzle in production, experiencing immense
 
 We have an outstanding **[Discord community](https://driz.link/discord)** and welcome all builders to our **[Twitter](https://twitter.com/drizzleorm)**.
   
-Now go build something awesome with Drizzle and your **[PostgreSQL](/docs/get-started-postgresql)**, **[MySQL](/docs/mysql/get-started-mysql)** or **[SQLite](/docs/sqlite/get-started-sqlite)** database. 🚀
+Now go build something awesome with Drizzle and your **[PostgreSQL](/docs/get-started-postgresql)**, **[MySQL](/docs/mysql/get-started-mysql)**, **[SQLite](/docs/sqlite/get-started-sqlite)**, **[MSSQL](/docs/mssql/get-started-mssql)** or **[CockroachDB](/docs/cockroach/get-started-cockroach)** database. 🚀
 
 ### Video Showcase
 

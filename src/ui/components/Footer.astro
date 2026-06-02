@@ -1,5 +1,5 @@
 ---
-import Logo from './Logo.astro';
+import Logo from "./Logo.astro";
 
 interface Props {
   isCenteredLayout?: boolean;
@@ -8,7 +8,7 @@ interface Props {
 const { isCenteredLayout } = Astro.props;
 ---
 
-<div class:list={['wrap', isCenteredLayout && 'wrap-centered']}>
+<div class:list={["wrap", isCenteredLayout && "wrap-centered"]}>
   <div class="container">
     <div class="content">
       <div class="logo-container">
@@ -55,7 +55,13 @@ const { isCenteredLayout } = Astro.props;
             aria-label="Drizzle Twitter"
             rel="nofollow noreferrer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="currentColor"
+            >
               <path
                 d="M8 2H1L9.26086 13.0145L1.44995 21.9999H4.09998L10.4883 14.651L16 22H23L14.3917 10.5223L21.8001 2H19.1501L13.1643 8.88578L8 2ZM17 20L5 4H7L19 20H17Z"
               ></path>
@@ -68,16 +74,22 @@ const { isCenteredLayout } = Astro.props;
           <div class="link-group-title">Documentation</div>
           <div>
             <a class="link-group-item" href="/docs/overview">Get Started</a>
-            <a class="link-group-item" href="/docs/sql-schema-declaration">Manage Schema</a>
-            <a class="link-group-item" href="/docs/rqb">Access Data</a>
+            <a class="link-group-item" href="/docs/sql-schema-declaration"
+              >Manage Schema</a
+            >
+            <a class="link-group-item" href="/docs/rqb-v2">Access Data</a>
             <a class="link-group-item" href="/docs/kit-overview">Migrations</a>
           </div>
         </div>
         <div>
           <div class="link-group-title">Resources</div>
           <div>
-            <a class="link-group-item" href="/drizzle-studio/overview">Drizzle Studio</a>
-            <a class="link-group-item" href="https://gateway.drizzle.team">Drizzle Gateway</a>
+            <a class="link-group-item" href="/drizzle-studio/overview"
+              >Drizzle Studio</a
+            >
+            <a class="link-group-item" href="https://gateway.drizzle.team"
+              >Drizzle Gateway</a
+            >
             <a class="link-group-item" href="/benchmarks">Benchmarks</a>
           </div>
         </div>
@@ -86,7 +98,9 @@ const { isCenteredLayout } = Astro.props;
           <div>
             <a class="link-group-item" href="/docs/guides">Guides</a>
             <a class="link-group-item" href="/docs/tutorials">Tutorials</a>
-            <a class="link-group-item" href="/docs/latest-releases">Latest Releases</a>
+            <a class="link-group-item" href="/docs/latest-releases"
+              >Latest Releases</a
+            >
           </div>
         </div>
       </div>
@@ -94,7 +108,7 @@ const { isCenteredLayout } = Astro.props;
   </div>
 </div>
 <style>
-  html[class~='dark'] .wrap {
+  html[class~="dark"] .wrap {
     color: #f3f4f6;
   }
 
@@ -112,7 +126,7 @@ const { isCenteredLayout } = Astro.props;
     margin-right: 0px;
   }
 
-  html[class~='dark'] .wrap {
+  html[class~="dark"] .wrap {
     border-top: 1px solid #2a2a2a;
   }
 
