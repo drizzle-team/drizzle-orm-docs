@@ -36,6 +36,7 @@ drizzle-kit pull
 drizzle-kit check
 drizzle-kit up
 drizzle-kit studio
+drizzle-kit export
 </Npx>
 
 
@@ -48,6 +49,7 @@ drizzle-kit studio
 | [`drizzle-kit studio`](/docs/mssql/drizzle-kit-studio)     | will connect to your database and spin up proxy server for Drizzle Studio which you can use for convenient database browsing, [see here](/docs/mssql/drizzle-kit-studio) |
 | [`drizzle-kit check`](/docs/mssql/drizzle-kit-check)       | will walk through all generate migrations and check for any race conditions(collisions) of generated migrations, [see here](/docs/mssql/drizzle-kit-check)               |
 | [`drizzle-kit up`](/docs/mssql/drizzle-kit-up)             | used to upgrade snapshots of previously generated migrations, [see here](/docs/mssql/drizzle-kit-up)                                                                     |
+| [`drizzle-kit export`](/docs/mssql/drizzle-kit-export)     | used to convert a TypeScript schema into raw SQL DDL and print it out [see here](/docs/mssql/drizzle-kit-export)                                                                     |
 <br/>
 
 Drizzle Kit is configured through [drizzle.config.ts](/docs/mssql/drizzle-config-file) configuration file or via CLI params.<br/>
@@ -58,8 +60,8 @@ It's required to at least provide SQL `dialect` and `schema` path for Drizzle Ki
  ├ 📂 src
  ├ 📜 .env
  ├ 📜 drizzle.config.ts  <--- Drizzle config file
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```
 
 <CodeTabs items={["simple config", "extended config"]}>
@@ -79,13 +81,11 @@ export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
 
-  driver: "pglite",
   dbCredentials: {
     url: "./database/",
   },
 
-  extensionsFilters: ["postgis"],
-  schemaFilter: "public",
+  schemaFilter: "dbo",
   tablesFilter: "*",
 
   introspect: {
@@ -93,13 +93,11 @@ export default defineConfig({
   },
 
   migrations: {
-    prefix: "datetime2",
     table: "__drizzle_migrations__",
-    schema: "public",
+    schema: "drizzle",
   },
 
   breakpoints: true,
-  strict: true,
   verbose: true,
 });
 ```
@@ -118,6 +116,6 @@ You can provide Drizzle Kit config path via CLI param, it's very useful when you
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```

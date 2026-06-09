@@ -7,7 +7,7 @@ import Callout from "@mdx/Callout.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import Npm from "@mdx/Npm.astro";
 import Npx from "@mdx/Npx.astro";
-
+import Dialects from "@mdx/Dialects.mdx"
 
 # `drizzle-kit check`
 
@@ -29,8 +29,8 @@ altering database schema on different branches - read more about [migrations for
 <hr/>
 <br/>
 
-`drizzle-kit check` command requires you to specify both `dialect` and database connection credentials, 
-you can provide them either via [drizzle.config.ts](/docs/mssql/drizzle-config-file) config file or via CLI options
+`drizzle-kit check` command requires you to specify `dialect`, 
+you can provide it either via [drizzle.config.ts](/docs/mssql/drizzle-config-file) config file or via CLI options
 
 <CodeTabs items={["With config file", "As CLI options"]}>
 <Section>
@@ -64,8 +64,17 @@ You can have multiple config files in the project, it's very useful when you hav
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
+```
+
+### Ignore conflicts
+
+In case you need `check` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
+there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
+
+```shell
+drizzle-kit check --ignore-conflicts
 ```
 
 ### Extended list of configurations
@@ -74,8 +83,8 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 <rem025/>
 |           |            |                                                                         |
 | :-------- | :--------- | :---------------------------------------------------------------------- |
-| `dialect` | `required` | Database dialect you are using. Can be `postgresql`, `mssql`, `sqlite`, or `singlestore` |
-| `out`     |            | Migrations folder, default=`./drizzle`                                  |
+| `dialect` | `required` | Database dialect you are using. Can be one of <Dialects/> |
+| `out`     |            | Migrations folder, default=`./drizzle`                                         |
 | `config`  |            | Configuration file path, default=`drizzle.config.ts`                           |
 <br/>
 <Npx>

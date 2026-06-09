@@ -25,9 +25,9 @@ import Dialects from "@mdx/Dialects.mdx"
 `drizzle-kit export` lets you export SQL representation of Drizzle schema and print in console SQL DDL representation on it.
 <Callout collapsed="How it works under the hood?">
 Drizzle Kit `export` command triggers a sequence of events:
-1. It will read through your Drizzle schema file(s) and compose a text snapshot of your schema
-3. Based on text differences it will generate SQL DDL statements
-4. Output SQL DDL statements to console
+1. It will read through your Drizzle schema file(s) and compose a json snapshot of your schema
+2. Based on the current json snapshot it will generate SQL DDL statements
+3. Output SQL DDL statements to console
 </Callout>
 
 It's designed to cover [codebase first](/docs/mssql/migrations) approach of managing Drizzle migrations. 
@@ -75,8 +75,8 @@ You can have multiple config files in the project, it's very useful when you hav
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```
 
 ### Extended list of available configurations
@@ -93,8 +93,7 @@ By default, Drizzle Kit outputs SQL files, but in the future, we want to support
 <rem025/>
 
 <Npx>
-drizzle-kit push --name=init
-drizzle-kit push --name=seed_users --custom
+drizzle-kit export --sql=true
 </Npx>
 
 <br/>
@@ -137,9 +136,9 @@ export default defineConfig({
 import { mssqlTable, int, text } from 'drizzle-orm/mssql-core'
 
 export const users = mssqlTable('users', {
-	id: int('id').primaryKey().identity(),
-	email: text('email').notNull(),
-	name: text('name')
+	id: int().primaryKey().identity(),
+	email: text().notNull(),
+	name: text()
 });
 ```
 
@@ -150,8 +149,9 @@ npx drizzle-kit export --config=./configs/drizzle.config.ts
 And it will successfully output SQL representation of drizzle schema
 ```bash
 CREATE TABLE [users] (
-        [id] int identity primary key not null,
-        [email] varchar(255) not null,
-        [name] text
+        [id] int IDENTITY(1, 1),
+        [email] text NOT NULL,
+        [name] text,
+        CONSTRAINT [users_pkey] PRIMARY KEY([id])
 );
 ```

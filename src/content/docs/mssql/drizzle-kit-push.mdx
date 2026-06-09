@@ -28,7 +28,7 @@ approach of Drizzle migrations.
 
 <Callout collapsed="How it works under the hood?">
 When you run Drizzle Kit `push` command it will:
-1. Read through your Drizzle schema file(s) and compose a text snapshot of your schema
+1. Read through your Drizzle schema file(s) and compose a json snapshot of your schema
 2. Pull(introspect) database schema 
 3. Based on differences between those two it will generate SQL migrations
 4. Apply SQL migrations to the database
@@ -39,8 +39,8 @@ import * as p from "drizzle-orm/mssql-core";
 
 export const users = p.mssqlTable("users", {
   id: p.int().primaryKey().identity(),
-  name: p.varchar({ length: 255 }),
-};
+  name: p.nvarchar({ length: 255 }),
+});
 ```
 ```
 ┌─────────────────────┐                  
@@ -54,15 +54,19 @@ export const users = p.mssqlTable("users", {
   └ Apply migrations to the database -------> │                          │
                                        │      └──────────────────────────┘
                                        │
-  ┌────────────────────────────────────┴────────────────┐
-   create table [users]([id] int identity primary key, [name] varchar(255));
+  ┌────────────────────────────────────┴─────┐
+   CREATE TABLE [users] (
+     [id] int IDENTITY(1, 1),
+     [name] nvarchar(255),
+     CONSTRAINT [users_pkey] PRIMARY KEY([id])
+   );
 ```
 </Section>
 </Callout>
 
 It's the best approach for rapid prototyping and we've seen dozens of teams
 and solo developers successfully using it as a primary migrations flow in their production applications.
-It pairs well with blue/green deployment strategies, managed database deployments, and CI/CD workflows.
+It pairs exceptionally well with blue/green deployment strategy, managed database deployments, and CI/CD workflows.
 
 <br/>
 <hr/>
@@ -83,7 +87,7 @@ export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
   dbCredentials: {
-    url: "mssql://user:password@host:3306/dbname",
+    url: "mssql://user:password@host:port/dbname",
   },
 });
 ```
@@ -93,7 +97,7 @@ npx drizzle-kit push
 </Section>
 
 ```shell
-npx drizzle-kit push --dialect=mssql --schema=./src/schema.ts --url=mssql://user:password@host:3306/dbname
+npx drizzle-kit push --dialect=mssql --schema=./src/schema.ts --url=mssql://user:password@host:port/dbname
 ```
 
 </CodeTabs>
@@ -120,51 +124,33 @@ You can have multiple config files in the project, it's very useful when you hav
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```
 
-### Specifying database driver
-Drizzle Kit does not come with a pre-bundled database driver,
-it will automatically pick an available MSSQL driver from your current project based on `dialect: "mssql"` - [see discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2203).
+### Including tables and schemas
+`drizzle-kit push` will manage all tables and schemas by default.
+You can configure list of tables, schemas via `tablesFilter`, `schemaFilter` options.
 
-Most MSSQL drivers share the same connection params. If you use an exception driver, such as AWS Data API, specify `driver` explicitly.
-
-```ts {6}
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "mssql",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-});
-```
-
-### Including tables
-`drizzle-kit push` will manage all MSSQL tables by default.
-You can configure the list of tables via `tablesFilter`.
-
-|                |                                                                                               |
-| :------------- | :-------------------------------------------------------------------------------------------- |
-| `tablesFilter` | `glob` based table names filter, e.g. `["users", "user_info"]` or `"user*"`. Default is `"*"` |
+|                     |                                                                                               |
+| :------------------ | :-------------------------------------------------------------------------------------------- |
+| `tablesFilter`      | `glob` based table names filter, e.g. `["users", "user_info"]` or `"user*"`. Default is `"*"` |
+| `schemaFilter`      | Schema names filter, e.g. `["dbo", "drizzle"]`                                             |
 <br/>
 
-Let's configure drizzle-kit to operate with **all tables** in the connected MSSQL database.
+Let's configure drizzle-kit to only operate with **all tables** in **dbo** schema.
 
 <Section>
-```ts filename="drizzle.config.ts" {9}
+```ts filename="drizzle.config.ts" {9-10}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
   dbCredentials: {
-    url: "mssql://user:password@host:3306/dbname",
+    url: "mssql://user:password@host:port/dbname",
   },
+  schemaFilter: ["dbo"],
   tablesFilter: ["*"],
 });
 ```
@@ -179,14 +165,14 @@ npx drizzle-kit push
 
 <rem025/>
 
-|           |                                                          |
-| :-------- | :---------------------------------------------------     |
-| `verbose` | print all SQL statements prior to execution              |
-| `strict`  | always ask for approval before executing SQL statements  |
-| `force`   | auto-accept all data-loss statements                     |
+|           |                                                                 |
+| :-------- | :---------------------------------------------------------------|
+| `verbose` | print all SQL statements prior to execution                     |
+| `explain` | print the planned SQL changes, without applying them (dry run)  |
+| `force`   | auto-accept all data-loss statements                            |
 <br/>
 <Npx>
-drizzle-kit push --strict --verbose --force
+drizzle-kit push --explain --verbose --force
 </Npx>
 
 <br/>
@@ -199,8 +185,8 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | :------------------ | :--------- | :------------------------------------------------------------------------ |
 | `dialect`           | `required` | Database dialect, one of <Dialects/>                                      |
 | `schema`            | `required` | Path to typescript schema file(s) or folder(s) with multiple schema files |
-| `driver`            |            | Driver exception, for example `aws-data-api`                              |
 | `tablesFilter`      |            | Table name filter                                                         |
+| `schemaFilter`      |            | Schema name filter. Default: `["*"]`                                 |
 | `url`               |            | Database connection string                                                |
 | `user`              |            | Database user                                                             |
 | `password`          |            | Database password                                                         |
@@ -210,8 +196,8 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 | `config`            |            | Configuration file path, default=`drizzle.config.ts`                             |
 
 <Npx>
-drizzle-kit push dialect=mssql schema=src/schema.ts url=mssql://user:password@host:3306/dbname
-drizzle-kit push dialect=mssql schema=src/schema.ts --tablesFilter='user*' url=mssql://user:password@host:3306/dbname
+drizzle-kit push dialect=mssql schema=src/schema.ts url=mssql://user:password@host:port/dbname
+drizzle-kit push dialect=mssql schema=src/schema.ts --tablesFilter='user*' url=mssql://user:password@host:port/dbname
 </Npx>
 
 
@@ -234,7 +220,7 @@ export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
   dbCredentials: {
-    url: "mssql://user:password@host:3306/dbname"
+    url: "mssql://user:password@host:port/dbname"
   },
 });
 ```
@@ -243,7 +229,7 @@ import * as p from "drizzle-orm/mssql-core";
 
 export const users = p.mssqlTable("users", {
   id: p.int().primaryKey().identity(),
-  name: p.varchar({ length: 255 }),
+  name: p.nvarchar({ length: 255 }),
 })
 ```
 </CodeTabs>
@@ -255,10 +241,11 @@ npx drizzle-kit push
 
 it will pull existing(empty) schema from the database and generate SQL migration and apply it under the hood
 ```sql
-CREATE TABLE [users](
-  [id] int identity primary key,
-  [name] varchar(255)
-)
+CREATE TABLE [users] (
+	[id] int IDENTITY(1, 1),
+	[name] nvarchar(255),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id])
+);
 ```
 
 DONE ✅

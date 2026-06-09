@@ -65,7 +65,7 @@ export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
   dbCredentials: {
-    url: "mssql://user:password@host:3306/dbname"
+    url: "mssql://user:password@host:port/dbname"
   },
 });
 ```
@@ -74,39 +74,27 @@ npx drizzle-kit migrate
 ```
 </Section>
 ```shell
-npx drizzle-kit migrate --dialect=mssql --url=mssql://user:password@host:3306/dbname
+npx drizzle-kit migrate --dialect=mssql --url=mssql://user:password@host:port/dbname
 ```
 </CodeTabs>
 
 ### Applied migrations log in the database
 Upon running migrations Drizzle Kit will persist records about successfully applied migrations in your database. 
-It will store them in migrations log table named `__drizzle_migrations`.
+It will store them in migrations log table named `__drizzle_migrations` in `drizzle` schema.
 
-You can customise the **table** name of that log table via drizzle config file:
+You can customise both **table** and **schema** of that table via drizzle config file:
 ```ts filename="drizzle.config.ts" {8-9}
 export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
   dbCredentials: {
-    url: "mssql://user:password@host:3306/dbname"
+    url: "mssql://user:password@host:port/dbname"
   },
   migrations: {
     table: 'my-migrations-table', // `__drizzle_migrations` by default
+    schema: 'drizzle', // `drizzle` by default
   },
 });
-```
-
-### Ignore conflicts
-
-<Callout type='warning'>
-`--ignore-conflicts` available starting from `drizzle-orm@1.0.0-beta.16`
-</Callout>
-
-In case you need `migrate` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
-there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
-
-```shell
-drizzle-kit migrate --ignore-conflicts
 ```
 
 ### Multiple configuration files in one project
@@ -122,8 +110,8 @@ You can have multiple config files in the project, it's very useful when you hav
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```
 
 ### Extended example
@@ -146,10 +134,11 @@ export default defineConfig({
   dialect: "mssql",
   schema: "./src/schema.ts",
   dbCredentials: {
-    url: "mssql://user:password@host:3306/dbname"
+    url: "mssql://user:password@host:port/dbname"
   },
   migrations: {
     table: 'journal', 
+    schema: 'drizzle', 
   },
 });
 ```
@@ -158,7 +147,7 @@ import * as p from "drizzle-orm/mssql-core";
 
 export const users = p.mssqlTable("users", {
   id: p.int().primaryKey().identity(),
-  name: p.varchar({ length: 255 }),
+  name: p.nvarchar({ length: 255 }),
 })
 ```
 </CodeTabs>
@@ -179,10 +168,11 @@ it will generate
 ```sql
 -- ./drizzle/0000_init.sql
 
-CREATE TABLE [users](
-  [id] int identity primary key,
-  [name] varchar(255)
-)
+CREATE TABLE [users] (
+	[id] int IDENTITY(1, 1),
+	[name] nvarchar(255),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id])
+);
 ```
 </Section>
 

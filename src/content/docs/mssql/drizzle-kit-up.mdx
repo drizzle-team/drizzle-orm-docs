@@ -6,6 +6,7 @@ import Tabs from "@mdx/Tabs.astro";
 import Callout from "@mdx/Callout.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import Npx from "@mdx/Npx.astro";
+import Dialects from "@mdx/Dialects.mdx"
 
 # `drizzle-kit up`
 
@@ -19,14 +20,14 @@ import Npx from "@mdx/Npx.astro";
 </Prerequisites>
 
 `drizzle-kit up` command lets you upgrade drizzle schema snapshots to a newer version. 
-It's required whenever we introduce breaking changes to the text snapshots of the schema and upgrade the internal version.
+It's required whenever we introduce breaking changes to the json snapshots of the schema and upgrade the internal version.
 
 <br/>
 <hr/>
 <br/>
 
-`drizzle-kit up` command requires you to specify both `dialect` and database connection credentials, 
-you can provide them either via [drizzle.config.ts](/docs/mssql/drizzle-config-file) config file or via CLI options
+`drizzle-kit up` command requires you to specify `dialect` param,
+you can provide it either via [drizzle.config.ts](/docs/mssql/drizzle-config-file) config file or via CLI options
 
 <CodeTabs items={["With config file", "As CLI options"]}>
 <Section>
@@ -60,8 +61,8 @@ You can have multiple config files in the project, it's very useful when you hav
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```
 
 ### Extended list of configurations
@@ -70,7 +71,7 @@ yet you can provide all configuration options through CLI if necessary, e.g. in 
 <rem025/>
 |           |            |                                                                         |
 | :-------- | :--------- | :---------------------------------------------------------------------- |
-| `dialect` | `required` | Database dialect you are using. Can be `postgresql`, `mssql`, `sqlite`, or `singlestore` |
+| `dialect` | `required` | Database dialect you are using. Can be one of <Dialects/> |
 | `out`     |            | Migrations folder, default=`./drizzle`                                  |
 | `config`  |            | Configuration file path, default=`drizzle.config.ts`                           |
 <br/>
@@ -79,4 +80,5 @@ drizzle-kit up --dialect=mssql
 drizzle-kit up --dialect=mssql --out=./migrations-folder
 </Npx>
 
+{/* TODO: update up gif */}
 ![](@/assets/gifs/up_mysql.gif)

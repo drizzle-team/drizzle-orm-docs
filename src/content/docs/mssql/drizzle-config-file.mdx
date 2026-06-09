@@ -29,7 +29,7 @@ Drizzle Kit lets you declare configuration options in `TypeScript` or `JavaScrip
  ├ 📂 drizzle
  ├ 📂 src
  ├ 📜 drizzle.config.ts
- └ 📜 package.text
+ └ 📜 package.json
 ```
 <CodeTabs items={["drizzle.config.ts", "drizzle.config.js"]}>
 <CodeTab>
@@ -70,17 +70,19 @@ export default defineConfig({
     url: "mssql://user:password@host:3306/dbname",
   },
 
+  schemaFilter: "dbo",
+  tablesFilter: "*",
+
   introspect: {
     casing: "camel",
   },
 
   migrations: {
-    prefix: "datetime2",
     table: "__drizzle_migrations__",
+    schema: "drizzle",
   },
 
   breakpoints: true,
-  strict: true,
   verbose: true,
 });
 ```
@@ -98,8 +100,8 @@ You can have multiple config files in the project, it's very useful when you hav
  ├ 📜 .env
  ├ 📜 drizzle-dev.config.ts
  ├ 📜 drizzle-prod.config.ts
- ├ 📜 package.text
- └ 📜 tsconfig.text
+ ├ 📜 package.json
+ └ 📜 tsconfig.json
 ```
 
 ### Migrations folder
@@ -120,13 +122,13 @@ Migration folder contains folders with `.sql` migration files which is used by `
  │ └ 📜 comment.ts 
  ├ 📂 src
  ├ 📜 drizzle.config.ts
- └ 📜 package.text
+ └ 📜 package.json
 ```
-```ts {5}
+```ts {6}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "mssql", // "mssql" | "sqlite" | "postgresql" | "turso" | "singlestore" | "mssql"
+  dialect: "mssql",
   schema: "./src/schema/*",
   out: "./drizzle",
 });
@@ -143,7 +145,7 @@ Dialect of the database you're using
 | :------------ | :-----------------------------------            |
 | type        | <Dialects/>                                     |
 | default        | --                                     |
-| commands    | `generate` `migrate` `push` `pull` `check` `up` |
+| commands    | `generate`, `push`, `pull`, `studio`,  `migrate`, `up`, `export` |
 
 <rem025/>
 ```ts {4}
@@ -164,7 +166,7 @@ export default defineConfig({
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | --                    |
-| commands      | `generate` `push`    |
+| commands      | `generate`, `push`, `export`, `studio`  |
 
 <rem025/>
 <SchemaFilePaths />
@@ -173,12 +175,12 @@ export default defineConfig({
 ### `out`
 <rem025/>
 
-Defines output folder of your SQL migration files, text snapshots of your schema and `schema.ts` from `drizzle-kit pull` command.
+Defines output folder of your SQL migration files, json snapshots of your schema and `schema.ts` from `drizzle-kit pull` command.
 |               |                      |
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | `drizzle`                    |
-| commands      | `generate` `migrate` `push` `pull` `check` `up`    |
+| commands      | `generate`, `pull`, `migrate`, `check`, `up` |
 
 <rem025/>
 ```ts {4}
@@ -189,52 +191,23 @@ export default defineConfig({
 });
 ```
 
-### `driver`
-<rem025/>
-
-Drizzle Kit automatically picks an available MSSQL driver from your current project based on `dialect: "mssql"`.
-Use `driver` only for supported MSSQL driver exceptions, such as AWS Data API.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `"aws-data-api"` |
-| default       | --                    |
-| commands      | `migrate` `push` `pull`   |
-
-<rem025/>
-
-```ts
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "mssql",
-  driver: "aws-data-api",
-  dbCredentials: {
-    database: "database",
-    resourceArn: "resourceArn",
-    secretArn: "secretArn",
-  },
-});
-```
-
 ## ---
 
 ### `dbCredentials`
 <rem025/>
 
-Database connection credentials in a form of `url`, 
-`user:password@host:port/db` params or exceptions drivers(<Drivers/>) specific connection options.
+Database connection credentials in a form of `url` or 
+`user:password@host:port/db` params.
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | union of drivers connection options |
+| type          | <Dialects/> |
 | default       | --                    |
-| commands      | `migrate` `push` `pull`   |
+| commands      | `push`, `pull`, `migrate`, `studio` |
 
 <rem025/>
 
 <CodeTabs items={["Connection string", "Connection params"]}>
-<Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -245,39 +218,41 @@ export default defineConfig({
   }
 });
 ```
-</Section>
-<Section>
 ```ts
-import { defineConfig } from 'drizzle-kit'
+import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  dialect: "mssql",
+  dialect: 'mssql',
+  schema: './schema.ts',
+  breakpoints: false,
   dbCredentials: {
-    host: "host",
-    port: 1433,
-    user: "user",
-    password: "password",
-    database: "dbname",
-    ssl: "...", // can be: string | SslOptions from mssql
-  }
+    database: '',
+    password: '',
+    port: 3306,
+    server: '',
+    user: '',
+    options: {
+      encrypt: true,
+      trustServerCertificate: true,
+    },
+  },
 });
 ```
-</Section>
 </CodeTabs>
 
 ### `migrations`
 <rem025/>
 
 When running `drizzle-kit migrate` - drizzle will records about 
-successfully applied migrations in your database in log table named `__drizzle_migrations`.
+successfully applied migrations in your database in log table named `__drizzle_migrations` in `drizzle` schema.
 
-`migrations` config options lets you change the migrations log `table` name.
+`migrations` config options lets you change both migrations log `table` name and `schema`.
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `{ table: string }` |
-| default       | `{ table: "__drizzle_migrations" }`                    |
-| commands      | `migrate`   |
+| type          | `{ table: string, schema: string }` |
+| default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
+| commands      | `migrate`, `push`, `pull` |
 
 <rem025/>
 
@@ -287,6 +262,7 @@ export default defineConfig({
   schema: "./src/schema.ts",
   migrations: {
     table: 'my-migrations-table', // `__drizzle_migrations` by default
+    schema: 'my_schema', // `drizzle` by default
   },
 });
 ```
@@ -320,16 +296,16 @@ export const users = p.mssqlTable("users", {
 });
 ```
 ```sql
-SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users';
+SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users';
 ```
-```
-  Field        | Type
---------------+--------------
- id           | int
- first-name   | varchar(255)
- LastName     | varchar(255)
- email        | varchar(255)
- phone_number | varchar(255)
+``` 
+ COLUMN_NAME   | DATA_TYPE        
+---------------+--------------
+ id            | int
+ first-name    | varchar
+ LastName      | varchar
+ email         | varchar
+ phone_number  | varchar
 ```
 </Section>
 <Section>
@@ -345,16 +321,16 @@ export const users = p.mssqlTable("users", {
 });
 ```
 ```sql
-SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users';
+SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users';
 ```
-```
-  Field        | Type
---------------+--------------
- id           | int
- first-name   | varchar(255)
- LastName     | varchar(255)
- email        | varchar(255)
- phone_number | varchar(255)
+``` 
+ COLUMN_NAME   | DATA_TYPE
+---------------+--------------
+ id            | int
+ first-name    | varchar
+ LastName      | varchar
+ email         | varchar
+ phone_number  | varchar
 ```
 </Section>
 </CodeTabs>
@@ -368,7 +344,7 @@ If you want to run multiple projects with one database - check out [our guide](/
 </Callout>
 <rem025/>
 `drizzle-kit push` and `drizzle-kit pull` will manage all tables by default.
-You can configure the list of tables via `tablesFilter`.
+You can configure list of tables and schemas via `tablesFilters` and `schemaFilter` options.
 
 `tablesFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
 based table names filter, e.g. `["users", "user_info"]` or `"user*"`
@@ -377,7 +353,7 @@ based table names filter, e.g. `["users", "user_info"]` or `"user*"`
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default       | --                    |
-| commands      | `generate` `push` `pull`   |
+| commands      | `push` `pull`   |
 
 <rem025/>
 ```ts
@@ -389,27 +365,33 @@ export default defineConfig({
 });
 ```
 
-## ---
+### `schemaFilter`
 
-### `strict`
-<rem025/>
 
-Prompts confirmation to run printed SQL statements when running `drizzle-kit push` command.
+<Callout>
+If you want to run multiple projects with one database - check out [our guide](/docs/mssql/goodies#multi-project-schema).
+</Callout>
+
+`drizzle-kit push` and `drizzle-kit pull` will by default manage all schemas.
+
+`schemaFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
+based schema names filter, e.g. `["dbo", "auth"]` or `"tenant_*"`
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `bit` |
-| default       | `false`                    |
-| commands      | `push`   |
+| type          | `string[]` |
+| commands      | `push` `pull`   |
 
 <rem025/>
 
 ```ts
 export default defineConfig({
   dialect: "mssql",
-  strict: false,
+  schemaFilter: ["dbo", "schema1", "schema2"],
 });
 ```
+
+## ---
 
 ### `verbose`
 <rem025/>
@@ -418,9 +400,9 @@ Print all SQL statements during `drizzle-kit push` command.
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `bit` |
-| default       | `true`                    |
-| commands      | `generate` `pull`   |
+| type          | `boolean` |
+| default       | `false`                    |
+| commands      | `pull`   |
 
 <rem025/>
 
@@ -435,13 +417,13 @@ export default defineConfig({
 <rem025/>
 
 Drizzle Kit will automatically embed `--> statement-breakpoint` into generated SQL migration files, 
-that's necessary for databases that do not support multiple DDL alternation statements in one transaction(MSSQL and SQLite).
+that's necessary for databases that do not support multiple DDL alternation statements in one transaction.
 
 `breakpoints` option flag lets you switch it on and off
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `bit` |
+| type          | `boolean` |
 | default       | `true`                    |
 | commands      | `generate` `pull`   |
 
