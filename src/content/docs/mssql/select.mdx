@@ -1,12 +1,11 @@
 import CodeTabs from '@mdx/CodeTabs.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
-import $count from '@mdx/$count.mdx';
 
 # SQL Select
 Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
 It natively supports mostly every query feature and capability of every dialect,
-and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/mssql/sql) operator.
+and whatever it doesn't support yet, can be added by the user with the powerful [sql](/docs/mssql/sql) operator.
 
 For the following examples, let's assume you have a `users` table defined like this:
 
@@ -14,9 +13,9 @@ For the following examples, let's assume you have a `users` table defined like t
 import { mssqlTable, text, int } from 'drizzle-orm/mssql-core';
 
 export const users = mssqlTable('users', {
-  id: int('id').primaryKey().identity(),
-  name: text('name').notNull(),
-  age: int('age'),
+  id: int().primaryKey().identity(),
+  name: text().notNull(),
+  age: int(),
 });
 ```
 
@@ -85,23 +84,12 @@ Drizzle cannot perform any type casts based on the provided type generic, becaus
 If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/mssql/sql#sqlmapwith) method.
 </Callout>
 
-<Callout title='Info'>
-Starting from `v1.0.0-beta.1` you can use `.as()` for columns:
-
-```ts
-const result = await db.select({
-  id: users.id,
-  lowerName: users.name.as("lower"),
-}).from(users);
-```
-</Callout>
-
 ### Conditional select
 
 You can have a dynamic selection object based on some condition:
 
 ```typescript
-async function selectUsers(withName: bit) {
+async function selectUsers(withName: boolean) {
   return db
     .select({
       id: users.id,
@@ -110,7 +98,7 @@ async function selectUsers(withName: bit) {
     .from(users);
 }
 
-const users = await selectUsers(true);
+const result = await selectUsers(true);
 ```
 
 ### Distinct select
@@ -133,14 +121,6 @@ select distinct [id] from [users] order by [id];
 Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
 
 Sneak peek of advanced partial select, for more detailed advanced usage examples - see our [dedicated guide](/docs/mssql/guides/include-or-exclude-columns).
-
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/mssql/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
-
-<br/>
 
 <CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
 ```ts
@@ -190,10 +170,10 @@ await db.select().from(users).where(ne(users.id, 42));
 ...
 ```
 ```sql
-select [id], [name], [age] from [users] where [id] = 42;
-select [id], [name], [age] from [users] where [id] < 42;
-select [id], [name], [age] from [users] where [id] >= 42;
-select [id], [name], [age] from [users] where [id] <> 42;
+select [id], [name], [age] from [users] where [users].[id] = 42;
+select [id], [name], [age] from [users] where [users].[id] < 42;
+select [id], [name], [age] from [users] where [users].[id] >= 42;
+select [id], [name], [age] from [users] where [users].[id] <> 42;
 ```
 </Section>
 
@@ -203,8 +183,9 @@ For inspiration, you can check how the operators provided by Drizzle are [implem
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm';
+import type { MsSqlColumn } from 'drizzle-orm/mssql-core';
 
-function equals42(col: Column) {
+function equals42(col: MsSqlColumn) {
   return sql`${col} = 42`;
 }
 
@@ -216,12 +197,12 @@ await db.select().from(users).where(sql`${users.id} <> 42`);
 await db.select().from(users).where(sql`lower(${users.name}) = 'aaron'`);
 ```
 ```sql
-select [id], [name], [age] from [users] where [id] < 42;
-select [id], [name], [age] from [users] where [id] = 42;
-select [id], [name], [age] from [users] where [id] = 42;
-select [id], [name], [age] from [users] where [id] >= 42;
-select [id], [name], [age] from [users] where [id] <> 42;
-select [id], [name], [age] from [users] where lower([name]) = 'aaron';
+select [id], [name], [age] from [users] where [users].[id] < 42;
+select [id], [name], [age] from [users] where [users].[id] = 42;
+select [id], [name], [age] from [users] where [users].[id] = 42;
+select [id], [name], [age] from [users] where [users].[id] >= 42;
+select [id], [name], [age] from [users] where [users].[id] <> 42;
+select [id], [name], [age] from [users] where lower([users].[name]) = 'aaron';
 ```
 </Section>
 
@@ -233,7 +214,7 @@ await db.select().from(users).where(eq(users.id, 42));
 ```
 will be translated to:
 ```sql
-select [id], [name], [age] from [users] where [id] = @p1; -- params: [42]
+select [id], [name], [age] from [users] where [users].[id] = @par0; -- params: [42]
 ```
 </Callout>
 
@@ -246,8 +227,8 @@ await db.select().from(users).where(not(eq(users.id, 42)));
 await db.select().from(users).where(sql`not ${users.id} = 42`);
 ```
 ```sql
-select [id], [name], [age] from [users] where not ([id] = 42);
-select [id], [name], [age] from [users] where not ([id] = 42);
+select [id], [name], [age] from [users] where not ([users].[id] = 42);
+select [id], [name], [age] from [users] where not [users].[id] = 42;
 ```
 </Section>
 
@@ -272,8 +253,8 @@ await db.select().from(users).where(
 await db.select().from(users).where(sql`${users.id} = 42 and ${users.name} = 'Dan'`);
 ```
 ```sql
-select [id], [name], [age] from [users] where [id] = 42 and [name] = 'Dan';
-select [id], [name], [age] from [users] where [id] = 42 and [name] = 'Dan';
+select [id], [name], [age] from [users] where (([users].[id] = 42) and ([users].[name] = 'Dan'));
+select [id], [name], [age] from [users] where [users].[id] = 42 and [users].[name] = 'Dan';
 ```
 </Section>
 
@@ -290,8 +271,8 @@ await db.select().from(users).where(
 await db.select().from(users).where(sql`${users.id} = 42 or ${users.name} = 'Dan'`);
 ```
 ```sql
-select [id], [name], [age] from [users] where [id] = 42 or [name] = 'Dan';
-select [id], [name], [age] from [users] where [id] = 42 or [name] = 'Dan';
+select [id], [name], [age] from [users] where (([users].[id] = 42) or ([users].[name] = 'Dan'));
+select [id], [name], [age] from [users] where [users].[id] = 42 or [users].[name] = 'Dan';
 ```
 </Section>
 
@@ -341,11 +322,11 @@ await db.select().from(users).orderBy(users.name, users.name2);
 await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
 ```
 ```sql
-select [id], [name], [age] from [users] order by [name];
-select [id], [name], [age] from [users] order by [name] desc;
+select [id], [name], [name2], [age] from [users] order by [users].[name];
+select [id], [name], [name2], [age] from [users] order by [users].[name] desc;
 
-select [id], [name], [age] from [users] order by [name], [name2];
-select [id], [name], [age] from [users] order by [name] asc, [name2] desc;
+select [id], [name], [name2], [age] from [users] order by [users].[name], [users].[name];
+select [id], [name], [name2], [age] from [users] order by [users].[name] asc, [users].[name2] desc;
 ```
 </Section>
 
@@ -367,7 +348,7 @@ await db
 ```
 ```ts
 const getUsers = async (page = 1, pageSize = 3) => {
-  await db.query.users.findMany({
+  return await db.query.users.findMany({
     orderBy: (users, { asc }) => asc(users.id),
     limit: pageSize,
     offset: (page - 1) * pageSize,
@@ -384,12 +365,12 @@ const getUsers = async (page = 1, pageSize = 10) => {
     .limit(pageSize)
     .offset((page - 1) * pageSize)
     .as('subquery');
-   await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
+   return await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
 };
 ```
 ```ts
 const nextUserPage = async (cursor?: number, pageSize = 3) => {
-  await db
+  return await db
     .select()
     .from(users)
     .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
@@ -413,12 +394,11 @@ const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
 const result = await db.with(sq).select().from(sq);
 ```
 ```sql
-with sq as (select [id], [name], [age] from [users] where [id] = 42)
-select [id], [name], [age] from sq;
+with [sq] as (select [id], [name], [age] from [users] where [users].[id] = 42)
+select [id], [name], [age] from [sq];
 ```
 </Section>
 
-MSSQL doesn't support native `RETURNING`, so `insert`, `update`, and `delete` statements that depend on returning rows are not available inside `with` for this dialect.
 
 To select arbitrary SQL values as fields in a CTE and reference them in other CTEs or in the main query,
 you need to add aliases to them:
@@ -443,7 +423,7 @@ const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
 ```sql
-select [id], [name], [age] from (select [id], [name], [age] from [users] where [id] = 42) [sq];
+select [id], [name], [age] from (select [id], [name], [age] from [users] where [users].[id] = 42) [sq];
 ```
 </Section>
 
@@ -455,7 +435,7 @@ const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
 ```sql
 select [users].[id], [users].[name], [users].[age], [sq].[id], [sq].[name], [sq].[age] from [users]
-  left join (select [id], [name], [age] from [users] where [id] = 42) [sq]
+  left join (select [id], [name], [age] from [users] where [users].[id] = 42) [sq]
     on [users].[id] = [sq].[id];
 ```
 </Section>
@@ -468,7 +448,7 @@ grouping and filtering with `.groupBy()` and `.having()` respectfully, same as y
 
 <Section>
 ```typescript
-import { gt } from 'drizzle-orm';
+import { gt, sql } from "drizzle-orm";
 
 await db.select({
   age: users.age,
@@ -488,20 +468,19 @@ await db.select({
 ```sql
 select [age], cast(count([id]) as int)
   from [users]
-  group by [age];
+  group by [users].[age];
 
 select [age], cast(count([id]) as int)
   from [users]
-  group by [age]
-  having cast(count([id]) as int) > 1;
+  group by [users].[age]
+  having cast(count([users].[id]) as int) > 1;
 ```
 </Section>
 
 <Callout type="info">
-`cast(... as int)` is necessary because `count()` returns `decimal` in MSSQL, which is treated as a string value instead of a number.
-Alternatively, you can use [`.mapWith(Number)`](/docs/mssql/sql#sqlmapwith) to cast the value to a number at runtime.
+As an alternative to `cast(... as int)`, you can use [`.mapWith(Number)`](/docs/mssql/sql#sqlmapwith) to cast the value to a number at runtime.
 
-If you need count aggregation - we recommend using our [`$count`](/docs/mssql/select#count) API
+If you need count aggregation - we recommend using our [$count](/docs/mssql/select#count) API
 </Callout>
 
 ### Aggregations helpers
@@ -556,7 +535,7 @@ select count(distinct [id]) from [users];
 ```ts
 // It's equivalent to writing
 await db.select({ 
-  value: sql`count(${users.id})`.mapWith(Number) 
+  value: sql`count(distinct ${users.id})`.mapWith(Number) 
 }).from(users);
 ```
 </Section>
@@ -691,12 +670,12 @@ const orders = mssqlTable('order', {
   shippedDate: datetime2('shipped_date'),
   shipVia: int('ship_via').notNull(),
   freight: numeric('freight').notNull(),
-  shipName: text('ship_name').notNull(),
-  shipCity: text('ship_city').notNull(),
-  shipRegion: text('ship_region'),
-  shipPostalCode: text('ship_postal_code'),
-  shipCountry: text('ship_country').notNull(),
-  customerId: text('customer_id').notNull(),
+  shipName: nvarchar('ship_name', { length: 256 }).notNull(),
+  shipCity: nvarchar('ship_city', { length: 256 }).notNull(),
+  shipRegion: nvarchar('ship_region', { length: 256 }),
+  shipPostalCode: nvarchar('ship_postal_code', { length: 256 }),
+  shipCountry: nvarchar('ship_country', { length: 256 }).notNull(),
+  customerId: nvarchar('customer_id', { length: 256 }).notNull(),
   employeeId: int('employee_id').notNull(),
 });
 
@@ -707,27 +686,31 @@ const details = mssqlTable('order_detail', {
   orderId: int('order_id').notNull(),
   productId: int('product_id').notNull(),
 });
-
-db
-  .select({
-    id: orders.id,
-    shippedDate: orders.shippedDate,
-    shipName: orders.shipName,
-    shipCity: orders.shipCity,
-    shipCountry: orders.shipCountry,
-    productsCount: sql<number>`cast(count(${details.productId}) as int)`,
-    quantitySum: sql<number>`sum(${details.quantity})`,
-    totalPrice: sql<number>`sum(${details.quantity} * ${details.unitPrice})`,
-  })
+await db.select({
+  id: orders.id,
+  shippedDate: orders.shippedDate,
+  shipName: orders.shipName,
+  shipCity: orders.shipCity,
+  shipCountry: orders.shipCountry,
+  productsCount: sql<number>`cast(count(${details.productId}) as int)`,
+  quantitySum: sql<number>`sum(${details.quantity})`,
+  totalPrice: sql<number>`sum(${details.quantity} * ${details.unitPrice})`,
+})
   .from(orders)
   .leftJoin(details, eq(orders.id, details.orderId))
-  .groupBy(orders.id)
-  .orderBy(asc(orders.id))
-  .all();
+  .groupBy(
+    orders.id,
+    orders.shipName,
+    orders.shippedDate,
+    orders.shipCity,
+    orders.shipCountry,
+  )
+  .orderBy(asc(orders.id));
 ```
 
 ### $count
-<$count />
+
+Currently not supported
 
 ## ---
 
@@ -736,7 +719,7 @@ db
 If you need to return a very large amount of rows from a query and you don't want to load them all into memory, you can use `.iterator()` to convert the query into an async iterator:
 
 ```ts copy
-const iterator = await db.select().from(users).iterator();
+const iterator = db.select().from(users).iterator();
 
 for await (const row of iterator) {
   console.log(row);
@@ -746,90 +729,10 @@ for await (const row of iterator) {
 It also works with prepared statements:
 
 ```ts copy
-const query = await db.select().from(users).prepare();
-const iterator = await query.iterator();
+const query = db.select().from(users).prepare();
+const iterator = query.iterator();
 
 for await (const row of iterator) {
   console.log(row);
 }
-```
-
-## ---
-
-### Use Index
-
-The `USE INDEX` hint suggests to the optimizer which indexes to consider when processing the query. The optimizer is not forced to use these indexes but will prioritize them if they are suitable.
-
-```ts copy
-export const users = mssqlTable('users', {
-	id: int('id').primaryKey(),
-	name: varchar('name', { length: 100 }).notNull(),
-}, () => [usersTableNameIndex]);
-
-const usersTableNameIndex = index('users_name_index').on(users.name);
-
-await db.select()
-  .from(users, { useIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
-```
-
-You can also use this option on any join you want
-
-```ts
-await db.select()
-  .from(users)
-  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
-```
-
-### Ignore Index
-
-The `IGNORE INDEX` hint tells the optimizer to avoid using specific indexes for the query. MSSQL will consider all other indexes (if any) or perform a full table scan if necessary.
-
-```ts copy
-export const users = mssqlTable('users', {
-	id: int('id').primaryKey(),
-	name: varchar('name', { length: 100 }).notNull(),
-}, () => [usersTableNameIndex]);
-
-const usersTableNameIndex = index('users_name_index').on(users.name);
-
-await db.select()
-  .from(users, { ignoreIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
-```
-
-You can also use this option on any join you want
-
-```ts
-await db.select()
-  .from(users)
-  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
-```
-
-### Force Index
-
-The `FORCE INDEX` hint forces the optimizer to use the specified index(es) for the query. If the specified index cannot be used, MSSQL will not fall back to other indexes; it might resort to a full table scan instead.
-
-```ts copy
-export const users = mssqlTable('users', {
-	id: int('id').primaryKey(),
-	name: varchar('name', { length: 100 }).notNull(),
-}, () => [usersTableNameIndex]);
-
-const usersTableNameIndex = index('users_name_index').on(users.name);
-
-await db.select()
-  .from(users, { forceIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
-```
-
-You can also use this option on any join you want
-
-```ts
-await db.select()
-  .from(users)
-  .leftJoin(posts, eq(posts.userId, users.id), { useIndex: usersTableNameIndex })
-  .where(eq(users.name, 'David'));
 ```

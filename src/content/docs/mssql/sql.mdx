@@ -37,13 +37,13 @@ await db.execute(sql`select * from ${usersTable} where ${usersTable.id} = ${id}`
 It will generate the current query
 
 ```sql
-select * from [users] where [users].[id] = @p1; --> [69]
+select * from [users] where [users].[id] = @par0 -- params: [69]
 ```
 
 Any tables and columns provided to the sql parameter are automatically mapped to their corresponding SQL 
 syntax with escaped names for tables, and the escaped table names are appended to column names. 
 
-Additionally, any dynamic parameters such as `${id}` will be mapped to the `?` placeholder, 
+Additionally, any dynamic parameters such as `${id}` will be mapped to the @par0 placeholder, 
 and the corresponding values will be moved to an array of values that are passed separately to the database. 
 
 This approach effectively prevents any potential SQL Injection vulnerabilities.
@@ -85,8 +85,8 @@ the interface inside mapWith is the same interface that is implemented by Column
 import { mssqlTable, int, text } from 'drizzle-orm/mssql-core';
 
 const usersTable = mssqlTable('users', {
-    id: int('id').primaryKey().identity(),
-    name: text('name').notNull(),
+    id: int().primaryKey().identity(),
+    name: text().notNull(),
 });
 
 //  at runtime this values will be mapped same as `text` column is mapped in drizzle
@@ -120,10 +120,10 @@ name for the field, making your queries more intuitive and readable.
 
 <Section>
 ```typescript
-sql`lower(usersTable.name)`.as('lower_name')
+sql`lower(${usersTable.name})`.as('lower_name')
 ```
 ```sql
-... [usersTable].[name] as lower_name ...
+... [users].[name] as [lower_name] ...
 ```
 </Section>
 
@@ -145,7 +145,7 @@ sql`select * from users where id = ${12}`;
 ```sql
 select * from users where id = 12;
 --> vs
-select * from users where id = @p1; --> [12]
+select * from users where id = @par0; --> [12]
 ```
 </Section>
 
@@ -163,7 +163,7 @@ sql`select * from ${usersTable} where id = ${12}`;
 sql`select * from ${usersTable} where id = ${sql.raw(12)}`;
 ```
 ```sql
-select * from [users] where id = @p1; --> [12]
+select * from [users] where id = @par0; --> [12]
 --> vs
 select * from [users] where id = 12;
 ```
@@ -204,7 +204,7 @@ for (let i = 0; i < 5; i++) {
 const finalSql: SQL = sql.fromList(sqlChunks)
 ```
 ```sql
-select * from users where id = @p1 or id = @p2 or id = @p3 or id = @p4 or id = @p5; --> [0, 1, 2, 3, 4]
+select * from users where id = @par0 or id = @par1 or id = @par2 or id = @par3 or id = @par4; --> [0, 1, 2, 3, 4]
 ```
 </Section>
 
@@ -243,7 +243,7 @@ if (i === 4) continue;
 const finalSql: SQL = sql.join(sqlChunks, sql.raw(' '));
 ```
 ```sql
-select * from users where id = @p1 or id = @p2 or id = @p3 or id = @p4 or id = @p5; --> [0, 1, 2, 3, 4]
+select * from users where id = @par0 or id = @par1 or id = @par2 or id = @par3 or id = @par4; --> [0, 1, 2, 3, 4]
 ```
 </Section>
 
@@ -274,7 +274,7 @@ for (let i = 0; i < 5; i++) {
 }
 ```
 ```sql
-select * from users where id = @p1 or id = @p2 or id = @p3 or id = @p4 or id = @p5; --> [0, 1, 2, 3, 4]
+select * from users where id = @par0 or id = @par1 or id = @par2 or id = @par3 or id = @par4; --> [0, 1, 2, 3, 4]
 ```
 </Section>
 
@@ -308,7 +308,7 @@ for (let i = 0; i < 5; i++) {
 }
 ```
 ```sql
-select * from users where id = @p1 or id = @p2 or id = @p3 or id = @p4 or id = @p5; --> [0, 1, 2, 3, 4]
+select * from users where id = @par0 or id = @par1 or id = @par2 or id = @par3 or id = @par4; --> [0, 1, 2, 3, 4]
 ```
 
 ## Convert `sql` to string and params
@@ -332,7 +332,7 @@ const mssqlDialect = new MsSqlDialect();
 mssqlDialect.sqlToQuery(sql`select * from ${usersTable} where ${usersTable.id} = ${12}`);
 ```
 ```sql
-select * from [users] where [users].[id] = @p1; --> [ 12 ]
+select * from [users] where [users].[id] = @par0; --> [ 12 ]
 ```
 </Section>
 
@@ -351,7 +351,7 @@ Here you can see a usage for **[`sql<T>`](/docs/mssql/sql#sqlt)**, **[`sql``.map
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select({
     id: usersTable.id,
@@ -384,7 +384,7 @@ the underlying database system provides.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 const id = 77
 
@@ -393,7 +393,7 @@ await db.select()
         .where(sql`${usersTable.id} = ${id}`)
 ```
 ```sql
-select * from [users] where [users].[id] = @p1; --> [ 77 ]
+select * from [users] where [users].[id] = @par0; --> [ 77 ]
 ```
 </Section>
 
@@ -401,16 +401,16 @@ select * from [users] where [users].[id] = @p1; --> [ 77 ]
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
-const searchPattern = "%Ale%"
+const searchParam = "%Ale%"
 
 await db.select()
         .from(usersTable)
         .where(sql`lower(${usersTable.name}) like lower(${searchPattern})`)
 ```
 ```sql
-select * from [users] where lower([users].[name]) like lower(@p1); --> [ "%Ale%" ]
+select * from [users] where lower([users].[name]) like lower(@par0); --> [ "%Ale%" ]
 ```
 </Section>
 
@@ -422,12 +422,12 @@ available in Drizzle, but you prefer not to resort to raw SQL.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
-await db.select().from(usersTable).orderBy(sql`${usersTable.id} desc nulls first`)
+await db.select().from(usersTable).orderBy(sql`${usersTable.id} desc`)
 ```
 ```sql
-select * from [users] order by [users].[id] desc nulls first;
+select * from [users] order by [users].[id] desc;
 ```
 </Section>
 
@@ -439,7 +439,7 @@ available in Drizzle, but you prefer not to resort to raw SQL.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select({ 
     projectId: usersTable.projectId,
@@ -449,6 +449,6 @@ await db.select({
     .having(sql`count(${usersTable.id}) > 300`)
 ```
 ```sql
-select [project_id], count([users].[id]) from users group by [users].[project_id] having count([users].[id]) > 300; 
+select [project_id], count([id]) from [users] group by [users].[project_id] having count([users].[id]) > 300;
 ```
 </Section>

@@ -3,14 +3,34 @@ import Section from '@mdx/Section.astro';
 
 # SQL Update
 
+<Callout type='info'>
+All the values provided to `.set()`are parameterized automatically.
+For example, this query:
+```ts
+await db.update(users).set({ name: "Mr. Dan" }).where(eq(users.name, "Dan"));
+```
+will be translated to:
+```sql
+update [users] set [name] = @par0 where [users].[name] = @par1; -- params: ['Mr. Dan', 'Dan']
+```
+</Callout>
+
+<br/>
+
+The object that you pass to `update` should have keys that match column names in your database schema.
+Values of `undefined` are ignored in the object: to set a column to `null`, pass `null`.
+
 ```typescript copy
 await db.update(users)
   .set({ name: 'Mr. Dan' })
   .where(eq(users.name, 'Dan'));
 ```
+```typescript copy
+await db.update(users)
+  .set({ name: null })
+  .where(eq(users.name, 'Dan'));
+```
 
-The object that you pass to `update` should have keys that match column names in your database schema.
-Values of `undefined` are ignored in the object: to set a column to `null`, pass `null`.
 You can pass SQL as a value to be used in the update object, like this:
 
 ```typescript copy
@@ -19,36 +39,44 @@ await db.update(users)
   .where(eq(users.name, 'Dan'));
 ```
 
-### Limit
-Use `.limit()` to add `limit` clause to the query - for example:
-<Section>
-```typescript
-await db.update(usersTable).set({ verified: true }).limit(2);
+### Output
+
+This method allows you to return values from the rows affected by the query. MSSQL supports returning inserted (new row values) and deleted (old row values) values.
+
+If no fields are specified, all inserted values will be returned by default.
+
+```ts
+// Update cars and return all new values
+const updatedCars: Car[] = await db.update(cars)
+  .set({ color: 'red' })
+  .output()
+  .where(eq(cars.color, 'green'));
+
+// Update cars and return all new values
+const updatedCars: Car[] = await db.update(cars)
+  .set({ color: 'red' })
+  .output({ inserted: true })
+  .where(eq(cars.color, 'green'));
+
+// Update cars and return all old values
+const updatedCarsIds: { deleted: Car }[] = await db.update(cars)
+  .set({ color: 'red' })
+  .output({ deleted: true })
+  .where(eq(cars.color, 'green'));
+
+// Update cars and return partial old and new values
+const beforeAndAfter: { deleted: { oldColor: string }, inserted: { newColor: string } }[] = await db.update(cars)
+  .set({ color: 'red' })
+  .output({
+    deleted: { oldColor: cars.color },
+    inserted: { newColor: cars.color }
+  })
+  .where(eq(cars.color, 'green'));
 ```
+
 ```sql
-update [users] set [verified] = @p1 limit @p2;
+update [cars] set [color] = 'red' output INSERTED.[name], INSERTED.[color] where [cars].[color] = 'green';
+update [cars] set [color] = 'red' output INSERTED.[name], INSERTED.[color] where [cars].[color] = 'green';
+update [cars] set [color] = 'red' output DELETED.[name], DELETED.[color] where [cars].[color] = 'green';
+update [cars] set [color] = 'red' output INSERTED.[color], DELETED.[color] where [cars].[color] = 'green';
 ```
-</Section>
-
-### Order By
-Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
-<Section>
-```typescript
-import { asc, desc } from 'drizzle-orm';
-
-await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name);
-await db.update(usersTable).set({ verified: true }).orderBy(desc(usersTable.name));
-
-// order by multiple fields
-await db.update(usersTable).set({ verified: true }).orderBy(usersTable.name, usersTable.name2);
-await db.update(usersTable).set({ verified: true }).orderBy(asc(usersTable.name), desc(usersTable.name2));
-```
-```sql
-update [users] set [verified] = @p1 order by [name];
-update [users] set [verified] = @p2 order by [name] desc;
-
-update [users] set [verified] = @p3 order by [name], [name2];
-update [users] set [verified] = @p4 order by [name] asc, [name2] desc;
-```
-</Section>
-

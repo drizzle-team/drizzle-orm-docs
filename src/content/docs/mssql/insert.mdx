@@ -4,6 +4,21 @@ import Tab from '@mdx/Tab.astro';
 import Tabs from '@mdx/Tabs.astro';
 
 # SQL Insert
+
+<Callout type='info'>
+All the values provided to `.values()`are parameterized automatically.
+For example, this query:
+```ts
+await db.insert(users).values({ name: 'Andrew' });
+```
+will be translated to:
+```sql
+insert into [users] ([name]) values (@par0); -- params: ['Andrew']
+```
+</Callout>
+
+<br/>
+
 Drizzle ORM provides you the most SQL-like way to insert rows into the database tables.
 
 Inserting data with Drizzle is extremely straightforward and sql-like. See for yourself:
@@ -12,8 +27,9 @@ Inserting data with Drizzle is extremely straightforward and sql-like. See for y
 ```typescript copy 
 await db.insert(users).values({ name: 'Andrew' });
 ```
+
 ```sql
-insert into [users] ([name]) values ('Andrew');
+insert into [users] ([name], [age]) values ('Andrew', default)
 ```
 </Section>
 
@@ -32,16 +48,7 @@ await insertUser(newUser);
 ## Insert with output
 MSSQL supports the `OUTPUT` clause for returning inserted rows. Drizzle exposes it through the `.output()` method.
 
-```ts
-import { bit, int, text, mssqlTable } from 'drizzle-orm/mssql-core';
-
-const usersTable = mssqlTable('users', {
-  id: int('id').primaryKey(),
-  name: text('name').notNull(),
-  verified: bit('verified').notNull().default(false),
-});
-
-
+```typescript copy
 const result = await db
   .insert(usersTable)
   .output({ id: usersTable.id })
@@ -66,64 +73,4 @@ MSSQL does not support PostgreSQL-style `ON CONFLICT` or MySQL-style `ON DUPLICA
 
 ## Insert into ... select
 
-As the MSSQL documentation mentions:
-
-<Callout>
-With INSERT ... SELECT, you can quickly insert many rows into a table from the result of a SELECT statement, which can select from one or many tables
-</Callout>
-
-Drizzle supports the current syntax for all dialects, and all of them share the same syntax. Let's review some common scenarios and API usage. 
-There are several ways to use select inside insert statements, allowing you to choose your preferred approach:
-
-- You can pass a query builder inside the select function.
-- You can use a query builder inside a callback.
-- You can pass an SQL template tag with any custom select query you want to use
-
-
-<Tabs items={["Query Builder", "Callback", "SQL template tag"]}>
-<Tab>
-<Section>
-```ts
-const insertedEmployees = await db
-  .insert(employees)
-  .select(
-    db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
-  );
-```
-```ts
-const qb = new QueryBuilder();
-await db.insert(employees).select(
-    qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
-);
-```
-</Section>
-</Tab>
-<Tab>
-<Section>
-```ts
-await db.insert(employees).select(
-    () => db.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
-);
-```
-```ts
-await db.insert(employees).select(
-    (qb) => qb.select({ name: users.name }).from(users).where(eq(users.role, 'employee'))
-);
-```
-</Section>
-</Tab>
-<Tab>
-<Section>
-```ts
-await db.insert(employees).select(
-    sql`select users.name as name from users where users.role = 'employee'`
-);
-```
-```ts
-await db.insert(employees).select(
-    () => sql`select users.name as name from users where users.role = 'employee'`
-);
-```
-</Section>
-</Tab>
-</Tabs>
+Currently not supported

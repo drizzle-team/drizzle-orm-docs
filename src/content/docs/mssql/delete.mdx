@@ -2,6 +2,7 @@ import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
 
 # SQL Delete
+
 You can delete all rows in the table:
 ```typescript copy
 await db.delete(users);
@@ -11,36 +12,23 @@ And you can delete with filters and conditions:
 await db.delete(users).where(eq(users.name, 'Dan'));
 ```
 
-### Limit
-Use `.limit()` to add `limit` clause to the query - for example:
-<Section>
-```typescript
-await db.delete(users).where(eq(users.name, 'Dan')).limit(2);
+### Output
+
+You can delete a row and get it back in PostgreSQL:
+```typescript copy
+const deletedUser = await db.delete(users)
+  .where(eq(users.name, 'Dan'))
+  .output();
+
+// partial return
+const deletedUserId = await db.delete(users)
+  .where(eq(users.name, "Dan"))
+  .output({ deletedId: users.id });
+
+// deletedUserId: { deletedId: number }[]
 ```
 ```sql
-delete from [users] where [users].[name] = @p1 limit @p2;
+delete from [users] output DELETED.[id], DELETED.[name], DELETED.[age] where [users].[name] = 'Dan'
+
+delete from [users] output DELETED.[id] where [users].[name] = 'Dan'
 ```
-</Section>
-
-### Order By
-Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
-<Section>
-```typescript
-import { asc, desc } from 'drizzle-orm';
-
-await db.delete(users).where(eq(users.name, 'Dan')).orderBy(users.name);
-await db.delete(users).where(eq(users.name, 'Dan')).orderBy(desc(users.name));
-
-// order by multiple fields
-await db.delete(users).where(eq(users.name, 'Dan')).orderBy(users.name, users.name2);
-await db.delete(users).where(eq(users.name, 'Dan')).orderBy(asc(users.name), desc(users.name2));
-```
-```sql
-delete from [users] where [users].[name] = @p1 order by [name];
-delete from [users] where [users].[name] = @p2 order by [name] desc;
-
-delete from [users] where [users].[name] = @p3 order by [name], [name2];
-delete from [users] where [users].[name] = @p4 order by [name] asc, [name2] desc;
-```
-</Section>
-
