@@ -23,15 +23,15 @@ a string constant, a blob constant, a signed-number, or any constant expression 
     import { sql } from "drizzle-orm";
     import { int, time, mssqlTable } from "drizzle-orm/mssql-core";
     
-    const table = mssqlTable("table", {
-      int: int("int").default(42),
-      time: time("time").default(sql`cast("14:06:10" AS TIME)`),
+    export const table = mssqlTable("table", {
+      int: int().default(42),
+      time: time().default(sql`cast('14:06:10' AS TIME)`),
     });
     ```
     ```sql
     CREATE TABLE [table] (
-      [int] int DEFAULT 42,
-      [time] time DEFAULT cast("14:06:10" AS TIME)
+      [int] int CONSTRAINT [table_int_default] DEFAULT ((42)),
+      [time] time CONSTRAINT [table_time_default] DEFAULT (cast('14:06:10' AS TIME))
     );
     ```
     </Section>
@@ -47,8 +47,8 @@ or update a record without adding a value to this field.
       ```typescript
       import { int, mssqlTable } from "drizzle-orm/mssql-core";
 
-      const table = mssqlTable('table', {
-        int: int('int').notNull(),
+      export const table = mssqlTable('table', {
+        int: int().notNull(),
       });
       ```
 
@@ -76,38 +76,38 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
       import { int, varchar, unique, mssqlTable } from "drizzle-orm/mssql-core";
 
       export const user = mssqlTable('user', {
-        id: int('id').unique(),
+        id: int().unique(),
       });
 
       export const table = mssqlTable('table', {
-        id: int('id').unique('custom_name'),
+        id: int().unique('custom_name_1'),
       });
 
       export const composite = mssqlTable('composite_example', {
-        id: int('id'),
-        name: varchar('name', { length: 256 }),
+        id: int(),
+        name: varchar({ length: 256 }),
       }, (t) => [
         unique().on(t.id, t.name),
-        unique('custom_name').on(t.id, t.name)
+        unique('custom_name_2').on(t.id, t.name)
       ]);
       ```
 
       ```sql
       CREATE TABLE [user] (
       	[id] int,
-      	CONSTRAINT [user_id_unique] UNIQUE([id])
+      	CONSTRAINT [user_id_key] UNIQUE([id])
       );
 
       CREATE TABLE [table] (
       	[id] int,
-      	CONSTRAINT [custom_name] UNIQUE([id])
+      	CONSTRAINT [custom_name_1] UNIQUE([id])
       );
 
       CREATE TABLE [composite_example] (
         [id] int,
         [name] varchar(256),
-        CONSTRAINT [composite_example_id_name_unique] UNIQUE([id],[name]),
-        CONSTRAINT [custom_name] UNIQUE([id],[name])
+        CONSTRAINT [composite_example_id_name_key] UNIQUE([id],[name]),
+        CONSTRAINT [custom_name_2] UNIQUE([id],[name])
       );
       ```
     </Section>
@@ -139,11 +139,11 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
       ```
       ```sql
       CREATE TABLE [users] (
-	      [id] int NOT NULL,
-	      [username] text NOT NULL,
-	      [age] int,
-	      CONSTRAINT [users_id] PRIMARY KEY([id]),
-	      CONSTRAINT [age_check1] CHECK([users].[age] > 21)
+          [id] int,
+          [username] text NOT NULL,
+          [age] int,
+          CONSTRAINT [users_pkey] PRIMARY KEY([id]),
+          CONSTRAINT [age_check1] CHECK ([users].[age] > 21)
       );
       ```
     </Section>
@@ -157,24 +157,26 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
 <Section>
       ```typescript
-      import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+      import { int, mssqlTable } from "drizzle-orm/mssql-core";
 
       export const user = mssqlTable("user", {
-        id: int("id").identity().primaryKey(),
+        id: int().identity().primaryKey(),
       })
 
       export const table = mssqlTable("table", {
-        cuid: text("cuid").primaryKey(),
+        id: int().primaryKey(),
       })
       ```
 
       ```sql
       CREATE TABLE [user] (
-        [id] int AUTO_INCREMENT PRIMARY KEY NOT NULL
+        [id] int IDENTITY(1, 1),
+        CONSTRAINT [user_pkey] PRIMARY KEY([id])
       );
 
       CREATE TABLE [table] (
-        [cuid] text PRIMARY KEY NOT NULL
+        [id] int,
+        CONSTRAINT [table_pkey] PRIMARY KEY([id])
       );
       ```
     </Section>
@@ -190,13 +192,13 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       import { int, text, primaryKey, mssqlTable } from "drizzle-orm/mssql-core";
 
       export const user = mssqlTable("user", {
-        id: int("id").identity().primaryKey(),
-        name: text("name"),
+        id: int().identity().primaryKey(),
+        name: text(),
       });
 
       export const book = mssqlTable("book", {
-        id: int("id").identity().primaryKey(),
-        name: text("name"),
+        id: int().identity().primaryKey(),
+        name: text(),
       });
 
       export const booksToAuthors = mssqlTable("books_to_authors", {
@@ -212,10 +214,10 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       ```sql {6}
       ...
 
-      CREATE TABLE `books_to_authors` (
-        `author_id` int,
-        `book_id` int,
-        PRIMARY KEY(`book_id`,`author_id`)
+      CREATE TABLE [books_to_authors] (
+      	[author_id] int,
+      	[book_id] int,
+      	CONSTRAINT [books_to_authors_pkey] PRIMARY KEY([book_id],[author_id])
       );
       ```
     </Section>
@@ -230,70 +232,70 @@ Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
 ```typescript {11}
-    import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
 
-    export const user = mssqlTable("user", {
-      id: int("id").primaryKey().identity(),
-      name: text("name"),
-    });
+export const user = mssqlTable("user", {
+  id: int().primaryKey().identity(),
+  name: text(),
+});
 
-    export const book = mssqlTable("book", {
-      id: int("id").primaryKey().identity(),
-      name: text("name"),
-      authorId: int("author_id").references(() => user.id)
-    });
-    ```
+export const book = mssqlTable("book", {
+  id: int().primaryKey().identity(),
+  name: text(),
+  authorId: int("author_id").references(() => user.id)
+});
+```
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
 ```typescript {6,16-19}
-    import { int, text, foreignKey, AnyMsSqlColumn, mssqlTable } from "drizzle-orm/mssql-core";
+import { int, text, foreignKey, type AnyMsSqlColumn, mssqlTable } from "drizzle-orm/mssql-core";
 
-    export const user = mssqlTable("user", {
-      id: int("id").primaryKey().identity(),
-      name: text("name"),
-      parentId: int("parent_id").references((): AnyMsSqlColumn => user.id),
-    });
+export const user = mssqlTable("user", {
+  id: int().primaryKey().identity(),
+  name: text(),
+  parentId: int("parent_id").references((): AnyMsSqlColumn => user.id),
+});
 
-    // or
-    export const user = mssqlTable("user", {
-      id: int("id").primaryKey().identity(),
-      name: text("name"),
-      parentId: int("parent_id")
-    }, (table) => [
-      foreignKey({
-        columns: [table.parentId],
-        foreignColumns: [table.id],
-        name: "custom_fk"
-      })
-    ]);
-    ```
+// or
+export const user = mssqlTable("user", {
+  id: int().primaryKey().identity(),
+  name: text(),
+  parentId: int("parent_id")
+}, (table) => [
+  foreignKey({
+    columns: [table.parentId],
+    foreignColumns: [table.id],
+    name: "custom_fk"
+  })
+]);
+```
 
 To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
 
 ```typescript copy {4-5,14-15,18-21}
-    import { int, text, primaryKey, foreignKey, mssqlTable, AnyMsSqlColumn } from "drizzle-orm/mssql-core";
+import { int, varchar, primaryKey, foreignKey, mssqlTable } from "drizzle-orm/mssql-core";
 
-    export const user = mssqlTable("user", {
-      firstName: text("firstName"),
-      lastName: text("lastName"),
-    }, (table) => [
-      primaryKey({ columns: [table.firstName, table.lastName]})
-    ]);
+export const user = mssqlTable("user", {
+  firstName: varchar('firstName', { length: 100 }),
+  lastName: varchar('lastName', { length: 100 }),
+}, (table) => [
+  primaryKey({ columns: [table.firstName, table.lastName]})
+]);
 
-    export const profile = mssqlTable("profile", {
-      id: int("id").identity().primaryKey(),
-      userFirstName: text("user_first_name"),
-      userLastName: text("user_last_name"),
-    }, (table) => [
-      foreignKey({
-        columns: [table.userFirstName, table.userLastName],
-        foreignColumns: [user.firstName, user.lastName],
-        name: "custom_name"
-      })
-    ]);
-    ```
+export const profile = mssqlTable("profile", {
+  id: int("id").identity().primaryKey(),
+  userFirstName: varchar("user_first_name", { length: 100 }),
+  userLastName: varchar("user_last_name", { length: 100 }),
+}, (table) => [
+  foreignKey({
+    columns: [table.userFirstName, table.userLastName],
+    foreignColumns: [user.firstName, user.lastName],
+    name: "custom_name"
+  })
+]);
+```
 
 ## Indexes
 
@@ -301,12 +303,12 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
 
 <Section>
     ```typescript copy {9-10}
-    import { int, text, index, uniqueIndex, mssqlTable } from "drizzle-orm/mssql-core";
+    import { int, varchar, index, uniqueIndex, mssqlTable } from "drizzle-orm/mssql-core";
 
     export const user = mssqlTable("user", {
-      id: int("id").primaryKey().identity(),
-      name: text("name"),
-      email: text("email"),
+      id: int().primaryKey().identity(),
+      name: varchar({ length: 256 }),
+      email: varchar({ length: 256 }),
     }, (table) => [
       index("name_idx").on(table.name),
       uniqueIndex("email_idx").on(table.email),
@@ -317,21 +319,16 @@ Drizzle ORM provides API for both `index` and `unique index` declaration:
       ...
     );
 
-    CREATE INDEX `name_idx` ON `user` (`name`);
+    CREATE INDEX [name_idx] ON [user] ([name]);
     CREATE UNIQUE INDEX [email_idx] ON [user] ([email]);
     ```
     </Section>
-    <Callout type="warning" emoji="⚠️">
-      As of now `drizzle-kit` only supports index `name` and `on()` param.
-    </Callout>
 
      Drizzle ORM provides set of all params for index creation:
 
     ```typescript
     // Index declaration reference
-    index("name")
+    index('name_idx')
       .on(table.name)
-      .algorythm("default") // "default" | "copy" | "inplace"
-      .using("btree") // "btree" | "hash"
-      .lock("default") // "none" | "default" | "exclusive" | "shared"
+      .where(sql``)
     ```
