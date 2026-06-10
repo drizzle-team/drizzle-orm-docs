@@ -1,8 +1,3 @@
----
-test: 10
----
-export const a = 10;
-
 import Callout from '@mdx/Callout.astro';
 import Steps from '@mdx/Steps.astro';
 import CodeTab from '@mdx/CodeTab.astro';
@@ -35,6 +30,7 @@ drizzle-kit migrate
 drizzle-kit generate
 drizzle-kit push
 drizzle-kit pull
+drizzle-kit export
 ```
 It is designed to let you choose how to approach migrations based on your current business demands. 
 
@@ -58,8 +54,8 @@ Drizzle lets you pull database schema to TypeScript using [`drizzle-kit pull`](/
 
 <Section>
 ```
-                                  ┌────────────────────────┐      ┌─────────────────────────┐ 
-                                  │                        │ <---  CREATE TABLE "users" (
+                                  ┌────────────────────────┐      ┌───────────────────────────────┐ 
+                                  │                        │ <---  CREATE TABLE [users] (
 ┌──────────────────────────┐      │                        │        [id] int identity primary key,
 │ ~ drizzle-kit pull       │      │                        │        [name] varchar(255),
 └─┬────────────────────────┘      │        DATABASE        │        [email] varchar(255) unique
@@ -74,10 +70,13 @@ Drizzle lets you pull database schema to TypeScript using [`drizzle-kit pull`](/
 import * as p from "drizzle-orm/mssql-core";
 
 export const users = p.mssqlTable("users", {
-  id: p.int().primaryKey().identity(),
-  name: p.varchar({ length: 255 }),
-  email: p.varchar({ length: 255 }).unique(),
-});
+	id: p.int().identity({ seed: 1 ,increment: 1 }),
+	name: p.varchar({ length: 255 }),
+	email: p.varchar({ length: 255 }),
+}, (table) => [
+	p.primaryKey({ columns: [table.id], name: "PK__users__3213E83FFAA14405"}),
+	p.unique("UQ__users__AB6E6164E0557A2A").on(table.email)
+]);
 ```
 </Section>
 </Callout>
@@ -110,9 +109,9 @@ export const users = p.mssqlTable("users", {
 ```
 ```
 Add column to `users` table                                                                          
-┌──────────────────────────┐                  
-│ + email: text().unique() │                  
-└─┬────────────────────────┘                  
+┌────────────────────────────────────────────┐                  
+│ + email: varchar({ length: 255 }).unique() │                  
+└─┬──────────────────────────────────────────┘                  
   │                                           
   v                                           
 ┌──────────────────────────┐                  
@@ -126,8 +125,9 @@ Add column to `users` table
   └ Apply migrations to the database -------> │                          │
                                        │      └──────────────────────────┘
                                        │
-  ┌────────────────────────────────────┴──────────────┐
-   ALTER TABLE [users] ADD [email] varchar(255) unique; 
+  ┌────────────────────────────────────┴───────────────────────────────┐
+   ALTER TABLE [users] ADD [email] varchar(255);
+   ALTER TABLE [users] ADD CONSTRAINT [users_email_key] UNIQUE([email]);
 ```
 </Section>
 </Callout>
@@ -166,7 +166,7 @@ export const users = p.mssqlTable("users", {
   │    ┌─┴───────────────────────────────────────┐  
   │      📂 drizzle       
   │      └ 📂 20242409125510_premium_mister_fear
-  │        ├ 📜 snapshot.text
+  │        ├ 📜 snapshot.json
   │        └ 📜 migration.sql
   v
 ```
@@ -174,9 +174,11 @@ export const users = p.mssqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE [users] (
- [id] int identity primary key,
- [name] varchar(255),
- [email] varchar(255) unique
+	[id] int IDENTITY(1, 1),
+	[name] varchar(255),
+	[email] varchar(255),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id]),
+	CONSTRAINT [users_email_key] UNIQUE([email])
 );
 ```
 ```
@@ -234,7 +236,7 @@ export const users = p.mssqlTable("users", {
   │    ┌─┴───────────────────────────────────────┐  
   │      📂 drizzle       
   │      └ 📂 20242409125510_premium_mister_fear
-  │        ├ 📜 snapshot.text
+  │        ├ 📜 snapshot.json
   │        └ 📜 migration.sql
   v
 ```
@@ -242,9 +244,11 @@ export const users = p.mssqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE [users] (
- [id] int identity primary key,
- [name] varchar(255),
- [email] varchar(255) unique
+	[id] int IDENTITY(1, 1),
+	[name] varchar(255),
+	[email] varchar(255),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id]),
+	CONSTRAINT [users_email_key] UNIQUE([email])
 );
 ```
 ```ts
@@ -309,7 +313,7 @@ export const users = p.mssqlTable("users", {
   │    ┌─┴───────────────────────────────────────┐  
   │      📂 drizzle       
   │      └ 📂 20242409125510_premium_mister_fear
-  │        ├ 📜 snapshot.text
+  │        ├ 📜 snapshot.json
   │        └ 📜 migration.sql
   v
 ```
@@ -317,9 +321,11 @@ export const users = p.mssqlTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE [users] (
- [id] int identity primary key,
- [name] varchar(255),
- [email] varchar(255) unique
+	[id] int IDENTITY(1, 1),
+	[name] varchar(255),
+	[email] varchar(255),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id]),
+	CONSTRAINT [users_email_key] UNIQUE([email])
 );
 ```
 ```
@@ -386,9 +392,11 @@ export const users = p.mssqlTable("users", {
 ```
 ```sql
 CREATE TABLE [users] (
- [id] int identity primary key,
- [name] varchar(255),
- [email] varchar(255) unique
+	[id] int IDENTITY(1, 1),
+	[name] varchar(255),
+	[email] varchar(255),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id]),
+	CONSTRAINT [users_email_key] UNIQUE([email])
 );
 ```
 ```

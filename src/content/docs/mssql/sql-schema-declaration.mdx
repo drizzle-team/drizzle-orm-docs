@@ -127,8 +127,7 @@ You can also group them in any way you like, such as creating groups for user-re
 
 Drizzle schema consists of several model types from database you are using. With drizzle you can specify:
 - Tables with columns, constraints, etc.
-- Schemas, which are equivalent to databases in MSSQL
-- Enums
+- Schemas
 - Views
 - etc.
 
@@ -200,35 +199,40 @@ SELECT [id], [first_name] FROM [users];
 
 ### Camel and Snake casing
 
-Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models. 
-This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically 
-map `camelCase` from TypeScript to `snake_case` in the database by including one optional parameter during Drizzle database initialization
+Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models.
+This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically
+map `camelCase` from TypeScript to `snake_case` in the database via a dedicated builder.
 
-For such mapping, you can use the `casing` option in the Drizzle DB declaration. This parameter will 
-help you specify the database model naming convention and will attempt to map all JavaScript keys accordingly
+Use the `snakeCase` or `camelCase` builder from `drizzle-orm/mssql-core` to declare a table whose column keys are
+automatically mapped to the chosen database naming convention
 
 <Section>
-```ts
+```ts {2,4,11,12}
 // schema.ts
-import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
+import { snakeCase, camelCase } from 'drizzle-orm/mssql-core';
 
-export const users = mssqlTable('users', {
-  id: int(),
-  firstName: varchar({ length: 256 })
-})
+export const users = snakeCase.table('users', {
+  id: int().primaryKey(),
+  fullName: text(), // → full_name in DB
+  createdAt: datetime2(), // → created_at in DB
+});
+
+// Available on all entity types:
+snakeCase.table / snakeCase.view / snakeCase.schema
+camelCase.table / camelCase.view / camelCase.schema
 ```
 ```ts
 // db.ts
 import { drizzle } from "drizzle-orm/node-mssql";
 
-const db = drizzle({ connection: process.env.DATABASE_URL, casing: 'snake_case' })
+const db = drizzle({ connection: process.env.DATABASE_URL })
 ```
 ```ts
 // query.ts
 await db.select().from(users);
 ```
 ```sql
-SELECT [id], [first_name] FROM [users];
+select [id], [full_name], [created_at] from [users]
 ```
 </Section>
 
@@ -246,9 +250,9 @@ We can define those columns in a separate file and then import and spread them a
 <Section>
 ```ts
 // columns.helpers.ts
-const timestamps = {
+export const timestamps = {
   updated_at: datetime2(),
-  created_at: datetime2().defaultNow().notNull(),
+  created_at: datetime2()..defaultGetDate().notNull(),
   deleted_at: datetime2(),
 }
 ```
@@ -271,11 +275,11 @@ export const posts = mssqlTable('posts', {
 #### **Schemas**
 
 \
-In MSSQL, a schema is a namespace inside a database. You can use schemas to group tables, views, and other database objects without creating a separate database.
+In MSSQL, there is an entity called a `schema` (which we believe should be called `folders`). This creates a structure in MSSQL:
 
-You can define them with `drizzle-orm` and use them in queries, but they won't be detected by `drizzle-kit` or included in the migration flow
+![](@/assets/images/postgresql-db-structure.png)
 
-![](@/assets/images/table-structure.svg)
+You can manage your PostgreSQL schemas with `mssqlSchema` and place any other models inside it.
 
 Define the schema you want to manage using Drizzle
 ```ts
@@ -302,9 +306,9 @@ Once you know the basics, let's define a schema example for a real project to ge
 > All examples will use `generateUniqueString`. The implementation for it will be provided after all the schema examples
 
 ```ts copy
+import type { AnyMsSqlColumn } from "drizzle-orm/mssql-core";
 import { mssqlTable as table } from "drizzle-orm/mssql-core";
 import * as t from "drizzle-orm/mssql-core";
-import { AnyMsSqlColumn } from "drizzle-orm/mssql-core";
 
 export const users = table(
   "users",
@@ -314,7 +318,7 @@ export const users = table(
     lastName: t.varchar("last_name", { length: 256 }),
     email: t.varchar({ length: 256 }).notNull(),
     invitee: t.int().references((): AnyMsSqlColumn => users.id),
-    role: t.varchar({ length: 20 }).default("guest"),
+    role: t.varchar({ length: 20, enum: ["guest", "admin", "user"] }).default("guest"),
   },
   (table) => [
     t.uniqueIndex("email_idx").on(table.email)
@@ -367,6 +371,8 @@ function generateUniqueString(length: number = 12): string {
     links={[
         ["Column types", "/docs/mssql/column-types"], 
         ["Indexes and Constraints", "/docs/mssql/indexes-constraints"],
+        ["Database Views", "/docs/mssql/views"],
+        ["Database Schemas", "/docs/mssql/schemas"],
       ]}
   />
   <LinksList 
