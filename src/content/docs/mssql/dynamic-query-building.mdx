@@ -53,77 +53,28 @@ This is possible, because `MsSqlSelect` and other similar types are specifically
 
 Here is the list of all types that can be used as generic parameters in dynamic query building:
 
-{
-
-<table>
-	<thead align='center'>
-		<tr>
-			<td>
-				<b>Dialect</b>
-			</td>
-			<td colspan='4'>
-				<b>Type</b>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Query</b>
-			</td>
-			<td>
-				<b>Select</b>
-			</td>
-			<td>
-				<b>Insert</b>
-			</td>
-			<td>
-				<b>Update</b>
-			</td>
-			<td>
-				<b>Delete</b>
-			</td>
-		</tr>
-	</thead>
-	<tbody>
-		<tr align='center'>
-			<td rowspan='2'>MSSQL</td>
-			<td>
-				<code>MsSqlSelect</code>
-			</td>
-			<td rowspan='2'>
-				<code>MsSqlInsert</code>
-			</td>
-			<td rowspan='2'>
-				<code>MsSqlUpdate</code>
-			</td>
-			<td rowspan='2'>
-				<code>MsSqlDelete</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td>
-				<code>MsSqlSelectQueryBuilder</code>
-			</td>
-		</tr>
-	</tbody>
-</table>
-
-}
+| Query  | Type                              |
+|:--------|:-----------------------------------|
+| Select | `MsSqlSelect` / `MsSqlSelectQueryBuilder` |
+| Insert | `MsSqlInsert`                        |
+| Update | `MsSqlUpdate`                        |
+| Delete | `MsSqlDelete`                        |
 
 <Callout type='info'>
 	The `...QueryBuilder` types are for usage with [standalone query builder
 	instances](/docs/mssql/goodies#standalone-query-builder). DB query builders are
 	subclasses of them, so you can use them as well.
 
-    ```ts
-    	import { QueryBuilder } from 'drizzle-orm/mssql-core';
+```ts
+import { QueryBuilder } from 'drizzle-orm/mssql-core';
 
-    	function withFriends<T extends MsSqlSelectQueryBuilder>(qb: T) {
-    		return qb.leftJoin(friends, eq(friends.userId, users.id));
-    	}
+function withFriends<T extends MsSqlSelectQueryBuilder>(qb: T) {
+	return qb.leftJoin(friends, eq(friends.userId, users.id));
+}
 
-    	const qb = new QueryBuilder();
-    	let query = qb.select().from(users).where(eq(users.id, 1)).$dynamic();
-    	query = withFriends(query);
-    ```
+const qb = new QueryBuilder();
+let query = qb.select().from(users).where(eq(users.id, 1)).$dynamic();
+query = withFriends(query);
+```
 
 </Callout>

@@ -1,18 +1,12 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-arktype` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-arktype` package but all new update will be added to Drizzle ORM directly
-</Callout>
-
 # arktype
 
 ### Install the dependencies
 
 <Npm>
-arktype
+drizzle-orm arktype
 </Npm>
 
 ### Select schema
@@ -22,6 +16,7 @@ Defines the shape of data queried from the database - can be used to validate AP
 ```ts copy
 import { int, mssqlTable, text } from 'drizzle-orm/mssql-core';
 import { createSelectSchema } from 'drizzle-orm/arktype';
+import type { ArkErrors } from 'arktype';
 
 const users = mssqlTable('users', {
   id: int().primaryKey().identity(),
@@ -31,14 +26,24 @@ const users = mssqlTable('users', {
 
 const userSelectSchema = createSelectSchema(users);
 
-const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
+const rows = await db.select({ id: users.id, name: users.name }).top(1).from(users);
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
 
-const rows = await db.select().from(users).limit(1);
-const parsed: { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
+const rows = await db.select().top(1).from(users);
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
 ```
 
-The generated schemas can be used to validate MSSQL table rows and API payloads.
+Views and enums are also supported.
+```ts copy
+import { pgEnum, pgView } from 'drizzle-orm/mssql-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
+
+const usersView = mssqlView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: ArkErrors | { id: number; name: string; age: number } = usersViewSchema(...);
+```
 
 ### Insert schema
 
@@ -47,6 +52,7 @@ Defines the shape of data to be inserted into the database - can be used to vali
 ```ts copy
 import { int, mssqlTable, text } from 'drizzle-orm/mssql-core';
 import { createInsertSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from 'arktype';
 
 const users = mssqlTable('users', {
   id: int().primaryKey().identity(),
@@ -57,10 +63,15 @@ const users = mssqlTable('users', {
 const userInsertSchema = createInsertSchema(users);
 
 const user = { name: 'John' };
-const parsed: { name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
+const parsed: ArkErrors | { name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
 
 const user = { name: 'Jane', age: 30 };
-const parsed: { name: string, age: number } = userInsertSchema(user); // Will parse successfully
+const parsed: ArkErrors | { name: string, age: number } = userInsertSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
 await db.insert(users).values(parsed);
 ```
 
@@ -72,6 +83,8 @@ Defines the shape of data to be updated in the database - can be used to validat
 import { int, mssqlTable, text } from 'drizzle-orm/mssql-core';
 import { createUpdateSchema } from 'drizzle-orm/arktype';
 import { parse } from 'arktype';
+import { eq } from 'drizzle-orm';
+import { ArkErrors } from 'arktype';
 
 const users = mssqlTable('users', {
   id: int().primaryKey().identity(),
@@ -81,11 +94,14 @@ const users = mssqlTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
-const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+const parsed: ArkErrors | { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
 ```
 
@@ -96,7 +112,7 @@ Each create schema function accepts an additional optional parameter that you ca
 ```ts copy
 import { int, mssqlTable, text } from 'drizzle-orm/mssql-core';
 import { createSelectSchema } from 'drizzle-orm/arktype';
-import { parse, pipe, maxLength, object, string } from 'arktype';
+import { ArkErrors, type } from 'arktype';
 
 const users = mssqlTable('users', {
   id: int().primaryKey().identity(),
@@ -106,15 +122,15 @@ const users = mssqlTable('users', {
 });
 
 const userSelectSchema = createSelectSchema(users, {
-  name: (schema) => pipe(schema, maxLength(20)), // Extends schema
-  bio: (schema) => pipe(schema, maxLength(1000)), // Extends schema before becoming nullable/optional
-  preferences: object({ theme: string() }) // Overwrites the field, including its nullability
+  name: (schema) => schema.atMostLength(20), // Extends schema
+  bio: () => type.string.atMostLength(2000), // Extends schema before becoming nullable/optional
+  preferences: type({ theme: 'string' }) // Overwrites the field, including its nullability
 });
 
-const parsed: {
+const parsed: ArkErrors | {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };

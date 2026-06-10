@@ -77,7 +77,7 @@ await db.transaction(async (tx) => {
 
 We provide dialect-specific transaction configuration APIs:
 
-```ts {6-8}
+```ts {6}
 await db.transaction(
   async (tx) => {
     await tx.update(accounts).set({ balance: sql`${accounts.balance} - 100.00` }).where(eq(users.name, "Dan"));

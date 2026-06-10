@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is legacy by using `@sinclair/typebox` package
-</Callout>
-
 # typebox-legacy
 
 ### Install the dependencies
@@ -40,7 +32,18 @@ const rows = await db.select().from(users).limit(1);
 const parsed: { id: number; name: string; age: number } = Value.Parse(userSelectSchema, rows[0]); // Will parse successfully
 ```
 
-The generated schemas can be used to validate MSSQL table rows and API payloads.
+Views are also supported.
+
+```ts copy
+import { mssqlView } from 'drizzle-orm/mssql-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
+
+const usersView = mssqlView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = Value.Parse(usersViewSchema, ...);
+```
 
 ### Insert schema
 
@@ -75,6 +78,7 @@ Defines the shape of data to be updated in the database - can be used to validat
 import { int, mssqlTable, text } from 'drizzle-orm/mssql-core';
 import { createUpdateSchema } from 'drizzle-orm/typebox-legacy';
 import { Value } from '@sinclair/typebox/value';
+import { eq } from "drizzle-orm";
 
 const users = mssqlTable('users', {
   id: int().primaryKey().identity(),
@@ -83,9 +87,6 @@ const users = mssqlTable('users', {
 });
 
 const userUpdateSchema = createUpdateSchema(users);
-
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
 
 const user = { age: 35 };
 const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
@@ -118,7 +119,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };
@@ -141,12 +142,11 @@ const users = mssqlTable('users', {
   name: text().notNull(),
   age: int().notNull()
 });
-
 const { createInsertSchema } = createSchemaFactory({ typeboxInstance: t });
 
 const userInsertSchema = createInsertSchema(users, {
   // We can now use the extended instance
-  name: (schema) => t.Number({ ...schema }, { error: '`name` must be a string' })
+  name: (schema) => t.Number({ ...schema, error: "`name` must be a string" }),
 });
 ```
 

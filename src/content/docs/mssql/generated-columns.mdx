@@ -4,10 +4,6 @@ import Callout from '@mdx/Callout.astro';
 
 # Generated Columns
 
-<Callout type="info">
-To use this feature you need `drizzle-orm@1.0.0-beta.22` or higher and a matching `drizzle-kit` beta version.
-</Callout>
-
 MSSQL supports computed columns. A computed column is calculated from an expression that can reference other columns in the same table.
 
 1. Virtual computed columns are calculated when queried and do not occupy storage space.
@@ -47,7 +43,7 @@ CREATE TABLE [users] (
 
 #### Persisted Computed Column
 
-Use `{ mode: "stored" }` when you want SQL Server to persist the computed value.
+Use `{ mode: "persisted" }` when you want SQL Server to persist the computed value.
 
 <CodeTabs items={["schema.ts", "SQL"]}>
 <CodeTab>
@@ -60,7 +56,7 @@ export const orders = mssqlTable("orders", {
   unitPrice: int("unit_price"),
   total: int("total").generatedAlwaysAs(
     (): SQL => sql`${orders.quantity} * ${orders.unitPrice}`,
-    { mode: "stored" },
+    { mode: "persisted" },
   ),
 });
 ```
@@ -78,4 +74,6 @@ CREATE TABLE [orders] (
 
 #### Limitations
 
-Drizzle Kit has the same `push` limitation for MSSQL generated columns as other dialects: changing a generated expression may require dropping and recreating the column because databases can normalize generated expressions differently during introspection.
+Drizzle Kit will also have limitations for `push` command:
+1. You can't change the generated constraint expression using `push`. Drizzle-kit will ignore this change. To make it work, you would need to `drop the column`, `push`, and then `add a column with a new expression`. This was done due to the complex mapping from the database side, where the schema expression will be modified on the database side and, on introspection, we will get a different string. We can't be sure if you changed this expression or if it was changed and formatted by the database. As long as these are generated columns and `push` is mostly used for prototyping on a local database, it should be fast to `drop` and `create` generated columns. Since these columns are `generated`, all the data will be restored
+2. `generate` should have no limitations

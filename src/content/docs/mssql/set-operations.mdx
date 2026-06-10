@@ -5,7 +5,7 @@ import Callout from '@mdx/Callout.astro';
 # Set Operations
 
 SQL set operations combine the results of multiple query blocks into a single result. 
-The SQL standard defines the following three set operations: `UNION`, `INTERSECT`, `EXCEPT`, `UNION ALL`, `INTERSECT ALL`, `EXCEPT ALL`.
+The SQL standard defines the following three set operations: `UNION`, `INTERSECT`, `EXCEPT`, `UNION ALL`.
 
 ### Union
 Combine all results from two query blocks into a single result, omitting any duplicates.
@@ -23,13 +23,12 @@ Get all names from customers and users tables without duplicates.
     const result = await union(
 		allNamesForUserQuery,
 		db.select({ name: customers.name }).from(customers)
-	).limit(10);
+	);
     ```
     ```sql
     (select [name] from [sellers])
     union
     (select [name] from [customers])
-    limit @p1
     ```
 	</CodeTab>
     <CodeTab>
@@ -39,31 +38,29 @@ Get all names from customers and users tables without duplicates.
     const result = await db
       .select({ name: users.name })
       .from(users)
-      .union(db.select({ name: customers.name }).from(customers))
-      .limit(10);
+      .union(db.select({ name: customers.name }).from(customers));
     ```
     ```sql
     (select [name] from [sellers])
     union
     (select [name] from [customers])
-    limit @p1
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { int, mssqlTable, text, varchar } from "drizzle-orm/mssql-core";
 
-    const users = mssqlTable('sellers', {
-        id: int('id').primaryKey(),
-        name: varchar('name', { length: 256 }).notNull(),
-        address: text('address'),
+    export const users = mssqlTable('sellers', {
+        id: int().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        address: text(),
     });
     
-    const customers = mssqlTable('customers', {
-        id: int('id').primaryKey(),
-        name: varchar('name', { length: 256 }).notNull(),
-        city: text('city'),
-        email: varchar('email', { length: 256 }).notNull()
+    export const customers = mssqlTable('customers', {
+        id: int().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        city: text(),
+        email: varchar({ length: 256 }).notNull()
     });
     ```
     </CodeTab>
@@ -89,9 +86,9 @@ you want to keep all the records and not eliminate duplicates.
     const result = await unionAll(onlineTransactions, inStoreTransactions);
     ```
     ```sql
-    select [transaction_id] from [online_sales]
+    (select [transaction_id] from [online_sales])
     union all
-    select [transaction_id] from [in_store_sales]
+    (select [transaction_id] from [in_store_sales])
     ```
     </CodeTab>
     <CodeTab>
@@ -115,14 +112,14 @@ you want to keep all the records and not eliminate duplicates.
 	```typescript copy
     import { int, mssqlTable, text, datetime2, varchar } from "drizzle-orm/mssql-core";
 
-    const onlineSales = mssqlTable('online_sales', {
+    export const onlineSales = mssqlTable('online_sales', {
         transactionId: int('transaction_id').primaryKey(),
         productId: int('product_id').unique(),
         quantitySold: int('quantity_sold'),
         saleDate: datetime2('sale_date', { mode: 'date' }),
     });
     
-    const inStoreSales = mssqlTable('in_store_sales', {
+    export const inStoreSales = mssqlTable('in_store_sales', {
         transactionId: int('transaction_id').primaryKey(),
         productId: int('product_id').unique(),
         quantitySold: int('quantity_sold'),
@@ -155,9 +152,9 @@ to count the same course multiple times even if multiple students from the same 
     const result = await intersect(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select [projects_name] from [department_a_projects]
+    (select [projects_name] from [department_a_projects])
     intersect
-    select [projects_name] from [department_b_projects]
+    (select [projects_name] from [department_b_projects])
     ```
 	</CodeTab>
     <CodeTab>
@@ -170,103 +167,23 @@ to count the same course multiple times even if multiple students from the same 
       .intersect(db.select({ courseName: depB.courseName }).from(depB));
     ```
     ```sql
-    select [projects_name] from [department_a_projects]
+    (select [projects_name] from [department_a_projects])
     intersect
-    select [projects_name] from [department_b_projects]
+    (select [projects_name] from [department_b_projects])
     ```
     </CodeTab>
     <CodeTab>
 	```typescript copy
     import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
 
-    const depA = mssqlTable('department_a_courses', {
+    export const depA = mssqlTable('department_a_courses', {
         studentId: int('student_id'),
         courseName: varchar('course_name', { length: 256 }).notNull(),
     });
     
-    const depB = mssqlTable('department_b_courses', {
+    export const depB = mssqlTable('department_b_courses', {
         studentId: int('student_id'),
         courseName: varchar('course_name', { length: 256 }).notNull(),
-    });
-    ```
-    </CodeTab>
-  </CodeTabs>
-
-### Intersect All
-Combine only those rows which the results of two query blocks have in common, with duplicates.
-
-Let's consider a scenario where you have two tables containing data about customer orders, and you want 
-to identify products that are ordered by both regular customers and VIP customers. In this case, 
-you want to keep track of the quantity of each product, even if it's ordered multiple times by 
-different customers.
-
-In this scenario, you want to find products that are ordered by both regular customers and VIP customers, 
-but you want to retain the quantity information, even if the same product is ordered multiple 
-times by different customers.
-
-<CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
-    import { intersectAll } from 'drizzle-orm/mssql-core'
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
-
-    const regularOrders = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders);
-
-    const vipOrders = db.select({ 
-        productId: vipCustomerOrders.productId,
-        quantityOrdered: vipCustomerOrders.quantityOrdered }
-    ).from(vipCustomerOrders);
-
-    const result = await intersectAll(regularOrders, vipOrders);
-    ```
-    ```sql
-    select [product_id], [quantity_ordered] from [regular_customer_orders]
-    intersect all
-    select [product_id], [quantity_ordered] from [vip_customer_orders]
-    ```
-	</CodeTab>
-    <CodeTab>
-    ```ts copy
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
-
-    const result = await db
-        .select({
-          productId: regularCustomerOrders.productId,
-          quantityOrdered: regularCustomerOrders.quantityOrdered,
-        })
-        .from(regularCustomerOrders)
-        .intersectAll(
-          db
-            .select({
-              productId: vipCustomerOrders.productId,
-              quantityOrdered: vipCustomerOrders.quantityOrdered,
-            })
-            .from(vipCustomerOrders)
-        );
-    ```
-    ```sql
-    select [product_id], [quantity_ordered] from [regular_customer_orders]
-    intersect all 
-    select [product_id], [quantity_ordered] from [vip_customer_orders]
-    ```
-    </CodeTab>
-    <CodeTab>
-	```typescript copy
-    import { int, mssqlTable } from "drizzle-orm/mssql-core";
-
-    const regularCustomerOrders = mssqlTable('regular_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
-    });
-    
-    const vipCustomerOrders = mssqlTable('vip_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
     });
     ```
     </CodeTab>
@@ -295,9 +212,9 @@ multiple times, even if multiple employees from the same department are assigned
     const result = await except(departmentACourses, departmentBCourses);
     ```
     ```sql
-    select [projects_name] from [department_a_projects]
+    (select [projects_name] from [department_a_projects])
     except
-    select [projects_name] from [department_b_projects]
+    (select [projects_name] from [department_b_projects])
     ```
 	</CodeTab>
     <CodeTab>
@@ -310,99 +227,23 @@ multiple times, even if multiple employees from the same department are assigned
         .except(db.select({ courseName: depB.projectsName }).from(depB));
     ```
     ```sql
-    select [projects_name] from [department_a_projects]
+    (select [projects_name] from [department_a_projects])
     except
-    select [projects_name] from [department_b_projects]
+    (select [projects_name] from [department_b_projects])
     ```
     </CodeTab>
     <CodeTab>
 	```typescript 
     import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
 
-    const depA = mssqlTable('department_a_projects', {
+    export const depA = mssqlTable('department_a_projects', {
         employeeId: int('employee_id'),
         projectsName: varchar('projects_name', { length: 256 }).notNull(),
     });
     
-    const depB = mssqlTable('department_b_projects', {
+    export const depB = mssqlTable('department_b_projects', {
         employeeId: int('employee_id'),
         projectsName: varchar('projects_name', { length: 256 }).notNull(),
-    });
-    ```
-    </CodeTab>
-  </CodeTabs>
-
-### Except All
-For two query blocks A and B, return all results from A which are not also present in B, with duplicates.
-
-Let's consider a scenario where you have two tables containing data about customer orders, and you want to 
-identify products that are exclusively ordered by regular customers (without VIP customers). 
-In this case, you want to keep track of the quantity of each product, even if it's ordered multiple times by different regular customers.
-
-In this scenario, you want to find products that are exclusively ordered by regular customers and not 
-ordered by VIP customers. You want to retain the quantity information, even if the same product is ordered multiple times by different regular customers.
-
-<CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
-	```typescript copy
-    import { exceptAll } from 'drizzle-orm/mssql-core'
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
-
-    const regularOrders = db.select({ 
-        productId: regularCustomerOrders.productId,
-        quantityOrdered: regularCustomerOrders.quantityOrdered }
-    ).from(regularCustomerOrders);
-
-    const vipOrders = db.select({ 
-        productId: vipCustomerOrders.productId,
-        quantityOrdered: vipCustomerOrders.quantityOrdered }
-    ).from(vipCustomerOrders);
-
-    const result = await exceptAll(regularOrders, vipOrders);
-    ```
-    ```sql
-    select [product_id], [quantity_ordered] from [regular_customer_orders]
-    except all
-    select [product_id], [quantity_ordered] from [vip_customer_orders]
-    ```
-	</CodeTab>
-    <CodeTab>
-    ```ts copy
-    import { regularCustomerOrders, vipCustomerOrders } from './schema'
- 
-    const result = await db
-        .select({
-          productId: regularCustomerOrders.productId,
-          quantityOrdered: regularCustomerOrders.quantityOrdered,
-        })
-        .from(regularCustomerOrders)
-        .exceptAll(
-          db
-            .select({
-              productId: vipCustomerOrders.productId,
-              quantityOrdered: vipCustomerOrders.quantityOrdered,
-            })
-            .from(vipCustomerOrders)
-        );
-    ```
-    ```sql
-    select [product_id], [quantity_ordered] from [regular_customer_orders]
-    except all
-    select [product_id], [quantity_ordered] from [vip_customer_orders]
-    ```
-    </CodeTab>
-	<CodeTab>
-	```typescript copy
-    const regularCustomerOrders = mssqlTable('regular_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
-    });
-    
-    const vipCustomerOrders = mssqlTable('vip_customer_orders', {
-        customerId: int('customer_id').primaryKey(),
-        productId: int('product_id').notNull(),
-        quantityOrdered: int('quantity_ordered').notNull(),
     });
     ```
     </CodeTab>

@@ -5,7 +5,7 @@ JIT mappers are **disabled by default**. Enable them with the `jit` option:
 ```ts
 import { drizzle } from 'drizzle-orm/...';
 
-const db = drizzle(client, { jit: true });
+const db = drizzle({ client, jit: true });
 ```
 
 On initialization, Drizzle runs a compatibility check that tests whether the `Function` constructor works in the current runtime. If it doesn't (e.g. some edge runtimes or CSP-restricted environments), it falls back to regular mappers with a console warning.
