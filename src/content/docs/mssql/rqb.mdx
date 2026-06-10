@@ -19,7 +19,7 @@ We've made sure you have both the best-in-class developer experience and perform
 	<CodeTab>
 	```typescript copy /schema/3
 	import * as schema from './schema';
-	import { drizzle } from 'drizzle-orm/...';
+	import { drizzle } from 'drizzle-orm/node-mssql';
 
 	const db = drizzle({ schema });
 
@@ -52,11 +52,11 @@ We've made sure you have both the best-in-class developer experience and perform
 
 	```typescript copy
 	import { int, mssqlTable, text } from 'drizzle-orm/mssql-core';
-	import { relations } from 'drizzle-orm';
+	import { relations } from 'drizzle-orm/_relations';
 
 	export const users = mssqlTable('users', {
-		id: int('id').primaryKey().identity(),
-		name: text('name').notNull(),
+		id: int().primaryKey().identity(),
+		name: text().notNull(),
 	});
 
 	export const usersRelations = relations(users, ({ many }) => ({
@@ -64,8 +64,8 @@ We've made sure you have both the best-in-class developer experience and perform
 	}));
 
 	export const posts = mssqlTable('posts', {
-		id: int('id').primaryKey().identity(),
-		content: text('content').notNull(),
+		id: int().primaryKey().identity(),
+		content: text().notNull(),
 		authorId: int('author_id').notNull(),
 	});
 
@@ -80,7 +80,7 @@ We've made sure you have both the best-in-class developer experience and perform
 	```typescript copy /schema/3
 	import * as schema1 from './schema1';
 	import * as schema2 from './schema2';
-	import { drizzle } from 'drizzle-orm/...';
+	import { drizzle } from 'drizzle-orm/node-mssql';
 
 	const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
@@ -99,19 +99,6 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 </CodeTabs>
 
-## Modes
-Drizzle relational queries always generate exactly one SQL statement to run on the database. For MSSQL, use the default relational query mode.
-
-```ts copy
-import * as schema from './schema';
-import { drizzle } from "drizzle-orm/node-mssql";
-import { connect } from "mssql";
-
-const connection = await connect(process.env.DATABASE_URL!);
-
-const db = drizzle({ client: connection, schema, mode: 'default' });
-```
-
 ## Querying
 Relational queries are an extension to Drizzle's original **[query builder](/docs/mssql/select)**.
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
@@ -123,7 +110,7 @@ initialization and then just use the `db._query` API.
 <CodeTab>
 ```ts
 import * as schema from './schema';
-import { drizzle } from 'drizzle-orm/...';
+import { drizzle } from 'drizzle-orm/node-mssql';
 
 const db = drizzle({ schema });
 
@@ -133,7 +120,7 @@ await db._query.users.findMany(...);
 // if you have schema in multiple files
 import * as schema1 from './schema1';
 import * as schema2 from './schema2';
-import { drizzle } from 'drizzle-orm/...';
+import { drizzle } from 'drizzle-orm/node-mssql';
 
 const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
@@ -143,7 +130,7 @@ await db._query.users.findMany(...);
 ```typescript copy
 	import { type AnyMsSqlColumn, bit, int, mssqlTable, primaryKey, text, datetime2 } from 'drizzle-orm/mssql-core';
 
-	import { relations } from 'drizzle-orm';
+	import { relations } from 'drizzle-orm/_relations';
 
 	export const users = mssqlTable('users', {
 		id: int('id').primaryKey().identity(),
@@ -185,7 +172,7 @@ await db._query.users.findMany(...);
 		id: int('id').primaryKey().identity(),
 		content: text('content').notNull(),
 		authorId: int('author_id').references(() => users.id),
-		createdAt: datetime2('created_at').notNull().defaultNow(),
+		createdAt: datetime2('created_at').notNull().defaultGetDate(),
 	});
 
 	export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -198,7 +185,7 @@ await db._query.users.findMany(...);
 		content: text('content').notNull(),
 		creator: int('creator').references(() => users.id),
 		postId: int('post_id').references(() => posts.id),
-		createdAt: datetime2('created_at').notNull().defaultNow(),
+		createdAt: datetime2('created_at').notNull().defaultGetDate(),
 	});
 
 	export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -211,7 +198,7 @@ await db._query.users.findMany(...);
 		id: int('id').primaryKey().identity(),
 		creator: int('creator').references(() => users.id),
 		commentId: int('comment_id').references(() => comments.id),
-		createdAt: datetime2('created_at').notNull().defaultNow(),
+		createdAt: datetime2('created_at').notNull().defaultGetDate(),
 	});
 
 	export const commentLikesRelations = relations(commentLikes, ({ one }) => ({
@@ -459,11 +446,11 @@ await db._query.posts.findMany({
 });
 ```
 
-Find posts with comments from the 5th to the 10th post:
+Find posts with comments from the 6th to the 10th post:
 ```typescript copy
 await db._query.posts.findMany({
 	limit: 5,
-  offset: 5,
+	offset: 5,
 	with: {
 		comments: true,
 	},
@@ -522,11 +509,12 @@ await db._query.users.findMany({
 ```
 ```typescript copy {3}
 await db._query.users.findMany({
-	extras: {
-		loweredName: (users, { sql }) => sql`lower(${users.name})`.as('lowered_name'),
-	},
+  extras: (table, { sql }) => ({
+    loweredName: sql`lower(${table.name})`.as('lowered_name'),
+  }),
 })
 ```
+
 </Section>
 
 `lowerName` as a key will be included to all fields in returned object.
@@ -546,6 +534,7 @@ const res = await db._query.users.findMany({
 	},
 	with: {
 		usersToGroups: {
+			columns: {},
 			with: {
 				group: true,
 			},
@@ -556,18 +545,18 @@ const res = await db._query.users.findMany({
 ```ts
 // result type
 const res: {
-	id: number;
-	name: string;
-	verified: bit;
-	invitedBy: number | null;
-	fullName: string;
-	usersToGroups: {
-			group: {
-					id: number;
-					name: string;
-					description: string | null;
-			};
-	}[];
+    id: number;
+    name: string;
+    verified: boolean;
+    invitedBy: number | null;
+    fullName: string;
+    usersToGroups: {
+        group: {
+            id: number;
+            name: string;
+            description: string | null;
+        };
+    }[];
 }[];
 
 ```
@@ -592,20 +581,20 @@ const res = await db._query.posts.findMany({
 ```ts
 // result type
 const res: {
-	id: number;
-	createdAt: Date;
-	content: string;
-	authorId: number | null;
-	contentLength: number;
-	comments: {
-			id: number;
-			createdAt: Date;
-			content: string;
-			creator: number | null;
-			postId: number | null;
-			commentSize: number;
-	}[];
-};
+    id: number;
+    createdAt: Date;
+    content: string;
+    authorId: number | null;
+    contentLength: number;
+    comments: {
+        id: number;
+        createdAt: Date;
+        content: string;
+        creator: number | null;
+        postId: number | null;
+        commentSize: number;
+    }[];
+}[];
 ```
 </Section>
 
@@ -620,10 +609,10 @@ using the Drizzle relational query builder.
 <Section>
 ```ts copy
 const prepared = db._query.users.findMany({
-	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
+	where: ((users, { eq }) => eq(users.id, sql.placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
+			where: ((posts, { eq }) => eq(posts.id, sql.placeholder('pid'))),
 		},
 	},
 }).prepare();

@@ -138,14 +138,14 @@ const { content, ...rest } = getColumns(posts); // exclude "content" column
 await db.select({ ...rest }).from(posts); // select all other columns
 ```
 ```ts
-await db.query.posts.findMany({
+await db._query.posts.findMany({
   columns: {
     title: true,
   },
 });
 ```
 ```ts
-await db.query.posts.findMany({
+await db._query.posts.findMany({
   columns: {
     content: false,
   },
@@ -343,12 +343,12 @@ await db
   .select()
   .from(users)
   .orderBy(asc(users.id)) // order by is mandatory
-  .limit(4) // the number of rows to return
-  .offset(4); // the number of rows to skip
+  .offset(4) // the number of rows to skip
+  .fetch(4) // the number of rows to fetch
 ```
 ```ts
 const getUsers = async (page = 1, pageSize = 3) => {
-  return await db.query.users.findMany({
+  return await db._query.users.findMany({
     orderBy: (users, { asc }) => asc(users.id),
     limit: pageSize,
     offset: (page - 1) * pageSize,
@@ -361,9 +361,9 @@ const getUsers = async (page = 1, pageSize = 10) => {
    const sq = db
     .select({ id: users.id })
     .from(users)
-    .orderBy(users.id)
-    .limit(pageSize)
-    .offset((page - 1) * pageSize)
+    .orderBy(asc(users.id)) // order by is mandatory
+    .offset(pageSize) // the number of rows to skip
+    .fetch((page - 1) * pageSize) // the number of rows to fetch
     .as('subquery');
    return await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
 };
@@ -372,9 +372,9 @@ const getUsers = async (page = 1, pageSize = 10) => {
 const nextUserPage = async (cursor?: number, pageSize = 3) => {
   return await db
     .select()
+	.top(pageSize)
     .from(users)
     .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
-    .limit(pageSize) // the number of rows to return
     .orderBy(asc(users.id)); // ordering
 };
 // pass the cursor of the last row of the previous page (id)
