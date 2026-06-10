@@ -322,6 +322,19 @@ await searchPosts(filters);
 
 ## ---
 
+### Limit & offset
+Use `.limit()` and `.offset()` to add limit and offset clauses to the query - for example, to implement pagination:
+
+```ts
+await db.select().from(users).limit(10);
+await db.select().from(users).limit(10).offset(10);
+```
+
+```sql
+select "id", "name", "age" from "users" limit 10;
+select "id", "name", "age" from "users" limit 10 offset 10;
+```
+
 ### Order By
 Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
 <Section>

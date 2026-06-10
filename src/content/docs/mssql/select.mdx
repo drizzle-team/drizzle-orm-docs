@@ -308,6 +308,30 @@ await searchPosts(filters);
 
 ## ---
 
+### Fetch & offset
+
+In MSSQL, `FETCH` and `OFFSET` are part of the `ORDER BY` clause, so they can only be used after the `.orderBy()` function
+
+```ts
+await db.select().from(users).orderBy(asc(users.id)).offset(5);
+await db.select().from(users).orderBy(asc(users.id)).offset(5).fetch(10);
+```
+```sql
+select [id], [name], [age] from [users] offset 5 rows;
+select [id], [name], [age] from [users] offset 5 rows fetch next 10 rows;
+```
+
+### Top
+
+Limits the rows returned in a query result set to a specified number of rows
+
+```ts
+await db.select().top(10).from(users);
+```
+```sql
+select top (10) [id], [name], [age] from [users];
+```
+
 ### Order By
 Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
 <Section>
