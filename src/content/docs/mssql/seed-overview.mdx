@@ -283,7 +283,7 @@ The Drizzle Seed package has a few places where weighted random can be used:
 Let's check an example for both:
 
 ```ts filename="schema.ts"
-import { mssqlTable, int, varchar, double } from "drizzle-orm/mssql-core";
+import { mssqlTable, int, varchar, numeric } from "drizzle-orm/mssql-core";
 
 export const orders = mssqlTable(
   "orders",
@@ -291,7 +291,7 @@ export const orders = mssqlTable(
     id: int().primaryKey().identity(),
     name: varchar({ length: 255 }).notNull(),
     quantityPerUnit: varchar().notNull(),
-    unitPrice: double().notNull(),
+    unitPrice: numeric().notNull(),
     unitsInStock: int().notNull(),
     unitsOnOrder: int().notNull(),
     reorderLevel: int().notNull(),
@@ -302,9 +302,9 @@ export const orders = mssqlTable(
 export const details = mssqlTable(
   "details",
   {
-    unitPrice: double().notNull(),
+    unitPrice: numeric().notNull(),
     quantity: int().notNull(),
-    discount: double().notNull(),
+    discount: numeric().notNull(),
 
     orderId: int()
       .notNull()
@@ -331,11 +331,11 @@ async function main() {
                [
                    {
                        weight: 0.3,
-                       value: funcs.int({ minValue: 10, maxValue: 100 })
+                       value: f.int({ minValue: 10, maxValue: 100 })
                    },
                    {
                        weight: 0.7,
-                       value: funcs.number({ minValue: 100, maxValue: 300, precision: 100 })
+                       value: f.number({ minValue: 100, maxValue: 300, precision: 100 })
                    }
                ]
            ),
