@@ -53,61 +53,12 @@ This is possible, because `CockroachSelect` and other similar types are specific
 
 Here is the list of all types that can be used as generic parameters in dynamic query building:
 
-{
-
-<table>
-	<thead align='center'>
-		<tr>
-			<td>
-				<b>Dialect</b>
-			</td>
-			<td colspan='4'>
-				<b>Type</b>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Query</b>
-			</td>
-			<td>
-				<b>Select</b>
-			</td>
-			<td>
-				<b>Insert</b>
-			</td>
-			<td>
-				<b>Update</b>
-			</td>
-			<td>
-				<b>Delete</b>
-			</td>
-		</tr>
-	</thead>
-	<tbody>
-		<tr align='center'>
-			<td rowspan='2'>CockroachDB</td>
-			<td>
-				<code>CockroachSelect</code>
-			</td>
-			<td rowspan='2'>
-				<code>CockroachInsert</code>
-			</td>
-			<td rowspan='2'>
-				<code>CockroachUpdate</code>
-			</td>
-			<td rowspan='2'>
-				<code>CockroachDelete</code>
-			</td>
-		</tr>
-		<tr align='center'>
-			<td>
-				<code>CockroachSelectQueryBuilder</code>
-			</td>
-		</tr>
-	</tbody>
-</table>
-
-}
+| Query  | Type                              |
+|:--------|:-----------------------------------|
+| Select | `CockroachSelect` / `CockroachSelectQueryBuilder` |
+| Insert | `CockroachInsert`                        |
+| Update | `CockroachUpdate`                        |
+| Delete | `CockroachDelete`                        |
 
 <Callout type='info'>
 	The `...QueryBuilder` types are for usage with [standalone query builder

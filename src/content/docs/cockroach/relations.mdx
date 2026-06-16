@@ -14,11 +14,11 @@ The sole purpose of Drizzle relations is to let you query your relational data i
 <Section>
 ```ts
 import * as schema from './schema';
-import { drizzle } from 'drizzle-orm/node-mssql';
+import { drizzle } from 'drizzle-orm/cockroach';
 
 const db = drizzle({ client, schema });
 
-const result = db._query.users.findMany({
+const result = await db._query.users.findMany({
   with: {
     posts: true,
   },
@@ -45,7 +45,7 @@ const result = db._query.users.findMany({
 </Section>
 <Section>
 ```ts
-import { drizzle } from 'drizzle-orm/node-mssql';
+import { drizzle } from 'drizzle-orm/cockroach';
 import { eq } from 'drizzle-orm';
 import { posts, users } from './schema';
 
@@ -67,13 +67,13 @@ Drizzle ORM provides you an API to define `one-to-one` relations between tables 
 An example of a `one-to-one` relation between users and users, where a user can invite another (this example uses a self reference):
 
 ```typescript copy {10-15}
-import { mssqlTable, ntext, int } from 'drizzle-orm/mssql-core';
+import { cockroachTable, int4, text, } from 'drizzle-orm/cockroach-core';
 import { relations } from 'drizzle-orm/_relations';
 
-export const users = mssqlTable('users', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
-	invitedBy: int('invited_by'),
+export const users = cockroachTable('users', {
+	id: int4().primaryKey(),
+	name: text(),
+	invitedBy: int4('invited_by'),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -87,22 +87,22 @@ export const usersRelations = relations(users, ({ one }) => ({
 Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
 ```typescript copy {9-17}
-import { mssqlTable, ntext, int } from 'drizzle-orm/mssql-core';
+import { cockroachTable, int4, text, jsonb } from 'drizzle-orm/cockroach-core';
 import { relations } from 'drizzle-orm/_relations';
 
-export const users = mssqlTable('users', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4('id').primaryKey(),
+	name: text('name'),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
 	profileInfo: one(profileInfo),
 }));
 
-export const profileInfo = mssqlTable('profile_info', {
-	id: int().identity().primaryKey(),
-	userId: int('user_id').references(() => users.id),
-	metadata: ntext(),
+export const profileInfo = cockroachTable('profile_info', {
+	id: int4('id').primaryKey(),
+	userId: int4('user_id').references(() => users.id),
+	metadata: jsonb('metadata'),
 });
 
 export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
@@ -110,7 +110,7 @@ export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
 }));
 
 const user = await queryUserWithProfileInfo();
-//____^? type { id: number, profileInfo: string | null  }
+//____^? type { id: number, profileInfo: { ... } | null  }
 ```
 
 ### One-to-many
@@ -119,22 +119,22 @@ Drizzle ORM provides you an API to define `one-to-many` relations between tables
 Example of `one-to-many` relation between users and posts they've written:
 
 ```typescript copy {9-11, 19-24}
-import { mssqlTable, ntext, int } from 'drizzle-orm/mssql-core';
+import { cockroachTable, int4, text } from 'drizzle-orm/cockroach-core';
 import { relations } from 'drizzle-orm/_relations';
 
-export const users = mssqlTable('users', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4('id').primaryKey(),
+	name: text('name'),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
 	posts: many(posts),
 }));
 
-export const posts = mssqlTable('posts', {
-	id: int().identity().primaryKey(),
-	content: ntext(),
-	authorId: int('author_id'),
+export const posts = cockroachTable('posts', {
+	id: int4('id').primaryKey(),
+	content: text('content'),
+	authorId: int4('author_id'),
 });
 
 export const postsRelations = relations(posts, ({ one }) => ({
@@ -149,10 +149,10 @@ Now lets add comments to the posts:
 ```typescript copy {14,17-22,24-29}
 ...
 
-export const posts = mssqlTable('posts', {
-	id: int().identity().primaryKey(),
-	content: ntext(),
-	authorId: int('author_id'),
+export const posts = cockroachTable('posts', {
+	id: int4('id').primaryKey(),
+	content: text('content'),
+	authorId: int4('author_id'),
 });
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -163,11 +163,11 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 	comments: many(comments)
 }));
 
-export const comments = mssqlTable('comments', {
-	id: int().identity().primaryKey(),
-	text: ntext(),
-	authorId: int('author_id'),
-	postId: int('post_id'),
+export const comments = cockroachTable('comments', {
+	id: int4('id').primaryKey(),
+	text: text('text'),
+	authorId: int4('author_id'),
+	postId: int4('post_id'),
 });
 
 export const commentsRelations = relations(comments, ({ one }) => ({
@@ -186,33 +186,33 @@ they have to be explicitly defined and store associations between related tables
 Example of `many-to-many` relation between users and groups:
 ```typescript copy {9-11, 18-20, 37-46}
 import { relations } from 'drizzle-orm/_relations';
-import { int, mssqlTable, primaryKey, ntext } from 'drizzle-orm/mssql-core';
+import { int4, cockroachTable, primaryKey, text } from 'drizzle-orm/cockroach-core';
 
-export const users = mssqlTable('users', {
-  id: int().identity().primaryKey(),
-  name: ntext(),
+export const users = cockroachTable('users', {
+  id: int4('id').primaryKey(),
+  name: text('name'),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   usersToGroups: many(usersToGroups),
 }));
 
-export const groups = mssqlTable('groups', {
-  id: int().identity().primaryKey(),
-  name: ntext(),
+export const groups = cockroachTable('groups', {
+  id: int4('id').primaryKey(),
+  name: text('name'),
 });
 
 export const groupsRelations = relations(groups, ({ many }) => ({
   usersToGroups: many(usersToGroups),
 }));
 
-export const usersToGroups = mssqlTable(
+export const usersToGroups = cockroachTable(
   'users_to_groups',
   {
-    userId: int('user_id')
+    userId: int4('user_id')
       .notNull()
       .references(() => users.id),
-    groupId: int('group_id')
+    groupId: int4('group_id')
       .notNull()
       .references(() => groups.id),
   },
@@ -250,15 +250,15 @@ The following two examples will work exactly the same in terms of querying the d
 <CodeTabs items={["schema1.ts", "schema2.ts"]}>
 <CodeTab>
 ```ts {15}
-export const users = mssqlTable('users', {
-  id: int().identity().primaryKey(),
-  name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4('id').primaryKey(),
+	name: text('name'),
 });
 
-export const profileInfo = mssqlTable('profile_info', {
-  id: int().identity().primaryKey(),
-  userId: int('user_id'),
-  metadata: nvarchar({ mode: 'json' }),
+export const profileInfo = cockroachTable('profile_info', {
+	id: int4('id').primaryKey(),
+	userId: int4("user_id"),
+	metadata: jsonb("metadata"),
 });
 
 export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
@@ -271,9 +271,15 @@ export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
 </CodeTab>
 <CodeTab>
 ```ts {15}
-export const users = mssqlTable('users', {
-  id: int().identity().primaryKey(),
-  name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4('id').primaryKey(),
+	name: text('name'),
+});
+
+export const profileInfo = cockroachTable('profile_info', {
+	id: int4('id').primaryKey(),
+	userId: int4("user_id").references(() => users.id),
+	metadata: jsonb("metadata"),
 });
 
 export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
@@ -282,27 +288,23 @@ export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
     references: [users.id],
   }),
 }));
-
-export const profileInfo = mssqlTable('profile_info', {
-  id: int().identity().primaryKey(),
-  userId: int('user_id').references(() => users.id),
-  metadata: nvarchar({ mode: 'json' }),
-});
 ```
 </CodeTab>
 </CodeTabs>
 
 ### Foreign key actions
 
-For more information check the [MSSQL foreign keys docs](https://learn.microsoft.com/en-us/sql/relational-databases/tables/create-foreign-key-relationships?view=sql-server-ver17)
+For more information check the [CockroachDB foreign keys docs](https://www.cockroachlabs.com/docs/v26.2/foreign-key.html)
 
-You can specify actions that should occur when the referenced data in the parent table is modified. These actions are known as "foreign key actions." MSSQL provides several options for these actions.
+You can specify actions that should occur when the referenced data in the parent table is modified. These actions are known as "foreign key actions." CockroachDB provides several options for these actions.
 
 On Delete/ Update Actions
 
 - `CASCADE`: When a row in the parent table is deleted, all corresponding rows in the child table will also be deleted. This ensures that no orphaned rows exist in the child table.
 
 - `NO ACTION`: This is the default action. It prevents the deletion of a row in the parent table if there are related rows in the child table. The DELETE operation in the parent table will fail.
+
+- `RESTRICT`: Similar to NO ACTION, it prevents the deletion of a parent row if there are dependent rows in the child table. It is essentially the same as NO ACTION and included for compatibility reasons.
 
 - `SET DEFAULT`: If a row in the parent table is deleted, the foreign key column in the child table will be set to its default value if it has one. If it doesn't have a default value, the DELETE operation will fail.
 
@@ -314,7 +316,7 @@ in drizzle you can add foreign key action using `references()` second argument.
 type of the actions
 
 ```typescript
-export type UpdateDeleteAction = 'cascade' | 'no action' | 'set null' | 'set default';
+export type UpdateDeleteAction = 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 
 // second argument of references interface
 actions?: {
@@ -327,34 +329,34 @@ In the following example, adding `onDelete: 'cascade'` to the author field on th
 
 
 ```typescript {11}
-import { mssqlTable, ntext, int } from 'drizzle-orm/mssql-core';
+import { cockroachTable, int4, text } from 'drizzle-orm/cockroach-core';
 
-export const users = mssqlTable('users', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4().primaryKey(),
+	name: text(),
 });
 
-export const posts = mssqlTable('posts', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
-	author: int().references(() => users.id, {onDelete: 'cascade'}).notNull(),
+export const posts = cockroachTable('posts', {
+	id: int4().primaryKey(),
+	name: text(),
+	author: int4().references(() => users.id, { onDelete: 'cascade' }).notNull(),
 });
 ```
 
 For constraints specified with the `foreignKey` operator, foreign key actions are defined with the syntax:
 
 ```typescript {18-19}
-import { foreignKey, mssqlTable, ntext, int } from 'drizzle-orm/mssql-core';
+import { foreignKey, cockroachTable, int4, text } from 'drizzle-orm/cockroach-core';
 
-export const users = mssqlTable('users', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4().primaryKey(),
+	name: text(),
 });
 
-export const posts = mssqlTable('posts', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
-	author: int().notNull(),
+export const posts = cockroachTable('posts', {
+	id: int4().primaryKey(),
+	name: text(),
+	author: int4().notNull(),
 }, (table) => [
 	foreignKey({
 		name: "author_fk",
@@ -374,12 +376,12 @@ example, if you define a `posts` table that has the `author` and `reviewer`
 relations.
 
 ```ts {9-12, 21-32}
-import { mssqlTable, ntext, int } from 'drizzle-orm/mssql-core';
+import { cockroachTable, int4, text } from 'drizzle-orm/cockroach-core';
 import { relations } from 'drizzle-orm/_relations';
  
-export const users = mssqlTable('users', {
-	id: int().identity().primaryKey(),
-	name: ntext(),
+export const users = cockroachTable('users', {
+	id: int4().primaryKey(),
+	name: text(),
 });
  
 export const usersRelations = relations(users, ({ many }) => ({
@@ -387,11 +389,11 @@ export const usersRelations = relations(users, ({ many }) => ({
 	reviewer: many(posts, { relationName: 'reviewer' }),
 }));
  
-export const posts = mssqlTable('posts', {
-	id: int().identity().primaryKey(),
-	content: ntext(),
-	authorId: int('author_id'),
-	reviewerId: int('reviewer_id'),
+export const posts = cockroachTable('posts', {
+	id: int4().primaryKey(),
+	content: text(),
+	authorId: int4('author_id'),
+	reviewerId: int4('reviewer_id'),
 });
  
 export const postsRelations = relations(posts, ({ one }) => ({

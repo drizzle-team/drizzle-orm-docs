@@ -617,7 +617,7 @@ const prepared = db._query.users.findMany({
 	},
 }).prepare();
 
-const usersWithPosts = await prepared.execute({ id: 1 });
+const usersWithPosts = await prepared.execute({ id: 1, pid: 1 });
 ```
 </Section>
 

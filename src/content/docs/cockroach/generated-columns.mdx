@@ -4,17 +4,7 @@ import Callout from '@mdx/Callout.astro';
 
 # Generated Columns
 
-<Callout type="info">
-To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
-</Callout>
-
-1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
-
-2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
-
-<Callout type="info">
-    CockroachDB supports stored generated columns. In this section, we will explore how to define generated columns with Drizzle and CockroachDB.
-</Callout>
+Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
 
 #### Database side
     **Types**: `STORED` only
@@ -32,7 +22,7 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     - Schema changes required to modify generated column expressions.
     - Cannot directly use in primary keys, foreign keys, or unique constraints   
 
-    For more info, please check [CockroachDB](https://www.cockroach.org/docs/current/ddl-generated-columns.html) docs 
+    For more info, please check [CockroachDB](https://www.cockroachlabs.com/docs/stable/computed-columns) docs 
 
     #### Drizzle side
     In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
@@ -41,32 +31,12 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     #### Features 
     This function can accept generated expression in 2 ways:
 
-    <Callout type='warning' collapsed="What was changed starting from 1.0.0-beta.12 version">
-    
-    In previous versions, `.generatedAlwaysAs()` also accepted literals as expressions.
-
-    **`string`**
-    <CodeTab>
-    ```ts
-    export const test = cockroachTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(`'hello world!'`),
-    });
-    ```
-    ```sql
-    CREATE TABLE "test" (
-	    "gen_name" text GENERATED ALWAYS AS ('hello world!') STORED
-    );
-    ```
-    </CodeTab>
-    
-    </Callout>
-
     **`sql`** tag - if you want drizzle to escape some values for you
 
     <CodeTab>
     ```ts
     export const test = cockroachTable("test", {
-        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
+        generatedName: string("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
     });
     ```
     ```sql
@@ -80,16 +50,16 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     <CodeTab>
     ```ts
     export const test = cockroachTable("test", {
-        name: text("first_name"),
-        generatedName: text("gen_name").generatedAlwaysAs(
+        name: string("first_name"),
+        generatedName: string("gen_name").generatedAlwaysAs(
           (): SQL => sql`'hi, ' || ${test.name} || '!'`
         ),
     });
     ```
     ```sql
     CREATE TABLE "test" (
-	    "first_name" text,
-	    "gen_name" text GENERATED ALWAYS AS ('hi, ' || "test"."first_name" || '!') STORED
+	        "first_name" string,
+	        "gen_name" string GENERATED ALWAYS AS ('hi, ' || "test"."first_name" || '!') STORED
     );
     ```
     </CodeTab>
@@ -99,7 +69,7 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
 	<CodeTab>
 	```typescript copy {17-19}
     import { SQL, sql } from "drizzle-orm";
-    import { customType, index, integer, cockroachTable, text } from "drizzle-orm/cockroach-core";
+    import { customType, index, int4, cockroachTable, string } from "drizzle-orm/cockroach-core";
 
     const tsVector = customType<{ data: string }>({
       dataType() {
@@ -110,8 +80,8 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     export const test = cockroachTable(
       "test",
       {
-        id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-        content: text("content"),
+        id: int4("id").primaryKey().generatedAlwaysAsIdentity(),
+        content: string("content"),
         contentSearch: tsVector("content_search", {
           dimensions: 3,
         }).generatedAlwaysAs(
@@ -125,11 +95,11 @@ To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `d
     ```
     ```sql {4}
     CREATE TABLE "test" (
-    	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "test_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
-    	"content" text,
-    	"content_search" "tsvector" GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
+            "id" int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+            "content" string,
+            "content_search" tsvector GENERATED ALWAYS AS (to_tsvector('english', "test"."content")) STORED
     );
-    --> statement-breakpoint
+
     CREATE INDEX "idx_content_search" ON "test" USING gin ("content_search");
     ```
     </CodeTab>

@@ -19,7 +19,7 @@ We've made sure you have both the best-in-class developer experience and perform
 	<CodeTab>
 	```typescript copy /schema/3
 	import * as schema from './schema';
-	import { drizzle } from 'drizzle-orm/...';
+	import { drizzle } from 'drizzle-orm/cockroach';
 
 	const db = drizzle({ schema });
 
@@ -51,12 +51,12 @@ We've made sure you have both the best-in-class developer experience and perform
 	</CodeTab>
 
 	```typescript copy
-	import { integer, serial, text, cockroachTable } from 'drizzle-orm/cockroach-core';
-	import { relations } from 'drizzle-orm';
+	import { int4, string, cockroachTable } from 'drizzle-orm/cockroach-core';
+	import { relations } from 'drizzle-orm/_relations';
 
 	export const users = cockroachTable('users', {
-		id: serial('id').primaryKey(),
-		name: text('name').notNull(),
+		id: int4().primaryKey(),
+		name: string().notNull(),
 	});
 
 	export const usersRelations = relations(users, ({ many }) => ({
@@ -64,9 +64,9 @@ We've made sure you have both the best-in-class developer experience and perform
 	}));
 
 	export const posts = cockroachTable('posts', {
-		id: serial('id').primaryKey(),
-		content: text('content').notNull(),
-		authorId: integer('author_id').notNull(),
+		id: int4().primaryKey(),
+		content: string('content').notNull(),
+		authorId: int4('author_id').notNull(),
 	});
 
 	export const postsRelations = relations(posts, ({ one }) => ({
@@ -80,7 +80,7 @@ We've made sure you have both the best-in-class developer experience and perform
 	```typescript copy /schema/3
 	import * as schema1 from './schema1';
 	import * as schema2 from './schema2';
-	import { drizzle } from 'drizzle-orm/...';
+	import { drizzle } from 'drizzle-orm/cockroach';
 
 	const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
@@ -99,9 +99,6 @@ We've made sure you have both the best-in-class developer experience and perform
 	```
 </CodeTabs>
 
-## Modes
-Drizzle relational queries for CockroachDB use the default relational query mode. You do not need to configure a database-specific mode.
-
 ## Querying
 Relational queries are an extension to Drizzle's original **[query builder](/docs/cockroach/select)**.
 You need to provide all `tables` and `relations` from your schema file/files upon `drizzle()` 
@@ -113,7 +110,7 @@ initialization and then just use the `db._query` API.
 <CodeTab>
 ```ts
 import * as schema from './schema';
-import { drizzle } from 'drizzle-orm/...';
+import { drizzle } from 'drizzle-orm/cockroach';
 
 const db = drizzle({ schema });
 
@@ -123,7 +120,7 @@ await db._query.users.findMany(...);
 // if you have schema in multiple files
 import * as schema1 from './schema1';
 import * as schema2 from './schema2';
-import { drizzle } from 'drizzle-orm/...';
+import { drizzle } from 'drizzle-orm/cockroach';
 
 const db = drizzle({ schema: { ...schema1, ...schema2 } });
 
@@ -131,15 +128,15 @@ await db._query.users.findMany(...);
 ```
 </CodeTab>
 ```typescript copy
-	import { type AnyPgColumn, boolean, integer, cockroachTable, primaryKey, serial, text, timestamp } from 'drizzle-orm/cockroach-core';
+	import { type AnyCockroachColumn, boolean, int4, cockroachTable, primaryKey, string, timestamp } from 'drizzle-orm/cockroach-core';
 
-	import { relations } from 'drizzle-orm';
+	import { relations } from 'drizzle-orm/_relations';
 
 	export const users = cockroachTable('users', {
-		id: serial('id').primaryKey(),
-		name: text('name').notNull(),
+		id: int4('id').primaryKey(),
+		name: string('name').notNull(),
 		verified: boolean('verified').notNull(),
-		invitedBy: integer('invited_by').references((): AnyPgColumn => users.id),
+		invitedBy: int4('invited_by').references((): AnyCockroachColumn => users.id),
 	});
 
 	export const usersRelations = relations(users, ({ one, many }) => ({
@@ -149,9 +146,9 @@ await db._query.users.findMany(...);
 	}));
 
 	export const groups = cockroachTable('groups', {
-		id: serial('id').primaryKey(),
-		name: text('name').notNull(),
-		description: text('description'),
+		id: int4('id').primaryKey(),
+		name: string('name').notNull(),
+		description: string('description'),
 	});
 
 	export const groupsRelations = relations(groups, ({ many }) => ({
@@ -159,9 +156,9 @@ await db._query.users.findMany(...);
 	}));
 
 	export const usersToGroups = cockroachTable('users_to_groups', {
-		id: serial('id').primaryKey(),
-		userId: integer('user_id').notNull().references(() => users.id),
-		groupId: integer('group_id').notNull().references(() => groups.id),
+		id: int4('id').primaryKey(),
+		userId: int4('user_id').notNull().references(() => users.id),
+		groupId: int4('group_id').notNull().references(() => groups.id),
 	}, (t) => [
 		primaryKey({ columns: [t.userId, t.groupId] })
 	]);
@@ -172,9 +169,9 @@ await db._query.users.findMany(...);
 	}));
 
 	export const posts = cockroachTable('posts', {
-		id: serial('id').primaryKey(),
-		content: text('content').notNull(),
-		authorId: integer('author_id').references(() => users.id),
+		id: int4('id').primaryKey(),
+		content: string('content').notNull(),
+		authorId: int4('author_id').references(() => users.id),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
@@ -184,10 +181,10 @@ await db._query.users.findMany(...);
 	}));
 
 	export const comments = cockroachTable('comments', {
-		id: serial('id').primaryKey(),
-		content: text('content').notNull(),
-		creator: integer('creator').references(() => users.id),
-		postId: integer('post_id').references(() => posts.id),
+		id: int4('id').primaryKey(),
+		content: string('content').notNull(),
+		creator: int4('creator').references(() => users.id),
+		postId: int4('post_id').references(() => posts.id),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
@@ -198,9 +195,9 @@ await db._query.users.findMany(...);
 	}));
 
 	export const commentLikes = cockroachTable('comment_likes', {
-		id: serial('id').primaryKey(),
-		creator: integer('creator').references(() => users.id),
-		commentId: integer('comment_id').references(() => comments.id),
+		id: int4('id').primaryKey(),
+		creator: int4('creator').references(() => users.id),
+		commentId: int4('comment_id').references(() => comments.id),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	});
 
@@ -329,7 +326,7 @@ all fields apart from `name` would be excluded anyways.
 const users = await db._query.users.findMany({
 	columns: {
 		name: true,
-		id: false //ignored
+		id: false // ignored
 	},
 });
 ```
@@ -356,7 +353,7 @@ const res = await db._query.users.findMany({
 const res: {
 	posts: {
 		id: number,
-		text: string
+		string: string
 	}
 }[];
 ```
@@ -618,7 +615,7 @@ const prepared = db._query.users.findMany({
 	},
 }).prepare('query_name');
 
-const usersWithPosts = await prepared.execute({ id: 1 });
+const usersWithPosts = await prepared.execute({ id: 1, pid: 1 });
 ```
 </Section>
 

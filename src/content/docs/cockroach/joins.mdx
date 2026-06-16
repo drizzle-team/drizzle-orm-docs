@@ -10,16 +10,19 @@ Drizzle ORM joins syntax is a balance between the SQL-likeness and type safety.
 Drizzle ORM has APIs for `INNER JOIN [LATERAL]`, `FULL JOIN`, `LEFT JOIN [LATERAL]`, `RIGHT JOIN`, `CROSS JOIN [LATERAL]`.
 Lets have a quick look at examples based on below table schemas:
 ```typescript copy
-export const users = cockroachTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+export const users = cockroachTable("users", {
+  id: int4().primaryKey(),
+  name: string().notNull(),
+  age: int4(),
 });
 
-export const pets = cockroachTable('pets', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  ownerId: integer('owner_id').notNull().references(() => users.id),
-})
+export const pets = cockroachTable("pets", {
+  id: int4().primaryKey(),
+  name: string().notNull(),
+  ownerId: int4("owner_id")
+    .notNull()
+    .references(() => users.id),
+});
 ```
 
 ### Left Join
@@ -33,9 +36,10 @@ select ... from "users" left join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     pets: {
         id: number;
@@ -58,9 +62,10 @@ select ... from "users" left join lateral (select ... from "pets" where "users".
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     userPets: {
         id: number;
@@ -82,9 +87,10 @@ select ... from "users" right join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     } | null;
     pets: {
         id: number;
@@ -106,9 +112,10 @@ select ... from "users" inner join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     pets: {
         id: number;
@@ -131,9 +138,10 @@ select ... from "users" inner join lateral (select ... from "pets" where "users"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     userPets: {
         id: number;
@@ -155,9 +163,10 @@ select ... from "users" full join "pets" on "users"."id" = "pets"."owner_id"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     } | null;
     pets: {
         id: number;
@@ -179,9 +188,10 @@ select ... from "users" cross join "pets"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     pets: {
         id: number;
@@ -204,9 +214,10 @@ select ... from "users" cross join lateral (select ... from "pets" where "users"
 ```typescript
 // result type
 const result: {
-    user: {
+    users: {
         id: number;
         name: string;
+        age: number | null;
     };
     userPets: {
         id: number;
@@ -225,7 +236,7 @@ supports joins with partial select and will automatically infer return type base
 await db.select({
   userId: users.id,
   petId: pets.id,
-}).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
+}).from(users).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
 select "users"."id", "pets"."id" from "users" left join "pets" on "users"."id" = "pets"."owner_id"
@@ -250,10 +261,12 @@ const result = await db.select({
   petName1: sql`upper(${pets.name})`,
   petName2: sql<string | null>`upper(${pets.name})`,
   //˄we should explicitly tell 'string | null' in type, since we're left joining that field
-}).from(user).leftJoin(pets, eq(users.id, pets.ownerId))
+}).from(users).leftJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
-select "users"."id", "pets"."id", upper("pets"."name")... from "users" left join "pets" on "users"."id" = "pets"."owner_id"
+select "users"."id", "pets"."id", upper("pets"."name")...
+from "users" 
+left join "pets" on "users"."id" = "pets"."owner_id"
 ```
 ```typescript
 // result type
@@ -277,7 +290,7 @@ await db.select({
     name: pets.name,
     upperName: sql<string>`upper(${pets.name})`
   }
-}).from(user).fullJoin(pets, eq(users.id, pets.ownerId))
+}).from(users).fullJoin(pets, eq(users.id, pets.ownerId))
 ```
 ```sql
 select ... from "users" full join "pets" on "users"."id" = "pets"."owner_id"
@@ -304,9 +317,10 @@ Lets say you need to fetch users with their parents:
 <CodeTab>
 ```typescript copy
 import { user } from "./schema";
+import { alias } from "drizzle-orm/cockroach-core";
 
 const parent = alias(user, "parent");
-const result = db
+const result = await db
   .select()
   .from(user)
   .leftJoin(parent, eq(parent.id, user.parentId));
@@ -333,9 +347,9 @@ const result: {
 
 ```typescript
 export const user = cockroachTable("user", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  parentId: integer("parent_id").notNull().references((): AnyPgColumn => user.id)
+  id: int4().primaryKey(),
+  name: string().notNull(),
+  parentId: int4("parent_id").notNull().references((): AnyCockroachColumn => user.id)
 });
 ```
 
@@ -349,22 +363,25 @@ You're free to operate with results the way you want, here's an example of mappi
 type User = typeof users.$inferSelect;
 type Pet = typeof pets.$inferSelect;
 
-const rows = db.select({
+const rows = await db
+  .select({
     user: users,
     pet: pets,
-  }).from(users).leftJoin(pets, eq(users.id, pets.ownerId)).all();
+  })
+  .from(users)
+  .leftJoin(pets, eq(users.id, pets.ownerId));
 
 const result = rows.reduce<Record<number, { user: User; pets: Pet[] }>>(
   (acc, row) => {
     const user = row.user;
     const pet = row.pet;
 
-    if (!acc[user.id]) {
+    if (typeof acc[user.id] === "undefined") {
       acc[user.id] = { user, pets: [] };
-    }
+    }	
 
     if (pet) {
-      acc[user.id].pets.push(pet);
+      acc[user.id]!.pets.push(pet);
     }
 
     return acc;
@@ -381,47 +398,49 @@ const result: Record<number, {
 
 ## Many-to-one example
 ```typescript
-import { cockroachTable, text, integer } from 'drizzle-orm/cockroach-core';
-import { drizzle } from 'drizzle-orm/cockroach';
+import { cockroachTable, string, int4 } from "drizzle-orm/cockroach-core";
+import { drizzle } from "drizzle-orm/cockroach";
 
-const cities = cockroachTable('cities', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+const cities = cockroachTable("cities", {
+  id: int4().primaryKey(),
+  name: string(),
 });
 
-const users = cockroachTable('users', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
-  cityId: integer('city_id').references(() => cities.id)
+const users = cockroachTable("users", {
+  id: int4().primaryKey(),
+  name: string(),
+  cityId: int4("city_id").references(() => cities.id),
 });
 
-const db = drizzle();
+const db = drizzle(process.env.DATABASE_URL);
 
-const result = db.select().from(cities).leftJoin(users, eq(cities.id, users.cityId)).all();
+const result = await db.select().from(cities).leftJoin(users, eq(cities.id, users.cityId));
 ```
 ## Many-to-many example
 ```typescript
-const users = cockroachTable('users', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+const users = cockroachTable("users", {
+  id: int4().primaryKey(),
+  name: string(),
 });
 
-const chatGroups = cockroachTable('chat_groups', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
+const chatGroups = cockroachTable("chat_groups", {
+  id: int4().primaryKey(),
+  name: string(),
 });
 
-const usersToChatGroups = cockroachTable('usersToChatGroups', {
-  userId: integer('user_id').notNull().references(() => users.id),
-  groupId: integer('group_id').notNull().references(() => chatGroups.id),
+const usersToChatGroups = cockroachTable("users_to_chat_groups", {
+  userId: int4("user_id")
+    .notNull()
+    .references(() => users.id),
+  groupId: int4("group_id")
+    .notNull()
+    .references(() => chatGroups.id),
 });
-
 
 // querying user group with id 1 and all the participants(users)
-db.select()
+await db.select()
   .from(usersToChatGroups)
   .leftJoin(users, eq(usersToChatGroups.userId, users.id))
   .leftJoin(chatGroups, eq(usersToChatGroups.groupId, chatGroups.id))
-  .where(eq(chatGroups.id, 1))
-  .all();
+  .where(eq(chatGroups.id, 1));
 ```

@@ -83,8 +83,8 @@ the interface inside mapWith is the same interface that is implemented by Column
 
 ```typescript
 const usersTable = cockroachTable('users', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
+    id: int4('id').primaryKey(),
+    name: string('name').notNull(),
 });
 
 //  at runtime this values will be mapped same as `text` column is mapped in drizzle
@@ -118,10 +118,10 @@ name for the field, making your queries more intuitive and readable.
 
 <Section>
 ```typescript
-sql`lower(usersTable.name)`.as('lower_name')
+sql`lower(${usersTable.name})`.as('lower_name')
 ```
 ```sql
-... "usersTable"."name" as lower_name ...
+... "users"."name" as lower_name ...
 ```
 </Section>
 
@@ -349,7 +349,7 @@ Here you can see a usage for **[`sql<T>`](/docs/cockroach/sql#sqlt)**, **[`sql``
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select({
     id: usersTable.id,
@@ -382,7 +382,7 @@ the underlying database system provides.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 const id = 77
 
@@ -399,7 +399,7 @@ select * from "users" where "users"."id" = $1; --> [ 77 ]
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 const searchParam = "Ale"
 
@@ -420,7 +420,7 @@ available in Drizzle, but you prefer not to resort to raw SQL.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select().from(usersTable).orderBy(sql`${usersTable.id} desc nulls first`)
 ```
@@ -437,7 +437,7 @@ available in Drizzle, but you prefer not to resort to raw SQL.
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm'
-import { usersTable } from 'schema'
+import { usersTable } from './schema'
 
 await db.select({ 
     projectId: usersTable.projectId,
@@ -447,6 +447,6 @@ await db.select({
     .having(sql`count(${usersTable.id}) > 300`)
 ```
 ```sql
-select "project_id", count("users"."id") from users group by "users"."project_id" having count("users"."id") > 300; 
+select "project_id", count("id") from "users" group by "users"."project_id" having count("users"."id") > 300
 ```
 </Section>

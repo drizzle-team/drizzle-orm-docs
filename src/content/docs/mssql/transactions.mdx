@@ -67,7 +67,7 @@ You can use transactions with **[relational queries](/docs/mssql/rqb)**:
 const db = drizzle({ schema })
 
 await db.transaction(async (tx) => {
-  await tx.query.users.findMany({
+  await tx._query.users.findMany({
     with: {
       accounts: true
     }

@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is legacy by using `@sinclair/typebox` package
-</Callout>
-
 # typebox-legacy
 
 ### Install the dependencies
@@ -40,16 +32,20 @@ const rows = await db.select().from(users).limit(1);
 const parsed: { id: number; name: string; age: number } = Value.Parse(userSelectSchema, rows[0]); // Will parse successfully
 ```
 
-Enums are also supported.
+Views and enums are also supported.
 
 ```ts copy
-import { cockroachEnum } from 'drizzle-orm/cockroach-core';
+import { cockroachEnum, cockroachView } from 'drizzle-orm/cockroach-core';
 import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
 import { Value } from '@sinclair/typebox/value';
 
 const roles = cockroachEnum('roles', ['admin', 'basic']);
 const rolesSchema = createSelectSchema(roles);
 const parsed: 'admin' | 'basic' = Value.Parse(rolesSchema, ...);
+
+const usersView = cockroachView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = Value.Parse(usersViewSchema, ...);
 ```
 
 ### Insert schema
@@ -94,9 +90,6 @@ const users = cockroachTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
-
 const user = { age: 35 };
 const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
 await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
@@ -128,7 +121,7 @@ const userSelectSchema = createSelectSchema(users, {
 const parsed: {
   id: number;
   name: string,
-  bio?: string | undefined;
+  bio: string | null;
   preferences: {
     theme: string;
   };

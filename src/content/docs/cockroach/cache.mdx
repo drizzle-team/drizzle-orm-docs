@@ -323,15 +323,7 @@ export class TestGlobalCache extends Cache {
 db.execute(sql`select 1`);
 ```
 
-- Using cache with `batch` feature in `d1` and `libsql`
-
-```ts
-db.batch([
-    db.insert(users).values(...),
-    db.update(users).set(...).where()
-])
 ```
-
 - Using cache in transactions
 ```ts
 await db.transaction(async (tx) => {
@@ -344,7 +336,7 @@ await db.transaction(async (tx) => {
 
 - Using cache with Drizzle Relational Queries
 ```ts
-await db.query.users.findMany();
+await db._query.users.findMany();
 ```
 
 - Using cache with views

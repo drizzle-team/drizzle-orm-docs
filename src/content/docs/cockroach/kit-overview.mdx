@@ -36,6 +36,7 @@ drizzle-kit pull
 drizzle-kit check
 drizzle-kit up
 drizzle-kit studio
+drizzle-kit export
 </Npx>
 
 
@@ -48,6 +49,7 @@ drizzle-kit studio
 | [`drizzle-kit studio`](/docs/cockroach/drizzle-kit-studio)     | will connect to your database and spin up proxy server for Drizzle Studio which you can use for convenient database browsing, [see here](/docs/cockroach/drizzle-kit-studio) |
 | [`drizzle-kit check`](/docs/cockroach/drizzle-kit-check)       | will walk through all generate migrations and check for any race conditions(collisions) of generated migrations, [see here](/docs/cockroach/drizzle-kit-check)               |
 | [`drizzle-kit up`](/docs/cockroach/drizzle-kit-up)             | used to upgrade snapshots of previously generated migrations, [see here](/docs/cockroach/drizzle-kit-up)                                                                     |
+| [`drizzle-kit export`](/docs/cockroach/drizzle-kit-export)     | used to convert a TypeScript schema into raw SQL DDL and print it out [see here](/docs/cockroach/drizzle-kit-export)                                                                     |
 <br/>
 
 Drizzle Kit is configured through [drizzle.config.ts](/docs/cockroach/drizzle-config-file) configuration file or via CLI params.<br/>
@@ -79,12 +81,18 @@ export default defineConfig({
   dialect: "cockroach",
   schema: "./src/schema.ts",
 
-  driver: "pglite",
+  entities: {
+    roles: {
+      exclude: ["admin"],
+      include: ["user"],
+      provider: "supabase",
+    },
+  },
+
   dbCredentials: {
     url: "./database/",
   },
 
-  extensionsFilters: ["postgis"],
   schemaFilter: "public",
   tablesFilter: "*",
 
@@ -93,13 +101,11 @@ export default defineConfig({
   },
 
   migrations: {
-    prefix: "timestamp",
     table: "__drizzle_migrations__",
     schema: "public",
   },
 
   breakpoints: true,
-  strict: true,
   verbose: true,
 });
 ```

@@ -21,20 +21,20 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 <Section>
     ```typescript
     import { sql } from "drizzle-orm";
-    import { integer, uuid, cockroachTable } from "drizzle-orm/cockroach-core";
+    import { int4, uuid, cockroachTable } from "drizzle-orm/cockroach-core";
 
-    const table = cockroachTable('table', {
-      integer1: integer('integer1').default(42),
-      integer2: integer('integer2').default(sql`'42'::integer`),
-      uuid1: uuid('uuid1').defaultRandom(),
-      uuid2: uuid('uuid2').default(sql`gen_random_uuid()`),
+    export const table = cockroachTable('table', {
+      integer1: int4().default(42),
+      integer2: int4().default(sql`24`),
+      uuid1: uuid().defaultRandom(),
+      uuid2: uuid().default(sql`gen_random_uuid()`),
     });
     ```
 
     ```sql
     CREATE TABLE "table" (
-      "integer1" integer DEFAULT 42,
-      "integer2" integer DEFAULT '42'::integer,
+      "integer1" int4 DEFAULT 42,
+      "integer2" int4 DEFAULT 24,
       "uuid1" uuid DEFAULT gen_random_uuid(),
       "uuid2" uuid DEFAULT gen_random_uuid()
     );
@@ -50,16 +50,16 @@ or update a record without adding a value to this field.
 
 <Section>
       ```typescript copy
-      import { integer, cockroachTable } from "drizzle-orm/cockroach-core";
+      import { int4, cockroachTable } from "drizzle-orm/cockroach-core";
 
-      const table = cockroachTable('table', {
-        integer: integer('integer').notNull(),
+      export const table = cockroachTable('table', {
+        int4: int4().notNull(),
       });
       ```
 
       ```sql
       CREATE TABLE "table" (
-        "integer" integer NOT NULL
+        "int4" int4 NOT NULL
       );
       ```
     </Section>
@@ -78,56 +78,41 @@ A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.
 
 <Section>
       ```typescript copy
-      import { integer, text, unique, cockroachTable } from "drizzle-orm/cockroach-core";
+      import { int4, string, unique, cockroachTable } from "drizzle-orm/cockroach-core";
 
       export const user = cockroachTable('user', {
-        id: integer('id').unique(),
+        id: int4().unique(),
       });
 
       export const table = cockroachTable('table', {
-        id: integer('id').unique('custom_name'),
+        id: int4().unique('custom_name'),
       });
 
       export const composite = cockroachTable('composite_example', {
-        id: integer('id'),
-        name: text('name'),
+        id: int4(),
+        name: string(),
       }, (t) => [
         unique().on(t.id, t.name),
         unique('custom_name').on(t.id, t.name)
       ]);
 
-      // In Postgres 15.0+ NULLS NOT DISTINCT is available
-      // This example demonstrates both available usages
-      export const userNulls = cockroachTable('user_nulls_example', {
-        id: integer('id').unique("custom_name", { nulls: 'not distinct' }),
-      }, (t) => [
-        unique().on(t.id).nullsNotDistinct()
-      ]);
       ```
 
       ```sql
-      CREATE TABLE "composite_example" (
-	      "id" integer,
-        "name" text,
-        CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
-        CONSTRAINT "custom_name" UNIQUE("id","name")
-      );
+	CREATE TABLE "user" (
+		"id" int4 UNIQUE
+	);
 
-      CREATE TABLE "table" (
-      	"id" integer,
-      	CONSTRAINT "custom_name" UNIQUE("id")
-      );
-
-      CREATE TABLE "user" (
-      	"id" integer,
-      	CONSTRAINT "user_id_unique" UNIQUE("id")
-      );
-
-      CREATE TABLE "user_nulls_example" (
-        "id" integer,
-        CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT("id"),
-        CONSTRAINT "user_nulls_example_id_unique" UNIQUE NULLS NOT DISTINCT("id")
-      );
+	CREATE TABLE "table" (
+		"id" int4 CONSTRAINT "custom_name" UNIQUE
+	);
+	
+	CREATE TABLE "composite_example" (
+		"id" int4,
+		"name" string,
+		CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
+		CONSTRAINT "custom_name" UNIQUE("id","name")
+	);
       ```
     </Section>
 
@@ -142,14 +127,14 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
 <Section>
       ```typescript copy
       import { sql } from "drizzle-orm";
-      import { check, integer, cockroachTable, text, uuid } from "drizzle-orm/cockroach-core";
+      import { check, int4, cockroachTable, string, uuid } from "drizzle-orm/cockroach-core";
 
       export const users = cockroachTable(
         "users",
         {
           id: uuid().defaultRandom().primaryKey(),
-          username: text().notNull(),
-          age: integer(),
+          username: string().notNull(),
+          age: int4(),
         },
         (table) => [
           check("age_check1", sql`${table.age} > 21`),
@@ -157,12 +142,12 @@ If you define a `CHECK` constraint on a table it can limit the values in certain
       );
       ```
       ```sql
-      CREATE TABLE "users" (
-	      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	      "username" text NOT NULL,
-	      "age" integer,
-	      CONSTRAINT "age_check1" CHECK ("users"."age" > 21)
-      );
+	  CREATE TABLE "users" (
+		"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+		"username" string NOT NULL,
+		"age" int4,
+		CONSTRAINT "age_check1" CHECK ("users"."age" > 21)
+	  );
       ```
     </Section>
 
@@ -175,25 +160,25 @@ A table can have only **ONE** primary key; and in the table, this primary key ca
 
 <Section>
       ```typescript copy
-      import { serial, text, cockroachTable } from "drizzle-orm/cockroach-core";
+      import { int4, string, cockroachTable } from "drizzle-orm/cockroach-core";
 
-      const user = cockroachTable('user', {
-        id: serial('id').primaryKey(),
+      export const user = cockroachTable('user', {
+        id: int4('id').primaryKey(),
       });
 
-      const table = cockroachTable('table', {
-        id: text('cuid').primaryKey(),
+      export const table = cockroachTable('table', {
+        id: string('cuid').primaryKey(),
       });
       ```
 
       ```sql
-      CREATE TABLE "user" (
-        "id" serial PRIMARY KEY
-      );
+	  CREATE TABLE "user" (
+		"id" int4 PRIMARY KEY
+	  );
 
-      CREATE TABLE "table" (
-        "cuid" text PRIMARY KEY
-      );
+	  CREATE TABLE "table" (
+		"cuid" string PRIMARY KEY
+	  );
       ```
     </Section>
 
@@ -204,22 +189,22 @@ Just like `PRIMARY KEY`, composite primary key uniquely identifies each record i
 Drizzle ORM provides a standalone `primaryKey` operator for that:
 
 <Section>
-      ```typescript copy {18, 19}
-      import { serial, text, integer, primaryKey, cockroachTable } from "drizzle-orm/cockroach-core";
+      ```typescript copy {17,19}
+      import { int4, string, primaryKey, cockroachTable } from "drizzle-orm/cockroach-core";
 
       export const user = cockroachTable("user", {
-        id: serial("id").primaryKey(),
-        name: text("name"),
+        id: int4("id").primaryKey(),
+        name: string("name"),
       });
 
       export const book = cockroachTable("book", {
-        id: serial("id").primaryKey(),
-        name: text("name"),
+        id: int4("id").primaryKey(),
+        name: string("name"),
       });
 
       export const booksToAuthors = cockroachTable("books_to_authors", {
-        authorId: integer("author_id"),
-        bookId: integer("book_id"),
+        authorId: int4("author_id"),
+        bookId: int4("book_id"),
       }, (table) => [
         primaryKey({ columns: [table.bookId, table.authorId] }),
         // Or PK with custom name
@@ -227,12 +212,12 @@ Drizzle ORM provides a standalone `primaryKey` operator for that:
       ]);
       ```
 
-      ```sql {6, 9}
+      ```sql {6,9}
       ...
 
       CREATE TABLE "books_to_authors" (
-        "author_id" integer,
-        "book_id" integer,
+        "author_id" int4,
+        "book_id" int4,
         PRIMARY KEY("book_id","author_id")
       );
 
@@ -249,38 +234,54 @@ The table with the foreign key is called the child table, and the table with the
 Drizzle ORM provides several ways to declare foreign keys.
 You can declare them in a column declaration statement:
 
-```typescript copy {11}
-    import { serial, text, integer, cockroachTable } from "drizzle-orm/cockroach-core";
+	```typescript copy {11}
+	import { int4, string, cockroachTable } from "drizzle-orm/cockroach-core";
 
-    export const user = cockroachTable("user", {
-      id: serial("id"),
-      name: text("name"),
-    });
+	export const user = cockroachTable("user", {
+		id: int4("id").primaryKey(),
+		name: string("name"),
+	});
 
-    export const book = cockroachTable("book", {
-      id: serial("id"),
-      name: text("name"),
-      authorId: integer("author_id").references(() => user.id)
-    });
-    ```
+	export const book = cockroachTable("book", {
+		id: int4("id"),
+		name: string("name"),
+		authorId: int4("author_id").references(() => user.id)
+	});
+	```
+	```sql {12}
+	CREATE TABLE "user" (
+		"id" int4 PRIMARY KEY,
+		"name" string
+	);
+
+	CREATE TABLE "book" (
+		"id" int4,
+		"name" string,
+		"author_id" int4
+	);
+
+	ALTER TABLE "book" ADD CONSTRAINT "book_author_id_user_id_fkey" FOREIGN KEY ("author_id") REFERENCES "user"("id");
+	```
+
+
 
 If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
 set return type for reference callback or use a standalone `foreignKey` operator.
 
-```typescript copy {6,16-19}
-    import { serial, text, integer, foreignKey, cockroachTable, AnyPgColumn } from "drizzle-orm/cockroach-core";
+	```typescript copy {6,16-18}
+    import { int4, string, foreignKey, cockroachTable, type AnyCockroachColumn } from "drizzle-orm/cockroach-core";
 
     export const user = cockroachTable("user", {
-      id: serial("id"),
-      name: text("name"),
-      parentId: integer("parent_id").references((): AnyPgColumn => user.id)
+      id: int4().primaryKey(),
+      name: string(),
+      parentId: int4("parent_id").references((): AnyCockroachColumn => user.id)
     });
 
     // or
     export const user = cockroachTable("user", {
-      id: serial("id"),
-      name: text("name"),
-      parentId: integer("parent_id"),
+      id: int4(),
+      name: string(),
+      parentId: int4("parent_id"),
     }, (table) => [
       foreignKey({
         columns: [table.parentId],
@@ -289,23 +290,32 @@ set return type for reference callback or use a standalone `foreignKey` operator
       })
     ]);
     ```
+	```sql {7}
+	CREATE TABLE "user" (
+		"id" int4 PRIMARY KEY,
+		"name" string,
+		"parent_id" int4
+	);
+	
+	ALTER TABLE "user" ADD CONSTRAINT "user_parent_id_user_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "user"("id");
+	```
 
 To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
 
-```typescript copy {4-5,14-15,18-21}
-    import { serial, text, foreignKey, cockroachTable, AnyPgColumn } from "drizzle-orm/cockroach-core";
+```typescript copy {15-19}
+    import { int4, string, foreignKey, cockroachTable, primaryKey } from "drizzle-orm/cockroach-core";
 
     export const user = cockroachTable("user", {
-      firstName: text("firstName"),
-      lastName: text("lastName"),
+      firstName: string("firstName"),
+      lastName: string("lastName"),
     }, (table) => [
       primaryKey({ columns: [table.firstName, table.lastName]})
     ]);
 
     export const profile = cockroachTable("profile", {
-      id: serial("id").primaryKey(),
-      userFirstName: text("user_first_name"),
-      userLastName: text("user_last_name"),
+      id: int4("id").primaryKey(),
+      userFirstName: string("user_first_name"),
+      userLastName: string("user_last_name"),
     }, (table) => [
       foreignKey({
         columns: [table.userFirstName, table.userLastName],
@@ -314,52 +324,65 @@ To declare multi-column foreign keys you can use a dedicated `foreignKey` operat
       })
     ])
     ```
+	```sql {13}
+	CREATE TABLE "user" (
+		"firstName" string,
+		"lastName" string,
+		CONSTRAINT "user_pkey" PRIMARY KEY("firstName","lastName")
+	);
+
+	CREATE TABLE "profile" (
+		"id" int4 PRIMARY KEY,
+		"user_first_name" string,
+		"user_last_name" string
+	);
+	
+	ALTER TABLE "profile" ADD CONSTRAINT "custom_fk" FOREIGN KEY ("user_first_name","user_last_name") REFERENCES "user"("firstName","lastName");
+	```
 
 ## Indexes
 
 Drizzle ORM provides API for both `index` and `unique index` declaration:
 
 <Section>
-    ```typescript copy {9-10}
-    import { serial, text, index, uniqueIndex, cockroachTable } from "drizzle-orm/cockroach-core";
+    ```typescript copy {8-9}
+    import { int4, string, index, uniqueIndex, cockroachTable } from "drizzle-orm/cockroach-core";
 
     export const user = cockroachTable("user", {
-      id: serial("id").primaryKey(),
-      name: text("name"),
-      email: text("email"),
+      id: int4().primaryKey(),
+      name: string(),
+      email: string(),
     }, (table) => [
       index("name_idx").on(table.name),
       uniqueIndex("email_idx").on(table.email)
     ]);
     ```
-    ```sql {5-6}
-    CREATE TABLE "user" (
-      ...
-    );
+    ```sql {3,6}
+	CREATE TABLE "user" (
+	  ...,
+	  CONSTRAINT "email_idx" UNIQUE("email")
+	  );
 
-    CREATE INDEX "name_idx" ON "user" ("name");
-    CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
+	CREATE INDEX "name_idx" ON "user" ("name");
     ```
-    </Section>
-    <Callout type="warning" emoji="⚠️">
-      For versions before `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` `drizzle-kit` only supports index `name` and `on()` param.
+</Section>
 
-      After versions `drizzle-kit@0.22.0` and `drizzle-orm@0.31.0` all fields are supported in drizzle-kit!
-    </Callout>
 
-    Starting from 0.31.0 a new index api for Drizzle ORM provides set of all params for index creation:
+Drizzle ORM provides a set of params for index creation:
 
 ```ts
-// First example, with `.on()`
+// `.on()`
 index('name')
-  .on(table.column1.asc(), table.column2.nullsFirst(), ...) or .onOnly(table.column1.desc().nullsLast(), table.column2, ...)
-  .concurrently()
-  .where(sql``)
-  .with({ fillfactor: '70' })
+  .on(table.column1.asc(), ...)
+  .where(sql``) // sql expression
+
+// `.onOnly()`
+index('name')
+  .onOnly(table.column1.asc(), ...)
+  .where(sql``) // sql expression
 
 // Second Example, with `.using()`
 index('name')
-  .using('btree', table.column1.asc(), sql`lower(${table.column2})`, table.column1.op('text_ops'))
+  .using('btree', table.column1.asc(), sql`lower(${table.column2})`)
   .where(sql``) // sql expression
-  .with({ fillfactor: '70' })
 ```

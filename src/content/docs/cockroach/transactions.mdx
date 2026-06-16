@@ -67,7 +67,7 @@ You can use transactions with **[relational queries](/docs/cockroach/rqb)**:
 const db = drizzle({ schema })
 
 await db.transaction(async (tx) => {
-  await tx.query.users.findMany({
+  await tx._query.users.findMany({
     with: {
       accounts: true
     }
@@ -89,13 +89,13 @@ await db.transaction(
   }
 );
 
-interface PgTransactionConfig {
-  isolationLevel?:
+interface CockroachTransactionConfig {
+  isolationLevel?: 
     | "read uncommitted"
-    | "read committed"
-    | "repeatable read"
-    | "serializable";
-  accessMode?: "read only" | "read write";
-  deferrable?: boolean;
+	| "read committed"
+	| "repeatable read"
+	| "serializable";
+	accessMode?: "read only" | "read write";
+	deferrable?: boolean;
 }
 ```

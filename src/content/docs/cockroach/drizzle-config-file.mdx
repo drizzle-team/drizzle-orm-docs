@@ -65,9 +65,11 @@ export default defineConfig({
   out: "./drizzle",
   dialect: "cockroach",
   schema: "./src/schema.ts",
+
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: "./database/",
   },
+
   schemaFilter: "public",
   tablesFilter: "*",
 
@@ -76,9 +78,8 @@ export default defineConfig({
   },
 
   migrations: {
-    prefix: "timestamp",
     table: "__drizzle_migrations__",
-    schema: "public",
+    schema: "drizzle",
   },
 
   entities: {
@@ -90,7 +91,6 @@ export default defineConfig({
   },
 
   breakpoints: true,
-  strict: true,
   verbose: true,
 });
 ```
@@ -132,11 +132,11 @@ Migration folder contains folders with `.sql` migration files which is used by `
  ├ 📜 drizzle.config.ts
  └ 📜 package.json
 ```
-```ts {5}
+```ts {6}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "cockroach", // "mysql" | "sqlite" | "cockroach" | "turso" | "singlestore" | "mssql"
+  dialect: "cockroach",
   schema: "./src/schema/*",
   out: "./drizzle",
 });
@@ -153,7 +153,7 @@ Dialect of the database you're using
 | :------------ | :-----------------------------------            |
 | type        | <Dialects/>                                     |
 | default        | --                                     |
-| commands    | `generate` `migrate` `push` `pull` `check` `up` |
+| commands    | `generate`, `push`, `pull`, `studio`,  `migrate`, `up`, `export` |
 
 <rem025/>
 ```ts {4}
@@ -174,7 +174,7 @@ export default defineConfig({
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | --                    |
-| commands      | `generate` `push`    |
+| commands      | `generate`, `push`, `export`, `studio`  |
 
 <rem025/>
 <SchemaFilePaths />
@@ -188,7 +188,7 @@ Defines output folder of your SQL migration files, json snapshots of your schema
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | `drizzle`                    |
-| commands      | `generate` `migrate` `push` `pull` `check` `up`    |
+| commands      | `generate`, `pull`, `migrate`, `check`, `up` |
 
 <rem025/>
 ```ts {4}
@@ -198,24 +198,6 @@ export default defineConfig({
   out: "./drizzle", 
 });
 ```
-
-### `driver`
-<rem025/>
-
-Drizzle Kit automatically picks available database driver from your current project based on the provided `dialect`, 
-yet some vendor specific databases require a different subset of connection params.
-
-`driver` option let's you explicitely pick those exceptions drivers.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | <Drivers/> |
-| default        | --                    |
-| commands      | `migrate` `push` `pull`   |
-
-<rem025/>
-
-<DriversExamples/>
 
 ## ---
 
@@ -227,14 +209,13 @@ Database connection credentials in a form of `url`,
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | union of drivers connection options |
+| type          | <Dialects/> |
 | default       | --                    |
-| commands      | `migrate` `push` `pull`   |
+| commands      | `push`, `pull`, `migrate`, `studio` |
 
 <rem025/>
 
 <CodeTabs items={["Connection string", "Connection params"]}>
-<Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -245,8 +226,6 @@ export default defineConfig({
   }
 });
 ```
-</Section>
-<Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -258,18 +237,17 @@ export default defineConfig({
     user: "user",
     password: "password",
     database: "dbname",
-    ssl: true,
+    ssl: true, // can be boolean | "require" | "allow" | "prefer" | "verify-full" | options from node:tls
   }
 });
 ```
-</Section>
 </CodeTabs>
 
 ### `migrations`
 <rem025/>
 
 When running `drizzle-kit migrate` - drizzle will records about 
-successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema(CockroachDB only).
+successfully applied migrations in your database in log table named `__drizzle_migrations` in `drizzle` schema.
 
 `migrations` config options lets you change both migrations log `table` name and `schema`.
 
@@ -277,7 +255,7 @@ successfully applied migrations in your database in log table named `__drizzle_m
 | :------------ | :-----------------   |
 | type          | `{ table: string, schema: string }` |
 | default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
-| commands      | `migrate`   |
+| commands      | `migrate`, `push`, `pull` |
 
 <rem025/>
 
@@ -287,7 +265,7 @@ export default defineConfig({
   schema: "./src/schema.ts",
   migrations: {
     table: 'my-migrations-table', // `__drizzle_migrations` by default
-    schema: 'public', // used in CockroachDB only, `drizzle` by default
+    schema: 'my_schema', // `drizzle` by default
   },
 });
 ```
@@ -313,24 +291,24 @@ Configuration for `drizzle-kit pull` command.
 import * as p from "drizzle-orm/cockroach-core"
 
 export const users = p.cockroachTable("users", {
-  id: p.serial(),
-  firstName: p.text("first-name"),
-  lastName: p.text("LastName"),
-  email: p.text(),
-  phoneNumber: p.text("phone_number"),
+  id: p.int4(),
+  firstName: p.string("first-name"),
+  lastName: p.string("LastName"),
+  email: p.string(),
+  phoneNumber: p.string("phone_number"),
 });
 ```
 ```sql
-SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_type FROM pg_catalog.pg_attribute a;
+SELECT column_name as column_name, lower(crdb_sql_type) as data_type FROM information_schema.columns WHERE table_name = 'users';
 ```
 ``` 
  column_name   | data_type        
 ---------------+------------------------
- id            | serial
- first-name    | text
- LastName      | text
- email         | text
- phone_number  | text
+ id            | int4
+ first-name    | string
+ LastName      | string
+ email         | string
+ phone_number  | string
 ```
 </Section>
 <Section>
@@ -338,24 +316,24 @@ SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_ty
 import * as p from "drizzle-orm/cockroach-core"
 
 export const users = p.cockroachTable("users", {
-  id: p.serial(),
-  "first-name": p.text("first-name"),
-  LastName: p.text("LastName"),
-  email: p.text(),
-  phone_number: p.text("phone_number"),
+  id: p.int4(),
+  "first-name": p.string("first-name"),
+  LastName: p.string("LastName"),
+  email: p.string(),
+  phone_number: p.string("phone_number"),
 });
 ```
 ```sql
-SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_type FROM pg_catalog.pg_attribute a;
+SELECT column_name as column_name, lower(crdb_sql_type) as data_type FROM information_schema.columns WHERE table_name = 'users';
 ```
 ``` 
  column_name   | data_type        
 ---------------+------------------------
- id            | serial
- first-name    | text
- LastName      | text
- email         | text
- phone_number  | text
+ id            | int4
+ first-name    | string
+ LastName      | string
+ email         | string
+ phone_number  | string
 ```
 </Section>
 </CodeTabs>
@@ -368,7 +346,7 @@ SELECT a.attname AS column_name, format_type(a.atttypid, a.atttypmod) as data_ty
 If you want to run multiple projects with one database - check out [our guide](/docs/cockroach/goodies#multi-project-schema).
 </Callout>
 <rem025/>
-`drizzle-kit push` and `drizzle-kit pull` will by default manage all tables in `public` schema.
+`drizzle-kit push` and `drizzle-kit pull` will manage all tables by default.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
 `tablesFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
@@ -378,7 +356,7 @@ based table names filter, e.g. `["users", "user_info"]` or `"user*"`
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default       | --                    |
-| commands      | `generate` `push` `pull`   |
+| commands      | `push` `pull`   |
 
 <rem025/>
 ```ts
@@ -392,21 +370,6 @@ export default defineConfig({
 
 ### `schemaFilter`
 
-Was changed starting from `1.0.0-beta.1` version!
-
-<Callout type='warning' collapsed="How it works in 0.x versions">
-`drizzle-kit push` and `drizzle-kit pull` will by default manage all tables in `public` schema.
-You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
-
-`schemaFilter` option lets you specify list of schemas for Drizzle Kit to manage
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `string[]` |
-| default       | `["public"]`                    |
-| commands      | `push` `pull`   |
-
-</Callout>
 
 <Callout>
 If you want to run multiple projects with one database - check out [our guide](/docs/cockroach/goodies#multi-project-schema).
@@ -428,28 +391,6 @@ based schema names filter, e.g. `["public", "auth"]` or `"tenant_*"`
 export default defineConfig({
   dialect: "cockroach",
   schemaFilter: ["public", "schema1", "schema2"],
-});
-```
-
-### `extensionsFilters`
-<rem025/>
-
-Some extensions like [`postgis`](https://postgis.net/), when installed on the database, create its own tables in public schema. 
-Those tables have to be ignored by `drizzle-kit push` or `drizzle-kit pull`.
-
-`extensionsFilters` option lets you declare list of installed extensions for drizzle kit to ignore their tables in the schema.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `["postgis"]` |
-| default       | `[]`                    |
-| commands      | `push` `pull`   |
-
-<rem025/>
-
-```ts
-export default defineConfig({
-  dialect: "cockroach",
 });
 ```
 
@@ -478,9 +419,9 @@ The `roles` option lets you:
 
 |               |                       |
 | :------------ | :-----------------    |
-| type          | `boolean \| { provider: "neon" \| "supabase", include: string[], exclude: string[]}`|
+| type          | `boolean \| { provider: "neon" \| "supabase", include: string[], exclude: string[] }`|
 | default       | `false`                  |
-| commands      | `push` `pull` `generate` |
+| commands      | `push` `pull` |
 
 <rem025/>
 
@@ -580,26 +521,6 @@ export default defineConfig({
 
 ## ---
 
-### `strict`
-<rem025/>
-
-Prompts confirmation to run printed SQL statements when running `drizzle-kit push` command.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `boolean` |
-| default       | `false`                    |
-| commands      | `push`   |
-
-<rem025/>
-
-```ts
-export default defineConfig({
-  dialect: "cockroach",
-  strict: false,
-});
-```
-
 ### `verbose`
 <rem025/>
 
@@ -608,8 +529,8 @@ Print all SQL statements during `drizzle-kit push` command.
 |               |                      |
 | :------------ | :-----------------   |
 | type          | `boolean` |
-| default       | `true`                    |
-| commands      | `generate` `pull`   |
+| default       | `false`                    |
+| commands      | `pull`   |
 
 <rem025/>
 

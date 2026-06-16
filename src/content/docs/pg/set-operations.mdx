@@ -1,6 +1,7 @@
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
+import Section from "@mdx/Section.astro";
 
 # Set Operations
 
@@ -205,7 +206,7 @@ but you want to retain the quantity information, even if the same product is ord
 times by different customers.
 
 <CodeTabs items={["import-pattern", "builder-pattern", "schema.ts"]}>
-	<CodeTab>
+	<Section>
 	```typescript copy
     import { intersectAll } from 'drizzle-orm/pg-core'
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
@@ -227,7 +228,8 @@ times by different customers.
     intersect all
     (select "product_id", "quantity_ordered" from "vip_customer_orders")
     ```
-	</CodeTab>
+	</Section>
+	<Section>
     ```ts copy
     import { regularCustomerOrders, vipCustomerOrders } from './schema'
 
@@ -251,7 +253,8 @@ times by different customers.
     intersect all
     (select "product_id", "quantity_ordered" from "vip_customer_orders")
     ```
-    <CodeTab>
+    </Section>
+	<Section>
 	```typescript copy
     import { integer, pgTable } from "drizzle-orm/pg-core";
 
@@ -267,7 +270,7 @@ times by different customers.
         quantityOrdered: integer('quantity_ordered').notNull(),
     });
     ```
-    </CodeTab>
+    </Section>
   </CodeTabs>
 
 ### Except

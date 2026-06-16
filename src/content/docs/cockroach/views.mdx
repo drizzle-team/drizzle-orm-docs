@@ -15,11 +15,12 @@ yet when you use `sql` you have to explicitly declare view columns schema.
 ### Declaring views
 
 <Section>
-      ```ts filename="schema.ts" copy {13-14}
-      import { cockroachTable, cockroachView, serial, text, timestamp } from "drizzle-orm/cockroach-core";
+      ```ts filename="schema.ts" copy {14-15}
+      import { cockroachTable, cockroachView, int4, text, timestamp } from "drizzle-orm/cockroach-core";
+      import { eq } from "drizzle-orm";
 
       export const user = cockroachTable("user", {
-        id: serial(),
+        id: int4(),
         name: text(),
         email: text(),
         password: text(),
@@ -32,21 +33,22 @@ yet when you use `sql` you have to explicitly declare view columns schema.
       export const customersView = cockroachView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW "user_view" AS SELECT * FROM "user";
-      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      CREATE VIEW "customers_view" AS (select ... from "user" where "user"."role" = 'customer');
+      CREATE VIEW "user_view" AS (select ... from "user");
       ```
     </Section>
 
 You can also declare views using `standalone query builder`, it works exactly the same way:
 
 <Section>
-      ```ts filename="schema.ts" copy {3, 15-16}
-      import { cockroachTable, cockroachView, serial, text, timestamp, QueryBuilder} from "drizzle-orm/cockroach-core";
-      
+      ```ts filename="schema.ts" copy {4,16-17}
+      import { cockroachTable, cockroachView, int4, text, timestamp, QueryBuilder} from "drizzle-orm/cockroach-core";
+      import { eq } from "drizzle-orm";
+
       const qb = new QueryBuilder();
 
       export const user = cockroachTable("user", {
-        id: serial(),
+        id: int4(),
         name: text(),
         email: text(),
         password: text(),
@@ -59,8 +61,8 @@ You can also declare views using `standalone query builder`, it works exactly th
       export const customersView = cockroachView("customers_view").as(qb.select().from(user).where(eq(user.role, "customer")));
       ```
       ```sql
-      CREATE VIEW "user_view" AS SELECT * FROM "user";
-      CREATE VIEW "customers_view" AS SELECT * FROM "user" WHERE "role" = 'customer';
+      CREATE VIEW "user_view" AS (SELECT ... FROM "user");
+      CREATE VIEW "customers_view" AS (SELECT ... FROM "user" WHERE "user"."role" = 'customer');
       ```
     </Section>
 
@@ -70,16 +72,16 @@ you can directly use `sql` operator and explicitly specify view columns schema.
 
 ```ts copy
 // regular view
-const newYorkers = cockroachView('new_yorkers', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+export const newYorkers = cockroachView('new_yorkers', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
   cityId: integer('city_id').notNull(),
 }).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
 
 // materialized view
-const newYorkers = cockroachMaterializedView('new_yorkers', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+export const newYorkers = cockroachMaterializedView('new_yorkers', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
   cityId: integer('city_id').notNull(),
 }).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
 ```
@@ -87,9 +89,9 @@ const newYorkers = cockroachMaterializedView('new_yorkers', {
 ### Declaring existing views
 When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
 `drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
-```ts
+```ts {16,23}
 export const user = cockroachTable("user", {
-  id: serial(),
+  id: int4(),
   name: text(),
   email: text(),
   password: text(),
@@ -100,14 +102,14 @@ export const user = cockroachTable("user", {
 
 // regular view
 export const trimmedUser = cockroachView("trimmed_user", {
-  id: serial("id"),
+  id: int4("id"),
   name: text("name"),
   email: text("email"),
 }).existing();
 
 // materialized view won't make any difference, yet you can use it for consistency
 export const trimmedUser = cockroachMaterializedView("trimmed_user", {
-  id: serial("id"),
+  id: int4("id"),
   name: text("name"),
   email: text("email"),
 }).existing();
@@ -115,19 +117,19 @@ export const trimmedUser = cockroachMaterializedView("trimmed_user", {
 
 ### Materialized views
 
-According to the official docs, CockroachDB and CockroachDB have both **[`regular`](https://www.cockroach.org/docs/current/sql-createview.html)**
-and **[`materialized`](https://www.cockroach.org/docs/current/sql-creatematerializedview.html)** views.
+According to the official docs, CockroachDB have both **[`regular`](https://www.cockroachlabs.com/docs/v26.2/create-view.html#synopsis)**
+and **[`materialized`](https://www.cockroachlabs.com/docs/v26.2/create-view.html#synopsis)** views.
   
-Materialized views in CockroachDB and CockroachDB use the rule system like views do, but persist the results in a table-like form.
+Materialized views in CockroachDB use the rule system like views do, but persist the results in a table-like form.
 {/* This means that when a query is executed against a materialized view, the results are returned directly from the materialized view,
 like from a table, rather than being reconstructed by executing the query against the underlying base tables that make up the view. */}
 
 <Section>
 ```ts filename="schema.ts" copy
-const newYorkers = cockroachMaterializedView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
+export const newYorkers = cockroachMaterializedView('new_yorkers').as((qb) => qb.select().from(users).where(eq(users.cityId, 1)));
 ```
 ```sql
-CREATE MATERIALIZED VIEW "new_yorkers" AS SELECT * FROM "users";
+CREATE MATERIALIZED VIEW "new_yorkers" AS (SELECT ... FROM "users" WHERE "users"."city_id" = 1);
 ```
 </Section>
 
@@ -146,45 +148,95 @@ All the parameters inside the query will be inlined, instead of replaced by `$1`
 </Callout>
 
 ```ts copy
-// regular view
-const newYorkers = cockroachView('new_yorkers')
-  .with({
-    checkOption: 'cascaded',
-    securityBarrier: true,
-    securityInvoker: true,
-  })
-  .as((qb) => {
-    const sq = qb
-      .$with('sq')
-      .as(
-        qb.select({ userId: users.id, cityId: cities.id })
-          .from(users)
-          .leftJoin(cities, eq(cities.id, users.homeCity))
-          .where(sql`${users.age1} > 18`),
-      );
-    return qb.with(sq).select().from(sq).where(sql`${users.homeCity} = 1`);
-  });
+export const newYorkers = cockroachView('new_yorkers').as((qb) => {
+  const sq = qb.$with('sq').as(
+    qb
+      .select({
+        userId: users.id.as('users_id'),
+        cityId: cities.id.as('cities_id'),
+        homeCity: users.homeCity,
+      })
+      .from(users)
+      .leftJoin(cities, eq(cities.id, users.homeCity))
+      .where(sql`${users.age1} > 18`),
+  );
+  return qb
+    .with(sq)
+    .select()
+    .from(sq)
+    .where(sql`${sq.homeCity} = 1`);
+});
 
 // materialized view
-const newYorkers2 = cockroachMaterializedView('new_yorkers')
-  .using('btree')
-  .with({
-    fillfactor: 90,
-    toast_tuple_target: 0.5,
-    autovacuum_enabled: true,
-    ...
-  })
-  .tablespace('custom_tablespace')
+export const newYorkers2 = cockroachMaterializedView('new_yorkers_2')
   .withNoData()
   .as((qb) => {
-    const sq = qb
-      .$with('sq')
-      .as(
-        qb.select({ userId: users.id, cityId: cities.id })
-          .from(users)
-          .leftJoin(cities, eq(cities.id, users.homeCity))
-          .where(sql`${users.age1} > 18`),
-      );
-    return qb.with(sq).select().from(sq).where(sql`${users.homeCity} = 1`);
+    const sq = qb.$with('sq').as(
+      qb
+        .select({
+          userId: users.id.as('users_id'),
+          cityId: cities.id.as('cities_id'),
+          homeCity: users.homeCity,
+        })
+        .from(users)
+        .leftJoin(cities, eq(cities.id, users.homeCity))
+        .where(sql`${users.age1} > 18`),
+    );
+    return qb
+      .with(sq)
+      .select()
+      .from(sq)
+      .where(sql`${sq.homeCity} = 1`);
   });
+```
+```sql
+...
+
+CREATE VIEW "new_yorkers" AS (
+	WITH
+		"sq" AS (
+			SELECT
+				"users"."id" AS "users_id",
+				"cities"."id" AS "cities_id",
+				"users"."home_city"
+			FROM
+				"users"
+				LEFT JOIN "cities" ON "cities"."id" = "users"."home_city"
+			WHERE
+				"users"."age" > 18
+		)
+	SELECT
+		"users_id",
+		"cities_id",
+		"home_city"
+	FROM
+		"sq"
+	WHERE
+		"sq"."home_city" = 1
+);
+
+CREATE MATERIALIZED VIEW "new_yorkers_2" AS (
+	WITH
+		"sq" AS (
+			SELECT
+				"users"."id" AS "users_id",
+				"cities"."id" AS "cities_id",
+				"users"."home_city"
+			FROM
+				"users"
+				LEFT JOIN "cities" ON "cities"."id" = "users"."home_city"
+			WHERE
+				"users"."age" > 18
+		)
+	SELECT
+		"users_id",
+		"cities_id",
+		"home_city"
+	FROM
+		"sq"
+	WHERE
+		"sq"."home_city" = 1
+)
+WITH
+	NO DATA;
 ```

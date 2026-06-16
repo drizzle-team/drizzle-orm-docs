@@ -1,15 +1,16 @@
 import Callout from '@mdx/Callout.astro';
+import CodeTabs from '@mdx/CodeTabs.astro';
 
 ## Type API
 Use Drizzle's type helpers to infer `select` and `insert` models from a CockroachDB table schema.
 
 ```ts
-import { serial, text, cockroachTable } from 'drizzle-orm/cockroach-core';
+import { string, int4, cockroachTable } from 'drizzle-orm/cockroach-core';
 import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
 
 const users = cockroachTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+  id: int4('id').primaryKey(),
+  name: string('name').notNull(),
 });
 
 type SelectUser = typeof users.$inferSelect;
@@ -23,15 +24,31 @@ type InsertUserAlt = InferInsertModel<typeof users>;
 Enable default query logging by passing `{ logger: true }` to `drizzle`.
 
 ```ts
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { drizzle } from "drizzle-orm/cockroach";
 
-const db = drizzle({ logger: true });
+const db = drizzle(process.env.DB_URL, { logger: true });
+```
+
+You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
+```typescript copy
+import { DefaultLogger, type LogWriter } from "drizzle-orm/logger";
+import { drizzle } from "drizzle-orm/...";
+
+class MyLogWriter implements LogWriter {
+  write(message: string) {
+    // Write to file, stdout, etc.
+  }
+}
+
+const logger = new DefaultLogger({ writer: new MyLogWriter() });
+const db = drizzle(process.env.DB_URL, { logger });
 ```
 
 You can also provide a custom logger.
 
 ```ts
-import { Logger } from 'drizzle-orm/logger';
+import type { Logger } from 'drizzle-orm/logger';
+import { drizzle } from "drizzle-orm/cockroach";
 
 class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -39,20 +56,20 @@ class MyLogger implements Logger {
   }
 }
 
-const db = drizzle({ logger: new MyLogger() });
+const db = drizzle(process.env.DB_URL, { logger: new MyLogger() });
 ```
 
 ## Multi-project schema
 Use `cockroachTableCreator` to customize table names when several projects share one database.
 
 ```ts
-import { serial, text, cockroachTableCreator } from 'drizzle-orm/cockroach-core';
+import { int4, string, cockroachTableCreator } from 'drizzle-orm/cockroach-core';
 
 const cockroachTable = cockroachTableCreator((name) => `project1_${name}`);
 
-const users = cockroachTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
+export const users = cockroachTable('users', {
+  id: int4().primaryKey(),
+  name: string().notNull(),
 });
 ```
 
@@ -68,6 +85,12 @@ export default defineConfig({
   },
   tablesFilter: ['project1_*'],
 });
+```
+```sql
+CREATE TABLE "project1_users" (
+        "id" int4 PRIMARY KEY,
+        "name" string NOT NULL
+);
 ```
 
 ## Printing SQL Query
@@ -105,10 +128,7 @@ const { sql, params } = query.toSQL();
 ## Get Typed Columns
 Use `getColumns` to get a typed column map, which is useful when excluding fields from a selection.
 
-<Callout type='warning'>
-`getColumns` is available starting from `drizzle-orm@1.0.0-beta.2`. For pre-1 versions, use `getTableColumns`.
-</Callout>
-
+<CodeTabs items={["index.ts", "schema.ts"]}>
 ```ts
 import { getColumns } from 'drizzle-orm';
 import { users } from './schema';
@@ -117,6 +137,18 @@ const { password, role, ...rest } = getColumns(users);
 
 await db.select({ ...rest }).from(users);
 ```
+```ts
+import { int4, string, pgTable } from "drizzle-orm/pg-core";
+
+export const user = pgTable("user", {
+  id: int4().primaryKey(),
+  name: string(),
+  email: string(),
+  password: string(),
+  role: string().$type<"admin" | "customer">(),
+});
+```
+</CodeTabs>
 
 ## Get Table Information
 Use `getTableConfig` to inspect CockroachDB table metadata.

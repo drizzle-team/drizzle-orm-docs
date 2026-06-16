@@ -347,7 +347,7 @@ const result: {
 
 ```typescript
 export const user = pgTable("user", {
-  id: integer().primaryKey({ autoIncrement: true }),
+  id: integer().primaryKey(),
   name: text().notNull(),
   parentId: integer("parent_id").notNull().references((): AnyPgColumn => user.id)
 });

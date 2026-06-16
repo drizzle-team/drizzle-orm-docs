@@ -159,12 +159,12 @@ export const newYorkers = pgView('new_yorkers')
     const sq = qb
       .$with('sq')
       .as(
-        qb.select({ userId: users.id, cityId: cities.id })
+        qb.select({ userId: users.id.as("user_id"), cityId: cities.id.as("city_id"), homeCity: users.homeCity })
           .from(users)
           .leftJoin(cities, eq(cities.id, users.homeCity))
           .where(sql`${users.age1} > 18`),
       );
-    return qb.with(sq).select().from(sq).where(sql`${users.homeCity} = 1`);
+    return qb.with(sq).select().from(sq).where(sql`${sq.homeCity} = 1`);
   });
 
 // materialized view
@@ -182,67 +182,66 @@ export const newYorkers2 = pgMaterializedView('new_yorkers_2')
     const sq = qb
       .$with('sq')
       .as(
-        qb.select({ userId: users.id, cityId: cities.id })
+        qb.select({ userId: users.id.as("user_id"), cityId: cities.id.as("city_id"), homeCity: users.homeCity })
           .from(users)
           .leftJoin(cities, eq(cities.id, users.homeCity))
           .where(sql`${users.age1} > 18`),
       );
-    return qb.with(sq).select().from(sq).where(sql`${users.homeCity} = 1`);
+    return qb.with(sq).select().from(sq).where(sql`${sq.homeCity} = 1`);
   });
 ```
 ```sql
 ...
 
-CREATE VIEW "new_yorkers" 
-WITH 
-  (
-    check_option = cascaded, security_barrier = true, 
-    security_invoker = true
-  ) AS (
-    with 
-      "sq" as (
-        select 
-          "user"."id", 
-          "cities"."id" 
-        from 
-          "user" 
-          left join "cities" on "cities"."id" = "user"."homeCity" 
-        where 
-          "user"."age1" > 18
-      ) 
-    select 
-      "id", 
-      "id" 
-    from 
-      "sq" 
-    where 
-      "user"."homeCity" = 1
-  );
-  
-CREATE MATERIALIZED VIEW "new_yorkers_2" USING "btree" 
-WITH 
-  (
-    autovacuum_enabled = true, fillfactor = 90, 
-    toast_tuple_target = 0.5
-  ) TABLESPACE custom_tablespace AS (
-    with 
-      "sq" as (
-        select 
-          "user"."id", 
-          "cities"."id" 
-        from 
-          "user" 
-          left join "cities" on "cities"."id" = "user"."homeCity" 
-        where 
-          "user"."age1" > 18
-      ) 
-    select 
-      "id", 
-      "id" 
-    from 
-      "sq" 
-    where 
-      "user"."homeCity" = 1
-  ) 
-WITH NO DATA;
+CREATE VIEW "new_yorkers"
+WITH
+	(check_option = cascaded, security_barrier = TRUE, security_invoker = TRUE) AS (
+		WITH
+			"sq" AS (
+				SELECT
+					"user"."id" AS "user_id",
+					"cities"."id" AS "city_id",
+					"user"."homeCity"
+				FROM
+					"user"
+					LEFT JOIN "cities" ON "cities"."id" = "user"."homeCity"
+				WHERE
+					"user"."age1" > 18
+			)
+		SELECT
+			"user_id",
+			"city_id",
+			"homeCity"
+		FROM
+			"sq"
+		WHERE
+			"sq"."homeCity" = 1
+	);
+
+CREATE MATERIALIZED VIEW "new_yorkers_2" USING "btree"
+WITH
+	(autovacuum_enabled = TRUE, fillfactor = 90, toast_tuple_target = 0.5) TABLESPACE custom_tablespace AS (
+		WITH
+			"sq" AS (
+				SELECT
+					"user"."id" AS "user_id",
+					"cities"."id" AS "city_id",
+					"user"."homeCity"
+				FROM
+					"user"
+					LEFT JOIN "cities" ON "cities"."id" = "user"."homeCity"
+				WHERE
+					"user"."age1" > 18
+			)
+		SELECT
+			"user_id",
+			"city_id",
+			"homeCity"
+		FROM
+			"sq"
+		WHERE
+			"sq"."homeCity" = 1
+	)
+WITH
+	NO DATA;
 ```

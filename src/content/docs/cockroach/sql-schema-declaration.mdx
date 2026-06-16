@@ -17,12 +17,12 @@ If you are using Drizzle-Kit for the migration process, make sure to export all 
 
 <CodeTabs items={["Using imports", "Using callback", "Using import *"]}>
 ```ts
-import { integer, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
+import { int4, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
 
 export const usersTable = cockroachTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: int4().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar().notNull(),
-  age: integer().notNull(),
+  age: int4().notNull(),
   email: varchar().notNull().unique(),
 });
 ```
@@ -30,9 +30,9 @@ export const usersTable = cockroachTable("users", {
 import { cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const usersTable = cockroachTable("users", (t) => ({
-  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: t.int4().primaryKey().generatedAlwaysAsIdentity(),
   name: t.varchar().notNull(),
-  age: t.integer().notNull(),
+  age: t.int4().notNull(),
   email: t.varchar().notNull().unique(),
 }));
 ```
@@ -40,9 +40,9 @@ export const usersTable = cockroachTable("users", (t) => ({
 import * as p from "drizzle-orm/cockroach-core";
 
 export const usersTable = p.cockroachTable("users", {
-  id: p.integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: p.int4().primaryKey().generatedAlwaysAsIdentity(),
   name: p.varchar().notNull(),
-  age: p.integer().notNull(),
+  age: p.int4().notNull(),
   email: p.varchar().notNull().unique(),
 });
 ```
@@ -74,7 +74,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: 'cockroach'
+  dialect: 'cockroach',
   schema: './src/db/schema.ts'
 })
 ```
@@ -107,7 +107,7 @@ about the `drizzle.config.ts` file and migrations with Drizzle, please check: [l
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: 'cockroach'
+  dialect: 'cockroach',
   schema: './src/db/schema'
 })
 ```
@@ -127,9 +127,9 @@ You can also group them in any way you like, such as creating groups for user-re
 
 Drizzle schema consists of several model types from database you are using. With drizzle you can specify:
 - Tables with columns, constraints, etc.
-- Schemas(CockroachDB only)
+- Schemas
 - Enums
-- Sequences(CockroachDB only)
+- Sequences
 - Views
 - Materialized Views
 - etc.
@@ -139,15 +139,15 @@ Let's go one by one and check how the schema should be defined with drizzle
 #### **Tables and columns declaration** 
 
 A table in Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
-there is no such thing as a common table object in drizzle. You need to choose the CockroachDB table object for CockroachDB schemas.
+there is no such thing as a common table object in drizzle. You need to choose a dialect you are using, Cockroach, MySQL, SQLite, etc.
 
 ![](@/assets/images/table-structure.svg)
 
 ```ts copy
-import { cockroachTable, integer } from "drizzle-orm/cockroach-core"
+import { cockroachTable, int4 } from "drizzle-orm/cockroach-core"
 
 export const users = cockroachTable('users', {
-  id: integer()
+  id: int4()
 });
 ```
 
@@ -163,10 +163,10 @@ This example uses a db object, whose initialization is not covered in this part 
 <Section>
 ```ts
 // schema.ts
-import { integer, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
+import { int4, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
 
 export const users = cockroachTable('users', {
-  id: integer(),
+  id: int4(),
   first_name: varchar()
 })
 ```
@@ -184,10 +184,10 @@ If you want to use different names in your TypeScript code and in the database, 
 <Section>
 ```ts
 // schema.ts
-import { integer, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
+import { int4, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
 
 export const users = cockroachTable('users', {
-  id: integer(),
+  id: int4(),
   firstName: varchar('first_name')
 })
 ```
@@ -202,34 +202,40 @@ SELECT "id", "first_name" from users;
 
 ### Camel and Snake casing
 
-Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models. 
-This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically 
-map `camelCase` from TypeScript to `snake_case` in the database by including one optional parameter during Drizzle database initialization
+Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models.
+This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically
+map `camelCase` from TypeScript to `snake_case` in the database via a dedicated builder.
 
-For such mapping, you can use the `casing` option in the Drizzle DB declaration. This parameter will 
-help you specify the database model naming convention and will attempt to map all JavaScript keys accordingly
+Use the `snakeCase` or `camelCase` builder from `drizzle-orm/cockroach-core` to declare a table whose column keys are
+automatically mapped to the chosen database naming convention
 
 <Section>
-```ts
+```ts {2,4,11,12}
 // schema.ts
-import { drizzle } from "drizzle-orm/node-postgres";
-import { integer, cockroachTable, varchar } from "drizzle-orm/cockroach-core";
+import { snakeCase, camelCase } from 'drizzle-orm/cockroach-core';
 
-export const users = cockroachTable('users', {
-  id: integer(),
-  firstName: varchar()
-})
+export const users = snakeCase.table('users', {
+  id: int4().primaryKey(),
+  fullName: text(),        // → full_name in DB
+  createdAt: timestamp(),  // → created_at in DB
+});
+
+// Available on all entity types:
+snakeCase.table / snakeCase.view / snakeCase.materializedView / snakeCase.schema
+camelCase.table / camelCase.view / camelCase.materializedView / camelCase.schema
 ```
 ```ts
 // db.ts
-const db = drizzle({ connection: process.env.DATABASE_URL, casing: 'snake_case' })
+import { drizzle } from "drizzle-orm/cockroach";
+
+const db = drizzle({ connection: process.env.DATABASE_URL })
 ```
 ```ts
 // query.ts
 await db.select().from(users);
 ```
 ```sql
-SELECT "id", "first_name" from users;
+select "id", "full_name", "created_at" from "users"
 ```
 </Section>
 
@@ -247,7 +253,7 @@ We can define those columns in a separate file and then import and spread them a
 <Section>
 ```ts
 // columns.helpers.ts
-const timestamps = {
+export const timestamps = {
   updated_at: timestamp(),
   created_at: timestamp().defaultNow().notNull(),
   deleted_at: timestamp(),
@@ -256,14 +262,14 @@ const timestamps = {
 ```ts
 // users.sql.ts
 export const users = cockroachTable('users', {
-  id: integer(),
+  id: int4(),
   ...timestamps
 })
 ```
 ```ts
 // posts.sql.ts
 export const posts = cockroachTable('posts', {
-  id: integer(),
+  id: int4(),
   ...timestamps
 })
 ```
@@ -272,11 +278,11 @@ export const posts = cockroachTable('posts', {
 #### **Schemas**
 
 \
-In CockroachDB, there is an entity called a `schema` (which we believe should be called `folders`). This creates a structure in CockroachDB:
+In cockroach, there is an entity called a `schema` (which we believe should be called `folders`). This creates a structure in cockroach:
 
 ![](@/assets/images/postgresql-db-structure.png)
 
-You can manage your CockroachDB schemas with `cockroachSchema` and place any other models inside it.
+You can manage your cockroach schemas with `cockroachSchema` and place any other models inside it.
 
 Define the schema you want to manage using Drizzle
 ```ts
@@ -287,12 +293,12 @@ export const customSchema = cockroachSchema('custom');
 
 Then place the table inside the schema object
 ```ts {5-7}
-import { integer, cockroachSchema } from "drizzle-orm/cockroach-core";
+import { int4, cockroachSchema } from "drizzle-orm/cockroach-core";
 
 export const customSchema = cockroachSchema('custom');
 
 export const users = customSchema.table('users', {
-  id: integer()
+  id: int4()
 })
 ```
 
@@ -303,7 +309,7 @@ Once you know the basics, let's define a schema example for a real project to ge
 > All examples will use `generateUniqueString`. The implementation for it will be provided after all the schema examples
 
 ```ts copy
-import { AnyPgColumn } from "drizzle-orm/cockroach-core";
+import type { AnyCockroachColumn } from "drizzle-orm/cockroach-core";
 import { cockroachEnum, cockroachTable as table } from "drizzle-orm/cockroach-core";
 import * as t from "drizzle-orm/cockroach-core";
 
@@ -312,11 +318,11 @@ export const rolesEnum = cockroachEnum("roles", ["guest", "user", "admin"]);
 export const users = table(
   "users",
   {
-    id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+    id: t.int4().primaryKey().generatedAlwaysAsIdentity(),
     firstName: t.varchar("first_name", { length: 256 }),
     lastName: t.varchar("last_name", { length: 256 }),
     email: t.varchar().notNull(),
-    invitee: t.integer().references((): AnyPgColumn => users.id),
+    invitee: t.int4().references((): AnyCockroachColumn => users.id),
     role: rolesEnum().default("guest"),
   },
   (table) => [
@@ -327,10 +333,10 @@ export const users = table(
 export const posts = table(
   "posts",
   {
-    id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+    id: t.int4().primaryKey().generatedAlwaysAsIdentity(),
     slug: t.varchar().$default(() => generateUniqueString(16)),
     title: t.varchar({ length: 256 }),
-    ownerId: t.integer("owner_id").references(() => users.id),
+    ownerId: t.int4("owner_id").references(() => users.id),
   },
   (table) => [
     t.uniqueIndex("slug_idx").on(table.slug),
@@ -339,10 +345,10 @@ export const posts = table(
 );
 
 export const comments = table("comments", {
-  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: t.int4().primaryKey().generatedAlwaysAsIdentity(),
   text: t.varchar({ length: 256 }),
-  postId: t.integer("post_id").references(() => posts.id),
-  ownerId: t.integer("owner_id").references(() => users.id),
+  postId: t.int4("post_id").references(() => posts.id),
+  ownerId: t.int4("owner_id").references(() => users.id),
 });
 ```
 

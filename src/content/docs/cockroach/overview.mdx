@@ -11,7 +11,7 @@ Drizzle ORM is a headless TypeScript ORM with a head. 🐲
 It looks and feels simple, performs on day _1000_ of your project,\
 lets you do things your way, and is there when you need it.
 
-**It's the only ORM with both [relational](/docs/mssql/rqb) and [SQL-like](/docs/mssql/select) query APIs**, 
+**It's the only ORM with both [relational](/docs/cockroach/rqb) and [SQL-like](/docs/cockroach/select) query APIs**, 
 providing you the best of both worlds when it comes to accessing your relational data. 
 Drizzle is lightweight, performant, typesafe, non-lactose, gluten-free, sober, flexible and **serverless-ready by design**.
 Drizzle is not just a library, it's an experience. 🤩
@@ -44,8 +44,8 @@ Drizzle is the opposite.
 We embrace SQL and built Drizzle to be SQL-like at its core, so you can have zero to no 
 learning curve and access to the full power of SQL.  
 
-We bring all the familiar **[SQL schema](/docs/mssql/sql-schema-declaration)**, **[queries](/docs/mssql/select)**, 
-**[automatic migrations](/docs/mssql/migrations)** and **[one more thing](/docs/mssql/rqb)**. ✨
+We bring all the familiar **[SQL schema](/docs/cockroach/sql-schema-declaration)**, **[queries](/docs/cockroach/select)**, 
+**[automatic migrations](/docs/cockroach/migrations)** and **[one more thing](/docs/cockroach/rqb)**. ✨
 
 <CodeTabs items={["index.ts", "schema.ts", "migration.sql"]}>
 ```typescript copy
@@ -58,32 +58,31 @@ await db
 ```
 ```typescript copy
 // manage your schema
-export const countries = mssqlTable('countries', {
-  id: int().primaryKey().identity(),
+export const countries = cockroachTable('countries', {
+  id: int4().primaryKey(),
   name: varchar({ length: 256 }),
 });
 
-export const cities = mssqlTable('cities', {
-  id: int().primaryKey().identity(),
+export const cities = cockroachTable('cities', {
+  id: int4().primaryKey(),
   name: varchar({ length: 256 }),
-  countryId: int('country_id').references(() => countries.id),
+  countryId: int4('country_id').references(() => countries.id),
 });
 ```
 ```sql
-CREATE TABLE [countries] (
-	[id] int IDENTITY(1, 1),
-	[name] varchar(256),
-	CONSTRAINT [countries_pkey] PRIMARY KEY([id])
+-- generate migrations
+CREATE TABLE "countries" (
+	"id" int4 PRIMARY KEY,
+	"name" varchar(256)
 );
 
-CREATE TABLE [cities] (
-	[id] int IDENTITY(1, 1),
-	[name] varchar(256),
-	[country_id] int,
-	CONSTRAINT [cities_pkey] PRIMARY KEY([id])
+CREATE TABLE "cities" (
+	"id" int4 PRIMARY KEY,
+	"name" varchar(256),
+	"country_id" int4
 );
 
-ALTER TABLE [cities] ADD CONSTRAINT [cities_country_id_countries_id_fk] FOREIGN KEY ([country_id]) REFERENCES [countries]([id]);
+ALTER TABLE "cities" ADD CONSTRAINT "cities_country_id_countries_id_fkey" FOREIGN KEY ("country_id") REFERENCES "countries"("id");
 ```
 </CodeTabs>
 
@@ -91,7 +90,7 @@ ALTER TABLE [cities] ADD CONSTRAINT [cities_country_id_countries_id_fk] FOREIGN 
 We're always striving for a perfectly balanced solution, and while SQL-like does cover 100% of the needs, 
 there are certain common scenarios where you can query data in a better way.  
 
-We've built the **[Queries API](/docs/mssql/rqb)** for you, so you can fetch relational nested data from the database 
+We've built the **[Queries API](/docs/cockroach/rqb)** for you, so you can fetch relational nested data from the database 
 in the most convenient and performant way, and never think about joins and data mapping.  
 
 **Drizzle always outputs exactly 1 SQL query.** Feel free to use it with serverless databases and never worry about performance or roundtrip costs!

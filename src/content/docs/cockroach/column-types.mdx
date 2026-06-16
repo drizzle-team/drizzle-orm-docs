@@ -6,13 +6,9 @@ import Section from '@mdx/Section.astro';
 import Callout from '@mdx/Callout.astro';
 import Npm from '@mdx/Npm.astro';
 
-<Callout type='error'>
-This page explains concepts available on drizzle versions `1.0.0-beta.2` and higher.
-</Callout>
-
 <Npm>
-drizzle-orm@beta
-drizzle-kit@beta -D
+drizzle-orm
+drizzle-kit -D
 </Npm>
 
 <br/>
@@ -35,22 +31,26 @@ Signed 8-byte integer
 If you're expecting values above 2^31 but below 2^53, you can utilize `mode: 'number'` and deal with javascript number as opposed to bigint.
 <Section>
 ```typescript
-import { bigint, cockroachTable } from "drizzle-orm/cockroach-core";
+import { int8, bigint, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
+	int8: int8({ mode: 'number' })
 	bigint: bigint({ mode: 'number' })
 });
 
 // will be inferred as `number`
+int8: int8({ mode: 'number' })
 bigint: bigint({ mode: 'number' })
 
 // will be inferred as `bigint`
+int8: int8({ mode: 'bigint' })
 bigint: bigint({ mode: 'bigint' })
 ```
 
 ```sql
 CREATE TABLE "table" (
-	"bigint" bigint
+	"int8" int8,
+	"bigint" int8
 );
 ```
 </Section>
@@ -62,14 +62,14 @@ import { bigint, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
 	bigint1: bigint().default(10),
-	bigint2: bigint().default(sql`'10'::bigint`)
+	bigint2: int8().default(10),
 });
 ```
 
 ```sql
 CREATE TABLE "table" (
 	"bigint1" bigint DEFAULT 10,
-	"bigint2" bigint DEFAULT '10'::bigint
+	"bigint2" int8 DEFAULT 10
 );
 ```
 </Section>
@@ -83,12 +83,14 @@ Small-range signed 2-byte integer
 import { smallint, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
+	int2: int2(),
 	smallint: smallint()
 });
 ```
 
 ```sql
 CREATE TABLE "table" (
+	"int2" int2,
 	"smallint" smallint
 );
 ```
@@ -97,18 +99,18 @@ CREATE TABLE "table" (
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { smallint, cockroachTable } from "drizzle-orm/cockroach-core";
+import { int2, smallint, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
-	smallint1: smallint().default(10),
-	smallint2: smallint().default(sql`'10'::smallint`)
+	smallint1: int2().default(10),
+	smallint2: smallint().default(10)
 });
 ```
 
 ```sql
 CREATE TABLE "table" (
-	"smallint1" smallint DEFAULT 10,
-	"smallint2" smallint DEFAULT '10'::smallint
+	"smallint1" int2 DEFAULT 10,
+	"smallint2" int2 DEFAULT 10
 );
 ```
 </Section>
@@ -140,15 +142,13 @@ import { sql } from "drizzle-orm";
 import { int4, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
-	int1: int4().default(10),
-	int2: int4().default(sql`'10'::int4`)
+	int1: int4().default(10)
 });
 ```
 
 ```sql
 CREATE TABLE "table" (
-	"int1" int4 DEFAULT 10,
-	"int2" int4 DEFAULT '10'::int4
+	"int1" int4 DEFAULT 10
 );
 ```
 </Section>
@@ -246,7 +246,7 @@ text: text({ enum: ["value1", "value2"] })
 
 ```sql
 CREATE TABLE "table" (
-	"text" text
+	"text" string
 );
 ```
 </Section>
@@ -726,6 +726,87 @@ CREATE TABLE "table" (
 
 ## ---
 
+### geometry
+`geometry`
+
+The GEOMETRY data type stores 2D spatial data
+
+For more info please refer to the official CockroachDB **[docs.](https://www.cockroachlabs.com/docs/stable/spatial-data-overview)**
+
+<Section>
+```typescript
+import { geometry, cockroachTable } from "drizzle-orm/cockroach-core";
+
+export const table = cockroachTable('table', {
+  geo1: geometry({ type: 'point' }),
+  geo2: geometry({ type: 'point', mode: 'xy' }),
+  geo3: geometry({ type: 'point', srid: 4326 }),
+});
+
+// will be inferred as [number, number]
+geo1: geometry({ type: 'point' })
+
+// will be inferred as { x: number, y: number }
+geo2: geometry({ type: 'point', mode: 'xy' })
+```
+
+```sql
+CREATE TABLE "table" (
+	"geo1" geometry(point),
+	"geo2" geometry(point),
+	"geo3" geometry(point,4326)
+);
+```
+</Section>
+
+### inet
+`inet`
+
+The INET data type stores an IPv4 or IPv6 address
+
+For more info please refer to the official CockroachDB **[docs.](https://www.cockroachlabs.com/docs/stable/inet)**
+
+<Section>
+```typescript
+import { inet, cockroachTable } from "drizzle-orm/cockroach-core";
+
+export const table = cockroachTable('table', {
+	inet: inet(),
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"inet" inet
+);
+```
+</Section>
+
+### vector
+`vector`
+
+The `VECTOR` data type stores fixed-length arrays of floating-point numbers, which represent data points in multi-dimensional space
+
+You must specify the number of `dimensions` for the vector.
+
+<Section>
+```typescript
+import { vector, cockroachTable } from "drizzle-orm/cockroach-core";
+
+export const table = cockroachTable('table', {
+	embedding: vector({ dimensions: 3 }),
+});
+```
+
+```sql
+CREATE TABLE "table" (
+	"embedding" vector(3)
+);
+```
+</Section>
+
+## ---
+
 ### Customizing data type
 Every column builder has a `.$type()` method, which allows you to customize the data type of the column. 
 
@@ -738,8 +819,8 @@ type Data = {
 };
 
 const users = cockroachTable('users', {
-  id: int().$type<UserId>().primaryKey(),
-  jsonField: json().$type<Data>(),
+  id: int4().$type<UserId>().primaryKey(),
+  jsonbField: jsonb().$type<Data>(),
 });
 ```
 
@@ -749,7 +830,7 @@ const users = cockroachTable('users', {
 To use this feature you would need to have `drizzle-orm@0.32.0` or higher and `drizzle-kit@0.23.0` or higher
 </Callout>
 
-PostgreSQL and CockroachDB supports identity columns as a way to automatically generate unique integer values for a column. These values are generated using sequences and can be defined using the GENERATED AS IDENTITY clause.
+PostgreSQL and CockroachDB supports identity columns as a way to automatically generate unique int4 values for a column. These values are generated using sequences and can be defined using the GENERATED AS IDENTITY clause.
 
 **Types of Identity Columns**
 - `GENERATED ALWAYS AS IDENTITY`: The database always generates a value for the column. Manual insertion or updates to this column are not allowed unless the OVERRIDING SYSTEM VALUE clause is used.
@@ -757,10 +838,10 @@ PostgreSQL and CockroachDB supports identity columns as a way to automatically g
 
 **Usage example**
 ```ts
-import { cockroachTable, integer, text } from 'drizzle-orm/cockroach-core' 
+import { cockroachTable, int4, text } from 'drizzle-orm/cockroach-core' 
 
 export const ingredients = cockroachTable("ingredients", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
+  id: int4().primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
   name: text().notNull(),
   description: text(),
 });
@@ -782,11 +863,11 @@ a string constant, a blob constant, a signed-number, or any constant expression 
 <Section>
 ```typescript
 import { sql } from "drizzle-orm";
-import { integer, cockroachTable, uuid } from "drizzle-orm/cockroach-core";
+import { int4, cockroachTable, uuid } from "drizzle-orm/cockroach-core";
+import { sql } from 'drizzle-orm';
 
-const table = cockroachTable('table', {
-	integer1: integer().default(42),
-	integer2: integer().default(sql`'42'::integer`),
+export const table = cockroachTable('table', {
+	int: int4().default(42),
 	uuid1: uuid().defaultRandom(),
 	uuid2: uuid().default(sql`gen_random_uuid()`),
 });
@@ -794,8 +875,7 @@ const table = cockroachTable('table', {
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"integer1" integer DEFAULT 42,
-	"integer2" integer DEFAULT '42'::integer,
+	"int" int4 DEFAULT 42,
 	"uuid1" uuid DEFAULT gen_random_uuid(),
 	"uuid2" uuid DEFAULT gen_random_uuid()
 );
@@ -815,7 +895,7 @@ These functions can assist you in utilizing various implementations such as `uui
 import { text, cockroachTable } from "drizzle-orm/cockroach-core";
 import { createId } from '@paralleldrive/cuid2';
 
-const table = cockroachTable('table', {
+export const table = cockroachTable('table', {
 	id: text().$defaultFn(() => createId()),
 });
 ```
@@ -833,12 +913,12 @@ when the row is inserted as well, and the returned value will be used as the col
 </Callout>
 
 ```ts
-import { integer, timestamp, text, cockroachTable } from "drizzle-orm/cockroach-core";
+import { int4, timestamp, text, cockroachTable } from "drizzle-orm/cockroach-core";
 
 const table = cockroachTable('table', {
-	updateCounter: integer().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
+	updateCounter: int4().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
 	updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
-    	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
+	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
 ```
 
@@ -848,16 +928,16 @@ const table = cockroachTable('table', {
 
 <Section>
 ```typescript
-import { integer, cockroachTable } from "drizzle-orm/cockroach-core";
+import { int4, cockroachTable } from "drizzle-orm/cockroach-core";
 
 const table = cockroachTable('table', {
-	integer: integer().notNull(),
+	int4: int4().notNull(),
 });
 ```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"integer" integer NOT NULL
+	"int4" int4 NOT NULL
 );
 ```
 </Section>
@@ -868,16 +948,16 @@ A primary key constraint indicates that a column, or group of columns, can be us
 This requires that the values be both unique and not null.
 <Section>
 ```typescript
-import { serial, cockroachTable } from "drizzle-orm/cockroach-core";
+import { int4, cockroachTable } from 'drizzle-orm/cockroach-core';
 
-const table = cockroachTable('table', {
-	id: serial().primaryKey(),
+export const table = cockroachTable('table', {
+  id: int4().primaryKey(),
 });
 ```
 
 ```sql
 CREATE TABLE IF NOT EXISTS "table" (
-	"id" serial PRIMARY KEY NOT NULL
+	"id" int4 PRIMARY KEY
 );
 ```
 </Section>

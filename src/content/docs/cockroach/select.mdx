@@ -1,22 +1,22 @@
 import CodeTabs from '@mdx/CodeTabs.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from '@mdx/Section.astro';
-import $count from '@mdx/$count.mdx';
+import $count from '@mdx/$count-cockroach.mdx';
 
 # SQL Select
 Drizzle provides you the most SQL-like way to fetch data from your database, while remaining type-safe and composable.
 It natively supports mostly every query feature and capability of every dialect,
-and whatever it doesn't support yet, can be added by the user with the powerful [`sql`](/docs/cockroach/sql) operator.
+and whatever it doesn't support yet, can be added by the user with the powerful [sql](/docs/cockroach/sql) operator.
 
 For the following examples, let's assume you have a `users` table defined like this:
 
 ```typescript
-import { cockroachTable, serial, text } from 'drizzle-orm/cockroach-core';
+import { cockroachTable, serial, string } from 'drizzle-orm/cockroach-core';
 
 export const users = cockroachTable('users', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age'),
+  id: int4().primaryKey(),
+  name: string().notNull(),
+  age: int4(),
 });
 ```
 
@@ -85,17 +85,6 @@ Drizzle cannot perform any type casts based on the provided type generic, becaus
 If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/cockroach/sql#sqlmapwith) method.
 </Callout>
 
-<Callout title='Info'>
-Starting from `v1.0.0-beta.1` you can use `.as()` for columns:
-
-```ts
-const result = await db.select({
-  id: users.id,
-  lowerName: users.name.as("lower"),
-}).from(users);
-```
-</Callout>
-
 ### Conditional select
 
 You can have a dynamic selection object based on some condition:
@@ -110,7 +99,7 @@ async function selectUsers(withName: boolean) {
     .from(users);
 }
 
-const users = await selectUsers(true);
+const result = await selectUsers(true);
 ```
 
 ### Distinct select
@@ -123,24 +112,21 @@ await db.selectDistinct().from(users).orderBy(users.id, users.name);
 await db.selectDistinct({ id: users.id }).from(users).orderBy(users.id);
 ```
 ```sql
-select distinct "id", "name" from "users" order by "id", "name";
+select distinct "id", "name", "age" from "users" order by "users"."id", "users"."name";
 
-select distinct "id" from "users" order by "id";
+select distinct "id" from "users" order by "users"."id";
 ```
 </Section>
 
 In CockroachDB, you can also use the `distinct on` clause to specify how the unique rows are determined:
-<Callout type='warning'>
-`distinct on` clause is only supported in CockroachDB.
-</Callout>
 <Section>
 ```ts
 await db.selectDistinctOn([users.id]).from(users).orderBy(users.id);
 await db.selectDistinctOn([users.name], { name: users.name }).from(users).orderBy(users.name);
 ```
 ```sql
-select distinct on ("id") "id", "name" from "users" order by "id";
-select distinct on ("name") "name" from "users" order by "name";
+select distinct on ("users"."id") "id", "name", "age" from "users" order by "users"."id";
+select distinct on ("users"."name") "name" from "users" order by "users"."name";
 ```
 </Section>
 
@@ -148,14 +134,6 @@ select distinct on ("name") "name" from "users" order by "name";
 Powered by TypeScript, Drizzle APIs let you build your select queries in a variety of flexible ways.
 
 Sneak peek of advanced partial select, for more detailed advanced usage examples - see our [dedicated guide](/docs/cockroach/guides/include-or-exclude-columns).
-
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/cockroach/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
-
-<br/>
 
 <CodeTabs items={["example 1", "example 2", "example 3", "example 4"]}>
 ```ts
@@ -205,10 +183,10 @@ await db.select().from(users).where(ne(users.id, 42));
 ...
 ```
 ```sql
-select "id", "name", "age" from "users" where "id" = 42;
-select "id", "name", "age" from "users" where "id" < 42;
-select "id", "name", "age" from "users" where "id" >= 42;
-select "id", "name", "age" from "users" where "id" <> 42;
+select "id", "name", "age" from "users" where "users"."id" = 42;
+select "id", "name", "age" from "users" where "users"."id" < 42;
+select "id", "name", "age" from "users" where "users"."id" >= 42;
+select "id", "name", "age" from "users" where "users"."id" <> 42;
 ```
 </Section>
 
@@ -218,8 +196,9 @@ For inspiration, you can check how the operators provided by Drizzle are [implem
 <Section>
 ```typescript copy
 import { sql } from 'drizzle-orm';
+import type { CockroachColumn } from "drizzle-orm/cockroach-core";
 
-function equals42(col: Column) {
+function equals42(col: CockroachColumn) {
   return sql`${col} = 42`;
 }
 
@@ -231,12 +210,12 @@ await db.select().from(users).where(sql`${users.id} <> 42`);
 await db.select().from(users).where(sql`lower(${users.name}) = 'aaron'`);
 ```
 ```sql
-select "id", "name", "age" from "users" where 'id' < 42;
-select "id", "name", "age" from "users" where 'id' = 42;
-select "id", "name", "age" from "users" where 'id' = 42;
-select "id", "name", "age" from "users" where 'id' >= 42;
-select "id", "name", "age" from "users" where 'id' <> 42;
-select "id", "name", "age" from "users" where lower("name") = 'aaron';
+select "id", "name", "age" from "users" where "users"."id" < 42;
+select "id", "name", "age" from "users" where "users"."id" = 42;
+select "id", "name", "age" from "users" where "users"."id" = 42;
+select "id", "name", "age" from "users" where "users"."id" >= 42;
+select "id", "name", "age" from "users" where "users"."id" <> 42;
+select "id", "name", "age" from "users" where lower("users"."name") = 'aaron';
 ```
 </Section>
 
@@ -248,7 +227,7 @@ await db.select().from(users).where(eq(users.id, 42));
 ```
 will be translated to:
 ```sql
-select "id", "name", "age" from "users" where "id" = $1; -- params: [42]
+select "id", "name", "age" from "users" where "users"."id" = $1; -- params: [42]
 ```
 </Callout>
 
@@ -261,8 +240,8 @@ await db.select().from(users).where(not(eq(users.id, 42)));
 await db.select().from(users).where(sql`not ${users.id} = 42`);
 ```
 ```sql
-select "id", "name", "age" from "users" where not ("id" = 42);
-select "id", "name", "age" from "users" where not ("id" = 42);
+select "id", "name", "age" from "users" where not ("users"."id" = 42);
+select "id", "name", "age" from "users" where not "users"."id" = 42;
 ```
 </Section>
 
@@ -287,8 +266,8 @@ await db.select().from(users).where(
 await db.select().from(users).where(sql`${users.id} = 42 and ${users.name} = 'Dan'`);
 ```
 ```sql
-select "id", "name", "age" from "users" where "id" = 42 and "name" = 'Dan';
-select "id", "name", "age" from "users" where "id" = 42 and "name" = 'Dan';
+select "id", "name", "age" from "users" where (("users"."id" = 42) and ("users"."name" = 'Dan'));
+select "id", "name", "age" from "users" where "users"."id" = 42 and "users"."name" = 'Dan';
 ```
 </Section>
 
@@ -305,8 +284,8 @@ await db.select().from(users).where(
 await db.select().from(users).where(sql`${users.id} = 42 or ${users.name} = 'Dan'`);
 ```
 ```sql
-select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
-select "id", "name", "age" from "users" where "id" = 42 or "name" = 'Dan';
+select "id", "name", "age" from "users" where (("users"."id" = 42) or ("users"."name" = 'Dan'));
+select "id", "name", "age" from "users" where "users"."id" = 42 or "users"."name" = 'Dan';
 ```
 </Section>
 
@@ -342,6 +321,19 @@ await searchPosts(filters);
 
 ## ---
 
+### Limit & offset
+Use `.limit()` and `.offset()` to add limit and offset clauses to the query - for example, to implement pagination:
+
+```ts
+await db.select().from(users).limit(10);
+await db.select().from(users).limit(10).offset(10);
+```
+
+```sql
+select "id", "name", "age" from "users" limit 10;
+select "id", "name", "age" from "users" limit 10 offset 10;
+```
+
 ### Order By
 Use `.orderBy()` to add `order by` clause to the query, sorting the results by the specified fields:
 <Section>
@@ -356,11 +348,11 @@ await db.select().from(users).orderBy(users.name, users.name2);
 await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
 ```
 ```sql
-select "id", "name", "age" from "users" order by "name";
-select "id", "name", "age" from "users" order by "name" desc;
+select "id", "name", "name2", "age" from "users" order by "users"."name";
+select "id", "name", "name2", "age" from "users" order by "users"."name" desc;
 
-select "id", "name", "age" from "users" order by "name", "name2";
-select "id", "name", "age" from "users" order by "name" asc, "name2" desc;
+select "id", "name", "name2", "age" from "users" order by "users"."name", "users"."name";
+select "id", "name", "name2", "age" from "users" order by "users"."name" asc, "users"."name2" desc;
 ```
 </Section>
 
@@ -382,7 +374,7 @@ await db
 ```
 ```ts
 const getUsers = async (page = 1, pageSize = 3) => {
-  await db.query.users.findMany({
+  return await db.query.users.findMany({
     orderBy: (users, { asc }) => asc(users.id),
     limit: pageSize,
     offset: (page - 1) * pageSize,
@@ -399,12 +391,12 @@ const getUsers = async (page = 1, pageSize = 10) => {
     .limit(pageSize)
     .offset((page - 1) * pageSize)
     .as('subquery');
-   await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
+   return await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
 };
 ```
 ```ts
 const nextUserPage = async (cursor?: number, pageSize = 3) => {
-  await db
+  return await db
     .select()
     .from(users)
     .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
@@ -432,8 +424,8 @@ const sq = db.$with('sq').as(db.select().from(users).where(eq(users.id, 42)));
 const result = await db.with(sq).select().from(sq);
 ```
 ```sql
-with sq as (select "id", "name", "age" from "users" where "id" = 42)
-select "id", "name", "age" from sq;
+with "sq" as (select "id", "name", "age" from "users" where "users"."id" = 42)
+select "id", "name", "age" from "sq";
 ```
 </Section>
 
@@ -448,8 +440,8 @@ const sq = db.$with('sq').as(
 const result = await db.with(sq).select().from(sq);
 ```
 ```sql
-with "sq" as (insert into "users" ("id", "name") values (default, 'John') returning "id", "name") 
-select "id", "name" from "sq"
+with "sq" as (insert into "users" ("id", "name", "age") values (default, 'John', default) returning "id", "name", "age")
+select "id", "name", "age" from "sq";
 ```
 </Section>
 
@@ -462,7 +454,7 @@ const result = await db.with(sq).select().from(sq);
 ```
 ```sql
 with "sq" as (update "users" set "age" = 25 where "users"."name" = 'John' returning "id", "name", "age") 
-select "id", "name", "age" from "sq"
+select "id", "name", "age" from "sq";
 ```
 </Section>
 
@@ -476,7 +468,7 @@ const result = await db.with(sq).select().from(sq);
 ```
 ```sql
 with "sq" as (delete from "users" where "users"."name" = $1 returning "id", "name", "age") 
-select "id", "name", "age" from "sq"
+select "id", "name", "age" from "sq";
 ```
 </Section>
 
@@ -503,7 +495,7 @@ const sq = db.select().from(users).where(eq(users.id, 42)).as('sq');
 const result = await db.select().from(sq);
 ```
 ```sql
-select "id", "name", "age" from (select "id", "name", "age" from "users" where "id" = 42) "sq";
+select "id", "name", "age" from (select "id", "name", "age" from "users" where "users"."id" = 42) "sq";
 ```
 </Section>
 
@@ -515,7 +507,7 @@ const result = await db.select().from(users).leftJoin(sq, eq(users.id, sq.id));
 ```
 ```sql
 select "users"."id", "users"."name", "users"."age", "sq"."id", "sq"."name", "sq"."age" from "users"
-  left join (select "id", "name", "age" from "users" where "id" = 42) "sq"
+  left join (select "id", "name", "age" from "users" where "users"."id" = 42) "sq"
     on "users"."id" = "sq"."id";
 ```
 </Section>
@@ -528,7 +520,7 @@ grouping and filtering with `.groupBy()` and `.having()` respectfully, same as y
 
 <Section>
 ```typescript
-import { gt } from 'drizzle-orm';
+import { gt, sql } from "drizzle-orm";
 
 await db.select({
   age: users.age,
@@ -548,20 +540,19 @@ await db.select({
 ```sql
 select "age", cast(count("id") as int)
   from "users"
-  group by "age";
+  group by "users"."age";
 
 select "age", cast(count("id") as int)
   from "users"
-  group by "age"
-  having cast(count("id") as int) > 1;
+  group by "users"."age"
+  having cast(count("users"."id") as int) > 1;
 ```
 </Section>
 
 <Callout type="info">
-`cast(... as int)` is necessary because `count()` returns `bigint` in CockroachDB and `decimal` in MySQL, which are treated as string values instead of numbers.
 Alternatively, you can use [`.mapWith(Number)`](/docs/cockroach/sql#sqlmapwith) to cast the value to a number at runtime.
 
-If you need count aggregation - we recommend using our [`$count`](/docs/cockroach/select#count) API
+If you need count aggregation - we recommend using our [$count](/docs/cockroach/select#count) API
 </Callout>
 
 ### Aggregations helpers
@@ -586,7 +577,7 @@ await db.select({ value: count() }).from(users);
 await db.select({ value: count(users.id) }).from(users);
 ```
 ```sql
-select count("*") from "users";
+select count(*) from "users";
 select count("id") from "users";
 ```
 ```ts
@@ -616,7 +607,7 @@ select count(distinct "id") from "users";
 ```ts
 // It's equivalent to writing
 await db.select({ 
-  value: sql`count(${users.id})`.mapWith(Number) 
+  value: sql`count(distinct ${users.id})`.mapWith(Number) 
 }).from(users);
 ```
 </Section>
@@ -744,31 +735,32 @@ await db.select({
 A more advanced example:
 
 ```typescript copy
-const orders = cockroachTable('order', {
-  id: integer('id').primaryKey(),
-  orderDate: integer('order_date', { mode: 'timestamp' }).notNull(),
-  requiredDate: integer('required_date', { mode: 'timestamp' }).notNull(),
-  shippedDate: integer('shipped_date', { mode: 'timestamp' }),
-  shipVia: integer('ship_via').notNull(),
-  freight: numeric('freight').notNull(),
-  shipName: text('ship_name').notNull(),
-  shipCity: text('ship_city').notNull(),
-  shipRegion: text('ship_region'),
-  shipPostalCode: text('ship_postal_code'),
-  shipCountry: text('ship_country').notNull(),
-  customerId: text('customer_id').notNull(),
-  employeeId: integer('employee_id').notNull(),
+const orders = cockroachTable("order", {
+  id: int4().primaryKey(),
+  orderDate: timestamp("order_date", { withTimezone: true }).notNull(),
+  requiredDate: timestamp("required_date", { withTimezone: true }).notNull(),
+  shippedDate: timestamp("shipped_date", { withTimezone: true }),
+  shipVia: int4("ship_via").notNull(),
+  freight: numeric("freight").notNull(),
+  shipName: string("ship_name").notNull(),
+  shipCity: string("ship_city").notNull(),
+  shipRegion: string("ship_region"),
+  shipPostalCode: string("ship_postal_code"),
+  shipCountry: string("ship_country").notNull(),
+  customerId: string("customer_id").notNull(),
+  employeeId: int4("employee_id").notNull(),
 });
 
-const details = cockroachTable('order_detail', {
-  unitPrice: numeric('unit_price').notNull(),
-  quantity: integer('quantity').notNull(),
-  discount: numeric('discount').notNull(),
-  orderId: integer('order_id').notNull(),
-  productId: integer('product_id').notNull(),
+const details = cockroachTable("order_detail", {
+  unitPrice: numeric("unit_price").notNull(),
+  quantity: int4("quantity").notNull(),
+  discount: numeric("discount").notNull(),
+  orderId: int4("order_id").notNull(),
+  productId: int4("product_id").notNull(),
 });
 
-db
+
+await db
   .select({
     id: orders.id,
     shippedDate: orders.shippedDate,
@@ -783,12 +775,8 @@ db
   .leftJoin(details, eq(orders.id, details.orderId))
   .groupBy(orders.id)
   .orderBy(asc(orders.id))
-  .all();
 ```
 
 ### $count
-<$count />
 
-## ---
-
-## ---
+<$count/>

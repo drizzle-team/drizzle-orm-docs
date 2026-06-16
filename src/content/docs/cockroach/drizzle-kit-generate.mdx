@@ -32,13 +32,13 @@ Drizzle Kit `generate` command triggers a sequence of events:
 
 <Section>
 ```typescript filename="src/schema.ts"
-import * as p from "./drizzle-orm/cockroach-core";
+import * as p from "drizzle-orm/cockroach-core";
 
 export const users = p.cockroachTable("users", {
-  id: p.serial().primaryKey(),
-  name: p.text(),
-  email: p.text().unique(), 
-};
+  id: p.int4().primaryKey(),
+  name: p.string(),
+  email: p.string().unique(), 
+});
 ```
 ```                                  
 ┌────────────────────────┐                  
@@ -60,9 +60,10 @@ export const users = p.cockroachTable("users", {
 -- drizzle/20242409125510_premium_mister_fear/migration.sql
 
 CREATE TABLE "users" (
- "id" SERIAL PRIMARY KEY,
- "name" TEXT,
- "email" TEXT UNIQUE
+	"id" int4 PRIMARY KEY,
+	"name" string,
+	"email" string,
+	CONSTRAINT "users_email_key" UNIQUE("email")
 );
 ```
 </Section>
@@ -161,10 +162,6 @@ INSERT INTO "users" ("name") VALUES('Dandrew');
 
 ### Ignore conflicts
 
-<Callout type='warning'>
-`--ignore-conflicts` available starting from `drizzle-orm@1.0.0-beta.16`
-</Callout>
-
 In case you need `generate` command to skip commutativity checks and bypass it, you can use `--ignore-conflicts`. If there is a situation you want to use it, then
 there is a big chance that `drizzle-kit` didn't check migrations right and it's a bug. Please report us your case, so we can fix it
 
@@ -182,7 +179,6 @@ drizzle-kit generate --ignore-conflicts
 | `custom`      | generate empty SQL for custom migration              |
 | `name`        | generate migration with custom name                  |
 | `ignore-conflicts` | skip commutativity conflict checks, default is `false` |
-
 <rem025/>
 
 <Npx>

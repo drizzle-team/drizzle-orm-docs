@@ -1,14 +1,6 @@
 import Npm from '@mdx/Npm.astro';
 import Callout from '@mdx/Callout.astro';
 
-<Callout type="error">
-Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
-
-You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
-
-This version of `typebox` is using new `typebox` package
-</Callout>
-
 # typebox
 
 #### Install the dependencies
@@ -33,10 +25,10 @@ import { Type } from 'typebox';
 import { Value } from 'typebox/value';
 
 const users = cockroachTable('users', {
-	id: int4('id').primaryKey().generatedAlwaysAsIdentity(),
-	name: text('name').notNull(),
-	email: text('email').notNull(),
-	role: text('role', { enum: ['admin', 'user'] }).notNull(),
+	id: int4().primaryKey().generatedAlwaysAsIdentity(),
+	name: text().notNull(),
+	email: text().notNull(),
+	role: text({ enum: ['admin', 'user'] }).notNull(),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

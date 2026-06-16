@@ -6,15 +6,15 @@ instance, you can leverage the `withReplicas()` function within Drizzle
 
 ```ts copy
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { boolean, jsonb, cockroachTable, serial, text, timestamp, withReplicas } from 'drizzle-orm/cockroach-core';
+import { drizzle } from 'drizzle-orm/cockroach';
+import { boolean, jsonb, cockroachTable, int4, string, timestamp, withReplicas } from 'drizzle-orm/cockroach-core';
 
-const usersTable = cockroachTable('users', {
-	id: serial('id' as string).primaryKey(),
-	name: text('name').notNull(),
-	verified: boolean('verified').notNull().default(false),
-	jsonb: jsonb('jsonb').$type<string[]>(),
-	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+const usersTable = cockroachTable("users", {
+  id: int4().primaryKey(),
+  name: string().notNull(),
+  verified: boolean().notNull().default(false),
+  jsonb: jsonb().$type<string[]>(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 const primaryDb = drizzle("postgres://user:password@host:port/primary_db");

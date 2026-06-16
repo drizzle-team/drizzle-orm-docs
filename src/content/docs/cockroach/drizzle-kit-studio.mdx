@@ -27,12 +27,12 @@ import { defineConfig } from "drizzle-kit";
 export default defineConfig({
   dialect: "cockroach",
   dbCredentials: {
-    url: "cockroach://user:password@host:port/dbname"
+    url: "postgresql://user:password@host:port/dbname"
   },
 });
 ```
 ```shell
-npx drizzle-kit migrate
+npx drizzle-kit studio
 ```
 </Section>
 

@@ -99,9 +99,6 @@ const users = pgTable('users', {
 
 const userUpdateSchema = createUpdateSchema(users);
 
-const user = { id: 5, name: 'John' };
-const parsed: ArkErrors |  { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user);  // `id` will be omitted
-
 const user = { age: 35 };
 const parsed: ArkErrors | { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
 
