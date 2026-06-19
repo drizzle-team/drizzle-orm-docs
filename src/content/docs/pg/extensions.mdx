@@ -31,7 +31,7 @@ For more info please refer to the official pg_vector docs **[docs.](https://gith
 <Section>
 ```ts
 const table = pgTable('table', {
-	embedding: vector({ dimensions: 3 })
+	embedding: vector({ dimensions: 3 }),
 	embedding2: vector({ dimensions: 3 }).default([0, -2, 3])
 })
 ```
@@ -39,7 +39,7 @@ const table = pgTable('table', {
 ```sql
 CREATE TABLE "table" (
 	"embedding" vector(3),
-	"embedding" vector(3) DEFAULT '[0,-2,3]'
+	"embedding2" vector(3) DEFAULT '[0,-2,3]'
 );
 ```
 </Section>
@@ -103,7 +103,7 @@ export const table = pgTable('table', {
 ```
 
 ```sql
-CREATE TABLE IF "table" (
+CREATE TABLE "table" (
 	"bit" bit(5),
 	"bit2" bit(3) DEFAULT '101'
 );
@@ -232,7 +232,7 @@ const subquery = db.select({ embedding: items.embedding }).from(items).where(eq(
 db.select().from(items).orderBy(l2Distance(items.embedding, subquery)).limit(5)
 
 // SELECT (embedding <#> '[3,1,2]') * -1 AS inner_product FROM items;
-db.select({ innerProduct: sql`(${maxInnerProduct(items.embedding, [3,1,2])}) * -1` }).from(items)
+db.select({ innerProduct: sql`(${innerProduct(items.embedding, [3,1,2])}) * -1` }).from(items)
 
 // and more!
 ```
