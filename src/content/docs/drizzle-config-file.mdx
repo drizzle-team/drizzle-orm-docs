@@ -183,6 +183,22 @@ export default defineConfig({
 <rem025/>
 <SchemaFilePaths />
 
+### `casing`
+<rem025/>
+`casing` is responsible for in-code column keys casing for migration commands.
+|               |                      |
+| :------------ | :-----------------   |
+| type          | `'camelCase' \| 'snake_case'` |
+| default        | --                    |
+| commands      | `migrate` `push` `pull` `generate`   |
+<rem025/>
+```ts {4}
+import { defineConfig } from "drizzle-kit";
+export default defineConfig({
+  dialect: "postgresql",
+  casing: "snake_case", 
+});
+```
 
 ### `out`
 <rem025/>
