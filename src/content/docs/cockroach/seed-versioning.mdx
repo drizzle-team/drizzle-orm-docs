@@ -68,7 +68,7 @@ However, when the `1 minute 60 seconds` interval is inserted into a CockroachDB 
 You will be affected, if your table includes a unique column of type `interval`:
 
 ```ts
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { cockroachTable, interval } from "drizzle-orm/cockroach-core";
 import { seed } from "drizzle-seed";
 
@@ -88,7 +88,7 @@ main();
 You will be affected, if you use the unique `interval` generator in your seeding script, as shown in the script below:
 
 ```ts
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { cockroachTable, interval, char, varchar, text } from "drizzle-orm/cockroach-core";
 import { seed } from "drizzle-seed";
 
@@ -134,7 +134,7 @@ Ability to generate a unique string based on the length of the text column (e.g.
 You will be affected, if your table includes a column of a text-like type with a maximum length parameter or a unique column of a text-like type:
 
 ```ts
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { cockroachTable, char, varchar, text } from "drizzle-orm/cockroach-core";
 import { seed } from "drizzle-seed";
 
@@ -159,7 +159,7 @@ main();
 You will be affected, if you use the `string` generator in your seeding script, as shown in the script below:
 
 ```ts
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { cockroachTable, char, varchar, text } from "drizzle-orm/cockroach-core";
 import { seed } from "drizzle-seed";
 

@@ -217,11 +217,11 @@ export interface CustomTypeParams<T extends CustomTypeValues> {
 	/**
 	 * Optional mapping function, that is used for transforming data returned by transofmed to JSON in database data to desired format
 	 *
-	 * Used by [relational queries](https://orm.drizzle.team/docs/rqb-v2)
+	 * Used by [relational queries](https://orm.drizzle.team/docs/rqb)
 	 *
 	 * Defaults to {@link fromDriver} function
 	 * @example
-	 * For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb-v2) or [JSON functions](https://orm.drizzle.team/docs/json-functions), the result field will be returned as it's string representation, as opposed to bigint from regular query
+	 * For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb) or [JSON functions](https://orm.drizzle.team/docs/json-functions), the result field will be returned as it's string representation, as opposed to bigint from regular query
 	 * To handle that, we need a separate function to handle such field's mapping:
 	 * ```
 	 * fromJson(value: string): bigint {
@@ -249,7 +249,7 @@ export interface CustomTypeParams<T extends CustomTypeValues> {
 	 *
 	 * Additional mapping that could be required for such scenarios can be handled using {@link fromJson} function
 	 *
-	 * Used by [relational queries](https://orm.drizzle.team/docs/rqb-v2)
+	 * Used by [relational queries](https://orm.drizzle.team/docs/rqb)
 	 *
 	 * Following types are being casted to text by default: `bytea`, `geometry`, `timestamp`, `numeric`, `bigint`
 	 * @example

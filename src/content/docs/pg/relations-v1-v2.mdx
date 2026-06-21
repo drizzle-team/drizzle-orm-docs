@@ -25,7 +25,7 @@ Below is the table of contents. Click an item to jump to that section:
 
 - [What is working differently from v1](#what-is-working-differently-from-v1)  
 - [New features in v2](#what-is-new)  
-- [How to migrate relations definition from v1 to v2](#how-to-migrate-relations-schema-definition-from-v1-to-v2)  
+- [How to migrate relations definition from v1 to v2](#how-to-migrate-relations-schema-definition-from-v1-to)  
 - [How to migrate queries from v1 to v2](#how-to-migrate-queries-from-v1-to-v2)  
 - [Internal changes(imports, internal types, etc.)](#internal-changes)
 </Callout>
@@ -495,7 +495,7 @@ const response = db.query.users.findMany({
 });
 ```
 
-For a complete API Reference please check our [Select Filters docs](/docs/rqb-v2#select-filters)
+For a complete API Reference please check our [Select Filters docs](/docs/rqb#select-filters)
 </Callout>
 
 <Callout collapsed='Complex filter example using RAW'>
@@ -677,13 +677,13 @@ If you had MySQL dialect, you can remove `mode` from `drizzle()` as long as it's
 
 ##### **Option 2**: Manual migration
 
-If you want to migrate manually, you can check our [Drizzle Relations section](/docs/relations-v2) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
+If you want to migrate manually, you can check our [Drizzle Relations section](/docs/relations) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
 
 #### How to migrate queries from v1 to v2
 
 ##### Migrate `where` statements
 
-You can check our [Select Filters docs](/docs/rqb-v2#select-filters) to see examples and a complete API reference.
+You can check our [Select Filters docs](/docs/rqb#select-filters) to see examples and a complete API reference.
 
 With the new syntax, you can use `AND`, `OR`, `NOT`, and `RAW`, plus all the filtering operators that 
 were previously available in Relations v1.

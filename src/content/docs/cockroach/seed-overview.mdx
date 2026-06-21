@@ -40,12 +40,12 @@ With drizzle-seed, you get the best of both worlds: the ability to generate real
 In this example we will create 10 users with random names and ids
 
 ```ts {12}
-import { cockroachTable, integer, text } from "drizzle-orm/cockroach-core";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { cockroachTable, int4, text } from "drizzle-orm/cockroach-core";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 
 const users = cockroachTable("users", {
-  id: integer().primaryKey(),
+  id: int4().primaryKey(),
   name: text().notNull(),
 });
 
@@ -136,23 +136,23 @@ await seed(db, schema).refine((f) => ({
 Let's check a few examples with an explanation of what will happen:
 
 ```ts filename='schema.ts'
-import { cockroachTable, integer, text } from "drizzle-orm/cockroach-core";
+import { cockroachTable, int4, text } from "drizzle-orm/cockroach-core";
 
 export const users = cockroachTable("users", {
-  id: integer().primaryKey(),
+  id: int4().primaryKey(),
   name: text().notNull(),
 });
 
 export const posts = cockroachTable("posts", {
-  id: integer().primaryKey(),
+  id: int4().primaryKey(),
   description: text(),
-  userId: integer().references(() => users.id),
+  userId: int4().references(() => users.id),
 });
 ```
 
 **Example 1**: Seed only the `users` table with 20 entities and with refined seed logic for the `name` column
 ```ts filename='index.ts'
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 import * as schema from './schema.ts'
 
@@ -174,7 +174,7 @@ main();
 
 **Example 2**: Seed only the `users` table, excluding the `name` column from seeding
 ```ts filename='index.ts'
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 import * as schema from './schema.ts'
 
@@ -195,7 +195,7 @@ main();
 
 **Example 3**: Seed the `users` table with 20 entities and add 10 `posts` for each `user` by seeding the `posts` table and creating a reference from `posts` to `users`
 ```ts filename='index.ts'
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 import * as schema from './schema.ts'
 
@@ -218,7 +218,7 @@ main();
 **Example 4**: Seed the `users` table with 5 entities and populate the database with 100 `posts` without connecting them to the `users` entities. Refine `id` generation for `users` so 
 that it will give any int from `10000` to `20000` and remains unique, and refine `posts` to retrieve values from a self-defined array
 ```ts filename='index.ts'
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 import * as schema from './schema.ts'
 
@@ -277,19 +277,19 @@ The Drizzle Seed package has a few places where weighted random can be used:
 Let's check an example for both:
 
 ```ts filename="schema.ts"
-import { cockroachTable, integer, text, varchar, doublePrecision } from "drizzle-orm/cockroach-core";
+import { cockroachTable, int4, text, varchar, doublePrecision } from "drizzle-orm/cockroach-core";
 
 export const orders = cockroachTable(
   "orders",
   {
-    id: integer().primaryKey(),
+    id: int4().primaryKey(),
     name: text().notNull(),
     quantityPerUnit: varchar().notNull(),
     unitPrice: doublePrecision().notNull(),
-    unitsInStock: integer().notNull(),
-    unitsOnOrder: integer().notNull(),
-    reorderLevel: integer().notNull(),
-    discontinued: integer().notNull(),
+    unitsInStock: int4().notNull(),
+    unitsOnOrder: int4().notNull(),
+    reorderLevel: int4().notNull(),
+    discontinued: int4().notNull(),
   }
 );
 
@@ -297,10 +297,10 @@ export const details = cockroachTable(
   "details",
   {
     unitPrice: doublePrecision().notNull(),
-    quantity: integer().notNull(),
+    quantity: int4().notNull(),
     discount: doublePrecision().notNull(),
 
-    orderId: integer()
+    orderId: int4()
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
   }
@@ -310,7 +310,7 @@ export const details = cockroachTable(
 **Example 1**: Refine the `unitPrice` generation logic to generate `5000` random prices, with a 30% chance of prices between 10-100 and a 70% chance of prices between 100-300
 
 ```ts filename="index.ts"
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 import * as schema from './schema.ts'
 
@@ -325,11 +325,11 @@ async function main() {
                [
                    {
                        weight: 0.3,
-                       value: funcs.int({ minValue: 10, maxValue: 100 })
+                       value: f.int({ minValue: 10, maxValue: 100 })
                    },
                    {
                        weight: 0.7,
-                       value: funcs.number({ minValue: 100, maxValue: 300, precision: 100 })
+                       value: f.number({ minValue: 100, maxValue: 300, precision: 100 })
                    }
                ]
            ),
@@ -344,7 +344,7 @@ main();
 **Example 2**: For each order, generate 1 to 3 details with a 60% chance, 5 to 7 details with a 30% chance, and 8 to 10 details with a 10% chance
 
 ```ts filename="index.ts"
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/cockroach";
 import { seed } from "drizzle-seed";
 import * as schema from './schema.ts'
 
@@ -503,8 +503,8 @@ main();
 </Section>
 <Section>
 ```ts
-import type { AnyPgColumn } from "drizzle-orm/cockroach-core";
-import { integer, numeric, cockroachTable, text, timestamp, varchar } from "drizzle-orm/cockroach-core";
+import type { AnyCockroachColumn } from "drizzle-orm/cockroach-core";
+import { int4, numeric, cockroachTable, text, timestamp, varchar } from "drizzle-orm/cockroach-core";
 
 export const customers = cockroachTable('customer', {
 	id: varchar({ length: 256 }).primaryKey(),
@@ -523,7 +523,7 @@ export const customers = cockroachTable('customer', {
 export const employees = cockroachTable(
 	'employee',
 	{
-		id: integer().primaryKey(),
+		id: int4().primaryKey(),
 		lastName: text().notNull(),
 		firstName: text(),
 		title: text().notNull(),
@@ -535,19 +535,19 @@ export const employees = cockroachTable(
 		postalCode: text().notNull(),
 		country: text().notNull(),
 		homePhone: text().notNull(),
-		extension: integer().notNull(),
+		extension: int4().notNull(),
 		notes: text().notNull(),
-		reportsTo: integer().references((): AnyPgColumn => employees.id),
+		reportsTo: int4().references((): AnyCockroachColumn => employees.id),
 		photoPath: text(),
 	},
 );
 
 export const orders = cockroachTable('order', {
-	id: integer().primaryKey(),
+	id: int4().primaryKey(),
 	orderDate: timestamp().notNull(),
 	requiredDate: timestamp().notNull(),
 	shippedDate: timestamp(),
-	shipVia: integer().notNull(),
+	shipVia: int4().notNull(),
 	freight: numeric().notNull(),
 	shipName: text().notNull(),
 	shipCity: text().notNull(),
@@ -557,11 +557,11 @@ export const orders = cockroachTable('order', {
 
 	customerId: text().notNull().references(() => customers.id, { onDelete: 'cascade' }),
 
-	employeeId: integer().notNull().references(() => employees.id, { onDelete: 'cascade' }),
+	employeeId: int4().notNull().references(() => employees.id, { onDelete: 'cascade' }),
 });
 
 export const suppliers = cockroachTable('supplier', {
-	id: integer().primaryKey(),
+	id: int4().primaryKey(),
 	companyName: text().notNull(),
 	contactName: text().notNull(),
 	contactTitle: text().notNull(),
@@ -574,26 +574,26 @@ export const suppliers = cockroachTable('supplier', {
 });
 
 export const products = cockroachTable('product', {
-	id: integer().primaryKey(),
+	id: int4().primaryKey(),
 	name: text().notNull(),
 	quantityPerUnit: text().notNull(),
 	unitPrice: numeric().notNull(),
-	unitsInStock: integer().notNull(),
-	unitsOnOrder: integer().notNull(),
-	reorderLevel: integer().notNull(),
-	discontinued: integer().notNull(),
+	unitsInStock: int4().notNull(),
+	unitsOnOrder: int4().notNull(),
+	reorderLevel: int4().notNull(),
+	discontinued: int4().notNull(),
 
-	supplierId: integer().notNull().references(() => suppliers.id, { onDelete: 'cascade' }),
+	supplierId: int4().notNull().references(() => suppliers.id, { onDelete: 'cascade' }),
 });
 
 export const details = cockroachTable('order_detail', {
 	unitPrice: numeric().notNull(),
-	quantity: integer().notNull(),
+	quantity: int4().notNull(),
 	discount: numeric().notNull(),
 
-	orderId: integer().notNull().references(() => orders.id, { onDelete: 'cascade' }),
+	orderId: int4().notNull().references(() => orders.id, { onDelete: 'cascade' }),
 
-	productId: integer().notNull().references(() => products.id, { onDelete: 'cascade' }),
+	productId: int4().notNull().references(() => products.id, { onDelete: 'cascade' }),
 });
 
 ```

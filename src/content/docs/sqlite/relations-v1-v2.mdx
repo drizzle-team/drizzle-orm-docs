@@ -324,7 +324,7 @@ There are a few new function were added to custom types, so you can control how 
 
 <Callout collapsed='fromJson'>
 Optional mapping function, that is used for transforming data returned by transofmed to JSON in database data to desired format
-For example, when querying blob column via [RQB](/docs/sqlite/rqb-v2) or JSON functions, the result field will be returned as it's hex string representation, as opposed to Buffer from regular query
+For example, when querying blob column via [RQB](/docs/sqlite/rqb) or JSON functions, the result field will be returned as it's hex string representation, as opposed to Buffer from regular query
 To handle that, we need a separate function to handle such field's mapping:
 ```ts
 fromJson(value: string): Buffer {
@@ -347,7 +347,7 @@ to:
 <Callout collapsed='forJsonSelect'>
 Optional selection modifier function, that is used for modifying selection of column inside JSON functions
 Additional mapping that could be required for such scenarios can be handled using fromJson function
-Used by [relational queries](/docs/sqlite/rqb-v2)
+Used by [relational queries](/docs/sqlite/rqb)
 
 ```ts
 forJsonSelect(identifier: SQL, sql: SQLGenerator): SQL {
@@ -568,7 +568,7 @@ const response = db.query.users.findMany({
 });
 ```
 
-For a complete API Reference please check our [Select Filters docs](/docs/sqlite/rqb-v2#select-filters)
+For a complete API Reference please check our [Select Filters docs](/docs/sqlite/rqb#select-filters)
 </Callout>
 
 <Callout collapsed='Complex filter example using RAW'>
@@ -743,13 +743,13 @@ If you had MySQL dialect, you can remove `mode` from `drizzle()` as long as it's
 
 ##### **Option 2**: Manual migration
 
-If you want to migrate manually, you can check our [Drizzle Relations section](/docs/sqlite/relations-v2) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
+If you want to migrate manually, you can check our [Drizzle Relations section](/docs/sqlite/relations) for the complete API reference and examples of one-to-one, one-to-many, and many-to-many relations.
 
 #### How to migrate queries from v1 to v2
 
 ##### Migrate `where` statements
 
-You can check our [Select Filters docs](/docs/sqlite/rqb-v2#select-filters) to see examples and a complete API reference.
+You can check our [Select Filters docs](/docs/sqlite/rqb#select-filters) to see examples and a complete API reference.
 
 With the new syntax, you can use `AND`, `OR`, `NOT`, and `RAW`, plus all the filtering operators that 
 were previously available in Relations v1.
