@@ -57,11 +57,11 @@ camelCase.table / camelCase.view / camelCase.materializedView / camelCase.schema
 You can still use drizzle-zod/valibot/typebox/arktype validation packages but all new update will be added to Drizzle ORM directly
 </Callout>
 
-- drizzle-zod -> drizzle-orm/zod
-- drizzle-valibot -> drizzle-orm/valibot
-- drizzle-typebox -> drizzle-orm/typebox-legacy (using @sinclair/typebox)
-- drizzle-typebox -> drizzle-orm/typebox (using typebox)
-- drizzle-arktype -> drizzle-orm/arktype
+- drizzle-zod -> [drizzle-orm/zod](/docs/zod)
+- drizzle-valibot -> [drizzle-orm/valibot](/docs/valibot)
+- drizzle-typebox -> [drizzle-orm/typebox-legacy](/docs/typebox-legacy) (using @sinclair/typebox)
+- drizzle-typebox -> [drizzle-orm/typebox](/docs/typebox) (using typebox)
+- drizzle-arktype -> [drizzle-orm/arktype](/docs/arktype)
 - new `drizzle-orm/effect-schema` package added
 
 #### `.array()` is no longer chainable
@@ -161,9 +161,9 @@ export default defineConfig({
 
 The `--strict` flag has been removed — its behavior is now the default. `drizzle-kit push` always prompts for confirmation for data-loss statements unless the `--force` flag is passed. Use [drizzle-kit push --explain](/docs/drizzle-kit-push) to preview the SQL that would be executed before running it.
 
-#### Drizzle seed: UUID generator upgraded to v4
+{/* #### Drizzle seed: UUID generator upgraded to v4
 
-The UUID generator now produces RFC 4122 v4 compliant UUIDs, ensuring compatibility with Zod v4 validation. Use `{ version: '1' }` to keep old behavior, or `{ version: '2' | '3' }` for newer generators.
+The UUID generator now produces RFC 4122 v4 compliant UUIDs, ensuring compatibility with Zod v4 validation. Use `{ version: '1' }` to keep old behavior, or `{ version: '2' | '3' }` for newer generators. */}
 
 ## Other features
 
@@ -251,7 +251,7 @@ How it works:
 - Computes the DDL diff from parent snapshot to each branch leaf
 - Checks conflicts using a footprint map of which DDL statement types can interfere
 
-If conflicts are found, the report tells you exactly which migrations on which branches are incompatible and which statements collide.
+If conflicts are found, the report tells you exactly which migrations on which branches are incompatible
 
 #### `drizzle-kit --ignore-conflicts` flag
 
@@ -302,33 +302,3 @@ Top-level `await` is now supported in `drizzle.config.ts` and schema files on No
 #### TS Schema file processing
 
 Only files with the following extensions are processed: `.js`, `.mjs`, `.cjs`, `.jsx`, `.ts`, `.mts`, `.cts`, `.tsx`. All other file types are ignored.
-
-#### Drizzle Seed: Ignore columns in refinements
-
-Skip specific columns during seeding — the database default will be used instead:
-
-```ts
-await seed(db, schema).refine((f) => ({
-  users: {
-    count: 5,
-    columns: {
-      name: f.fullName(),
-      photo: false, // skip — DB default will be used
-    },
-  },
-}));
-```
-
-#### `min` / `max` parameters
-
-Time-based generators now accept boundaries:
-
-```ts
-funcs.time({ min: '13:12:13', max: '15:12:13' })
-funcs.timestamp({ min: '2024-01-01T00:00:00Z', max: '2025-01-01T00:00:00Z' })
-funcs.datetime({ min: '2024-01-01', max: '2025-01-01' })
-```
-
-#### Drizzle Seed: Sequences auto-updated after seed
-
-For `smallint`/`integer`/`bigint`/`smallserial`/`serial`/`bigserial` columns, the matching sequence is automatically set to the column's max seeded value via `setval(pg_get_serial_sequence(...))`.
