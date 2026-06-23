@@ -314,7 +314,7 @@ export const usersToGroups = pgTable(
       .notNull()
       .references(() => groups.id),
   },
-  (t) => [primaryKey({ columns: [t.userId, t.groupId] })],
+  (table) => [primaryKey({ columns: [table.userId, table.groupId] })],
 );
 
 export const relations = defineRelations({ users, groups, usersToGroups },
@@ -444,7 +444,7 @@ export const usersToGroups = p.pgTable(
       .notNull()
       .references(() => groups.id, { onDelete: "cascade" }),
   },
-  (t) => [p.primaryKey({ columns: [t.groupId, t.userId] })]
+  (table) => [p.primaryKey({ columns: [table.groupId, table.userId] })]
 );
 ```
 </Section>
@@ -731,7 +731,7 @@ export const posts = p.pgTable('posts', {
 	id: p.integer().primaryKey(),
 	content: p.text(),
 	authorId: p.integer('author_id'),
-}, (t) => [
+}, (table) => [
   index('posts_author_id_idx').on(table.authorId)
 ]);
 
@@ -802,7 +802,7 @@ export const usersToGroups = p.pgTable(
       .notNull()
       .references(() => groups.id),
   },
-  (t) => [p.primaryKey({ columns: [t.userId, t.groupId] })],
+  (table) => [p.primaryKey({ columns: [table.userId, table.groupId] })],
 );
 
 export const relations = defineRelations({ users, groups, usersToGroups },
@@ -846,8 +846,8 @@ export const usersToGroups = p.pgTable(
       .notNull()
       .references(() => groups.id),
   },
-  (t) => [
-    p.primaryKey({ columns: [t.userId, t.groupId] }),
+  (table) => [
+    p.primaryKey({ columns: [table.userId, table.groupId] }),
     p.index('users_to_groups_user_id_idx').on(table.userId),
     p.index('users_to_groups_group_id_idx').on(table.groupId),
     p.index('users_to_groups_composite_idx').on(table.userId, table.groupId),
