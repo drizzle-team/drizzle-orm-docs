@@ -367,15 +367,20 @@ export default defineConfig({
 ### `migrations`
 <rem025/>
 
-When running `drizzle-kit migrate` - drizzle will records about 
-successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema(PostgreSQL only).
+When running `drizzle-kit migrate` - drizzle will record  successfully applied migrations 
+in your database in log table named `__drizzle_migrations` in `public` schema (schema is PostgreSQL only). 
+The `migrations` config options let you change both the `table` name and `schema` of this log table.
 
-`migrations` config options lets you change both migrations log `table` name and `schema`.
+You can also customize migration file prefixes to make the format suitable for your migration tools:
+- `index` is the default type and will result in `0001_name.sql` file names;
+- `supabase` and timestamp are equal and will result in `20240627123900_name.sql` file names;
+- `unix` will result in unix seconds prefixes `1719481298_name.sql` file names;
+- `none` will omit the prefix completely;
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | `{ table: string, schema: string }` |
-| default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
+| type          | `{ table: string, schema: string, prefix: string }` |
+| default       | `{ table: "__drizzle_migrations", schema: "drizzle", prefix: "index" }`                    |
 | commands      | `migrate`   |
 
 <rem025/>
@@ -387,6 +392,7 @@ export default defineConfig({
   migrations: {
     table: 'my-migrations-table', // `__drizzle_migrations` by default
     schema: 'public', // used in PostgreSQL only, `drizzle` by default
+    prefix: 'timestamp'  // or `index`/`timestamp`/`unix`/`none`
   },
 });
 ```
@@ -471,7 +477,7 @@ If you want to run multiple projects with one database - check out [our guide](/
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
 `tablesFilter` option lets you specify [`glob`](https://www.digitalocean.com/community/tools/glob?comments=true&glob=/**/*.js&matches=false&tests=//%20This%20will%20match%20as%20it%20ends%20with%20'.js'&tests=/hello/world.js&tests=//%20This%20won't%20match!&tests=/test/some/globs) 
-based table names filter, e.g. `["users", "user_info"]` or `"user*"`
+based table names filter, e.g. `["users", "user_info"]` or `"user*"`.
 
 |               |                      |
 | :------------ | :-----------------   |
@@ -497,7 +503,7 @@ Was changed starting from `1.0.0-beta.1` version!
 `drizzle-kit push` and `drizzle-kit pull` will by default manage all tables in `public` schema.
 You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
 
-`schemaFilter` option lets you specify list of schemas for Drizzle Kit to manage
+`schemaFilter` option lets you specify list of schemas for Drizzle Kit to manage.
 
 |               |                      |
 | :------------ | :-----------------   |
