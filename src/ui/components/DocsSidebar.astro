@@ -18,7 +18,9 @@ const { tree, headings, forLanding, customSlug } = Astro.props;
 
 <div class="aside invisible" id="aside">
   <div class="aside-content aside-scroll scrollbar">
-    <DialectSwitcher slug={slug!} />
+    <div class="db-switcher-mobile">
+      <DialectSwitcher slug={slug!} />
+    </div>
     <SidebarContentWrap filteredHeadings={headings} slug={customSlug || slug} tree={tree} forLanding={forLanding} />
     <ThemeSelectorMobile />
     <AsideSocials />
@@ -134,7 +136,16 @@ document.addEventListener("astro:after-swap", mainScript);
     overscroll-behavior: contain;
   }
 
+  .db-switcher-mobile {
+    display: none;
+  }
+
   @media screen and (max-width: 768px) {
+    .db-switcher-mobile {
+      display: block;
+      padding: 16px 0;
+    }
+
     html.dark .aside {
       background: #111;
       border-right: none;

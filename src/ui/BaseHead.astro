@@ -10,11 +10,13 @@ const { title, description } = Astro.props;
 const defaultDescription =
   "Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.";
 const isProd = import.meta.env.PROD_BUILD === "true" || process.env.PROD_BUILD === "true";
+const noindex = /\/docs\/[^/]+\/get-started\/?$/.test(Astro.url.pathname);
+const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "index,follow";
 ---
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="robots" content={isProd ? "index,follow" : "noindex,nofollow"} />
+  <meta name="robots" content={robots} />
   <link rel="sitemap" href="/sitemap-index.xml" />
   <ViewTransitions />
   <meta

@@ -58,7 +58,7 @@ const darkStylesSVGString = svgCodeDark.replace(
 
 <div class="db-switcher">
   <select
-    id="db-switcher-select"
+    class="db-switcher-select"
     style="opacity: 0; position: absolute; inset: 0; width: 100%; cursor: pointer"
   >
     {
@@ -104,8 +104,7 @@ const darkStylesSVGString = svgCodeDark.replace(
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    style="margin: 0 4px 0 auto"
-    class="lucide lucide-chevrons-up-down-icon lucide-chevrons-up-down"
+    style="margin-left: auto;"
   >
     <path d="m7 15 5 5 5-5"></path>
     <path d="m7 9 5-5 5 5"></path>
@@ -115,10 +114,9 @@ const darkStylesSVGString = svgCodeDark.replace(
 <style>
   .db-switcher {
     display: flex;
-    border: 1px solid #21272e1f;
+    border: none;
     border-radius: 4px;
     align-items: center;
-    padding: 4px;
     color: rgb(51, 65, 85);
     text-decoration: none;
     font-weight: 600;
@@ -131,8 +129,9 @@ const darkStylesSVGString = svgCodeDark.replace(
       border-color 0.2s,
       background-color 0.2s;
     flex-shrink: 0;
-    margin-bottom: -56px;
-    margin-top: 16px;
+    height: 33px;
+    min-width: 154px;
+    padding: 3px 8px;
     cursor: pointer;
   }
 
@@ -155,15 +154,13 @@ const darkStylesSVGString = svgCodeDark.replace(
   .img_light {
     visibility: visible;
     display: flex;
-    margin-right: 6px;
-    border: 1px solid #e0e0e0;
-    width: 32px;
-    height: 32px;
+    margin-right: 8px;
+    width: 22px;
+    height: 22px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    background: white;
+    border-radius: 5px;
   }
 
   .img_dark {
@@ -172,9 +169,7 @@ const darkStylesSVGString = svgCodeDark.replace(
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    border: 1px solid rgb(41 41 41);
-    background: #141414;
+    border-radius: 5px;
     width: 0;
     height: 0;
     margin: 0;
@@ -195,21 +190,21 @@ const darkStylesSVGString = svgCodeDark.replace(
 
   html.dark .img_dark {
     visibility: visible;
-    width: 32px;
-    height: 32px;
-    border: 1px solid #404040;
+    width: 22px;
+    height: 22px;
     margin-right: 8px;
   }
 </style>
 
 <script is:inline define:vars={{ dialectSwitcherItems }}>
-  document.addEventListener("astro:page-load", () => {
-    const dbSelect = document.getElementById("db-switcher-select");
-
-    dbSelect.addEventListener("change", (e) => {
-      window.location.href = dialectSwitcherItems.find(
-        ({ id }) => id === e.target.value,
-      ).path;
+  if (!window.__dbSwitcherBound) {
+    window.__dbSwitcherBound = true;
+    document.addEventListener("change", (e) => {
+      const sel = e.target;
+      if (!sel.classList || !sel.classList.contains("db-switcher-select"))
+        return;
+      const item = dialectSwitcherItems.find(({ id }) => id === sel.value);
+      if (item) window.location.href = item.path;
     });
-  });
+  }
 </script>
