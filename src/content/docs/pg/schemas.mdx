@@ -1,0 +1,41 @@
+import Section from '@mdx/Section.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Table schemas
+
+If you declare an entity within a schema, query builder will prepend schema names in queries:<br/>
+`select * from "schema"."users"`
+
+<Section>
+    ```ts copy {3,5,7}
+    import { serial, text, pgSchema } from "drizzle-orm/pg-core";
+
+    export const mySchema = pgSchema("my_schema");
+
+    export const colors = mySchema.enum('colors', ['red', 'green', 'blue']);
+
+    export const mySchemaUsers = mySchema.table('users', {
+      id: serial('id').primaryKey(),
+      name: text('name'),
+      color: colors('color').default('red'),
+    });
+
+    
+    ```
+    ```sql
+    CREATE SCHEMA "my_schema";
+
+    CREATE TYPE "my_schema"."colors" AS ENUM ('red', 'green', 'blue');
+
+    CREATE TABLE "my_schema"."users" (
+      "id" serial PRIMARY KEY,
+      "name" text,
+      "color" "my_schema"."colors" DEFAULT 'red'
+    );
+    ```
+    </Section>
+
+{/* TODO: ??? example > **Warning**
+> If you will have tables with same names in different schemas then drizzle will respond with `never[]` error in result types and error from database
+>
+> In this case you may use [alias syntax](./joins#join-aliases-and-self-joins) */}

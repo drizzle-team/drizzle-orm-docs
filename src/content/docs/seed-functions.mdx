@@ -218,11 +218,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates a date within the given range
 
-|  | param      | default                 | type
-|:-| :--------  | :--------------         | :--------
-|  |`minDate`   |`new Date('2020-05-08')` | `string \| Date`
-|  |`maxDate`   |`new Date('2028-05-08')` | `string \| Date`
-|  |`arraySize` |--                       |`number`
+|  | param      | default                                                                                                   | type
+|:-| :--------  | :--------------                                                                                           | :--------
+|  |`minDate`   |``` `'2024-05-08' - 4 years` - if maxDate is not set``` ``` `maxDate - 8 years`  - if maxDate is set ```   |`string \| Date`
+|  |`maxDate`   |``` `'2024-05-08' + 4 years` - if minDate is not set``` ``` `minDate + 8 years`  - if minDate is set ```   |`string \| Date`
+|  |`arraySize` |--                                                                                                         |`number`
 
 <Callout type='warning'>
 If only one of the parameters (`minDate` or `maxDate`) is provided, the unspecified parameter will be calculated by adding or subtracting 8 years to/from the specified one
@@ -257,9 +257,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates time in 24-hour format
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`arraySize` |--          |`number`
+|  | param      | default             | type
+|:-| :--------  | :--------           | :--------
+|  |`min`       |`'00:00:00.000Z'`    |`string \| Date`
+|  |`max`       |`'23:59:59.999Z'`    |`string \| Date`
+|  |`arraySize` |--                   |`number`
 
 <rem025 />
 ```ts 
@@ -269,6 +271,12 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   users: {
     columns: {
       birthTime: funcs.time({
+        // lower border of range.
+        min: "11:12:13.141",
+
+        // upper border of range.
+        max: "15:16:17.181",
+
         // number of elements in each one-dimensional array. 
         // (If specified, arrays will be generated.)
         arraySize: 3
@@ -284,9 +292,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates timestamps
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`arraySize` |--          |`number`
+|  | param           | default                                                                                       | type
+|:-| :--------       | :--------                                                                                     | :--------
+|  |`min`            |``` `'2024-05-08' - 2 years` - if max is not set``` ``` `max - 4 years` - if max is set ```    |`string \| Date`
+|  |`max`            |``` `'2024-05-08' + 2 years` - if min is not set``` ``` `min + 4 years` - if min is set ```    |`string \| Date`
+|  |`arraySize`      |--                                                                                             |`number`
 
 <rem025 />
 ```ts 
@@ -296,6 +306,12 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   orders: {
     columns: {
       shippedDate: funcs.timestamp({
+        // lower border of range.
+        min: "2025-03-07T11:12:13.141",
+
+        // upper border of range.
+        max: "2025-03-08T15:16:17.181",
+
         // number of elements in each one-dimensional array. 
         // (If specified, arrays will be generated.)
         arraySize: 3
@@ -311,9 +327,11 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
 <rem025 />
 Generates datetime objects
 
-|  | param      | default    | type
-|:-| :--------  | :--------  | :--------
-|  |`arraySize` |--          |`number`
+|  | param        | default                                                                                       | type
+|:-| :--------    | :--------                                                                                     | :--------
+|  |`min`         |``` `'2024-05-08' - 2 years` - if max is not set``` ``` `max - 4 years`  - if max is set ```   |`string \| Date`
+|  |`max`         |``` `'2024-05-08' + 2 years` - if min is not set``` ``` `min + 4 years`  - if min is set ```   |`string \| Date`
+|  |`arraySize`   |--                                                                                             |`number`
 <rem025 />
 ```ts 
 import { seed } from "drizzle-seed";
@@ -322,6 +340,12 @@ await seed(db, schema, { count: 1000 }).refine((funcs) => ({
   orders: {
     columns: {
       shippedDate: funcs.datetime({
+        // lower border of range.
+        min: "2025-03-07 13:12:13Z",
+        
+        // upper border of range.
+        max: "2025-03-09 15:12:13Z",
+
         // number of elements in each one-dimensional array. 
         // (If specified, arrays will be generated.)
         arraySize: 3

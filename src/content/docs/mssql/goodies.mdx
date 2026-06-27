@@ -1,0 +1,186 @@
+import Callout from '@mdx/Callout.astro';
+import CodeTabs from '@mdx/CodeTabs.astro';
+
+## Type API
+Use Drizzle's type helpers to infer `select` and `insert` models from a MSSQL table schema.
+
+```ts
+import { int, text, mssqlTable } from 'drizzle-orm/mssql-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
+
+const users = mssqlTable('users', {
+  id: int().identity().primaryKey(),
+  name: text().notNull(),
+});
+
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+
+## Logging
+Enable default query logging by passing `{ logger: true }` to `drizzle`.
+
+```ts
+import { drizzle } from "drizzle-orm/node-mssql";
+
+const db = drizzle(process.env.DB_URL, { logger: true });
+```
+
+You can change the logs destination by creating a `DefaultLogger` instance and providing a custom `writer` to it:
+```typescript copy
+import { DefaultLogger, type LogWriter } from "drizzle-orm/logger";
+import { drizzle } from "drizzle-orm/node-mssql";
+
+class MyLogWriter implements LogWriter {
+  write(message: string) {
+    // Write to file, stdout, etc.
+  }
+}
+
+const logger = new DefaultLogger({ writer: new MyLogWriter() });
+const db = drizzle(process.env.DB_URL, { logger });
+```
+
+You can also provide a custom logger.
+
+```ts
+import type { Logger } from 'drizzle-orm/logger';
+import { drizzle } from "drizzle-orm/node-mssql";
+
+class MyLogger implements Logger {
+  logQuery(query: string, params: unknown[]): void {
+    console.log({ query, params });
+  }
+}
+
+const db = drizzle(process.env.DB_URL, { logger: new MyLogger() });
+```
+
+## Multi-project schema
+Use `mssqlTableCreator` to customize table names when several projects share one database.
+
+```ts
+import { int, text, mssqlTableCreator } from 'drizzle-orm/mssql-core';
+
+const mssqlTable = mssqlTableCreator((name) => `project1_${name}`);
+
+export const users = mssqlTable('users', {
+  id: int().identity().primaryKey(),
+  name: text().notNull(),
+});
+
+```
+
+```ts
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  schema: './src/schema/*',
+  out: './drizzle',
+  dialect: 'mssql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+  tablesFilter: ['project1_*'],
+});
+```
+```sql
+CREATE TABLE [project1_users] (
+	[id] int IDENTITY(1, 1),
+	[name] text NOT NULL,
+	CONSTRAINT [project1_users_pkey] PRIMARY KEY([id])
+);
+```
+
+## Printing SQL Query
+Print generated SQL from a query with `.toSQL()`.
+
+```ts
+const query = db
+  .select({ id: users.id, name: users.name })
+  .from(users)
+  .groupBy(users.id)
+  .toSQL();
+```
+
+## Raw SQL Queries
+Use `db.execute` for raw parametrized SQL.
+
+```ts
+import { sql } from 'drizzle-orm';
+
+const statement = sql`select * from ${users} where ${users.id} = ${userId}`;
+const result = await db.execute(statement);
+```
+
+## Standalone Query Builder
+Use the MSSQL query builder without creating a database instance.
+
+```ts
+import { QueryBuilder } from 'drizzle-orm/mssql-core';
+
+const qb = new QueryBuilder();
+const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+const { sql, params } = query.toSQL();
+```
+
+## Get Typed Columns
+Use `getColumns` to get a typed column map, which is useful when excluding fields from a selection.
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+```ts
+import { getColumns } from 'drizzle-orm';
+import { users } from './schema';
+
+const { password, role, ...rest } = getColumns(users);
+
+await db.select({ ...rest }).from(users);
+```
+```ts
+import { int, text, mssqlTable } from "drizzle-orm/mssql-core";
+
+export const user = mssqlTable("user", {
+  id: int().identity().primaryKey(),
+  name: text(),
+  email: text(),
+  password: text(),
+  role: text().$type<"admin" | "customer">(),
+});
+```
+</CodeTabs>
+
+## Get Table Information
+Use `getTableConfig` to inspect PostgreSQL table metadata.
+
+```ts
+import { getTableConfig, mssqlTable } from 'drizzle-orm/mssql-core';
+
+export const table = mssqlTable(...);
+
+const { columns, indexes, foreignKeys, checks, primaryKeys, name, schema } =
+  getTableConfig(table);
+```
+
+## Compare Object Types
+Use `is()` instead of `instanceof` to check Drizzle object types.
+
+```ts
+import { Column, is } from 'drizzle-orm';
+
+if (is(value, Column)) {
+  // value is narrowed to Column
+}
+```
+
+## Mock Driver
+Use `drizzle.mock()` when you need a typed database object without a real PostgreSQL connection.
+
+```ts
+import { drizzle } from 'drizzle-orm/node-mssql';
+import * as schema from './schema';
+
+const db = drizzle.mock({ schema });
+```

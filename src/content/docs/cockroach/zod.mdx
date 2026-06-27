@@ -1,0 +1,177 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+# zod
+
+### Install the dependencies
+
+<Npm>
+drizzle-orm@rc zod
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const users = cockroachTable('users', {
+  id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
+  age: int4().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Will parse successfully
+```
+
+Enums are also supported.
+
+```ts copy
+import { cockroachEnum } from 'drizzle-orm/cockroach-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const roles = cockroachEnum('roles', ['admin', 'basic']);
+const rolesSchema = createSelectSchema(roles);
+const parsed: 'admin' | 'basic' = rolesSchema.parse(...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+import { createInsertSchema } from 'drizzle-orm/zod';
+
+const users = cockroachTable('users', {
+  id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
+  age: int4().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+import { createUpdateSchema } from 'drizzle-orm/zod';
+
+const users = cockroachTable('users', {
+  id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
+  age: int4().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { age: 35 };
+const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Will parse successfully
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Zod schema will overwrite it.
+
+```ts copy
+import { int4, jsonb, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = cockroachTable('users', {
+  id: int4().primaryKey(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: jsonb()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => schema.max(20), // Extends schema
+  bio: (schema) => schema.max(1000), // Extends schema before becoming nullable/optional
+  preferences: z.object({ theme: z.string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string,
+  bio: string | null;
+  preferences: {
+    theme: string;
+  };
+} = userSelectSchema.parse(...);
+```
+
+### Factory functions
+
+For more advanced use cases, you can use the `createSchemaFactory` function.
+
+**Use case: Using an extended Zod instance**
+
+```ts copy
+import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from '@hono/zod-openapi'; // Extended Zod instance
+
+const users = cockroachTable('users', {
+  id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
+  age: int4().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({ zodInstance: z });
+
+const userInsertSchema = createInsertSchema(users, {
+  // We can now use the extended instance
+  name: (schema) => schema.openapi({ example: 'John' })
+});
+```
+
+**Use case: Type coercion**
+
+```ts copy
+import { cockroachTable, timestamp } from 'drizzle-orm/cockroach-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = cockroachTable('users', {
+  ...,
+  createdAt: timestamp().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({
+  // This configuration will only coerce dates. Set `coerce` to `true` to coerce all data types or specify others
+  coerce: {
+    date: true
+  }
+});
+
+const userInsertSchema = createInsertSchema(users);
+// The above is the same as this:
+const userInsertSchema = z.object({
+  ...,
+  createdAt: z.coerce.date()
+});
+```
+
+### Data type reference
+
+CockroachDB data type mappings follow the CockroachDB column builders. See the [CockroachDB data types](/docs/cockroach/column-types) page for the full column reference.

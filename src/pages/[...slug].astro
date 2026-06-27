@@ -1,44 +1,165 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 
-import Link from '@mdx/Link.astro';
-import CustomHeader from '@components/CustomHeader.astro';
-import DocsLayout from '@/ui/DocsLayout.astro';
+import Link from "@mdx/Link.astro";
+import { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
+import DocsLayout from "@/ui/DocsLayout.astro";
+import CustomHeader from "@components/CustomHeader.astro";
+import {
+  commonFolders,
+  defaultDocsDialect,
+  dialectRelatedFolder,
+  isDocsDialectId,
+} from "@/dialect-docs";
+import pgMeta from "../content/docs/pg/_meta.json";
+import mysqlMeta from "../content/docs/mysql/_meta.json";
+import sqliteMeta from "../content/docs/sqlite/_meta.json";
+import singlestoreMeta from "../content/docs/singlestore/_meta.json";
+import mssqlMeta from "../content/docs/mssql/_meta.json";
+import cockroachMeta from "../content/docs/cockroach/_meta.json";
 
 export async function getStaticPaths() {
-  const metaFiles = import.meta.glob('../content/**/*.json');
-  const slugs: string[] = [];
-  const regex = /\.\.\/content\/(.*?)\/_meta\.json/;
-  
-  for(const meta in metaFiles) {
-    const {default: parsed} = await metaFiles[meta]() as {default: string[]};
+  const allDocsEntries = await getCollection("docs");
+  type DocsEntry = (typeof allDocsEntries)[number];
+  type DocsRoute = {
+    params: { slug: string };
+    props: { entry: DocsEntry; frontmatter: DocsEntry["data"] };
+  };
 
-    const metaSlug = meta.match(regex);
-    if (metaSlug) {
-      const extractedText = metaSlug[1];
+  const routes: DocsRoute[] = [];
+  const routeSlugs = new Set<string>();
+  const entriesBySlug = new Map<string, DocsEntry>(
+    allDocsEntries.map((entry) => [entry.slug, entry]),
+  );
+  const getMetaSlugs = (items: Array<string | string[]>): string[] =>
+    items.flatMap((item) => (Array.isArray(item) ? [`${item[0]}`] : []));
+  const metaSlugsByDialect = {
+    pg: getMetaSlugs(pgMeta),
+    mysql: getMetaSlugs(mysqlMeta),
+    sqlite: getMetaSlugs(sqliteMeta),
+    singlestore: getMetaSlugs(singlestoreMeta),
+    mssql: getMetaSlugs(mssqlMeta),
+    cockroach: getMetaSlugs(cockroachMeta),
+  };
+  const metaSlugSetsByDialect = {
+    pg: new Set(metaSlugsByDialect.pg),
+    mysql: new Set(metaSlugsByDialect.mysql),
+    sqlite: new Set(metaSlugsByDialect.sqlite),
+    singlestore: new Set(metaSlugsByDialect.singlestore),
+    mssql: new Set(metaSlugsByDialect.mssql),
+    cockroach: new Set(metaSlugsByDialect.cockroach),
+  };
+  const getDialectMetaSlugs = (dialectId: string) =>
+    isDocsDialectId(dialectId)
+      ? metaSlugsByDialect[dialectId]
+      : [];
+  const getDialectMetaSlugSet = (dialectId: string) =>
+    isDocsDialectId(dialectId)
+      ? metaSlugSetsByDialect[dialectId]
+      : new Set<string>();
 
-      parsed.forEach((key) => {
-        if(Array.isArray(key)) {
-          slugs.push(`${extractedText}/${key[0]}`);
-        }
-      })
+  const addRoute = (slug: string, entry: DocsEntry) => {
+    if (routeSlugs.has(slug)) {
+      return;
     }
-  }
+    routeSlugs.add(slug);
+    routes.push({
+      params: { slug },
+      props: { entry, frontmatter: entry.data },
+    });
+  };
 
-  const docEntries = await getCollection("docs", (entry) => {
-    return slugs.includes(`docs/${entry.slug}`);
+  const resolveDialectEntry = (dialectId: string, slug: string) => {
+    const dialectEntry = entriesBySlug.get(`${dialectId}/${slug}`);
+    if (dialectEntry) {
+      return dialectEntry;
+    }
+
+    const rootEntry = entriesBySlug.get(slug);
+    if (rootEntry) {
+      return rootEntry;
+    }
+
+    throw new Error(
+      `[docs] ${dialectId}/_meta.json references "${slug}", but neither src/content/docs/${dialectId}/${slug}.mdx nor src/content/docs/${slug}.mdx exists.`,
+    );
+  };
+
+  const addDialectMetaRoutes = (dialectId: string) => {
+    const routePrefix =
+      dialectId === defaultDocsDialect ? "docs" : `docs/${dialectId}`;
+    getDialectMetaSlugs(dialectId).forEach((slug) => {
+      addRoute(`${routePrefix}/${slug}`, resolveDialectEntry(dialectId, slug));
+    });
+  };
+
+  addDialectMetaRoutes(defaultDocsDialect);
+  dialectSwitcherItems.forEach((dialect) => {
+    if (
+      !dialect.id ||
+      dialect.id === defaultDocsDialect ||
+      !isDocsDialectId(dialect.id)
+    ) {
+      return;
+    }
+    addDialectMetaRoutes(dialect.id);
   });
-  return docEntries.map(entry => ({
-    params: { slug: `docs/${entry.slug}` }, props: { entry, frontmatter: entry.data },
-  }));
+
+  // Keep direct root docs URLs available even when they are not in PG's meta.
+  const rootDocsEntries = allDocsEntries.filter(
+    (entry) => !entry.slug.includes("/"),
+  );
+  rootDocsEntries.forEach((entry) =>
+    addRoute(`docs/${entry.slug}`, entry),
+  );
+
+  // 2. tutorials and guides for all dialects that list the folder in meta.
+  dialectRelatedFolder.forEach((folder) => {
+    const folderEntries = allDocsEntries.filter((entry) =>
+      entry.slug.startsWith(`${folder}/`),
+    );
+
+    [defaultDocsDialect, ...dialectSwitcherItems.map((dialect) => dialect.id)]
+      .filter(
+        (dialectId): dialectId is string =>
+          !!dialectId && isDocsDialectId(dialectId),
+      )
+      .forEach((dialectId) => {
+        if (!getDialectMetaSlugSet(dialectId).has(folder)) {
+          return;
+        }
+
+        const routePrefix =
+          dialectId === defaultDocsDialect ? "docs" : `docs/${dialectId}`;
+
+        folderEntries.forEach((entry) => {
+          const dialectEntry = entriesBySlug.get(`${dialectId}/${entry.slug}`);
+          addRoute(`${routePrefix}/${entry.slug}`, dialectEntry || entry);
+        });
+      });
+    });
+
+  // 3. Single shared folders (e.g. get-started) keep their direct root URLs.
+  commonFolders.forEach((folder) => {
+    const folderEntries = allDocsEntries.filter((entry) =>
+      entry.slug.startsWith(`${folder}/`),
+    );
+    folderEntries.forEach((entry) => addRoute(`docs/${entry.slug}`, entry));
+  });
+
+  return routes;
 }
 
 const { entry, frontmatter } = Astro.props;
 
 const { Content, headings } = await entry.render();
-
 ---
-<DocsLayout customTitle={entry.data.title} description={frontmatter.description} headings={headings}>
+
+<DocsLayout
+  customTitle={entry.data.title}
+  description={frontmatter.description}
+  headings={headings}
+>
   {frontmatter?.title && <CustomHeader>{frontmatter.title}</CustomHeader>}
   <Content components={{ a: Link }} />
 </DocsLayout>

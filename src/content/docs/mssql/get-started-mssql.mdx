@@ -1,0 +1,74 @@
+import Tab from '@mdx/Tab.astro';
+import Tabs from '@mdx/Tabs.astro';
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import Steps from '@mdx/Steps.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+import WhatsNextMSSQL from "@mdx/WhatsNextMSSQL.astro";
+
+# Drizzle \<\> MSSQL
+
+<br/>
+
+<Prerequisites>
+- Database [connection basics](/docs/mssql/connect-overview) with Drizzle
+- node-mssql [basics](https://github.com/tediousjs/node-mssql)
+</Prerequisites>
+
+Drizzle has native support for MSSQL connections with the `mssql` driver.
+
+#### Step 1 - Install packages
+<Npm>
+ drizzle-orm@rc mssql
+ -D drizzle-kit@rc
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+<CodeTabs items={["mssql", "mssql with config"]}>
+```typescript copy
+// Make sure to install the 'mssql' package 
+import { drizzle } from 'drizzle-orm/node-mssql';
+
+const db = drizzle(process.env.DATABASE_URL);
+ 
+const result = await db.execute('select 1');
+```
+```typescript copy
+// Make sure to install the 'mssql' package 
+import { drizzle } from 'drizzle-orm/node-mssql';
+
+const db = drizzle({
+  connection: process.env.DATABASE_URL,
+});
+ 
+const result = await db.execute('select 1');
+```
+</CodeTabs>
+
+<Callout type='warning'>
+As long as the `node-mssql` driver requires `await` on `Pool` initialization, we need to `await` it before each request - unless you are providing your own Pool instance to Drizzle. In that case, when you want to access `db.$client`, you first need to `await` it, and then use it
+
+```ts
+const awaitedClient = await db.$client.$instance();
+const response = awaitedClient.query...;
+```
+</Callout>
+
+If you need to provide your existing driver:
+
+```typescript copy
+// Make sure to install the 'mssql' package 
+import { drizzle } from "drizzle-orm/node-mssql";
+import { connect } from 'mssql';
+
+const pool = await connect(process.env.DATABASE_URL!);
+const db = drizzle({ client: pool });
+ 
+const result = await db.execute('select 1');
+```
+
+#### What's next?
+
+<WhatsNextMSSQL/>

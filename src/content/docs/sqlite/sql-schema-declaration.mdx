@@ -1,0 +1,362 @@
+import Callout from '@mdx/Callout.astro';
+import SimpleLinkCards from '@mdx/SimpleLinkCards.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Section from '@mdx/Section.astro';
+import Flex from "@mdx/Flex.astro"
+import LinksList from "@mdx/LinksList.astro"
+
+# Drizzle schema
+
+Drizzle lets you define a schema in TypeScript with various models and properties supported by the underlying database. 
+When you define your schema, it serves as the source of truth for future modifications in queries (using Drizzle-ORM)
+and migrations (using Drizzle-Kit).
+
+<Callout> 
+If you are using Drizzle-Kit for the migration process, make sure to export all the models defined in your schema files so that Drizzle-Kit can import them and use them in the migration diff process. 
+</Callout>
+
+<CodeTabs items={["Using imports", "Using callback", "Using import *"]}>
+```ts
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+export const usersTable = sqliteTable("users", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull(),
+  email: text().notNull().unique(),
+});
+```
+```ts
+import { sqliteTable } from "drizzle-orm/sqlite-core";
+
+export const usersTable = sqliteTable("users", (t) => ({
+  id: t.integer().primaryKey({ autoIncrement: true }),
+  name: t.text().notNull(),
+  age: t.integer().notNull(),
+  email: t.text().notNull().unique(),
+}));
+```
+```ts
+import * as t from "drizzle-orm/sqlite-core";
+
+export const usersTable = t.sqliteTable("users", {
+  id: t.integer().primaryKey({ autoIncrement: true }),
+  name: t.text().notNull(),
+  age: t.integer().notNull(),
+  email: t.text().notNull().unique(),
+});
+```
+</CodeTabs>
+
+## Organize your schema files 
+You can declare your SQL schema directly in TypeScript either in a single `schema.ts` file,
+or you can spread them around — whichever you prefer, all the freedom!
+
+#### Schema in 1 file
+The most common way to declare your schema with Drizzle is to put all your tables into one `schema.ts` file.
+
+> Note: You can name your schema file whatever you like. For example, it could be `models.ts`, or something else.
+
+This approach works well if you don't have too many table models defined, or if you're okay with keeping them all in one file
+
+Example:
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📜 schema.ts
+```
+
+In the `drizzle.config.ts` file, you need to specify the path to your schema file. With this configuration, Drizzle will 
+read from the `schema.ts` file and use this information during the migration generation process. For more information 
+about the `drizzle.config.ts` file and migrations with Drizzle, please check: [link](/docs/sqlite/drizzle-config-file)
+```ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: 'sqlite',
+  schema: './src/db/schema.ts'
+})
+```
+
+#### Schema in multiple files
+
+You can place your Drizzle models — such as tables, enums, sequences, etc. — not only in one file but in any file you prefer. 
+The only thing you must ensure is that you export all the models from those files so that the Drizzle kit can import 
+them and use them in migrations.
+
+One use case would be to separate each table into its own file.
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📂 schema
+          ├ 📜 users.ts
+          ├ 📜 countries.ts
+          ├ 📜 cities.ts
+          ├ 📜 products.ts
+          ├ 📜 clients.ts
+          └ 📜 etc.ts
+```
+
+In the `drizzle.config.ts` file, you need to specify the path to your schema folder. With this configuration, Drizzle will 
+read from the `schema` folder and find all the files recursively and get all the drizzle tables from there. For more information 
+about the `drizzle.config.ts` file and migrations with Drizzle, please check: [link](/docs/sqlite/drizzle-config-file)
+
+```ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  dialect: 'sqlite',
+  schema: './src/db/schema'
+})
+```
+
+You can also group them in any way you like, such as creating groups for user-related tables, messaging-related tables, product-related tables, etc. 
+```plaintext
+📦 <project root>
+ └ 📂 src
+    └ 📂 db
+       └ 📂 schema
+          ├ 📜 users.ts
+          ├ 📜 messaging.ts
+          └ 📜 products.ts
+```
+
+## Shape your data schema
+
+Drizzle schema consists of several model types from database you are using. With drizzle you can specify:
+- Tables with columns, constraints, etc.
+- Views
+- etc.
+
+Let's go one by one and check how the schema should be defined with drizzle
+
+#### **Tables and columns declaration** 
+
+A table in Drizzle should be defined with at least 1 column, the same as it should be done in database. There is one important thing to know,
+there is no such thing as a common table object in Drizzle. You need to choose a dialect you are using, PostgreSQL, MySQL, SQLite, etc.
+
+![](@/assets/images/table-structure.svg)
+
+```ts copy
+import { sqliteTable, integer } from "drizzle-orm/sqlite-core"
+
+export const users = sqliteTable('users', {
+  id: integer()
+});
+```
+
+By default, Drizzle will use the TypeScript key names for columns in database queries. 
+Therefore, the schema and query from the example will generate the SQL query shown below
+
+<Callout>
+This example uses a db object, whose initialization is not covered in this part of the documentation. To learn how to connect to the database, please refer to the [Connections Docs](/docs/sqlite/get-started-sqlite)
+</Callout>
+
+\
+**TypeScript key = database key**
+<Section>
+```ts
+// schema.ts
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+export const users = sqliteTable('users', {
+  id: integer(),
+  first_name: text()
+})
+```
+```ts
+// query.ts
+await db.select().from(users);
+```
+```sql
+SELECT "id", "first_name" from users;
+```
+</Section>
+
+If you want to use different names in your TypeScript code and in the database, you can use column aliases
+
+<Section>
+```ts
+// schema.ts
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+export const users = sqliteTable('users', {
+  id: integer(),
+  firstName: text('first_name')
+})
+```
+```ts
+// query.ts
+await db.select().from(users);
+```
+```sql
+SELECT "id", "first_name" from users;
+```
+</Section>
+
+### Camel and Snake casing
+
+Database model names often use `snake_case` conventions, while in TypeScript, it is common to use `camelCase` for naming models.
+This can lead to a lot of alias definitions in the schema. To address this, Drizzle provides a way to automatically
+map `camelCase` from TypeScript to `snake_case` in the database via a dedicated builder.
+
+Use the `snakeCase` or `camelCase` builder from `drizzle-orm/pg-core` to declare a table whose column keys are
+automatically mapped to the chosen database naming convention
+
+<Section>
+```ts {2,4,11,12}
+// schema.ts
+import { snakeCase, camelCase } from 'drizzle-orm/sqlite-core';
+
+export const users = snakeCase.table('users', {
+  id: integer().primaryKey(),
+  fullName: text(),        // → full_name in DB
+  createdAt: integer({ mode: 'timestamp' }),  // → created_at in DB
+});
+
+// Available on all entity types:
+snakeCase.table / snakeCase.view
+camelCase.table / camelCase.view
+```
+```ts
+// db.ts
+import { drizzle } from "drizzle-orm/better-sqlite3";
+
+const db = drizzle({ connection: process.env.DATABASE_URL })
+```
+```ts
+// query.ts
+await db.select().from(users);
+```
+```sql
+select "id", "full_name", "created_at" from "users";
+```
+</Section>
+
+### Advanced
+
+There are a few tricks you can use with Drizzle ORM. As long as Drizzle is entirely in TypeScript files, 
+you can essentially do anything you would in a simple TypeScript project with your code.
+
+One common feature is to separate columns into different places and then reuse them. 
+For example, consider the `updated_at`, `created_at`, and `deleted_at` columns. Many tables/models may need these 
+three fields to track and analyze the creation, deletion, and updates of entities in a system
+
+We can define those columns in a separate file and then import and spread them across all the table objects you have
+
+<Section>
+```ts
+// columns.helpers.ts
+export const timestamps = {
+  updated_at: text(),
+  created_at: text().$defaultFn(() => new Date().toISOString()).notNull(),
+  deleted_at: text(),
+}
+```
+```ts
+// users.sql.ts
+export const users = sqliteTable('users', {
+  id: integer(),
+  ...timestamps
+})
+```
+```ts
+// posts.sql.ts
+export const posts = sqliteTable('posts', {
+  id: integer(),
+  ...timestamps
+})
+```
+</Section>
+
+#### **Schemas**
+
+\
+In SQLite, there is no concept of a schema, so you can only define tables within a single SQLite file context
+
+![](@/assets/images/sqlite-db-structure.png)
+
+### Example
+
+Once you know the basics, let's define a schema example for a real project to get a better view and understanding
+
+> All examples will use `generateUniqueString`. The implementation for it will be provided after all the schema examples
+
+```ts copy
+import * as t from "drizzle-orm/sqlite-core";
+
+export const users = t.sqliteTable(
+  "users",
+  {
+    id: t.integer().primaryKey({ autoIncrement: true }),
+    firstName: t.text("first_name"),
+    lastName: t.text("last_name"),
+    email: t.text().notNull(),
+    invitee: t.integer().references((): t.AnySQLiteColumn => users.id),
+    role: t.text().$type<"guest" | "user" | "admin">().default("guest"),
+  },
+  (table) => [
+    t.uniqueIndex("email_idx").on(table.email)
+  ]
+);
+
+export const posts = t.sqliteTable(
+  "posts",
+  {
+    id: t.integer().primaryKey({ autoIncrement: true }),
+    slug: t.text().$default(() => generateUniqueString(16)),
+    title: t.text(),
+    ownerId: t.integer("owner_id").references(() => users.id),
+  },
+  (table) => [
+    t.uniqueIndex("slug_idx").on(table.slug),
+    t.index("title_idx").on(table.title),
+  ]
+);
+
+export const comments = t.sqliteTable("comments", {
+  id: t.integer().primaryKey({ autoIncrement: true }),
+  text: t.text({ length: 256 }),
+  postId: t.integer("post_id").references(() => posts.id),
+  ownerId: t.integer("owner_id").references(() => users.id),
+});
+```
+
+**`generateUniqueString` implementation:**
+```ts
+function generateUniqueString(length: number = 12): string {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let uniqueString = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    uniqueString += characters[randomIndex];
+  }
+
+  return uniqueString;
+}
+```
+
+#### What's next?
+<br/>
+<Flex>
+  <LinksList 
+    title='Manage schema'
+    links={[
+        ["Column types", "/docs/sqlite/column-types"], 
+        ["Indexes and Constraints", "/docs/sqlite/indexes-constraints"],
+        ["Database Views", "/docs/sqlite/views"],
+      ]}
+  />
+  <LinksList 
+    title='Zero to Hero'
+    links={[
+        ["Database connection", "/docs/sqlite/connect-overview"], 
+        ["Data querying", "/docs/sqlite/data-querying"], 
+        ["Migrations", "/docs/sqlite/migrations"], 
+      ]}
+  />
+</Flex>

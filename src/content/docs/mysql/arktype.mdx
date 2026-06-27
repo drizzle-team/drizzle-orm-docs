@@ -1,0 +1,491 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+# arktype
+
+### Install the dependencies
+
+<Npm>
+drizzle-orm@rc arktype
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+import type { ArkErrors } from "arktype";
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
+```
+
+Views are also supported.
+
+```ts copy
+import { mysqlView } from 'drizzle-orm/mysql-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+
+const usersView = mysqlView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: ArkErrors | { id: number; name: string; age: number } = usersViewSchema(...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createInsertSchema } from 'drizzle-orm/arktype';
+import type { ArkErrors } from "arktype";
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: ArkErrors | { id?: number | undefined, name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: ArkErrors | { id?: number | undefined, name: string, age: number } = userInsertSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createUpdateSchema } from 'drizzle-orm/arktype';
+import { parse } from 'arktype';
+import { ArkErrors } from "arktype";
+import { eq } from "drizzle-orm";
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { age: 35 };
+const parsed:  ArkErrors | { id?: number | undefined, name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a arktype schema will overwrite it.
+
+```ts copy
+import { int, json, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors, type } from 'arktype';
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: json()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => pipe(schema, maxLength(20)), // Extends schema
+  bio: (schema) => pipe(schema, maxLength(1000)), // Extends schema before becoming nullable/optional
+  preferences: object({ theme: string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: ArkErrors | {
+  id: number;
+  name: string,
+  bio?: string | undefined;
+  preferences: {
+    theme: string;
+  };
+} = userSelectSchema(...);
+```
+
+### Data type reference
+
+```ts
+mysql.boolean();
+
+// Schema
+type.boolean;
+```
+
+```ts
+mysql.mysqlEnum('name', ['val1', 'val2']);
+
+// Schema
+type.enumerated('val1', 'val2')
+```
+
+```ts
+mysql.date({ mode: 'date' });
+mysql.datetime({ mode: 'date' });
+mysql.timestamp({ mode: 'date' });
+
+// Schema
+type.Date;
+```
+
+```ts
+mysql.binary();
+mysql.date({ mode: 'string' });
+mysql.datetime({ mode: 'string' });
+mysql.decimal();
+mysql.time();
+mysql.timestamp({ mode: 'string' });
+mysql.varbinary();
+
+// Schema
+type.string;
+```
+
+```ts
+mysql.tinyblob({ mode: 'string' });
+mysql.tinyblob();
+
+type.string.atMostLength(255)
+```
+
+```ts
+mysql.blob({ mode: 'string' });
+mysql.blob();
+
+type.string.atMostLength(65_535)
+```
+
+```ts
+mysql.mediumblob({ mode: 'string' });
+mysql.mediumblob();
+
+type.string.atMostLength(16_777_215)
+```
+
+```ts
+mysql.longblob({ mode: 'string' });
+mysql.longblob();
+
+type.string.atMostLength(4_294_967_295)
+```
+
+```ts
+mysql.char({ length: ... });
+
+// Schema
+type.string.exactlyLength(length);
+```
+
+```ts
+mysql.varchar({ length: ... });
+
+// Schema
+type.string.atMostLength(length);
+```
+
+```ts
+binary({ length: ... });
+
+// Schema
+type(`/^[01]{0,${length ?? "*"}}$/`)
+```
+
+```ts
+mysql.varbinary({ length: ... });
+
+// Schema
+type(`/^[01]{0,${length ?? "*"}}$/`)
+```
+
+```ts
+mysql.tinytext();
+
+// Schema
+type.string.atMostLength(255); // unsigned 8-bit integer limit
+```
+
+```ts
+mysql.text();
+
+// Schema
+type.string.atMostLength(65_535); // unsigned 16-bit integer limit
+```
+
+```ts
+mysql.mediumtext();
+
+// Schema
+type.string.atMostLength(16_777_215); // unsigned 24-bit integer limit
+```
+
+```ts
+mysql.longtext();
+
+// Schema
+type.string.atMostLength(4_294_967_295); // unsigned 32-bit integer limit
+```
+
+```ts
+mysql.tinytext({ enum: ... });
+mysql.mediumtext({ enum: ... });
+mysql.text({ enum: ... });
+mysql.longtext({ enum: ... });
+mysql.char({ enum: ... });
+mysql.varchar({ enum: ... });
+
+// Schema
+type.enumerated(...enum);
+```
+
+```ts
+mysql.tinyint();
+
+// Schema
+type.keywords.number.integer.atLeast(-128).atMost(127); // 8-bit integer lower and upper limit
+```
+
+```ts
+mysql.tinyint({ unsigned: true });
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(255); // unsigned 8-bit integer lower and upper limit
+```
+
+```ts
+mysql.smallint();
+
+// Schema
+type.keywords.number.integer.atLeast(-32_768).atMost(32_767); // 16-bit integer lower and upper limit
+```
+
+```ts
+mysql.smallint({ unsigned: true });
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(65_535); // unsigned 16-bit integer lower and upper limit
+```
+
+```ts
+mysql.float();
+
+// Schema
+type.number.atLeast(-8_388_608).atMost(8_388_607); // 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.mediumint();
+
+// Schema
+type.keywords.number.integer.atLeast(-8_388_608).atMost(8_388_607); // 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.float({ unsigned: true });
+
+// Schema
+type.number.atLeast(0).atMost(16_777_215); // unsigned 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.mediumint({ unsigned: true });
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(16_777_215); // unsigned 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.int();
+
+// Schema
+type.keywords.number.integer.atLeast(-2_147_483_648).atMost(2_147_483_647); // 32-bit integer lower and upper limit
+```
+
+```ts
+mysql.int({ unsigned: true });
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(4_294_967_295); // unsgined 32-bit integer lower and upper limit
+```
+
+```ts
+mysql.double();
+mysql.real();
+
+// Schema
+type.number.atLeast(-140_737_488_355_328).atMost(140_737_488_355_327); // 48-bit integer lower and upper limit
+```
+
+```ts
+mysql.double({ unsigned: true });
+
+// Schema
+type.number.atLeast(0).atMost(281_474_976_710_655); // unsigned 48-bit integer lower and upper limit
+```
+
+```ts
+mysql.decimal({ mode: 'number' });
+
+// Schema
+type.number.atLeast(9_007_199_254_740_991).atMost(9_007_199_254_740_991)
+```
+
+```ts
+mysql.decimal({ mode: 'bigint' });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < -9_223_372_036_854_775_808n ? ctx.mustBe('greater than') : value > 9_223_372_036_854_775_807n ? ctx.mustBe('less than') : true
+); // 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.decimal({ mode: 'number', unsigned: true });
+
+// Schema
+type.number.atLeast(0).atMost(9_007_199_254_740_991)
+```
+
+```ts
+mysql.decimal({ mode: 'bigint', unsigned: true });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < 0n ? ctx.mustBe('greater than') : value > 18_446_744_073_709_551_615n ? ctx.mustBe('less than') : true
+); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.bigint({ mode: 'number' });
+
+// Schema
+type.keywords.number.integer.atLeast(-9_007_199_254_740_991).atMost(9_007_199_254_740_991); // Javascript min. and max. safe integers
+```
+
+```ts
+mysql.bigint({ mode: 'number', unsigned: true });
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(9_007_199_254_740_991); // Javascript min. and max. safe integers
+```
+
+```ts
+mysql.bigint({ mode: 'string' });
+
+// Schema
+type.string.narrow((v, ctx) => {
+	if (typeof v !== 'string') {
+		return ctx.mustBe('a string');
+	}
+	if (!(/^-?\d+$/.test(v))) {
+		return ctx.mustBe('a string representing a number');
+	}
+
+	const bigint = BigInt(v);
+	if (bigint < -9_223_372_036_854_775_808n) {
+		return ctx.mustBe('greater than');
+	}
+	if (bigint > 9_223_372_036_854_775_807n) {
+		return ctx.mustBe('less than');
+	}
+
+	return true;
+});
+```
+
+```ts
+mysql.bigint({ mode: 'string', unsigned: true });
+
+// Schema
+type.string.narrow((v, ctx) => {
+	if (typeof v !== 'string') {
+		return ctx.mustBe('a string');
+	}
+	if (!(/^\d+$/.test(v))) {
+		return ctx.mustBe('a string representing a number');
+	}
+
+	const bigint = BigInt(v);
+	if (bigint < 0) {
+		return ctx.mustBe('greater than');
+	}
+	if (bigint > 9_223_372_036_854_775_807n) {
+		return ctx.mustBe('less than');
+	}
+
+	return true;
+});
+```
+
+```ts
+mysql.bigint({ mode: 'bigint' });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < -9_223_372_036_854_775_808n ? ctx.mustBe('greater than') : value > 9_223_372_036_854_775_807n ? ctx.mustBe('less than') : true
+); // 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.bigint({ mode: 'bigint', unsigned: true });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < 0n ? ctx.mustBe('greater than') : value > 18_446_744_073_709_551_615n ? ctx.mustBe('less than') : true
+); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.serial();
+
+// Schema
+type.keywords.number.integer.atLeast(0).atMost(9_007_199_254_740_991); // Javascript max. safe integer
+```
+
+```ts
+mysql.year();
+
+// Schema
+type.keywords.number.integer.atLeast(1_901).atMost(2_155);
+```
+
+```ts
+mysql.json();
+
+// Schema
+type('string | number | boolean | null').or(type('unknown.any[] | Record<string, unknown.any>'));
+```

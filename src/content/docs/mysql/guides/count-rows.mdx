@@ -1,0 +1,167 @@
+---
+title: Count rows
+---
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
+
+<Prerequisites>
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Select statement](/docs/mysql/select)
+- [Filters](/docs/mysql/operators) and [sql operator](/docs/mysql/sql)
+- [Aggregations](/docs/mysql/select#aggregations) and [Aggregation helpers](/docs/mysql/select#aggregations-helpers)
+- [Joins](/docs/mysql/joins)
+</Prerequisites>
+
+To count all rows in table you can use `count()` function or `sql` operator like below:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {6,9}
+    import { count, sql } from 'drizzle-orm';
+    import { products } from './schema';
+
+    const db = drizzle(...);
+
+    await db.select({ count: count() }).from(products);
+
+    // Under the hood, the count() function casts its result to a number at runtime.
+    await db.select({ count: sql`count(*)`.mapWith(Number) }).from(products);
+    ```
+
+    ```ts
+    // result type
+    type Result = {
+      count: number;
+    }[];
+    ```
+
+    ```sql
+    select count(*) from products;
+    ```
+  </CodeTab>
+  ```ts
+  import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+
+  export const products = mysqlTable('products', {
+    id: int('id').primaryKey().autoincrement(),
+    name: varchar('name', { length: 255 }).notNull(),
+    discount: int('discount'),
+    price: int('price').notNull(),
+  });
+  ```
+</CodeTabs>
+
+To count rows where the specified column contains non-NULL values you can use `count()` function with a column:
+
+<Section>
+```ts copy {1}
+await db.select({ count: count(products.discount) }).from(products);
+```
+
+```ts
+// result type
+type Result = {
+  count: number;
+}[];
+```
+
+```sql
+select count(`discount`) from products;
+```
+</Section>
+
+Drizzle has simple and flexible API, which lets you create your custom solutions. In MySQL, `count()` can be returned as a string by the driver, so cast it to a number when you need a numeric result:
+
+<Section>
+```ts copy {5,7,11,12}
+import { AnyColumn, sql } from 'drizzle-orm';
+
+const customCount = (column?: AnyColumn) => {
+  if (column) {
+    return sql<number>`cast(count(${column}) as unsigned)`; // In MySQL cast to unsigned integer
+  } else {
+    return sql<number>`cast(count(*) as unsigned)`; // In MySQL cast to unsigned integer
+  }
+};
+
+await db.select({ count: customCount() }).from(products);
+await db.select({ count: customCount(products.discount) }).from(products);
+```
+
+```sql
+select cast(count(*) as unsigned) from products;
+select cast(count(`discount`) as unsigned) from products;
+```
+</Section>
+
+
+<Callout type="warning">
+By specifying `sql<number>`, you are telling Drizzle that the **expected** type of the field is `number`.<br />
+If you specify it incorrectly (e.g. use `sql<string>` for a field that will be returned as a number), the runtime value won't match the expected type.
+Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
+
+If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/mysql/sql#sqlmapwith) method.
+</Callout>
+
+To count rows that match a condition you can use `.where()` method:
+
+<Section>
+```ts copy {4,6}
+import { count, gt } from 'drizzle-orm';
+
+await db
+  .select({ count: count() })
+  .from(products)
+  .where(gt(products.price, 100));
+```
+
+```sql
+select count(*) from products where price > 100
+```
+</Section>
+
+This is how you can use `count()` function with joins and aggregations:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+	<CodeTab>
+    ```ts copy {8,11,12,13}
+    import { count, eq } from 'drizzle-orm';
+    import { countries, cities } from './schema';
+
+    // Count cities in each country
+    await db
+      .select({
+        country: countries.name,
+        citiesCount: count(cities.id),
+      })
+      .from(countries)
+      .leftJoin(cities, eq(countries.id, cities.countryId))
+      .groupBy(countries.id)
+      .orderBy(countries.name);
+    ```
+
+    ```sql
+    select countries.name, count(`cities`.`id`) from countries
+      left join cities on countries.id = cities.country_id
+      group by countries.id
+      order by countries.name;
+    ```
+  </CodeTab>
+  ```ts
+  import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+
+  export const countries = mysqlTable('countries', {
+    id: int('id').primaryKey().autoincrement(),
+    name: varchar('name', { length: 255 }).notNull(),
+  });
+
+  export const cities = mysqlTable('cities', {
+    id: int('id').primaryKey().autoincrement(),
+    name: varchar('name', { length: 255 }).notNull(),
+    countryId: int('country_id').notNull().references(() => countries.id),
+  });
+  ```
+</CodeTabs>

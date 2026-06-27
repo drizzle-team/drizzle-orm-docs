@@ -1,0 +1,122 @@
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Generated Columns
+
+1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
+
+2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
+
+#### Database side
+    **Types**: `VIRTUAL`, `STORED`
+
+	When no type is specified, `VIRTUAL` is used by default
+
+    **How It Works**
+    - Defined with an expression in the table schema.
+    - Virtual columns are computed during read operations.
+    - Stored columns are computed during write operations and stored.
+
+    **Capabilities**
+    - Used in SELECT, INSERT, UPDATE, and DELETE statements.
+    - Can be indexed, both virtual and stored.
+    - Can specify NOT NULL and other constraints.
+    
+    **Limitations**
+    - Cannot directly insert or update values in a generated column 
+
+    For more info, please check [MySQL Alter Generated](https://dev.mysql.com/doc/refman/8.4/en/alter-table-generated-columns.html) docs and [MySQL create generated](https://dev.mysql.com/doc/refman/8.4/en/create-table-generated-columns.html) docs
+
+    #### Drizzle side
+    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
+    that will generate this column data for you.
+
+    #### Features 
+    This function can accept generated expression in 2 ways:
+
+    **`sql`** tag - if you want drizzle to escape some values for you
+
+    <CodeTab>
+    ```ts {2,6}
+    export const test_1 = mysqlTable("test_1", {
+      generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
+    });
+    
+    export const test_2 = mysqlTable("test_2", {
+      generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`, { mode: "stored" }),
+    });
+    ```
+    ```sql {2,6}
+    CREATE TABLE `test_1` (
+        `gen_name` text GENERATED ALWAYS AS ('hello "world"!') VIRTUAL
+    );
+    
+    CREATE TABLE `test_2` (
+        `gen_name` text GENERATED ALWAYS AS ('hello "world"!') STORED
+    );
+    ```
+    </CodeTab>
+
+    **`callback`** - if you need to reference columns from a table
+
+     <CodeTab>
+    ```ts {4,10}
+    export const test_1 = mysqlTable("test_1", {
+      name: text("first_name"),
+      generatedName: text("gen_name")
+	     .generatedAlwaysAs((): SQL => sql`concat('hi, ', ${test_1.name}, '!')`),
+    });
+    
+    export const test_2 = mysqlTable("test_2", {
+      name: text("first_name"),
+      generatedName: text("gen_name")
+	     .generatedAlwaysAs((): SQL => sql`concat('hi, ', ${test_2.name}, '!')`, { mode: "stored" }),
+    });
+    ```
+    ```sql {3,8}
+    CREATE TABLE `test_1` (
+        `first_name` text,
+        `gen_name` text GENERATED ALWAYS AS (concat('hi, ', `test_1`.`first_name`, '!')) VIRTUAL
+    );
+    
+    CREATE TABLE `test_2` (
+        `first_name` text,
+        `gen_name` text GENERATED ALWAYS AS (concat('hi, ', `test_2`.`first_name`, '!')) STORED
+    );
+    ```
+    </CodeTab>
+
+    #### Limitations
+    Drizzle Kit will also have limitations for `push` command:
+    1. You can't change the generated constraint expression and type using `push`. Drizzle-kit will ignore this change. To make it work, you would need to `drop the column`, `push`, and then `add a column with a new expression`. This was done due to the complex mapping from the database side, where the schema expression will be modified on the database side and, on introspection, we will get a different string. We can't be sure if you changed this expression or if it was changed and formatted by the database. As long as these are generated columns and `push` is mostly used for prototyping on a local database, it should be fast to `drop` and `create` generated columns. Since these columns are `generated`, all the data will be restored
+    2. `generate` should have no limitations
+
+  <CodeTabs items={["schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    export const users = mysqlTable("users", {
+        id: int(),
+        id2: int(),
+        name: text(),
+        storedGenerated: text("stored_gen").generatedAlwaysAs(
+          (): SQL => sql`concat(${users.name}, ' ', 'hello')`,
+          { mode: "stored" }
+        ),
+        virtualGenerated: text("virtual_gen").generatedAlwaysAs(
+          (): SQL => sql`concat(${users.name}, ' ', 'hello')`,
+          { mode: "virtual" }
+        ),
+    });
+    ```
+    ```sql
+    CREATE TABLE `users` (
+      `id` int,
+      `id2` int,
+      `name` text,
+      `stored_gen` text GENERATED ALWAYS AS (concat(`users`.`name`, ' ', 'hello')) STORED,
+      `virtual_gen` text GENERATED ALWAYS AS (concat(`users`.`name`, ' ', 'hello')) VIRTUAL
+    );
+    ```
+    </CodeTab>
+  </CodeTabs>

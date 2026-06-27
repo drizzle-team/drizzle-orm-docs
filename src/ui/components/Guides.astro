@@ -3,15 +3,17 @@ import { getCollection } from "astro:content";
 
 import guideMap from "@/content/docs/guides/_map.json";
 
-const guides = await getCollection("docs", ({ id }) => {
-  return id.startsWith('guides');
-});
+const guides = await getCollection("docs", ({ id }) =>
+  id.startsWith("guides/"),
+);
 
 const sortedGuides: typeof guides = [];
 
 guideMap.forEach((key) => {
-  const item = guides.find((g) => g.data.slug === key[0]);
-  if (item) sortedGuides.push(item);
+  const guide = guides.find((g) => g.slug.endsWith(key[0]));
+  if (guide) {
+    sortedGuides.push(guide);
+  }
 });
 ---
 
@@ -25,8 +27,7 @@ guideMap.forEach((key) => {
     sortedGuides.map((guide) => {
       return (
         <div class="guides__item">
-          {" "}
-          <a class="guides__item_link" href={`/docs/guides/${guide.slug}`}>
+          <a class="guides__item_link" href={`./${guide.slug}`}>
             {guide.data.title}
           </a>
         </div>

@@ -1,0 +1,378 @@
+import Callout from "@mdx/Callout.astro";
+
+# Custom types
+
+Custom types let you define your own column types with custom SQL data types and JS/DB value transforms
+
+PostgreSQL exposes `customType` from `drizzle-orm/pg-core`.
+
+## Examples
+The best way to see how `customType` definition is working is to check how existing data types could be defined using `customType` function from Drizzle ORM.
+
+#### Integer
+
+```ts
+import { customType, pgTable } from 'drizzle-orm/pg-core';
+
+const customInteger = customType<{ data: number; }>(
+  {
+    dataType() {
+      return 'integer';
+    },
+  },
+);
+
+export const users = pgTable("users", {
+  id: customInteger(),
+});
+```
+
+#### Text
+```ts
+import { customType, pgTable } from 'drizzle-orm/pg-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = pgTable('users', {
+  name: customText(),
+});
+```
+
+#### Timestamp
+```ts
+import { customType, pgTable } from 'drizzle-orm/pg-core';
+
+const customTimestamp = customType<{
+  data: Date;
+  driverData: string;
+  config: { withTimezone: boolean; precision?: number };
+  configRequired: false;
+}>({
+  dataType(config) {
+    const precision = typeof config?.precision !== 'undefined' ? ` (${config.precision})` : '';
+    return `timestamp${precision}${config?.withTimezone ? ' with time zone' : ''}`;
+  },
+  fromDriver(value: string): Date {
+    return new Date(value);
+  },
+  codec: (config) => {
+    if (config?.withTimezone) return 'timestamp with time zone';
+
+    return 'timestamp';
+  },
+});
+
+export const users = pgTable('users', {
+  createdAt: customTimestamp('created_at'),
+});
+```
+
+Usage for all types will be same as defined functions in Drizzle ORM. For example:
+```ts
+const usersTable = pgTable('users', {
+  id: customInteger().primaryKey(),
+  name: customText().notNull(),
+  createdAt: customTimestamp('created_at', { withTimezone: true }).notNull()
+    .default(sql`now()`),
+});
+```
+
+### Methods and Generic types
+<br/>
+
+| Type | Required | Description |
+|---|---|---|
+| `data` | Yes | The TypeScript type for the column after selecting/inserting. |
+| `driverData` | No | The type the database driver accepts for this data type. |
+| `driverOutput` | No | **Deprecated** — use codecs instead (bypasses JSON codecs if used). The type the driver returns, if different from `driverData`. |
+| `jsonData` | No | **Deprecated** — use codecs instead (bypasses JSON codecs if used). The type returned when aggregated to JSON. |
+| `config` | No | Config object type for `dataType` generation (e.g. `{ length: number }`). |
+| `configRequired` | No | Whether the config argument is required. Default `false`. |
+| `notNull` | No | Set to `true` if the custom type should be `notNull` by default. |
+| `default` | No | Set to `true` if the custom type has a default value. |
+
+<br/>
+
+| Method | Required | Description |
+|---|---|---|
+| `dataType` | Yes | Defines the SQL type string. If database data type needs additional params you can use them from `config` param |
+| `toDriver` | No | Transform inputs from desired to be used in code format to one suitable for driver |
+| `fromDriver` | No | Transform data returned by driver to desired column's output format |
+| `codec` | No | Which driver codec to use (see [Codecs](/docs/codecs) section). |
+| `fromJson` | No | **Deprecated** — use `codec` instead. Transforms value from JSON context. |
+| `forJsonSelect` | No | **Deprecated** — use `codec` instead. Modify selection of column inside JSON functions |
+
+<br/>
+
+## TS-doc for type definitions
+
+You can check `ts-doc` for types, param definition and examples
+
+<Callout collapsed="Expand details">
+```ts
+interface CustomTypeValues {
+  /**
+   * Required type for custom column, that will infer proper type model
+   *
+   * Examples:
+   *
+   * If you want your column to be `string` type after selecting/or on inserting - use `data: string`. Like `text`, `varchar`
+   *
+   * If you want your column to be `number` type after selecting/or on inserting - use `data: number`. Like `integer`
+   */
+  data: unknown;
+  /**
+   * Type helper, that represents what type database driver is accepting for specific database data type
+   */
+  driverData?: unknown;
+  /**
+   * @deprecated Use codecs instead
+   *
+   * Type helper, that represents what type database driver is returning for specific database data type
+   *
+   * Needed only in case driver's output and input for type differ
+   *
+   * Defaults to {@link driverData}
+   */
+  driverOutput?: unknown;
+  /**
+   * @deprecated Use codecs instead
+   *
+   * Type helper, that represents what type field returns after being aggregated to JSON
+   */
+  jsonData?: unknown;
+  /**
+   * What config type should be used for {@link CustomTypeParams} `dataType` generation
+   */
+  config?: Record<string, any>;
+  /**
+   * Whether the config argument should be required or not
+   * @default false
+   */
+  configRequired?: boolean;
+  /**
+   * If your custom data type should be notNull by default you can use `notNull: true`
+   *
+   * @example
+   * const customSerial = customType<{ data: number, notNull: true, default: true }>({
+   * 	  dataType() {
+   * 	    return 'serial';
+   *    },
+   * });
+   */
+  notNull?: boolean;
+  /**
+   * If your custom data type has default you can use `default: true`
+   *
+   * @example
+   * const customSerial = customType<{ data: number, notNull: true, default: true }>({
+   * 	  dataType() {
+   * 	    return 'serial';
+   *    },
+   * });
+   */
+  default?: boolean;
+}
+interface CustomTypeParams<T extends CustomTypeValues> {
+  /**
+   * Database data type string representation, that is used for migrations
+   * @example
+   * ```
+   * `jsonb`, `text`
+   * ```
+   *
+   * If database data type needs additional params you can use them from `config` param
+   * @example
+   * ```
+   * `varchar(256)`, `numeric(2,3)`
+   * ```
+   *
+   * To make `config` be of specific type please use config generic in {@link CustomTypeValues}
+   *
+   * @example
+   * Usage example
+   * ```
+   *   dataType() {
+   *     return 'boolean';
+   *   },
+   * ```
+   * Or
+   * ```
+   *   dataType(config) {
+   * 	   return typeof config.length !== 'undefined' ? `varchar(${config.length})` : `varchar`;
+   * 	 }
+   * ```
+   */
+  dataType: (config: T['config'] | (Equal<T['configRequired'], true> extends true ? never : undefined)) => string;
+  /**
+   * Optional mapping function, that is used to transform inputs from desired to be used in code format to one suitable for driver
+   * @example
+   * For example, when using jsonb we need to map JS/TS object to string before writing to database
+   * ```
+   * toDriver(value: TData): string {
+   * 	 return JSON.stringify(value);
+   * }
+   * ```
+   */
+  toDriver?: (value: T['data']) => T['driverData'] | SQL;
+  /**
+   * Optional mapping function, that is used for transforming data returned by driver to desired column's output format
+   * @example
+   * For example, when using timestamp we need to map string Date representation to JS Date
+   * ```
+   * fromDriver(value: string): Date {
+   * 	return new Date(value);
+   * }
+   * ```
+   *
+   * It'll cause the returned data to change from:
+   * ```
+   * {
+   * 	customField: "2025-04-07T03:25:16.635Z";
+   * }
+   * ```
+   * to:
+   * ```
+   * {
+   * 	customField: new Date("2025-04-07T03:25:16.635Z");
+   * }
+   * ```
+   */
+  fromDriver?: (value: 'driverOutput' extends keyof T ? T['driverOutput'] : T['driverData']) => T['data'];
+  /**
+   * @deprecated Use codecs instead; bypasses JSON codecs if used
+   *
+   * Optional mapping function, that is used for transforming data returned by transofmed to JSON in database data to desired format
+   *
+   * Used by [relational queries](https://orm.drizzle.team/docs/rqb)
+   *
+   * Defaults to {@link fromDriver} function
+   * @example
+   * For example, when querying bigint column via [RQB](https://orm.drizzle.team/docs/rqb) or JSON functions, the result field will be returned as it's string representation, as opposed to bigint from regular query
+   * To handle that, we need a separate function to handle such field's mapping:
+   * ```
+   * fromJson(value: string): bigint {
+   * 	return BigInt(value);
+   * },
+   * ```
+   *
+   * It'll cause the returned data to change from:
+   * ```
+   * {
+   * 	customField: "5044565289845416380";
+   * }
+   * ```
+   * to:
+   * ```
+   * {
+   * 	customField: 5044565289845416380n;
+   * }
+   * ```
+   */
+  fromJson?: (value: T['jsonData']) => T['data'];
+  /**
+   * @deprecated Use codecs instead; bypasses JSON codecs if used
+   *
+   * Optional selection modifier function, that is used for modifying selection of column inside JSON functions
+   *
+   * Additional mapping that could be required for such scenarios can be handled using {@link fromJson} function
+   *
+   * Used by [relational queries](https://orm.drizzle.team/docs/rqb)
+   *
+   * Following types are being casted to text by default: `bytea`, `geometry`, `timestamp`, `numeric`, `bigint`
+   * @example
+   * For example, when using bigint we need to cast field to text to preserve data integrity
+   * ```
+   * forJsonSelect(identifier: SQL, sql: SQLGenerator, arrayDimensions?: number): SQL {
+   * 	return sql`${identifier}::text`
+   * },
+   * ```
+   *
+   * This will change query from:
+   * ```
+   * SELECT
+   * 	row_to_json("t".*)
+   * 	FROM
+   * 	(
+   * 		SELECT
+   * 		"table"."custom_bigint" AS "bigint"
+   * 		FROM
+   * 		"table"
+   * 	) AS "t"
+   * ```
+   * to:
+   * ```
+   * SELECT
+   * 	row_to_json("t".*)
+   * 	FROM
+   * 	(
+   * 		SELECT
+   * 		"table"."custom_bigint"::text AS "bigint"
+   * 		FROM
+   * 		"table"
+   * 	) AS "t"
+   * ```
+   *
+   * Returned by query object will change from:
+   * ```
+   * {
+   * 	bigint: 5044565289845416000; // Partial data loss due to direct conversion to JSON format
+   * }
+   * ```
+   * to:
+   * ```
+   * {
+   * 	bigint: "5044565289845416380"; // Data is preserved due to conversion of field to text before JSON-ification
+   * }
+   * ```
+   */
+  forJsonSelect?: (identifier: SQL, sql: SQLGenerator, arrayDimensions?: number) => SQL;
+  /**
+   * Select which column type codec will be used for this column
+   */
+  codec?: PostgresColumnType | undefined | ((config: T['config'] | (Equal<T['configRequired'], true> extends true ? never : undefined)) => PostgresColumnType | undefined);
+}
+```
+</Callout>
+
+## Transform layers and execution order
+
+Custom types have two transform layers: column-level (`toDriver`/`fromDriver`) and driver-level ([codecs](/docs/codecs)). Both run in a specific order. You can read more on how to use codecs with customTypes [here](/docs/codecs#how-codecs-work-in-customtype)
+
+<br/>
+
+- **Writes:** (Insert/Update) `toDriver` first → codec `normalizeParam` second
+- **Reads:** (Select) codec `normalize` first → `fromDriver` second
+- If no codec is set, only `toDriver`/`fromDriver` run
+- If no `toDriver`/`fromDriver` is set, only codecs run (if defined)
+- If neither is set, values pass through untouched
+
+<br/>
+
+Use both (`toDriver`/`fromDriver` and `codecs`) when you need driver-level normalization AND column-level transformation:
+
+```ts
+// DB stores as bigint, driver returns string, codec converts to BigInt,
+// but you want a number in your app code
+const myColumn = customType<{ data: number; driverData: string }>({
+  dataType() { return 'bigint'; },
+  codec: 'bigint',           // driver "123" → BigInt(123n)
+  fromDriver(value) {        // BigInt(123n) → Number(123)
+    return Number(value);
+  },
+});
+```
+
+But often you can simplify by choosing the right codec variant:
+
+```ts
+// Same result, no fromDriver needed
+const myColumn = customType<{ data: number; driverData: string }>({
+  dataType() { return 'bigint'; },
+  codec: 'bigint:number',    // driver "123" → Number(123) directly
+});
+```

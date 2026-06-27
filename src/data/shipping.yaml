@@ -1,4 +1,94 @@
+2026-05:
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-rc.3'>v1.0.0-rc.3</a> release</b>
+    Porting all the changes that were made in PostgreSQL to other dialects. This release is about MySQL:
+    <ul>
+    <li>Removed RQBv1 from mysql dialect (._query)</li>
+    <li>Internal MySQL sessions refactoring and moving to a unified query preparation function</li>
+    <li>Fallback to regular queries on iterators for drivers that don't support streaming instead of throwing an error for compatibility</li>
+    <li>Enabled optimized non-jit mappers for regular queries for MySQL dialect</li>
+    <li>Switched RQBv2 to array mode querying, disabled root query level JSON conversions</li>
+    <li>Fixed MySQL proxy driver not using lastInsertId, affectedRows from dedicated response fields</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-rc.2'>v1.0.0-rc.2</a> release</b>
+    <ul>
+    <li>Disabled default codec type selectors for custom columns (fixes #5711)</li>
+    <li>Сallback type overload for codec selector in custom pg columns (codec: (config) => config?.withTimeZone ? 'timestamptz' : 'timestamp')</li>
+    <li>Extended list of postgis types for codecs (improvement for #5711)</li>
+    <li>Updated codecs: geometry -> geometry(point), geometry:tuple -> geometry(point):tuple</li>
+    <li>Switched PG transactions from class properties back to class methods (fixes #5709)</li>
+    <li>Updated AWS Data Api codecs, removed query typings, improved input param mapping</li>
+    <li>Removed prepared query typings field from all builders</li>
+    <li>Added column argument to CastParam,CastArrayParam codecs</li>
+    <li>Fixed DrizzleQueryError and TransactionRollbackError constructors to properly set the error name for better instanceof checks</li>
+    <li>Fixed error handling in aws-data-api to properly show database error messages</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-rc.1'>v1.0.0-rc.1</a> release</b>
+    <ul>
+    <li>⚠️ This release introduced a breaking change into our casing API and removed RQB v1 ._query</li>
+    <li>Effect v4 native support</li>
+    <li>JIT row mappers to reduce ORM overhead to ~0</li>
+    <li>Reworked casing API (breaking change)</li>
+    <li>Drizzle for LLM agents (preview)</li>
+    </ul>
+2026-04:
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.22'>v1.0.0-beta.22</a> release</b>
+    <ul>
+    <li>drizzle-kit generate fails to generate correct migrations.js file on Windows</li>
+    <li>[BUG]: MSSQL real() column returns imprecise float64 values -- missing mapFromDriverValue</li>
+    <li>Object key collision</li>
+    <li>[BUG]:beta20 Migration to Cloudflare D1 fails</li>
+    <li>[BUG]: drizzle-kit migrate: migration SQL failures exit with code 1 but print no error (MigrateProgress hides rejection)</li>
+    <li>[BUG]: MS SQL Filtered Index - Drizzle Kit incorrectly generates fully qualified column name in WHERE clause</li>
+    <li>[BUG]: [Drizzle-kit][Pg] Altering a UNIQUE constraint: generated SQL ignores the new changes</li>
+    <li>[BUG]: Non-commutative migration false positive: create_index commutativity check ignores table name</li>
+    <li>Commutativity checks were updated for PostgreSQL and MySQL. Before, create_index statements could be reported as non-commutative even when they targeted different tables, and --ignore-conflicts could still collapse multi-parent history down to a single parent. Now index/table/schema footprints are resolved more accurately, unrelated index branches are accepted, and --ignore-conflicts preserves all open leaf parents for the next migration</li>
+    <li>fix: mark mssql and @types/mssql as optional peer dependencies</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.20'>v1.0.0-beta.20</a> release</b>
+    <ul>
+    <li>Fixed sql.identifier(), sql.as() escaping issues. Previously all the values passed to this functions were not properly escaped causing a possible SQL Injection (CWE-89) vulnerability</li>
+    </ul>
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.19'>v1.0.0-beta.19</a> release</b>
+    <ul>
+    <li>sql commenter feature</li>
+    <li>Fixed error message for the defineRelations function</li>
+    <li>[BUG]: drizzle-kit push attempts to drop policies in excluded schemas (e.g. cron) despite schemaFilter: ["public"]</li>
+    <li>[BUG]: error attempting to drizzle-kit migrate table with char array field generated using drizzle-kit generate</li>
+    <li>[BUG]: Ignore Vim *.swp files in drizzle-kit generate</li>
+    <li>[BUG]: drizzle-kit pull outputs access method name instead of operator class for ivfflat indexes</li>
+    <li>[BUG]: drizzle-kit pull generates not enough data provided to build the relation</li>
+    <li>drizzle-kit push fails with Turso/libSQL on table recreation: "cannot commit - no transaction is active"</li>
+    <li>[BUG]: Cannot read properties of undefined (reading 'requestLayout') when running drizzle-kit introspect (MySQL)</li>
+    <li>[BUG (beta)]: RDS Data API pulling schema error</li>
+    <li>[BUG]: drizzle-kit commutative migrations takes only last leaf migration into account</li>
+    <li>Updated migrate() function for mysql dialect to correctly manage multiple databases</li>
+    <li>The behavior for reading schema files has been updated. From now only files with the following extensions will be processed: .js .mjs .cjs .jsx .ts .mts .cts .tsx. All other file types will be ignored</li>
+    </ul>
 2026-03:
+  - |
+    <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.18'>v1.0.0-beta.18</a> release</b>
+    <ul>
+    <li>resolved tsconfig path aliases in drizzle-kit loader using get-tsconfig + jiti alias mapping</li>
+    <li>added fixtures and tests covering wildcard and non-wildcard path aliases</li>
+    <li>ensured schema load succeeds for alias imports</li>
+    <li>Updated to hanji@0.0.8 - native bun stringWidth, stripANSI support, errors for non-TTY environments</li>
+    <li>[BUG]: drizzle-kit@1.0.0-beta.13 regression in module resolution</li>
+    <li>[BUG]: drizzle-kit does not support node:sqlite</li>
+    </ul>
+  - |
+    <b>KIT <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.31.8'>v0.31.8</a> release</b>
+
+    <ul>
+    <li>Updated to hanji@0.0.8 - native bun stringWidth, stripANSI support, errors for non-TTY environments</li>
+    <li>We've migrated away from esbuild-register to tsx loader, it will now allow to use drizzle-kit seamlessly with both ESM and CJS modules</li>
+    <li>We've also added native Bun and Deno launch support, which will not trigger tsx loader and utilise native bun and deno imports capabilities and faster startup times</li>
+    </ul>
   - |
     <b>Drizzle Beta <a href='https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.17'>v1.0.0-beta.17</a> release</b>
     <ul>

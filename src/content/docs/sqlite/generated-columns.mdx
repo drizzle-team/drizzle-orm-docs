@@ -1,0 +1,99 @@
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Generated Columns
+
+1. Virtual (or non-persistent) Generated Columns: These columns are computed dynamically whenever they are queried. They do not occupy storage space in the database.
+
+2. Stored (or persistent) Generated Columns: These columns are computed when a row is inserted or updated and their values are stored in the database. This allows them to be indexed and can improve query performance since the values do not need to be recomputed for each query.
+
+#### Database side
+    **Types**: `STORED`, `VIRTUAL`
+
+    **How It Works**
+    - Defined with an expression in the table schema.
+    - Virtual columns are computed during read operations.
+    - Stored columns are computed during write operations and stored.
+
+    **Capabilities**
+    - Used in SELECT, INSERT, UPDATE, and DELETE statements.
+    - Can be indexed, both virtual and stored.
+    - Can specify NOT NULL and other constraints.
+    
+    **Limitations**
+    - Cannot directly insert or update values in a generated column 
+
+    For more info, please check [SQLite](https://www.sqlite.org/gencol.html) docs 
+
+    #### Drizzle side
+    In Drizzle you can specify `.generatedAlwaysAs()` function on any column type and add a supported sql query, 
+    that will generate this column data for you.
+
+    #### Features 
+    This function can accept generated expression in 2 ways:
+
+    **`sql`** tag - if you want drizzle to escape some values for you
+
+    ```ts
+    export const test = sqliteTable("test", {
+        id: int().primaryKey(),
+        generatedName: text("gen_name").generatedAlwaysAs(sql`'hello "world"!'`),
+    });
+    ```
+    ```sql
+    CREATE TABLE `test` (
+      `id` integer PRIMARY KEY,
+      `gen_name` text GENERATED ALWAYS AS ('hello "world"!') VIRTUAL
+    );
+    ```
+
+    **`callback`** - if you need to reference columns from a table
+
+    ```ts
+    export const test = sqliteTable("test", {
+        name: text("first_name"),
+        generatedName: text("gen_name").generatedAlwaysAs(
+          (): SQL => sql`'hi,' || ${test.name} || '!'`
+        ),
+    });
+    ```
+    ```sql
+    CREATE TABLE `test` (
+      `first_name` text,
+      `gen_name` text GENERATED ALWAYS AS ('hi,' || "first_name" || '!') VIRTUAL
+    );
+    ```
+
+    #### Behavior in Drizzle Kit
+	`push` and `generate` command:
+    1. Changing the generated expression on a `stored` column in an existing table will cause table recreation. (Changing a `virtual` expression will cause column recreation).
+    2. Adding a `stored` generated expression to an existing column will cause table recreation. (Adding a `virtual` expression to an existing column will cause column recreation).
+    3. Changing the generated mode from `virtual` to `stored` will cause table recreation. (Switching from `stored` to `virtual` will cause column recreation).
+
+  <CodeTabs items={["schema.ts"]}>
+	<CodeTab>
+	```typescript copy
+    export const users = sqliteTable("users", {
+      id: int(),
+      name: text(),
+      storedGenerated: text("stored_gen").generatedAlwaysAs(
+        (): SQL => sql`${users.name} || 'hello'`,
+        { mode: "stored" }
+      ),
+      virtualGenerated: text("virtual_gen").generatedAlwaysAs(
+        (): SQL => sql`${users.name} || 'hello'`,
+        { mode: "virtual" }
+      ),
+    });
+    ```
+    ```sql
+    CREATE TABLE `users` (
+	    `id` integer,
+	    `name` text,
+	    `stored_gen` text GENERATED ALWAYS AS ("name" || 'hello') STORED,
+	    `virtual_gen` text GENERATED ALWAYS AS ("name" || 'hello') VIRTUAL
+    );
+    ```
+    </CodeTab>
+  </CodeTabs>

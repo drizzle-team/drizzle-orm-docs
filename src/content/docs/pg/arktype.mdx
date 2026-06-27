@@ -1,0 +1,330 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+# arktype
+
+### Install the dependencies
+
+<Npm>
+drizzle-orm@rc arktype
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: ArkErrors | { id: number; name: string; age: number } = userSelectSchema(rows[0]); // Will parse successfully
+```
+
+Views and enums are also supported.
+
+```ts copy
+import { pgEnum, pgView } from 'drizzle-orm/pg-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
+
+const roles = pgEnum('roles', ['admin', 'basic']);
+const rolesSchema = createSelectSchema(roles);
+const parsed: ArkErrors | 'admin' | 'basic' = rolesSchema(...);
+
+const usersView = pgView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: ArkErrors | { id: number; name: string; age: number } = usersViewSchema(...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-orm/arktype';
+import { ArkErrors } from "arktype";
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: ArkErrors | { name: string, age: number } = userInsertSchema(user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: ArkErrors | { name: string, age: number } = userInsertSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createUpdateSchema } from 'drizzle-orm/arktype';
+import { eq } from "drizzle-orm";
+import { ArkErrors } from "arktype";
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { age: 35 };
+const parsed: ArkErrors | { name?: string | undefined, age?: number | undefined } = userUpdateSchema(user); // Will parse successfully
+
+if (parsed instanceof ArkErrors) {
+  console.error(parsed.summary);
+  process.exit(1);
+}
+
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a arktype schema will overwrite it.
+
+```ts copy
+import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-orm/arktype';
+import { ArkErrors, type } from 'arktype';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: json()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => schema.atMostLength(20), // Extends schema
+  bio: () => type.string.atMostLength(2000), // Extends schema before becoming nullable/optional
+  preferences: type({ theme: 'string' }) // Overwrites the field, including its nullability
+});
+
+const parsed: ArkErrors | {
+  id: number;
+  name: string,
+  bio: string | null;
+  preferences: {
+    theme: string;
+  };
+} = userSelectSchema(...);
+```
+
+### Data type reference
+
+```ts
+pg.boolean();
+
+// Schema
+type.boolean;
+```
+
+```ts
+pgEnum('name', ['val1', 'val2']);
+
+// Schema
+type.enumerated('val1', 'val2')
+```
+
+```ts
+pg.date({ mode: 'date' });
+pg.timestamp({ mode: 'date' });
+
+// Schema
+type.Date;
+```
+
+```ts
+pg.date({ mode: 'string' });
+pg.timestamp({ mode: 'string' });
+pg.cidr();
+pg.inet();
+pg.interval();
+pg.macaddr();
+pg.macaddr8();
+pg.numeric();
+pg.text();
+pg.sparsevec();
+pg.time();
+
+// Schema
+type.string;
+```
+
+```ts
+pg.bit({ dimensions: ... });
+
+// Schema
+type(`/^[01]{${column.dimensions}}$/`);
+```
+
+```ts
+pg.uuid();
+
+// Schema
+type(/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iu);
+```
+
+```ts
+pg.char({ length: ... });
+
+// Schema
+type.string.exactlyLength(length);
+```
+
+```ts
+pg.varchar({ length: ... });
+
+// Schema
+type.string.atMostLength(length);
+```
+
+```ts
+pg.text({ enum: ... });
+pg.char({ enum: ... });
+pg.varchar({ enum: ... });
+
+// Schema
+type.enumerated(...enum);
+```
+
+```ts
+pg.smallint();
+pg.smallserial();
+
+// Schema
+type.keywords.number.integer.atLeast(-32_768).atMost(32_767); // 16-bit integer lower and upper limit
+```
+
+```ts
+pg.real();
+
+// Schema
+type.number.atLeast(-8_388_608).atMost(8_388_607); // 24-bit integer lower and upper limit
+```
+
+```ts
+pg.integer();
+pg.serial();
+
+// Schema
+type.keywords.number.integer.atLeast(-2_147_483_648).atMost(2_147_483_647); // 32-bit integer lower and upper limit
+```
+
+```ts
+pg.doublePrecision();
+
+// Schema
+type.number.atLeast(-140_737_488_355_328).atMost(140_737_488_355_327); // 48-bit integer lower and upper limit
+```
+
+```ts
+pg.bigint({ mode: 'number' });
+pg.bigserial({ mode: 'number' });
+
+// Schema
+type.keywords.number.integer.atLeast(-9_007_199_254_740_991).atMost(9_007_199_254_740_991); // Javascript min. and max. safe integers
+```
+
+```ts
+pg.bigint({ mode: 'bigint' });
+pg.bigserial({ mode: 'bigint' });
+
+// Schema
+type.bigint.narrow(
+  (value, ctx) => value < -9_223_372_036_854_775_808n ? ctx.mustBe('greater than') : value > 9_223_372_036_854_775_807n ? ctx.mustBe('less than') : true
+); // 64-bit integer lower and upper limit
+```
+
+```ts
+pg.geometry({ type: 'point', mode: 'tuple' });
+pg.point({ mode: 'tuple' });
+
+// Schema
+type([type.number, type.number]);
+```
+
+```ts
+pg.geometry({ type: 'point', mode: 'xy' });
+pg.point({ mode: 'xy' });
+
+// Schema
+type({ x: type.number, y: type.number });
+```
+
+```ts
+pg.halfvec({ dimensions: ... });
+pg.vector({ dimensions: ... });
+
+// Schema
+type.number.array().exactlyLength(dimensions);
+```
+
+```ts
+pg.line({ mode: 'abc' });
+
+// Schema
+type({ a: type.number, b: type.number, c: type.number });
+```
+
+```ts
+pg.line({ mode: 'tuple' });
+
+// Schema
+type([type.number, type.number, type.number]);
+```
+
+```ts
+pg.json();
+pg.jsonb();
+
+// Schema
+type('string | number | boolean | null').or(type('unknown.any[] | Record<string, unknown.any>'));
+```
+
+```ts
+pg.dataType().array(...);
+
+// Schema
+baseDataTypeSchema.array().exactlyLength(size);
+```
+
+```ts
+pg.bytea();
+
+// Schema
+type.unknown.narrow((value) => value instanceof Buffer).as<Buffer>()
+```
+

@@ -1,0 +1,29 @@
+---
+import Flex from "@mdx/Flex.astro";
+import LinksList from "@mdx/LinksList.astro";
+---
+
+<Flex>
+  <LinksList
+    title="Manage schema"
+    links={[
+      ["Drizzle Schema", "/docs/sqlite/sql-schema-declaration"],
+      ["SQLite data types", "/docs/sqlite/column-types"],
+      ["Indexes and Constraints", "/docs/sqlite/indexes-constraints"],
+      ["Database Views", "/docs/sqlite/views"],
+    ]}
+  />
+  <LinksList
+    title="Query data"
+    links={[
+      ["Relational Queries", "/docs/sqlite/rqb"],
+      ["Select", "/docs/sqlite/select"],
+      ["Insert", "/docs/sqlite/insert"],
+      ["Update", "/docs/sqlite/update"],
+      ["Delete", "/docs/sqlite/delete"],
+      ["Filters", "/docs/sqlite/operators"],
+      ["Joins", "/docs/sqlite/joins"],
+      ["sql`` operator", "/docs/sqlite/sql"],
+    ]}
+  />
+</Flex>

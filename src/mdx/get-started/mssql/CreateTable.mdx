@@ -4,7 +4,7 @@ Create a `schema.ts` file in the `src/db` directory and declare your table:
 import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
 
 export const usersTable = mssqlTable("users", {
-  id: int().primaryKey(),
+  id: int().primaryKey().identity(),
   name: varchar({ length: 255 }).notNull(),
   age: int().notNull(),
   email: varchar({ length: 255 }).notNull().unique(),

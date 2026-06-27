@@ -1,0 +1,102 @@
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# Views
+
+There're several ways you can declare views with Drizzle ORM.  
+
+You can declare views that have to be created or you can declare views that already exist in the database. 
+
+You can declare views statements with an inline `query builder` syntax, with `standalone query builder` and with raw `sql` operators. 
+
+When views are created with either inlined or standalone query builders, view columns schema will be automatically inferred, 
+yet when you use `sql` you have to explicitly declare view columns schema.
+
+### Declaring views
+
+<Section>
+      ```ts filename="schema.ts" copy {13-14}
+      import { integer, text, sqliteView, sqliteTable } from "drizzle-orm/sqlite-core";
+      import { eq } from 'drizzle-orm';
+
+      export const user = sqliteTable("user", {
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
+        createdAt: integer("created_at"),
+        updatedAt: integer("updated_at"),
+      });
+
+      export const userView = sqliteView("user_view").as((qb) => qb.select().from(user));
+      export const customersView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
+      ```
+      ```sql
+      CREATE VIEW `user_view` AS select "id", ... from "user";
+      CREATE VIEW `customers_view` AS select "id", ... from "user" where "user"."role" = 'customer';
+      ```
+    </Section>
+
+You can also declare views using `standalone query builder`, it works exactly the same way:
+
+<Section>
+      ```ts filename="schema.ts" copy {3, 15-16}
+      import { integer, text, sqliteView, sqliteTable, QueryBuilder } from "drizzle-orm/sqlite-core";
+      import { eq } from 'drizzle-orm';
+
+      const qb = new QueryBuilder();
+
+      export const user = sqliteTable("user", {
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
+        email: text(),
+        password: text(),
+        role: text().$type<"admin" | "customer">(),
+        createdAt: integer("created_at"),
+        updatedAt: integer("updated_at"),
+      });
+
+      export const userView = sqliteView("user_view").as(() => qb.select().from(user));
+      export const customerView = sqliteView("customers_view").as((qb) => qb.select().from(user).where(eq(user.role, "customer")));
+      ```
+      ```sql
+      CREATE VIEW `user_view` AS select "id", ... from "user";
+      CREATE VIEW `customers_view` AS select "id", ... from "user" where "user"."role" = 'customer';
+      ```
+    </Section>
+
+### Declaring views with raw SQL
+Whenever you need to declare view using a syntax that is not supported by the query builder, 
+you can directly use `sql` operator and explicitly specify view columns schema.
+
+```ts copy
+// regular view
+const newYorkers = sqliteView('new_yorkers', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  cityId: integer('city_id').notNull(),
+}).as(sql`select * from ${users} where ${eq(users.cityId, 1)}`);
+```
+
+### Declaring existing views
+When you're provided with a read only access to an existing view in the database you should use `.existing()` view configuration, 
+`drizzle-kit` will ignore and will not generate a `create view` statement in the generated migration.
+```ts
+export const user = sqliteTable("user", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text(),
+  email: text(),
+  password: text(),
+  role: text().$type<"admin" | "customer">(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
+
+// regular view
+export const trimmedUser = sqliteView("trimmed_user", {
+  id: integer("id"),
+  name: text("name"),
+  email: text("email"),
+}).existing();
+```

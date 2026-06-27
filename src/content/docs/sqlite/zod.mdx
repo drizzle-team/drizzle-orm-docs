@@ -1,0 +1,263 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+# zod
+
+### Install the dependencies
+
+<Npm>
+drizzle-orm@rc zod
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Will parse successfully
+```
+
+Views are also supported.
+
+```ts copy
+import { sqliteView } from 'drizzle-orm/sqlite-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const usersView = sqliteView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = usersViewSchema.parse(...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createInsertSchema } from 'drizzle-orm/zod';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createUpdateSchema } from 'drizzle-orm/zod';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { age: 35 };
+const parsed: { name?: string | undefined, age?: number | undefined } = userUpdateSchema.parse(user); // Will parse successfully
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Zod schema will overwrite it.
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: text({ mode: 'json' })
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => schema.max(20), // Extends schema
+  bio: (schema) => schema.max(1000), // Extends schema before becoming nullable/optional
+  preferences: z.object({ theme: z.string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string,
+  bio: string | null;
+  preferences: {
+    theme: string;
+  };
+} = userSelectSchema.parse(...);
+```
+
+### Factory functions
+
+For more advanced use cases, you can use the `createSchemaFactory` function.
+
+**Use case: Using an extended Zod instance**
+
+```ts copy
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from '@hono/zod-openapi'; // Extended Zod instance
+
+const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({ zodInstance: z });
+
+const userInsertSchema = createInsertSchema(users, {
+  // We can now use the extended instance
+  name: (schema) => schema.openapi({ example: 'John' })
+});
+```
+
+**Use case: Type coercion**
+
+```ts copy
+import { integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = sqliteTable('users', {
+  ...,
+  createdAt: integer({ mode: 'timestamp' }).notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({
+  // This configuration will only coerce dates. Set `coerce` to `true` to coerce all data types or specify others
+  coerce: {
+    date: true
+  }
+});
+
+const userInsertSchema = createInsertSchema(users);
+// The above is the same as this:
+const userInsertSchema = z.object({
+  ...,
+  createdAt: z.coerce.date()
+});
+```
+
+### Data type reference
+
+```ts
+sqlite.integer({ mode: 'boolean' });
+
+// Schema
+z.boolean();
+```
+
+```ts
+sqlite.integer({ mode: 'timestamp' });
+sqlite.integer({ mode: 'timestamp_ms' });
+
+// Schema
+z.date();
+```
+
+```ts
+sqlite.numeric();
+sqlite.text({ mode: 'text' });
+
+// Schema
+z.string();
+```
+
+```ts
+sqlite.numeric({ mode: 'number' });
+
+// Schema
+z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991); // Javascript min. and max. safe integers
+```
+
+```ts
+sqlite.numeric({ mode: 'bigint' });
+
+// Schema
+z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n); // 64-bit integer lower and upper limit
+```
+
+```ts
+sqlite.text({ mode: 'text', length: ... });
+
+// Schema
+z.string().max(length);
+```
+
+```ts
+sqlite.text({ mode: 'text', enum: ... });
+
+// Schema
+z.enum(enum);
+```
+
+```ts
+sqlite.real();
+
+// Schema
+z.number().min(-140_737_488_355_328).max(140_737_488_355_327); // 48-bit integer lower and upper limit
+```
+
+```ts
+sqlite.integer({ mode: 'number' });
+
+// Schema
+z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991).int(); // Javascript min. and max. safe integers
+```
+
+```ts
+sqlite.blob({ mode: 'bigint' });
+
+// Schema
+z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n); // 64-bit integer lower and upper limit
+```
+
+```ts
+sqlite.blob({ mode: 'json' });
+sqlite.text({ mode: 'json' });
+
+// Schema
+z.union([z.union([z.string(), z.number(), z.boolean(), z.null()]), z.record(z.any()), z.array(z.any())]);
+```
+
+```ts
+sqlite.blob({ mode: 'buffer' });
+
+// Schema
+z.custom<Buffer>((v) => v instanceof Buffer);
+```
