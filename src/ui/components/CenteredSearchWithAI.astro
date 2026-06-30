@@ -1,14 +1,276 @@
+---
+import { getCollection } from "astro:content";
+
+import {
+  defaultDocsDialect,
+  dialectRelatedFolder,
+  docsDialectIds,
+  isDocsDialectId,
+  resolveDocsDialectFromSlug,
+  type DocsDialectId,
+} from "@/dialect-docs";
+import cockroachMeta from "@/content/docs/cockroach/_meta.json";
+import mssqlMeta from "@/content/docs/mssql/_meta.json";
+import mysqlMeta from "@/content/docs/mysql/_meta.json";
+import pgMeta from "@/content/docs/pg/_meta.json";
+import singlestoreMeta from "@/content/docs/singlestore/_meta.json";
+import sqliteMeta from "@/content/docs/sqlite/_meta.json";
+
+const allDocsEntries = await getCollection("docs");
+const docsEntrySlugs = new Set<string>(
+  allDocsEntries.map((entry) => entry.slug),
+);
+const metaByDialect = {
+  pg: pgMeta,
+  mysql: mysqlMeta,
+  sqlite: sqliteMeta,
+  singlestore: singlestoreMeta,
+  mssql: mssqlMeta,
+  cockroach: cockroachMeta,
+} satisfies Record<DocsDialectId, Array<string | string[]>>;
+
+const getMetaSlugs = (items: Array<string | string[]>): string[] =>
+  items.flatMap((item) => (Array.isArray(item) ? [`${item[0]}`] : []));
+
+const metaSlugsByDialect = Object.fromEntries(
+  docsDialectIds.map((dialectId) => [
+    dialectId,
+    getMetaSlugs(metaByDialect[dialectId]),
+  ]),
+) as Record<DocsDialectId, string[]>;
+const docSearchScopeSets = Object.fromEntries(
+  docsDialectIds.map((dialectId) => [dialectId, new Set<string>()]),
+) as Record<DocsDialectId, Set<string>>;
+
+const addDocSearchPath = (dialectId: DocsDialectId, path: string) => {
+  docSearchScopeSets[dialectId].add(path.replace(/\/$/, ""));
+};
+const getRoutePrefix = (dialectId: DocsDialectId) =>
+  dialectId === defaultDocsDialect ? "/docs" : `/docs/${dialectId}`;
+const getRootDocsPathDialect = (slug: string): DocsDialectId | null => {
+  if (slug.startsWith("get-started/")) {
+    return resolveDocsDialectFromSlug(`docs/${slug}`);
+  }
+
+  const [folder, page] = slug.split("/");
+  if (folder === "column-types" && isDocsDialectId(page)) {
+    return page;
+  }
+
+  return null;
+};
+
+docsDialectIds.forEach((dialectId) => {
+  const routePrefix = getRoutePrefix(dialectId);
+  metaSlugsByDialect[dialectId].forEach((slug) =>
+    addDocSearchPath(dialectId, `${routePrefix}/${slug}`),
+  );
+});
+
+allDocsEntries.forEach((entry) => {
+  const [maybeDialect, ...slugParts] = entry.slug.split("/");
+
+  if (isDocsDialectId(maybeDialect) && slugParts.length > 0) {
+    addDocSearchPath(
+      maybeDialect,
+      `${getRoutePrefix(maybeDialect)}/${slugParts.join("/")}`,
+    );
+    return;
+  }
+
+  const rootPath = `/docs/${entry.slug}`;
+  const rootPathDialect = getRootDocsPathDialect(entry.slug);
+  if (rootPathDialect) {
+    addDocSearchPath(rootPathDialect, rootPath);
+    return;
+  }
+
+  if (docsEntrySlugs.has(`${defaultDocsDialect}/${entry.slug}`)) {
+    addDocSearchPath(defaultDocsDialect, rootPath);
+    return;
+  }
+
+  docsDialectIds.forEach((dialectId) => addDocSearchPath(dialectId, rootPath));
+});
+
+dialectRelatedFolder.forEach((folder) => {
+  const folderEntries = allDocsEntries.filter((entry) =>
+    entry.slug.startsWith(`${folder}/`),
+  );
+
+  docsDialectIds.forEach((dialectId) => {
+    if (!metaSlugsByDialect[dialectId].includes(folder)) {
+      return;
+    }
+
+    const routePrefix = getRoutePrefix(dialectId);
+    folderEntries.forEach((entry) =>
+      addDocSearchPath(dialectId, `${routePrefix}/${entry.slug}`),
+    );
+  });
+});
+
+const docSearchScopes = Object.fromEntries(
+  docsDialectIds.map((dialectId) => [
+    dialectId,
+    Array.from(docSearchScopeSets[dialectId]).sort(),
+  ]),
+) as Record<DocsDialectId, string[]>;
+---
+
 <div class="nav_search-wrap">
   <div class="search-wrap--centered" id="docsearch"></div>
   <div id="custom-button" class="nav_ai-btn"></div>
 </div>
-<script type="module" is:inline data-astro-rerun>
+<script
+  type="module"
+  is:inline
+  data-astro-rerun
+  define:vars={{
+    defaultDocSearchDialect: defaultDocsDialect,
+    docSearchDialectIds: docsDialectIds,
+    docSearchScopes,
+  }}
+>
+  // @ts-ignore Astro injects these values from define:vars.
+  const currentDocSearchDialectIds = docSearchDialectIds;
+  // @ts-ignore Astro injects these values from define:vars.
+  const currentDefaultDocSearchDialect = defaultDocSearchDialect;
+  // @ts-ignore Astro injects these values from define:vars.
+  const currentDocSearchScopes = docSearchScopes;
+  const docSearchDialectSet = new Set(currentDocSearchDialectIds);
+  const docSearchScopeSets = Object.fromEntries(
+    Object.entries(currentDocSearchScopes).map(([dialectId, paths]) => [
+      dialectId,
+      new Set(paths),
+    ]),
+  );
+  const getDocSearchDialect = () => {
+    const [, section, maybeDialect] = window.location.pathname.split("/");
+
+    if (section !== "docs") {
+      return null;
+    }
+
+    return docSearchDialectSet.has(maybeDialect)
+      ? maybeDialect
+      : currentDefaultDocSearchDialect;
+  };
+  const getDocSearchPath = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    try {
+      return new URL(value, window.location.origin).pathname.replace(/\/$/, "");
+    } catch {
+      return "";
+    }
+  };
+  const isDocSearchHitInScope = (hit) => {
+    const dialectId = getDocSearchDialect();
+    const scope = dialectId ? docSearchScopeSets[dialectId] : null;
+
+    if (!scope) {
+      return true;
+    }
+
+    const hitPath = getDocSearchPath(hit?.url || hit?.url_without_anchor);
+    return hitPath ? scope.has(hitPath) : true;
+  };
+  const getSearchParamValue = (params, key) => {
+    if (!params) {
+      return undefined;
+    }
+
+    if (typeof params === "string") {
+      return new URLSearchParams(params).get(key);
+    }
+
+    if (params instanceof URLSearchParams) {
+      return params.get(key);
+    }
+
+    return params[key];
+  };
+  const getHitsPerPage = (params, fallback = 20) => {
+    const hitsPerPage = Number(getSearchParamValue(params, "hitsPerPage"));
+    return Number.isFinite(hitsPerPage) && hitsPerPage > 0
+      ? hitsPerPage
+      : fallback;
+  };
+  const setHitsPerPage = (params, hitsPerPage) => {
+    if (typeof params === "string") {
+      const searchParams = new URLSearchParams(params);
+      searchParams.set("hitsPerPage", String(hitsPerPage));
+      return searchParams.toString();
+    }
+
+    if (params instanceof URLSearchParams) {
+      const searchParams = new URLSearchParams(params);
+      searchParams.set("hitsPerPage", String(hitsPerPage));
+      return searchParams;
+    }
+
+    return { ...params, hitsPerPage };
+  };
+
   docsearch({
     container: '#docsearch',
     appId: "MXZNUT59HV",
     apiKey: "7c390e262ac8858df0b6624d01d9dfef",
     indexName: "orm-drizzle",
     placeholder: "Search documentation...",
+    transformSearchClient(searchClient) {
+      return {
+        ...searchClient,
+        search(requests) {
+          const dialectId = getDocSearchDialect();
+
+          if (!dialectId || !docSearchScopeSets[dialectId]) {
+            return searchClient.search(requests);
+          }
+
+          const requestedHitsPerPage = requests.map((request) =>
+            getHitsPerPage(request.params),
+          );
+          const scopedRequests = requests.map((request, index) => ({
+            ...request,
+            params: setHitsPerPage(
+              request.params,
+              Math.max(requestedHitsPerPage[index] * 6, 60),
+            ),
+          }));
+
+          return searchClient.search(scopedRequests).then((response) => ({
+            ...response,
+            results: response.results.map((result, index) => {
+              if (!Array.isArray(result.hits)) {
+                return result;
+              }
+
+              const hitsPerPage = requestedHitsPerPage[index] ||
+                result.hitsPerPage ||
+                20;
+              const hits = result.hits
+                .filter(isDocSearchHitInScope)
+                .slice(0, hitsPerPage);
+
+              return {
+                ...result,
+                hits,
+                hitsPerPage,
+                nbHits: hits.length,
+                nbPages: hits.length > 0 ? 1 : 0,
+              };
+            }),
+          }));
+        },
+      };
+    },
+    transformItems(items) {
+      return items.filter(isDocSearchHitInScope);
+    },
   });
 
   let themeName = localStorage.getItem('theme');

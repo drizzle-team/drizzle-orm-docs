@@ -40,6 +40,7 @@ const getStartedDialectBySlug: Record<string, DocsDialectId> = {
   "turso-database": "sqlite",
   d1: "sqlite",
   "bun-sqlite": "sqlite",
+  "node-sqlite": "sqlite",
   do: "sqlite",
   expo: "sqlite",
   "op-sqlite": "sqlite",
