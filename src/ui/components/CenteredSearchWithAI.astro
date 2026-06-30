@@ -178,20 +178,34 @@ const docSearchScopes = Object.fromEntries(
     const hitPath = getDocSearchPath(hit?.url || hit?.url_without_anchor);
     return hitPath ? scope.has(hitPath) : true;
   };
-  const getSearchParamValue = (params, key) => {
+  const getSearchParams = (params) => {
+    const searchParams = new URLSearchParams(
+      typeof params === "string" || params instanceof URLSearchParams
+        ? params
+        : undefined,
+    );
+
     if (!params) {
-      return undefined;
+      return searchParams;
     }
 
-    if (typeof params === "string") {
-      return new URLSearchParams(params).get(key);
+    if (typeof params !== "string" && !(params instanceof URLSearchParams)) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+          return;
+        }
+
+        searchParams.set(
+          key,
+          typeof value === "object" ? JSON.stringify(value) : String(value),
+        );
+      });
     }
 
-    if (params instanceof URLSearchParams) {
-      return params.get(key);
-    }
-
-    return params[key];
+    return searchParams;
+  };
+  const getSearchParamValue = (params, key) => {
+    return getSearchParams(params).get(key);
   };
   const getHitsPerPage = (params, fallback = 20) => {
     const hitsPerPage = Number(getSearchParamValue(params, "hitsPerPage"));
@@ -200,19 +214,9 @@ const docSearchScopes = Object.fromEntries(
       : fallback;
   };
   const setHitsPerPage = (params, hitsPerPage) => {
-    if (typeof params === "string") {
-      const searchParams = new URLSearchParams(params);
-      searchParams.set("hitsPerPage", String(hitsPerPage));
-      return searchParams.toString();
-    }
-
-    if (params instanceof URLSearchParams) {
-      const searchParams = new URLSearchParams(params);
-      searchParams.set("hitsPerPage", String(hitsPerPage));
-      return searchParams;
-    }
-
-    return { ...params, hitsPerPage };
+    const searchParams = getSearchParams(params);
+    searchParams.set("hitsPerPage", String(hitsPerPage));
+    return searchParams.toString();
   };
   const getSearchRequests = (requests) => {
     if (Array.isArray(requests)) {
