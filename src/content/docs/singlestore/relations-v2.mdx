@@ -146,8 +146,6 @@ const relations = defineRelations({ users, posts }, (r) => ({
 In this case, the relation starts from the `id` column in the `users` table.
 - `to: r.posts.ownerId` specifies the table to which we are establishing a soft relation. 
 In this case, the relation points to the `ownerId` column in the `posts` table.
-- `optional: false` at the type level makes the `feed` key in the posts object `required`. 
-This should be used when you are certain that this specific entity will always exist.
 - `alias` is used to add a specific alias to relationships between tables. If you have multiple identical relationships between two tables, you should 
 differentiate them using `alias`
 - `where` condition can be used for polymorphic relations. It fetches relations based on a `where` statement.
