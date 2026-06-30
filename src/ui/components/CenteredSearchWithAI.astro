@@ -214,6 +214,21 @@ const docSearchScopes = Object.fromEntries(
 
     return { ...params, hitsPerPage };
   };
+  const getSearchRequests = (requests) => {
+    if (Array.isArray(requests)) {
+      return requests;
+    }
+
+    if (Array.isArray(requests?.requests)) {
+      return requests.requests;
+    }
+
+    return null;
+  };
+  const setSearchRequests = (requests, searchRequests) =>
+    Array.isArray(requests)
+      ? searchRequests
+      : { ...requests, requests: searchRequests };
 
   docsearch({
     container: '#docsearch',
@@ -226,15 +241,20 @@ const docSearchScopes = Object.fromEntries(
         ...searchClient,
         search(requests) {
           const dialectId = getDocSearchDialect();
+          const searchRequests = getSearchRequests(requests);
 
-          if (!dialectId || !docSearchScopeSets[dialectId]) {
+          if (
+            !dialectId ||
+            !docSearchScopeSets[dialectId] ||
+            !searchRequests
+          ) {
             return searchClient.search(requests);
           }
 
-          const requestedHitsPerPage = requests.map((request) =>
+          const requestedHitsPerPage = searchRequests.map((request) =>
             getHitsPerPage(request.params),
           );
-          const scopedRequests = requests.map((request, index) => ({
+          const scopedRequests = searchRequests.map((request, index) => ({
             ...request,
             params: setHitsPerPage(
               request.params,
@@ -242,29 +262,31 @@ const docSearchScopes = Object.fromEntries(
             ),
           }));
 
-          return searchClient.search(scopedRequests).then((response) => ({
-            ...response,
-            results: response.results.map((result, index) => {
-              if (!Array.isArray(result.hits)) {
-                return result;
-              }
+          return searchClient
+            .search(setSearchRequests(requests, scopedRequests))
+            .then((response) => ({
+              ...response,
+              results: response.results.map((result, index) => {
+                if (!Array.isArray(result.hits)) {
+                  return result;
+                }
 
-              const hitsPerPage = requestedHitsPerPage[index] ||
-                result.hitsPerPage ||
-                20;
-              const hits = result.hits
-                .filter(isDocSearchHitInScope)
-                .slice(0, hitsPerPage);
+                const hitsPerPage = requestedHitsPerPage[index] ||
+                  result.hitsPerPage ||
+                  20;
+                const hits = result.hits
+                  .filter(isDocSearchHitInScope)
+                  .slice(0, hitsPerPage);
 
-              return {
-                ...result,
-                hits,
-                hitsPerPage,
-                nbHits: hits.length,
-                nbPages: hits.length > 0 ? 1 : 0,
-              };
-            }),
-          }));
+                return {
+                  ...result,
+                  hits,
+                  hitsPerPage,
+                  nbHits: hits.length,
+                  nbPages: hits.length > 0 ? 1 : 0,
+                };
+              }),
+            }));
         },
       };
     },
