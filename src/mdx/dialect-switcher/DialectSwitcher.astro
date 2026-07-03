@@ -2,7 +2,25 @@
 import type { SVGProps } from "@/types";
 import type { CSSProperties } from "react";
 import { dialectSwitcherItems } from "./data";
-import { resolveDocsDialectFromSlug } from "@/dialect-docs";
+import { defaultDocsDialect, resolveDocsDialectFromSlug } from "@/dialect-docs";
+import pgMeta from "@/content/docs/pg/_meta.json";
+import mysqlMeta from "@/content/docs/mysql/_meta.json";
+import sqliteMeta from "@/content/docs/sqlite/_meta.json";
+import singlestoreMeta from "@/content/docs/singlestore/_meta.json";
+import mssqlMeta from "@/content/docs/mssql/_meta.json";
+import cockroachMeta from "@/content/docs/cockroach/_meta.json";
+
+// Page slugs each dialect exposes (mirrors route generation in [...slug].astro).
+const getMetaSlugs = (items: Array<string | string[]>): string[] =>
+  items.flatMap((item) => (Array.isArray(item) ? [`${item[0]}`] : []));
+const pageSlugsByDialect: Record<string, string[]> = {
+  pg: getMetaSlugs(pgMeta as any),
+  mysql: getMetaSlugs(mysqlMeta as any),
+  sqlite: getMetaSlugs(sqliteMeta as any),
+  singlestore: getMetaSlugs(singlestoreMeta as any),
+  mssql: getMetaSlugs(mssqlMeta as any),
+  cockroach: getMetaSlugs(cockroachMeta as any),
+};
 
 interface Props {
   slug: string;
@@ -196,15 +214,47 @@ const darkStylesSVGString = svgCodeDark.replace(
   }
 </style>
 
-<script is:inline define:vars={{ dialectSwitcherItems }}>
+<script
+  is:inline
+  define:vars={{ dialectSwitcherItems, pageSlugsByDialect, defaultDocsDialect }}
+>
   if (!window.__dbSwitcherBound) {
     window.__dbSwitcherBound = true;
+
+    // Slug of the current docs page, without /docs and any dialect prefix.
+    const currentPageSlug = () => {
+      const rest = window.location.pathname
+        .replace(/^\/docs\/?/, "")
+        .replace(/\/$/, "");
+      if (!rest) return "";
+      const [first, ...tail] = rest.split("/");
+      if (first !== defaultDocsDialect && pageSlugsByDialect[first]) {
+        return tail.join("/");
+      }
+      return rest;
+    };
+
     document.addEventListener("change", (e) => {
       const sel = e.target;
       if (!sel.classList || !sel.classList.contains("db-switcher-select"))
         return;
       const item = dialectSwitcherItems.find(({ id }) => id === sel.value);
-      if (item) window.location.href = item.path;
+      if (!item) return;
+
+      // Stay on the same page if the target dialect has it, else go to overview.
+      const slug = currentPageSlug();
+      const slugs = pageSlugsByDialect[item.id] || [];
+      const hasPage =
+        slug &&
+        (slugs.includes(slug) ||
+          (slug.includes("/") && slugs.includes(slug.split("/")[0])));
+      if (hasPage) {
+        const prefix =
+          item.id === defaultDocsDialect ? "/docs" : "/docs/" + item.id;
+        window.location.href = prefix + "/" + slug;
+      } else {
+        window.location.href = item.path;
+      }
     });
   }
 </script>
