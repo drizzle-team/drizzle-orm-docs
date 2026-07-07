@@ -137,7 +137,7 @@ const { title, tree } = await getContentTree({
     </script>
     <script is:inline>
       const changeNpmTab = () => {
-        const packageManagers = ["npm", "yarn", "pnpm", "bun"];
+        const packageManagers = ["npm", "yarn", "pnpm", "bun", "deno"];
         // @ts-nocheck
         let packageManagerIndex = packageManagers.indexOf(packageManager);
 
@@ -154,7 +154,7 @@ const { title, tree } = await getContentTree({
           });
 
           npxSelectResizer.querySelector(".line span").innerText =
-            packageManagers[index];
+            npxSelects[0]?.children[index]?.innerText ?? packageManagers[index];
 
           npxSelects.forEach((element) => {
             element.value = index;
@@ -250,7 +250,7 @@ const { title, tree } = await getContentTree({
         const npxSelectResizer = document.querySelector<HTMLDivElement>(
           ".npx-select-resizer",
         );
-        const packageManagers: string[] = ["npm", "yarn", "pnpm", "bun"];
+        const packageManagers: string[] = ["npm", "yarn", "pnpm", "bun", "deno"];
         let packageManager: string =
           localStorage.getItem("package-manager") || "npm";
         let packageManagerIndex: number =
@@ -274,7 +274,7 @@ const { title, tree } = await getContentTree({
           const lineSpan =
             npxSelectResizer?.querySelector<HTMLSpanElement>(".line span");
           if (lineSpan) {
-            lineSpan.innerText = packageManagers[index];
+            lineSpan.innerText = (npxSelects[0]?.children[index] as HTMLElement)?.innerText ?? packageManagers[index];
           }
 
           npxSelects.forEach((element) => {
