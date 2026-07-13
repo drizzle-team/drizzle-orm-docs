@@ -16,6 +16,10 @@ export const GET: APIRoute = async ({ url }) => {
     if (entry.slug.includes("latest-releases") || entry.slug.includes("migrate/")) {
       return false;
     }
+    // Tutorials live per dialect; pg is canonical for the /docs/tutorials URLs
+    if (entry.slug.includes("/tutorials/") && !entry.slug.startsWith("pg/")) {
+      return false;
+    }
     return true;
   }).forEach((doc) => {
     if (doc.slug.includes("tutorials/")) {

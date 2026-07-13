@@ -87,9 +87,9 @@ export const db = drizzle(process.env.DATABASE_URL!);
 import { integer, text, boolean, pgTable } from "drizzle-orm/pg-core";
 
 export const todo = pgTable("todo", {
-  id: integer("id").primaryKey(),
-  text: text("text").notNull(),
-  done: boolean("done").default(false).notNull(),
+  id: integer().primaryKey(),
+  text: text().notNull(),
+  done: boolean().default(false).notNull(),
 });
 ```
 
@@ -127,13 +127,13 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain a folder for each migration, each holding a `migration.sql` file with the statements necessary to update your database schema and a `snapshot.json` file storing a snapshot of the schema at that migration stage.
 
 Example of a generated migration:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "todo" (
-	"id" integer PRIMARY KEY NOT NULL,
+CREATE TABLE "todo" (
+	"id" integer PRIMARY KEY,
 	"text" text NOT NULL,
 	"done" boolean DEFAULT false NOT NULL
 );
@@ -176,8 +176,8 @@ In this step, we establish server-side functions in the **src/actions/todoAction
 "use server";
 import { eq, not } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { db } from "@/db/drizzle";
-import { todo } from "@/db/schema";
+import { db } from "@/src/db/drizzle";
+import { todo } from "@/src/db/schema";
 
 export const getData = async () => {
   const data = await db.select().from(todo);
@@ -244,11 +244,11 @@ export type todoType = {
 3. **`src/components/todos.tsx`:**
     Create Todos components that represents the main interface of a Todo app. It manages the state of todo items, provides functions for creating, editing, toggling, and deleting todos, and renders the individual todo items using the `Todo` component.
 
-<CodeTabs items={["todo.tsx", "addTodo.tsx", "todos.tsx"]}>
+<CodeTabs items={["todo.tsx", "addTodo.tsx", "todos.tsx"]}>	
 ```tsx collapsable copy
 "use client";
 import { ChangeEvent, FC, useState } from "react";
-import { todoType } from "@/types/todoType";
+import { todoType } from "@/src/types/todoType";
 
 interface Props {
   todo: todoType;
@@ -417,10 +417,10 @@ export default AddTodo;
 ```tsx collapsable copy
 "use client";
 import { FC, useState } from "react";
-import { todoType } from "@/types/todoType";
+import { todoType } from "@/src/types/todoType";
 import Todo from "./todo";
 import AddTodo from "./addTodo";
-import { addTodo, deleteTodo, editTodo, toggleTodo } from "@/actions/todoAction";
+import { addTodo, deleteTodo, editTodo, toggleTodo } from "@/src/actions/todoAction";
 
 interface Props {
   todos: todoType[];
@@ -487,11 +487,11 @@ export default Todos;
     </CodeTab>
 </CodeTabs>
 
-Update the `page.tsx` file in the `src/app` folder to fetch the todo items from the database and render the `Todos` component:
+Update the `page.tsx` file in the `app` folder to fetch the todo items from the database and render the `Todos` component:
 
-```tsx copy filename="src/app/page.tsx"
-import { getData } from "@/actions/todoAction";
-import Todos from "@/components/todos";
+```tsx copy filename="app/page.tsx"
+import { getData } from "@/src/actions/todoAction";
+import Todos from "@/src/components/todos";
 
 export default async function Home() {
   const data = await getData();
@@ -507,17 +507,18 @@ This guide uses the following file structure:
 ```text
 📦 <project root>
  ├ 📂 migrations
- │  ├ 📂 meta
- │  └ 📜 0000_heavy_doctor_doom.sql
+ │  └ 📂 20260708180055_clean_captain_britain
+ │    ├ 📜 migration.sql
+ │    └ 📜 snapshot.json
  ├ 📂 public
+ ├ 📂 app
+ │  ├ 📜 favicon.ico
+ │  ├ 📜 globals.css
+ │  ├ 📜 layout.tsx
+ │  └ 📜 page.tsx
  ├ 📂 src
  │  ├ 📂 actions
- │  │  └ 📜 todoActions.ts
- │  ├ 📂 app
- │  │  ├ 📜 favicon.ico
- │  │  ├ 📜 globals.css
- │  │  ├ 📜 layout.tsx
- │  │  └ 📜 page.tsx
+ │  │  └ 📜 todoAction.ts
  │  ├ 📂 components
  │  │  ├ 📜 addTodo.tsx
  │  │  ├ 📜 todo.tsx

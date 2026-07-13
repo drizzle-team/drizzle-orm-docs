@@ -32,6 +32,12 @@ This tutorial demonstrates how to use **Drizzle ORM** with **Encore**, an open s
       drizzle-orm@rc
       -D drizzle-kit@rc
   </Npm>
+
+  - You should have installed `pg` package for applying migrations through `drizzle`. Read more about this package [here](https://www.npmjs.com/package/pg)
+  <Npm>
+      pg
+      -D @types/pg
+  </Npm>
 </Prerequisites>
 
 ## Setup Encore and Drizzle ORM
@@ -39,14 +45,14 @@ This tutorial demonstrates how to use **Drizzle ORM** with **Encore**, an open s
 <Steps>
 #### Create a new Encore project
 
-You can create a new Encore project with Drizzle already configured:
+You can create a new Encore project:
 
 ```bash
-encore app create my-app --example=ts/drizzle
+encore app create my-app
 cd my-app
 ```
 
-Or if you have an existing Encore project, install Drizzle:
+Install Drizzle:
 
 <Npm>
     drizzle-orm@rc

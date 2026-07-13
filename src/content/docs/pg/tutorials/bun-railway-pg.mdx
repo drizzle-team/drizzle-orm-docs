@@ -1,6 +1,6 @@
 ---
-title: "Drizzle with Node.js and PostgreSQL on Railway"
-date: "2026-03-19"
+title: "Drizzle with Bun and PostgreSQL on Railway"
+date: "2026-03-07"
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -9,10 +9,10 @@ import Steps from "@mdx/Steps.astro";
 import Section from "@mdx/Section.astro";
 import Callout from "@mdx/Callout.astro";
 
-This tutorial demonstrates how to use Drizzle ORM with [Node.js](https://nodejs.org/) and a PostgreSQL database, all deployed on [Railway](https://driz.link/railway).
+This tutorial demonstrates how to use Drizzle ORM with [Bun](https://bun.sh/) runtime and a PostgreSQL database, all deployed on [Railway](https://driz.link/railway).
 
 <Prerequisites>
-  - You should have [Node.js](https://nodejs.org/) installed. You can install it by following the [official guide](https://nodejs.org/en/download/).
+  - You should have [Bun](https://bun.sh/) installed. You can install it by following the [official guide](https://bun.sh/docs/installation).
 
   - You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
   <Npm>
@@ -20,10 +20,10 @@ This tutorial demonstrates how to use Drizzle ORM with [Node.js](https://nodejs.
       -D drizzle-kit@rc
   </Npm>
 
-  - You should have installed the `pg` package as the PostgreSQL driver and `tsx` to run TypeScript files directly.
+  - You should have installed the `pg` package as the PostgreSQL driver.
   <Npm>
     pg
-    -D @types/pg tsx
+    -D @types/pg
   </Npm>
 
   - You should have a [Railway](https://driz.link/railway) account.
@@ -34,13 +34,13 @@ This tutorial demonstrates how to use Drizzle ORM with [Node.js](https://nodejs.
 <Steps>
 #### Create a Railway project
 
-Log in to your [Railway dashboard](https://railway.app/dashboard) and click the `New Project` button.
+Log in to your [Railway dashboard](https://railway.app/dashboard) and click the `New` button.
 
 ![](@/assets/images/tutorials/railway-create-service-menu.png)
 
 #### Provision a PostgreSQL database
 
-On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also use the command palette (`Cmd/Ctrl + K`) and search for PostgreSQL. Railway will provision a new PostgreSQL instance for you.
+On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also search for PostgreSQL using the search bar. Railway will provision a new PostgreSQL instance for you.
 
 ![](@/assets/images/tutorials/railway-select-postgres.png)
 
@@ -149,16 +149,16 @@ You can generate migrations using `drizzle-kit generate` command and then run th
 Generate migrations:
 
 ```bash copy
-npx drizzle-kit generate
+bunx --bun drizzle-kit generate
 ```
 
-The `generate` command only creates migration SQL files based on your schema — it does **not** apply any changes to the database. These migrations are stored in the `migrations` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+The `generate` command only creates migration SQL files based on your schema — it does **not** apply any changes to the database. These migrations are stored in the `./migrations` directory, as specified in your `drizzle.config.ts`. This directory will contain a folder for each migration, each holding a `migration.sql` file with the statements necessary to update your database schema and a `snapshot.json` file storing a snapshot of the schema at that migration stage.
 
 Example of a generated migration:
 
 ```sql
 CREATE TABLE "posts" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY,
 	"title" text NOT NULL,
 	"content" text NOT NULL,
 	"userId" integer NOT NULL,
@@ -167,20 +167,19 @@ CREATE TABLE "posts" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"age" integer NOT NULL,
-	"email" text NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	"email" text NOT NULL UNIQUE
 );
 --> statement-breakpoint
-ALTER TABLE "posts" ADD CONSTRAINT "posts_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "posts" ADD CONSTRAINT "posts_userId_users_id_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
 ```
 
 Apply the generated migrations to the database:
 
 ```bash copy
-npx drizzle-kit migrate
+bunx --bun drizzle-kit migrate
 ```
 
 <Callout type="info">
@@ -189,10 +188,10 @@ npx drizzle-kit migrate
   apply them manually with `drizzle-kit migrate` for local testing.
 </Callout>
 
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/drizzle-kit-push):
 
 ```bash copy
-npx drizzle-kit push
+bunx --bun drizzle-kit push
 ```
 
 <Callout type="warning">
@@ -215,10 +214,9 @@ This is the basic file structure of the project. In the `src` directory, we have
  │  ├ 📜 schema.ts
  │  └ 📜 index.ts
  ├ 📂 migrations
- │  ├ 📂 meta
- │  │  ├ 📜 _journal.json
- │  │  └ 📜 0000_snapshot.json
- │  └ 📜 0000_optimal_the_fury.sql
+ │  └ 📂 20242409125510_optimal_the_fury
+ │    ├ 📜 migration.sql
+ │    └ 📜 snapshot.json
  ├ 📜 .env
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
@@ -232,10 +230,9 @@ This is the basic file structure of the project. In the `src` directory, we have
 
 Once you've [generated your migrations](#applying-changes-to-the-database), commit the `migrations` directory to your repository — these files will be applied automatically when your app starts.
 
-Create an `index.ts` file as the entry point for your application. This example runs migrations on startup and then starts a simple HTTP server using Node.js:
+Create an `index.ts` file as the entry point for your application. This example runs migrations on startup and then starts a simple HTTP server using Bun:
 
 ```typescript copy filename="src/index.ts"
-import { createServer } from "node:http";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { usersTable } from "./schema";
@@ -244,40 +241,33 @@ const db = drizzle(process.env.DATABASE_URL!);
 
 await migrate(db, { migrationsFolder: "./migrations" });
 
-const server = createServer(async (req, res) => {
-  const url = new URL(req.url!, `http://${req.headers.host}`);
+const server = Bun.serve({
+  port: process.env.PORT || 3000,
+  async fetch(req) {
+    const url = new URL(req.url);
 
-  if (url.pathname === "/users") {
-    const users = await db.select().from(usersTable);
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(users));
-    return;
-  }
+    if (url.pathname === "/users") {
+      const users = await db.select().from(usersTable);
+      return new Response(JSON.stringify(users), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-  res.writeHead(200);
-  res.end("OK");
+    return new Response("OK");
+  },
 });
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+console.log(`Server running on port ${server.port}`);
 ```
 
 The `migrate()` function reads the SQL files from your `migrations` directory and applies any unapplied migrations to the database. It is safe to run on every startup — already applied migrations are skipped.
 
-<Callout type="info">
-  Top-level `await` requires Node.js to treat the file as an ES module. Make
-  sure your `package.json` includes `"type": "module"`.
-</Callout>
-
-Make sure your `package.json` has the module type and a start script:
+Make sure your `package.json` has a start script:
 
 ```json copy filename="package.json"
 {
-  "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "bun src/index.ts"
   }
 }
 ```
@@ -296,35 +286,35 @@ Create a new repository on GitHub and push your code to it.
 
 #### Connect your GitHub repository to Railway
 
-In your Railway project, click the `New` button in the top right corner of the canvas and select `GitHub Repo`. Connect your GitHub account if prompted, then select the repository you just pushed.
+In your Railway project, click the `Add` button in the top right corner of the canvas and select `GitHub Repo`. Connect your GitHub account if prompted, then select the repository you just pushed.
 
 ![](@/assets/images/tutorials/railway-canvas-postgres-add-service.png)
 
-![](@/assets/images/tutorials/node-railway-github-repo-search.png)
+![](@/assets/images/tutorials/bun-railway-github-repo-search.png)
 
 #### Configure environment variables
 
 In the deployed service settings, go to the `Variables` tab. Add the `DATABASE_URL` variable by referencing the PostgreSQL service variable:
 
-Click `Add Variable`, set the name to `DATABASE_URL`, and use the Railway variable reference `${{Postgres.DATABASE_URL}}` as the value.
+Click `New Variable`, set the name to `DATABASE_URL`, and use the Railway variable reference `${{Postgres.DATABASE_URL}}` as the value.
 
 <Callout type="info">
 The `${{Postgres.DATABASE_URL}}` reference variable automatically resolves to the **private** internal connection string at runtime, which is optimal for service-to-service communication within Railway. This is different from the public URL you use in your local `.env` file.
 </Callout>
 
-![](@/assets/images/tutorials/node-railway-app-set-database-url.png)
+![](@/assets/images/tutorials/bun-railway-app-set-database-url.png)
 
 #### Deploy
 
 Railway will automatically deploy your application when you push to the connected branch. You can monitor the deployment in the `Deployments` tab.
 
-![](@/assets/images/tutorials/node-railway-deployment-successful.png)
+![](@/assets/images/tutorials/bun-railway-deployment-successful.png)
 
 #### Verify your setup
 
 Once deployed, navigate to the `Architecture` tab in your Railway project. You should see your application service connected to the PostgreSQL database.
 
-![](@/assets/images/tutorials/node-railway-canvas-app-postgres-full.png)
+![](@/assets/images/tutorials/bun-railway-canvas-app-postgres.png)
 
 <Callout type="warning" title="Alternative: Zero-downtime migrations">
 This tutorial applies migrations at application startup using `migrate()`. This is the simplest approach and works well for most applications.
@@ -335,12 +325,12 @@ On Railway, you can achieve this using a [pre-deploy command](https://docs.railw
 
 In your service settings, scroll down to the **Deploy** section and click **Add pre-deploy step**:
 
-![](@/assets/images/tutorials/node-railway-app-predeploy-migrate.png)
+![](@/assets/images/tutorials/bun-railway-app-predeploy-migrate.png)
 
 Enter the following command:
 
 ```bash copy
-npx drizzle-kit migrate
+bunx --bun drizzle-kit migrate
 ```
 
 With this approach, remove the `await migrate(db, { migrationsFolder: "./migrations" })` call from your `index.ts` — migrations are handled by the pre-deploy command instead.
@@ -358,9 +348,9 @@ You can deploy [Drizzle Studio](/drizzle-studio/overview) alongside your applica
 <Steps>
 #### Add a new service from a template
 
-In your Railway project, click the `New` button in the top right corner of the canvas and select `Template`.
+In your Railway project, click the `Add` button in the top right corner of the canvas and select `Template`.
 
-![](@/assets/images/tutorials/node-railway-canvas-postgres-add-new-service.png)
+![](@/assets/images/tutorials/bun-railway-canvas-postgres-add-new-service.png)
 
 #### Select the Drizzle Studio template
 
@@ -395,6 +385,6 @@ Open the Drizzle Studio URL in your browser. You should see your database tables
 
 Navigate to the `Architecture` tab in your Railway project. You should now see three services: your application, the PostgreSQL database, and Drizzle Studio.
 
-![](@/assets/images/tutorials/node-railway-canvas-all-services.png)
+![](@/assets/images/tutorials/bun-railway-canvas-all-services.png)
 
 </Steps>

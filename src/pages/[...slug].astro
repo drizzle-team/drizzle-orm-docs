@@ -132,6 +132,15 @@ export async function getStaticPaths() {
         const routePrefix =
           dialectId === defaultDocsDialect ? "docs" : `docs/${dialectId}`;
 
+        // Dialect-owned files first, then shared root files as fallback.
+        const dialectFolderEntries = allDocsEntries.filter((entry) =>
+          entry.slug.startsWith(`${dialectId}/${folder}/`),
+        );
+        dialectFolderEntries.forEach((entry) => {
+          const folderSlug = entry.slug.slice(dialectId.length + 1);
+          addRoute(`${routePrefix}/${folderSlug}`, entry);
+        });
+
         folderEntries.forEach((entry) => {
           const dialectEntry = entriesBySlug.get(`${dialectId}/${entry.slug}`);
           addRoute(`${routePrefix}/${entry.slug}`, dialectEntry || entry);

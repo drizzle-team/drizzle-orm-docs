@@ -76,16 +76,16 @@ Create a `schema.ts` file and declare your tables:
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull(),
-  email: text('email').notNull().unique(),
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull(),
+  email: text().notNull().unique(),
 });
 
 export const postsTable = pgTable('posts_table', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
+  id: serial().primaryKey(),
+  title: text().notNull(),
+  content: text().notNull(),
   userId: integer('user_id')
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
@@ -139,8 +139,8 @@ These migrations are stored in the `drizzle/migrations`  directory, as specified
 Example of a generated migration:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "posts_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE "posts_table" (
+	"id" serial PRIMARY KEY,
 	"title" text NOT NULL,
 	"content" text NOT NULL,
 	"user_id" integer NOT NULL,
@@ -148,19 +148,14 @@ CREATE TABLE IF NOT EXISTS "posts_table" (
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "users_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE "users_table" (
+	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"age" integer NOT NULL,
-	"email" text NOT NULL,
-	CONSTRAINT "users_table_email_unique" UNIQUE("email")
+	"email" text NOT NULL UNIQUE
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
+ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users_table"("id") ON DELETE CASCADE;
 ```
 
 Run migrations:
@@ -169,7 +164,7 @@ Run migrations:
 npx drizzle-kit migrate
 ```
 
-Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/kit-overview#prototyping-with-db-push):
+Alternatively, you can push changes directly to the database using [Drizzle kit push command](/docs/drizzle-kit-push):
 
 ```bash copy
 npx drizzle-kit push
@@ -189,10 +184,9 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │  ├ 📜 db.ts
  │  └ 📜 schema.ts
  ├ 📂 migrations
- │  ├ 📂 meta
- │  │  ├ 📜 _journal.json
- │  │  └ 📜 0000_snapshot.json
- │  └ 📜 0000_dry_richard_fisk.sql
+ │  └ 📂 20260708130533_chubby_tigra
+ │     ├📜 migration.sql
+ │     └📜 snapshot.json
  ├ 📜 .env
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
@@ -207,7 +201,7 @@ For instance, we create `src/queries` folder and separate files for each operati
 
 Read more about insert query in the [documentation](/docs/insert).
 
-```typescript copy filename="src/queries/insert.ts" {4, 8}
+```typescript copy filename="src/queries/insert.ts" {4,8}
 import { db } from '../db';
 import { InsertPost, InsertUser, postsTable, usersTable } from '../schema';
 
@@ -224,13 +218,7 @@ export async function createPost(data: InsertPost) {
 
 Read more about select query in the [documentation](/docs/select).
 
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
-
-```typescript copy filename="src/queries/select.ts" {5, 16, 41}
+```typescript copy filename="src/queries/select.ts" {5,16,41}
 import { asc, between, count, eq, getColumns, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { SelectUser, usersTable, postsTable } from '../schema';

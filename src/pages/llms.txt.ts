@@ -141,7 +141,8 @@ export const GET: APIRoute = async ({ url }) => {
   // Tutorials
   llms += `\n## Tutorials\n\n`;
 
-  const tutorialsEntries = docCollection.filter((entry) => entry.slug.includes("tutorials"));
+  // Tutorials live per dialect; pg is canonical for the /docs/tutorials URLs
+  const tutorialsEntries = docCollection.filter((entry) => entry.slug.startsWith("pg/tutorials/"));
 
   // Main Tutorials page
   llms += `- [Tutorials](${getUrl("tutorials")})\n`;
