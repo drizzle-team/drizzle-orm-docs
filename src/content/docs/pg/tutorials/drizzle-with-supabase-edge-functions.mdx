@@ -32,9 +32,9 @@ Create a `schema.ts` file in your `src` directory and declare a table schema:
 import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull()
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
 })
 ```
 
@@ -73,7 +73,7 @@ It will create `supabase` folder with `config.toml` file:
     └── config.toml
 ```
 
-If you are using Visual Studio Code, follow the [Supabase documentation](https://supabase.com/docs/guides/functions/local-development#deno-with-visual-studio-code) to setup settings for Deno.
+If you are using Visual Studio Code, follow the [Supabase documentation](https://supabase.com/docs/guides/functions/development-environment) to setup settings for Deno.
 
 #### Generate migrations
 
@@ -133,7 +133,7 @@ Add the following imports to the `deno.json` file in the `supabase/functions/dri
 ```json copy filename="supabase/functions/drizzle-tutorial/deno.json"
 {
   "imports": {
-    "drizzle-orm/": "npm:/drizzle-orm/",
+    "drizzle-orm/": "npm:/drizzle-orm@rc/",
     "postgres": "npm:postgres"
   }
 }
@@ -151,9 +151,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 
 const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull()
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
 })
 
 Deno.serve(async (req) => {
@@ -178,17 +178,17 @@ For these reasons, Supabase recommend maintaining separate configuration files (
 
 Update your edge function code with your database configuration:
 
-```typescript copy filename="supabase/functions/drizzle-tutorial/index.ts" {14,17,18}
+```typescript copy filename="supabase/functions/drizzle-tutorial/index.ts" {2,4,14,17-18,20-24}
 // Setup type definitions for built-in Supabase Runtime APIs
-import { integer, pgTable, serial, text } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import postgres from "postgres";
+import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 
 const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull()
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
 })
 
 Deno.serve(async () => {
@@ -252,7 +252,7 @@ supabase db push
 
 You can find `Project connect details` by clicking **Connect** in the top bar of the dashboard and copy the URI from the `Transaction pooler` section. Remember to replace the password placeholder with your actual database password.
 
-Read more about Connection Pooler in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
+Read more about Connection Pooler in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#poolers).
 
 Update your edge function code to use the `DATABASE_URL` environment variable instead of `SUPABASE_DB_URL`:
 
@@ -272,6 +272,35 @@ supabase secrets set DATABASE_URL=<CONNECTION_STRING>
 ```
 
 Learn more about managing environment variables in Supabase Edge Functions in the [documentation](https://supabase.com/docs/guides/functions/secrets).
+
+#### Apply migrations to the remote database
+
+To apply migrations to the remote database using the [drizzle-kit migrate](/docs/drizzle-kit-migrate) command, provide `dbCredentials` in your Drizzle config file. Use the connection string from the previous step:
+
+```typescript copy filename="drizzle.config.ts" {8}
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/schema.ts",
+  out: "./supabase/migrations",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+
+Make sure the `DATABASE_URL` environment variable is available in your local environment and run the following command:
+
+```bash copy
+npx drizzle-kit migrate
+```
+
+Alternatively, you can apply migrations using the [supabase db push](https://supabase.com/docs/reference/cli/supabase-db-push) command:
+
+```bash copy
+supabase db push
+```
 
 #### Deploy your function
 

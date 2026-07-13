@@ -1,8 +1,14 @@
 ---
 import { getCollection } from "astro:content";
 
+import { resolveDocsDialectFromSlug } from "@/dialect-docs";
+
+const currentDialect = resolveDocsDialectFromSlug(
+  Astro.url.pathname.replace(/^\//, ""),
+);
+
 const tutorials = await getCollection("docs", ({ id }) => {
-  return id.startsWith("tutorials/");
+  return id.startsWith(`${currentDialect}/tutorials/`);
 });
 
 const formattedTutorials = tutorials

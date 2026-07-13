@@ -1,5 +1,5 @@
 ---
-title: "Drizzle with Netlify Edge Functions and Neon Postgres "
+title: "Drizzle with Netlify Edge Functions and Supabase Database"
 date: "2025-01-30"
 ---
 
@@ -9,7 +9,7 @@ import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
 import Callout from "@mdx/Callout.astro";
 
-This tutorial demonstrates how to use Drizzle ORM with [Netlify Edge Functions](https://docs.netlify.com/edge-functions/overview/) and [Neon Postgres](https://neon.tech/) database.
+This tutorial demonstrates how to use Drizzle ORM with [Netlify Edge Functions](https://docs.netlify.com/edge-functions/overview/) and [Supabase Database](https://supabase.com/docs/guides/database/overview) database.
 
 <Prerequisites>
 - You should have the latest version of [Netlify CLI](https://docs.netlify.com/cli/get-started/#installation) installed.
@@ -17,6 +17,11 @@ This tutorial demonstrates how to use Drizzle ORM with [Netlify Edge Functions](
 <Npm>
   drizzle-orm@rc
   -D drizzle-kit@rc
+</Npm>
+
+- You should have installed the `postgres` package as the PostgreSQL driver. Read more about it [here](https://www.npmjs.com/package/postgres)
+<Npm>
+  postgres
 </Npm>
 
 - You should have installed the `dotenv` package for managing environment variables. If you use Node.js `v20.6.0` or later, there is no need to install it because Node.js natively supports `.env` files. Read more about it [here](https://nodejs.org/en/blog/release/v20.6.0#built-in-env-file-support).
@@ -35,25 +40,21 @@ These installed packages are used only to create table in the database in [Creat
 </Callout>
 
 <Steps>
-#### Setup Neon Postgres
+#### Create a new Supabase project
 
-Log in to the [Neon Console](https://console.neon.tech/app/projects) and navigate to the Projects section. Select a project or click the `New Project` button to create a new one. 
-
-Your Neon projects come with a ready-to-use Postgres database named `neondb`. We'll use it in this tutorial.
+You can create new Supabase project in the [dashboard](https://supabase.com/dashboard) or by following this [link](https://database.new/).
 
 #### Setup connection string variable
 
-In **Project Dashboard** section click the `Connect` button and copy your database connection string. It should look similar to this:
+You can find `Project connect details` by clicking **Connect** in the top bar of the dashboard and copy the URI from the `Transaction pooler` section. Remember to replace the password placeholder with your actual database password.
 
-```bash
-postgres://username:password@ep-cool-darkness-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
+Add `DATABASE_URL` variable to your `.env` file.
+
+```plaintext copy
+DATABASE_URL=<YOUR_DATABASE_URL>
 ```
 
-Add the `DATABASE_URL` environment variable to your `.env` file, which you'll use to connect to the Neon database.
-
-```text copy
-DATABASE_URL=NEON_DATABASE_CONNECTION_STRING
-```
+Read more about connecting to Supabase Database in the [documentation](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler).
 
 #### Setup Netlify Edge Functions
 
@@ -80,8 +81,8 @@ Create a `import_map.json` file in the root of your project and add the followin
 ```json copy filename="import_map.json"
 {
   "imports": {
-    "drizzle-orm/": "https://esm.sh/drizzle-orm/",
-    "@neondatabase/serverless": "https://esm.sh/@neondatabase/serverless"
+    "drizzle-orm/": "https://esm.sh/drizzle-orm@rc/",
+    "postgres": "https://esm.sh/postgres"
   }
 }
 ```
@@ -112,10 +113,10 @@ Create a `schema.ts` file in the `netlify/edge-functions/common` directory and d
 import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable('users_table', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  age: integer('age').notNull(),
-  email: text('email').notNull().unique(),
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull(),
+  email: text().notNull().unique(),
 })
 ```
 
@@ -157,12 +158,12 @@ Update your `netlify/edge-functions/user.ts` file and set up your database confi
 ```typescript copy filename="netlify/edge-functions/user.ts"
 import type { Context } from "@netlify/edge-functions";
 import { usersTable } from "./common/schema.ts";
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 
 export default async (request: Request, context: Context) => {
-  const sql = neon(Netlify.env.get("DATABASE_URL")!);
-  const db = drizzle({ client: sql });
+  const queryClient = postgres(Netlify.env.get("DATABASE_URL")!);
+  const db = drizzle({ client: queryClient });
 
   const users = await db.select().from(usersTable);
 
