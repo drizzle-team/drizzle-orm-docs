@@ -92,6 +92,8 @@ export default defineConfig({
     }
   },
 
+  provider: 'supabase',
+
   breakpoints: true,
   verbose: true,
 });
@@ -620,6 +622,44 @@ export default defineConfig({
 });
 ```
 </Callout>
+
+### `provider`
+<rem025/>
+
+`provider` option lets you generate migrations compatible with your database provider's migration tooling.
+
+When set to `supabase`, `drizzle-kit generate` will duplicate each generated migration `.sql` file 
+to the root of your migrations folder, so Supabase can read and apply them.
+
+|               |                      |
+| :------------ | :-----------------   |
+| type          | `"supabase"` |
+| default       | --                    |
+| commands      | `generate`   |
+
+<rem025/>
+
+```ts
+export default defineConfig({
+  dialect: "postgresql",
+  provider: "supabase",
+});
+```
+
+<Section>
+```plaintext {4-7}
+📦 <project root>
+ ├ ...
+ ├ 📂 drizzle
+ │ ├ 📂 20242409125510_premium_mister_fear
+ │ │ ├ 📜 migration.sql
+ │ │ └ 📜 snapshot.json
+ │ └ 📜 20242409125510_premium_mister_fear.sql
+ ├ 📂 src
+ ├ 📜 drizzle.config.ts
+ └ 📜 package.json
+```
+</Section>
 
 ## ---
 
