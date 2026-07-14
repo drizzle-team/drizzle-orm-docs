@@ -172,3 +172,114 @@ export const updateDialectLinks = () => {
     (link as HTMLAnchorElement).href = `${href}/${savedDialect}`;
   });
 };
+
+const dialectParam = "dialect";
+
+const dialectAliases: Record<string, string> = {
+  postgresql: "postgresql",
+  postgres: "postgresql",
+  pg: "postgresql",
+  mysql: "mysql",
+  sqlite: "sqlite",
+  sqllite: "sqlite",
+  singlestore: "singlestore",
+  "single store": "singlestore",
+  mssql: "mssql",
+  "ms sql": "mssql",
+  cockroachdb: "cockroachdb",
+  cockroach: "cockroachdb",
+  turso: "turso",
+};
+
+const normalizeDialectValue = (value: string | undefined | null) => {
+  if (!value) return;
+
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .replace(/\s*\(wip\)\s*$/u, "")
+    .replace(/[-_]+/gu, " ")
+    .replace(/\s+/gu, " ");
+
+  return dialectAliases[normalized];
+};
+
+const getTabButtonDialect = (button: HTMLElement) => {
+  return normalizeDialectValue(button.dataset.tabLabel ?? button.textContent);
+};
+
+const activateTabButton = (button: HTMLElement) => {
+  const parent = button.parentElement;
+  if (!parent) return;
+
+  const index = Array.from(parent.children).indexOf(button);
+  const content = parent.nextElementSibling;
+  const isCodeTab = button.hasAttribute("data-change-code-tab-btn");
+  const activeClass = isCodeTab ? "codetabs_tab--active" : "tabs__button--active";
+  const inactiveClass = isCodeTab ? "codetabs_tab" : "tabs__button";
+
+  if (content) {
+    Array.from(content.children).forEach((child, contentIndex) => {
+      child.classList.toggle("hidden", contentIndex !== index);
+    });
+  }
+
+  Array.from(parent.children).forEach((child, buttonIndex) => {
+    child.classList.toggle(inactiveClass, buttonIndex !== index);
+    child.classList.toggle(activeClass, buttonIndex === index);
+  });
+};
+
+const updateDialectQueryParam = (dialect: string) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set(dialectParam, dialect);
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+};
+
+const activateDialectTabs = (dialect: string) => {
+  const tabGroups = new Set<Element>();
+  const selector = "[data-change-tab-btn], [data-change-code-tab-btn]";
+
+  document.querySelectorAll<HTMLElement>(selector).forEach((button) => {
+    const parent = button.parentElement;
+    if (!parent || tabGroups.has(parent)) return;
+
+    const matchingButton = Array.from(parent.children).find((child) => {
+      return getTabButtonDialect(child as HTMLElement) === dialect;
+    }) as HTMLElement | undefined;
+
+    if (matchingButton) {
+      activateTabButton(matchingButton);
+      tabGroups.add(parent);
+    }
+  });
+};
+
+export const setupSyncedTabs = () => {
+  const selector = "[data-change-tab-btn], [data-change-code-tab-btn]";
+
+  document.querySelectorAll<HTMLElement>(selector).forEach((button) => {
+    if (button.dataset.syncedTabBound === "true") return;
+
+    button.dataset.syncedTabBound = "true";
+    button.addEventListener("click", () => {
+      const dialect = getTabButtonDialect(button);
+
+      if (dialect) {
+        activateDialectTabs(dialect);
+        updateDialectQueryParam(dialect);
+        return;
+      }
+
+      activateTabButton(button);
+    });
+  });
+
+  const urlDialect = normalizeDialectValue(
+    new URLSearchParams(window.location.search).get(dialectParam),
+  );
+
+  if (urlDialect) {
+    activateDialectTabs(urlDialect);
+  }
+};
