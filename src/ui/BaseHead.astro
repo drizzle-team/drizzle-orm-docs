@@ -9,9 +9,16 @@ interface Props {
 const { title, description } = Astro.props;
 const defaultDescription =
   "Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.";
-const isProd = import.meta.env.PROD_BUILD === "true" || process.env.PROD_BUILD === "true";
-const noindex = /\/docs\/[^/]+\/get-started\/?$/.test(Astro.url.pathname);
-const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "index,follow";
+const isProd =
+  import.meta.env.PROD_BUILD === "true" || process.env.PROD_BUILD === "true";
+const noindex = /\/docs\/[^/]+\/(?:get-started|overview)\/?$/.test(
+  Astro.url.pathname,
+);
+const robots = !isProd
+  ? "noindex,nofollow"
+  : noindex
+    ? "noindex,follow"
+    : "index,follow";
 ---
 
 <head>

@@ -52,7 +52,12 @@ export default defineConfig({
       experimentalReactChildren: true,
     }),
     ...(isProd
-      ? [sitemap({ filter: (page) => !/\/docs\/[^/]+\/get-started\/?$/.test(page) })]
+      ? [
+          sitemap({
+            filter: (page) =>
+              !/\/docs\/[^/]+\/(?:get-started|overview)\/?$/.test(page),
+          }),
+        ]
       : []),
   ],
   markdown: {
