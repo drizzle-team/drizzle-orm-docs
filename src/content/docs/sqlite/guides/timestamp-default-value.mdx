@@ -1,0 +1,111 @@
+---
+title: SQL Timestamp as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
+- Learn about [column data types](/docs/sqlite/column-types)
+- [sql operator](/docs/sqlite/sql)
+</Prerequisites>
+
+To set current timestamp as a default value in SQLite, you can use `sql` operator with `current_timestamp` constant which returns text representation of the current UTC date and time `(YYYY-MM-DD HH:MM:SS)`:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  timestamp: text()
+    .notNull()
+    .default(sql`(current_timestamp)`),
+});
+```
+
+```sql
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`timestamp` text DEFAULT (current_timestamp) NOT NULL
+);
+```
+
+```plaintext
+// Data stored in the database
++----+---------------------+
+| id | timestamp           |
++----+---------------------+
+|  1 | 2024-04-11 15:40:43 |
++----+---------------------+
+```
+
+```ts
+// Data returned by the application
+[
+  {
+    id: 1,
+    timestamp: '2024-04-11 15:40:43' // string
+  }
+]
+```
+</Section>
+
+To set unix timestamp as a default value in SQLite, you can use the `sql` operator and `unixepoch()` function which returns the number of seconds since `1970-01-01 00:00:00 UTC`:
+
+<Section>
+```ts copy {8,11,14}
+import { sql } from 'drizzle-orm';
+import { integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  timestamp1: integer('timestamp1', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  timestamp2: integer('timestamp2', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+  timestamp3: integer('timestamp3', { mode: 'number' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+```
+
+```sql
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`timestamp1` integer DEFAULT (unixepoch()) NOT NULL,
+	`timestamp2` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`timestamp3` integer DEFAULT (unixepoch()) NOT NULL
+);
+```
+</Section>
+
+The `mode` option defines how values are handled in the application. In the application, values with `timestamp` and `timestamp_ms` modes are treated as `Date` objects, but stored as integers in the database.
+The difference is that `timestamp` handles seconds, while `timestamp_ms` handles milliseconds.
+
+<Section>
+```plaintext
+// Data stored in the database
++------------+------------+---------------+------------+
+| id         | timestamp1 | timestamp2    | timestamp3 |
++------------+------------+---------------+------------+
+| 1          | 1712835640 | 1712835640000 | 1712835640 |
++------------+------------+---------------+------------+
+```
+
+```ts
+// Data returned by the application
+[
+  {
+    id: 1,
+    timestamp1: 2024-04-11T11:40:40.000Z, // Date object
+    timestamp2: 2024-04-11T11:40:40.000Z, // Date object
+    timestamp3: 1712835640 // number
+  }
+]
+```
+</Section>

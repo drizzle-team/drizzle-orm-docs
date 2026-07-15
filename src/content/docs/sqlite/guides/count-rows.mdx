@@ -39,17 +39,17 @@ To count all rows in table you can use `count()` function or `sql` operator like
     ```
 
     ```sql
-    select count(*) from products;
+    select count(*) from "products";
     ```
   </CodeTab>
   ```ts
   import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
   export const products = sqliteTable('products', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    name: text('name').notNull(),
-    discount: integer('discount'),
-    price: integer('price').notNull(),
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
+    discount: integer(),
+    price: integer().notNull(),
   });
   ```
 </CodeTabs>
@@ -69,11 +69,11 @@ type Result = {
 ```
 
 ```sql
-select count("discount") from products;
+select count("discount") from "products";
 ```
 </Section>
 
-In SQLite, `count()` result returns as integer.
+In SQLite, `count()` result returns as integer, so you don't need to cast it. Drizzle has simple and flexible API, which lets you create your custom solutions:
 
 <Section>
 ```ts copy {3,4}
@@ -84,8 +84,8 @@ await db.select({ count: sql<number>`count(${products.discount})` }).from(produc
 ```
 
 ```sql
-select count(*) from products;
-select count("discount") from products;
+select count(*) from "products";
+select count("discount") from "products";
 ```
 </Section>
 
@@ -110,7 +110,7 @@ await db
 ```
 
 ```sql
-select count(*) from products where price > 100
+select count(*) from "products" where "products"."price" > 100;
 ```
 </Section>
 
@@ -135,23 +135,23 @@ This is how you can use `count()` function with joins and aggregations:
     ```
 
     ```sql
-    select countries.name, count("cities"."id") from countries
-      left join cities on countries.id = cities.country_id
-      group by countries.id
-      order by countries.name;
+    select "countries"."name", count("cities"."id") from "countries"
+      left join "cities" on "countries"."id" = "cities"."country_id"
+      group by "countries"."id"
+      order by "countries"."name";
     ```
   </CodeTab>
   ```ts
   import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
   export const countries = sqliteTable('countries', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    name: text('name').notNull(),
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
   });
 
   export const cities = sqliteTable('cities', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    name: text('name').notNull(),
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
     countryId: integer('country_id').notNull().references(() => countries.id),
   });
   ```

@@ -1,0 +1,35 @@
+---
+title: SQL Toggle value
+---
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
+- [Update statement](/docs/sqlite/update)
+- [Filters](/docs/sqlite/operators) and [not operator](/docs/sqlite/operators#not)
+- [Boolean data type](/docs/sqlite/column-types#boolean)
+</Prerequisites>
+
+To toggle a column value you can use `update().set()` method like below:
+
+<Section>
+```tsx copy {8}
+import { eq, not } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+await db
+  .update(table)
+  .set({
+    isActive: not(table.isActive),
+  })
+  .where(eq(table.id, 1));
+```
+
+```sql
+update "table" set "is_active" = not "table"."is_active" where "table"."id" = 1;
+```
+</Section>
+
+Please note that there is no boolean type in SQLite, it uses integers `0` (false) and `1` (true) instead.

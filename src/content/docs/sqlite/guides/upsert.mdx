@@ -1,0 +1,274 @@
+---
+title: Upsert Query
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+
+<Prerequisites>
+- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
+- [Insert statement](/docs/sqlite/insert) and [onConflictDoUpdate method](/docs/sqlite/insert#on-conflict-do-update)
+- [Composite primary key](/docs/sqlite/indexes-constraints#composite-primary-key)
+- [sql operator](/docs/sqlite/sql)
+</Prerequisites>
+
+To implement an upsert query in SQLite with Drizzle you can use `.onConflictDoUpdate()` method:
+
+<Section>
+```ts copy {8,9,10,11}
+import { users } from './schema';
+
+const db = drizzle(...);
+
+await db
+  .insert(users)
+  .values({ id: 1, name: 'John' })
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { name: 'Super John' },
+  });
+```
+
+```sql
+insert into "users" ("id", "name") values (1, 'John')
+  on conflict ("users"."id") do update set "name" = 'Super John';
+```
+</Section>
+
+To upsert multiple rows in one query in SQLite you can use `sql operator` and `excluded` keyword. `excluded` is a special reference that refer to the row that was proposed for insertion, but wasn't inserted because of the conflict.
+
+This is how you can do it:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {21,24}
+    import { sql } from 'drizzle-orm';
+    import { users } from './schema';
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: { lastLogin: sql.raw(`excluded.${users.lastLogin.name}`) },
+      });
+    ```
+
+    ```sql
+    insert into "users" ("id", "last_login") 
+      values 
+        (1, 1710512946),
+        (2, 1710516546),
+        (3, 1710520146)
+      on conflict ("users"."id") do update set "last_login" = excluded.last_login;
+    ```
+  </CodeTab>
+  ```ts copy
+  import { integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+  export const users = sqliteTable('users', {
+    id: integer().primaryKey({ autoIncrement: true }),
+    lastLogin: integer('last_login', { mode: 'timestamp' }).notNull(),
+  });
+  ```
+</CodeTabs>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in SQLite:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {40,43}
+    import { SQL, getColumns, sql } from 'drizzle-orm';
+    import { SQLiteTable } from 'drizzle-orm/sqlite-core';
+    import { users } from './schema';
+
+    const buildConflictUpdateColumns = <
+      T extends SQLiteTable,
+      Q extends keyof T['_']['columns']
+    >(
+      table: T,
+      columns: Q[],
+    ) => {
+      const cls = getColumns(table);
+
+      return columns.reduce((acc, column) => {
+        const colName = cls[column].name;
+        acc[column] = sql.raw(`excluded.${colName}`);
+
+        return acc;
+      }, {} as Record<Q, SQL>);
+    };
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+        active: true,
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+        active: true,
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+        active: true,
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: buildConflictUpdateColumns(users, ['lastLogin', 'active']),
+      });
+    ```
+
+    ```sql
+    insert into "users" ("id", "last_login", "active")
+    values
+      (1, 1710512946, 1),
+      (2, 1710516546, 1),
+      (3, 1710520146, 1)
+    on conflict ("users"."id") do update set "last_login" = excluded.last_login, "active" = excluded.active;
+    ```
+  </CodeTab>
+  ```ts copy
+  import { integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+
+  export const users = sqliteTable('users', {
+    id: integer().primaryKey({ autoIncrement: true }),
+    lastLogin: integer('last_login', { mode: 'timestamp' }).notNull(),
+    active: integer({ mode: 'boolean' }).notNull().default(false),
+  });
+  ```
+</CodeTabs>
+
+This is how you can implement an upsert query with multiple targets in SQLite:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { inventory } from './schema';
+
+await db
+  .insert(inventory)
+  .values({ warehouseId: 1, productId: 1, quantity: 100 })
+  .onConflictDoUpdate({
+    target: [inventory.warehouseId, inventory.productId], // composite primary key
+    set: { quantity: sql`${inventory.quantity} + 100` }, // add 100 to the existing quantity
+  });
+```
+
+```sql
+insert into "inventory" ("warehouse_id", "product_id", "quantity") values (1, 1, 100)
+  on conflict ("inventory"."warehouse_id", "inventory"."product_id") do update set "quantity" = "inventory"."quantity" + 100;
+```
+</Section>
+
+If you want to implement upsert query with `where` clause for `update` statement, you can use `setWhere` property in `onConflictDoUpdate` method:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+  ```ts copy {25,26,27,28}
+  import { or, sql } from 'drizzle-orm';
+  import { products } from './schema';
+
+  const data = {
+    id: 1,
+    title: 'Phone',
+    price: '999.99',
+    stock: 10,
+    lastUpdated: new Date(),
+  };
+
+  const excludedPrice = sql.raw(`excluded.${products.price.name}`);
+  const excludedStock = sql.raw(`excluded.${products.stock.name}`);
+
+  await db
+    .insert(products)
+    .values(data)
+    .onConflictDoUpdate({
+      target: products.id,
+      set: {
+        price: excludedPrice,
+        stock: excludedStock,
+        lastUpdated: sql.raw(`excluded.${products.lastUpdated.name}`)
+      },
+      setWhere: or(
+        sql`${products.stock} != ${excludedStock}`,
+        sql`${products.price} != ${excludedPrice}`
+      ),
+    });
+  ```
+
+  ```sql
+  insert into "products" ("id", "title", "stock", "price", "last_updated")
+    values (1, 'Phone', 10, '999.99', 1710512946)
+    on conflict ("products"."id") do update
+    set "stock" = excluded.stock, "price" = excluded.price, "last_updated" = excluded.last_updated
+    where (("products"."stock" != excluded.stock) or ("products"."price" != excluded.price));
+  ```
+  </CodeTab>
+
+  ```ts copy
+  import { integer, numeric, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+  export const products = sqliteTable('products', {
+    id: integer().primaryKey({ autoIncrement: true }),
+    title: text().notNull(),
+    stock: integer().notNull(),
+    price: numeric().notNull(),
+    lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull(),
+  });
+  ```
+</CodeTabs>
+
+
+If you want to update all columns except of specific one, you can leave the previous value like this:
+
+<Section>
+```ts copy {16}
+import { sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const data = {
+  id: 1,
+  name: 'John',
+  email: 'john@email.com',
+  age: 29,
+};
+
+await db
+  .insert(users)
+  .values(data)
+  .onConflictDoUpdate({
+    target: users.id,
+    set: { ...data, email: sql`${users.email}` }, // leave email as it was
+});
+```
+
+```sql
+insert into "users" ("id", "name", "email", "age") values (1, 'John', 'john@email.com', 29)
+  on conflict ("users"."id") do update set "id" = 1, "name" = 'John', "email" = "users"."email", "age" = 29;
+```
+</Section>

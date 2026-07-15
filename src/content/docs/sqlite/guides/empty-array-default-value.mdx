@@ -1,0 +1,45 @@
+---
+title: Empty array as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
+- Learn about [column data types](/docs/sqlite/column-types)
+- [sql operator](/docs/sqlite/sql)
+</Prerequisites>
+
+SQLite doesn't have an array data type, but you can use `text` data type for the same purpose. To set an empty array as a default value in SQLite, you can use `json_array()` function or `sql` operator with `'[]'` syntax:
+
+<Section>
+```ts copy {9,13}
+import { sql } from 'drizzle-orm';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  tags1: text({ mode: 'json' })
+    .notNull()
+    .$type<string[]>()
+    .default(sql`(json_array())`),
+  tags2: text({ mode: 'json' })
+    .notNull()
+    .$type<string[]>()
+    .default(sql`'[]'`),
+});
+```
+
+```sql
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`tags1` text DEFAULT (json_array()) NOT NULL,
+	`tags2` text DEFAULT '[]' NOT NULL
+);
+```
+</Section>
+
+The `mode` option defines how values are handled in the application. With `json` mode, values are treated as JSON object literal. 
+
+You can specify `.$type<..>()` for json object inference, it will not check runtime values. It provides compile time protection for default values, insert and select schemas.
