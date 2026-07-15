@@ -8,10 +8,8 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
 - [Select statement](/docs/select)
 - [Filters](/docs/operators) and [sql operator](/docs/sql)
 - [Aggregations](/docs/select#aggregations) and [Aggregation helpers](/docs/select#aggregations-helpers)
@@ -42,17 +40,17 @@ To count all rows in table you can use `count()` function or `sql` operator like
     ```
 
     ```sql
-    select count(*) from products;
+    select count(*) from "products";
     ```
   </CodeTab>
   ```ts
   import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
   export const products = pgTable('products', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
-    discount: integer('discount'),
-    price: integer('price').notNull(),
+    id: serial().primaryKey(),
+    name: text().notNull(),
+    discount: integer(),
+    price: integer().notNull(),
   });
   ```
 </CodeTabs>
@@ -72,7 +70,7 @@ type Result = {
 ```
 
 ```sql
-select count("discount") from products;
+select count("discount") from "products";
 ```
 </Section>
 
@@ -84,9 +82,9 @@ import { AnyColumn, sql } from 'drizzle-orm';
 
 const customCount = (column?: AnyColumn) => {
   if (column) {
-    return sql<number>`cast(count(${column}) as integer)`; // In MySQL cast to unsigned integer
+    return sql<number>`cast(count(${column}) as integer)`;
   } else {
-    return sql<number>`cast(count(*) as integer)`; // In MySQL cast to unsigned integer
+    return sql<number>`cast(count(*) as integer)`;
   }
 };
 
@@ -95,24 +93,8 @@ await db.select({ count: customCount(products.discount) }).from(products);
 ```
 
 ```sql
-select cast(count(*) as integer) from products;
-select cast(count("discount") as integer) from products;
-```
-</Section>
-
-In SQLite and MSSQL, `count()` result returns as integer.
-
-<Section>
-```ts copy {3,4}
-import { sql } from 'drizzle-orm';
-
-await db.select({ count: sql<number>`count(*)` }).from(products);
-await db.select({ count: sql<number>`count(${products.discount})` }).from(products);
-```
-
-```sql
-select count(*) from products;
-select count("discount") from products;
+select cast(count(*) as integer) from "products";
+select cast(count("discount") as integer) from "products";
 ```
 </Section>
 
@@ -137,7 +119,7 @@ await db
 ```
 
 ```sql
-select count(*) from products where price > 100
+select count(*) from "products" where "products"."price" > 100
 ```
 </Section>
 
@@ -162,23 +144,24 @@ This is how you can use `count()` function with joins and aggregations:
     ```
 
     ```sql
-    select countries.name, count("cities"."id") from countries
-      left join cities on countries.id = cities.country_id
-      group by countries.id
-      order by countries.name;
+    select "countries"."name", count("cities"."id") 
+	from "countries" 
+	left join "cities" on "countries"."id" = "cities"."country_id" 
+	group by "countries"."id" 
+	order by "countries"."name"
     ```
   </CodeTab>
   ```ts
   import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
   export const countries = pgTable('countries', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
+    id: serial().primaryKey(),
+    name: text().notNull(),
   });
 
   export const cities = pgTable('cities', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
+    id: serial().primaryKey(),
+    name: text().notNull(),
     countryId: integer('country_id').notNull().references(() => countries.id),
   });
   ```

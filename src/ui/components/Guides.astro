@@ -1,20 +1,18 @@
 ---
-import { getCollection } from "astro:content";
+import { resolveDocsDialectFromSlug } from "@/dialect-docs";
 
-import guideMap from "@/content/docs/guides/_map.json";
-
-const guides = await getCollection("docs", ({ id }) =>
-  id.startsWith("guides/"),
+const currentDialect = resolveDocsDialectFromSlug(
+  Astro.url.pathname.replace(/^\//, ""),
 );
 
-const sortedGuides: typeof guides = [];
-
-guideMap.forEach((key) => {
-  const guide = guides.find((g) => g.slug.endsWith(key[0]));
-  if (guide) {
-    sortedGuides.push(guide);
-  }
-});
+// Each dialect ships its own guides/_map.json with [slug, title] pairs
+// defining the list and its order.
+const guideMaps = import.meta.glob<{ default: string[][] }>(
+  "/src/content/docs/*/guides/_map.json",
+);
+const guideMapFile =
+  guideMaps[`/src/content/docs/${currentDialect}/guides/_map.json`];
+const guides = guideMapFile ? (await guideMapFile()).default : [];
 ---
 
 <div class="guides_title">Guides</div>
@@ -24,11 +22,11 @@ guideMap.forEach((key) => {
 </div>
 <div class="guides__items">
   {
-    sortedGuides.map((guide) => {
+    guides.map(([slug, title]) => {
       return (
         <div class="guides__item">
-          <a class="guides__item_link" href={`./${guide.slug}`}>
-            {guide.data.title}
+          <a class="guides__item_link" href={`./guides/${slug}`}>
+            {title}
           </a>
         </div>
       );
