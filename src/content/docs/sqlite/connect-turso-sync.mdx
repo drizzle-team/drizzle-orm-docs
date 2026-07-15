@@ -1,0 +1,63 @@
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Steps from '@mdx/Steps.astro';
+import WhatsNextSQLite from "@mdx/WhatsNextSQLite.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from "@mdx/CodeTabs.astro";
+import LibsqlTable from "@mdx/LibsqlTable.mdx";
+import LibsqlTabs from "@mdx/LibsqlTabs.mdx";
+
+# Drizzle \<\> Turso Database Sync
+
+<Prerequisites>
+- Database [connection basics](/docs/sqlite/connect-overview) with Drizzle
+- Turso Database - [website](https://docs.turso.tech/introduction)
+- Turso Database sync driver - [GitHub](https://github.com/tursodatabase/turso/tree/main/bindings/javascript/sync)
+</Prerequisites>
+
+According to the **[official website](https://docs.turso.tech/introduction)**, 
+Turso is the small database to power your big dreams in the age of AI.
+
+#### Step 1 - Install packages
+<Npm>
+ drizzle-orm@rc @tursodatabase/sync
+ -D drizzle-kit@rc
+</Npm>
+
+#### Step 2 - Initialize the driver and make a query
+```typescript
+import { drizzle } from 'drizzle-orm/tursodatabase/sync';
+
+const db = drizzle({
+	connection: {
+    	path: 'local.db',                // path used as a prefix for local files created by sync-engine
+    	url: 'https://<db>.turso.io',    // URL of the remote database: turso db show <db>
+    	authToken: '...',                // auth token issued from the Turso Cloud: turso db tokens create <db>
+    	clientName: 'turso-sync-example' // arbitrary client name
+	}
+});
+
+const result = await db.all('select 1');
+```
+
+If you need to provide your existing drivers:
+
+```typescript
+import { connect } from '@tursodatabase/sync';
+import { drizzle } from 'drizzle-orm/tursodatabase/sync';
+
+const client = await connect({
+    path: 'local.db',                // path used as a prefix for local files created by sync-engine
+    url: 'https://<db>.turso.io',    // URL of the remote database: turso db show <db>
+    authToken: '...',                // auth token issued from the Turso Cloud: turso db tokens create <db>
+    clientName: 'turso-sync-example' // arbitrary client name
+});
+const db = drizzle({ client });
+
+const result = await db.all('select 1');
+```
+
+#### What's next?
+
+<WhatsNextSQLite/>
