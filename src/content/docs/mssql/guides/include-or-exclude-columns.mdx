@@ -1,0 +1,426 @@
+---
+title: Include or Exclude Columns in Query
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from "@mdx/Callout.astro";
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- [Select statement](/docs/mssql/select)
+- [Get typed table columns](/docs/mssql/goodies#get-typed-columns)
+- [Joins](/docs/mssql/joins)
+- [Relational queries](/docs/mssql/rqb)
+- [Partial select with relational queries](/docs/mssql/rqb#partial-fields-select)
+</Prerequisites>
+
+<Callout>
+MSSQL uses [Relational Queries v1](/docs/mssql/rqb): relations are declared with the
+`relations()` helper, passed to `drizzle(client, { schema })`, and queried via `db._query`.
+</Callout>
+
+Drizzle has flexible API for including or excluding columns in queries. To include all columns you can use `.select()` method like this:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+	<CodeTab>
+    ```ts copy {5}
+    import { posts } from './schema';
+
+    const db = drizzle(...);
+
+    await db.select().from(posts);
+    ```
+
+    ```ts
+    // result type
+    type Result = {
+      id: number;
+      title: string;
+      content: string;
+      views: number;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+  export const posts = mssqlTable('posts', {
+    id: int().identity().primaryKey(),
+    title: varchar({ length: 255 }).notNull(),
+    content: varchar({ length: 'max' }).notNull(),
+    views: int().notNull().default(0),
+  });
+	```
+</CodeTabs>
+
+To include specific columns you can use `.select()` method like this:
+
+<Section>
+  ```ts copy {1}
+  await db.select({ title: posts.title }).from(posts);
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    title: string;
+  }[];
+  ```
+</Section>
+
+To include all columns with extra columns you can use `getColumns()` utility function like this:
+
+<Section>
+  ```ts copy {5,6}
+  import { getColumns, sql } from 'drizzle-orm';
+
+  await db
+    .select({
+      ...getColumns(posts),
+      titleLength: sql<number>`len(${posts.title})`,
+    })
+    .from(posts);
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    id: number;
+    title: string;
+    content: string;
+    views: number;
+    titleLength: number;
+  }[];
+  ```
+</Section>
+
+To exclude columns you can use `getColumns()` utility function like this:
+
+<Section>
+  ```ts copy {3,5}
+  import { getColumns } from 'drizzle-orm';
+
+  const { content, ...rest } = getColumns(posts); // exclude "content" column
+
+  await db.select({ ...rest }).from(posts); // select all other columns
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    id: number;
+    title: string;
+    views: number;
+  }[];
+  ```
+</Section>
+
+This is how you can include or exclude columns with joins:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {5,9,10,11}
+    import { eq, getColumns } from 'drizzle-orm';
+    import { comments, posts, users } from './db/schema';
+
+    // exclude "userId" and "postId" columns from "comments"
+    const { userId, postId, ...rest } = getColumns(comments);
+
+    await db
+      .select({
+        postId: posts.id, // include "id" column from "posts"
+        comment: { ...rest }, // include all other columns
+        user: users, // equivalent to getColumns(users)
+      })
+      .from(posts)
+      .leftJoin(comments, eq(posts.id, comments.postId))
+      .leftJoin(users, eq(users.id, posts.userId));
+    ```
+
+    ```ts
+    // result type
+    type Result = {
+      postId: number;
+      comment: {
+        id: number;
+        content: string;
+        createdAt: Date;
+      } | null;
+      user: {
+        id: number;
+        name: string;
+        email: string;
+      } | null;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { datetime2, int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+  export const users = mssqlTable('users', {
+    id: int().identity().primaryKey(),
+    name: varchar({ length: 255 }).notNull(),
+    email: varchar({ length: 255 }).notNull(),
+  });
+
+  export const posts = mssqlTable('posts', {
+    id: int().identity().primaryKey(),
+    title: varchar({ length: 255 }).notNull(),
+    content: varchar({ length: 'max' }).notNull(),
+    views: int().notNull().default(0),
+    userId: int('user_id').notNull().references(() => users.id),
+  });
+
+  export const comments = mssqlTable('comments', {
+    id: int().identity().primaryKey(),
+    postId: int('post_id').notNull().references(() => posts.id),
+    userId: int('user_id').notNull().references(() => users.id),
+    content: varchar({ length: 'max' }).notNull(),
+    createdAt: datetime2('created_at').notNull().defaultGetDate(),
+  });
+  ```
+</CodeTabs>
+
+Drizzle has useful relational queries API, that lets you easily include or exclude columns in queries. This is how you can include all columns:
+
+<CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
+  <CodeTab>
+	```ts copy {5,7,8,9,12,13,14,17,18,19,20,21,22}
+	import * as schema from './schema';
+
+	const db = drizzle(client, { schema });
+
+	await db._query.posts.findMany();
+	```
+
+	```ts
+	// result type
+	type Result = {
+	  id: number;
+	  title: string;
+	  content: string;
+	  views: number;
+	}[]
+	```
+  </CodeTab>
+
+  ```ts copy
+  import { int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+  export const posts = mssqlTable('posts', {
+	id: int().identity().primaryKey(),
+	title: varchar({ length: 255 }).notNull(),
+	content: varchar({ length: 'max' }).notNull(),
+	views: int().notNull().default(0),
+  });
+	```
+
+  ```ts copy
+  import { relations } from 'drizzle-orm/_relations';
+  import { posts } from './schema.ts';
+
+  export const postsRelations = relations(posts, () => ({}));
+	```
+</CodeTabs>
+
+This is how you can include specific columns using relational queries:
+
+<Section>
+  ```ts copy {2,3,4}
+  await db._query.posts.findMany({
+    columns: {
+      title: true,
+    },
+  });
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    title: string;
+  }[]
+  ```
+</Section>
+
+This is how you can include all columns with extra columns using relational queries:
+
+<Section>
+  ```ts copy {4,5,6}
+  import { sql } from 'drizzle-orm';
+  import { posts } from './schema';
+
+  await db._query.posts.findMany({
+    extras: {
+      titleLength: sql<number>`len(${posts.title})`.as('title_length'),
+    },
+  });
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    id: number;
+    title: string;
+    content: string;
+    views: number;
+    titleLength: number;
+  }[];
+  ```
+</Section>
+
+This is how you can exclude columns using relational queries:
+
+<Section>
+  ```ts copy {2,3,4}
+  await db._query.posts.findMany({
+    columns: {
+      content: false,
+    },
+  });
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    id: number;
+    title: string;
+    views: number;
+  }[]
+  ```
+</Section>
+
+This is how you can include or exclude columns with relations using relational queries:
+
+<CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
+  <CodeTab>
+  ```ts copy {7,12,13,16}
+  import * as schema from './schema';
+
+  const db = drizzle(client, { schema });
+
+  await db._query.posts.findMany({
+    columns: {
+      id: true, // include "id" column
+    },
+    with: {
+      comments: {
+        columns: {
+          userId: false, // exclude "userId" column
+          postId: false, // exclude "postId" column
+        },
+      },
+      user: true, // include all columns from "users" table
+    },
+  });
+  ```
+
+  ```ts
+  // result type
+  type Result = {
+    id: number;
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+    comments: {
+      id: number;
+      content: string;
+      createdAt: Date;
+    }[];
+  }[]
+  ```
+  </CodeTab>
+
+  ```ts copy
+  import { datetime2, int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+  export const users = mssqlTable('users', {
+    id: int().identity().primaryKey(),
+    name: varchar({ length: 255 }).notNull(),
+    email: varchar({ length: 255 }).notNull(),
+  });
+
+  export const posts = mssqlTable('posts', {
+    id: int().identity().primaryKey(),
+    title: varchar({ length: 255 }).notNull(),
+    content: varchar({ length: 'max' }).notNull(),
+    views: int().notNull().default(0),
+    userId: int('user_id').notNull().references(() => users.id),
+  });
+
+  export const comments = mssqlTable('comments', {
+    id: int().identity().primaryKey(),
+    postId: int('post_id').notNull().references(() => posts.id),
+    userId: int('user_id').notNull().references(() => users.id),
+    content: varchar({ length: 'max' }).notNull(),
+    createdAt: datetime2('created_at').notNull().defaultGetDate(),
+  });
+  ```
+
+	```ts copy
+  import { relations } from 'drizzle-orm/_relations';
+  import { comments, posts, users } from "./schema";
+
+  export const usersRelations = relations(users, ({ many }) => ({
+    posts: many(posts),
+    comments: many(comments),
+  }));
+
+  export const postsRelations = relations(posts, ({ one, many }) => ({
+    user: one(users, { fields: [posts.userId], references: [users.id] }),
+    comments: many(comments),
+  }));
+
+  export const commentsRelations = relations(comments, ({ one }) => ({
+    post: one(posts, { fields: [comments.postId], references: [posts.id] }),
+    user: one(users, { fields: [comments.userId], references: [users.id] }),
+  }));
+	```
+</CodeTabs>
+
+This is how you can create custom solution for conditional select:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {7}
+    import { posts } from './schema';
+
+    const searchPosts = async (withTitle = false) => {
+      return await db
+        .select({
+          id: posts.id,
+          ...(withTitle && { title: posts.title }),
+        })
+        .from(posts);
+    };
+
+    await searchPosts();
+    await searchPosts(true);
+    ```
+
+    ```ts
+    // result type
+    type Result = {
+      id: number;
+      title?: string | undefined;
+    }[];
+    ```
+  </CodeTab>
+
+  ```ts copy
+  import { int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+  export const posts = mssqlTable('posts', {
+    id: int().identity().primaryKey(),
+    title: varchar({ length: 255 }).notNull(),
+    content: varchar({ length: 'max' }).notNull(),
+    views: int().notNull().default(0),
+  });
+	```
+</CodeTabs>

@@ -1,0 +1,58 @@
+---
+title: Upsert Query
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from "@mdx/Callout.astro";
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- [Insert statement](/docs/mssql/insert)
+- [sql operator](/docs/mssql/sql)
+</Prerequisites>
+
+<Callout type="warning">
+**Upsert does not work in MSSQL with Drizzle.**
+
+SQL Server does not support the `ON CONFLICT DO UPDATE` / `ON DUPLICATE KEY UPDATE`
+syntax, and Drizzle's MSSQL insert builder does not expose `.onConflictDoUpdate()`
+or `.onDuplicateKeyUpdate()` methods. Calling them will not compile.
+</Callout>
+
+In SQL Server, upserts are usually implemented with the `MERGE` statement. Drizzle does
+not provide a builder for `MERGE`, so you have to write it manually with the [`sql`](/docs/mssql/sql)
+operator and run it via `db.execute()`:
+
+<Section>
+```ts copy
+import { sql } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+await db.execute(sql`
+  merge into [users] as target
+  using (values (1, 'John')) as source ([id], [name])
+  on target.[id] = source.[id]
+  when matched then
+    update set [name] = source.[name]
+  when not matched then
+    insert ([id], [name]) values (source.[id], source.[name]);
+`);
+```
+
+```sql
+merge into [users] as target
+using (values (1, 'John')) as source ([id], [name])
+on target.[id] = source.[id]
+when matched then
+  update set [name] = source.[name]
+when not matched then
+  insert ([id], [name]) values (source.[id], source.[name]);
+```
+</Section>
+
+<Callout>
+Because this is raw SQL, Drizzle cannot type-check the statement or map its result.
+Make sure the column names and the `MERGE` semantics match your schema.
+</Callout>

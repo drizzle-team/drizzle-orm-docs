@@ -1,0 +1,49 @@
+---
+title: Empty array as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- Learn about [column data types](/docs/mssql/column-types)
+- [sql operator](/docs/mssql/sql)
+</Prerequisites>
+
+MSSQL doesn't have an array or a native `json` data type, but you can store a JSON array in an `nvarchar` column and work with it using SQL Server's built-in JSON functions. To set an empty array as a default value you can use the `sql` operator with `'[]'` syntax:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { int, mssqlTable, nvarchar } from 'drizzle-orm/mssql-core';
+
+export const users = mssqlTable('users', {
+  id: int().identity().primaryKey(),
+  tags: nvarchar({ length: 'max', mode: 'json' })
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'`),
+});
+```
+
+```sql
+CREATE TABLE [users] (
+	[id] int IDENTITY(1, 1),
+	[tags] nvarchar(max) NOT NULL CONSTRAINT [users_tags_default] DEFAULT ('[]'),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id])
+);
+```
+</Section>
+
+The `mode: 'json'` option defines how values are handled in the application. With `json` mode, values are treated as JSON object literal.
+
+You can specify `.$type<..>()` for json object inference, it will not check runtime values. It provides compile time protection for default values, insert and select schemas.
+
+<Callout type="warning">
+MSSQL has no native array type. The column is stored as `nvarchar(max)` containing a
+JSON string, so validation and querying of its contents rely on SQL Server's
+[JSON functions](https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server)
+rather than array operators.
+</Callout>

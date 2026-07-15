@@ -1,0 +1,187 @@
+---
+title: SQL Limit/Offset pagination
+---
+
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from "@mdx/Callout.astro";
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- [Select statement](/docs/mssql/select) with [order by clause](/docs/mssql/select#order-by) and [offset & fetch clauses](/docs/mssql/select#limit--offset)
+- [Relational queries](/docs/mssql/rqb) with [order by clause](/docs/mssql/rqb#order-by) and [limit & offset clauses](/docs/mssql/rqb#limit--offset)
+- [Dynamic query building](/docs/mssql/dynamic-query-building)
+</Prerequisites>
+
+<Callout>
+MSSQL has no `LIMIT` clause. Pagination is done with `OFFSET ... ROWS FETCH NEXT ... ROWS ONLY`,
+which requires an `ORDER BY`. In Drizzle you use `.offset()` together with `.fetch()`.
+</Callout>
+
+This guide demonstrates how to implement `limit/offset` pagination in Drizzle:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {9,10,11}
+    import { asc } from 'drizzle-orm';
+    import { users } from './schema';
+
+    const db = drizzle(...);
+
+    await db
+      .select()
+      .from(users)
+      .orderBy(asc(users.id)) // order by is mandatory
+      .offset(4) // the number of rows to skip
+      .fetch(4); // the number of rows to return
+    ```
+
+    ```sql
+    select * from [users] order by [users].[id] asc offset 4 rows fetch next 4 rows only;
+    ```
+
+    ```ts
+    // 5-8 rows returned
+    [
+      {
+        id: 5,
+        firstName: 'Beth',
+        lastName: 'Davis',
+        createdAt: 2024-03-11T20:51:46.787Z
+      },
+      {
+        id: 6,
+        firstName: 'Charlie',
+        lastName: 'Miller',
+        createdAt: 2024-03-11T21:15:46.787Z
+      },
+      {
+        id: 7,
+        firstName: 'Clara',
+        lastName: 'Wilson',
+        createdAt: 2024-03-11T21:33:46.787Z
+      },
+      {
+        id: 8,
+        firstName: 'David',
+        lastName: 'Moore',
+        createdAt: 2024-03-11T21:45:46.787Z
+      }
+    ]
+    ```
+  </CodeTab>
+  <CodeTab>
+    ```ts copy
+    import { datetime2, int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+    export const users = mssqlTable('users', {
+      id: int().identity().primaryKey(),
+      firstName: varchar('first_name', { length: 255 }).notNull(),
+      lastName: varchar('last_name', { length: 255 }).notNull(),
+      createdAt: datetime2('created_at').notNull().defaultGetDate(),
+    });
+    ```
+
+    ```plaintext
+    +----+------------+-----------+-----------------------------+
+    | id | first_name | last_name |          created_at         |
+    +----+------------+-----------+-----------------------------+
+    |  1 | Alice      | Johnson   | 2024-03-08 12:23:55.2517970 |
+    +----+------------+-----------+-----------------------------+
+    |  2 | Alex       | Smith     | 2024-03-08 12:25:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    |  3 | Aaron      | Williams  | 2024-03-08 12:28:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    |  4 | Brian      | Brown     | 2024-03-08 12:34:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    |  5 | Beth       | Davis     | 2024-03-08 12:40:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    |  6 | Charlie    | Miller    | 2024-03-08 13:04:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    |  7 | Clara      | Wilson    | 2024-03-08 13:22:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    |  8 | David      | Moore     | 2024-03-08 13:34:55.1820000 |
+    +----+------------+-----------+-----------------------------+
+    ```
+  </CodeTab>
+</CodeTabs>
+
+Offset is the number of rows to skip `((page number - 1) * page size)` and fetch is the number of rows to return `(page size)`. 
+For consistent pagination, ensure ordering by a unique column. Otherwise, the results can be inconsistent.
+
+If you need to order by a non-unique column, you should also append a unique column to the ordering.
+
+This is how you can implement `limit/offset` pagination with 2 columns:
+
+<Section>
+```ts copy {5}
+const getUsers = async (page = 1, pageSize = 3) => {
+  await db
+    .select()
+    .from(users)
+    .orderBy(asc(users.firstName), asc(users.id)) // order by first_name (non-unique), id (pk)
+    .offset((page - 1) * pageSize)
+    .fetch(pageSize);
+}
+
+await getUsers();
+```
+</Section>
+
+Drizzle has useful relational queries API, that lets you easily implement `limit/offset` pagination. MSSQL uses [Relational Queries v1](/docs/mssql/rqb), accessed via `db._query`:
+
+<Section>
+```ts copy {7,8,9}
+import { schema } from './schema';
+
+const db = drizzle(client, { schema });
+
+const getUsers = async (page = 1, pageSize = 3) => {
+  return await db._query.users.findMany({
+    orderBy: (users, { asc }) => asc(users.id),
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  });
+};
+
+await getUsers();
+```
+
+```sql
+select top(3) [id], [first_name], [last_name], [created_at] from [users] order by [users].[id] asc offset 0 rows;
+```
+</Section>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you can create custom function for pagination using `.$dynamic()` function:
+
+<Section>
+```ts copy {11,12,13,16}
+import { SQL, asc } from 'drizzle-orm';
+import { MsSqlColumn, type MsSqlSelect } from 'drizzle-orm/mssql-core';
+
+function withPagination<T extends MsSqlSelect>(
+  qb: T,
+  orderByColumn: MsSqlColumn | SQL | SQL.Aliased,
+  page = 1,
+  pageSize = 3,
+) {
+  return qb
+    .orderBy(orderByColumn)
+    .offset((page - 1) * pageSize)
+    .fetch(pageSize);
+}
+
+const query = db.select().from(users); // query that you want to execute with pagination
+
+await withPagination(query.$dynamic(), asc(users.id));
+```
+
+</Section>
+
+**Benefits** of `limit/offset` pagination: it's simple to implement and pages are easily reachable, which means that you can navigate to any page without having to save the state of the previous pages.
+
+**Drawbacks** of `limit/offset` pagination: degradation in query performance with increasing offset because database has to scan all rows before the offset to skip them, and inconsistency due to data shifts, which can lead to the same row being returned on different pages or rows being skipped.
+
+So, if your database experiences frequently insert and delete operations in real time or you need high performance to paginate large tables, you should consider using [cursor-based](/docs/mssql/guides/cursor-based-pagination) pagination instead.

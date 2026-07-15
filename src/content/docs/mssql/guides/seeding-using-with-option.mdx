@@ -9,9 +9,9 @@ import Callout from '@mdx/Callout.astro';
 import Section from "@mdx/Section.astro";
 
 <Prerequisites>
-- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
-- Get familiar with [One-to-many Relation](/docs/sqlite/relations#one-to-many)
-- Get familiar with [Drizzle Seed](/docs/sqlite/seed-overview)
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- Get familiar with [One-to-many Relation](/docs/mssql/relations#one-to-many)
+- Get familiar with [Drizzle Seed](/docs/mssql/seed-overview)
 </Prerequisites>
 
 <Callout title='Warning'>
@@ -52,17 +52,17 @@ main();
 
 <CodeTab>
 ```ts
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
 
-export const users = sqliteTable('users', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	name: text(),
+export const users = mssqlTable('users', {
+	id: int().identity().primaryKey(),
+	name: varchar({ length: 255 }),
 });
 
-export const posts = sqliteTable('posts', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	content: text(),
-	authorId: integer('author_id').notNull(),
+export const posts = mssqlTable('posts', {
+	id: int().identity().primaryKey(),
+	content: varchar({ length: 'max' }),
+	authorId: int('author_id').notNull(),
 });
 ```
 </CodeTab>
@@ -124,17 +124,17 @@ main();
 </CodeTab>
 <CodeTab>
 ```ts copy{11}
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
 
-export const users = sqliteTable('users', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	name: text(),
+export const users = mssqlTable('users', {
+	id: int().identity().primaryKey(),
+	name: varchar({ length: 255 }),
 });
 
-export const posts = sqliteTable('posts', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	content: text(),
-	authorId: integer('author_id').notNull().references(() => users.id),
+export const posts = mssqlTable('posts', {
+	id: int().identity().primaryKey(),
+	content: varchar({ length: 'max' }),
+	authorId: int('author_id').notNull().references(() => users.id),
 });
 ```
 </CodeTab>
@@ -188,27 +188,25 @@ main();
 
 <CodeTab>
 ```ts copy{2,15-20}
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { defineRelations } from "drizzle-orm";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
+import { relations } from "drizzle-orm/_relations";
 
-export const users = sqliteTable('users', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	name: text(),
+export const users = mssqlTable('users', {
+	id: int().identity().primaryKey(),
+	name: varchar({ length: 255 }),
 });
 
-export const posts = sqliteTable('posts', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	content: text(),
-	authorId: integer('author_id').notNull(),
+export const posts = mssqlTable('posts', {
+	id: int().identity().primaryKey(),
+	content: varchar({ length: 'max' }),
+	authorId: int('author_id').notNull(),
 });
 
-export const postsRelations = defineRelations({ posts, users }, (r) => ({
-  posts: {
-	author: r.one.users({
-	  from: r.posts.authorId,
-	  to: r.users.id,
+export const postsRelations = relations(posts, ({ one }) => ({
+	author: one(users, {
+		fields: [posts.authorId],
+		references: [users.id],
 	}),
-  },
 }));
 ```
 </CodeTab>
@@ -239,17 +237,17 @@ main();
 
 <CodeTab>
 ```ts
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
 
-export const users = sqliteTable('users', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	name: text(),
+export const users = mssqlTable('users', {
+	id: int().identity().primaryKey(),
+	name: varchar({ length: 255 }),
 });
 
-export const posts = sqliteTable('posts', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	content: text(),
-	authorId: integer('author_id').notNull().references(() => users.id),
+export const posts = mssqlTable('posts', {
+	id: int().identity().primaryKey(),
+	content: varchar({ length: 'max' }),
+	authorId: int('author_id').notNull().references(() => users.id),
 });
 ```
 </CodeTab>
@@ -269,10 +267,10 @@ You have a `posts` table referencing a `users` table in your schema,
 .
 .
 .
-export const posts = sqliteTable('posts', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	content: text(),
-	authorId: integer('author_id').notNull().references(() => users.id),
+export const posts = mssqlTable('posts', {
+	id: int().identity().primaryKey(),
+	content: varchar({ length: 'max' }),
+	authorId: int('author_id').notNull().references(() => users.id),
 });
 ```
 or in other words, you have one-to-many relation where `one` user can have `many` posts.
@@ -355,13 +353,13 @@ main();
 
 <CodeTab>
 ```ts
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
+import type { AnyMsSqlColumn } from "drizzle-orm/mssql-core";
 
-export const users = sqliteTable('users', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	name: text(),
-    reportsTo: integer('reports_to').references((): AnySQLiteColumn => users.id),
+export const users = mssqlTable('users', {
+	id: int().identity().primaryKey(),
+	name: varchar({ length: 255 }),
+    reportsTo: int('reports_to').references((): AnyMsSqlColumn => users.id),
 });
 ```
 </CodeTab>
@@ -380,10 +378,10 @@ You have a `users` table referencing a `users` table in your schema,
 .
 .
 .
-export const users = sqliteTable('users', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	name: text(),
-    reportsTo: integer('reports_to').references((): AnySQLiteColumn => users.id),
+export const users = mssqlTable('users', {
+	id: int().identity().primaryKey(),
+	name: varchar({ length: 255 }),
+    reportsTo: int('reports_to').references((): AnyMsSqlColumn => users.id),
 });
 ```
 or in other words, you have one-to-one relation where `one` user can have only `one` user.

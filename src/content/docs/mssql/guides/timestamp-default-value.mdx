@@ -1,0 +1,99 @@
+---
+title: SQL Timestamp as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- Learn about [column data types](/docs/mssql/column-types)
+- [sql operator](/docs/mssql/sql)
+</Prerequisites>
+
+To set current timestamp as a default value in MSSQL, you can use the `defaultGetDate()` method or `sql` operator with `getdate()` function which returns the current date and time:
+
+<Section>
+```ts copy {6}
+import { int, mssqlTable, datetime2 } from 'drizzle-orm/mssql-core';
+
+export const users = mssqlTable('users', {
+  id: int().identity().primaryKey(),
+  timestamp1: datetime2().notNull().defaultGetDate(),
+});
+```
+
+```sql
+CREATE TABLE [users] (
+	[id] int IDENTITY(1, 1),
+	[timestamp1] datetime2 NOT NULL CONSTRAINT [users_timestamp1_default] DEFAULT (getdate()),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id])
+);
+```
+</Section>
+
+The value returned by the application is a `Date` object.
+
+<Section>
+```plaintext
+// Data stored in the database
++----+-----------------------------+
+| id |         timestamp1          |
++----+-----------------------------+
+|  1 | 2024-04-11 14:14:28.0386970 |
++----+-----------------------------+
+```
+
+```ts
+// Data returned by the application
+[
+  {
+    id: 1,
+    timestamp1: 2024-04-11T14:14:28.038Z, // Date object
+  }
+]
+```
+</Section>
+
+To set unix timestamp as a default value in MSSQL, you can use the `sql` operator with `datediff()` and `getutcdate()` functions which return the number of seconds since `1970-01-01 00:00:00 UTC`:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { int, mssqlTable } from 'drizzle-orm/mssql-core';
+
+export const users = mssqlTable('users', {
+  id: int().identity().primaryKey(),
+  timestamp: int()
+    .notNull()
+    .default(sql`datediff(second, '1970-01-01', getutcdate())`),
+});
+```
+
+```sql
+CREATE TABLE [users] (
+	[id] int IDENTITY(1, 1),
+	[timestamp] int NOT NULL CONSTRAINT [users_timestamp_default] DEFAULT (datediff(second, '1970-01-01', getutcdate())),
+	CONSTRAINT [users_pkey] PRIMARY KEY([id])
+);
+```
+
+```plaintext
+// Data stored in the database
++----+------------+
+| id | timestamp  |
++----+------------+
+|  1 | 1712847986 |
++----+------------+
+```
+
+```ts
+// Data returned by the application
+[ 
+  { 
+    id: 1, 
+    timestamp: 1712847986 // number
+  } 
+]
+```
+</Section>

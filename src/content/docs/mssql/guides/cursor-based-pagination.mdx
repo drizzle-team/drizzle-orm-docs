@@ -1,0 +1,223 @@
+---
+title: SQL Cursor-based pagination
+---
+
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from "@mdx/Callout.astro";
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- [Select statement](/docs/mssql/select) with [order by clause](/docs/mssql/select#order-by)
+- [Relational queries](/docs/mssql/rqb) with [order by clause](/docs/mssql/rqb#order-by)
+- [Indices](/docs/mssql/indexes-constraints)
+</Prerequisites>
+
+<Callout>
+MSSQL has no `LIMIT` clause, and its `FETCH NEXT ... ROWS ONLY` requires a preceding
+`OFFSET ... ROWS`. To return a fixed number of rows without skipping any, use
+`.offset(0).fetch(pageSize)`.
+</Callout>
+
+This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+  ```ts copy {10,11,12}
+  import { asc, gt } from 'drizzle-orm';
+  import { users } from './schema';
+
+  const db = drizzle(...);
+
+  const nextUserPage = async (cursor?: number, pageSize = 3) => {
+    await db
+      .select()
+      .from(users)
+      .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
+      .orderBy(asc(users.id)) // ordering
+      .offset(0) // required before fetch
+      .fetch(pageSize); // the number of rows to return
+  };
+
+  // pass the cursor of the last row of the previous page (id)
+  await nextUserPage(3);
+  ```
+
+  ```sql
+  select * from [users] where [users].[id] > 3 order by [users].[id] asc offset 0 rows fetch next 3 rows only;
+  ```
+
+  ```ts
+  // next page, 4-6 rows returned
+  [
+    {
+      id: 4,
+      firstName: 'Brian',
+      lastName: 'Brown',
+      createdAt: 2024-03-08T12:34:55.182Z
+    },
+    {
+      id: 5,
+      firstName: 'Beth',
+      lastName: 'Davis',
+      createdAt: 2024-03-08T12:40:55.182Z
+    },
+    {
+      id: 6,
+      firstName: 'Charlie',
+      lastName: 'Miller',
+      createdAt: 2024-03-08T13:04:55.182Z
+    }
+  ]
+  ```
+  </CodeTab>
+  <CodeTab>
+  ```ts copy
+  import { datetime2, int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
+
+  export const users = mssqlTable('users', {
+    id: int().identity().primaryKey(),
+    firstName: varchar('first_name', { length: 255 }).notNull(),
+    lastName: varchar('last_name', { length: 255 }).notNull(),
+    createdAt: datetime2('created_at').notNull().defaultGetDate(),
+  });
+  ```
+
+  ```plaintext
+  +----+------------+------------+-----------------------------+
+  | id | first_name | last_name  |          created_at         |
+  +----+------------+------------+-----------------------------+
+  |  1 | Alice      | Johnson    | 2024-03-08 12:23:55.2517970 |
+  +----+------------+------------+-----------------------------+
+  |  2 | Alex       | Smith      | 2024-03-08 12:25:55.1820000 |
+  +----+------------+------------+-----------------------------+
+  |  3 | Aaron      | Williams   | 2024-03-08 12:28:55.1820000 |
+  +----+------------+------------+-----------------------------+
+  |  4 | Brian      | Brown      | 2024-03-08 12:34:55.1820000 |
+  +----+------------+------------+-----------------------------+
+  |  5 | Beth       | Davis      | 2024-03-08 12:40:55.1820000 |
+  +----+------------+------------+-----------------------------+
+  |  6 | Charlie    | Miller     | 2024-03-08 13:04:55.1820000 |
+  +----+------------+------------+-----------------------------+
+  ```
+  </CodeTab>
+
+</CodeTabs>
+
+If you need dynamic order by you can do like below:
+
+```ts copy {6,8}
+const nextUserPage = async (order: 'asc' | 'desc' = 'asc', cursor?: number, pageSize = 3) => {
+  await db
+    .select()
+    .from(users)
+    // cursor comparison
+    .where(cursor ? (order === 'asc' ? gt(users.id, cursor) : lt(users.id, cursor)) : undefined)
+    .orderBy(order === 'asc' ? asc(users.id) : desc(users.id))
+    .offset(0)
+    .fetch(pageSize);
+};
+
+await nextUserPage();
+await nextUserPage('asc', 3);
+// descending order
+await nextUserPage('desc');
+await nextUserPage('desc', 7);
+```
+
+The main idea of this pagination is to use cursor as a pointer to a specific row in a dataset, indicating the end of the previous page. For correct ordering and cursor comparison, cursor should be unique and sequential.
+
+If you need to order by a non-unique and non-sequential column, you can use multiple columns for cursor. This is how you can do it:
+
+<Section>
+```ts copy {14,15,16,17,18,19,22}
+import { and, asc, eq, gt, or } from 'drizzle-orm';
+
+const nextUserPage = async (
+  cursor?: {
+    id: number;
+    firstName: string;
+  },
+  pageSize = 3,
+) => {
+  await db
+    .select()
+    .from(users)
+    .where(
+      cursor
+        ? or(
+            gt(users.firstName, cursor.firstName),
+            and(eq(users.firstName, cursor.firstName), gt(users.id, cursor.id)),
+          )
+        : undefined,
+    )
+    .orderBy(asc(users.firstName), asc(users.id))
+    .offset(0)
+    .fetch(pageSize);
+};
+
+// pass the cursor from previous page (id & firstName)
+await nextUserPage({
+  id: 2,
+  firstName: 'Alex',
+});
+```
+
+```sql
+select * from [users]
+  where (([users].[first_name] > 'Alex') or (([users].[first_name] = 'Alex') and ([users].[id] > 2)))
+  order by [users].[first_name] asc, [users].[id] asc offset 0 rows fetch next 3 rows only;
+```
+</Section>
+
+Make sure to create indices for the columns that you use for cursor to make query efficient.
+
+<Section>
+```ts copy {7,8}
+import { index, ...imports } from 'drizzle-orm/mssql-core';
+
+export const users = mssqlTable('users', {
+  // columns declaration
+},
+(t) => [
+  index('first_name_index').on(t.firstName),
+  index('first_name_and_id_index').on(t.firstName, t.id),
+]);
+```
+
+```sql
+CREATE INDEX [first_name_index] ON [users] ([first_name]);
+CREATE INDEX [first_name_and_id_index] ON [users] ([first_name], [id]);
+```
+</Section>
+
+Drizzle has useful relational queries API, that lets you easily implement `cursor-based` pagination. MSSQL uses [Relational Queries v1](/docs/mssql/rqb), accessed via `db._query`:
+
+```ts copy {7,8,9}
+import { schema } from './schema';
+
+const db = drizzle(client, { schema });
+
+const nextUserPage = async (cursor?: number, pageSize = 3) => {
+  return await db._query.users.findMany({
+    where: (users, { gt }) => (cursor ? gt(users.id, cursor) : undefined),
+    orderBy: (users, { asc }) => asc(users.id),
+    limit: pageSize,
+  });
+};
+
+// next page, cursor of last row of the first page (id = 3)
+await nextUserPage(3);
+```
+
+```sql
+select top(3) [id], [first_name], [last_name], [created_at] from [users] where [users].[id] > 3 order by [users].[id] asc;
+```
+
+**Benefits** of `cursor-based` pagination: consistent query results, with no skipped or duplicated rows due to insert or delete operations, and greater efficiency compared to `limit/offset` pagination because it does not need to scan and skip previous rows to access the next page.
+
+**Drawbacks** of `cursor-based` pagination: the inability to directly navigate to a specific page and complexity of implementation. Since you add more columns to the sort order, you'll need to add more filters to the `where` clause for the cursor comparison to ensure consistent pagination.
+
+So, if you need to directly navigate to a specific page or you need simpler implementation of pagination, you should consider using [offset/limit](/docs/mssql/guides/limit-offset-pagination) pagination instead.
