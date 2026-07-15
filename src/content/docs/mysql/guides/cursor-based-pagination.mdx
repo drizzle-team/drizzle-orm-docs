@@ -4,17 +4,14 @@ title: SQL Cursor-based pagination
 
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
-- [Select statement](/docs/select) with [order by clause](/docs/select#order-by)
-- [Relational queries](/docs/rqb) with [order by clause](/docs/rqb#order-by)
-- [Indices](/docs/indexes-constraints)
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Select statement](/docs/mysql/select) with [order by clause](/docs/mysql/select#order-by)
+- [Relational queries](/docs/mysql/rqb) with [order by clause](/docs/mysql/rqb#order-by)
+- [Indices](/docs/mysql/indexes-constraints)
 </Prerequisites>
 
 This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
@@ -41,7 +38,7 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   ```
 
   ```sql
-  select * from users order by id asc limit 3;
+  select * from `users` where `users`.`id` > 3 order by `users`.`id` asc limit 3;
   ```
 
   ```ts
@@ -70,12 +67,12 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   </CodeTab>
   <CodeTab>
   ```ts copy
-  import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
-  export const users = pgTable('users', {
-    id: serial('id').primaryKey(),
-    firstName: text('first_name').notNull(),
-    lastName: text('last_name').notNull(),
+  export const users = mysqlTable('users', {
+    id: int().primaryKey().autoincrement(),
+    firstName: varchar('first_name', { length: 255 }).notNull(),
+    lastName: varchar('last_name', { length: 255 }).notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
   ```
@@ -165,9 +162,9 @@ await nextUserPage({
 ```
 
 ```sql
-select * from users
-  where (first_name > 'Alex' or (first_name = 'Alex' and id > 2))
-  order by first_name asc, id asc limit 3;
+select * from `users`
+  where ((`users`.`first_name` > 'Alex') or ((`users`.`first_name` = 'Alex') and (`users`.`id` > 2)))
+  order by `users`.`first_name` asc, `users`.`id` asc limit 3;
 ```
 
 ```ts
@@ -199,21 +196,20 @@ Make sure to create indices for the columns that you use for cursor to make quer
 
 <Section>
 ```ts copy {7,8}
-import { index, ...imports } from 'drizzle-orm/pg-core';
+import { index, ...imports } from 'drizzle-orm/mysql-core';
 
-export const users = pgTable('users', {
+export const users = mysqlTable('users', {
   // columns declaration
 },
 (t) => [
-  index('first_name_index').on(t.firstName).asc(),
-  index('first_name_and_id_index').on(t.firstName, t.id).asc(),
+  index('first_name_index').on(t.firstName),
+  index('first_name_and_id_index').on(t.firstName, t.id),
 ]);
 ```
 
 ```sql
--- As of now drizzle-kit only supports index name and on() param, so you have to add order manually
-CREATE INDEX IF NOT EXISTS "first_name_index" ON "users" ("first_name" ASC);
-CREATE INDEX IF NOT EXISTS "first_name_and_id_index" ON "users" ("first_name" ASC,"id" ASC);
+CREATE INDEX `first_name_index` ON `users` (`first_name`);
+CREATE INDEX `first_name_and_id_index` ON `users` (`first_name`,`id`);
 ```
 </Section>
 
@@ -257,13 +253,13 @@ await nextUserPage({
 Drizzle has useful relational queries API, that lets you easily implement `cursor-based` pagination:
 
 ```ts copy {7,8,9}
-import * as schema from './db/schema';
+import { relations } from './relations';
 
-const db = drizzle(..., { schema });
+const db = drizzle({ relations });
 
 const nextUserPage = async (cursor?: number, pageSize = 3) => {
-  await db.query.users.findMany({
-    where: (users, { gt }) => (cursor ? gt(users.id, cursor) : undefined),
+  return await db.query.users.findMany({
+    where: cursor ? { id: { gt: cursor } } : undefined,
     orderBy: (users, { asc }) => asc(users.id),
     limit: pageSize,
   });
@@ -277,4 +273,4 @@ await nextUserPage(3);
 
 **Drawbacks** of `cursor-based` pagination: the inability to directly navigate to a specific page and complexity of implementation. Since you add more columns to the sort order, you'll need to add more filters to the `where` clause for the cursor comparison to ensure consistent pagination.
 
-So, if you need to directly navigate to a specific page or you need simpler implementation of pagination, you should consider using [offset/limit](/docs/guides/limit-offset-pagination) pagination instead.
+So, if you need to directly navigate to a specific page or you need simpler implementation of pagination, you should consider using [offset/limit](/docs/mysql/guides/limit-offset-pagination) pagination instead.

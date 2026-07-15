@@ -4,14 +4,11 @@ title: Update many with different values for each row
 
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
-
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
-- [Update statement](/docs/update)
-- [Filters](/docs/operators) and [sql operator](/docs/sql)
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Update statement](/docs/mysql/update)
+- [Filters](/docs/mysql/operators) and [sql operator](/docs/mysql/sql)
 </Prerequisites>
 
 To implement update many with different values for each row within 1 request you can use `sql` operator with `case` statement and `.update().set()` methods like this:
@@ -61,8 +58,8 @@ await db.update(users).set({ city: finalSql }).where(inArray(users.id, ids));
 ```
 
 ```sql
-update users set "city" = 
-  (case when id = 1 then 'New York' when id = 2 then 'Los Angeles' when id = 3 then 'Chicago' end)
-where id in (1, 2, 3)
+update `users` set `city` = 
+  (case when `users`.`id` = 1 then 'New York' when `users`.`id` = 2 then 'Los Angeles' when `users`.`id` = 3 then 'Chicago' end)
+where `users`.`id` in (1, 2, 3)
 ```
 </Section>

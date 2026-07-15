@@ -2,19 +2,16 @@
 title: Seeding using 'with' option
 ---
 
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 import Section from "@mdx/Section.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
-- Get familiar with [One-to-many Relation](/docs/relations#one-to-many)
-- Get familiar with [Drizzle Seed](/docs/seed-overview)
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- Get familiar with [One-to-many Relation](/docs/mysql/relations#one-to-many)
+- Get familiar with [Drizzle Seed](/docs/mysql/seed-overview)
 </Prerequisites>
 
 <Callout title='Warning'>
@@ -55,17 +52,17 @@ main();
 
 <CodeTab>
 ```ts
-import { serial, pgTable, integer, text } from "drizzle-orm/pg-core";
+import { int, mysqlTable, text } from "drizzle-orm/mysql-core";
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+export const users = mysqlTable('users', {
+	id: int().primaryKey().autoincrement(),
+	name: text(),
 });
 
-export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull(),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey().autoincrement(),
+	content: text(),
+	authorId: int('author_id').notNull(),
 });
 ```
 </CodeTab>
@@ -79,8 +76,9 @@ you didn't include your one-to-many relation in the seed function schema.
 You can't specify "posts" as parameter in users.with object.
 ```
 
-You will have several options to resolve an error:
-- You can add reference to the `authorId` column in `posts` table in your schema
+{/* TODO return when seed accepts rqb v2*/}
+{/* You will have several options to resolve an error: */}
+- To resolve this - you can add reference to the `authorId` column in `posts` table in your schema
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 <Section>
@@ -126,23 +124,24 @@ main();
 </CodeTab>
 <CodeTab>
 ```ts copy{11}
-import { serial, pgTable, integer, text } from "drizzle-orm/pg-core";
+import { int, mysqlTable, text } from "drizzle-orm/mysql-core";
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+export const users = mysqlTable('users', {
+	id: int().primaryKey().autoincrement(),
+	name: text(),
 });
 
-export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull().references(() => users.id),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey().autoincrement(),
+	content: text(),
+	authorId: int('author_id').notNull().references(() => users.id),
 });
 ```
 </CodeTab>
 </CodeTabs>
 
-- You can add one-to-many relation to your schema and include it in the seed function schema
+{/* TODO return when seed accepts rqb v2*/}
+{/* - You can add one-to-many relation to your schema and include it in the seed function schema
 <CodeTabs items={["index.ts", "schema.ts"]}>
 <CodeTab>
 <Section>
@@ -150,15 +149,15 @@ export const posts = pgTable('posts', {
 import { users, posts, postsRelations } from './schema.ts';
 
 async function main() {
-    const db = drizzle(...);
-    await seed(db, { users, posts, postsRelations }).refine(() => ({
-        users: {
-            count: 2,
-            with: {
-                posts: 3,
-            },
-        },
-    }));
+	const db = drizzle(...);
+	await seed(db, { users, posts, postsRelations }).refine(() => ({
+		users: {
+			count: 2,
+			with: {
+				posts: 3,
+			},
+		},
+	}));
 }
 main();
 
@@ -189,29 +188,31 @@ main();
 
 <CodeTab>
 ```ts copy{2,15-20}
-import { serial, pgTable, integer, text } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { int, mysqlTable, text } from "drizzle-orm/mysql-core";
+import { defineRelations } from "drizzle-orm";
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+export const users = mysqlTable('users', {
+	id: int().primaryKey().autoincrement(),
+	name: text(),
 });
 
-export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull(),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey().autoincrement(),
+	content: text(),
+	authorId: int('author_id').notNull(),
 });
 
-export const postsRelations = relations(posts, ({ one }) => ({
-	author: one(users, {
-		fields: [posts.authorId],
-		references: [users.id],
+export const postsRelations = defineRelations({ posts, users }, (r) => ({
+  posts: {
+	author: r.one.users({
+	  from: r.posts.authorId,
+	  to: r.users.id,
 	}),
+  },
 }));
 ```
 </CodeTab>
-</CodeTabs>
+</CodeTabs> */}
 
 
 ## Example 2
@@ -238,17 +239,17 @@ main();
 
 <CodeTab>
 ```ts
-import { serial, pgTable, integer, text } from "drizzle-orm/pg-core";
+import { int, mysqlTable, text } from "drizzle-orm/mysql-core";
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
+export const users = mysqlTable('users', {
+	id: int().primaryKey().autoincrement(),
+	name: text(),
 });
 
-export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull().references(() => users.id),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey().autoincrement(),
+	content: text(),
+	authorId: int('author_id').notNull().references(() => users.id),
 });
 ```
 </CodeTab>
@@ -268,10 +269,10 @@ You have a `posts` table referencing a `users` table in your schema,
 .
 .
 .
-export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	content: text('content'),
-	authorId: integer('author_id').notNull().references(() => users.id),
+export const posts = mysqlTable('posts', {
+	id: int().primaryKey().autoincrement(),
+	content: text(),
+	authorId: int('author_id').notNull().references(() => users.id),
 });
 ```
 or in other words, you have one-to-many relation where `one` user can have `many` posts.
@@ -354,13 +355,13 @@ main();
 
 <CodeTab>
 ```ts
-import { serial, pgTable, integer, text } from "drizzle-orm/pg-core";
-import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import { int, mysqlTable, text } from "drizzle-orm/mysql-core";
+import type { AnyMySqlColumn } from "drizzle-orm/mysql-core";
 
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
-    reportsTo: integer('reports_to').references((): AnyPgColumn => users.id),
+export const users = mysqlTable('users', {
+	id: int().primaryKey().autoincrement(),
+	name: text(),
+    reportsTo: int('reports_to').references((): AnyMySqlColumn => users.id),
 });
 ```
 </CodeTab>
@@ -379,10 +380,10 @@ You have a `users` table referencing a `users` table in your schema,
 .
 .
 .
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
-    reportsTo: integer('reports_to').references((): AnyPgColumn => users.id),
+export const users = mysqlTable('users', {
+	id: int().primaryKey().autoincrement(),
+	name: text(),
+    reportsTo: int('reports_to').references((): AnyMySqlColumn => users.id),
 });
 ```
 or in other words, you have one-to-one relation where `one` user can have only `one` user.

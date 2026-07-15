@@ -3,21 +3,18 @@ title: Include or Exclude Columns in Query
 ---
 
 import Section from "@mdx/Section.astro";
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from "@mdx/Callout.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
-- [Select statement](/docs/select)
-- [Get typed table columns](/docs/goodies#get-typed-table-columns)
-- [Joins](/docs/joins)
-- [Relational queries](/docs/rqb)
-- [Partial select with relational queries](/docs/rqb#partial-fields-select)
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Select statement](/docs/mysql/select)
+- [Get typed table columns](/docs/mysql/goodies#get-typed-columns)
+- [Joins](/docs/mysql/joins)
+- [Relational queries](/docs/mysql/rqb)
+- [Partial select with relational queries](/docs/mysql/rqb#partial-fields-select)
 </Prerequisites>
 
 Drizzle has flexible API for including or excluding columns in queries. To include all columns you can use `.select()` method like this:
@@ -44,13 +41,13 @@ Drizzle has flexible API for including or excluding columns in queries. To inclu
   </CodeTab>
 
   ```ts copy
-  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 
-  export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    views: integer('views').notNull().default(0),
+  export const posts = mysqlTable('posts', {
+    id: int().primaryKey().autoincrement(),
+    title: text().notNull(),
+    content: text().notNull(),
+    views: int().notNull().default(0),
   });
 	```
 </CodeTabs>
@@ -158,27 +155,27 @@ This is how you can include or exclude columns with joins:
   </CodeTab>
 
   ```ts copy
-  import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, text, timestamp } from 'drizzle-orm/mysql-core';
 
-  export const users = pgTable('users', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
-    email: text('email').notNull(),
+  export const users = mysqlTable('users', {
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
+    email: text().notNull(),
   });
 
-  export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    views: integer('views').notNull().default(0),
-    userId: integer('user_id').notNull().references(() => users.id),
+  export const posts = mysqlTable('posts', {
+    id: int().primaryKey().autoincrement(),
+    title: text().notNull(),
+    content: text().notNull(),
+    views: int().notNull().default(0),
+    userId: int('user_id').notNull().references(() => users.id),
   });
 
-  export const comments = pgTable('comments', {
-    id: serial('id').primaryKey(),
-    postId: integer('post_id').notNull().references(() => posts.id),
-    userId: integer('user_id').notNull().references(() => users.id),
-    content: text('content').notNull(),
+  export const comments = mysqlTable('comments', {
+    id: int().primaryKey().autoincrement(),
+    postId: int('post_id').notNull().references(() => posts.id),
+    userId: int('user_id').notNull().references(() => users.id),
+    content: text().notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
   ```
@@ -208,13 +205,13 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
   </CodeTab>
 
   ```ts copy
-  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 
-  export const posts = pgTable('posts', {
-	id: serial('id').primaryKey(),
-	title: text('title').notNull(),
-	content: text('content').notNull(),
-	views: integer('views').notNull().default(0),
+  export const posts = mysqlTable('posts', {
+	id: int().primaryKey().autoincrement(),
+	title: text().notNull(),
+	content: text().notNull(),
+	views: int().notNull().default(0),
   });
 	```
 
@@ -334,27 +331,27 @@ This is how you can include or exclude columns with relations using relational q
   </CodeTab>
 
   ```ts copy
-  import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, text, timestamp } from 'drizzle-orm/mysql-core';
 
-  export const users = pgTable('users', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
-    email: text('email').notNull(),
+  export const users = mysqlTable('users', {
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
+    email: text().notNull(),
   });
 
-  export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    views: integer('views').notNull().default(0),
-    userId: integer('user_id').notNull().references(() => users.id),
+  export const posts = mysqlTable('posts', {
+    id: int().primaryKey().autoincrement(),
+    title: text().notNull(),
+    content: text().notNull(),
+    views: int().notNull().default(0),
+    userId: int('user_id').notNull().references(() => users.id),
   });
 
-  export const comments = pgTable('comments', {
-    id: serial('id').primaryKey(),
-    postId: integer('post_id').notNull().references(() => posts.id),
-    userId: integer('user_id').notNull().references(() => users.id),
-    content: text('content').notNull(),
+  export const comments = mysqlTable('comments', {
+    id: int().primaryKey().autoincrement(),
+    postId: int('post_id').notNull().references(() => posts.id),
+    userId: int('user_id').notNull().references(() => users.id),
+    content: text().notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
   ```
@@ -420,13 +417,13 @@ This is how you can create custom solution for conditional select:
   </CodeTab>
 
   ```ts copy
-  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 
-  export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    views: integer('views').notNull().default(0),
+  export const posts = mysqlTable('posts', {
+    id: int().primaryKey().autoincrement(),
+    title: text().notNull(),
+    content: text().notNull(),
+    views: int().notNull().default(0),
   });
 	```
 </CodeTabs>

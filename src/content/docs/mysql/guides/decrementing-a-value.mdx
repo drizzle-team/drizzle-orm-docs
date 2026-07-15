@@ -2,15 +2,12 @@
 title: SQL Decrement value
 ---
 import Section from "@mdx/Section.astro";
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
-- [Update statement](/docs/update)
-- [Filters](/docs/operators) and [sql operator](/docs/sql)
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Update statement](/docs/mysql/update)
+- [Filters](/docs/mysql/operators) and [sql operator](/docs/mysql/sql)
 </Prerequisites>
 
 To decrement a column value you can use `update().set()` method like below:
@@ -30,14 +27,14 @@ await db
 ```
 
 ```sql
-update "table" set "counter" = "counter" - 1 where "id" = 1;
+update `table` set `counter` = `table`.`counter` - 1 where `table`.`id` = 1;
 ```
 </Section>
 
 Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom decrement function:
 
 ```ts copy {4,10,11}
-import { AnyColumn } from 'drizzle-orm';
+import { AnyColumn, sql } from 'drizzle-orm';
 
 const decrement = (column: AnyColumn, value = 1) => {
   return sql`${column} - ${value}`;

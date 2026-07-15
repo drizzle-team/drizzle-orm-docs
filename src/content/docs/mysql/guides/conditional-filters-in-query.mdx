@@ -2,22 +2,19 @@
 title: Conditional filters in query
 ---
 import Section from "@mdx/Section.astro";
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach);
-- [Select statement](/docs/select);
-- [Filtering](/docs/select#filters) and [Filter operators](/docs/operators);
+- Get started with [MySQL](/docs/mysql/get-started-mysql);
+- [Select statement](/docs/mysql/select);
+- [Filtering](/docs/mysql/select#filters) and [Filter operators](/docs/mysql/operators);
 </Prerequisites>
 
 To pass a conditional filter in query you can use `.where()` method and logical operator like below:
 
 <Section>
 ```ts copy {9}
-import { ilike } from 'drizzle-orm';
+import { like } from 'drizzle-orm';
 
 const db = drizzle(...)
 
@@ -25,7 +22,7 @@ const searchPosts = async (term?: string) => {
   await db
     .select()
     .from(posts)
-    .where(term ? ilike(posts.title, term) : undefined);
+    .where(term ? like(posts.title, term) : undefined);
 };
 
 await searchPosts();
@@ -34,8 +31,8 @@ await searchPosts('AI');
 
 
 ```sql
-select * from posts;
-select * from posts where title ilike 'AI';
+select * from `posts`;
+select * from `posts` where `posts`.`title` like 'AI';
 ```
 </Section>
 
@@ -43,7 +40,7 @@ To combine conditional filters you can use `and()` or `or()` operators like belo
 
 <Section>
 ```ts copy {7,8,9,10,11,12,13}
-import { and, gt, ilike, inArray } from 'drizzle-orm';
+import { and, gt, inArray, like } from 'drizzle-orm';
 
 const searchPosts = async (term?: string, categories: string[] = [], views = 0) => {
   await db
@@ -51,7 +48,7 @@ const searchPosts = async (term?: string, categories: string[] = [], views = 0) 
     .from(posts)
     .where(
       and(
-        term ? ilike(posts.title, term) : undefined,
+        term ? like(posts.title, term) : undefined,
         categories.length > 0 ? inArray(posts.category, categories) : undefined,
         views > 100 ? gt(posts.views, views) : undefined,
       ),
@@ -63,12 +60,12 @@ await searchPosts('AI', ['Tech', 'Art', 'Science'], 200);
 ```
 
 ```sql
-select * from posts;
-select * from posts
+select * from `posts`;
+select * from `posts`
   where (
-    title ilike 'AI'
-    and category in ('Tech', 'Science', 'Art')
-    and views > 200
+    (`posts`.`title` like 'AI')
+    and (`posts`.`category` in ('Tech', 'Art', 'Science'))
+    and (`posts`.`views` > 200)
   );
 ```
 </Section>
@@ -86,7 +83,7 @@ const searchPosts = async (filters: SQL[]) => {
 };
 
 const filters: SQL[] = [];
-filters.push(ilike(posts.title, 'AI'));
+filters.push(like(posts.title, 'AI'));
 filters.push(inArray(posts.category, ['Tech', 'Art', 'Science']));
 filters.push(gt(posts.views, 200));
 
@@ -98,7 +95,7 @@ Drizzle has useful and flexible API, which lets you create your custom solutions
 <Section>
 
 ```ts copy {5,14}
-import { AnyColumn, ... } from 'drizzle-orm';
+import { AnyColumn, sql, ... } from 'drizzle-orm';
 
 // length less than
 const lenlt = (column: AnyColumn, value: number) => {
@@ -122,8 +119,8 @@ await searchPosts(8, 200);
 ```
 
 ```sql
-select * from posts where length(title) < 8;
-select * from posts where (length(title) < 8 and views > 200);
+select * from `posts` where length(`posts`.`title`) < 8;
+select * from `posts` where ((length(`posts`.`title`) < 8) and (`posts`.`views` > 200));
 ```
 </Section>
 

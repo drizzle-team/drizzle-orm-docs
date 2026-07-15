@@ -3,36 +3,33 @@ title: Select parent rows with at least one related child row
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Section from "@mdx/Section.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
-
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
-- [Select statement](/docs/select) and [select from subquery](/docs/select#select-from-subquery)
-- [Inner join](/docs/joins#inner-join)
-- [Filter operators](/docs/operators) and [exists function](/docs/operators#exists)
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Select statement](/docs/mysql/select) and [select from subquery](/docs/mysql/select#select-from-subquery)
+- [Inner join](/docs/mysql/joins#inner-join)
+- [Filter operators](/docs/mysql/operators) and [exists function](/docs/mysql/operators#exists)
 </Prerequisites>
 
 This guide demonstrates how to select parent rows with the condition of having at least one related child row. Below, there are examples of schema definitions and the corresponding database data:
 
   ```ts copy
-  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+  import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 
-  export const users = pgTable('users', {
-    id: serial('id').primaryKey(),
-    name: text('name').notNull(),
-    email: text('email').notNull(),
+  export const users = mysqlTable('users', {
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
+    email: text().notNull(),
   });
 
-  export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    userId: integer('user_id').notNull().references(() => users.id),
+  export const posts = mysqlTable('posts', {
+    id: int().primaryKey().autoincrement(),
+    title: text().notNull(),
+    content: text().notNull(),
+    userId: int('user_id').notNull().references(() => users.id),
   });
   ```
 
@@ -81,14 +78,14 @@ To select parent rows with at least one related child row and retrieve child dat
       post: posts,
     })
     .from(users)
-    .innerJoin(posts, eq(users.id, posts.userId));
+    .innerJoin(posts, eq(users.id, posts.userId))
     .orderBy(users.id);
   ```
 
   ```sql
-  select users.*, posts.* from users
-    inner join posts on users.id = posts.user_id
-    order by users.id;
+  select `users`.*, `posts`.* from `users` 
+    inner join `posts` on `users`.`id` = `posts`.`user_id` 
+	order by `users`.`id`
   ```
 
   ```ts
@@ -140,7 +137,7 @@ await db.select().from(users).where(exists(sq));
 ```
 
 ```sql
-select * from users where exists (select 1 from posts where posts.user_id = users.id);
+select * from `users` where exists (select 1 from `posts` where `posts`.`user_id` = `users`.`id`)
 ```
 
 ```ts
