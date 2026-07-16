@@ -1,0 +1,137 @@
+---
+title: Vector similarity search
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from "@mdx/Callout.astro";
+import Npm from "@mdx/Npm.astro";
+
+<Prerequisites>
+- Get started with [CockroachDB](/docs/cockroach/get-started-cockroach)
+- [Select statement](/docs/cockroach/select)
+- [Indexes](/docs/cockroach/indexes-constraints#indexes)
+- [sql operator](/docs/cockroach/sql)
+- You should have installed the `openai` [package](https://www.npmjs.com/package/openai) for generating embeddings. 
+<Npm>
+  openai
+</Npm>
+</Prerequisites>
+
+CockroachDB has a built-in `vector` data type (no extension is required), so you can store vector
+embeddings and perform similarity search directly.
+
+To perform similarity search, create a table with a vector column:
+
+<CodeTabs items={["schema.ts", "migration.sql"]}>
+  <CodeTab>
+  ```ts copy {8}
+  import { cockroachTable, int4, text, vector } from 'drizzle-orm/cockroach-core';
+
+  export const guides = cockroachTable('guides', {
+    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+    title: text().notNull(),
+    description: text().notNull(),
+    url: text().notNull(),
+    embedding: vector({ dimensions: 1536 }),
+  });
+  ```
+  </CodeTab>
+  ```sql
+  CREATE TABLE "guides" (
+    "id" int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+    "title" string NOT NULL,
+    "description" string NOT NULL,
+    "url" string NOT NULL,
+    "embedding" vector(1536)
+  );
+  ```
+</CodeTabs>
+
+<Callout>
+To speed up similarity search you can add a vector index. CockroachDB vector indexes must
+first be enabled at the cluster level, then created with `CREATE VECTOR INDEX`:
+
+```sql
+SET CLUSTER SETTING feature.vector_index.enabled = true;
+CREATE VECTOR INDEX "embeddingIndex" ON "guides" ("embedding");
+```
+
+The similarity queries below also work without an index (with a sequential scan).
+</Callout>
+
+The `embedding` column is used to store vector embeddings of the guide descriptions. Vector embedding is just a representation of some data. It converts different types of data into a common format (vectors) that language models can process. This allows us to perform mathematical operations, such as measuring the distance between two vectors, to determine how similar or different two data items are.
+
+In this example we will use `OpenAI` model to generate [embeddings](https://platform.openai.com/docs/guides/embeddings) for the description:
+```ts copy
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env['OPENAI_API_KEY'],
+});
+
+export const generateEmbedding = async (value: string): Promise<number[]> => {
+  const input = value.replaceAll('\n', ' ');
+
+  const { data } = await openai.embeddings.create({
+    model: 'text-embedding-ada-002',
+    input,
+  });
+
+  return data[0].embedding;
+};
+```
+
+To search for similar guides by embedding, you can use `gt` and `sql` operators with `cosineDistance` function to calculate the similarity between the `embedding` column and the generated embedding:
+
+<Section>
+```ts copy {10,15,16}
+import { cosineDistance, desc, gt, sql } from 'drizzle-orm';
+import { generateEmbedding } from './embedding';
+import { guides } from './schema';
+
+const db = drizzle(...);
+
+const findSimilarGuides = async (description: string) => {
+  const embedding = await generateEmbedding(description);
+
+  const similarity = sql<number>`1 - (${cosineDistance(guides.embedding, embedding)})`;
+
+  const similarGuides = await db
+    .select({ name: guides.title, url: guides.url, similarity })
+    .from(guides)
+    .where(gt(similarity, 0.5))
+    .orderBy((t) => desc(t.similarity))
+    .limit(4);
+
+  return similarGuides;
+};
+```
+
+```sql
+select "title", "url", 1 - ("guides"."embedding" <=> '[...]')
+  from "guides"
+  where 1 - ("guides"."embedding" <=> '[...]') > 0.5
+  order by 1 - ("guides"."embedding" <=> '[...]') desc
+  limit 4;
+```
+
+```json
+[
+  {
+    name: 'Drizzle with Turso',
+    url: '/docs/tutorials/drizzle-with-turso',
+    similarity: 0.8642314333984994
+  },
+  {
+    name: 'Drizzle with Supabase Database',
+    url: '/docs/tutorials/drizzle-with-supabase',
+    similarity: 0.8593631126014918
+  }
+]
+```
+</Section>
+
+The `<=>` operator is the cosine distance operator; `1 - cosine distance` gives the cosine similarity.
