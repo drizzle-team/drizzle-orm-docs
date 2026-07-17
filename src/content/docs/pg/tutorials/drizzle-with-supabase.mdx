@@ -107,7 +107,14 @@ export type SelectPost = typeof postsTable.$inferSelect;
 
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
-```typescript copy filename="drizzle.config.ts"
+<Callout type="info">
+If you want to apply migrations using the Supabase CLI, add the `provider: "supabase"` option. With
+it, `drizzle-kit generate` duplicates each generated migration `.sql` file to the root of your
+migrations folder, so the Supabase CLI can read and apply them. Read more about the
+[`provider` option](/docs/drizzle-config-file#provider).
+</Callout>
+
+```typescript copy filename="drizzle.config.ts" {10}
 import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
@@ -117,6 +124,7 @@ export default defineConfig({
   schema: './src/db/schema.ts',
   out: './supabase/migrations',
   dialect: 'postgresql',
+  provider: 'supabase', // optional — lets the Supabase CLI apply the generated migrations
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
@@ -216,6 +224,7 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │   │  └ 📂 20260708132309_modern_gravity
  │   │     ├ 📜 migration.sql
  │   │     └ 📜 snapshot.json
+ │   │ 📜 20260708132309_modern_gravity.sql
  │   └ 📜 config.toml
  ├ 📜 .env
  ├ 📜 drizzle.config.ts

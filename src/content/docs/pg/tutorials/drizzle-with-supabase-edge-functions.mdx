@@ -46,15 +46,23 @@ This file will be used to generate migrations for your database.
 
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
-```typescript copy filename="drizzle.config.ts"
+```typescript copy filename="drizzle.config.ts" {6}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   schema: "./src/schema.ts",
   out: "./supabase/migrations",
+  provider: "supabase", // lets the Supabase CLI apply the generated migrations
   dialect: "postgresql",
 });
 ```
+
+<Callout type="info">
+Because this tutorial applies migrations with the Supabase CLI, the config uses the
+`provider: "supabase"` option. With it, `drizzle-kit generate` duplicates each generated migration
+`.sql` file to the root of the `supabase/migrations` folder, so the Supabase CLI can read and apply
+them. Read more about the [`provider` option](/docs/drizzle-config-file#provider).
+</Callout>
 
 In this tutorial we will use Drizzle kit to generate migrations for our schema.
 
@@ -277,12 +285,13 @@ Learn more about managing environment variables in Supabase Edge Functions in th
 
 To apply migrations to the remote database using the [drizzle-kit migrate](/docs/drizzle-kit-migrate) command, provide `dbCredentials` in your Drizzle config file. Use the connection string from the previous step:
 
-```typescript copy filename="drizzle.config.ts" {8}
+```typescript copy filename="drizzle.config.ts" {6,9}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   schema: "./src/schema.ts",
   out: "./supabase/migrations",
+  provider: "supabase", // lets the Supabase CLI apply the generated migrations
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL!,
