@@ -1,5 +1,5 @@
 ---
-title: SQL Limit/Offset pagination
+title: SQL Offset/Fetch pagination
 ---
 
 import CodeTabs from '@mdx/CodeTabs.astro';
@@ -15,12 +15,7 @@ import Callout from "@mdx/Callout.astro";
 - [Dynamic query building](/docs/mssql/dynamic-query-building)
 </Prerequisites>
 
-<Callout>
-MSSQL has no `LIMIT` clause. Pagination is done with `OFFSET ... ROWS FETCH NEXT ... ROWS ONLY`,
-which requires an `ORDER BY`. In Drizzle you use `.offset()` together with `.fetch()`.
-</Callout>
-
-This guide demonstrates how to implement `limit/offset` pagination in Drizzle:
+This guide demonstrates how to implement `offset/fetch` pagination in Drizzle:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
@@ -113,7 +108,7 @@ For consistent pagination, ensure ordering by a unique column. Otherwise, the re
 
 If you need to order by a non-unique column, you should also append a unique column to the ordering.
 
-This is how you can implement `limit/offset` pagination with 2 columns:
+This is how you can implement `offset/fetch` pagination with 2 columns:
 
 <Section>
 ```ts copy {5}
@@ -127,30 +122,6 @@ const getUsers = async (page = 1, pageSize = 3) => {
 }
 
 await getUsers();
-```
-</Section>
-
-Drizzle has useful relational queries API, that lets you easily implement `limit/offset` pagination. MSSQL uses [Relational Queries v1](/docs/mssql/rqb), accessed via `db._query`:
-
-<Section>
-```ts copy {7,8,9}
-import { schema } from './schema';
-
-const db = drizzle(client, { schema });
-
-const getUsers = async (page = 1, pageSize = 3) => {
-  return await db._query.users.findMany({
-    orderBy: (users, { asc }) => asc(users.id),
-    limit: pageSize,
-    offset: (page - 1) * pageSize,
-  });
-};
-
-await getUsers();
-```
-
-```sql
-select top(3) [id], [first_name], [last_name], [created_at] from [users] order by [users].[id] asc offset 0 rows;
 ```
 </Section>
 
@@ -180,8 +151,110 @@ await withPagination(query.$dynamic(), asc(users.id));
 
 </Section>
 
-**Benefits** of `limit/offset` pagination: it's simple to implement and pages are easily reachable, which means that you can navigate to any page without having to save the state of the previous pages.
+You can improve performance of `offset/fetch` pagination by using `deferred join` technique. This method performs the pagination on a subset of the data instead of the entire table.
 
-**Drawbacks** of `limit/offset` pagination: degradation in query performance with increasing offset because database has to scan all rows before the offset to skip them, and inconsistency due to data shifts, which can lead to the same row being returned on different pages or rows being skipped.
+To implement it you can do like this:
+
+```ts copy {10}
+const getUsers = async (page = 1, pageSize = 10) => {
+   const sq = db
+    .select({ id: users.id })
+    .from(users)
+    .orderBy(users.id)
+    .offset((page - 1) * pageSize)
+    .fetch(pageSize)
+    .as('subquery');
+
+   await db.select().from(users).innerJoin(sq, eq(users.id, sq.id)).orderBy(users.id);
+};
+```
+
+```sql
+select [users].[id], [users].[first_name], [users].[last_name], [users].[created_at], [subquery].[id]
+from [users]
+inner join (select [id] from [users] order by [users].[id] offset 0 rows fetch next 10 rows only) [subquery]
+  on [users].[id] = [subquery].[id]
+order by [users].[id];
+```
+
+**Benefits** of `offset/fetch` pagination: it's simple to implement and pages are easily reachable, which means that you can navigate to any page without having to save the state of the previous pages.
+
+**Drawbacks** of `offset/fetch` pagination: degradation in query performance with increasing offset because database has to scan all rows before the offset to skip them, and inconsistency due to data shifts, which can lead to the same row being returned on different pages or rows being skipped.
+
+This is how it works:
+
+<Section>
+```ts copy
+const getUsers = async (page = 1, pageSize = 3) => {
+  await db
+    .select()
+    .from(users)
+    .orderBy(asc(users.id))
+    .offset((page - 1) * pageSize)
+    .fetch(pageSize);
+};
+
+// user is browsing the first page
+await getUsers();
+```
+
+```ts
+// results for the first page
+[
+  {
+    id: 1,
+    firstName: 'Alice',
+    lastName: 'Johnson',
+    createdAt: 2024-03-10T17:17:06.148Z
+  },
+  {
+    id: 2,
+    firstName: 'Alex',
+    lastName: 'Smith',
+    createdAt: 2024-03-10T17:19:06.147Z
+  },
+  {
+    id: 3,
+    firstName: 'Aaron',
+    lastName: 'Williams',
+    createdAt: 2024-03-10T17:22:06.147Z
+  }
+]
+```
+
+```ts
+// while user is browsing the first page, a row with id 2 is deleted
+await db.delete(users).where(eq(users.id, 2));
+
+// user navigates to the second page
+await getUsers(2);
+```
+
+```ts
+// second page, row with id 3 was skipped
+[
+  {
+    id: 5,
+    firstName: 'Beth',
+    lastName: 'Davis',
+    createdAt: 2024-03-10T17:34:06.147Z
+  },
+  {
+    id: 6,
+    firstName: 'Charlie',
+    lastName: 'Miller',
+    createdAt: 2024-03-10T17:58:06.147Z
+  },
+  {
+    id: 7,
+    firstName: 'Clara',
+    lastName: 'Wilson',
+    createdAt: 2024-03-10T18:16:06.147Z
+  }
+]
+```
+</Section>
 
 So, if your database experiences frequently insert and delete operations in real time or you need high performance to paginate large tables, you should consider using [cursor-based](/docs/mssql/guides/cursor-based-pagination) pagination instead.
+
+To learn more about `deferred join` technique you should follow these guides: [Planetscale Pagination Guide](https://planetscale.com/blog/mysql-pagination) and [Efficient Pagination Guide by Aaron Francis](https://aaronfrancis.com/2022/efficient-pagination-using-deferred-joins).

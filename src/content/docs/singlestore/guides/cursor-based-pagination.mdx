@@ -4,15 +4,14 @@ title: SQL Cursor-based pagination
 
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
-import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql)
-- [Select statement](/docs/select) with [order by clause](/docs/select#order-by)
-- [Relational queries](/docs/rqb) with [order by clause](/docs/rqb#order-by)
-- [Indices](/docs/indexes-constraints)
+- Get started with [SingleStore](/docs/singlestore/get-started-singlestore)
+- [Select statement](/docs/singlestore/select) with [order by clause](/docs/singlestore/select#order-by)
+- [Relational queries](/docs/singlestore/rqb) with [order by clause](/docs/singlestore/rqb#order-by)
+- [Indices](/docs/singlestore/indexes-constraints)
 </Prerequisites>
 
 This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
@@ -26,7 +25,7 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   const db = drizzle(...);
 
   const nextUserPage = async (cursor?: number, pageSize = 3) => {
-    return await db
+    await db
       .select()
       .from(users)
       .where(cursor ? gt(users.id, cursor) : undefined) // if cursor is provided, get rows after it
@@ -39,7 +38,7 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   ```
 
   ```sql
-  select * from "users" where "users"."id" > 3 order by "users"."id" asc limit 3;
+  select * from `users` where `users`.`id` > 3 order by `users`.`id` asc limit 3;
   ```
 
   ```ts
@@ -68,38 +67,32 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
   </CodeTab>
   <CodeTab>
   ```ts copy
-  import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+  import { int, singlestoreTable, timestamp, varchar } from 'drizzle-orm/singlestore-core';
 
-  export const users = pgTable('users', {
-    id: serial().primaryKey(),
-    firstName: text('first_name').notNull(),
-    lastName: text('last_name').notNull(),
+  export const users = singlestoreTable('users', {
+    id: int().primaryKey().autoincrement(),
+    firstName: varchar('first_name', { length: 255 }).notNull(),
+    lastName: varchar('last_name', { length: 255 }).notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
   ```
 
   ```plaintext
-  +----+------------+------------+----------------------------+
-  | id | first_name | last_name  |         created_at         |
-  +----+------------+------------+----------------------------+
-  |  1 | Alice      | Johnson    | 2024-03-08 12:23:55.251797 |
-  +----+------------+------------+----------------------------+
-  |  2 | Alex       | Smith      | 2024-03-08 12:25:55.182    |
-  +----+------------+------------+----------------------------+
-  |  3 | Aaron      | Williams   | 2024-03-08 12:28:55.182    |
-  +----+------------+------------+----------------------------+
-  |  4 | Brian      | Brown      | 2024-03-08 12:34:55.182    |
-  +----+------------+------------+----------------------------+
-  |  5 | Beth       | Davis      | 2024-03-08 12:40:55.182    |
-  +----+------------+------------+----------------------------+
-  |  6 | Charlie    | Miller     | 2024-03-08 13:04:55.182    |
-  +----+------------+------------+----------------------------+
-  |  7 | Clara      | Wilson     | 2024-03-08 13:22:55.182    |
-  +----+------------+------------+----------------------------+
-  |  8 | David      | Moore      | 2024-03-08 13:34:55.182    |
-  +----+------------+------------+----------------------------+
-  |  9 | Aaron      | Anderson   | 2024-03-08 12:40:33.677235 |
-  +----+------------+------------+----------------------------+
+  +----+------------+------------+---------------------+
+  | id | first_name | last_name  |     created_at      |
+  +----+------------+------------+---------------------+
+  |  1 | Alice      | Johnson    | 2024-03-08 12:23:55 |
+  +----+------------+------------+---------------------+
+  |  2 | Alex       | Smith      | 2024-03-08 12:25:55 |
+  +----+------------+------------+---------------------+
+  |  3 | Aaron      | Williams   | 2024-03-08 12:28:55 |
+  +----+------------+------------+---------------------+
+  |  4 | Brian      | Brown      | 2024-03-08 12:34:55 |
+  +----+------------+------------+---------------------+
+  |  5 | Beth       | Davis      | 2024-03-08 12:40:55 |
+  +----+------------+------------+---------------------+
+  |  6 | Charlie    | Miller     | 2024-03-08 13:04:55 |
+  +----+------------+------------+---------------------+
   ```
   </CodeTab>
 
@@ -140,7 +133,7 @@ const nextUserPage = async (
   },
   pageSize = 3,
 ) => {
-  return await db
+  await db
     .select()
     .from(users)
     .where(
@@ -163,33 +156,9 @@ await nextUserPage({
 ```
 
 ```sql
-select * from "users" 
-  where (("users"."first_name" > 'Alex') or ((("users"."first_name" = 'Alex') and ("users"."id" > 2)))) 
-  order by "users"."first_name" asc, "users"."id" asc limit 3
-```
-
-```ts
-// next page, 4-6 rows returned
-[
-  {
-    id: 1,
-    firstName: 'Alice',
-    lastName: 'Johnson',
-    createdAt: 2024-03-08T12:23:55.251Z
-  },
-  {
-    id: 5,
-    firstName: 'Beth',
-    lastName: 'Davis',
-    createdAt: 2024-03-08T12:40:55.182Z
-  },
-  {
-    id: 4,
-    firstName: 'Brian',
-    lastName: 'Brown',
-    createdAt: 2024-03-08T12:34:55.182Z
-  }
-]
+select * from `users`
+  where ((`users`.`first_name` > 'Alex') or ((`users`.`first_name` = 'Alex') and (`users`.`id` > 2)))
+  order by `users`.`first_name` asc, `users`.`id` asc limit 3;
 ```
 </Section>
 
@@ -197,9 +166,9 @@ Make sure to create indices for the columns that you use for cursor to make quer
 
 <Section>
 ```ts copy {7,8}
-import { index, ...imports } from 'drizzle-orm/pg-core';
+import { index, ...imports } from 'drizzle-orm/singlestore-core';
 
-export const users = pgTable('users', {
+export const users = singlestoreTable('users', {
   // columns declaration
 },
 (t) => [
@@ -209,45 +178,8 @@ export const users = pgTable('users', {
 ```
 
 ```sql
-CREATE INDEX "first_name_index" ON "users" ("firstName");
-CREATE INDEX "first_name_and_id_index" ON "users" ("firstName","id");
-```
-</Section>
-
-If you are using primary key which is not sequential (e.g. `UUIDv4`), you should add sequential column (e.g. `created_at` column) and use multiple cursor.
-This is how you can do it:
-
-<Section>
-```ts copy {13-19,21}
-
-const nextUserPage = async (
-  cursor?: {
-    id: string;
-    createdAt: Date;
-  },
-  pageSize = 3,
-) => {
-  return await db
-    .select()
-    .from(users)
-    .where(
-      // make sure to add indices for the columns that you use for cursor
-      cursor
-        ? or(
-            gt(users.createdAt, cursor.createdAt),
-            and(eq(users.createdAt, cursor.createdAt), gt(users.id, cursor.id)),
-          )
-        : undefined,
-    )
-    .limit(pageSize)
-    .orderBy(asc(users.createdAt), asc(users.id));
-};
-
-// pass the cursor from previous page (id & createdAt)
-await nextUserPage({
-  id: '66ed00a4-c020-4dfd-a1ca-5d2e4e54d174',
-  createdAt: new Date('2024-03-09T17:59:36.406Z'),
-});
+CREATE INDEX `first_name_index` ON `users` (`first_name`);
+CREATE INDEX `first_name_and_id_index` ON `users` (`first_name`,`id`);
 ```
 </Section>
 
@@ -274,4 +206,4 @@ await nextUserPage(3);
 
 **Drawbacks** of `cursor-based` pagination: the inability to directly navigate to a specific page and complexity of implementation. Since you add more columns to the sort order, you'll need to add more filters to the `where` clause for the cursor comparison to ensure consistent pagination.
 
-So, if you need to directly navigate to a specific page or you need simpler implementation of pagination, you should consider using [offset/limit](/docs/guides/limit-offset-pagination) pagination instead.
+So, if you need to directly navigate to a specific page or you need simpler implementation of pagination, you should consider using [offset/limit](/docs/singlestore/guides/limit-offset-pagination) pagination instead.

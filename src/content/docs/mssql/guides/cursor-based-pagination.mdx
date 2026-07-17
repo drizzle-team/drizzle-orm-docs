@@ -15,17 +15,11 @@ import Callout from "@mdx/Callout.astro";
 - [Indices](/docs/mssql/indexes-constraints)
 </Prerequisites>
 
-<Callout>
-MSSQL has no `LIMIT` clause, and its `FETCH NEXT ... ROWS ONLY` requires a preceding
-`OFFSET ... ROWS`. To return a fixed number of rows without skipping any, use
-`.offset(0).fetch(pageSize)`.
-</Callout>
-
 This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-  ```ts copy {10,11,12}
+  ```ts copy {10-13}
   import { asc, gt } from 'drizzle-orm';
   import { users } from './schema';
 
@@ -108,7 +102,7 @@ This guide demonstrates how to implement `cursor-based` pagination in Drizzle:
 
 If you need dynamic order by you can do like below:
 
-```ts copy {6,8}
+```ts copy {6,7}
 const nextUserPage = async (order: 'asc' | 'desc' = 'asc', cursor?: number, pageSize = 3) => {
   await db
     .select()
@@ -193,7 +187,7 @@ CREATE INDEX [first_name_and_id_index] ON [users] ([first_name], [id]);
 ```
 </Section>
 
-Drizzle has useful relational queries API, that lets you easily implement `cursor-based` pagination. MSSQL uses [Relational Queries v1](/docs/mssql/rqb), accessed via `db._query`:
+Drizzle has useful relational queries API, that lets you easily implement `cursor-based` pagination.
 
 ```ts copy {7,8,9}
 import { schema } from './schema';

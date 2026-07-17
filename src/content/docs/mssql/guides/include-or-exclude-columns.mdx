@@ -17,11 +17,6 @@ import Callout from "@mdx/Callout.astro";
 - [Partial select with relational queries](/docs/mssql/rqb#partial-fields-select)
 </Prerequisites>
 
-<Callout>
-MSSQL uses [Relational Queries v1](/docs/mssql/rqb): relations are declared with the
-`relations()` helper, passed to `drizzle(client, { schema })`, and queried via `db._query`.
-</Callout>
-
 Drizzle has flexible API for including or excluding columns in queries. To include all columns you can use `.select()` method like this:
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
@@ -225,7 +220,7 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
   import { posts } from './schema.ts';
 
   export const postsRelations = relations(posts, () => ({}));
-	```
+  ```
 </CodeTabs>
 
 This is how you can include specific columns using relational queries:
@@ -363,7 +358,7 @@ This is how you can include or exclude columns with relations using relational q
   });
   ```
 
-	```ts copy
+  ```ts copy
   import { relations } from 'drizzle-orm/_relations';
   import { comments, posts, users } from "./schema";
 
@@ -381,7 +376,7 @@ This is how you can include or exclude columns with relations using relational q
     post: one(posts, { fields: [comments.postId], references: [posts.id] }),
     user: one(users, { fields: [comments.userId], references: [users.id] }),
   }));
-	```
+  ```
 </CodeTabs>
 
 This is how you can create custom solution for conditional select:

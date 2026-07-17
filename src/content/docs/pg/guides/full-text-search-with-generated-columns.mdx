@@ -48,7 +48,7 @@ export const posts = pgTable(
 );
   ```
   </CodeTab>
-  ```sql
+```sql
 CREATE TABLE "posts" (
 	"id" serial PRIMARY KEY,
 	"title" text NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE "posts" (
 );
 --> statement-breakpoint
 CREATE INDEX "idx_body_search" ON "posts" USING gin ("body_search");
-  ```
+```
 </CodeTabs>
 
 When you insert a row into a table, the value of a generated column is computed from an expression that you provide when you create the column:
@@ -111,7 +111,7 @@ This is typically used to mark entries coming from different parts of a document
 
 <CodeTabs items={["schema.ts", "migration.sql"]}>
   <CodeTab>
-  ```ts copy {18,19,20,21,22,23,24,28}
+```ts copy {18,19,20,21,22,23,24,28}
 import { SQL, sql } from 'drizzle-orm';
 import { index, pgTable, serial, text, customType } from 'drizzle-orm/pg-core';
 
@@ -142,9 +142,9 @@ export const posts = pgTable(
     index('idx_search').using('gin', t.search),
   ],
 );
-  ```
+```
   </CodeTab>
-  ```sql
+```sql
 CREATE TABLE "posts" (
 	"id" serial PRIMARY KEY,
 	"title" text NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE "posts" (
 );
 --> statement-breakpoint
 CREATE INDEX "idx_search" ON "posts" USING gin ("search");
-  ```
+```
 </CodeTabs>
 
 This is how you can query the table with full-text search:

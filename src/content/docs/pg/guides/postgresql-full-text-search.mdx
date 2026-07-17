@@ -157,8 +157,8 @@ await db
 ```
 
 ```sql
-select * from posts
-  where to_tsvector('english', title) @@ plainto_tsquery('english', 'discover Italy');
+select "id", "title" from "posts" 
+  where to_tsvector('english', "posts"."title") @@ plainto_tsquery('english', 'discover Italy')
 ```
 
 ```json
@@ -181,8 +181,8 @@ await db
 ```
 
 ```sql
-select * from posts
-  where to_tsvector('english', title) @@ phraseto_tsquery('english', 'family trip');
+select "id", "title" from "posts" 
+  where to_tsvector('english', "posts"."title") @@ phraseto_tsquery('english', 'family trip')
 ```
 
 ```json
@@ -204,9 +204,8 @@ await db
 ```
 
 ```sql
-select * from posts
-  where to_tsvector('english', title)
-  @@ websearch_to_tsquery('english', 'family or first trip Europe or Asia');
+select "id", "title" from "posts" 
+  where to_tsvector('english', "posts"."title") @@ websearch_to_tsquery('english', 'family or first trip Europe or Asia')
 ```
 
 ```json

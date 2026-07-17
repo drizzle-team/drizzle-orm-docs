@@ -6,6 +6,7 @@ import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
+import Callout from "@mdx/Callout.astro";
 
 <Prerequisites>
 - Get started with [CockroachDB](/docs/cockroach/get-started-cockroach)
@@ -13,6 +14,12 @@ import CodeTab from '@mdx/CodeTab.astro';
 - [Composite primary key](/docs/cockroach/indexes-constraints#composite-primary-key)
 - [sql operator](/docs/cockroach/sql)
 </Prerequisites>
+
+<Callout>
+The examples below insert explicit `id` values to trigger a conflict, so the identity column uses
+`generatedByDefaultAsIdentity()`. A column defined with `generatedAlwaysAsIdentity()` rejects
+explicit values (`cannot insert into column "id"`), which would make an id-based upsert impossible.
+</Callout>
 
 To implement an upsert query in CockroachDB with Drizzle you can use `.onConflictDoUpdate()` method:
 
@@ -84,7 +91,7 @@ This is how you can do it:
   import { cockroachTable, int4, timestamp } from 'drizzle-orm/cockroach-core';
 
   export const users = cockroachTable('users', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+    id: int4().primaryKey().generatedByDefaultAsIdentity(),
     lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
   });
   ```
@@ -94,7 +101,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 
 <CodeTabs items={["index.ts", "schema.ts"]}>
   <CodeTab>
-    ```ts copy {21,24}
+    ```ts copy
     import { SQL, getColumns, sql } from 'drizzle-orm';
     import { CockroachTable } from 'drizzle-orm/cockroach-core';
     import { users } from './schema';
@@ -144,7 +151,7 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
   import { boolean, cockroachTable, int4, timestamp } from 'drizzle-orm/cockroach-core';
 
   export const users = cockroachTable('users', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+    id: int4().primaryKey().generatedByDefaultAsIdentity(),
     lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
     active: boolean().notNull().default(false),
   });
@@ -222,7 +229,7 @@ If you want to implement upsert query with `where` clause for `update` statement
   import { int4, numeric, cockroachTable, text, timestamp } from 'drizzle-orm/cockroach-core';
 
   export const products = cockroachTable('products', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+    id: int4().primaryKey().generatedByDefaultAsIdentity(),
     title: text().notNull(),
     stock: int4().notNull(),
     price: numeric({ precision: 10, scale: 2 }).notNull(),

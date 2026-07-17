@@ -73,7 +73,7 @@ select count([discount]) from [products];
 ```
 </Section>
 
-In MSSQL, `count()` result returns as integer, so you don't need to cast it. Drizzle has simple and flexible API, which lets you create your custom solutions:
+Drizzle has simple and flexible API, which lets you create your custom solutions:
 
 <Section>
 ```ts copy {3,4}
@@ -130,14 +130,14 @@ This is how you can use `count()` function with joins and aggregations:
       })
       .from(countries)
       .leftJoin(cities, eq(countries.id, cities.countryId))
-      .groupBy(countries.id)
+      .groupBy(countries.id, countries.name)
       .orderBy(countries.name);
     ```
 
     ```sql
     select [countries].[name], count([cities].[id]) from [countries]
       left join [cities] on [countries].[id] = [cities].[country_id]
-      group by [countries].[id]
+      group by [countries].[id], [countries].[name]
       order by [countries].[name];
     ```
   </CodeTab>

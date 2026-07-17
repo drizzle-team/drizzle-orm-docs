@@ -6,13 +6,12 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
-import Callout from "@mdx/Callout.astro";
 
 <Prerequisites>
-- Get started with [CockroachDB](/docs/cockroach/get-started-cockroach)
-- [Select statement](/docs/cockroach/select) with [order by clause](/docs/cockroach/select#order-by) and [limit & offset clauses](/docs/cockroach/select#limit--offset)
-- [Relational queries](/docs/cockroach/rqb) with [order by clause](/docs/cockroach/rqb#order-by) and [limit & offset clauses](/docs/cockroach/rqb#limit--offset)
-- [Dynamic query building](/docs/cockroach/dynamic-query-building)
+- Get started with [SingleStore](/docs/singlestore/get-started-singlestore)
+- [Select statement](/docs/singlestore/select) with [order by clause](/docs/singlestore/select#order-by) and [limit & offset clauses](/docs/singlestore/select#limit--offset)
+- [Relational queries](/docs/singlestore/rqb) with [order by clause](/docs/singlestore/rqb#order-by) and [limit & offset clauses](/docs/singlestore/rqb#limit--offset)
+- [Dynamic query building](/docs/singlestore/dynamic-query-building)
 </Prerequisites>
 
 This guide demonstrates how to implement `limit/offset` pagination in Drizzle:
@@ -34,7 +33,7 @@ This guide demonstrates how to implement `limit/offset` pagination in Drizzle:
     ```
 
     ```sql
-    select * from "users" order by "users"."id" asc limit 4 offset 4;
+    select * from `users` order by `users`.`id` asc limit 4 offset 4;
     ```
 
     ```ts
@@ -69,36 +68,36 @@ This guide demonstrates how to implement `limit/offset` pagination in Drizzle:
   </CodeTab>
   <CodeTab>
     ```ts copy
-    import { cockroachTable, int4, text, timestamp } from 'drizzle-orm/cockroach-core';
+    import { int, singlestoreTable, timestamp, varchar } from 'drizzle-orm/singlestore-core';
 
-    export const users = cockroachTable('users', {
-      id: int4().primaryKey().generatedAlwaysAsIdentity(),
-      firstName: text('first_name').notNull(),
-      lastName: text('last_name').notNull(),
+    export const users = singlestoreTable('users', {
+      id: int().primaryKey().autoincrement(),
+      firstName: varchar('first_name', { length: 255 }).notNull(),
+      lastName: varchar('last_name', { length: 255 }).notNull(),
       createdAt: timestamp('created_at').notNull().defaultNow(),
     });
     ```
 
     ```plaintext
-    +----+------------+-----------+----------------------------+
-    | id | first_name | last_name |         created_at         |
-    +----+------------+-----------+----------------------------+
-    |  1 | Alice      | Johnson   | 2024-03-08 12:23:55.251797 |
-    +----+------------+-----------+----------------------------+
-    |  2 | Alex       | Smith     | 2024-03-08 12:25:55.182    |
-    +----+------------+-----------+----------------------------+
-    |  3 | Aaron      | Williams  | 2024-03-08 12:28:55.182    |
-    +----+------------+-----------+----------------------------+
-    |  4 | Brian      | Brown     | 2024-03-08 12:34:55.182    |
-    +----+------------+-----------+----------------------------+
-    |  5 | Beth       | Davis     | 2024-03-08 12:40:55.182    |
-    +----+------------+-----------+----------------------------+
-    |  6 | Charlie    | Miller    | 2024-03-08 13:04:55.182    |
-    +----+------------+-----------+----------------------------+
-    |  7 | Clara      | Wilson    | 2024-03-08 13:22:55.182    |
-    +----+------------+-----------+----------------------------+
-    |  8 | David      | Moore     | 2024-03-08 13:34:55.182    |
-    +----+------------+-----------+----------------------------+
+    +----+------------+-----------+---------------------+
+    | id | first_name | last_name |     created_at      |
+    +----+------------+-----------+---------------------+
+    |  1 | Alice      | Johnson   | 2024-03-08 12:23:55 |
+    +----+------------+-----------+---------------------+
+    |  2 | Alex       | Smith     | 2024-03-08 12:25:55 |
+    +----+------------+-----------+---------------------+
+    |  3 | Aaron      | Williams  | 2024-03-08 12:28:55 |
+    +----+------------+-----------+---------------------+
+    |  4 | Brian      | Brown     | 2024-03-08 12:34:55 |
+    +----+------------+-----------+---------------------+
+    |  5 | Beth       | Davis     | 2024-03-08 12:40:55 |
+    +----+------------+-----------+---------------------+
+    |  6 | Charlie    | Miller    | 2024-03-08 13:04:55 |
+    +----+------------+-----------+---------------------+
+    |  7 | Clara      | Wilson    | 2024-03-08 13:22:55 |
+    +----+------------+-----------+---------------------+
+    |  8 | David      | Moore     | 2024-03-08 13:34:55 |
+    +----+------------+-----------+---------------------+
     ```
   </CodeTab>
 </CodeTabs>
@@ -129,12 +128,12 @@ Drizzle has useful relational queries API, that lets you easily implement `limit
 
 <Section>
 ```ts copy {7,8,9}
-import * as schema from './schema';
+import { relations } from './relations';
 
-const db = drizzle(client, { schema });
+const db = drizzle({ relations });
 
 const getUsers = async (page = 1, pageSize = 3) => {
-  return await db._query.users.findMany({
+  return await db.query.users.findMany({
     orderBy: (users, { asc }) => asc(users.id),
     limit: pageSize,
     offset: (page - 1) * pageSize,
@@ -150,11 +149,11 @@ Drizzle has simple and flexible API, which lets you easily create custom solutio
 <Section>
 ```ts copy {11,12,13,16}
 import { SQL, asc } from 'drizzle-orm';
-import { CockroachColumn, type CockroachSelect } from 'drizzle-orm/cockroach-core';
+import { SingleStoreColumn, type SingleStoreSelect } from 'drizzle-orm/singlestore-core';
 
-function withPagination<T extends CockroachSelect>(
+function withPagination<T extends SingleStoreSelect>(
   qb: T,
-  orderByColumn: CockroachColumn | SQL | SQL.Aliased,
+  orderByColumn: SingleStoreColumn | SQL | SQL.Aliased,
   page = 1,
   pageSize = 3,
 ) {
@@ -267,4 +266,4 @@ await getUsers(2);
 ```
 </Section>
 
-So, if your database experiences frequently insert and delete operations in real time or you need high performance to paginate large tables, you should consider using [cursor-based](/docs/cockroach/guides/cursor-based-pagination) pagination instead.
+So, if your database experiences frequently insert and delete operations in real time or you need high performance to paginate large tables, you should consider using [cursor-based](/docs/singlestore/guides/cursor-based-pagination) pagination instead.

@@ -15,15 +15,13 @@ import Callout from '@mdx/Callout.astro';
 - [sql operator](/docs/mssql/sql)
 </Prerequisites>
 
-To implement a unique and case-insensitive `email` handling in MSSQL with Drizzle, you can create a unique index on the lowercased `email` column. This way, you can ensure that the `email` is unique regardless of the case.
-
-Drizzle has simple and flexible API, which lets you easily create such an index using SQL-like syntax:
+To implement a unique and case-insensitive `email` handling in MSSQL with Drizzle, you can create a persisted computed column with the lowercased `email` and a unique index on it. This way, you can ensure that the `email` is unique regardless of the case.
 
 <CodeTabs items={["schema.ts", "migration.sql"]}>
   <CodeTab>
-  ```ts copy {13,14}
-  import { SQL, sql } from 'drizzle-orm';
-  import { AnyMsSqlColumn, int, mssqlTable, uniqueIndex, varchar } from 'drizzle-orm/mssql-core';
+  ```ts copy {11,14}
+  import { sql } from 'drizzle-orm';
+  import { int, mssqlTable, uniqueIndex, varchar } from 'drizzle-orm/mssql-core';
 
   export const users = mssqlTable(
     'users',
@@ -31,44 +29,34 @@ Drizzle has simple and flexible API, which lets you easily create such an index 
       id: int().identity().primaryKey(),
       name: varchar({ length: 255 }).notNull(),
       email: varchar({ length: 255 }).notNull(),
+      emailLower: varchar('email_lower', { length: 255 })
+        .generatedAlwaysAs(sql`lower(${email})`, { mode: 'persisted' }),
     },
     (table) => [
-      // uniqueIndex('emailUniqueIndex').on(sql`lower(${table.email})`),
-      uniqueIndex('emailUniqueIndex').on(lower(table.email)),
-    ]
+      uniqueIndex('emailUniqueIndex').on(table.emailLower),
+    ],
   );
-
-  // custom lower function
-  export function lower(email: AnyMsSqlColumn): SQL {
-    return sql`lower(${email})`;
-  }
   ```
   </CodeTab>
   ```sql
   CREATE TABLE [users] (
-	  [id] int IDENTITY(1, 1),
-	  [name] varchar(255) NOT NULL,
-	  [email] varchar(255) NOT NULL,
-	  CONSTRAINT [users_pkey] PRIMARY KEY([id])
+	[id] int IDENTITY(1, 1),
+	[name] varchar(255) NOT NULL,
+	[email] varchar(255) NOT NULL,
+	[email_lower]  AS (lower(email)) PERSISTED,
+	CONSTRAINT [users_pkey] PRIMARY KEY([id])
   );
   --> statement-breakpoint
-  CREATE UNIQUE INDEX [emailUniqueIndex] ON [users] (lower([email]));
+  CREATE UNIQUE INDEX [emailUniqueIndex] ON [users] ([email_lower]);
   ```
 </CodeTabs>
-
-<Callout>
-In SQL Server, string comparison case-sensitivity is determined by the column's
-collation. On a case-insensitive collation (the common default, e.g. `SQL_Latin1_General_CP1_CI_AS`)
-comparisons already ignore case; the unique index on `lower(email)` guarantees
-uniqueness regardless of case even when a case-sensitive collation is used.
-</Callout>
 
 This is how you can select user by `email` with `lower` function:
 
 <Section>
 ```ts copy {10}
 import { eq } from 'drizzle-orm';
-import { lower, users } from './schema';
+import { users } from './schema';
 
 const db = drizzle(...);
 
@@ -76,7 +64,7 @@ const findUserByEmail = async (email: string) => {
   return await db
     .select()
     .from(users)
-    .where(eq(lower(users.email), email.toLowerCase()));
+    .where(eq(sql`lower(${users.email})`, email.toLowerCase()));
 };
 ```
 

@@ -5,10 +5,10 @@ import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
 
 <Prerequisites>
-- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
-- [Update statement](/docs/sqlite/update)
-- [Filters](/docs/sqlite/operators) and [not operator](/docs/sqlite/operators#not)
-- [Boolean data type](/docs/sqlite/column-types#boolean)
+- Get started with [SingleStore](/docs/singlestore/get-started-singlestore)
+- [Update statement](/docs/singlestore/update)
+- [Filters](/docs/singlestore/operators) and [not operator](/docs/singlestore/operators#not)
+- [Boolean data type](/docs/singlestore/column-types#boolean)
 </Prerequisites>
 
 To toggle a column value you can use `update().set()` method like below:
@@ -28,6 +28,8 @@ await db
 ```
 
 ```sql
-update "table" set "is_active" = not "table"."is_active" where "table"."id" = 1;
+update `table` set `is_active` = not `table`.`is_active` where `table`.`id` = 1;
 ```
 </Section>
+
+In SingleStore the `boolean` type is stored as `tinyint(1)` (`0` for false and `1` for true).

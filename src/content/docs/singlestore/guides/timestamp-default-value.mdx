@@ -1,0 +1,38 @@
+---
+title: SQL Timestamp as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
+
+<Prerequisites>
+- Get started with [SingleStore](/docs/singlestore/get-started-singlestore)
+- Learn about [column data types](/docs/singlestore/column-types)
+- [sql operator](/docs/singlestore/sql)
+</Prerequisites>
+
+To set current timestamp as a default value in SingleStore, you can use the `defaultNow()` method or `sql` operator with `now()` function which returns the current date and time:
+
+<Section>
+```ts copy {6,9}
+import { sql } from 'drizzle-orm';
+import { int, singlestoreTable, timestamp } from 'drizzle-orm/singlestore-core';
+
+export const users = singlestoreTable('users', {
+  id: int().primaryKey().autoincrement(),
+  timestamp1: timestamp().notNull().defaultNow(),
+  timestamp2: timestamp({ mode: 'string' })
+    .notNull()
+    .default(sql`now()`),
+});
+```
+
+```sql
+CREATE TABLE `users` (
+	`id` int AUTO_INCREMENT PRIMARY KEY,
+	`timestamp1` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`timestamp2` timestamp NOT NULL DEFAULT now()
+);
+```
+</Section>

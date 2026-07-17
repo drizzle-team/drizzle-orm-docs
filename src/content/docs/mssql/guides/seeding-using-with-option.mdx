@@ -289,11 +289,11 @@ posts: {
 To resolve the error, you can modify your seeding script as follows:
 <Section>
 ```ts copy{6-9}
-import { users, posts, postsRelations } from './schema.ts';
+import { users, posts } from './schema.ts';
 
 async function main() {
     const db = drizzle(...);
-    await seed(db, { users, posts, postsRelations }).refine(() => ({
+    await seed(db, { users, posts }).refine(() => ({
         users: {
             count: 2,
             with: {

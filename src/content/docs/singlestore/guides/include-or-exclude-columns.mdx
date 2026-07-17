@@ -9,13 +9,19 @@ import CodeTab from '@mdx/CodeTab.astro';
 import Callout from "@mdx/Callout.astro";
 
 <Prerequisites>
-- Get started with [CockroachDB](/docs/cockroach/get-started-cockroach)
-- [Select statement](/docs/cockroach/select)
-- [Get typed table columns](/docs/cockroach/goodies#get-typed-columns)
-- [Joins](/docs/cockroach/joins)
-- [Relational queries](/docs/cockroach/rqb)
-- [Partial select with relational queries](/docs/cockroach/rqb#partial-fields-select)
+- Get started with [SingleStore](/docs/singlestore/get-started-singlestore)
+- [Select statement](/docs/singlestore/select)
+- [Get typed table columns](/docs/singlestore/goodies#get-typed-columns)
+- [Joins](/docs/singlestore/joins)
+- [Relational queries](/docs/singlestore/rqb)
+- [Partial select with relational queries](/docs/singlestore/rqb#partial-fields-select)
 </Prerequisites>
+
+<Callout>
+SingleStore does not support foreign key constraints, so the schemas below use plain columns
+(no `.references()`). Relations for the relational queries API are declared with
+`defineRelations` and describe the logical relationships used at query time.
+</Callout>
 
 Drizzle has flexible API for including or excluding columns in queries. To include all columns you can use `.select()` method like this:
 
@@ -41,13 +47,13 @@ Drizzle has flexible API for including or excluding columns in queries. To inclu
   </CodeTab>
 
   ```ts copy
-  import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+  import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
 
-  export const posts = cockroachTable('posts', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const posts = singlestoreTable('posts', {
+    id: int().primaryKey().autoincrement(),
     title: text().notNull(),
     content: text().notNull(),
-    views: int4().notNull().default(0),
+    views: int().notNull().default(0),
   });
 	```
 </CodeTabs>
@@ -155,26 +161,26 @@ This is how you can include or exclude columns with joins:
   </CodeTab>
 
   ```ts copy
-  import { int4, cockroachTable, text, timestamp } from 'drizzle-orm/cockroach-core';
+  import { int, singlestoreTable, text, timestamp } from 'drizzle-orm/singlestore-core';
 
-  export const users = cockroachTable('users', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const users = singlestoreTable('users', {
+    id: int().primaryKey().autoincrement(),
     name: text().notNull(),
     email: text().notNull(),
   });
 
-  export const posts = cockroachTable('posts', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const posts = singlestoreTable('posts', {
+    id: int().primaryKey().autoincrement(),
     title: text().notNull(),
     content: text().notNull(),
-    views: int4().notNull().default(0),
-    userId: int4('user_id').notNull().references(() => users.id),
+    views: int().notNull().default(0),
+    userId: int('user_id').notNull(),
   });
 
-  export const comments = cockroachTable('comments', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
-    postId: int4('post_id').notNull().references(() => posts.id),
-    userId: int4('user_id').notNull().references(() => users.id),
+  export const comments = singlestoreTable('comments', {
+    id: int().primaryKey().autoincrement(),
+    postId: int('post_id').notNull(),
+    userId: int('user_id').notNull(),
     content: text().notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
@@ -186,11 +192,11 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
 <CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
   <CodeTab>
 	```ts copy {5,7,8,9,12,13,14,17,18,19,20,21,22}
-	import * as schema from './schema';
+	import { relations } from './relations';
 
-	const db = drizzle(client, { schema });
+	const db = drizzle(..., { relations });
 
-	await db._query.posts.findMany();
+	await db.query.posts.findMany();
 	```
 
 	```ts
@@ -205,21 +211,20 @@ Drizzle has useful relational queries API, that lets you easily include or exclu
   </CodeTab>
 
   ```ts copy
-  import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+  import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
 
-  export const posts = cockroachTable('posts', {
-	id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const posts = singlestoreTable('posts', {
+	id: int().primaryKey().autoincrement(),
 	title: text().notNull(),
 	content: text().notNull(),
-	views: int4().notNull().default(0),
+	views: int().notNull().default(0),
   });
 	```
 
   ```ts copy
-  import { relations } from 'drizzle-orm/_relations';
   import { posts } from './schema.ts';
 
-  export const postsRelations = relations(posts, () => ({}));
+  export const relations = defineRelations({ posts });
 	```
 </CodeTabs>
 
@@ -227,7 +232,7 @@ This is how you can include specific columns using relational queries:
 
 <Section>
   ```ts copy {2,3,4}
-  await db._query.posts.findMany({
+  await db.query.posts.findMany({
     columns: {
       title: true,
     },
@@ -247,11 +252,10 @@ This is how you can include all columns with extra columns using relational quer
 <Section>
   ```ts copy {4,5,6}
   import { sql } from 'drizzle-orm';
-  import { posts } from './schema';
 
-  await db._query.posts.findMany({
+  await db.query.posts.findMany({
     extras: {
-      titleLength: sql<number>`length(${posts.title})`.as("title_length"),
+      titleLength: (t) => sql<number>`length(${t.title})`.as("title_length"),
     },
   });
   ```
@@ -272,7 +276,7 @@ This is how you can exclude columns using relational queries:
 
 <Section>
   ```ts copy {2,3,4}
-  await db._query.posts.findMany({
+  await db.query.posts.findMany({
     columns: {
       content: false,
     },
@@ -294,11 +298,11 @@ This is how you can include or exclude columns with relations using relational q
 <CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
   <CodeTab>
   ```ts copy {7,12,13,16}
-  import * as schema from './schema';
+  import { relations } from './relations';
 
-  const db = drizzle(client, { schema });
+  const db = drizzle(..., { relations });
 
-  await db._query.posts.findMany({
+  await db.query.posts.findMany({
     columns: {
       id: true, // include "id" column
     },
@@ -333,48 +337,58 @@ This is how you can include or exclude columns with relations using relational q
   </CodeTab>
 
   ```ts copy
-  import { int4, cockroachTable, text, timestamp } from 'drizzle-orm/cockroach-core';
+  import { int, singlestoreTable, text, timestamp } from 'drizzle-orm/singlestore-core';
 
-  export const users = cockroachTable('users', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const users = singlestoreTable('users', {
+    id: int().primaryKey().autoincrement(),
     name: text().notNull(),
     email: text().notNull(),
   });
 
-  export const posts = cockroachTable('posts', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const posts = singlestoreTable('posts', {
+    id: int().primaryKey().autoincrement(),
     title: text().notNull(),
     content: text().notNull(),
-    views: int4().notNull().default(0),
-    userId: int4('user_id').notNull().references(() => users.id),
+    views: int().notNull().default(0),
+    userId: int('user_id').notNull(),
   });
 
-  export const comments = cockroachTable('comments', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
-    postId: int4('post_id').notNull().references(() => posts.id),
-    userId: int4('user_id').notNull().references(() => users.id),
+  export const comments = singlestoreTable('comments', {
+    id: int().primaryKey().autoincrement(),
+    postId: int('post_id').notNull(),
+    userId: int('user_id').notNull(),
     content: text().notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
   ```
 
 	```ts copy
-  import { relations } from "drizzle-orm/_relations";
+  import { defineRelations } from "drizzle-orm";
   import { comments, posts, users } from "./schema";
-
-  export const usersRelations = relations(users, ({ many }) => ({
-    posts: many(posts),
-    comments: many(comments),
-  }));
-
-  export const postsRelations = relations(posts, ({ one, many }) => ({
-    user: one(users, { fields: [posts.userId], references: [users.id] }),
-    comments: many(comments),
-  }));
-
-  export const commentsRelations = relations(comments, ({ one }) => ({
-    post: one(posts, { fields: [comments.postId], references: [posts.id] }),
-    user: one(users, { fields: [comments.userId], references: [users.id] }),
+  
+  export const relations = defineRelations({ users, posts, comments }, (r) => ({
+    users: {
+      posts: r.many.posts(),
+      comments: r.many.comments(),
+    },
+    posts: {
+      user: r.one.users({
+        from: r.posts.userId,
+        to: r.users.id,
+		optional: false,
+      }),
+      comments: r.many.comments(),
+    },
+    comments: {
+      post: r.one.posts({
+        from: r.comments.postId,
+        to: r.posts.id,
+      }),
+      user: r.one.users({
+        from: r.comments.userId,
+        to: r.users.id,
+      }),
+    },
   }));
 	```
 </CodeTabs>
@@ -409,13 +423,13 @@ This is how you can create custom solution for conditional select:
   </CodeTab>
 
   ```ts copy
-  import { int4, cockroachTable, text } from 'drizzle-orm/cockroach-core';
+  import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
 
-  export const posts = cockroachTable('posts', {
-    id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  export const posts = singlestoreTable('posts', {
+    id: int().primaryKey().autoincrement(),
     title: text().notNull(),
     content: text().notNull(),
-    views: int4().notNull().default(0),
+    views: int().notNull().default(0),
   });
 	```
 </CodeTabs>

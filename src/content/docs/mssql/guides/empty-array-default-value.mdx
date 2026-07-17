@@ -15,7 +15,7 @@ import Callout from '@mdx/Callout.astro';
 MSSQL doesn't have an array or a native `json` data type, but you can store a JSON array in an `nvarchar` column and work with it using SQL Server's built-in JSON functions. To set an empty array as a default value you can use the `sql` operator with `'[]'` syntax:
 
 <Section>
-```ts copy {8}
+```ts copy {9}
 import { sql } from 'drizzle-orm';
 import { int, mssqlTable, nvarchar } from 'drizzle-orm/mssql-core';
 
@@ -40,10 +40,3 @@ CREATE TABLE [users] (
 The `mode: 'json'` option defines how values are handled in the application. With `json` mode, values are treated as JSON object literal.
 
 You can specify `.$type<..>()` for json object inference, it will not check runtime values. It provides compile time protection for default values, insert and select schemas.
-
-<Callout type="warning">
-MSSQL has no native array type. The column is stored as `nvarchar(max)` containing a
-JSON string, so validation and querying of its contents rely on SQL Server's
-[JSON functions](https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server)
-rather than array operators.
-</Callout>
