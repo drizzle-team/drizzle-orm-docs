@@ -1,0 +1,105 @@
+---
+title: SQL Timestamp as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- Learn about column data types for [PostgreSQL](/docs/column-types)
+- [sql operator](/docs/sql)
+</Prerequisites>
+
+To set current timestamp as a default value in PostgreSQL, you can use the `defaultNow()` method or `sql` operator with `now()` function which returns the current date and time with the time zone:
+
+<Section>
+```ts copy {6,9}
+import { sql } from 'drizzle-orm';
+import { timestamp, pgTable, serial } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: serial().primaryKey(),
+  timestamp1: timestamp().notNull().defaultNow(),
+  timestamp2: timestamp({ mode: 'string' })
+    .notNull()
+    .default(sql`now()`),
+});
+```
+
+```sql
+CREATE TABLE "users" (
+	"id" serial PRIMARY KEY,
+	"timestamp1" timestamp DEFAULT now() NOT NULL,
+	"timestamp2" timestamp DEFAULT now() NOT NULL
+);
+```
+</Section>
+
+The `mode` option defines how values are handled in the application. Values with `string` mode are treated as `string` in the application, but stored as timestamps in the database.
+
+<Section>
+```plaintext
+// Data stored in the database
++----+----------------------------+----------------------------+
+| id |         timestamp1         |         timestamp2         |
++----+----------------------------+----------------------------+
+| 1  | 2024-04-11 14:14:28.038697 | 2024-04-11 14:14:28.038697 |
++----+----------------------------+----------------------------+
+```
+
+```ts
+// Data returned by the application
+[
+  {
+    id: 1,
+    timestamp1: 2024-04-11T14:14:28.038Z, // Date object
+    timestamp2: '2024-04-11 14:14:28.038697' // string
+  }
+]
+```
+</Section>
+
+To set unix timestamp as a default value in PostgreSQL, you can use the `sql` operator and `extract(epoch from now())` function which returns the number of seconds since `1970-01-01 00:00:00 UTC`:
+
+<Section>
+```ts copy {8}
+import { sql } from 'drizzle-orm';
+import { integer, pgTable, serial } from 'drizzle-orm/pg-core'
+
+export const users = pgTable('users', {
+  id: serial().primaryKey(),
+  timestamp: integer()
+    .notNull()
+    .default(sql`extract(epoch from now())`),
+});
+```
+
+```sql
+CREATE TABLE "users" (
+	"id" serial PRIMARY KEY,
+	"timestamp" integer DEFAULT extract(epoch from now()) NOT NULL
+);
+```
+
+```plaintext
+// Data stored in the database
++----+------------+
+| id | timestamp  |
++----+------------+
+|  1 | 1712846784 |
++----+------------+
+```
+
+```ts
+// Data returned by the application
+[ 
+  { 
+    id: 1, 
+    timestamp: 1712846784 // number
+  } 
+]
+```
+</Section>

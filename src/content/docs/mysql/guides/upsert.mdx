@@ -1,0 +1,182 @@
+---
+title: Upsert Query
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+
+<Prerequisites>
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- [Insert statement](/docs/mysql/insert) and [onDuplicateKeyUpdate method](/docs/mysql/insert#on-duplicate-key-update)
+- [sql operator](/docs/mysql/sql)
+</Prerequisites>
+
+To implement an upsert query in MySQL with Drizzle you can use `.onDuplicateKeyUpdate()` method. MySQL will automatically determine the conflict target based on the primary key and unique indexes, and will update the row if any unique index conflicts.
+
+This is how you can do it:
+
+<Section>
+```ts copy {8}
+import { users } from './schema';
+
+const db = drizzle(...);
+
+await db
+  .insert(users)
+  .values({ id: 1, name: 'John' })
+  .onDuplicateKeyUpdate({ set: { name: 'Super John' } });
+```
+
+```sql
+insert into `users` (`id`, `name`) values (1, 'John')
+  on duplicate key update `name` = 'Super John';
+```
+</Section>
+
+To upsert multiple rows in one query in MySQL you can use `sql operator` and `values()` function. `values()` function refers to the value of column that would be inserted if duplicate-key conflict hadn't occurred.  
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {21,24}
+    import { sql } from 'drizzle-orm';
+    import { users } from './schema';
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onDuplicateKeyUpdate({
+        set: {
+          lastLogin: sql`values(${users.lastLogin})`,
+        },
+      });
+    ```
+
+    ```sql
+    insert into `users` (`id`, `last_login`)
+      values
+        (1, '2024-03-15 23:08:27.025'),
+        (2, '2024-03-16 00:08:27.025'),
+        (3, '2024-03-16 01:08:27.025')
+      on duplicate key update `last_login` = values(`users`.`last_login`);
+    ```
+  </CodeTab>
+  ```ts copy
+  import { int, mysqlTable, timestamp } from 'drizzle-orm/mysql-core';
+
+  export const users = mysqlTable('users', {
+    id: int().primaryKey().autoincrement(),
+    lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
+  });
+  ```
+</CodeTabs>
+
+Drizzle has simple and flexible API, which lets you easily create custom solutions. This is how you do custom function for updating specific columns in multiple rows due to the conflict in MySQL:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+    ```ts copy {36,38}
+    import { SQL, getColumns, sql } from 'drizzle-orm';
+    import { MySqlTable } from 'drizzle-orm/mysql-core';
+    import { users } from './schema';
+
+    const buildConflictUpdateColumns = <T extends MySqlTable, Q extends keyof T['_']['columns']>(
+      table: T,
+      columns: Q[],
+    ) => {
+      const cls = getColumns(table);
+      return columns.reduce((acc, column) => {
+        acc[column] = sql`values(${cls[column]})`;
+        return acc;
+      }, {} as Record<Q, SQL>);
+    };
+
+    const values = [
+      {
+        id: 1,
+        lastLogin: new Date(),
+        active: true,
+      },
+      {
+        id: 2,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 60),
+        active: true,
+      },
+      {
+        id: 3,
+        lastLogin: new Date(Date.now() + 1000 * 60 * 120),
+        active: true,
+      },
+    ];
+
+    await db
+      .insert(users)
+      .values(values)
+      .onDuplicateKeyUpdate({
+        set: buildConflictUpdateColumns(users, ['lastLogin', 'active']),
+      });
+    ```
+
+    ```sql
+    insert into `users` (`id`, `last_login`, `active`)
+      values
+        (1, '2024-03-16 15:23:28.013', true),
+        (2, '2024-03-16 16:23:28.013', true),
+        (3, '2024-03-16 17:23:28.013', true)
+      on duplicate key update `last_login` = values(`users`.`last_login`), `active` = values(`users`.`active`);
+    ```
+  </CodeTab>
+  ```ts copy
+  import { boolean, int, mysqlTable, timestamp } from 'drizzle-orm/mysql-core';
+
+  export const users = mysqlTable('users', {
+    id: int().primaryKey().autoincrement(),
+    lastLogin: timestamp('last_login', { mode: 'date' }).notNull(),
+    active: boolean().notNull().default(false),
+  });
+  ```
+</CodeTabs>
+
+If you want to update all columns except of specific one, you can leave the previous value like this:
+
+<Section>
+```ts copy {15}
+import { sql } from 'drizzle-orm';
+import { users } from './schema';
+
+const data = {
+  id: 1,
+  name: 'John',
+  email: 'john@email.com',
+  age: 29,
+};
+
+await db
+  .insert(users)
+  .values(data)
+  .onDuplicateKeyUpdate({
+    set: { ...data, email: sql`${users.email}` }, // leave email as it was
+});
+```
+
+```sql
+insert into `users` (`id`, `name`, `email`, `age`) values (1, 'John', 'john@email.com', 29)
+  on duplicate key update `id` = 1, `name` = 'John', `email` = `users`.`email`, `age` = 29;
+```
+</Section>

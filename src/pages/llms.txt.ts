@@ -112,11 +112,12 @@ export const GET: APIRoute = async ({ url }) => {
     }
   });
 
-  // Guides
+  // Guides live per dialect; pg is canonical for the /docs/guides URLs
   const mapFiles = import.meta.glob("../content/**/_map.json");
   const guidesSlugs = [];
-  for (let map in mapFiles) {
-    const { default: parsed } = (await mapFiles[map]()) as {
+  const pgGuidesMap = mapFiles["../content/docs/pg/guides/_map.json"];
+  if (pgGuidesMap) {
+    const { default: parsed } = (await pgGuidesMap()) as {
       default: string[][];
     };
     // Add the parsed slugs to the guidesSlugs array
@@ -129,7 +130,7 @@ export const GET: APIRoute = async ({ url }) => {
   llms += `- [Guides](${getUrl("guides")})\n`;
   guidesSlugs.forEach((slug) => {
     const collectionEntry = docCollection.find(
-      (entry) => slug[0] === entry.slug,
+      (entry) => entry.slug === `pg/guides/${slug[0]}`,
     );
     const guideTitle = collectionEntry?.data.title;
     const guideSlug = collectionEntry?.data.slug || slug[0];

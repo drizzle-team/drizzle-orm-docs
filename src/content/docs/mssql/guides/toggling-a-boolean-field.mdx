@@ -1,0 +1,36 @@
+---
+title: SQL Toggle value
+---
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
+
+<Prerequisites>
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- [Update statement](/docs/mssql/update)
+- [sql operator](/docs/mssql/sql)
+- [Bit data type](/docs/mssql/column-types#bit)
+</Prerequisites>
+
+To toggle a column value you can use `update().set()` method with the `sql` operator like below:
+
+<Section>
+```tsx copy {8}
+import { eq, sql } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+await db
+  .update(table)
+  .set({
+    isActive: sql`1 - ${table.isActive}`,
+  })
+  .where(eq(table.id, 1));
+```
+
+```sql
+update [table] set [is_active] = 1 - [table].[is_active] where [table].[id] = 1;
+```
+</Section>
+
+Please note that there is no boolean type in MSSQL, it uses the `bit` data type instead (`0` for false and `1` for true).

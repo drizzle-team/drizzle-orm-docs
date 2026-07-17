@@ -39,17 +39,17 @@ To count all rows in table you can use `count()` function or `sql` operator like
     ```
 
     ```sql
-    select count(*) from products;
+    select count(*) from `products`;
     ```
   </CodeTab>
   ```ts
-  import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+  import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 
   export const products = mysqlTable('products', {
-    id: int('id').primaryKey().autoincrement(),
-    name: varchar('name', { length: 255 }).notNull(),
-    discount: int('discount'),
-    price: int('price').notNull(),
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
+    discount: int(),
+    price: int().notNull(),
   });
   ```
 </CodeTabs>
@@ -69,11 +69,11 @@ type Result = {
 ```
 
 ```sql
-select count(`discount`) from products;
+select count(`discount`) from `products`;
 ```
 </Section>
 
-Drizzle has simple and flexible API, which lets you create your custom solutions. In MySQL, `count()` can be returned as a string by the driver, so cast it to a number when you need a numeric result:
+Drizzle has simple and flexible API, which lets you create your custom solutions:
 
 <Section>
 ```ts copy {5,7,11,12}
@@ -81,9 +81,9 @@ import { AnyColumn, sql } from 'drizzle-orm';
 
 const customCount = (column?: AnyColumn) => {
   if (column) {
-    return sql<number>`cast(count(${column}) as unsigned)`; // In MySQL cast to unsigned integer
+    return sql<number>`cast(count(${column}) as unsigned)`;
   } else {
-    return sql<number>`cast(count(*) as unsigned)`; // In MySQL cast to unsigned integer
+    return sql<number>`cast(count(*) as unsigned)`;
   }
 };
 
@@ -92,11 +92,10 @@ await db.select({ count: customCount(products.discount) }).from(products);
 ```
 
 ```sql
-select cast(count(*) as unsigned) from products;
-select cast(count(`discount`) as unsigned) from products;
+select cast(count(*) as unsigned) from `products`;
+select cast(count(`discount`) as unsigned) from `products`;
 ```
 </Section>
-
 
 <Callout type="warning">
 By specifying `sql<number>`, you are telling Drizzle that the **expected** type of the field is `number`.<br />
@@ -119,7 +118,7 @@ await db
 ```
 
 ```sql
-select count(*) from products where price > 100
+select count(*) from `products` where `products`.`price` > 100;
 ```
 </Section>
 
@@ -144,23 +143,23 @@ This is how you can use `count()` function with joins and aggregations:
     ```
 
     ```sql
-    select countries.name, count(`cities`.`id`) from countries
-      left join cities on countries.id = cities.country_id
-      group by countries.id
-      order by countries.name;
+    select `countries`.`name`, count(`cities`.`id`) from `countries`
+      left join `cities` on `countries`.`id` = `cities`.`country_id`
+      group by `countries`.`id`
+      order by `countries`.`name`;
     ```
   </CodeTab>
   ```ts
-  import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+  import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
 
   export const countries = mysqlTable('countries', {
-    id: int('id').primaryKey().autoincrement(),
-    name: varchar('name', { length: 255 }).notNull(),
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
   });
 
   export const cities = mysqlTable('cities', {
-    id: int('id').primaryKey().autoincrement(),
-    name: varchar('name', { length: 255 }).notNull(),
+    id: int().primaryKey().autoincrement(),
+    name: text().notNull(),
     countryId: int('country_id').notNull().references(() => countries.id),
   });
   ```

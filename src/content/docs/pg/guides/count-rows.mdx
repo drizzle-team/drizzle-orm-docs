@@ -3,16 +3,17 @@ title: Count rows
 ---
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
+import IsSupportedChipGroup from "@mdx/IsSupportedChipGroup.astro";
 import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 
 <Prerequisites>
-- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
-- [Select statement](/docs/sqlite/select)
-- [Filters](/docs/sqlite/operators) and [sql operator](/docs/sqlite/sql)
-- [Aggregations](/docs/sqlite/select#aggregations) and [Aggregation helpers](/docs/sqlite/select#aggregations-helpers)
-- [Joins](/docs/sqlite/joins)
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- [Select statement](/docs/select)
+- [Filters](/docs/operators) and [sql operator](/docs/sql)
+- [Aggregations](/docs/select#aggregations) and [Aggregation helpers](/docs/select#aggregations-helpers)
+- [Joins](/docs/joins)
 </Prerequisites>
 
 To count all rows in table you can use `count()` function or `sql` operator like below:
@@ -43,10 +44,10 @@ To count all rows in table you can use `count()` function or `sql` operator like
     ```
   </CodeTab>
   ```ts
-  import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
-  export const products = sqliteTable('products', {
-    id: integer().primaryKey({ autoIncrement: true }),
+  export const products = pgTable('products', {
+    id: serial().primaryKey(),
     name: text().notNull(),
     discount: integer(),
     price: integer().notNull(),
@@ -73,19 +74,27 @@ select count("discount") from "products";
 ```
 </Section>
 
-Drizzle has simple and flexible API, which lets you create your custom solutions:
+Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL `count()` function returns bigint, which is interpreted as string by their drivers, so it should be casted to integer:
 
 <Section>
-```ts copy {3,4}
-import { sql } from 'drizzle-orm';
+```ts copy {5,7,11,12}
+import { AnyColumn, sql } from 'drizzle-orm';
 
-await db.select({ count: sql<number>`count(*)` }).from(products);
-await db.select({ count: sql<number>`count(${products.discount})` }).from(products);
+const customCount = (column?: AnyColumn) => {
+  if (column) {
+    return sql<number>`cast(count(${column}) as integer)`;
+  } else {
+    return sql<number>`cast(count(*) as integer)`;
+  }
+};
+
+await db.select({ count: customCount() }).from(products);
+await db.select({ count: customCount(products.discount) }).from(products);
 ```
 
 ```sql
-select count(*) from "products";
-select count("discount") from "products";
+select cast(count(*) as integer) from "products";
+select cast(count("discount") as integer) from "products";
 ```
 </Section>
 
@@ -94,7 +103,7 @@ By specifying `sql<number>`, you are telling Drizzle that the **expected** type 
 If you specify it incorrectly (e.g. use `sql<string>` for a field that will be returned as a number), the runtime value won't match the expected type.
 Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
 
-If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sqlite/sql#sqlmapwith) method.
+If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sql#sqlmapwith) method.
 </Callout>
 
 To count rows that match a condition you can use `.where()` method:
@@ -110,7 +119,7 @@ await db
 ```
 
 ```sql
-select count(*) from "products" where "products"."price" > 100;
+select count(*) from "products" where "products"."price" > 100
 ```
 </Section>
 
@@ -135,22 +144,23 @@ This is how you can use `count()` function with joins and aggregations:
     ```
 
     ```sql
-    select "countries"."name", count("cities"."id") from "countries"
-      left join "cities" on "countries"."id" = "cities"."country_id"
-      group by "countries"."id"
-      order by "countries"."name";
+    select "countries"."name", count("cities"."id") 
+	from "countries" 
+	left join "cities" on "countries"."id" = "cities"."country_id" 
+	group by "countries"."id" 
+	order by "countries"."name"
     ```
   </CodeTab>
   ```ts
-  import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+  import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
-  export const countries = sqliteTable('countries', {
-    id: integer().primaryKey({ autoIncrement: true }),
+  export const countries = pgTable('countries', {
+    id: serial().primaryKey(),
     name: text().notNull(),
   });
 
-  export const cities = sqliteTable('cities', {
-    id: integer().primaryKey({ autoIncrement: true }),
+  export const cities = pgTable('cities', {
+    id: serial().primaryKey(),
     name: text().notNull(),
     countryId: integer('country_id').notNull().references(() => countries.id),
   });

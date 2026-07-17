@@ -1,0 +1,47 @@
+---
+title: Empty array as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [MySQL](/docs/mysql/get-started-mysql)
+- Learn about [column data types](/docs/mysql/column-types)
+- [sql operator](/docs/mysql/sql)
+</Prerequisites>
+
+MySQL doesn't have an array data type, but you can use `json` data type for the same purpose. To set an empty array as a default value in MySQL, you can use `JSON_ARRAY()` function or `sql` operator with `('[]')` syntax:
+
+<Section>
+```ts copy {7,11,15}
+import { sql } from 'drizzle-orm';
+import { int, json, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+
+export const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: varchar({ length: 255 }).notNull(),
+  tags1: json().$type<string[]>().notNull().default([]),
+  tags2: json()
+    .$type<string[]>()
+    .notNull()
+    .default(sql`('[]')`), // the same as default([])
+  tags3: json()
+    .$type<string[]>()
+    .notNull()
+    .default(sql`(JSON_ARRAY())`),
+});
+```
+
+```sql
+CREATE TABLE `users` (
+	`id` int AUTO_INCREMENT PRIMARY KEY,
+	`name` varchar(255) NOT NULL,
+	`tags1` json NOT NULL DEFAULT ('[]'),
+	`tags2` json NOT NULL DEFAULT ('[]'),
+	`tags3` json NOT NULL DEFAULT (JSON_ARRAY())
+);
+```
+</Section>
+
+You can specify `.$type<..>()` for json object inference, it will not check runtime values. It provides compile time protection for default values, insert and select schemas.

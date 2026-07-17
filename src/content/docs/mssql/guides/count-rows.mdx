@@ -8,11 +8,11 @@ import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 
 <Prerequisites>
-- Get started with [SQLite](/docs/sqlite/get-started-sqlite)
-- [Select statement](/docs/sqlite/select)
-- [Filters](/docs/sqlite/operators) and [sql operator](/docs/sqlite/sql)
-- [Aggregations](/docs/sqlite/select#aggregations) and [Aggregation helpers](/docs/sqlite/select#aggregations-helpers)
-- [Joins](/docs/sqlite/joins)
+- Get started with [MSSQL](/docs/mssql/get-started-mssql)
+- [Select statement](/docs/mssql/select)
+- [Filters](/docs/mssql/operators) and [sql operator](/docs/mssql/sql)
+- [Aggregations](/docs/mssql/select#aggregations) and [Aggregation helpers](/docs/mssql/select#aggregations-helpers)
+- [Joins](/docs/mssql/joins)
 </Prerequisites>
 
 To count all rows in table you can use `count()` function or `sql` operator like below:
@@ -39,17 +39,17 @@ To count all rows in table you can use `count()` function or `sql` operator like
     ```
 
     ```sql
-    select count(*) from "products";
+    select count(*) from [products];
     ```
   </CodeTab>
   ```ts
-  import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+  import { int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
 
-  export const products = sqliteTable('products', {
-    id: integer().primaryKey({ autoIncrement: true }),
-    name: text().notNull(),
-    discount: integer(),
-    price: integer().notNull(),
+  export const products = mssqlTable('products', {
+    id: int().identity().primaryKey(),
+    name: varchar({ length: 255 }).notNull(),
+    discount: int(),
+    price: int().notNull(),
   });
   ```
 </CodeTabs>
@@ -69,7 +69,7 @@ type Result = {
 ```
 
 ```sql
-select count("discount") from "products";
+select count([discount]) from [products];
 ```
 </Section>
 
@@ -84,8 +84,8 @@ await db.select({ count: sql<number>`count(${products.discount})` }).from(produc
 ```
 
 ```sql
-select count(*) from "products";
-select count("discount") from "products";
+select count(*) from [products];
+select count([discount]) from [products];
 ```
 </Section>
 
@@ -94,7 +94,7 @@ By specifying `sql<number>`, you are telling Drizzle that the **expected** type 
 If you specify it incorrectly (e.g. use `sql<string>` for a field that will be returned as a number), the runtime value won't match the expected type.
 Drizzle cannot perform any type casts based on the provided type generic, because that information is not available at runtime.
 
-If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/sqlite/sql#sqlmapwith) method.
+If you need to apply runtime transformations to the returned value, you can use the [`.mapWith()`](/docs/mssql/sql#sqlmapwith) method.
 </Callout>
 
 To count rows that match a condition you can use `.where()` method:
@@ -110,7 +110,7 @@ await db
 ```
 
 ```sql
-select count(*) from "products" where "products"."price" > 100;
+select count(*) from [products] where [products].[price] > 100;
 ```
 </Section>
 
@@ -130,29 +130,29 @@ This is how you can use `count()` function with joins and aggregations:
       })
       .from(countries)
       .leftJoin(cities, eq(countries.id, cities.countryId))
-      .groupBy(countries.id)
+      .groupBy(countries.id, countries.name)
       .orderBy(countries.name);
     ```
 
     ```sql
-    select "countries"."name", count("cities"."id") from "countries"
-      left join "cities" on "countries"."id" = "cities"."country_id"
-      group by "countries"."id"
-      order by "countries"."name";
+    select [countries].[name], count([cities].[id]) from [countries]
+      left join [cities] on [countries].[id] = [cities].[country_id]
+      group by [countries].[id], [countries].[name]
+      order by [countries].[name];
     ```
   </CodeTab>
   ```ts
-  import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+  import { int, mssqlTable, varchar } from 'drizzle-orm/mssql-core';
 
-  export const countries = sqliteTable('countries', {
-    id: integer().primaryKey({ autoIncrement: true }),
-    name: text().notNull(),
+  export const countries = mssqlTable('countries', {
+    id: int().identity().primaryKey(),
+    name: varchar({ length: 255 }).notNull(),
   });
 
-  export const cities = sqliteTable('cities', {
-    id: integer().primaryKey({ autoIncrement: true }),
-    name: text().notNull(),
-    countryId: integer('country_id').notNull().references(() => countries.id),
+  export const cities = mssqlTable('cities', {
+    id: int().identity().primaryKey(),
+    name: varchar({ length: 255 }).notNull(),
+    countryId: int('country_id').notNull().references(() => countries.id),
   });
   ```
 </CodeTabs>

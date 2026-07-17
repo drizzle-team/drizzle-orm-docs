@@ -1,0 +1,48 @@
+---
+title: Empty array as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [CockroachDB](/docs/cockroach/get-started-cockroach)
+- Learn about [column data types](/docs/cockroach/column-types)
+- [sql operator](/docs/cockroach/sql)
+</Prerequisites>
+
+To set an empty array as a default value in CockroachDB,  you can use `.default([])` or `sql` operator with `'{}'` or `ARRAY[]` syntax:
+
+<Section>
+```ts copy {10,14,18}
+import { sql } from 'drizzle-orm';
+import { cockroachTable, int4, string } from 'drizzle-orm/cockroach-core';
+
+export const users = cockroachTable('users', {
+  id: int4().primaryKey().generatedAlwaysAsIdentity(),
+  name: string().notNull(),
+  tags1: string()
+    .array()
+    .notNull()
+    .default(sql`'{}'::string[]`),
+  tags2: string()
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::string[]`),
+  tags3: string()
+    .array()
+    .notNull()
+    .default([]),
+});
+```
+
+```sql
+CREATE TABLE "users" (
+	"id" int4 PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" string NOT NULL,
+	"tags1" string[] DEFAULT '{}'::string[] NOT NULL,
+	"tags2" string[] DEFAULT ARRAY[]::string[] NOT NULL,
+	"tags3" string[] DEFAULT '{}'::string[] NOT NULL
+);
+```
+</Section>

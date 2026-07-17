@@ -1,0 +1,48 @@
+---
+title: Empty array as a default value
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- Learn about column data types for [PostgreSQL](/docs/column-types)
+- [sql operator](/docs/sql)
+</Prerequisites>
+
+To set an empty array as a default value in PostgreSQL, you can use `.default([])` or `sql` operator with `'{}'` or `ARRAY[]` syntax:
+
+<Section>
+```ts copy {10,14,18}
+import { sql } from 'drizzle-orm';
+import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  tags1: text()
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  tags2: text()
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
+  tags3: text()
+    .array()
+    .notNull()
+    .default([]),
+});
+```
+
+```sql
+CREATE TABLE "users" (
+	"id" serial PRIMARY KEY,
+	"name" text NOT NULL,
+	"tags1" text[] DEFAULT '{}'::text[] NOT NULL,
+	"tags2" text[] DEFAULT ARRAY[]::text[] NOT NULL,
+	"tags3" text[] DEFAULT '{}'::text[] NOT NULL
+);
+```
+</Section>

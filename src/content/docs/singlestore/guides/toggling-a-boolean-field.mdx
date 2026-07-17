@@ -1,0 +1,35 @@
+---
+title: SQL Toggle value
+---
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+<Prerequisites>
+- Get started with [SingleStore](/docs/singlestore/get-started-singlestore)
+- [Update statement](/docs/singlestore/update)
+- [Filters](/docs/singlestore/operators) and [not operator](/docs/singlestore/operators#not)
+- [Boolean data type](/docs/singlestore/column-types#boolean)
+</Prerequisites>
+
+To toggle a column value you can use `update().set()` method like below:
+
+<Section>
+```tsx copy {8}
+import { eq, not } from 'drizzle-orm';
+
+const db = drizzle(...);
+
+await db
+  .update(table)
+  .set({
+    isActive: not(table.isActive),
+  })
+  .where(eq(table.id, 1));
+```
+
+```sql
+update `table` set `is_active` = not `table`.`is_active` where `table`.`id` = 1;
+```
+</Section>
+
+In SingleStore the `boolean` type is stored as `tinyint(1)` (`0` for false and `1` for true).
