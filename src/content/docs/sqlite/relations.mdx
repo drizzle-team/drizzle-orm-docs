@@ -179,7 +179,7 @@ export const relations = defineRelations({ users }, (r) => ({
 }));
 ```
 
-Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
+Another example would be a user having profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
 ```typescript copy {15-22}
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
