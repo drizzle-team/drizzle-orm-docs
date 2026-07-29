@@ -46,6 +46,51 @@ const db = drizzle(process.env.DB_URL!, {
 });
 ```
 
+### Cloudflare KV integration
+
+Cloudflare Workers applications can use a bound [Workers KV](https://developers.cloudflare.com/kv/) namespace as the query cache:
+
+```jsonc
+// wrangler.jsonc
+{
+  "kv_namespaces": [
+    {
+      "binding": "QUERY_CACHE",
+      "id": "<YOUR_KV_NAMESPACE_ID>"
+    }
+  ]
+}
+```
+
+Pass the binding to `cloudflareKVCache()` when creating your Drizzle instance:
+
+```ts
+import { cloudflareKVCache } from "drizzle-orm/cache/cloudflare-kv";
+import { drizzle } from "drizzle-orm/...";
+
+const db = drizzle(env.DB, {
+  cache: cloudflareKVCache(env.QUERY_CACHE, {
+    strategy: "explicit",
+    prefix: "drizzle",
+    config: { ex: 300 }
+  })
+});
+```
+
+Set `strategy: "all"` to cache every select query. Per-query settings passed to `.$withCache()` override the default expiration:
+
+```ts
+const users = await db.select().from(usersTable).$withCache({
+  config: { ex: 600 }
+});
+```
+
+The adapter supports `ex`, `px`, `exat`, and `pxat`. Cloudflare KV requires expiration targets to be at least 60 seconds in the future, so shorter values throw an error. The Redis-specific `keepTtl` and `hexOptions` settings are not supported.
+
+<Callout type="warning">
+Workers KV is eventually consistent and is intended for read-heavy data that can tolerate stale results. Table and tag invalidation can take time to become visible in other Cloudflare locations. Use a strongly consistent store when read-after-write consistency is required.
+</Callout>
+
 ## Cache config reference
 
 Drizzle supports the following cache config options for Upstash:
