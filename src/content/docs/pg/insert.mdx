@@ -65,7 +65,8 @@ Drizzle ORM provides simple interfaces for handling upserts and conflicts.
 
 ### On conflict do nothing
 
-`onConflictDoNothing` will cancel the insert if there's a conflict:
+`onConflictDoNothing` skips a row instead of inserting it when the row conflicts with an existing one.
+When inserting multiple rows, only the conflicting rows are skipped — the remaining rows are still inserted:
 
 ```typescript copy
 await db.insert(users)
@@ -76,6 +77,11 @@ await db.insert(users)
 await db.insert(users)
   .values({ id: 1, name: 'John' })
   .onConflictDoNothing({ target: users.id });
+
+// batch insert: the conflicting row is skipped, the others are inserted
+await db.insert(users)
+  .values([{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }])
+  .onConflictDoNothing();
 ```
 
 ### On conflict do update
