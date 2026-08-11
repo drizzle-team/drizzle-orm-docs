@@ -2,115 +2,66 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
-import {
-  description,
-  title,
-} from "@/data/llms";
+import { description, title } from "@/data/llms";
+import { defaultDocsDialect, docsDialectIds } from "@/dialect-docs";
+import { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
+
+type MetaItem = string | string[];
 
 export const GET: APIRoute = async ({ url }) => {
-  // Get the URL
   const getUrl = (path: string) => `${url.origin}/docs/${path}`;
 
-  // Create the LLMS
+  // Human-readable dialect name (pg -> PostgreSQL, etc.)
+  const dialectName = (id: string) =>
+    dialectSwitcherItems.find((item) => item.id === id)?.name ?? id;
+
   let llms = `# ${title}\n\n> ${description}\n`;
 
-  const docCollection = await getCollection("docs", (entry) => {
-    return {
-      slug: entry.slug,
-      body: entry.body,
-      data: entry.data,
-    };
-  });
-
-  // Get all meta files
-  const metaFiles = import.meta.glob("../content/**/_meta.json");
-
-  // Get all slugs from meta files
-  const metaFilesSlugs = await Promise.all(
-    Object.keys(metaFiles).map(async (meta) => {
-      const metaFilePath = meta.replace("/_meta.json", "");
-      const directoryName = metaFilePath.split("/")[3];
-      // Add directory name as prefix to the slug
-      const slugPrefix = directoryName ? `${directoryName}/` : "";
-
-      const { default: parsed } = (await metaFiles[meta]()) as {
-        default: string[] | string[][];
-      };
-      return parsed.map((slug) => {
-        if (Array.isArray(slug)) {
-          return slug.map((subSlug) => `${slugPrefix}${subSlug}`);
-        }
-        return `${slugPrefix}${slug}`;
-      });
-    }),
+  const docCollection = await getCollection("docs");
+  const entryBySlug = new Map<string, (typeof docCollection)[number]>(
+    docCollection.map((entry) => [entry.slug, entry]),
   );
 
-  // Remove slugs with "---" and replace "::"(collapse block)
-  const slugs = metaFilesSlugs
-    .flat()
-    .filter((slug) => !slug.includes("---"))
-    .map((slug) => (typeof slug === "string" ? slug.replace("::", "") : slug));
+  // Prefer the page's H1, fall back to the meta title, then the slug
+  const linkTitle = (dialect: string, slug: string, metaTitle?: string) => {
+    const entry =
+      entryBySlug.get(`${dialect}/${slug}`) ?? entryBySlug.get(slug);
+    const h1 = entry?.body.match(/^# (.+)/m)?.[1];
+    return h1 ?? metaTitle ?? slug;
+  };
 
-  // Reorder the array (grouped by prefix)
-  const reorderArray = (arr: string[]) => {
-    const grouped: Record<string, string[]> = {};
-    const order: string[] = [];
+  // Each dialect keeps its own _meta.json; root pages are referenced there too,
+  // so iterating per dialect duplicates the shared content under every dialect.
+  const metaFiles = import.meta.glob<{ default: MetaItem[] }>(
+    "../content/docs/*/_meta.json",
+  );
 
-    arr.forEach((item) => {
-      const prefix = item.includes("/") ? item.split("/")[0] : item;
-      if (!grouped[prefix]) {
-        grouped[prefix] = [];
-        order.push(prefix);
+  for (const dialect of docsDialectIds) {
+    const loader = metaFiles[`../content/docs/${dialect}/_meta.json`];
+    if (!loader) continue;
+
+    const { default: items } = await loader();
+
+    // Default dialect (pg) has no url prefix
+    const prefix = dialect === defaultDocsDialect ? "" : `${dialect}/`;
+
+    llms += `\n## ${dialectName(dialect)}\n`;
+
+    for (const item of items) {
+      // Section header
+      if (typeof item === "string") {
+        if (item === "---") continue; // visual separator, no heading
+        llms += `\n### ${item.replace("::", "")}\n\n`;
+        continue;
       }
-      grouped[prefix].push(item);
-    });
 
-    return order.flatMap((prefix) => grouped[prefix]);
+      // Page link
+      const [rawSlug, metaTitle] = item;
+      if (rawSlug.includes("---")) continue;
+      const slug = rawSlug.replace("::", "");
+      llms += `- [${linkTitle(dialect, slug, metaTitle)}](${getUrl(`${prefix}${slug}`)})\n`;
+    }
   }
-
-  // Get slugs without array
-  const slugsWithOneValue = slugs.map((slug) => {
-    if (Array.isArray(slug)) {
-      return slug[0];
-    }
-    return slug;
-  });
-
-  const sortedSlugs = reorderArray(slugsWithOneValue);
-
-  const formatedSlugs = sortedSlugs.map((slug) => {
-    const slugArray = slugs.find((s) => s[0] === slug) as string[] | undefined;
-    if (slugArray) {
-      return slugArray;
-    }
-    return slug;
-  });
-
-  // Add the slugs to the LLMS
-  formatedSlugs.forEach((slug) => {
-    if (typeof slug === "string") {
-      llms += `\n## ${slug}\n\n`;
-    }
-
-    // if the slug is an array, it means its a section
-    if (Array.isArray(slug)) {
-      const collectionEntry = docCollection.find(
-        (entry) => slug[0] === entry.slug,
-      );
-      // Find title in the body
-      const findTitle = collectionEntry?.body.match(/^# (.+)/gm);
-      if (findTitle) {
-        const sectionTitle = findTitle[0].replace("# ", "");
-        llms += `- [${sectionTitle}](${getUrl(slug[0])})\n`;
-      } else {
-        // If title is not found in the body, use the title from the meta file
-        const entryTitle = collectionEntry?.data.title;
-        if (entryTitle) {
-          llms += `- [${entryTitle}](${getUrl(slug[0])})\n`;
-        }
-      }
-    }
-  });
 
   // Guides
   const mapFiles = import.meta.glob("../content/**/_map.json");
@@ -128,10 +79,9 @@ export const GET: APIRoute = async ({ url }) => {
   // Main Guides page
   llms += `- [Guides](${getUrl("guides")})\n`;
   guidesSlugs.forEach((slug) => {
-    const collectionEntry = docCollection.find(
-      (entry) => slug[0] === entry.slug,
-    );
-    const guideTitle = collectionEntry?.data.title;
+    // Collection slugs are prefixed with the folder ("guides/<name>")
+    const collectionEntry = entryBySlug.get(`guides/${slug[0]}`);
+    const guideTitle = collectionEntry?.data.title ?? slug[1];
     const guideSlug = collectionEntry?.data.slug || slug[0];
     if (guideTitle) {
       llms += `- [${guideTitle}](` + getUrl(`guides/${guideSlug}`) + `)\n`;
@@ -141,7 +91,9 @@ export const GET: APIRoute = async ({ url }) => {
   // Tutorials
   llms += `\n## Tutorials\n\n`;
 
-  const tutorialsEntries = docCollection.filter((entry) => entry.slug.includes("tutorials"));
+  const tutorialsEntries = docCollection.filter((entry) =>
+    entry.slug.includes("tutorials"),
+  );
 
   // Main Tutorials page
   llms += `- [Tutorials](${getUrl("tutorials")})\n`;

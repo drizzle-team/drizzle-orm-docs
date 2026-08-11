@@ -1,4 +1,5 @@
 import { description, title } from "@/data/llms";
+import { defaultDocsDialect } from "@/dialect-docs";
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
@@ -22,7 +23,11 @@ export const GET: APIRoute = async ({ url }) => {
       const tutorialSlug = doc.slug.split("/").at(-1);
       llms += `Source: ${url.origin}/docs/tutorials/${tutorialSlug}\n\n${doc.body}\n\n`;
     } else {
-      llms += `Source: ${url.origin}/docs/${doc.slug}\n\n${doc.body}\n\n`;
+      // Default dialect (pg) has no URL prefix, so strip it from the slug
+      const slug = doc.slug.startsWith(`${defaultDocsDialect}/`)
+        ? doc.slug.slice(defaultDocsDialect.length + 1)
+        : doc.slug;
+      llms += `Source: ${url.origin}/docs/${slug}\n\n${doc.body}\n\n`;
     }
   });
 
