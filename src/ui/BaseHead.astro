@@ -4,11 +4,17 @@ import { ViewTransitions } from "astro:transitions";
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image } = Astro.props;
 const defaultDescription =
   "Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.";
+const pageDescription = description || defaultDescription;
+const imageUrl = image
+  ? new URL(image, Astro.site ?? Astro.url).toString()
+  : undefined;
+const pageUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 const isProd = import.meta.env.PROD_BUILD === "true" || process.env.PROD_BUILD === "true";
 const noindex = /\/docs\/[^/]+\/get-started\/?$/.test(Astro.url.pathname);
 const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "index,follow";
@@ -31,9 +37,23 @@ const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "inde
   />
   <meta name="generator" content={Astro.generator} />
   <title>{title}</title>
-  <meta name="description" content={defaultDescription || description} />
+  <meta name="description" content={pageDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
   <meta property="og:title" content={title} />
-  <meta property="og:description" content={defaultDescription || description} />
+  <meta property="og:description" content={pageDescription} />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={pageDescription} />
+  <meta name="twitter:site" content="@DrizzleORM" />
+  {imageUrl ? (
+    <>
+      <meta property="og:image" content={imageUrl} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content={imageUrl} />
+    </>
+  ) : (
+    <meta name="twitter:card" content="summary" />
+  )}
   <script is:inline>
     const transitionManager = () => {
       const style = document.createElement("style");
