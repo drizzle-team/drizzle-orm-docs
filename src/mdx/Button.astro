@@ -1,0 +1,90 @@
+---
+interface Props {
+  href: string;
+  variant?: "accent" | "default";
+  external?: boolean;
+}
+
+const { href, variant = "accent", external } = Astro.props;
+const isExternal = external ?? href.startsWith("http");
+---
+
+<a
+  class:list={["button", variant === "accent" && "button_accent"]}
+  href={href}
+  target={isExternal ? "_blank" : undefined}
+  rel={isExternal ? "nofollow noreferrer" : undefined}
+>
+  <slot />
+  {
+    isExternal && (
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M7 17L17 7" />
+        <path d="M8 7h9v9" />
+      </svg>
+    )
+  }
+</a>
+
+<style>
+  .button {
+    margin: 16px 0;
+    width: fit-content;
+    border-radius: 3px;
+    color: #282b3b;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    height: 48px;
+    padding: 0 24px;
+    gap: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    border: 1px solid rgba(33, 39, 46, 0.12);
+    background-color: rgba(240, 241, 242, 0.27);
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .button_accent {
+    color: #ffffff;
+    font-weight: 700;
+    border: none;
+    background-color: #282b3b;
+  }
+
+  .button:hover {
+    opacity: 0.85;
+  }
+
+  html[class~="dark"] .button {
+    color: #cccccc;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  html[class~="dark"] .button_accent {
+    color: #282828;
+    background-color: rgb(226, 232, 240);
+    border: none;
+  }
+
+  @media screen and (max-width: 599px) {
+    .button {
+      font-size: 14px;
+      height: 46px;
+    }
+  }
+</style>
