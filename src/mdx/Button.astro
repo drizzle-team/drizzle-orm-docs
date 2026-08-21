@@ -2,7 +2,7 @@
 interface Props {
   /** omit to render a plain <button>, e.g. as a modal trigger */
   href?: string;
-  variant?: "accent" | "default";
+  variant?: "accent" | "default" | "secondary";
   external?: boolean;
 }
 
@@ -12,7 +12,11 @@ const Tag = href ? "a" : "button";
 ---
 
 <Tag
-  class:list={["button", variant === "accent" && "button_accent"]}
+  class:list={[
+    "button",
+    variant === "accent" && "button_accent",
+    variant === "secondary" && "button_secondary",
+  ]}
   href={href}
   type={href ? undefined : "button"}
   target={isExternal ? "_blank" : undefined}
@@ -70,6 +74,35 @@ const Tag = href ? "a" : "button";
 
   .button:hover {
     opacity: 0.85;
+  }
+
+  .button_secondary {
+    height: 40px;
+    padding: 0 12px;
+    gap: 8px;
+    border-radius: 4px;
+    border: none;
+    background-color: #f6f6f7;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 600;
+    justify-content: flex-start;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .button_secondary:hover {
+    opacity: 1;
+    background-color: #eff0f3;
+  }
+
+  html[class~="dark"] .button_secondary {
+    border: none;
+    background-color: #1c1c1c;
+    color: #e1e3e6;
+  }
+
+  html[class~="dark"] .button_secondary:hover {
+    background-color: #282828;
   }
 
   html[class~="dark"] .button {
