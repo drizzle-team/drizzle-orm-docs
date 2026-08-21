@@ -1,0 +1,321 @@
+---
+import { Image } from "astro:assets";
+import Button from "@mdx/Button.astro";
+import blokh from "@/assets/images/team/blokh.png";
+
+interface Props {
+  label?: string;
+  name?: string;
+  role?: string[];
+  calLink?: string;
+  email?: string;
+  twitter?: string;
+}
+
+const {
+  label = "Talk to product manager",
+  name = "Alex Blokh",
+  role = ["Co-founder of Drizzle", "Product manager of Drizzle Studio"],
+  calLink = "https://cal.com/alexblokh/30min",
+  email = "alex.blokh@drizzle.team",
+  twitter = "DrizzleORM",
+} = Astro.props;
+---
+
+<div class="pm" data-pm>
+  <Button>{label}</Button>
+
+  <dialog class="pm__dialog" aria-label={name}>
+    <button class="pm__close" type="button" data-pm-close aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
+
+    <Image class="pm__photo" src={blokh} alt={name} width={96} height={96} />
+    <div class="pm__name">{name}</div>
+    <div class="pm__role">
+      {role.map((line) => <div>{line}</div>)}
+    </div>
+
+    <a class="pm__action pm__action--accent" href={calLink} target="_blank" rel="nofollow noreferrer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" />
+        <path d="M16 2v4M8 2v4M3 10h18" />
+      </svg>
+      Book a call
+    </a>
+
+    <div class="pm__action pm__action--with-copy">
+      <a class="pm__link" href={`mailto:${email}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m2 7 10 6 10-6" />
+        </svg>
+        <span class="pm__value">{email}</span>
+      </a>
+      <button class="pm__copy" type="button" data-pm-copy={email} aria-label={`Copy ${email}`}>
+        <svg class="pm__copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+        <svg class="pm__check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="pm__action pm__action--with-copy">
+      <a class="pm__link" href={`https://x.com/${twitter}`} target="_blank" rel="nofollow noreferrer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+        <span class="pm__value">@{twitter}</span>
+      </a>
+      <button class="pm__copy" type="button" data-pm-copy={`@${twitter}`} aria-label={`Copy @${twitter}`}>
+        <svg class="pm__copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+        <svg class="pm__check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </button>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>("[data-pm]").forEach((root) => {
+      const dialog = root.querySelector("dialog");
+      const trigger = root.querySelector<HTMLButtonElement>("button.button");
+      if (!dialog || !trigger) return;
+
+      trigger.addEventListener("click", () => dialog.showModal());
+
+      root
+        .querySelector<HTMLButtonElement>("[data-pm-close]")
+        ?.addEventListener("click", () => dialog.close());
+
+      // click on the backdrop, i.e. outside of the dialog box itself
+      dialog.addEventListener("click", (e) => {
+        if (e.target === dialog) dialog.close();
+      });
+
+      root.querySelectorAll<HTMLButtonElement>("[data-pm-copy]").forEach((btn) => {
+        let timeout: ReturnType<typeof setTimeout>;
+        btn.addEventListener("click", async () => {
+          await navigator.clipboard.writeText(btn.dataset.pmCopy!);
+          clearTimeout(timeout);
+          btn.classList.add("pm__copy--copied");
+          timeout = setTimeout(
+            () => btn.classList.remove("pm__copy--copied"),
+            1500,
+          );
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  .pm {
+    display: contents;
+  }
+
+  .pm__dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    background-color: #ffffff;
+    color: #14151a;
+    text-align: center;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  }
+
+  .pm__dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  html[class~="dark"] .pm__dialog {
+    background-color: #111111;
+    border-color: #303030;
+    color: #e1e3e6;
+  }
+
+  .pm__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: #909090;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pm__close:hover {
+    color: #14151a;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  html[class~="dark"] .pm__close:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .pm__photo {
+    width: 96px;
+    height: 96px;
+    border-radius: 100%;
+    object-fit: cover;
+    margin: 0 auto;
+  }
+
+  .pm__name {
+    margin-top: 12px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .pm__role {
+    margin-top: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #6b7280;
+  }
+
+  html[class~="dark"] .pm__role {
+    color: #909090;
+  }
+
+  .pm__action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    margin-top: 8px;
+    gap: 8px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(33, 39, 46, 0.12);
+    background-color: rgba(240, 241, 242, 0.27);
+    color: #282b3b;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pm__action--with-copy {
+    padding: 0 4px 0 0;
+    gap: 0;
+  }
+
+  .pm__link {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    padding: 0 14px;
+    color: inherit;
+    text-decoration: none !important;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pm__link:hover {
+    opacity: 0.85;
+  }
+
+  .pm__action--accent {
+    border: none;
+    background-color: #282b3b;
+    color: #ffffff;
+    font-weight: 700;
+    height: 44px;
+  }
+
+  .pm__action:not(.pm__action--with-copy):hover {
+    opacity: 0.85;
+  }
+
+  html[class~="dark"] .pm__action {
+    color: #cccccc;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  html[class~="dark"] .pm__action--accent {
+    color: #282828;
+    background-color: rgb(226, 232, 240);
+    border: none;
+  }
+
+  .pm__action svg {
+    flex-shrink: 0;
+  }
+
+  .pm__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pm__copy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 3px;
+    background: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pm__copy:hover {
+    color: #14151a;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  html[class~="dark"] .pm__copy {
+    color: #909090;
+  }
+
+  html[class~="dark"] .pm__copy:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .pm__check-icon {
+    display: none;
+    color: #22c55e;
+  }
+
+  .pm__copy--copied .pm__copy-icon {
+    display: none;
+  }
+
+  .pm__copy--copied .pm__check-icon {
+    display: block;
+  }
+</style>

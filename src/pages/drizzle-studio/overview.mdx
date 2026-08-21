@@ -1,12 +1,8 @@
 import CenteredLayout from "@/ui/CenteredLayout.astro";
-import Callout from "@mdx/Callout.astro";
 import CompanyLogos from "@mdx/CompanyLogos.astro";
-import CodeTabs from "@mdx/CodeTabs.astro";
-import Npm from "@mdx/Npm.astro";
-import Npx from "@mdx/Npx.astro";
 import Button from "@mdx/Button.astro";
 import Flex from "@mdx/Flex.astro";
-import Steps from '@mdx/Steps.astro';
+import ContactProductManager from "@mdx/ContactProductManager.astro";
 import TableWrapper from "@mdx/TableWrapper.astro";
 
 <CenteredLayout
@@ -16,10 +12,21 @@ import TableWrapper from "@mdx/TableWrapper.astro";
   image="/og/drizzle-studio.jpg"
 >
 # Meet Drizzle Studio
-Drizzle Studio is a modern web based database browser. Browse and edit your data, explore your schema
-and run SQL — with zero setup on top of your existing database.
+Drizzle Studio is a modern database browser. It comes in four flavours:
 
-<Button href="https://demo.drizzle.studio">Live demo</Button>
+<TableWrapper fit>
+| | | |
+| :------ | :--------- | :------ |
+| **[Local Studio](#drizzle-studio-for-local-development)** | free         | `drizzle-kit studio` in your Drizzle project                                           |
+| **[Drizzle Gateway](#drizzle-gateway)**                   | free         | self-hosted Studio for your infrastructure, deployed as a Docker container or a binary |
+| **[Chrome extension](#drizzle-studio-chrome-extension)**  | free         | browse serverless databases right in their vendor consoles                             |
+| **[Studio Component](#drizzle-studio-component)**         | B2B offering | embeddable Studio for your own product                                                 |
+</TableWrapper>
+
+<Flex>
+  <Button href="https://demo.drizzle.studio">Live demo</Button>
+  <ContactProductManager />
+</Flex>
 
 ![Drizzle Studio](@/assets/images/drizzle-studio-overview.webp)
 
@@ -32,18 +39,7 @@ and run SQL — with zero setup on top of your existing database.
 - **Run Drizzle queries** with the Drizzle runner
 - **Explore and manage your schema** — tables, views, columns, indexes, foreign keys, policies and privileges
 
-## Drizzle Studio family
-Studio comes in four flavours, all powered by the same database browser:
-
-<TableWrapper fit>
-| Product | Pricing | What it is |
-| :------ | :--------- | :------ |
-| **[Local Studio](#drizzle-studio-for-local-development)** | free         | `drizzle-kit studio` in your Drizzle project                                           |
-| **[Drizzle Gateway](#drizzle-gateway)**                   | free         | self-hosted Studio for your infrastructure, deployed as a Docker container or a binary |
-| **[Chrome extension](#drizzle-studio-chrome-extension)**  | free         | browse serverless databases right in their vendor consoles                             |
-| **[Studio Component](#drizzle-studio-component)**         | B2B offering | embeddable Studio for your own product                                                 |
-</TableWrapper>
-
+## Under the hood
 At its core Drizzle Studio is a UI component which renders database content and gives you primitives to
 manipulate both data and schema. Being written in TypeScript lets us plug it in basically everywhere
 with zero friction:
@@ -51,75 +47,21 @@ with zero friction:
 ![Drizzle Studio family — for infra, for platforms and for local development](@/assets/images/drizzle-studio-family.png)
 
 ## Drizzle Studio for local development
-This is the original one, where it all started — as of today it's at 247k monthly visits. It's meant to cover
+This is the original one, where it all started — and as of today, it has 120K monthly users. It's meant to cover
 your development needs on a local env: rapidly open a particular database and manage everything you need in there.
-
-![247k monthly visits to local.drizzle.studio](@/assets/images/drizzle-studio-stats.png)
 
 With the introduction of Schema Management, we started to deviate from the original schema in code first idea
 towards a more conventional database browser, where the database itself is the source of truth.
+
+![Drizzle Studio for local development](@/assets/images/drizzle-studio-local.png)
 
 It's free forever and grabs everything it needs from your
 [drizzle.config.ts](/docs/drizzle-config-file) file. It supports `PostgreSQL`, `MySQL`, `SQLite`, `SingleStore`,
 `MSSQL` and `CockroachDB`.
 
-<Steps>
-
-#### Install dependencies
-Make sure to go through our [get started](/docs/get-started) guides first!
-
-<Npm>
-  drizzle-orm@rc
-  -D drizzle-kit@rc
-</Npm>
-
-#### Prepare your database schema
-Check out extended schema declaration **[docs.](/docs/sql-schema-declaration)**
-```typescript copy filename="schema.ts"
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
-
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  fullName: text('full_name'),
-  phone: varchar('phone', { length: 256 }),
-});
-```
-
-#### Prepare config file
-Check out extended config file **[docs.](/docs/drizzle-config-file)**
-```typescript copy filename="drizzle.config.ts"
-import { defineConfig } from "drizzle-kit";
- 
-export default defineConfig({
-  schema: "./schema/*",
-  out: "./drizzle",
-  dialect: 'postgresql',
-  dbCredentials: {
-    url: process.env.DB_URL,
-  }
-});
-```
-#### Launch Drizzle Studio
-<Npx>
-drizzle-kit studio
-</Npx>
-
-You can launch Studio with the `--port` flag to customise the process port, and `--verbose` for extended SQL statements logging
-<Npx>
-drizzle-kit studio --port 3000 --verbose
-</Npx>
-
-By default the UI is served from `https://local.drizzle.studio` and the Studio server runs on `127.0.0.1` —
-you can bind it to any host you want
-<Npx>
-drizzle-kit studio --host 0.0.0.0
-</Npx>
-</Steps>
-
-<Callout type="info" title="Safari and Brave">
-Safari and Brave block access to localhost by default. You need to install [mkcert](https://github.com/FiloSottile/mkcert)
-and generate a self-signed certificate — check out the [drizzle-kit studio](/docs/drizzle-kit-studio) docs.
-</Callout>
+Install `drizzle-kit`, point it at your config and run `drizzle-kit studio` — the
+[`drizzle-kit studio` docs](/docs/drizzle-kit-studio) walk through the setup, the `--port`, `--verbose`
+and `--host` flags, and what to do about Safari and Brave blocking localhost.
 
 The hosted version of Studio is meant for local development and is **not** meant to be exposed on a remote machine —
 for that we have [Drizzle Gateway](#drizzle-gateway).
@@ -130,7 +72,7 @@ It's a single Docker image (or a standalone binary) that connects to all your da
 your infrastructure like any other dockerised application — in your VPC, behind your bastion, with all the
 benefits that come with it.
 
-![Drizzle Gateway](@/assets/images/drizzle-gateway.webp)
+![Drizzle Gateway](@/assets/images/drizzle-studio-gateway.png)
 
 Unlike `drizzle-kit studio`, Gateway doesn't need a Drizzle project — you add database connections right in the UI,
 keep them in a persistent volume, share it with your team and protect access with a master password
@@ -140,7 +82,15 @@ It was originally a paid service, but when Warhammer devs reached out to us we r
 it being paid just doesn't pay off, and eventually made it free. It's now at 350k container downloads
 on the GitHub registry.
 
-<CodeTabs items={["Docker", "Railway"]}>
+<a
+  href="https://railway.com/new/template/drizzle-studio-gateway?referralCode=eobqmj&utm_medium=integration&utm_source=button&utm_campaign=drizzle-studio-gateway"
+  target="_blank"
+  rel="nofollow noreferrer"
+  style="display: inline-block; margin: 16px 0;"
+>
+  <img src="https://railway.com/button.svg" alt="Deploy on Railway" width="183" height="40" />
+</a>
+
 ```shell
 # pull latest version
 docker pull ghcr.io/drizzle-team/gateway:latest
@@ -159,11 +109,6 @@ docker run -d \
   -v drizzle-gateway:/app \
   ghcr.io/drizzle-team/gateway:latest
 ```
-```shell
-# one click deploy via Railway template
-https://railway.com/new/template/drizzle-studio-gateway
-```
-</CodeTabs>
 
 Once it's running, Gateway is available at `http://localhost:4983`. It works on both `arm` and `amd` architectures,
 and standalone binaries are available for macOS and Linux — see [gateway.drizzle.team](https://gateway.drizzle.team)
@@ -175,16 +120,12 @@ vendor's UI — no local setup, no connection strings. It's the thing you build 
 a vendor's console the official way, but you use their product every day and desperately need a proper
 in-place database browser.
 
-It works with [PlanetScale](https://planetscale.com) and [Cloudflare D1](https://developers.cloudflare.com/d1/),
-and back in the day — with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres).
+It works with [PlanetScale](https://planetscale.com), [Cloudflare D1](https://developers.cloudflare.com/d1/) and [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres).
 
 ![Drizzle Studio button injected into the PlanetScale branches page](@/assets/images/drizzle-studio-extension-1.jpg)
 ![Drizzle Studio browsing a PlanetScale database inside the vendor console](@/assets/images/drizzle-studio-extension-2.png)
 
-It's hard to say how many developers use it today — Google products work like meh — but it averages
-~3.3k weekly users, up 165% compared to the previous period, so it does seem people needed one.
-
-![Chrome Web Store weekly users of the Drizzle Studio extension](@/assets/images/drizzle-studio-extension-users.png)
+It's at ~3.3k weekly users, so it does seem people needed one.
 
 We also have [sqlite.drizzle.studio](https://sqlite.drizzle.studio) to browse SQLite files right in your browser.
 
@@ -238,8 +179,19 @@ You might've already seen one in a database or agentic platform you use 👇
   ]}
 />
 
-Turso has been our first customer since Oct 2023, and we also have a set of companies using embeddable
-Drizzle Studio for internal use cases.
+<CompanyLogos
+  title="Platforms that used Studio before"
+  companies={[
+    { name: "Nuxt Hub", href: "https://hub.nuxt.com/" },
+    { name: "Deco.cx", href: "https://deco.cx/" },
+    { name: "Hydra", href: "https://www.hydra.so/" },
+    { name: "Runable", href: "https://runable.com/" },
+    { name: "Tembo", href: "https://www.tembo.io/" },
+    { name: "Squadbase", href: "https://www.squadbase.dev/" },
+  ]}
+/>
+
+We also have a set of companies using embeddable Drizzle Studio for internal use cases.
 
 Launch posts: [Neon](https://neon.tech/docs/changelog/2024-05-24) ·
 [SQLite Cloud](https://blog.sqlitecloud.io/release-notes-introducing-database-studio-in-sqlite-cloud) ·
@@ -249,10 +201,7 @@ Launch posts: [Neon](https://neon.tech/docs/changelog/2024-05-24) ·
 
 #### Interested?
 
-<Flex>
-  <Button href="https://cal.com/alexblokh/30min">Book a call</Button>
-  <Button href="mailto:alex.blokh@drizzle.team?subject=Drizzle%20Studio%20Component" variant="default">Email us</Button>
-</Flex>
+<ContactProductManager />
 
 You can read a detailed overview on npm — [@drizzle-team/studio](https://www.npmjs.com/package/@drizzle-team/studio)
 is just a markdown file, there's nothing to install there. We're also around in DMs

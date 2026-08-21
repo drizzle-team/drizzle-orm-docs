@@ -1,17 +1,20 @@
 ---
 interface Props {
-  href: string;
+  /** omit to render a plain <button>, e.g. as a modal trigger */
+  href?: string;
   variant?: "accent" | "default";
   external?: boolean;
 }
 
 const { href, variant = "accent", external } = Astro.props;
-const isExternal = external ?? href.startsWith("http");
+const isExternal = href ? (external ?? href.startsWith("http")) : false;
+const Tag = href ? "a" : "button";
 ---
 
-<a
+<Tag
   class:list={["button", variant === "accent" && "button_accent"]}
   href={href}
+  type={href ? undefined : "button"}
   target={isExternal ? "_blank" : undefined}
   rel={isExternal ? "nofollow noreferrer" : undefined}
 >
@@ -33,7 +36,7 @@ const isExternal = external ?? href.startsWith("http");
       </svg>
     )
   }
-</a>
+</Tag>
 
 <style>
   .button {
