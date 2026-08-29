@@ -1,10 +1,10 @@
 Create a `index.ts` file in the `src` directory and initialize the connection:
 
 ```typescript copy filename="index.ts"
-import { drizzle } from 'drizzle-orm'
+import { drizzle } from 'drizzle-orm/postgres-js'
 
 async function main() {
-    const db = drizzle('postgres-js', process.env.DATABASE_URL);
+    const db = drizzle(process.env.DATABASE_URL!);
 }
 
 main();
