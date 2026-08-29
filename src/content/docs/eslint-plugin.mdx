@@ -126,10 +126,10 @@ Most of the time, you don't need to update all rows in the table and require
 some kind of `WHERE` statements.
 
 Optionally, you can define a `drizzleObjectName` in the plugin options that accept 
-a `string` or `string[]`. This is useful when you have objects or classes with a delete 
-method that's not from Drizzle. Such as `update` method will trigger the ESLint rule. To 
+a `string` or `string[]`. This is useful when you have objects or classes with a update 
+method that's not from Drizzle. Such a `update` method will trigger the ESLint rule. To 
 avoid that, you can define the name of the Drizzle object that you use in your codebase (like db) 
-so that the rule would only trigger if the delete method comes from this object:
+so that the rule would only trigger if the update method comes from this object:
 
 Example, config 1:
 ```yml
