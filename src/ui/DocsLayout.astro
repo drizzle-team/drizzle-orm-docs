@@ -547,6 +547,23 @@ const pageHasDialects = Object.keys(dialects).includes(
         margin: 0 !important;
         padding: 0 !important;
       }
+
+      .page--with-dialect-tabs :target {
+        scroll-margin-block: 4rem;
+      }
     </style>
+    <script is:inline>
+      function toggleTargetScrollMargin() {
+        const hasDialectTabs = document.querySelector(".dialect-tabs__container")
+        if (hasDialectTabs) {
+          document.documentElement.classList.add('page--with-dialect-tabs');
+        } else {
+          document.documentElement.classList.remove('page--with-dialect-tabs');
+        }
+      }
+
+      document.addEventListener("astro:page-load", toggleTargetScrollMargin);
+      document.addEventListener("astro:after-swap", toggleTargetScrollMargin);
+    </script>
   </body>
 </html>
