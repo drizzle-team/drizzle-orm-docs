@@ -1,6 +1,6 @@
 ---
 const html = await Astro.slots.render("default");
-const installCommands = ["npx", "yarn", "pnpm", "bun"];
+const installCommands = ["npx", "yarn", "pnpm", "bun", "deno x"];
 const installLines = html.replaceAll(/<\/?p>/g, "").replaceAll('—', '--').split("\n");
 const getInstallCommands = () =>
   installLines
