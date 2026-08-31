@@ -169,7 +169,7 @@ export const newYorkers = pgView('new_yorkers')
 
 // materialized view
 export const newYorkers2 = pgMaterializedView('new_yorkers_2')
-  .using('btree')
+  .using('heap')
   .with({
     fillfactor: 90,
     toastTupleTarget: 0.5,
@@ -218,7 +218,7 @@ WITH
 			"sq"."homeCity" = 1
 	);
 
-CREATE MATERIALIZED VIEW "new_yorkers_2" USING "btree"
+CREATE MATERIALIZED VIEW "new_yorkers_2" USING "heap"
 WITH
 	(autovacuum_enabled = TRUE, fillfactor = 90, toast_tuple_target = 0.5) TABLESPACE custom_tablespace AS (
 		WITH
