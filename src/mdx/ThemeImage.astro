@@ -1,0 +1,98 @@
+---
+import { getImage } from "astro:assets";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  light: ImageMetadata;
+  dark: ImageMetadata;
+  alt: string;
+  width?: number;
+  /** small screenshot floated over the bottom right corner, e.g. a deploy flow */
+  inset?: ImageMetadata;
+  insetAlt?: string;
+  /** scale the screenshot up inside its frame, e.g. 1.15 for 115% */
+  zoom?: number;
+  /** which part of the screenshot stays in frame when zoomed */
+  position?: string;
+}
+
+const {
+  light,
+  dark,
+  alt,
+  width = 1600,
+  inset,
+  insetAlt,
+  zoom = 1,
+  position = "top center",
+} = Astro.props;
+
+const size = zoom === 1 ? "contain" : `${Math.round(zoom * 100)}% auto`;
+
+// both variants are resolved here, but only the one the theme applies is
+// ever fetched — an unused custom property never resolves its url()
+const [lightImg, darkImg] = await Promise.all([
+  getImage({ src: light, width, format: "webp" }),
+  getImage({ src: dark, width, format: "webp" }),
+]);
+---
+
+<div class="theme-image-wrap">
+  <div
+    class="theme-image"
+    role="img"
+    aria-label={alt}
+    style={`--light: url(${lightImg.src}); --dark: url(${darkImg.src}); aspect-ratio: ${light.width} / ${light.height}; background-size: ${size}; background-position: ${position};`}
+  >
+  </div>
+  {
+    inset && (
+      <Image class="theme-image__inset" src={inset} alt={insetAlt ?? ""} width={620} />
+    )
+  }
+</div>
+
+<style>
+  .theme-image-wrap {
+    position: relative;
+  }
+
+  .theme-image {
+    width: 100%;
+    background-image: var(--light);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top center;
+  }
+
+  html[class~="dark"] .theme-image {
+    background-image: var(--dark);
+  }
+
+  /* deliberately reads as something floating above the app, not part of it */
+  .theme-image__inset {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 40%;
+    height: auto;
+    /* corner rounding is baked into the png's alpha — border-radius would
+       only clip the rectangular box and miss the notched corners */
+    /* drop-shadow follows the alpha channel, so it hugs the notched shape
+       instead of outlining the transparent bounding box the way box-shadow would */
+    filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.28))
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  html[class~="dark"] .theme-image__inset {
+    filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.55))
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  }
+
+  @media screen and (max-width: 768px) {
+    .theme-image__inset {
+      width: 50%;
+    }
+  }
+</style>
