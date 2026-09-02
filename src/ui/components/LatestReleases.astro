@@ -21,6 +21,14 @@ const options: Intl.DateTimeFormatOptions = {
 <div class="learn__title-block">
   <div class="latest-releases_title">Latest Releases</div>
 </div>
+<div class="latest-releases__notice">
+  This page only covers releases we've written up in detail, so it's not a
+  complete or up to date list. For every release, see the
+  <a
+    href="https://github.com/drizzle-team/drizzle-orm/releases"
+    target="_blank"
+    rel="nofollow noreferrer">releases on GitHub</a>.
+</div>
 <div class="latest-updates__cards">
   {
     filteredArticles.map((update) => (
@@ -54,6 +62,23 @@ const options: Intl.DateTimeFormatOptions = {
     letter-spacing: -0.48px;
     margin-bottom: 16px;
     margin-top: 8px;
+  }
+
+  html.dark .latest-releases__notice {
+    color: #c4c5c6;
+  }
+
+  .latest-releases__notice {
+    color: #5f5f61;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.176px;
+  }
+
+  .latest-releases__notice a {
+    color: inherit;
+    text-decoration: underline;
   }
 
   .latest-updates__cards {
@@ -130,6 +155,10 @@ const options: Intl.DateTimeFormatOptions = {
       font-weight: 700;
       letter-spacing: -0.48px;
       line-height: 31.2px;
+    }
+    .latest-releases__notice {
+      font-size: 14px;
+      line-height: 21px;
     }
     .latest-updates__card_link {
       display: flex;
