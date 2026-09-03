@@ -10,6 +10,8 @@ import ExtensionLight from '@/assets/images/drizzle-studio-extension-2-light.web
 import ExtensionDark from '@/assets/images/drizzle-studio-extension-2-dark.webp';
 import StudioInTursoLight from '@/assets/images/drizzle-studio-in-turso-light.webp';
 import StudioInTursoDark from '@/assets/images/drizzle-studio-in-turso-dark.webp';
+import DesktopSoonLight from '@/assets/images/desktop-app-coming-soon-light.webp';
+import DesktopSoonDark from '@/assets/images/desktop-app-coming-soon-dark.webp';
 
 type Tab = {
   id: StudioIconName;
@@ -18,7 +20,9 @@ type Tab = {
   /** one-liner shown in the card above the screenshot */
   blurb: string;
   /** one entry per screenshot shown side by side; `dark` is optional */
-  shots: { light: ImageMetadata; dark?: ImageMetadata }[];
+  shots?: { light: ImageMetadata; dark?: ImageMetadata }[];
+  /** nothing to show yet — renders a placeholder panel and a badge on the tab */
+  soon?: boolean;
   /** scale the shot up inside the frame, e.g. 1.15 for 115% */
   zoom?: number;
   /** which part of the shot stays in frame when zoomed */
@@ -65,6 +69,15 @@ const tabs: Tab[] = [
       'The embeddable web component behind the platforms you already use — Studio inside your own product, themed to match.',
     shots: [{ light: StudioInTursoLight, dark: StudioInTursoDark }],
   },
+  {
+    id: 'desktop',
+    label: 'Desktop app',
+    alt: 'Drizzle Studio as a desktop application',
+    blurb:
+      'A native desktop database browser, with everything Studio does and none of the terminal — in the works.',
+    shots: [{ light: DesktopSoonLight, dark: DesktopSoonDark }],
+    soon: true,
+  },
 ];
 
 // both variants are resolved here, but only the one the theme applies is ever
@@ -72,7 +85,7 @@ const tabs: Tab[] = [
 const shotUrls = await Promise.all(
   tabs.map((tab) =>
     Promise.all(
-      tab.shots.map(async (shot) => ({
+      (tab.shots ?? []).map(async (shot) => ({
         light: (await getImage({ src: shot.light, width: 1600, format: 'webp' })).src,
         dark: shot.dark
           ? (await getImage({ src: shot.dark, width: 1600, format: 'webp' })).src
@@ -117,6 +130,7 @@ const shotUrls = await Promise.all(
             </svg>
           </div>
           <div>{tab.label}</div>
+          {tab.soon && <span class="pagination-item__badge">soon</span>}
           <div class="underline">
             <div class="underline-inner" />
           </div>
@@ -128,20 +142,6 @@ const shotUrls = await Promise.all(
     {
       tabs.map((tab, i) => (
         <div class:list={['tab-card', i === 0 && 'is-active']} data-tab-card>
-          <div class="tab-card__icon">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d={icons[tab.id]} />
-            </svg>
-          </div>
           <p class="tab-card__text">{tab.blurb}</p>
         </div>
       ))
@@ -332,16 +332,14 @@ const shotUrls = await Promise.all(
      height and switching tabs never shifts the layout */
   .tab-cards {
     display: grid;
-    max-width: 560px;
-    margin: 0 auto;
   }
 
   .tab-card {
     grid-area: 1 / 1;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 10px;
+    /* the grid cell still reserves the tallest/widest card's box so nothing
+       shifts, but each card only draws as big as its own text */
+    align-self: start;
+    justify-self: center;
     padding: 14px 16px;
     border-radius: 8px;
     border: 1px solid #efefef;
@@ -365,15 +363,6 @@ const shotUrls = await Promise.all(
   html[class~='dark'] .tab-card {
     border-color: #303030;
     background-color: rgba(255, 255, 255, 0.04);
-  }
-
-  .tab-card__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    height: 21px;
-    color: #909090;
   }
 
   .tab-card__text {
@@ -489,6 +478,22 @@ const shotUrls = await Promise.all(
     transition:
       opacity 0.4s ease,
       visibility 0s;
+  }
+
+  .pagination-item__badge {
+    padding: 2px 6px;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #909090;
+  }
+
+  html[class~='dark'] .pagination-item__badge {
+    border-color: #303030;
   }
 
   .panel .image {
