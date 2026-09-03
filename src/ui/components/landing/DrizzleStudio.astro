@@ -1,12 +1,11 @@
 ---
-import { getImage, Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { studioIcons as icons, type StudioIconName } from '@/data/studio-icons';
 import LocalLight from '@/assets/images/drizzle-studio-local-light.webp';
 import LocalDark from '@/assets/images/drizzle-studio-local-dark.webp';
 import GatewayLight from '@/assets/images/drizzle-gateway-light.webp';
 import GatewayDark from '@/assets/images/drizzle-gateway-dark.webp';
-import GatewayRailway from '@/assets/images/drizzle-gateway-railway.webp';
 import ExtensionLight from '@/assets/images/drizzle-studio-extension-2-light.webp';
 import ExtensionDark from '@/assets/images/drizzle-studio-extension-2-dark.webp';
 import StudioInTursoLight from '@/assets/images/drizzle-studio-in-turso-light.webp';
@@ -16,11 +15,10 @@ type Tab = {
   id: StudioIconName;
   label: string;
   alt: string;
+  /** one-liner shown in the card above the screenshot */
+  blurb: string;
   /** one entry per screenshot shown side by side; `dark` is optional */
   shots: { light: ImageMetadata; dark?: ImageMetadata }[];
-  /** small screenshot floated over the bottom right corner of the panel */
-  inset?: ImageMetadata;
-  insetAlt?: string;
   /** scale the shot up inside the frame, e.g. 1.15 for 115% */
   zoom?: number;
   /** which part of the shot stays in frame when zoomed */
@@ -35,6 +33,8 @@ const tabs: Tab[] = [
     id: 'local',
     label: 'Local Studio',
     alt: 'drizzle-kit studio running on a local database',
+    blurb:
+      'Point `drizzle-kit studio` at your config and get a browser for your local database — for a quick look at your data while you build.',
     shots: [{ light: LocalLight, dark: LocalDark }],
     // this shot is shorter than the frame — match its own bottom edge
     background: { light: '#FAFAFC', dark: '#1E1F1C' },
@@ -43,9 +43,9 @@ const tabs: Tab[] = [
     id: 'gateway',
     label: 'Gateway',
     alt: 'Drizzle Gateway self-hosted in your own infrastructure',
+    blurb:
+      'One Docker image in your own infrastructure, connected to all your databases. Your whole team gets a database browser on a link.',
     shots: [{ light: GatewayLight, dark: GatewayDark }],
-    inset: GatewayRailway,
-    insetAlt: 'Deploying Drizzle Gateway from the Railway template',
     // zoom: 1.18,
     // position: 'bottom',
   },
@@ -53,12 +53,16 @@ const tabs: Tab[] = [
     id: 'extension',
     label: 'Chrome extension',
     alt: 'Drizzle Studio inside a vendor console',
+    blurb:
+      "A Chrome extension that renders Studio right on top of your vendor's console — no local setup, no connection strings.",
     shots: [{ light: ExtensionLight, dark: ExtensionDark }],
   },
   {
     id: 'component',
     label: 'Component',
     alt: 'Drizzle Studio embedded as a web component',
+    blurb:
+      'The embeddable web component behind the platforms you already use — Studio inside your own product, themed to match.',
     shots: [{ light: StudioInTursoLight, dark: StudioInTursoDark }],
   },
 ];
@@ -120,6 +124,29 @@ const shotUrls = await Promise.all(
       ))
     }
   </div>
+  <div class="tab-cards">
+    {
+      tabs.map((tab, i) => (
+        <div class:list={['tab-card', i === 0 && 'is-active']} data-tab-card>
+          <div class="tab-card__icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d={icons[tab.id]} />
+            </svg>
+          </div>
+          <p class="tab-card__text">{tab.blurb}</p>
+        </div>
+      ))
+    }
+  </div>
   <div class="image_container">
     <div class="panels">
     {
@@ -145,9 +172,6 @@ const shotUrls = await Promise.all(
               }; background-position: ${tab.position ?? 'top center'};`}
             />
           ))}
-          {tab.inset && (
-            <Image class="panel__inset" src={tab.inset} alt={tab.insetAlt ?? ''} width={620} />
-          )}
         </div>
       ))
     }
@@ -167,6 +191,7 @@ const shotUrls = await Promise.all(
 
     const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const panels = [...container.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const cards = [...container.querySelectorAll<HTMLElement>('[data-tab-card]')];
 
     const ROTATE_MS = 5000;
     let current = 0;
@@ -181,6 +206,9 @@ const shotUrls = await Promise.all(
       });
       panels.forEach((panel, i) => {
         panel.classList.toggle('is-active', i === index);
+      });
+      cards.forEach((card, i) => {
+        card.classList.toggle('is-active', i === index);
       });
       if (focus) tabs[index].focus();
     };
@@ -298,9 +326,72 @@ const shotUrls = await Promise.all(
     transform: rotate(-2deg);
   }
 
+  /* every card sits in the same grid cell, so the tallest one sets the
+     height and switching tabs never shifts the layout */
+  /* every card sits in the same grid cell, so the tallest one sets the
+     height and switching tabs never shifts the layout */
+  .tab-cards {
+    display: grid;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .tab-card {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid #efefef;
+    background-color: rgba(240, 241, 242, 0.4);
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.4s ease,
+      visibility 0s linear 0.4s;
+  }
+
+  .tab-card.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.4s ease,
+      visibility 0s;
+  }
+
+  html[class~='dark'] .tab-card {
+    border-color: #303030;
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+
+  .tab-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 21px;
+    color: #909090;
+  }
+
+  .tab-card__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #4b5563;
+  }
+
+  html[class~='dark'] .tab-card__text {
+    color: #b6b7b8;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .panel,
     .panel.is-active,
+    .tab-card,
+    .tab-card.is-active,
     .underline-inner {
       transition: none;
     }
@@ -398,22 +489,6 @@ const shotUrls = await Promise.all(
     transition:
       opacity 0.4s ease,
       visibility 0s;
-  }
-
-  /* deliberately reads as something floating above the app, not part of it */
-  .panel__inset {
-    position: absolute;
-    right: 2%;
-    bottom: 4%;
-    width: 42%;
-    height: auto;
-    filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.28))
-      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  }
-
-  html[class~='dark'] .panel__inset {
-    filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.55))
-      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
   }
 
   .panel .image {
