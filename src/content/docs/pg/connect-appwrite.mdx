@@ -1,0 +1,89 @@
+import Npm from "@mdx/Npm.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Callout from '@mdx/Callout.astro';
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+
+# Drizzle \<\> Appwrite PostgreSQL
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- Appwrite managed PostgreSQL - [website](https://appwrite.io) & [docs](https://appwrite.io/docs/products/databases/postgresql)
+- Official Appwrite + Drizzle guide - [docs](https://appwrite.io/docs/products/databases/postgresql/integrations/drizzle)
+- Drizzle PostgreSQL drivers - [docs](/docs/get-started-postgresql)
+</Prerequisites>
+
+Appwrite's native PostgreSQL is a standard PostgreSQL engine (default **18**) inside your Appwrite project. You connect with the usual `node-postgres` or `postgres.js` drivers - there is no Appwrite-specific Drizzle driver.
+
+Create a database in the Appwrite Console, wait until it is `ready`, then copy the connection string from **Credentials** (DSN / `.env` / Drizzle tab). The primary user is `admin`; the database name is generated per database. Hostnames look like `db-*.*.appwrite.center`.
+
+#### Step 1 - Install packages
+
+<Npm>
+ drizzle-orm@rc pg
+ -D drizzle-kit@rc @types/pg
+</Npm>
+
+Or with `postgres.js`:
+
+<Npm>
+ drizzle-orm@rc postgres
+ -D drizzle-kit@rc
+</Npm>
+
+#### Step 2 - Set connection strings
+
+```bash
+# Runtime (pooled, transaction mode) - port 6432
+DATABASE_URL="postgresql://admin:<password>@db-<id>.<region>.appwrite.center:6432/<db>?sslmode=require"
+
+# Migrations & introspection (direct) - port 5432
+DIRECT_URL="postgresql://admin:<password>@db-<id>.<region>.appwrite.center:5432/<db>?sslmode=require"
+```
+
+<Callout type="info">
+TLS (`sslmode=require`) is included in the connection string Appwrite returns. Point **Drizzle Kit** and DDL at `DIRECT_URL` (session-level). Route serverless/runtime traffic through the pooler on **6432**.
+</Callout>
+
+#### Step 3 - Initialize the driver
+
+```typescript copy filename="index.ts"
+// Make sure to install the 'pg' package
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+export const db = drizzle(process.env.DATABASE_URL!);
+```
+
+With `postgres.js` over the **transaction-mode pooler**, disable prepared statements:
+
+```typescript copy filename="index.ts"
+// Make sure to install the 'postgres' package
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+
+const client = postgres(process.env.DATABASE_URL!, { prepare: false });
+export const db = drizzle({ client });
+```
+
+#### Step 4 - Configure Drizzle Kit
+
+```typescript copy filename="drizzle.config.ts"
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  dialect: 'postgresql',
+  schema: './src/schema.ts',
+  out: './drizzle',
+  dbCredentials: {
+    url: process.env.DIRECT_URL!,
+  },
+});
+```
+
+Then:
+
+```bash
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
+<WhatsNextPostgres />
