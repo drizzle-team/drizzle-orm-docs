@@ -17,12 +17,9 @@ import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
 - Drizzle PostgreSQL drivers - [docs](/docs/get-started-postgresql)
 </Prerequisites>
 
-Appwrite offers dedicated, native PostgreSQL databases that you connect to directly over TLS. There is no Appwrite-specific driver or abstraction layer,
-so you can use Drizzle with either the [`node-postgres`](https://node-postgres.com/) or [`postgres.js`](https://github.com/porsager/postgres) driver, the same way you would with any PostgreSQL server.
+Appwrite offers dedicated, native PostgreSQL databases that you connect to directly over TLS. There is no Appwrite-specific driver or abstraction layer, so you can use Drizzle with either the [`node-postgres`](https://node-postgres.com/) or [`postgres.js`](https://github.com/porsager/postgres) driver, the same way you would with any PostgreSQL server.
 
-To get your connection string, open your database in the Appwrite Console and click **Credentials**. The **Drizzle** tab contains a ready-made snippet,
-and the **DSN** and **.env** tabs contain the raw connection string. You can also fetch it from the Appwrite API with `postgresql.get()`.
-The connection string already includes `sslmode=require`, so no extra TLS configuration is needed.
+To get your connection string, open your database in the Appwrite Console and click **Credentials**. The **Drizzle** tab contains a ready-made snippet, and the **DSN** and **.env** tabs contain the raw connection string. You can also fetch it from the Appwrite API with `postgresql.get()`. The connection string already includes `sslmode=require`, so no extra TLS configuration is needed.
 
 ```env
 DATABASE_URL="postgresql://admin:<password>@db-<hash>.<region>.appwrite.center:5432/<database>?sslmode=require"
@@ -91,9 +88,7 @@ const result = await db.execute('select 1');
 
 #### Connection pooling for serverless
 
-Appwrite runs a [connection pooler](https://appwrite.io/docs/products/databases/postgresql/connection-pooling) on port `6432` of the same hostname.
-In serverless and edge environments, route your application traffic through the pooler so short-lived instances don't exhaust the engine's connection limit,
-and keep Drizzle Kit pointed at the direct engine port `5432`, because migrations issue DDL that needs a session-level connection.
+Appwrite runs a [connection pooler](https://appwrite.io/docs/products/databases/postgresql/connection-pooling) on port `6432` of the same hostname. In serverless and edge environments, route your application traffic through the pooler so short-lived instances don't exhaust the engine's connection limit, and keep Drizzle Kit pointed at the direct engine port `5432`, because migrations issue DDL that needs a session-level connection.
 
 ```env
 # Runtime: pooled, transaction mode
@@ -117,8 +112,7 @@ export default defineConfig({
 ```
 
 <Callout type="warning" emoji="⚙️">
-The pooler defaults to **transaction mode**, which does not keep a backend connection across statements, so server-side prepared statements are unavailable.
-With `postgres.js`, build the client yourself with `prepare: false` when connecting through the pooler:
+The pooler defaults to **transaction mode**, which does not keep a backend connection across statements, so server-side prepared statements are unavailable. With `postgres.js`, build the client yourself with `prepare: false` when connecting through the pooler:
 
 ```typescript
 import { drizzle } from 'drizzle-orm/postgres-js';
