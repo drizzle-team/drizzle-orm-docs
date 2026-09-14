@@ -57,6 +57,8 @@ Press the button below to open the Tailscale for Drizzle template.
 
 Open the `Deploy to` dropdown and select the project that holds your Drizzle Studio service.
 
+![](@/assets/images/tutorials/railway-tailscale-sidecar-template-form.png)
+
 #### Set the variables
 
 <TableWrapper>
@@ -91,6 +93,8 @@ with the account that owns your tailnet:
 
 Open the link and sign in. Anyone who opens that link first gets this machine on their tailnet, so do not forward it. The log is visible only to members of your Railway project.
 
+![](@/assets/images/tutorials/railway-tailscale-signin-log.png)
+
 If your tailnet requires device approval, the log says so and the machine waits until you approve it on the [Machines page](https://login.tailscale.com/admin/machines).
 
 #### Read the address from the deploy log
@@ -102,6 +106,8 @@ joined tailnet: example.com
 4983: ready
 open https://drizzle-studio.example-com.ts.net from any device on your tailnet
 ```
+
+![](@/assets/images/tutorials/railway-tailscale-open-log.png)
 
 Check that the tailnet name is yours. If it is not, remove the machine from the Machines page and redeploy the Tailscale service.
 
@@ -120,6 +126,8 @@ Go back to the service in Railway, open the `Variables` tab, and copy the value 
 #### Check the connection
 
 Drizzle Studio opens on the database from `DATABASE_URL`, as it did on the public domain.
+
+![](@/assets/images/tutorials/drizzle-studio-on-tailnet.png)
 
 </Steps>
 
@@ -143,6 +151,8 @@ Press the button below to open the Tailscale for Drizzle template.
 </a>
 
 Open the `Deploy to` dropdown and select the project that holds your Drizzle Gateway service.
+
+![](@/assets/images/tutorials/railway-tailscale-sidecar-template-form.png)
 
 #### Set the variables
 
@@ -178,6 +188,8 @@ with the account that owns your tailnet:
 
 Open the link and sign in. Anyone who opens that link first gets this machine on their tailnet, so do not forward it. The log is visible only to members of your Railway project.
 
+![](@/assets/images/tutorials/railway-tailscale-signin-log.png)
+
 If your tailnet requires device approval, the log says so and the machine waits until you approve it on the [Machines page](https://login.tailscale.com/admin/machines).
 
 #### Read the address from the deploy log
@@ -189,6 +201,8 @@ joined tailnet: example.com
 4983: ready
 open https://drizzle-gateway.example-com.ts.net from any device on your tailnet
 ```
+
+![](@/assets/images/tutorials/railway-tailscale-open-log.png)
 
 Check that the tailnet name is yours. If it is not, remove the machine from the Machines page and redeploy the Tailscale service.
 
@@ -207,6 +221,8 @@ Go back to the service in Railway, open the `Variables` tab, and copy the value 
 #### Check the connection
 
 Drizzle Gateway opens with the connections you saved before, because its volume did not change.
+
+![](@/assets/images/tutorials/drizzle-gateway-on-tailnet.png)
 
 </Steps>
 
@@ -240,6 +256,8 @@ If the port on the machine for `TS_FORWARD_BROWSER` is not 4983, an `http://` ad
 A machine that joined by signing in has its key expire on your tailnet's schedule, 180 days by default. When that happens, the Tailscale service prints a new sign-in link and waits. The address stops answering until you click it.
 
 To avoid that, open the [Machines page](https://login.tailscale.com/admin/machines) once, find the machine, open the menu at the far right of its row, and choose `Disable key expiry`.
+
+![](@/assets/images/tutorials/tailscale-machines-disable-key-expiry.png)
 
 Railway charges $0.05 per GB of egress, which is traffic that leaves Railway, and traffic over your tailnet leaves Railway. Browsing costs very little. A 20 GB `pg_dump` over port 5432 costs about $1. Check the current price on [Railway pricing](https://railway.com/pricing).
 

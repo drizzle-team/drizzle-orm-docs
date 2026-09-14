@@ -137,6 +137,8 @@ Press the button below to open the Tailscale for Drizzle template.
 
 Open the `Deploy to` dropdown and select the project that holds your database. Both services must be in the same project, otherwise the Tailscale service cannot reach the database over the private network.
 
+![](@/assets/images/tutorials/railway-tailscale-database-template-form.png)
+
 #### Set the variables
 
 <TableWrapper>
@@ -163,6 +165,8 @@ with the account that owns your tailnet:
 
 Open the link and sign in. Anyone who opens that link first gets this machine on their tailnet, so do not forward it. The log is visible only to members of your Railway project.
 
+![](@/assets/images/tutorials/railway-tailscale-signin-log.png)
+
 If your tailnet requires device approval, the log says so and the machine waits until you approve it on the [Machines page](https://login.tailscale.com/admin/machines).
 
 #### Check the forwarding rule
@@ -173,6 +177,8 @@ A few seconds after you sign in, the same log prints:
 joined tailnet: example.com
 5432: ready
 ```
+
+![](@/assets/images/tutorials/railway-tailscale-database-log.png)
 
 Check that the tailnet name is yours. If it is not, remove the machine from the Machines page and redeploy the Tailscale service.
 
@@ -277,6 +283,8 @@ For example, `5433:${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:5432` forwards port 5433
 A machine that joined by signing in has its key expire on your tailnet's schedule, 180 days by default. When that happens, the Tailscale service prints a new sign-in link and waits. The machine stops answering until you click it.
 
 To avoid that, open the [Machines page](https://login.tailscale.com/admin/machines) once, find the machine, open the menu at the far right of its row, and choose `Disable key expiry`.
+
+![](@/assets/images/tutorials/tailscale-machines-disable-key-expiry.png)
 
 Railway charges $0.05 per GB of egress, which is traffic that leaves Railway, and traffic over your tailnet leaves Railway. Browsing costs very little. A 20 GB `pg_dump` over port 5432 costs about $1. Check the current price on [Railway pricing](https://railway.com/pricing).
 
