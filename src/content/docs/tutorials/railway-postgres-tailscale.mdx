@@ -1,6 +1,6 @@
 ---
 title: "Connect Drizzle Kit to a private Railway database with Tailscale"
-date: "2026-09-14"
+date: "2026-09-15"
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -113,6 +113,12 @@ Click on the PostgreSQL service, go to the `Settings` tab, and find the `Network
 You can also use a project that already has a database. The template adds one Tailscale service and nothing else.
 </Callout>
 
+## Check your tailnet
+
+<Callout type="info">
+The machine name resolves only when MagicDNS is on. Tailnets created on or after 2022-10-20 have it on by default. If your tailnet is older, check the [DNS page](https://login.tailscale.com/admin/dns).
+</Callout>
+
 ## Add the Tailscale service
 
 <Callout type="info">
@@ -151,7 +157,9 @@ Open the `Deploy to` dropdown and select the project that holds your database. B
 
 </TableWrapper>
 
-Click `Deploy`.
+Some variables, such as `TS_HOSTNAME`, are in the collapsed `Pre-Configured Environment Variables` section of the card. Expand it to see or change them.
+
+On the service card, click `Save Config`. Then click `Review and deploy`. Railway opens your project with the template in a side panel. Click `Deploy Template` there.
 
 #### Sign in from the deploy log
 
@@ -180,7 +188,7 @@ joined tailnet: example.com
 
 ![](@/assets/images/tutorials/railway-tailscale-database-log.png)
 
-Check that the tailnet name is yours. If it is not, remove the machine from the Machines page and redeploy the Tailscale service.
+Check that the tailnet name is yours. If it is not, someone else opened the sign-in link first, and their tailnet can now reach this service. On the project canvas, click the volume under the Tailscale service, open its `Settings` tab, and click `Wipe volume`. Type the confirmation text and click `Wipe`. Railway deletes the machine's key and redeploys the service. The new deploy log prints a new sign-in link. Open that link yourself. Then change the database user's password.
 
 This Tailscale service forwards only the database, so the log prints no address to open.
 
@@ -289,13 +297,13 @@ To avoid that, open the [Machines page](https://login.tailscale.com/admin/machin
 Railway charges $0.05 per GB of egress, which is traffic that leaves Railway, and traffic over your tailnet leaves Railway. Browsing costs very little. A 20 GB `pg_dump` over port 5432 costs about $1. Check the current price on [Railway pricing](https://railway.com/pricing).
 
 <Callout type="info">
-If you automate deployments and want no sign-in at all, set `TS_AUTHKEY` on the Tailscale service to an auth key or an OAuth client secret. With an OAuth secret, also set `TS_TAGS` to a tag you own, for example `tag:drizzle`. A tagged machine never has its key expire.
+If you automate deployments and want no sign-in at all, set `TS_AUTHKEY` on the Tailscale service to an auth key or an OAuth client secret. With an OAuth secret, also set `TS_TAGS` to a tag you own, for example `tag:drizzle`. A tagged machine never has its key expire. The Tailscale service reads `TS_AUTHKEY` only before the machine joins. If the machine has already joined, the key has no effect until you remove the machine and wipe the volume. If you use an OAuth client secret, append `?ephemeral=false&preauthorized=true` to the value. Without that suffix, Tailscale removes the machine from the tailnet when it disconnects, and the machine waits for approval before it joins.
 </Callout>
 
 ## Troubleshooting
 
 <Callout collapsed="drizzle-kit cannot connect">
-**`drizzle-kit` cannot connect.** Run `tailscale status` on your device and check that it is signed in to the same tailnet the log named. Then open the Tailscale service's deploy log and look for `5432: ready`. If that line is missing and no line starts with `TS_FORWARD_DATABASE`, the variable is empty, or its reference names a service outside your project. Set it on the Tailscale service's `Variables` tab and click `Deploy` in the top bar. If a line starts with `TS_FORWARD_DATABASE`, the next entry explains it. If the machine name does not resolve, open the machine on the Machines page and use its `Full domain` value as the host. `connection refused` that never clears means the database has public networking on and private off, or a different port. Railway's PostgreSQL accepts TLS through the Tailscale service, so you do not need to disable SSL.
+**`drizzle-kit` cannot connect.** Run `tailscale status` on your device and check that it is signed in to the same tailnet the log named. Then open the Tailscale service's deploy log and look for `5432: ready`. If a line starts with `5432:` and shows an error, the variable is correct, and the database does not answer on its private domain. Check that the database service is running and listens on port 5432. If no line starts with `5432:` and no line starts with `TS_FORWARD_DATABASE`, the variable is empty, or its reference names a service outside your project. Set it on the Tailscale service's `Variables` tab and click `Deploy` in the top bar. If a line starts with `TS_FORWARD_DATABASE`, the next entry explains it. If the machine name does not resolve, open the [DNS page](https://login.tailscale.com/admin/dns) and check that MagicDNS is on. If it is on, open the machine on the Machines page and use its `Full domain` value as the host. `connection refused` that never clears means the database has public networking on and private off, or a different port. Railway's PostgreSQL accepts TLS through the Tailscale service, so you do not need to disable SSL.
 </Callout>
 
 <Callout collapsed="The log prints a line that ends in skipped">
@@ -306,6 +314,7 @@ If you automate deployments and want no sign-in at all, set `TS_AUTHKEY` on the 
 - `still contains a Railway reference that did not resolve`: Railway did not replace the reference. Check the service name inside it.
 - `has a port outside 1-65535`: a port is not a number from 1 to 65535.
 - `reuses port`: an earlier forward already uses that port on the machine.
+- `uses port 443, which the https listener owns`: pick another port on the machine. The browser address already uses 443 when HTTPS certificates are on.
 
 Fix the value on the Tailscale service's `Variables` tab and click `Deploy` in the top bar.
 </Callout>

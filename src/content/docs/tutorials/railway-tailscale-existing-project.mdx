@@ -1,6 +1,6 @@
 ---
 title: "Add Tailscale to Drizzle Studio or Gateway on Railway"
-date: "2026-09-11"
+date: "2026-09-15"
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -27,6 +27,10 @@ To start from scratch, follow [Drizzle Studio and Gateway on Railway with Tailsc
 
   - You have the Tailscale client installed on the machine you work from, and that machine is signed in to your tailnet. You can find the downloads on the [Tailscale website](https://tailscale.com/download).
 </Prerequisites>
+
+<Callout type="info">
+The `open` address and the machine name depend on MagicDNS. Tailnets created on or after 2022-10-20 have it on by default. If your tailnet is older, check the [DNS page](https://login.tailscale.com/admin/dns).
+</Callout>
 
 ## How it works
 
@@ -71,7 +75,9 @@ Open the `Deploy to` dropdown and select the project that holds your Drizzle Stu
 
 </TableWrapper>
 
-Click `Deploy`.
+Some variables, such as `TS_HOSTNAME`, are in the collapsed `Pre-Configured Environment Variables` section of the card. Expand it to see or change them.
+
+On the service card, click `Save Config`. Then click `Review and deploy`. Railway opens your project with the template in a side panel. Click `Deploy Template` there.
 
 #### Remove the public domain
 
@@ -109,7 +115,7 @@ open https://drizzle-studio.example-com.ts.net from any device on your tailnet
 
 ![](@/assets/images/tutorials/railway-tailscale-open-log.png)
 
-Check that the tailnet name is yours. If it is not, remove the machine from the Machines page and redeploy the Tailscale service.
+Check that the tailnet name is yours. If it is not, someone else opened the sign-in link first, and their tailnet can now reach this service. On the project canvas, click the volume under the Tailscale service, open its `Settings` tab, and click `Wipe volume`. Type the confirmation text and click `Wipe`. Railway deletes the machine's key and redeploys the service. The new deploy log prints a new sign-in link. Open that link yourself. Then change `PASSCODE` on your Drizzle Studio service. If you set `TS_FORWARD_DATABASE`, also change the database user's password.
 
 The machine name can end in `-1`, `-2` and so on if your tailnet already has a machine with that name. Use the address the log prints.
 
@@ -119,9 +125,9 @@ If you set `TS_FORWARD_DATABASE`, the log also prints `5432: ready`.
 
 #### Open it
 
-Open that address in your browser. Drizzle Studio asks for a passcode on first use.
+Open that address in your browser. On the first `https://` visit, the Tailscale service still fetches its certificate, so the page can fail or load slowly for about two minutes. If that happens, reload the page. Drizzle Studio asks for a passcode on first use.
 
-Go back to the service in Railway, open the `Variables` tab, and copy the value of `PASSCODE`. Paste it into the prompt.
+Open your Drizzle Studio service in Railway, go to the `Variables` tab, and copy the value of `PASSCODE`. Paste it into the prompt.
 
 #### Check the connection
 
@@ -166,7 +172,9 @@ Open the `Deploy to` dropdown and select the project that holds your Drizzle Gat
 
 </TableWrapper>
 
-Click `Deploy`.
+Some variables, such as `TS_HOSTNAME`, are in the collapsed `Pre-Configured Environment Variables` section of the card. Expand it to see or change them.
+
+On the service card, click `Save Config`. Then click `Review and deploy`. Railway opens your project with the template in a side panel. Click `Deploy Template` there.
 
 #### Remove the public domain
 
@@ -204,7 +212,7 @@ open https://drizzle-gateway.example-com.ts.net from any device on your tailnet
 
 ![](@/assets/images/tutorials/railway-tailscale-open-log.png)
 
-Check that the tailnet name is yours. If it is not, remove the machine from the Machines page and redeploy the Tailscale service.
+Check that the tailnet name is yours. If it is not, someone else opened the sign-in link first, and their tailnet can now reach this service. On the project canvas, click the volume under the Tailscale service, open its `Settings` tab, and click `Wipe volume`. Type the confirmation text and click `Wipe`. Railway deletes the machine's key and redeploys the service. The new deploy log prints a new sign-in link. Open that link yourself. Then change `MASTERPASS` on your Drizzle Gateway service. If you set `TS_FORWARD_DATABASE`, also change the database user's password.
 
 The machine name can end in `-1`, `-2` and so on if your tailnet already has a machine with that name. Use the address the log prints.
 
@@ -214,9 +222,9 @@ If you set `TS_FORWARD_DATABASE`, the log also prints `5432: ready`.
 
 #### Open it
 
-Open that address in your browser. Drizzle Gateway asks for a passcode on first use. The value it wants is `MASTERPASS`.
+Open that address in your browser. On the first `https://` visit, the Tailscale service still fetches its certificate, so the page can fail or load slowly for about two minutes. If that happens, reload the page. Drizzle Gateway asks for a passcode on first use. The value it wants is `MASTERPASS`.
 
-Go back to the service in Railway, open the `Variables` tab, and copy the value of `MASTERPASS`. Paste it into the prompt.
+Open your Drizzle Gateway service in Railway, go to the `Variables` tab, and copy the value of `MASTERPASS`. Paste it into the prompt.
 
 #### Check the connection
 
@@ -262,7 +270,7 @@ To avoid that, open the [Machines page](https://login.tailscale.com/admin/machin
 Railway charges $0.05 per GB of egress, which is traffic that leaves Railway, and traffic over your tailnet leaves Railway. Browsing costs very little. A 20 GB `pg_dump` over port 5432 costs about $1. Check the current price on [Railway pricing](https://railway.com/pricing).
 
 <Callout type="info">
-If you automate deployments and want no sign-in at all, set `TS_AUTHKEY` on the Tailscale service to an auth key or an OAuth client secret. With an OAuth secret, also set `TS_TAGS` to a tag you own, for example `tag:drizzle`. A tagged machine never has its key expire.
+If you automate deployments and want no sign-in at all, set `TS_AUTHKEY` on the Tailscale service to an auth key or an OAuth client secret. With an OAuth secret, also set `TS_TAGS` to a tag you own, for example `tag:drizzle`. A tagged machine never has its key expire. The Tailscale service reads `TS_AUTHKEY` only before the machine joins. If the machine has already joined, the key has no effect until you remove the machine and wipe the volume. If you use an OAuth client secret, append `?ephemeral=false&preauthorized=true` to the value. Without that suffix, Tailscale removes the machine from the tailnet when it disconnects, and the machine waits for approval before it joins.
 </Callout>
 
 ## Troubleshooting
@@ -279,6 +287,7 @@ If you automate deployments and want no sign-in at all, set `TS_AUTHKEY` on the 
 - `still contains a Railway reference that did not resolve`: Railway did not replace the reference. Check the service name inside it.
 - `has a port outside 1-65535`: a port is not a number from 1 to 65535.
 - `reuses port`: an earlier forward already uses that port on the machine.
+- `uses port 443, which the https listener owns`: pick another port on the machine. The browser address already uses 443 when HTTPS certificates are on.
 
 Fix the value on the Tailscale service's `Variables` tab and click `Deploy` in the top bar.
 </Callout>
@@ -292,7 +301,7 @@ Fix the value on the Tailscale service's `Variables` tab and click `Deploy` in t
 </Callout>
 
 <Callout collapsed="The address does not open">
-**The address does not open.** Run `tailscale status` on your device and check it is signed in to the same tailnet the log named. If the log printed an `http://` address, use that exact form with the port; there is no `https://` until HTTPS certificates are on in your tailnet.
+**The address does not open.** Run `tailscale status` on your device and check it is signed in to the same tailnet the log named. If the log printed an `http://` address, use that exact form with the port; there is no `https://` until HTTPS certificates are on in your tailnet. On the first `https://` visit, the Tailscale service still fetches its certificate, so the page can fail or load slowly for about two minutes. If that happens, reload the page. If MagicDNS is off for your tailnet, the address does not resolve. Enable MagicDNS on the [DNS page](https://login.tailscale.com/admin/dns).
 </Callout>
 
 <Callout collapsed="It worked for months and then stopped">
