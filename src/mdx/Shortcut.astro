@@ -1,0 +1,79 @@
+---
+interface Props {
+  /** Keys shown on macOS and iOS, separated by spaces, for example "⌘ K". */
+  mac: string;
+  /** Keys shown on every other system, and when the platform is unknown, separated by spaces, for example "Ctrl K". */
+  other: string;
+}
+
+const { mac, other } = Astro.props;
+
+const split = (keys: string) => keys.trim().split(/\s+/);
+---
+
+<span class="shortcut">
+  <span class="shortcut-keys shortcut-mac">
+    {split(mac).map((key) => <kbd>{key}</kbd>)}
+  </span>
+  <span class="shortcut-keys shortcut-other">
+    {split(other).map((key) => <kbd>{key}</kbd>)}
+  </span>
+</span>
+
+<style>
+  .shortcut {
+    display: inline-block;
+    vertical-align: baseline;
+  }
+
+  .shortcut-keys {
+    display: none;
+    gap: 4px;
+  }
+
+  /* BaseHead sets data-os on the html element before the first paint. Until
+     then the other-system keys show, which is the safer guess. */
+  .shortcut-other {
+    display: inline-flex;
+  }
+
+  html[data-os="mac"] .shortcut-other {
+    display: none;
+  }
+
+  html[data-os="mac"] .shortcut-mac {
+    display: inline-flex;
+  }
+
+  kbd {
+    display: inline-block;
+    min-width: 20px;
+    padding: 1px 6px;
+    border: 1px solid #d3d6dc;
+    border-bottom-color: #bfc4cd;
+    border-radius: 4px;
+    background: #fbfbfc;
+    box-shadow:
+      inset 0 1px 0 0 #fff,
+      inset 0 -2px 0 0 #e8eaee,
+      0 1px 2px 0 rgba(30, 35, 90, 0.28);
+    color: #4b5563;
+    font-family: var(--default-font);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  /* The base rule owns the border, so dark mode has to recolor it or the
+     light outline shows through. */
+  html[class~="dark"] kbd {
+    border-color: #5a5a5a;
+    border-bottom-color: #3f3f3f;
+    background: #484848;
+    box-shadow:
+      inset 0 -2px 0 0 rgba(249, 250, 251, 0.1),
+      0 1px 2px 1px #484848;
+    color: #c4c5c6;
+  }
+</style>

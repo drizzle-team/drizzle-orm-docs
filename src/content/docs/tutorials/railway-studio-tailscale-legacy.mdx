@@ -1,14 +1,16 @@
 ---
-title: "Drizzle Studio and Gateway on Railway behind Tailscale (legacy)"
+title: "Drizzle Studio and Gateway on Railway behind Tailscale [OUTDATED]"
 date: "2026-08-25"
 ---
 
 import Prerequisites from "@mdx/Prerequisites.astro";
 import Steps from "@mdx/Steps.astro";
 import Callout from "@mdx/Callout.astro";
+import Shortcut from "@mdx/Shortcut.astro";
 import Tabs from "@mdx/Tabs.astro";
 import Tab from "@mdx/Tab.astro";
 import TableWrapper from "@mdx/TableWrapper.astro";
+import ExternalLinkArrows from "@mdx/ExternalLinkArrows.astro";
 import { Image } from "astro:assets";
 import diagramLight from "@/assets/images/tutorials/railway-studio-tailscale-diagram-light.png";
 import diagramDark from "@/assets/images/tutorials/railway-studio-tailscale-diagram-dark.png";
@@ -29,36 +31,17 @@ import diagramDark from "@/assets/images/tutorials/railway-studio-tailscale-diag
   html[class~="dark"] .tailscale-diagram-dark {
     display: block;
   }
-
-  /* Mark links that leave the docs. Skips any link that already carries its own
-     icon, such as the deploy buttons. The glyph is a mask rather than a
-     background, so it takes the link color in any theme. */
-  .documentation-content a[href^="http://"]:not([href*="orm.drizzle.team"]):not(:has(img)):not(:has(svg))::after,
-  .documentation-content a[href^="https://"]:not([href*="orm.drizzle.team"]):not(:has(img)):not(:has(svg))::after {
-    content: "";
-    display: inline-block;
-    width: 0.72em;
-    height: 0.72em;
-    margin-left: 0.15em;
-    background-color: currentColor;
-    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272.5%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%2017%2017%207%27/%3E%3Cpath%20d=%27M8%207h9v9%27/%3E%3C/svg%3E");
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272.5%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%2017%2017%207%27/%3E%3Cpath%20d=%27M8%207h9v9%27/%3E%3C/svg%3E");
-    -webkit-mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-  }
 `}</style>
 
-<Callout type="warning">
-Drizzle now has Railway templates that put the browser on your tailnet with no forwarder to configure. You click one sign-in link in the deploy log, and the log prints the address to open. To start from scratch, follow [Drizzle Studio and Gateway on Railway with Tailscale](/docs/tutorials/railway-studio-tailscale). If you already run Drizzle Studio or Gateway on Railway, follow [Add Tailscale to Drizzle Studio or Gateway on Railway](/docs/tutorials/railway-tailscale-existing-project).
+<ExternalLinkArrows />
+
+<Callout type="error" title="Outdated guide" highlighted>
+Drizzle now has Railway templates that include their own Tailscale forwarders, which makes the setup simpler. To start from scratch, follow [Drizzle Studio and Gateway on Railway with Tailscale](/docs/tutorials/railway-studio-tailscale). If you already run Drizzle Studio or Gateway on Railway, follow [Add Tailscale to Drizzle Studio or Gateway on Railway](/docs/tutorials/railway-tailscale-existing-project).
 </Callout>
 
-This tutorial deploys a database browser and a PostgreSQL database on [Railway](https://driz.link/railway), and keeps both off the public internet.
+This tutorial deploys a database UI and a PostgreSQL database on [Railway](https://driz.link/railway), and keeps both off the public internet.
 
-A [Tailscale](https://tailscale.com/) Forwarder joins your tailnet and forwards the UI port into Railway's private network. After that, you open the browser UI over HTTPS from any device on your tailnet, with no public domain on either service.
+A [Tailscale](https://tailscale.com/) Forwarder joins your tailnet and forwards the UI port into Railway's private network. After that, you open the database UI over HTTPS from any device on your tailnet, with no public domain on either service.
 
 You can use either [Drizzle Studio](/drizzle-studio/overview) or Drizzle Gateway. Both are covered in full below.
 
@@ -91,7 +74,7 @@ Log in to your [Railway dashboard](https://railway.app/dashboard) and click the 
 
 #### Provision a PostgreSQL database
 
-On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also use the command palette (`Cmd/Ctrl + K`) and search for PostgreSQL.
+On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also use the command palette (<Shortcut mac="⌘ K" other="Ctrl K" />) and search for PostgreSQL.
 
 ![](@/assets/images/tutorials/railway-select-postgres.png)
 
@@ -247,7 +230,7 @@ Click the machine to open its page. Under `Machine Details`, copy the `Full doma
 
 #### Open the Studio URL
 
-Take the full domain you copied, add `https://` in front and `:4983` at the end, then open it in your browser.
+Take the full domain you copied, add `https://` in front and `:4983` at the end, then open it in your web browser.
 
 ```plaintext
 https://<full-domain>:4983
@@ -393,7 +376,7 @@ Click the machine to open its page. Under `Machine Details`, copy the `Full doma
 
 #### Open the Gateway URL
 
-Take the full domain you copied, add `https://` in front and `:4983` at the end, then open it in your browser.
+Take the full domain you copied, add `https://` in front and `:4983` at the end, then open it in your web browser.
 
 ```plaintext
 https://<full-domain>:4983
@@ -438,14 +421,16 @@ Drizzle Gateway opens on your database. The `public` schema has no tables yet, b
 
 ## Troubleshooting
 
-<Callout collapsed="The URL does not open">
-**The URL does not open.** Open the Studio/Gateway service in Railway, read its deploy logs, and find the line it prints on start. Drizzle Gateway prints:
+<Callout>
+<Fragment slot="collapsed-title">The URL does not open</Fragment>
+
+Open the Studio/Gateway service in Railway, read its deploy logs, and find the line it prints on start. Drizzle Gateway prints:
 
 ```plaintext
 Drizzle Gateway listening on http://0.0.0.0:4983, store at /app
 ```
 
-The port on that line must match the target port in `CONNECTION_MAPPING_02`. Both browsers listen on the port in `PORT`, so if the two disagree, set `PORT` back to `4983` on the service and redeploy.
+The port on that line must match the target port in `CONNECTION_MAPPING_02`. Both database UIs listen on the port in `PORT`, so if the two disagree, set `PORT` back to `4983` on the service and redeploy.
 
 If the line is missing, the container is not serving at all. The forwarder then reports the target it could not reach:
 
@@ -458,14 +443,20 @@ If the line is missing, the container is not serving at all. The forwarder then 
 `connection refused` means the address is right and nothing is listening on that port. If the log instead shows an empty or literal `${{...}}` target address, the reference variable did not resolve, so check the service name in your mapping.
 </Callout>
 
-<Callout collapsed="The browser shows a certificate warning">
-**The browser shows a certificate warning.** The certificate covers the machine's full domain. Open the `Full domain` value from the machine page, not the short name. Check that HTTPS certificates are enabled on the DNS page of the Tailscale admin console.
+<Callout>
+<Fragment slot="collapsed-title">The web browser shows a certificate warning</Fragment>
+
+The certificate covers the machine's full domain. Open the `Full domain` value from the machine page, not the short name. Check that HTTPS certificates are enabled on the DNS page of the Tailscale admin console.
 </Callout>
 
-<Callout collapsed="The forwarder is not in the Machines list">
-**The forwarder is not in the Machines list.** The auth key expired, or a key that was not reusable had already been used. Generate a new reusable key, update `TS_AUTHKEY` on the forwarder service, and redeploy.
+<Callout>
+<Fragment slot="collapsed-title">The forwarder is not in the Machines list</Fragment>
+
+The auth key expired, or a key that was not reusable had already been used. Generate a new reusable key, update `TS_AUTHKEY` on the forwarder service, and redeploy.
 </Callout>
 
-<Callout collapsed="The mapping variable is ignored">
-**The mapping variable is ignored.** Confirm the exact variable name on the forwarder service. The template declares `CONNECTION_MAPPING_01`, with a leading zero. Some older guides write `CONNECTION_MAPPING_1`. Use the form the config panel shows you, and keep the numbers unique.
+<Callout>
+<Fragment slot="collapsed-title">The mapping variable is ignored</Fragment>
+
+Confirm the exact variable name on the forwarder service. The template declares `CONNECTION_MAPPING_01`, with a leading zero. Some older guides write `CONNECTION_MAPPING_1`. Use the form the config panel shows you, and keep the numbers unique.
 </Callout>

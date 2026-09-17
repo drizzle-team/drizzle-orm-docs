@@ -1,5 +1,5 @@
 ---
-title: "Connect Drizzle Kit to a private Railway database with Tailscale (legacy)"
+title: "Connect Drizzle Kit to a private Railway database with Tailscale [OUTDATED]"
 date: "2026-08-27"
 ---
 
@@ -7,7 +7,9 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import Npm from "@mdx/Npm.astro";
 import Steps from "@mdx/Steps.astro";
 import Callout from "@mdx/Callout.astro";
+import Shortcut from "@mdx/Shortcut.astro";
 import TableWrapper from "@mdx/TableWrapper.astro";
+import ExternalLinkArrows from "@mdx/ExternalLinkArrows.astro";
 import { Image } from "astro:assets";
 import diagramLight from "@/assets/images/tutorials/railway-postgres-tailscale-diagram-light.png";
 import diagramDark from "@/assets/images/tutorials/railway-postgres-tailscale-diagram-dark.png";
@@ -28,31 +30,12 @@ import diagramDark from "@/assets/images/tutorials/railway-postgres-tailscale-di
   html[class~="dark"] .tailscale-diagram-dark {
     display: block;
   }
-
-  /* Mark links that leave the docs. Skips any link that already carries its own
-     icon, such as the deploy buttons. The glyph is a mask rather than a
-     background, so it takes the link color in any theme. */
-  .documentation-content a[href^="http://"]:not([href*="orm.drizzle.team"]):not(:has(img)):not(:has(svg))::after,
-  .documentation-content a[href^="https://"]:not([href*="orm.drizzle.team"]):not(:has(img)):not(:has(svg))::after {
-    content: "";
-    display: inline-block;
-    width: 0.72em;
-    height: 0.72em;
-    margin-left: 0.15em;
-    background-color: currentColor;
-    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272.5%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%2017%2017%207%27/%3E%3Cpath%20d=%27M8%207h9v9%27/%3E%3C/svg%3E");
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272.5%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%2017%2017%207%27/%3E%3Cpath%20d=%27M8%207h9v9%27/%3E%3C/svg%3E");
-    -webkit-mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-  }
 `}</style>
 
-<Callout type="warning">
-Drizzle now has a Railway template that adds a Tailscale service to your project. You click one sign-in link in its deploy log, and every device on your tailnet reaches the database. To connect `drizzle-kit` that way, follow [Connect Drizzle Kit to a private Railway database with Tailscale](/docs/tutorials/railway-postgres-tailscale). For a database browser on your tailnet, follow [Drizzle Studio and Gateway on Railway with Tailscale](/docs/tutorials/railway-studio-tailscale).
+<ExternalLinkArrows />
+
+<Callout type="error" title="Outdated guide" highlighted>
+Drizzle now has a Railway template that includes its own Tailscale forwarder, which makes the setup simpler. Follow the latest version of this guide: [Connect Drizzle Kit to a private Railway database with Tailscale](/docs/tutorials/railway-postgres-tailscale).
 </Callout>
 
 This tutorial runs a PostgreSQL database on [Railway](https://driz.link/railway) with public access turned off, and connects `drizzle-kit` to it from your machine.
@@ -93,7 +76,7 @@ Log in to your [Railway dashboard](https://railway.app/dashboard) and click the 
 
 #### Provision a PostgreSQL database
 
-On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also use the command palette (`Cmd/Ctrl + K`) and search for PostgreSQL.
+On the project canvas, click the `New` button in the top right corner and select `Database` → `PostgreSQL`. You can also use the command palette (<Shortcut mac="⌘ K" other="Ctrl K" />) and search for PostgreSQL.
 
 ![](@/assets/images/tutorials/railway-select-postgres.png)
 
@@ -112,7 +95,7 @@ Click on the PostgreSQL service, go to the `Settings` tab, and find the `Network
 
 Open the [DNS page](https://login.tailscale.com/admin/dns) in the Tailscale admin console. Both **MagicDNS** and **HTTPS Certificates** must be enabled. Each section offers the opposite action, so a button that reads `Disable MagicDNS...` means MagicDNS is already on.
 
-MagicDNS gives the forwarder a stable machine name, which the database connection needs. HTTPS certificates are not needed for the database connection, but they are needed to open a browser UI over the forwarder, and both settings live on this page.
+MagicDNS gives the forwarder a stable machine name, which the database connection needs. HTTPS certificates are not needed for the database connection, but they are needed to open a database UI over the forwarder, and both settings live on this page.
 
 ![](@/assets/images/tutorials/tailscale-dns-magicdns-https.png)
 
@@ -255,18 +238,24 @@ For occasional access you do not need Tailscale at all. The Railway CLI opens a 
 
 ## Next steps
 
-The forwarder can carry more than one port. ["Drizzle Studio and Gateway on Railway behind Tailscale"](/docs/tutorials/railway-studio-tailscale-legacy) tutorial deploys a database browser into the same Railway project and adds a second mapping for it, so you browse your tables from your tailnet without a public domain. That tutorial starts from an empty project, so with the forwarder already running you can go straight to the template deployment and the second mapping.
+The forwarder can carry more than one port. ["Drizzle Studio and Gateway on Railway behind Tailscale"](/docs/tutorials/railway-studio-tailscale-legacy) tutorial deploys a database UI into the same Railway project and adds a second mapping for it, so you browse your tables from your tailnet without a public domain. That tutorial starts from an empty project, so with the forwarder already running you can go straight to the template deployment and the second mapping.
 
 ## Troubleshooting
 
-<Callout collapsed="The forwarder is not in the Machines list">
-**The forwarder is not in the Machines list.** The auth key expired, or a key that was not reusable had already been used. Generate a new reusable key, update `TS_AUTHKEY` on the forwarder service, and redeploy.
+<Callout>
+<Fragment slot="collapsed-title">The forwarder is not in the Machines list</Fragment>
+
+The auth key expired, or a key that was not reusable had already been used. Generate a new reusable key, update `TS_AUTHKEY` on the forwarder service, and redeploy.
 </Callout>
 
-<Callout collapsed="drizzle-kit cannot connect">
-**`drizzle-kit` cannot connect.** Run `tailscale status` and check that your device is signed in to the same tailnet. Check that the port in your connection string matches the source port in `CONNECTION_MAPPING_01`. Railway's PostgreSQL accepts TLS through the forwarder, so you do not need to disable SSL.
+<Callout>
+<Fragment slot="collapsed-title">`drizzle-kit` cannot connect</Fragment>
+
+Run `tailscale status` and check that your device is signed in to the same tailnet. Check that the port in your connection string matches the source port in `CONNECTION_MAPPING_01`. Railway's PostgreSQL accepts TLS through the forwarder, so you do not need to disable SSL.
 </Callout>
 
-<Callout collapsed="The mapping variable is ignored">
-**The mapping variable is ignored.** Confirm the exact variable name on the forwarder service. The template declares `CONNECTION_MAPPING_01`, with a leading zero. Some older guides write `CONNECTION_MAPPING_1`. Use the form the config panel shows you, and keep the numbers unique.
+<Callout>
+<Fragment slot="collapsed-title">The mapping variable is ignored</Fragment>
+
+Confirm the exact variable name on the forwarder service. The template declares `CONNECTION_MAPPING_01`, with a leading zero. Some older guides write `CONNECTION_MAPPING_1`. Use the form the config panel shows you, and keep the numbers unique.
 </Callout>
