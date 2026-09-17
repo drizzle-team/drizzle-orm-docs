@@ -55,6 +55,16 @@ const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "inde
     <meta name="twitter:card" content="summary" />
   )}
   <script is:inline>
+    // The Shortcut component reads this attribute to pick the modifier key.
+    const osPlatform =
+      navigator.userAgentData?.platform ||
+      navigator.platform ||
+      navigator.userAgent ||
+      "";
+    document.documentElement.dataset.os = /mac|iphone|ipad|ipod/i.test(osPlatform)
+      ? "mac"
+      : "other";
+
     const transitionManager = () => {
       const style = document.createElement("style");
       const css = document.createTextNode(`* {

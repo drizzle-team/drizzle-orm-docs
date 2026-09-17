@@ -1,0 +1,25 @@
+<!-- The style is inline so that it lands only in the page that renders this
+     component. An is:global block is bundled into the shared docs stylesheet,
+     which would mark links on every page. -->
+<style is:inline>
+  /* Mark links that leave the docs. Skips any link that already carries its own
+     icon, such as the deploy buttons. The glyph is a mask rather than a
+     background, so it takes the link color in any theme. */
+  .documentation-content a[href^="http://"]:not([href*="orm.drizzle.team"]):not(:has(img)):not(:has(svg))::after,
+  .documentation-content a[href^="https://"]:not([href*="orm.drizzle.team"]):not(:has(img)):not(:has(svg))::after {
+    content: "";
+    display: inline-block;
+    width: 0.72em;
+    height: 0.72em;
+    margin-left: 0.15em;
+    background-color: currentColor;
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272.5%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%2017%2017%207%27/%3E%3Cpath%20d=%27M8%207h9v9%27/%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272.5%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M7%2017%2017%207%27/%3E%3Cpath%20d=%27M8%207h9v9%27/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+</style>
