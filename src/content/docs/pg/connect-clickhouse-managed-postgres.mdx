@@ -1,0 +1,73 @@
+import Npm from "@mdx/Npm.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+
+# Drizzle \<\> ClickHouse Managed Postgres
+
+[ClickHouse Managed Postgres](https://clickhouse.com/cloud/postgres) is a managed PostgreSQL service. Connect with Drizzle's `node-postgres` driver.
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- A ClickHouse Managed Postgres instance
+- Node.js and a TypeScript project
+</Prerequisites>
+
+#### Step 1 - Get your connection details
+
+Open **Connect** for your instance in the ClickHouse Cloud console. Turn **via PgBouncer** off to use a direct connection for this example. Copy the PostgreSQL connection URL and download your instance's CA certificate bundle from **Settings**.
+
+Create a `.env` file with your connection details and the path to the downloaded certificate:
+
+```plaintext copy filename=".env"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/postgres"
+PGSSLROOTCERT="/absolute/path/to/ca-certificate.pem"
+```
+
+For this example, use the hostname from the connection modal and remove the query string (the part starting with `?`) from the URL, including parameters such as `sslmode` and `channel_binding`. The client below configures TLS and verifies the server's certificate using the downloaded CA bundle. Keep `.env` out of version control. See the [connection and TLS documentation](https://clickhouse.com/docs/products/managed-postgres/connection) for details.
+
+#### Step 2 - Install packages
+
+<Npm>
+ drizzle-orm@rc pg dotenv
+ -D @types/pg tsx
+</Npm>
+
+#### Step 3 - Initialize the driver and make a query
+
+Pass a `pg` pool to Drizzle with certificate verification enabled:
+
+```typescript copy filename="index.ts"
+import 'dotenv/config';
+import { readFileSync } from 'node:fs';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { sql } from 'drizzle-orm';
+import { Pool } from 'pg';
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL!,
+  ssl: {
+    ca: readFileSync(process.env.PGSSLROOTCERT!, 'utf8'),
+    rejectUnauthorized: true,
+  },
+});
+const db = drizzle({ client: pool });
+
+try {
+  const result = await db.execute(sql`select current_database() as database`);
+  console.log(result.rows);
+} finally {
+  await pool.end();
+}
+```
+
+Run the query:
+
+```bash copy
+npx tsx index.ts
+```
+
+The result contains the name of the database you connected to, such as `postgres`.
+
+#### What's next?
+
+<WhatsNextPostgres/>
