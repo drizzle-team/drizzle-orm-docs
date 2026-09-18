@@ -4,6 +4,8 @@ pubDate: 2023-12-25
 description: Implemented enhancements in the planescale relational tests. Corrected string escaping for empty PgArrays. Rectified syntax error for the exists function in SQLite. Ensured proper handling of dates in AWS Data API. Resolved the Hermes mixins constructor issue.
 ---
 
+import Npm from "@mdx/Npm.astro";
+
 ## Fixes: 
 
 - Added improvements to the planescale relational tests ([#1579](https://github.com/drizzle-team/drizzle-orm/pull/1579))
@@ -59,9 +61,9 @@ If you want to use Drizzle Migrations, you need to update babel and metro config
 
 1. Install `babel-plugin-inline-import` package.
 
-```bash copy
-npm install babel-plugin-inline-import
-```
+<Npm>
+  babel-plugin-inline-import
+</Npm>
 
 2. Update `babel.config.js` and `metro.config.js` files.
 
