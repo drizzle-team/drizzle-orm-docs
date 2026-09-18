@@ -466,6 +466,34 @@ export const asideSponsors: ISponsor[] = [
         'url("/svg/warp-dark.svg") center / contain no-repeat content-box',
     },
   },
+  {
+    tier: {
+      name: "$1000 a month",
+      isOneTime: false,
+    },
+    sponsorEntity: {
+      __typename: "Organization",
+      login: "driz.link/appwrite",
+      name: "Appwrite",
+      avatarUrl:
+        '<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>',
+    },
+    createdAt: "2026-09-18T00:00:00Z",
+    isActive: true,
+    imageType: ImageType.SVG,
+    lightStyle: {
+      filter: "grayscale(1) brightness(1.2)",
+      padding: "6px",
+      background:
+        'url("/svg/appwrite.svg") center / contain no-repeat content-box',
+    },
+    darkStyle: {
+      filter: "brightness(0.6) grayscale(1)",
+      padding: "6px",
+      background:
+        'url("/svg/appwrite.svg") center / contain no-repeat content-box',
+    },
+  },
   // Placeholder
   {
     tier: {

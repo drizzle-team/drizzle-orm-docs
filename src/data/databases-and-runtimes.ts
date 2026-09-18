@@ -176,6 +176,19 @@ export const databases: {
     },
     sponsorUrl: "https://driz.link/sqlitecloud",
   },
+  Appwrite: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/appwrite.svg",
+      darkThemeSrc: "/public/svg/appwrite.svg",
+    },
+    lightStyle: {
+      width: 26,
+    },
+    darkStyle: {
+      width: 26,
+    },
+    sponsorUrl: "https://driz.link/appwrite",
+  },
   "Prisma Postgres": {
     imageSrc: {
       lightThemeSrc: "/public/svg/prisma.svg",
