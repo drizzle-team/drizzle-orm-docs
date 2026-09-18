@@ -1,0 +1,54 @@
+import Callout from '@mdx/Callout.astro';
+import CodeTabs from "@mdx/CodeTabs.astro";
+
+Create a `index.ts` file in the `src/db` directory and initialize the connection:
+
+<CodeTabs items={['mysql2', 'mysql2 with config', 'your mysql2 driver']}>
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from "drizzle-orm/mysql2";
+
+const db = drizzle(process.env.DATABASE_URL!);
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from "drizzle-orm/mysql2";
+
+// You can specify any property from the mysql2 connection options
+const db = drizzle({
+  connection: {
+    uri: process.env.DATABASE_URL!,
+    ssl: { rejectUnauthorized: true },
+  },
+});
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
+
+const poolConnection = mysql.createPool({
+  uri: process.env.DATABASE_URL!,
+});
+const db = drizzle({ client: poolConnection });
+
+// or if you need client connection
+async function main() {
+  const connection = await mysql.createConnection(process.env.DATABASE_URL!);
+  const db = drizzle({ client: connection });
+}
+main();
+```
+</CodeTabs>
+
+<Callout type="warning" emoji="⚙️">
+  Connections on Appwrite Cloud are encrypted with TLS. If your runtime or `mysql2` configuration does not infer TLS from the connection string, pass `ssl: { rejectUnauthorized: true }` in the connection options.
+
+  For the built in `migrate` function with DDL migrations we and drivers strongly encourage you to use single `client` connection.
+</Callout>
+
+<Callout title='Connection ports' type='info'>
+Appwrite MySQL supports two connection ports on the same hostname:
+- **Port 3306** — Direct connection to the MySQL engine. Use it for Drizzle Kit migrations and introspection.
+- **Port 6033** — Connection via the [connection pooler](https://appwrite.io/docs/products/databases/mysql/connection-pooling) in transaction mode. Recommended for serverless and edge environments. See the [Appwrite MySQL connection guide](/docs/mysql/connect-appwrite-mysql#connection-pooling-for-serverless) for details.
+</Callout>

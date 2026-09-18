@@ -1,0 +1,86 @@
+import Callout from '@mdx/Callout.astro';
+import Breadcrumbs from '@mdx/Breadcrumbs.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import IntrospectPostgreSQL from '@mdx/get-started/postgresql/IntrospectPostgreSQL.mdx';
+import FileStructure from '@mdx/get-started/FileStructure.mdx';
+import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
+import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
+import TransferCode from '@mdx/get-started/TransferCode.mdx';
+import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
+import RunFile from '@mdx/get-started/RunFile.mdx';
+import ConnectAppwritePostgres from '@mdx/get-started/postgresql/ConnectAppwritePostgres.mdx'
+import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
+import QueryDatabaseUpdated from '@mdx/get-started/QueryDatabaseUpdated.mdx';
+import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
+
+<Breadcrumbs/>
+
+# Get Started with Drizzle and Appwrite Postgres in existing project
+
+<Prerequisites>
+  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** - package for running TypeScript files - [read here](https://tsx.hirok.io/)
+  - **Appwrite Postgres** - native PostgreSQL database by Appwrite - [read here](https://appwrite.io/docs/products/databases/postgresql)
+  - **node-postgres** - package for querying your PostgreSQL database - [read here](https://node-postgres.com/)
+</Prerequisites>
+
+<Callout title='Appwrite also offers MySQL' type='info'>
+Looking for MySQL? Check out our [Appwrite MySQL guide](/docs/get-started/appwrite-mysql-existing)
+</Callout>
+
+Appwrite offers dedicated, native PostgreSQL databases that you connect to directly over TLS. There is no Appwrite-specific driver, so this guide uses the standard `node-postgres` driver.
+
+For detailed instructions on creating an Appwrite Postgres database, see the [Appwrite PostgreSQL documentation](https://appwrite.io/docs/products/databases/postgresql).
+
+<FileStructure/>
+
+#### Step 1 - Install **node-postgres** package
+<InstallPackages lib='pg' devlib=' @types/pg'/>
+
+#### Step 2 - Setup connection variables
+
+Create a `.env` file in the root of your project and add your database connection variable:
+
+```plaintext copy
+DATABASE_URL=postgresql://admin:<password>@db-<hash>.<region>.appwrite.center:5432/<database>?sslmode=require
+```
+
+<Callout title='tips'>
+You can obtain your connection string from the Appwrite Console by opening your database and clicking **"Credentials"**. The **"Drizzle"**, **"DSN"** and **".env"** tabs contain a ready-to-use connection string that already includes `sslmode=require`. See the [Appwrite PostgreSQL connections guide](https://appwrite.io/docs/products/databases/postgresql/connections) for detailed steps.
+</Callout>
+
+#### Step 3 - Setup Drizzle config file
+
+<SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
+
+#### Step 4 - Introspect your database
+
+<IntrospectPostgreSQL/>
+
+#### Step 5 - Transfer code to your actual schema file
+
+<TransferCode/>
+
+#### Step 6 - Connect Drizzle ORM to the database
+
+<ConnectAppwritePostgres/>
+
+#### Step 7 - Query the database
+
+<QueryDatabase dialect='node-postgres' env_variable='DATABASE_URL'/>
+
+#### Step 8 - Run index.ts file
+
+<RunFile/>
+
+#### Step 9 - Update your table schema (optional)
+
+<UpdateSchema/>
+
+#### Step 10 - Applying changes to the database (optional)
+
+<ApplyChanges />
+
+#### Step 11 - Query the database with a new field (optional)
+
+<QueryDatabaseUpdated dialect='node-postgres' env_variable='DATABASE_URL' />
