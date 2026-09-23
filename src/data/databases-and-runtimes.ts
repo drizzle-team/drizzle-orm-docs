@@ -174,7 +174,7 @@ export const databases: {
     darkStyle: {
       width: 26,
     },
-    sponsorUrl: "https://driz.link/sqlitecloud",
+    // sponsorUrl: "https://driz.link/sqlitecloud",
   },
   Appwrite: {
     imageSrc: {
@@ -221,6 +221,20 @@ export const runtimes: {
     },
     sponsorUrl: "https://driz.link/railway",
     badge: "Cloud Partner",
+  },
+  Appwrite: {
+    imageSrc: {
+      lightThemeSrc: "/public/svg/appwrite.svg",
+      darkThemeSrc: "/public/svg/appwrite.svg",
+    },
+    lightStyle: {
+      width: 28,
+      filter: "invert(1)",
+    },
+    darkStyle: {
+      width: 28,
+    },
+    sponsorUrl: "https://driz.link/appwrite",
   },
   "Cloudflare Workers": {
     imageSrc: "/public/svg/cloudflareworker.svg",
