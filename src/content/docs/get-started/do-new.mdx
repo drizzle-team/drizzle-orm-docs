@@ -50,11 +50,11 @@ compatibility_flags = [ "nodejs_compat" ]
 name = "MY_DURABLE_OBJECT"
 class_name = "MyDurableObject"
 
-# Durable Object migrations.
-# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#migrations
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["MyDurableObject"]
+# Durable Object class exports.
+# Docs: https://developers.cloudflare.com/durable-objects/reference/durable-objects-migrations/
+[exports.MyDurableObject]
+type = "durable-object"
+storage = "sqlite"
 
 # We need rules so we can import migrations in the next steps
 [[rules]] 
