@@ -116,6 +116,16 @@ import { getColumns } from 'drizzle-orm';
 const columns = getColumns(users);
 ```
 
+#### `PgDatabase` and `PgTransaction` removed from `drizzle-orm/pg-core`
+
+The v1 release candidate no longer exports `PgDatabase` or `PgTransaction` from `drizzle-orm/pg-core`. Import `PgAsyncDatabase` and `PgAsyncTransaction` from that module instead. `PgTransactionConfig` is still exported from `drizzle-orm/pg-core`.
+
+```ts
+import type { PgAsyncDatabase, PgAsyncTransaction } from 'drizzle-orm/pg-core';
+```
+
+The new types take a query-result kind and a relations object, `(TQueryResult, TRelations)`, not the old `(TQueryResult, TFullSchema, TSchema)` arguments. Driver classes such as `NodePgDatabase` extend `PgAsyncDatabase`.
+
 #### New migration folder structure (v3)
 
 **Linked discussion**: [#2832](https://github.com/drizzle-team/drizzle-orm/discussions/2832)
