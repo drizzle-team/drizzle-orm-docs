@@ -334,6 +334,8 @@ const shipping = fillMonthsGaps(shippingData);
 
     .colored {
         filter: grayscale(0) !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        transform: translateY(-3px) scale(1.02);
     }
 
     .core_team_container {
@@ -362,6 +364,11 @@ const shipping = fillMonthsGaps(shippingData);
         border-radius: 50%;
         position: relative;
         margin-right: -12px;
+        transition:
+            filter 180ms ease,
+            transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
+        will-change: transform, filter;
+        cursor: pointer;
     }
 
     .core_team_container span {
@@ -371,6 +378,11 @@ const shipping = fillMonthsGaps(shippingData);
         left: 50%;
         opacity: 0;
         transform: translateX(-50%);
+        transition:
+            opacity 160ms ease,
+            transform 180ms cubic-bezier(0.2, 0.9, 0.2, 1);
+        transform-origin: center bottom;
+        transform: translateX(-50%) translateY(6px);
         pointer-events: none;
         font-size: 14px;
         font-weight: 400;
@@ -388,6 +400,7 @@ const shipping = fillMonthsGaps(shippingData);
 
     .core_team_container div:hover {
         z-index: 20 !important;
+        transform: translateY(-6px) scale(1.06);
     }
 
     .core_team_container div:hover img {
@@ -396,6 +409,7 @@ const shipping = fillMonthsGaps(shippingData);
 
     .core_team_container div:hover span {
         opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 
     html.dark .core_team_container img {
