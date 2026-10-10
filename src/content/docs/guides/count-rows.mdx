@@ -1,6 +1,5 @@
 ---
 title: Count rows
-slug: count-rows
 ---
 import Section from "@mdx/Section.astro";
 import Prerequisites from "@mdx/Prerequisites.astro";
@@ -9,10 +8,10 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from '@mdx/Callout.astro';
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
 - [Select statement](/docs/select)
 - [Filters](/docs/operators) and [sql operator](/docs/sql)
 - [Aggregations](/docs/select#aggregations) and [Aggregation helpers](/docs/select#aggregations-helpers)
@@ -77,7 +76,7 @@ select count("discount") from products;
 ```
 </Section>
 
-Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL and MySQL `count()` function returns bigint, which is interpreted as string by their drivers, so it should be casted to integer:
+Drizzle has simple and flexible API, which lets you create your custom solutions. In PostgreSQL, MySQL and Cockroach `count()` function returns bigint, which is interpreted as string by their drivers, so it should be casted to integer:
 
 <Section>
 ```ts copy {5,7,11,12}
@@ -101,7 +100,7 @@ select cast(count("discount") as integer) from products;
 ```
 </Section>
 
-In SQLite, `count()` result returns as integer.
+In SQLite and MSSQL, `count()` result returns as integer.
 
 <Section>
 ```ts copy {3,4}

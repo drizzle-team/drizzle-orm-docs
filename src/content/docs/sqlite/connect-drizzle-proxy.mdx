@@ -1,0 +1,115 @@
+import Npm from "@mdx/Npm.astro";
+import Callout from '@mdx/Callout.astro';
+import Steps from '@mdx/Steps.astro';
+import AnchorCards from '@mdx/AnchorCards.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import Section from "@mdx/Section.astro";
+
+# Drizzle HTTP proxy
+
+<Prerequisites>
+- Database [connection basics](/docs/sqlite/connect-overview) with Drizzle
+</Prerequisites>
+
+How an HTTP Proxy works and why you might need it
+
+Drizzle Proxy is used when you need to implement your own driver communication with the database. 
+It can be used in several cases, such as adding custom logic at the query stage with existing drivers. 
+The most common use is with an HTTP driver, which sends queries to your server with the database, executes the query 
+on your database, and responds with raw data that Drizzle ORM can then map to results
+
+<Callout collapsed="How it works under the hood?">
+```                                  
+┌───────────────────────────┐                 ┌─────────────────────────────┐              
+│       Drizzle ORM         │                 │  HTTP Server with Database  │             
+└─┬─────────────────────────┘                 └─────────────────────────┬───┘             
+  │                                                ^                    │
+  │-- 1. Build query         2. Send built query --│                    │
+  │                                                │                    │
+  │              ┌───────────────────────────┐     │                    │
+  └─────────────>│                           │─────┘                    │ 
+                 │      HTTP Proxy Driver    │                          │
+  ┌──────────────│                           │<─────────────┬───────────┘
+  │              └───────────────────────────┘              │
+  │                                                  3. Execute a query + send raw results back
+  │-- 4. Map data and return        
+  │                   
+  v
+```
+</Callout>
+
+Drizzle ORM also supports simply using asynchronous callback function for executing SQL.
+
+- `sql` is a query string with placeholders.
+- `params` is an array of parameters.
+- One of the following values will set for `method` depending on the SQL statement - `run`, `all`, `values` or `get`.
+
+Drizzle always waits for `{rows: string[][]}` or `{rows: string[]}` for the return value.
+
+- When the `method` is `get`, you should return a value as `{rows: string[]}`.
+- Otherwise, you should return `{rows: string[][]}`.
+
+<br/>
+
+<Section>
+```typescript copy
+import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import axios from 'axios';
+
+const db = drizzle(async (sql, params, method) => {
+  try {
+    const rows = await axios.post('http://localhost:3000/query', { sql, params, method });
+
+    return { rows: rows.data };
+  } catch (e: any) {
+    console.error('Error from sqlite proxy server: ', e.response.data)
+    return { rows: [] };
+  }
+});
+```
+
+**Batch support**
+
+Sqlite Proxy supports batch requests, the same as it's done for all other drivers. Check full [docs](/docs/sqlite/batch-api)
+
+You will need to specify a specific callback for batch queries and handle requests to proxy server:
+
+```ts
+import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import axios from 'axios';
+
+type ResponseType = { rows: any[][] | any[] }[];
+
+const db = drizzle(async (sql, params, method) => {
+  // single queries logic. Same as in code above
+}, async (queries: { sql: string, params: any[], method: 'all' | 'run' | 'get' | 'values'}[]) => {
+    try {
+      const result: ResponseType = await axios.post('http://localhost:3000/batch', { queries });
+
+      return result;
+    } catch (e: any) {
+      console.error('Error from sqlite proxy server:', e);
+      throw e;
+    }
+  });
+```
+
+And then you can use `db.batch([])` method, that will proxy all queries
+
+<Callout>
+  Response from the batch should be an array of raw values (an array within an array), in the same order as they were sent to the proxy server
+</Callout>
+
+Unless you plan on writing every SQL query by hand, a table declaration is helpful:
+```typescript copy
+import { sql } from "drizzle-orm";
+import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable('users', {
+  id: text('id'),
+  textModifiers: text('text_modifiers').notNull().default(sql`CURRENT_TIMESTAMP`),
+  intModifiers: integer('int_modifiers', { mode: 'boolean' }).notNull().default(false),
+});
+```
+For more details about column types, see the **[SQLite column types in Drizzle.](/docs/sqlite/column-types)**
+</Section>

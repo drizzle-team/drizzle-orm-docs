@@ -1,0 +1,314 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+# valibot
+
+### Install the dependencies
+
+<Npm>
+drizzle-orm@rc valibot
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = parse(userSelectSchema, rows[0]); // Will parse successfully
+```
+
+Views and enums are also supported.
+
+```ts copy
+import { pgEnum, pgView } from 'drizzle-orm/pg-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const roles = pgEnum('roles', ['admin', 'basic']);
+const rolesSchema = createSelectSchema(roles);
+const parsed: 'admin' | 'basic' = parse(rolesSchema, ...);
+
+const usersView = pgView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = parse(usersViewSchema, ...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { name: string, age: number } = parse(userInsertSchema, user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { createUpdateSchema } from 'drizzle-orm/valibot';
+import { parse } from 'valibot';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  age: integer().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { age: 35 };
+const parsed: { name?: string | undefined, age?: number | undefined } = parse(userUpdateSchema, user); // Will parse successfully
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Valibot schema will overwrite it.
+
+```ts copy
+import { pgTable, text, integer, json } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-orm/valibot';
+import { parse, pipe, maxLength, object, string } from 'valibot';
+
+const users = pgTable('users', {
+  id: integer().generatedAlwaysAsIdentity().primaryKey(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: json()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => pipe(schema, maxLength(20)), // Extends schema
+  bio: (schema) => pipe(schema, maxLength(1000)), // Extends schema before becoming nullable/optional
+  preferences: object({ theme: string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string;
+  bio: string | null;
+  preferences: {
+      theme: string;
+  };
+} = parse(userSelectSchema, ...);
+```
+
+### Data type reference
+
+```ts
+pg.boolean();
+
+// Schema
+boolean();
+```
+
+```ts
+pgEnum('name', ['val1', 'val2']);
+
+// Schema
+enum({ val1: "val1", val2: "val2" });
+```
+
+```ts
+pg.date({ mode: 'date' });
+pg.timestamp({ mode: 'date' });
+
+// Schema
+date();
+```
+
+```ts
+pg.date({ mode: 'string' });
+pg.timestamp({ mode: 'string' });
+pg.cidr();
+pg.inet();
+pg.interval();
+pg.macaddr();
+pg.macaddr8();
+pg.numeric();
+pg.text();
+pg.sparsevec();
+pg.time();
+
+// Schema
+string();
+```
+
+```ts
+pg.bit({ dimensions: ... });
+
+// Schema
+pipe(string(), regex(/^[01]+$/), maxLength(dimensions));
+```
+
+```ts
+pg.uuid();
+
+// Schema
+pipe(string(), uuid());
+```
+
+```ts
+pg.char({ length: ... });
+
+// Schema
+pipe(string(), length(length));
+```
+
+```ts
+pg.varchar({ length: ... });
+
+// Schema
+pipe(string(), maxLength(length));
+```
+
+```ts
+pg.text({ enum: ... });
+pg.char({ enum: ... });
+pg.varchar({ enum: ... });
+
+// Schema
+enum(enum);
+```
+
+```ts
+pg.smallint();
+pg.smallserial();
+
+// Schema
+pipe(number(), minValue(-32_768), maxValue(32_767), integer()); // 16-bit integer lower and upper limit
+```
+
+```ts
+pg.real();
+
+// Schema
+pipe(number(), minValue(-8_388_608), maxValue(8_388_607)); // 24-bit integer lower and upper limit
+```
+
+```ts
+pg.integer();
+pg.serial();
+
+// Schema
+pipe(number(), minValue(-2_147_483_648), maxValue(2_147_483_647), integer()); // 32-bit integer lower and upper limit
+```
+
+```ts
+pg.doublePrecision();
+
+// Schema
+pipe(number(), minValue(-140_737_488_355_328), maxValue(140_737_488_355_327)); // 48-bit integer lower and upper limit
+```
+
+```ts
+pg.bigint({ mode: 'number' });
+pg.bigserial({ mode: 'number' });
+
+// Schema
+pipe(number(), minValue(-9_007_199_254_740_991), maxValue(9_007_199_254_740_991), integer()); // Javascript min. and max. safe integers
+```
+
+```ts
+pg.bigint({ mode: 'bigint' });
+pg.bigserial({ mode: 'bigint' });
+
+// Schema
+pipe(bigint(), minValue(-9_223_372_036_854_775_808n), maxValue(9_223_372_036_854_775_807n)); // 64-bit integer lower and upper limit
+```
+
+```ts
+pg.geometry({ type: 'point', mode: 'tuple' });
+pg.point({ mode: 'tuple' });
+
+// Schema
+tuple([number(), number()]);
+```
+
+```ts
+pg.geometry({ type: 'point', mode: 'xy' });
+pg.point({ mode: 'xy' });
+
+// Schema
+object({ x: number(), y: number() });
+```
+
+```ts
+pg.halfvec({ dimensions: ... });
+pg.vector({ dimensions: ... });
+
+// Schema
+pipe(array(number()), length(dimensions));
+```
+
+```ts
+pg.line({ mode: 'abc' });
+
+// Schema
+object({ a: number(), b: number(), c: number() });
+```
+
+```ts
+pg.line({ mode: 'tuple' });
+
+// Schema
+tuple([number(), number(), number()]);
+```
+
+```ts
+pg.json();
+pg.jsonb();
+
+// Schema
+union([union([string(), number(), boolean(), null_()]), array(any()), record(string(), any())]);
+```
+
+```ts
+pg.dataType().array(...);
+
+// Schema
+pipe(array(baseDataTypeSchema), length(size));
+```
+
+```ts
+pg.bytea();
+
+// Schema
+custom<Buffer>((v) => v instanceof Buffer)
+```

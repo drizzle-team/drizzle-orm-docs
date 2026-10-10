@@ -1,0 +1,53 @@
+---
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  light: ImageMetadata;
+  dark: ImageMetadata;
+  alt: string;
+  width?: number;
+  /** scale the screenshot up inside its frame, e.g. 1.15 for 115% */
+  zoom?: number;
+  /** which part of the screenshot stays in frame when zoomed */
+  position?: string;
+}
+
+const {
+  light,
+  dark,
+  alt,
+  width = 1600,
+  zoom = 1,
+  position = "top center",
+} = Astro.props;
+
+const size = zoom === 1 ? "contain" : `${Math.round(zoom * 100)}% auto`;
+
+// both variants are resolved here, but only the one the theme applies is
+// ever fetched — an unused custom property never resolves its url()
+const [lightImg, darkImg] = await Promise.all([
+  getImage({ src: light, width, format: "webp" }),
+  getImage({ src: dark, width, format: "webp" }),
+]);
+---
+
+<div
+  class="theme-image"
+  role="img"
+  aria-label={alt}
+  style={`--light: url(${lightImg.src}); --dark: url(${darkImg.src}); aspect-ratio: ${light.width} / ${light.height}; background-size: ${size}; background-position: ${position};`}
+>
+</div>
+
+<style>
+  .theme-image {
+    width: 100%;
+    background-repeat: no-repeat;
+    background-image: var(--light);
+  }
+
+  html[class~="dark"] .theme-image {
+    background-image: var(--dark);
+  }
+</style>

@@ -233,6 +233,27 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "Appwrite Postgres",
+        path: {
+          existing: "/docs/get-started/appwrite-postgres-existing",
+          new: "/docs/get-started/appwrite-postgres-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/appwrite.svg",
+            style: {
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/appwrite.svg",
+            style: {
+              width: 20,
+            },
+          },
+        },
+      },
     ],
   },
   {
@@ -353,6 +374,27 @@ export const getStartedItems: GetStartedItems = [
             style: {
               width: 20,
               fill: "#F0F0F0",
+            },
+          },
+        },
+      },
+      {
+        name: "Appwrite MySQL",
+        path: {
+          existing: "/docs/get-started/appwrite-mysql-existing",
+          new: "/docs/get-started/appwrite-mysql-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/appwrite.svg",
+            style: {
+              width: 20,
+            },
+          },
+          dark: {
+            path: "/public/svg/appwrite.svg",
+            style: {
+              width: 20,
             },
           },
         },

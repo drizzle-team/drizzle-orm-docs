@@ -1,0 +1,79 @@
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Generated Columns
+
+MSSQL supports computed columns. A computed column is calculated from an expression that can reference other columns in the same table.
+
+1. Virtual computed columns are calculated when queried and do not occupy storage space.
+
+2. Persisted computed columns store the computed value on disk and can be indexed when the expression is deterministic.
+
+For more info, see the Microsoft docs for [computed columns](https://learn.microsoft.com/en-us/sql/relational-databases/tables/specify-computed-columns-in-a-table).
+
+#### Drizzle Side
+
+In Drizzle you can specify `.generatedAlwaysAs()` on a column and pass a SQL expression.
+
+#### Virtual Computed Column
+
+<CodeTab>
+```ts
+import { SQL, sql } from "drizzle-orm";
+import { mssqlTable, varchar } from "drizzle-orm/mssql-core";
+
+export const users = mssqlTable("users", {
+  firstName: varchar("first_name", { length: 256 }),
+  lastName: varchar("last_name", { length: 256 }),
+  fullName: varchar("full_name", { length: 512 }).generatedAlwaysAs(
+    (): SQL => sql`concat(${users.firstName}, ' ', ${users.lastName})`,
+  ),
+});
+```
+
+```sql
+CREATE TABLE [users] (
+  [first_name] varchar(256),
+  [last_name] varchar(256),
+  [full_name] AS (concat([users].[first_name], ' ', [users].[last_name]))
+);
+```
+</CodeTab>
+
+#### Persisted Computed Column
+
+Use `{ mode: "persisted" }` when you want SQL Server to persist the computed value.
+
+<CodeTabs items={["schema.ts", "SQL"]}>
+<CodeTab>
+```typescript copy
+import { SQL, sql } from "drizzle-orm";
+import { int, mssqlTable, varchar } from "drizzle-orm/mssql-core";
+
+export const orders = mssqlTable("orders", {
+  quantity: int("quantity"),
+  unitPrice: int("unit_price"),
+  total: int("total").generatedAlwaysAs(
+    (): SQL => sql`${orders.quantity} * ${orders.unitPrice}`,
+    { mode: "persisted" },
+  ),
+});
+```
+</CodeTab>
+<CodeTab>
+```sql
+CREATE TABLE [orders] (
+  [quantity] int,
+  [unit_price] int,
+  [total] AS ([orders].[quantity] * [orders].[unit_price]) PERSISTED
+);
+```
+</CodeTab>
+</CodeTabs>
+
+#### Limitations
+
+Drizzle Kit will also have limitations for `push` command:
+1. You can't change the generated constraint expression using `push`. Drizzle-kit will ignore this change. To make it work, you would need to `drop the column`, `push`, and then `add a column with a new expression`. This was done due to the complex mapping from the database side, where the schema expression will be modified on the database side and, on introspection, we will get a different string. We can't be sure if you changed this expression or if it was changed and formatted by the database. As long as these are generated columns and `push` is mostly used for prototyping on a local database, it should be fast to `drop` and `create` generated columns. Since these columns are `generated`, all the data will be restored
+2. `generate` should have no limitations

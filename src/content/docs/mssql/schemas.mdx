@@ -1,0 +1,31 @@
+import Section from '@mdx/Section.astro';
+import Callout from '@mdx/Callout.astro';
+
+# Table schemas
+
+If you declare an entity within a schema, query builder will prepend schema names in queries:<br/>
+`select * from [schema].[users]`
+
+<Section>
+    ```ts copy {3,5}
+    import { int, text, mssqlSchema, nvarchar } from 'drizzle-orm/mssql-core';
+
+    export const mySchema = mssqlSchema('my_schema');
+
+    export const mySchemaUsers = mySchema.table('users', {
+      id: int().identity().primaryKey(),
+      name: text(),
+      color: nvarchar({ length: 100 }).default('red'),
+    });
+    ```
+    ```sql
+    CREATE SCHEMA [my_schema];
+    
+    CREATE TABLE [my_schema].[users] (
+      [id] int IDENTITY(1, 1),
+      [name] text,
+      [color] nvarchar(100) CONSTRAINT [users_color_default] DEFAULT ('red'),
+      CONSTRAINT [users_pkey] PRIMARY KEY([id])
+    );
+    ```
+    </Section>

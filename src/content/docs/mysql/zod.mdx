@@ -1,0 +1,496 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+# zod
+
+### Install the dependencies
+
+<Npm>
+drizzle-orm@rc zod
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = userSelectSchema.parse(rows[0]); // Will parse successfully
+```
+
+Views are also supported.
+
+```ts copy
+import { mysqlView } from 'drizzle-orm/mysql-core';
+import { gt } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/zod';
+
+const usersView = mysqlView('users_view').as((qb) => qb.select().from(users).where(gt(users.age, 18)));
+const usersViewSchema = createSelectSchema(usersView);
+const parsed: { id: number; name: string; age: number } = usersViewSchema.parse(...);
+```
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createInsertSchema } from 'drizzle-orm/zod';
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { id?: number | undefined, name: string, age: number } = userInsertSchema.parse(user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { id?: number | undefined, name: string, age: number } = userInsertSchema.parse(user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createUpdateSchema } from 'drizzle-orm/zod';
+import { eq } from "drizzle-orm";
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { age: 35 };
+const parsed: 
+	{ 
+		id?: number | undefined; 
+		name?: string | undefined; 
+		age?: number | undefined 
+	} = userUpdateSchema.parse(user); // Will parse successfully
+
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Zod schema will overwrite it.
+
+```ts copy
+import { int, json, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createSelectSchema } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = mysqlTable('users', {
+  id: int().primaryKey(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: json()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => schema.max(20), // Extends schema
+  bio: (schema) => schema.max(1000), // Extends schema before becoming nullable/optional
+  preferences: z.object({ theme: z.string() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string,
+  bio: string | null;
+  preferences: {
+    theme: string;
+  };
+} = userSelectSchema.parse(...);
+```
+
+### Factory functions
+
+For more advanced use cases, you can use the `createSchemaFactory` function.
+
+**Use case: Using an extended Zod instance**
+
+```ts copy
+import { int, mysqlTable, text } from 'drizzle-orm/mysql-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from '@hono/zod-openapi'; // Extended Zod instance
+
+const users = mysqlTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({ zodInstance: z });
+
+const userInsertSchema = createInsertSchema(users, {
+  // We can now use the extended instance
+  name: (schema) => schema.openapi({ example: 'John' })
+});
+```
+
+**Use case: Type coercion**
+
+```ts copy
+import { mysqlTable, timestamp } from 'drizzle-orm/mysql-core';
+import { createSchemaFactory } from 'drizzle-orm/zod';
+import { z } from 'zod/v4';
+
+const users = mysqlTable('users', {
+  ...,
+  createdAt: timestamp().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({
+  // This configuration will only coerce dates. Set `coerce` to `true` to coerce all data types or specify others
+  coerce: {
+    date: true
+  }
+});
+
+const userInsertSchema = createInsertSchema(users);
+// The above is the same as this:
+const userInsertSchema = z.object({
+  ...,
+  createdAt: z.coerce.date()
+});
+```
+
+### Data type reference
+
+```ts
+mysql.boolean();
+
+// Schema
+z.boolean();
+```
+
+```ts
+mysql.mysqlEnum('name', ['val1', 'val2']);
+
+// Schema
+z.enum(['val1', 'val2']);
+```
+
+```ts
+mysql.date({ mode: 'date' });
+mysql.datetime({ mode: 'date' });
+mysql.timestamp({ mode: 'date' });
+
+// Schema
+z.date();
+```
+
+```ts
+mysql.binary();
+mysql.date({ mode: 'string' });
+mysql.datetime({ mode: 'string' });
+mysql.decimal();
+mysql.time();
+mysql.timestamp({ mode: 'string' });
+mysql.varbinary();
+
+// Schema
+z.string();
+```
+
+```ts
+mysql.tinyblob({ mode: 'string' });
+mysql.tinyblob();
+
+z.string().max(255)
+```
+
+```ts
+mysql.blob({ mode: 'string' });
+mysql.blob();
+
+z.string().max(65_535)
+```
+
+```ts
+mysql.mediumblob({ mode: 'string' });
+mysql.mediumblob();
+
+z.string().max(16_777_215)
+```
+
+```ts
+mysql.longblob({ mode: 'string' });
+mysql.longblob();
+
+z.string().max(4_294_967_295)
+```
+
+```ts
+mysql.char({ length: ... });
+
+// Schema
+z.string().length(length);
+```
+
+```ts
+mysql.varchar({ length: ... });
+
+// Schema
+z.string().max(length);
+```
+
+```ts
+mysql.binary({ length: ... });
+
+// Schema
+schema.regex(/^[01]*$/).max(length);
+```
+
+```ts
+mysql.varbinary({ length: ... });
+
+// Schema
+schema.regex(/^[01]*$/).max(length);
+```
+
+```ts
+mysql.tinytext();
+
+// Schema
+z.string().max(255);
+```
+
+```ts
+mysql.text();
+
+// Schema
+z.string().max(65_535);
+```
+
+```ts
+mysql.mediumtext();
+
+// Schema
+z.string().max(16_777_215);
+```
+
+```ts
+mysql.longtext();
+
+// Schema
+z.string().max(4_294_967_295);
+```
+
+```ts
+mysql.tinytext({ enum: ... });
+mysql.mediumtext({ enum: ... });
+mysql.text({ enum: ... });
+mysql.longtext({ enum: ... });
+mysql.char({ enum: ... });
+mysql.varchar({ enum: ... });
+
+// Schema
+z.enum(enum);
+```
+
+```ts
+mysql.tinyint();
+
+// Schema
+z.number().min(-128).max(127).int(); // 8-bit integer lower and upper limit
+```
+
+```ts
+mysql.tinyint({ unsigned: true });
+
+// Schema
+z.number().min(0).max(255).int(); // unsigned 8-bit integer lower and upper limit
+```
+
+```ts
+mysql.smallint();
+
+// Schema
+z.number().min(-32_768).max(32_767).int(); // 16-bit integer lower and upper limit
+```
+
+```ts
+mysql.smallint({ unsigned: true });
+
+// Schema
+z.number().min(0).max(65_535).int(); // unsigned 16-bit integer lower and upper limit
+```
+
+```ts
+mysql.float();
+
+// Schema
+z.number().min(-8_388_608).max(8_388_607); // 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.mediumint();
+
+// Schema
+z.number().min(-8_388_608).max(8_388_607).int(); // 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.float({ unsigned: true });
+
+// Schema
+z.number().min(0).max(16_777_215); // unsigned 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.mediumint({ unsigned: true });
+
+// Schema
+z.number().min(0).max(16_777_215).int(); // unsigned 24-bit integer lower and upper limit
+```
+
+```ts
+mysql.int();
+
+// Schema
+z.number().min(-2_147_483_648).max(2_147_483_647).int(); // 32-bit integer lower and upper limit
+```
+
+```ts
+mysql.int({ unsigned: true });
+
+// Schema
+z.number().min(0).max(4_294_967_295).int(); // unsgined 32-bit integer lower and upper limit
+```
+
+```ts
+mysql.double();
+mysql.real();
+
+// Schema
+z.number().min(-140_737_488_355_328).max(140_737_488_355_327); // 48-bit integer lower and upper limit
+```
+
+```ts
+mysql.double({ unsigned: true });
+
+// Schema
+z.number().min(0).max(281_474_976_710_655); // unsigned 48-bit integer lower and upper limit
+```
+
+```ts
+mysql.decimal({ mode: 'number' });
+
+// Schema
+z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991);
+```
+
+```ts
+mysql.decimal({ mode: 'bigint' });
+
+// Schema
+z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n);
+```
+
+```ts
+mysql.decimal({ mode: 'number', unsigned: true });
+
+// Schema
+z.number().min(0).max(9_007_199_254_740_991);
+```
+
+```ts
+mysql.decimal({ mode: 'bigint', unsigned: true });
+
+// Schema
+z.bigint().min(0).max(18_446_744_073_709_551_615n);
+```
+
+```ts
+mysql.bigint({ mode: 'number' });
+
+// Schema
+z.number().min(-9_007_199_254_740_991).max(9_007_199_254_740_991).int(); // Javascript min. and max. safe integers
+```
+
+```ts
+mysql.bigint({ mode: 'number', unsigned: true });
+
+// Schema
+z.number().min(0).max(9_007_199_254_740_991).int(); // Javascript max safe integer
+```
+
+```ts
+mysql.bigint({ mode: 'string' });
+
+// Schema
+z.string().regex(/^-?\d+$/).transform(BigInt).pipe(
+	zod.bigint().gte(-9_223_372_036_854_775_808n).lte(9_223_372_036_854_775_807n),
+).transform(String)
+```
+
+```ts
+mysql.bigint({ mode: 'string', unsigned: true });
+
+// Schema
+z.string().regex(/^\d+$/).transform(BigInt).pipe(
+	zod.bigint().gte(0n).lte(9_223_372_036_854_775_807n),
+).transform(String)
+```
+
+```ts
+mysql.bigint({ mode: 'bigint' });
+
+// Schema
+z.bigint().min(-9_223_372_036_854_775_808n).max(9_223_372_036_854_775_807n); // 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.bigint({ mode: 'bigint', unsigned: true });
+
+// Schema
+z.bigint().min(0).max(18_446_744_073_709_551_615n); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+mysql.serial();
+
+// Schema
+z.number().min(0).max(9_007_199_254_740_991).int(); // Javascript max. safe integer
+```
+
+
+```ts
+mysql.year();
+
+// Schema
+z.number().min(1_901).max(2_155).int();
+```
+
+```ts
+mysql.json();
+
+// Schema
+z.union([z.union([z.string(), z.number(), z.boolean(), z.null()]), z.record(z.any()), z.array(z.any())]);
+```

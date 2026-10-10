@@ -1,0 +1,78 @@
+# Read Replicas
+
+When your project involves a set of read replica instances, and you require a convenient method for managing 
+SELECT queries from read replicas, as well as performing create, delete, and update operations on the primary 
+instance, you can leverage the `withReplicas()` function within Drizzle
+
+```ts copy
+import { drizzle } from "drizzle-orm/node-mssql";
+import { ConnectionPool } from "mssql";
+import { bit, int, mssqlTable, text, withReplicas } from 'drizzle-orm/mssql-core';
+
+const usersTable = mssqlTable('users', {
+	id: int('id').primaryKey().identity(),
+	name: text('name').notNull(),
+	verified: bit('verified').notNull().default(false),
+});
+
+const createClient = async (database: string) => {
+  const pool = new ConnectionPool({
+    server: "host",
+    user: "user",
+    password: "password",
+    database,
+    options: { encrypt: true },
+  });
+
+  await pool.connect();
+  return pool;
+};
+
+const primaryDb = drizzle({ client: await createClient("primary_db") });
+const read1 = drizzle({ client: await createClient("read_1") });
+const read2 = drizzle({ client: await createClient("read_2") });
+
+const db = withReplicas(primaryDb, [read1, read2]);
+```
+
+You can now use the `db` instance the same way you did before. Drizzle will 
+handle the choice between read replica and the primary instance automatically
+
+```ts
+// Read from either the read1 connection or the read2 connection
+await db.select().from(usersTable)
+
+// Use the primary database for the delete operation
+await db.delete(usersTable).where(eq(usersTable.id, 1))
+```
+
+You can use the `$primary` key to force using primary instances even for read operations
+
+```ts
+// read from primary
+await db.$primary.select().from(usersTable);
+```
+
+With Drizzle, you can also specify custom logic for choosing read replicas. 
+You can make a weighted decision or any other custom selection method for random read replica choice. 
+Here is an implementation example of custom logic for selecting read replicas, 
+where the first replica has a 70% chance of being chosen, and the second replica has a 30% 
+chance of being selected.
+
+Keep in mind that you can implement any type of random selection method for read replicas
+
+```ts
+const db = withReplicas(primaryDb, [read1, read2], (replicas) => {
+    const weight = [0.7, 0.3];
+    let cumulativeProbability = 0;
+    const rand = Math.random();
+
+    for (const [i, replica] of replicas.entries()) {
+      cumulativeProbability += weight[i]!;
+      if (rand < cumulativeProbability) return replica;
+    }
+    return replicas[0]!
+});
+
+await db.select().from(usersTable)
+```

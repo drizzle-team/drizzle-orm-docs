@@ -1,0 +1,35 @@
+# JIT Mappers
+
+JIT mappers are **disabled by default**. Enable them with the `jit` option:
+
+```ts
+import { drizzle } from 'drizzle-orm/...';
+
+const db = drizzle({ client, jit: true });
+```
+
+On initialization, Drizzle runs a compatibility check that tests whether the `Function` constructor works in the current runtime. If it doesn't (e.g. some edge runtimes or CSP-restricted environments), it falls back to regular mappers with a console warning.
+
+The `jit` option is available in every driver's config
+
+## What are JIT mappers?
+
+JIT (Just-In-Time) mappers are dynamically generated JavaScript functions that transform database rows into JS objects. Instead of interpreting column metadata at runtime for every row, JIT mappers **compile a specialized function once** and reuse it for all rows in the result set.
+
+## Why are they needed?
+
+The regular Drizzle ORM mapper loops through column metadata for every single row:
+
+```
+For each row:
+  For each column:
+    → look up decoder
+    → check if codec exists
+    → check if value is null
+    → apply codec if needed
+    → apply decoder if needed
+    → navigate nested path
+    → assign to result object
+```
+
+With thousands of rows, this interpretive overhead adds up. JIT mappers eliminate it by generating a function where all the metadata lookups, null checks, and nested object construction are hardcoded into the function body at generation time

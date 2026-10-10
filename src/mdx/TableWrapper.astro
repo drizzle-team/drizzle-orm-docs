@@ -1,18 +1,48 @@
-<div class="custom-table">
+---
+interface Props {
+  /** size columns to their content, letting the last one take the remaining width */
+  fit?: boolean;
+}
+
+const { fit } = Astro.props;
+---
+
+<div class:list={["custom-table", fit && "custom-table--fit"]}>
   <slot />
 </div>
 <style is:global>
-  .custom-table thead,
-  .custom-table tbody {
+  .custom-table:not(.custom-table--fit) thead,
+  .custom-table:not(.custom-table--fit) tbody {
     display: flex;
     flex-direction: column;
   }
-  .custom-table tr {
+  .custom-table:not(.custom-table--fit) tr {
     display: flex;
     flex: 1;
   }
-  .custom-table th,
-  .custom-table td {
+  .custom-table:not(.custom-table--fit) th,
+  .custom-table:not(.custom-table--fit) td {
     flex: 1;
+  }
+
+  .custom-table--fit thead {
+    display: table-header-group;
+  }
+  .custom-table--fit tbody {
+    display: table-row-group;
+  }
+  .custom-table--fit tr {
+    display: table-row;
+  }
+  .custom-table--fit th,
+  .custom-table--fit td {
+    display: table-cell;
+    width: 1%;
+    white-space: nowrap;
+  }
+  .custom-table--fit th:last-child,
+  .custom-table--fit td:last-child {
+    width: auto;
+    white-space: normal;
   }
 </style>

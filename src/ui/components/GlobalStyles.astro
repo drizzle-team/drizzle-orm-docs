@@ -572,6 +572,42 @@
     border-color: #292929;
   }
 
+  /* The body tint stays lighter than the label chip above it, so the chip
+     keeps its own edge. */
+  .callout-wrap-highlighted-info,
+  .callout-wrap-highlighted-default {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  html.dark .callout-wrap-highlighted-info,
+  html.dark .callout-wrap-highlighted-default {
+    background: rgb(15 22 42);
+    border-color: rgba(191, 219, 254, 0.22);
+  }
+
+  /* The warning chip already uses the lightest yellow, so the body takes
+     orange to stay apart from it. */
+  .callout-wrap-highlighted-warning {
+    background: #fff7ed;
+    border-color: #fed7aa;
+  }
+
+  html.dark .callout-wrap-highlighted-warning {
+    background: rgb(45 30 12);
+    border-color: rgba(254, 240, 138, 0.22);
+  }
+
+  .callout-wrap-highlighted-error {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+
+  html.dark .callout-wrap-highlighted-error {
+    background: rgb(45 18 18);
+    border-color: hsla(0, 96%, 89%, 0.22);
+  }
+
   .callout-content {
     min-width: 0;
     width: 100%;

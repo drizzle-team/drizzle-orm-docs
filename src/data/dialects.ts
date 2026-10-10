@@ -52,7 +52,7 @@ export const dialects: ICards = {
   },
   mssql: {
     title: "MSSQL",
-    imageSrc: "",
+    imageSrc: "/public/svg/mssql-light.png",
     lightStyle: {
       width: 24,
     },
@@ -64,7 +64,7 @@ export const dialects: ICards = {
   },
   cockroach: {
     title: "CockroachDB",
-    imageSrc: "",
+    imageSrc: "/public/svg/cockroachdb-light.png",
     lightStyle: {
       width: 24,
     },

@@ -1,0 +1,338 @@
+import Npm from '@mdx/Npm.astro';
+import Callout from '@mdx/Callout.astro';
+
+<Callout type="error">
+Starting from `drizzle-orm@1.0.0-beta.15`, `drizzle-typebox` has been deprecated in favor of first-class schema generation support within Drizzle ORM itself
+
+You can still use `drizzle-typebox` package but all new update will be added to Drizzle ORM directly
+
+This version of `typebox` is legacy by using `@sinclair/typebox` package
+</Callout>
+
+# typebox-legacy
+
+### Install the dependencies
+<Npm>
+drizzle-orm@rc @sinclair/typebox
+</Npm>
+
+### Select schema
+
+Defines the shape of data queried from the database - can be used to validate API responses.
+
+```ts copy
+import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
+import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
+
+const users = singlestoreTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userSelectSchema = createSelectSchema(users);
+
+const rows = await db.select({ id: users.id, name: users.name }).from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = Value.Parse(userSelectSchema, rows[0]); // Error: `age` is not returned in the above query
+
+const rows = await db.select().from(users).limit(1);
+const parsed: { id: number; name: string; age: number } = Value.Parse(userSelectSchema, rows[0]); // Will parse successfully
+```
+
+Column enums are supported through the SingleStore table schema and can be validated with the generated table schemas.
+
+### Insert schema
+
+Defines the shape of data to be inserted into the database - can be used to validate API requests.
+
+```ts copy
+import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
+import { createInsertSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
+
+const users = singlestoreTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userInsertSchema = createInsertSchema(users);
+
+const user = { name: 'John' };
+const parsed: { name: string, age: number } = Value.Parse(userInsertSchema, user); // Error: `age` is not defined
+
+const user = { name: 'Jane', age: 30 };
+const parsed: { name: string, age: number } = Value.Parse(userInsertSchema, user); // Will parse successfully
+await db.insert(users).values(parsed);
+```
+
+### Update schema
+
+Defines the shape of data to be updated in the database - can be used to validate API requests.
+
+```ts copy
+import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
+import { createUpdateSchema } from 'drizzle-orm/typebox-legacy';
+import { Value } from '@sinclair/typebox/value';
+
+const users = singlestoreTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const userUpdateSchema = createUpdateSchema(users);
+
+const user = { id: 5, name: 'John' };
+const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Error: `id` is a generated column, it can't be updated
+
+const user = { age: 35 };
+const parsed: { name?: string | undefined, age?: number | undefined } = Value.Parse(userUpdateSchema, user); // Will parse successfully
+await db.update(users).set(parsed).where(eq(users.name, 'Jane'));
+```
+
+### Refinements
+
+Each create schema function accepts an additional optional parameter that you can used to extend, modify or completely overwite a field's schema. Defining a callback function will extend or modify while providing a Typebox schema will overwrite it.
+
+```ts copy
+import { int, json, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
+import { createSelectSchema } from 'drizzle-orm/typebox-legacy';
+import { Type } from '@sinclair/typebox';
+import { Value } from '@sinclair/typebox/value';
+
+const users = singlestoreTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  bio: text(),
+  preferences: json()
+});
+
+const userSelectSchema = createSelectSchema(users, {
+  name: (schema) => Type.String({ ...schema, maxLength: 20 }), // Extends schema
+  bio: (schema) => Type.String({ ...schema, maxLength: 1000 }), // Extends schema before becoming nullable/optional
+  preferences: Type.Object({ theme: Type.String() }) // Overwrites the field, including its nullability
+});
+
+const parsed: {
+  id: number;
+  name: string,
+  bio?: string | undefined;
+  preferences: {
+    theme: string;
+  };
+} = Value.Parse(userSelectSchema, ...);
+```
+
+### Factory functions
+
+For more advanced use cases, you can use the `createSchemaFactory` function.
+
+**Use case: Using an extended Typebox instance**
+
+```ts copy
+import { int, singlestoreTable, text } from 'drizzle-orm/singlestore-core';
+import { createSchemaFactory } from 'drizzle-orm/typebox';
+import { t } from 'elysia'; // Extended Typebox instance
+
+const users = singlestoreTable('users', {
+  id: int().primaryKey().autoincrement(),
+  name: text().notNull(),
+  age: int().notNull()
+});
+
+const { createInsertSchema } = createSchemaFactory({ typeboxInstance: t });
+
+const userInsertSchema = createInsertSchema(users, {
+  // We can now use the extended instance
+  name: (schema) => t.Number({ ...schema }, { error: '`name` must be a string' })
+});
+```
+
+### Data type reference
+
+```ts
+singlestore.boolean();
+
+// Schema
+Type.Boolean();
+```
+
+```ts
+singlestore.date({ mode: 'date' });
+singlestore.datetime({ mode: 'date' });
+singlestore.timestamp({ mode: 'date' });
+
+// Schema
+Type.Date();
+```
+
+```ts
+singlestore.binary();
+singlestore.date({ mode: 'string' });
+singlestore.datetime({ mode: 'string' });
+singlestore.decimal();
+singlestore.time();
+singlestore.timestamp({ mode: 'string' });
+singlestore.varbinary();
+
+// Schema
+Type.String();
+```
+
+```ts
+singlestore.char({ length: ... });
+
+// Schema
+Type.String({ minLength: length, maxLength: length });
+```
+
+```ts
+singlestore.varchar({ length: ... });
+
+// Schema
+Type.String({ maxLength: length });
+```
+
+```ts
+singlestore.text();
+
+// Schema
+Type.String({ maxLength: 65_535 }); // unsigned 16-bit integer limit
+```
+
+```ts
+singlestore.text({ enum: ... });
+singlestore.char({ enum: ... });
+singlestore.varchar({ enum: ... });
+singlestore.singlestoreEnum(..., ...);
+
+// Schema
+Type.Enum(enum);
+```
+
+```ts
+singlestore.tinyint();
+
+// Schema
+Type.Integer({ minimum: -128, maximum: 127 }); // 8-bit integer lower and upper limit
+```
+
+```ts
+singlestore.tinyint({ unsigned: true });
+
+// Schema
+Type.Integer({ minimum: 0, maximum: 255 }); // unsigned 8-bit integer lower and upper limit
+```
+
+```ts
+singlestore.smallint();
+
+// Schema
+Type.Integer({ minimum: -32_768, maximum: 32_767 }); // 16-bit integer lower and upper limit
+```
+
+```ts
+singlestore.smallint({ unsigned: true });
+
+// Schema
+Type.Integer({ minimum: 0, maximum: 65_535 }); // unsigned 16-bit integer lower and upper limit
+```
+
+```ts
+singlestore.float();
+
+// Schema
+Type.Number().min(-8_388_608).max(8_388_607); // 24-bit integer lower and upper limit
+```
+
+```ts
+singlestore.mediumint();
+
+// Schema
+Type.Integer({ minimum: -8_388_608, maximum: 8_388_607 }); // 24-bit integer lower and upper limit
+```
+
+```ts
+singlestore.float({ unsigned: true });
+
+// Schema
+Type.Number({ minimum: 0, maximum: 16_777_215 }); // unsigned 24-bit integer lower and upper limit
+```
+
+```ts
+singlestore.mediumint({ unsigned: true });
+
+// Schema
+Type.Integer({ minimum: 0, maximum: 16_777_215 }); // unsigned 24-bit integer lower and upper limit
+```
+
+```ts
+singlestore.int();
+
+// Schema
+Type.Integer({ minimum: -2_147_483_648, maximum: 2_147_483_647 }); // 32-bit integer lower and upper limit
+```
+
+```ts
+singlestore.int({ unsigned: true });
+
+// Schema
+Type.Integer({ minimum: 0, maximum: 4_294_967_295 }); // unsgined 32-bit integer lower and upper limit
+```
+
+```ts
+singlestore.double();
+singlestore.real();
+
+// Schema
+Type.Number({ minimum: -140_737_488_355_328, maximum: 140_737_488_355_327 }); // 48-bit integer lower and upper limit
+```
+
+```ts
+singlestore.double({ unsigned: true });
+
+// Schema
+Type.Numer({ minimum: 0, maximum: 281_474_976_710_655 }); // unsigned 48-bit integer lower and upper limit
+```
+
+```ts
+singlestore.bigint({ mode: 'number' });
+
+// Schema
+Type.Integer({ minimum: -9_007_199_254_740_991, maximum: 9_007_199_254_740_991 }); // Javascript min. and max. safe integers
+```
+
+```ts
+singlestore.serial();
+
+```
+
+```ts
+singlestore.bigint({ mode: 'bigint' });
+
+// Schema
+Type.BigInt({ minimum: -9_223_372_036_854_775_808n, maximum: 9_223_372_036_854_775_807n }); // 64-bit integer lower and upper limit
+```
+
+```ts
+singlestore.bigint({ mode: 'bigint', unsigned: true });
+
+// Schema
+Type.BigInt({ minimum: 0, maximum: 18_446_744_073_709_551_615n }); // unsigned 64-bit integer lower and upper limit
+```
+
+```ts
+singlestore.year();
+
+// Schema
+Type.Integer({ minimum: 1_901, maximum: 2_155 });
+```
+
+```ts
+singlestore.json();
+
+// Schema
+Type.Recursive((self) => Type.Union([Type.Union([Type.String(), Type.Number(), Type.Boolean(), Type.Null()]), Type.Array(self), Type.Record(Type.String(), self)]));
+```

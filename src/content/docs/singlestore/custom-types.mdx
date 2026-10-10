@@ -1,0 +1,17 @@
+# Custom types
+
+SingleStore exposes `customType` from `drizzle-orm/singlestore-core`.
+
+```ts
+import { customType, singlestoreTable } from 'drizzle-orm/singlestore-core';
+
+const customText = customType<{ data: string }>({
+  dataType() {
+    return 'text';
+  },
+});
+
+export const users = singlestoreTable('users', {
+  name: customText('name').notNull(),
+});
+```

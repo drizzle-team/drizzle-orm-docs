@@ -5,6 +5,9 @@ import Logo from "./Logo.astro";
 import GithubStars from "./GithubStars.astro";
 import AnnouncementsButton from "./AnnouncementsButton.astro";
 import DocsIcon from "@/assets/icons/DocsIcon.astro";
+import DialectSwitcher from "@mdx/dialect-switcher/DialectSwitcher.astro";
+
+const { slug } = Astro.props;
 ---
 
 <div class="header" id="header">
@@ -13,8 +16,9 @@ import DocsIcon from "@/assets/icons/DocsIcon.astro";
       <Logo />
       <a class="docs-logo" href="/docs/overview">
         <div class="docs-logo-icon"><DocsIcon/></div>
-        <span>Documentation</span>
+        <span>Docs</span>
       </a>
+      <DialectSwitcher slug={slug ?? ""} />
     </div>
     <CenteredSearchWithAI/>
     <div class="header_nav">
@@ -194,6 +198,11 @@ import DocsIcon from "@/assets/icons/DocsIcon.astro";
 
     .docs-logo  {
         display: none;
+    }
+
+    /* switcher moves into the mobile nav menu instead */
+    .header__logo :global(.db-switcher) {
+      display: none;
     }
 
     .header_content {

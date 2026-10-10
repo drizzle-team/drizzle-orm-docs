@@ -1,0 +1,407 @@
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# Indexes & Constraints
+
+## Constraints
+
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
+
+### Default
+
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { integer, uuid, pgTable } from "drizzle-orm/pg-core";
+
+    export const table = pgTable('table', {
+      integer1: integer().default(42),
+      integer2: integer().default(sql`24`),
+      uuid1: uuid().defaultRandom(),
+      uuid2: uuid().default(sql`gen_random_uuid()`),
+    });
+    ```
+
+    ```sql
+    CREATE TABLE "table" (
+      "integer1" integer DEFAULT 42,
+      "integer2" integer DEFAULT 24,
+      "uuid1" uuid DEFAULT gen_random_uuid(),
+      "uuid2" uuid DEFAULT gen_random_uuid()
+    );
+    ```
+    </Section>
+
+### Not null
+
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
+This enforces a field to always contain a value, which means that you cannot insert a new record,
+or update a record without adding a value to this field.
+
+<Section>
+      ```typescript copy
+      import { integer, pgTable } from "drizzle-orm/pg-core";
+
+      export const table = pgTable('table', {
+        integer: integer().notNull(),
+      });
+      ```
+
+      ```sql
+      CREATE TABLE "table" (
+        "integer" integer NOT NULL
+      );
+      ```
+    </Section>
+
+### Unique
+
+The `UNIQUE` constraint ensures that all values in a column are different.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
+A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
+
+<Section>
+      ```typescript copy
+      import { integer, text, unique, pgTable } from "drizzle-orm/pg-core";
+
+      export const user = pgTable('user', {
+        id: integer().unique(),
+      });
+
+      export const table = pgTable('table', {
+        id: integer().unique('custom_name'),
+      });
+
+      export const composite = pgTable('composite_example', {
+        id: integer(),
+        name: text(),
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
+
+      // In Postgres 15.0+ NULLS NOT DISTINCT is available
+      // This example demonstrates both available usages
+	export const userNulls = pgTable("user_nulls_example", {
+		id: integer(),
+		id2: integer().unique("custom_name", { nulls: "not distinct" }),
+	}, (t) => [
+		unique().on(t.id).nullsNotDistinct()
+	]);
+      ```
+
+      ```sql
+	CREATE TABLE "user" (
+		"id" integer UNIQUE
+	);
+
+	CREATE TABLE "table" (
+		"id" integer CONSTRAINT "custom_name" UNIQUE
+	);
+	
+	CREATE TABLE "composite_example" (
+		"id" integer,
+		"name" text,
+		CONSTRAINT "composite_example_id_name_unique" UNIQUE("id","name"),
+		CONSTRAINT "custom_name" UNIQUE("id","name")
+	);
+
+	CREATE TABLE "user_nulls_example" (
+		"id" integer UNIQUE NULLS NOT DISTINCT,
+		"id2" integer CONSTRAINT "custom_name" UNIQUE NULLS NOT DISTINCT
+	);
+      ```
+    </Section>
+
+### Check
+
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
+If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+
+If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
+
+<Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
+
+      export const users = pgTable(
+        "users",
+        {
+          id: uuid().defaultRandom().primaryKey(),
+          username: text().notNull(),
+          age: integer(),
+        },
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`),
+        ]
+      );
+      ```
+      ```sql
+	  CREATE TABLE "users" (
+		"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+		"username" text NOT NULL,
+		"age" integer,
+		CONSTRAINT "age_check1" CHECK ("age" > 21)
+	  );
+      ```
+    </Section>
+
+### Primary Key
+
+The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
+Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
+
+A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
+<Section>
+      ```typescript copy
+      import { serial, text, pgTable } from "drizzle-orm/pg-core";
+
+      export const user = pgTable('user', {
+        id: serial('id').primaryKey(),
+      });
+
+      export const table = pgTable('table', {
+        id: text('cuid').primaryKey(),
+      });
+      ```
+
+      ```sql
+	  CREATE TABLE "user" (
+		"id" serial PRIMARY KEY
+	  );
+
+	  CREATE TABLE "table" (
+		"cuid" text PRIMARY KEY
+	  );
+      ```
+    </Section>
+
+### Composite Primary Key
+
+Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
+
+Drizzle ORM provides a standalone `primaryKey` operator for that:
+
+<Section>
+      ```typescript copy {17,19}
+      import { serial, text, integer, primaryKey, pgTable } from "drizzle-orm/pg-core";
+
+      export const user = pgTable("user", {
+        id: serial("id").primaryKey(),
+        name: text("name"),
+      });
+
+      export const book = pgTable("book", {
+        id: serial("id").primaryKey(),
+        name: text("name"),
+      });
+
+      export const booksToAuthors = pgTable("books_to_authors", {
+        authorId: integer("author_id"),
+        bookId: integer("book_id"),
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] }),
+      ]);
+      ```
+
+      ```sql {6,9}
+      ...
+
+      CREATE TABLE "books_to_authors" (
+        "author_id" integer,
+        "book_id" integer,
+        PRIMARY KEY("book_id","author_id")
+      );
+
+      ALTER TABLE "books_to_authors" ADD CONSTRAINT "custom_name" PRIMARY KEY("book_id","author_id");
+      ```
+    </Section>
+
+### Foreign key
+
+The `FOREIGN KEY` constraint is used to prevent actions that would destroy links between tables.
+A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
+The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
+
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
+
+	```typescript copy {11}
+	import { serial, text, integer, pgTable } from "drizzle-orm/pg-core";
+
+	export const user = pgTable("user", {
+		id: serial("id"),
+		name: text("name"),
+	});
+
+	export const book = pgTable("book", {
+		id: serial("id"),
+		name: text("name"),
+		authorId: integer("author_id").references(() => user.id)
+	});
+	```
+	```sql {12}
+	CREATE TABLE "user" (
+		"id" serial,
+		"name" text
+	);
+
+	CREATE TABLE "book" (
+		"id" serial,
+		"name" text,
+		"author_id" integer
+	);
+
+	ALTER TABLE "book" ADD CONSTRAINT "book_author_id_user_id_fkey" FOREIGN KEY ("author_id") REFERENCES "user"("id");
+	```
+
+
+
+If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
+set return type for reference callback or use a standalone `foreignKey` operator.
+
+	```typescript copy {6,16-18}
+    import { serial, text, integer, foreignKey, pgTable, type AnyPgColumn } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      id: serial("id"),
+      name: text("name"),
+      parentId: integer("parent_id").references((): AnyPgColumn => user.id)
+    });
+
+    // or
+    export const user = pgTable("user", {
+      id: serial("id"),
+      name: text("name"),
+      parentId: integer("parent_id"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
+    ```
+	```sql {7}
+	CREATE TABLE "user" (
+		"id" serial,
+		"name" text,
+		"parent_id" integer
+	);
+	
+	ALTER TABLE "user" ADD CONSTRAINT "user_parent_id_user_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "user"("id");
+	```
+
+To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
+
+```typescript copy {15-19}
+    import { serial, text, foreignKey, pgTable, AnyPgColumn } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
+
+    export const profile = pgTable("profile", {
+      id: serial("id").primaryKey(),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_fk"
+      })
+    ])
+    ```
+	```sql {13}
+	CREATE TABLE "user" (
+		"firstName" text,
+		"lastName" text,
+		CONSTRAINT "user_pkey" PRIMARY KEY("firstName","lastName")
+	);
+
+	CREATE TABLE "profile" (
+		"id" serial PRIMARY KEY,
+		"user_first_name" text,
+		"user_last_name" text
+	);
+	
+	ALTER TABLE "profile" ADD CONSTRAINT "custom_fk" FOREIGN KEY ("user_first_name","user_last_name") REFERENCES "user"("firstName","lastName");
+	```
+
+## Indexes
+
+Drizzle ORM provides API for both `index` and `unique index` declaration:
+
+<Section>
+    ```typescript copy {8-9}
+    import { serial, text, index, uniqueIndex, pgTable } from "drizzle-orm/pg-core";
+
+    export const user = pgTable("user", {
+      id: serial().primaryKey(),
+      name: text(),
+      email: text(),
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email)
+    ]);
+    ```
+    ```sql {5-6}
+	CREATE TABLE "user" (
+		...
+	);
+
+	CREATE INDEX "name_idx" ON "user" ("name");
+	CREATE UNIQUE INDEX "email_idx" ON "user" ("email");
+    ```
+</Section>
+
+
+Drizzle ORM provides a set of params for index creation:
+
+```ts
+// `.on()`
+index('name')
+  .on(table.column1.asc(), table.column2.nullsFirst(), ...)
+  .concurrently()
+  .where(sql``)
+  .with({ fillfactor: '70' })
+
+// `.onOnly()`
+index('name')
+  .onOnly(table.column1.asc(), table.column2.nullsFirst(), ...)
+  .concurrently()
+  .where(sql``)
+  .with({ fillfactor: '70' })
+
+// Second Example, with `.using()`
+index('name')
+  .using('btree', table.column1.asc(), sql`lower(${table.column2})`, table.column1.op('text_ops'))
+  .concurrently()
+  .where(sql``) // sql expression
+  .with({ fillfactor: '70' })
+```

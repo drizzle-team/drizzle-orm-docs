@@ -80,7 +80,6 @@ export default defineConfig({
   },
 
   migrations: {
-    prefix: "timestamp",
     table: "__drizzle_migrations__",
     schema: "public",
   },
@@ -94,7 +93,6 @@ export default defineConfig({
   },
 
   breakpoints: true,
-  strict: true,
   verbose: true,
 });
 ```
@@ -136,11 +134,11 @@ Migration folder contains folders with `.sql` migration files which is used by `
  ├ 📜 drizzle.config.ts
  └ 📜 package.json
 ```
-```ts {5}
+```ts {6}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "postgresql", // "mysql" | "sqlite" | "postgresql" | "turso" | "singlestore" | "mssql"
+  dialect: "postgresql",
   schema: "./src/schema/*",
   out: "./drizzle",
 });
@@ -157,14 +155,14 @@ Dialect of the database you're using
 | :------------ | :-----------------------------------            |
 | type        | <Dialects/>                                     |
 | default        | --                                     |
-| commands    | `generate` `migrate` `push` `pull` `check` `up` |
+| commands    | `generate`, `push`, `pull`, `studio`,  `migrate`, `up`, `export`, |
 
 <rem025/>
 ```ts {4}
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  dialect: "mysql", 
+  dialect: "postgresql", 
 });
 ```
 
@@ -178,7 +176,7 @@ export default defineConfig({
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | --                    |
-| commands      | `generate` `push`    |
+| commands      | `generate`, `push`, `export`, `studio`    |
 
 <rem025/>
 <SchemaFilePaths />
@@ -192,7 +190,7 @@ Defines output folder of your SQL migration files, json snapshots of your schema
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default        | `drizzle`                    |
-| commands      | `generate` `migrate` `push` `pull` `check` `up`    |
+| commands      | `generate`, `pull`, `migrate`, `check`, `up` |
 
 <rem025/>
 ```ts {4}
@@ -215,7 +213,7 @@ yet some vendor specific databases require a different subset of connection para
 | :------------ | :-----------------   |
 | type          | <Drivers/> |
 | default        | --                    |
-| commands      | `migrate` `push` `pull`   |
+| commands      | `push`, `migrate`, `pull`, `studio`  |
 
 <rem025/>
 
@@ -231,13 +229,13 @@ Database connection credentials in a form of `url`,
 
 |               |                      |
 | :------------ | :-----------------   |
-| type          | union of drivers connection options |
+| type          | <Dialects/> |
 | default       | --                    |
-| commands      | `migrate` `push` `pull`   |
+| commands      | `push`, `pull`, `migrate`, `studio` |
 
 <rem025/>
 
-<CodeTabs items={["PostgreSQL", "MySQL", "SQLite", "Turso", "Cloudflare D1", "AWS Data API", "PGLite"]}>
+<CodeTabs items={["PostgreSQL", "MySQL", "SQLite", "MSSQL", "Cockroach", "Turso", "Cloudflare D1", "AWS Data API", "PGLite"]}>
 <Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
@@ -308,6 +306,37 @@ export default defineConfig({
   }
 });
 ```
+<Section>
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: "mssql",
+  dbCredentials: {
+    url: "mssql://username:password@host:port/database",
+  }
+});
+```
+```ts
+import { defineConfig } from 'drizzle-kit'
+
+// via connection params
+export default defineConfig({
+  dialect: "mssql",
+  dbCredentials: {
+    database: "database",
+    password: "password",
+    port: 1433,
+    server: "server",
+    user: "user",
+    options: {
+      encrypt: true, // boolean
+      trustServerCertificate: false, // boolean
+    },
+  },
+});
+```
+</Section>
 ```ts
 import { defineConfig } from 'drizzle-kit'
 
@@ -368,7 +397,7 @@ export default defineConfig({
 <rem025/>
 
 When running `drizzle-kit migrate` - drizzle will records about 
-successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema(PostgreSQL only).
+successfully applied migrations in your database in log table named `__drizzle_migrations` in `public` schema (schema is used in PostgreSQL only).
 
 `migrations` config options lets you change both migrations log `table` name and `schema`.
 
@@ -376,7 +405,7 @@ successfully applied migrations in your database in log table named `__drizzle_m
 | :------------ | :-----------------   |
 | type          | `{ table: string, schema: string }` |
 | default       | `{ table: "__drizzle_migrations", schema: "drizzle" }`                    |
-| commands      | `migrate`   |
+| commands      | `migrate`, `push`, `pull`   |
 
 <rem025/>
 
@@ -477,7 +506,7 @@ based table names filter, e.g. `["users", "user_info"]` or `"user*"`
 | :------------ | :-----------------   |
 | type          | `string` `string[]` |
 | default       | --                    |
-| commands      | `generate` `push` `pull`   |
+| commands      | `push` `pull`   |
 
 <rem025/>
 ```ts
@@ -491,21 +520,6 @@ export default defineConfig({
 
 ### `schemaFilter`
 
-Was changed starting from `1.0.0-beta.1` version!
-
-<Callout type='warning' collapsed="How it works in 0.x versions">
-`drizzle-kit push` and `drizzle-kit pull` will by default manage all tables in `public` schema.
-You can configure list of tables, schemas and extensions via `tablesFilters`, `schemaFilter` and `extensionFilters` options.
-
-`schemaFilter` option lets you specify list of schemas for Drizzle Kit to manage
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `string[]` |
-| default       | `["public"]`                    |
-| commands      | `push` `pull`   |
-
-</Callout>
 
 <Callout>
 If you want to run multiple projects with one database - check out [our guide](/docs/goodies#multi-project-schema).
@@ -679,26 +693,6 @@ export default defineConfig({
 </Callout>
 
 ## ---
-
-### `strict`
-<rem025/>
-
-Prompts confirmation to run printed SQL statements when running `drizzle-kit push` command.
-
-|               |                      |
-| :------------ | :-----------------   |
-| type          | `boolean` |
-| default       | `false`                    |
-| commands      | `push`   |
-
-<rem025/>
-
-```ts
-export default defineConfig({
-  dialect: "postgresql",
-  strict: false,
-});
-```
 
 ### `verbose`
 <rem025/>

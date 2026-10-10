@@ -1,6 +1,5 @@
 ---
 title: Include or Exclude Columns in Query
-slug: include-or-exclude-columns
 ---
 
 import Section from "@mdx/Section.astro";
@@ -10,10 +9,10 @@ import CodeTabs from '@mdx/CodeTabs.astro';
 import CodeTab from '@mdx/CodeTab.astro';
 import Callout from "@mdx/Callout.astro";
 
-<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true}}/>
+<IsSupportedChipGroup chips={{PostgreSQL: true, MySQL: true, SQLite: true, MSSQL: true, Cockroach: true}}/>
 
 <Prerequisites>
-- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/get-started-mysql) and [SQLite](/docs/get-started-sqlite)
+- Get started with [PostgreSQL](/docs/get-started-postgresql), [MySQL](/docs/mysql/get-started-mysql), [SQLite](/docs/sqlite/get-started-sqlite), [MSSQL](/docs/mssql/get-started-mssql) and [Cockroach](/docs/cockroach/get-started-cockroach)
 - [Select statement](/docs/select)
 - [Get typed table columns](/docs/goodies#get-typed-table-columns)
 - [Joins](/docs/joins)
@@ -73,13 +72,6 @@ To include specific columns you can use `.select()` method like this:
 
 To include all columns with extra columns you can use `getColumns()` utility function like this:
 
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
-
-
 <Section>
   ```ts copy {5,6}
   import { getColumns, sql } from 'drizzle-orm';
@@ -105,12 +97,6 @@ If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
 </Section>
 
 To exclude columns you can use `getColumns()` utility function like this:
-
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
 
 <Section>
   ```ts copy {3,5}
@@ -200,36 +186,42 @@ This is how you can include or exclude columns with joins:
 
 Drizzle has useful relational queries API, that lets you easily include or exclude columns in queries. This is how you can include all columns:
 
-<CodeTabs items={["index.ts", "schema.ts"]}>
+<CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
   <CodeTab>
-    ```ts copy {5,7,8,9,12,13,14,17,18,19,20,21,22}
-    import * as schema from './schema';
+	```ts copy {5,7,8,9,12,13,14,17,18,19,20,21,22}
+	import { relations } from './relations';
 
-    const db = drizzle(..., { schema });
+	const db = drizzle(..., { relations });
 
-    await db.query.posts.findMany();
-    ```
+	await db.query.posts.findMany();
+	```
 
-    ```ts
-    // result type
-    type Result = {
-      id: number;
-      title: string;
-      content: string;
-      views: number;
-    }[]
-    ```
+	```ts
+	// result type
+	type Result = {
+	  id: number;
+	  title: string;
+	  content: string;
+	  views: number;
+	}[]
+	```
   </CodeTab>
 
   ```ts copy
   import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
   export const posts = pgTable('posts', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    views: integer('views').notNull().default(0),
+	id: serial('id').primaryKey(),
+	title: text('title').notNull(),
+	content: text('content').notNull(),
+	views: integer('views').notNull().default(0),
   });
+	```
+
+  ```ts copy
+  import { posts } from './schema.ts';
+
+  export const relations = defineRelations({ posts });
 	```
 </CodeTabs>
 
@@ -260,7 +252,7 @@ This is how you can include all columns with extra columns using relational quer
 
   await db.query.posts.findMany({
     extras: {
-      titleLength: sql<number>`length(${posts.title})`.as('title_length'),
+      titleLength: (t) => sql<number>`length(${t.title})`.as("title_length"),
     },
   });
   ```
@@ -300,12 +292,12 @@ This is how you can exclude columns using relational queries:
 
 This is how you can include or exclude columns with relations using relational queries:
 
-<CodeTabs items={["index.ts", "schema.ts"]}>
+<CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
   <CodeTab>
   ```ts copy {7,12,13,16}
-  import * as schema from './schema';
+  import { relations } from './relations';
 
-  const db = drizzle(..., { schema });
+  const db = drizzle(..., { relations });
 
   await db.query.posts.findMany({
     columns: {
@@ -342,7 +334,6 @@ This is how you can include or exclude columns with relations using relational q
   </CodeTab>
 
   ```ts copy
-  import { relations } from 'drizzle-orm';
   import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
   export const users = pgTable('users', {
@@ -366,22 +357,37 @@ This is how you can include or exclude columns with relations using relational q
     content: text('content').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   });
-
-  export const usersRelations = relations(users, ({ many }) => ({
-    posts: many(posts),
-    comments: many(comments),
-  }));
-
-  export const postsRelations = relations(posts, ({ many, one }) => ({
-    comments: many(comments),
-    user: one(users, { fields: [posts.userId], references: [users.id] }),
-  }));
-
-  export const commentsRelations = relations(comments, ({ one }) => ({
-    post: one(posts, { fields: [comments.postId], references: [posts.id] }),
-    user: one(users, { fields: [comments.userId], references: [users.id] }),
-  }));
   ```
+
+	```ts copy
+  import { defineRelations } from "drizzle-orm";
+  import { comments, posts, users } from "./schema";
+  
+  export const relations = defineRelations({ users, posts, comments }, (r) => ({
+    users: {
+      posts: r.many.posts(),
+      comments: r.many.comments(),
+    },
+    posts: {
+      user: r.one.users({
+        from: r.posts.userId,
+        to: r.users.id,
+		optional: false,
+      }),
+      comments: r.many.comments(),
+    },
+    comments: {
+      post: r.one.posts({
+        from: r.comments.postId,
+        to: r.posts.id,
+      }),
+      user: r.one.users({
+        from: r.comments.userId,
+        to: r.users.id,
+      }),
+    },
+  }));
+	```
 </CodeTabs>
 
 This is how you can create custom solution for conditional select:
@@ -392,7 +398,7 @@ This is how you can create custom solution for conditional select:
     import { posts } from './schema';
 
     const searchPosts = async (withTitle = false) => {
-      await db
+      return await db
         .select({
           id: posts.id,
           ...(withTitle && { title: posts.title }),

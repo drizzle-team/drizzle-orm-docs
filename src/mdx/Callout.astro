@@ -4,9 +4,16 @@ interface Props {
   title?: string;
   icon?: string;
   collapsed?: string;
+  highlighted?: boolean;
 }
 
-const { type = 'default', title, collapsed } = Astro.props;
+const { type = 'default', title, collapsed, highlighted } = Astro.props;
+
+// A title that needs inline code or a link comes through the collapsed-title
+// slot, because a prop can carry only plain text. Such a title stays visible
+// when the callout is expanded, so the body never repeats it.
+const hasTitleSlot = Astro.slots.has('collapsed-title');
+const isCollapsed = !!collapsed || hasTitleSlot;
 ---
 <>
   {type === 'warning' && !title && (
@@ -18,9 +25,9 @@ const { type = 'default', title, collapsed } = Astro.props;
   {!!title && (
     <div class:list={["callout-label", type]}>{title}</div>
   )}
-  <div class:list={["callout-wrap", !!collapsed && 'callout-wrap-collapsed']}>
+  <div class:list={["callout-wrap", isCollapsed && 'callout-wrap-collapsed', !!highlighted && `callout-wrap-highlighted-${type}`]}>
     <div class="callout-content">
-      {!!collapsed && (
+      {isCollapsed && (
         <div style="display: flex; align-items: center; gap: 4px">
           <button
             data-callout-collapse-btn
@@ -96,7 +103,7 @@ const { type = 'default', title, collapsed } = Astro.props;
                 stroke-linejoin="round"></path>
             </svg>
           </div>
-          <p class="collapsed-label">{collapsed}</p>
+          <p class:list={["collapsed-label", hasTitleSlot && "collapsed-label-persistent"]}>{collapsed}<slot name="collapsed-title" /></p>
         </div>
       )}
       <div class="content">
@@ -166,6 +173,12 @@ const { type = 'default', title, collapsed } = Astro.props;
 
   .callout-wrap-collapsed .collapsed-label {
       display: block;
+  }
+
+  .callout-wrap:not(.callout-wrap-collapsed) .collapsed-label-persistent {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
   }
 
   html[class~="dark"] .button-wrap:hover {

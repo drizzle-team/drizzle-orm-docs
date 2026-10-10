@@ -1,0 +1,327 @@
+import Callout from '@mdx/Callout.astro';
+import Section from '@mdx/Section.astro';
+
+# Indexes & Constraints
+
+## Constraints
+
+SQL constraints are the rules enforced on table columns. They are used to prevent invalid data from being entered into the database.
+
+This ensures the accuracy and reliability of your data in the database.
+
+### Default
+
+The `DEFAULT` clause specifies a default value to use for the column if no value provided by the user when doing an `INSERT`.
+If there is no explicit `DEFAULT` clause attached to a column definition,
+then the default value of the column is `NULL`.
+
+An explicit `DEFAULT` clause may specify that the default value is `NULL`,
+a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
+
+<Section>
+    ```typescript
+    import { sql } from "drizzle-orm";
+    import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    const table = sqliteTable('table', {
+      int1: integer('int1').default(42),
+      int2: integer('int2').default(sql`(abs(42))`)
+    });
+
+    ```
+    ```sql
+    CREATE TABLE `table` (
+      `int1` integer DEFAULT 42
+      `int2` integer DEFAULT (abs(42))
+    );
+    ```
+    </Section>
+
+### Not null
+
+By default, a column can hold **NULL** values. The `NOT NULL` constraint enforces a column to **NOT** accept **NULL** values.  
+
+This enforces a field to always contain a value, which means that you cannot insert a new record,
+or update a record without adding a value to this field.
+
+<Section>
+      ```typescript copy
+      const table = sqliteTable('table', { 
+        numInt: integer('numInt').notNull() 
+      });
+      ```
+
+      ```sql
+      CREATE TABLE table (
+        `numInt` integer NOT NULL
+      );
+      ```
+    </Section>
+
+### Unique
+
+The `UNIQUE` constraint ensures that all values in a column are different.  
+
+Both the `UNIQUE` and `PRIMARY KEY` constraints provide a guarantee for uniqueness for a column or set of columns.
+
+A `PRIMARY KEY` constraint automatically has a `UNIQUE` constraint.  
+
+<Callout type="info" emoji="ℹ️">
+  You can have many `UNIQUE` constraints per table, but only one `PRIMARY KEY` constraint per table.
+</Callout>
+
+<Section>
+      ```typescript copy
+      import { int, text, unique, sqliteTable } from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable('user', {
+        id: int('id').unique(),
+      });
+
+      export const table = sqliteTable('table', {
+        id: int('id').unique('custom_name'),
+      });
+
+      export const composite = sqliteTable('composite_example', {
+        id: int('id'),
+        name: text('name'),
+      }, (t) => [
+        unique().on(t.id, t.name),
+        unique('custom_name').on(t.id, t.name)
+      ]);
+      ```
+
+      ```sql
+	  CREATE TABLE `user` (
+        `id` integer UNIQUE
+      );
+
+      CREATE TABLE `table` (
+        `id` integer CONSTRAINT `custom_name` UNIQUE
+      );
+
+      CREATE TABLE `composite_example` (
+        `id` integer,
+        `name` text,
+        CONSTRAINT `composite_example_id_name_unique` UNIQUE(`id`,`name`),
+        CONSTRAINT `custom_name` UNIQUE(`id`,`name`)
+      );
+      ```
+    </Section>
+
+### Check
+
+The `CHECK` constraint is used to limit the value range that can be placed in a column.
+
+If you define a `CHECK` constraint on a column it will allow only certain values for this column.  
+
+If you define a `CHECK` constraint on a table it can limit the values in certain columns based on values in other columns in the row.
+
+<Section>
+      ```typescript copy
+      import { sql } from "drizzle-orm";
+      import { check, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+      export const users = sqliteTable(
+        "users",
+        {
+          id: int().primaryKey(),
+          username: text().notNull(),
+          age: int(),
+        },
+        (table) => [
+          check("age_check1", sql`${table.age} > 21`)
+        ]
+      );
+      ```
+      ```sql
+      CREATE TABLE `users` (
+	      `id` integer PRIMARY KEY NOT NULL,
+	      `username` text NOT NULL,
+	      `age` integer,
+	      CONSTRAINT "age_check1" CHECK("age" > 21)
+      );
+      ```
+    </Section>
+
+### Primary Key
+
+The `PRIMARY KEY` constraint uniquely identifies each record in a table.  
+Primary keys must contain `UNIQUE` values, and cannot contain `NULL` values.  
+
+A table can have only **ONE** primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
+<Section>
+      ```typescript copy
+      import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable("user", {
+        id: integer().primaryKey({ autoIncrement: true }),
+      })
+
+      export const pet = sqliteTable("pet", {
+        id: integer().primaryKey(),
+      })
+      ```
+
+      ```sql
+      CREATE TABLE `user` (
+        `id` integer PRIMARY KEY AUTOINCREMENT
+      );
+
+      CREATE TABLE `pet` (
+        `id` integer PRIMARY KEY
+      )
+      ```
+    </Section>
+
+### Composite Primary Key
+
+Just like `PRIMARY KEY`, composite primary key uniquely identifies each record in a table using multiple fields.
+
+Drizzle ORM provides a standalone `primaryKey` operator for that:
+
+<Section>
+      ```typescript copy {18, 19}
+      import { integer, text, primaryKey, sqliteTable} from "drizzle-orm/sqlite-core";
+
+      export const user = sqliteTable("user", {
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
+      });
+
+      export const book = sqliteTable("book", {
+        id: integer().primaryKey({ autoIncrement: true }),
+        name: text(),
+      });
+
+      export const bookToAuthor = sqliteTable("book_to_author", {
+        authorId: integer("author_id"),
+        bookId: integer("book_id"),
+      }, (table) => [
+        primaryKey({ columns: [table.bookId, table.authorId] }),
+        // Or PK with custom name
+        primaryKey({ name: 'custom_name', columns: [table.bookId, table.authorId] })
+      ]);
+      ```
+      ```sql {6}
+      ...
+
+      CREATE TABLE `book_to_author` (
+        `author_id` integer,
+        `book_id` integer,
+        PRIMARY KEY(`book_id`, `author_id`)
+      );
+      ```
+    </Section>
+
+### Foreign key
+
+The `FOREIGN KEY` constraint is used to prevent actions that would destroy links between tables.
+A `FOREIGN KEY` is a field (or collection of fields) in one table, that refers to the `PRIMARY KEY` in another table.
+The table with the foreign key is called the child table, and the table with the primary key is called the referenced or parent table.
+
+Drizzle ORM provides several ways to declare foreign keys.
+You can declare them in a column declaration statement:
+
+	```typescript {11}
+    import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+    });
+
+    export const book = sqliteTable("book", {
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+      authorId: integer("author_id").references(() => user.id)
+    });
+    ```
+
+If you want to do a self reference, due to a TypeScript limitations you will have to either explicitly
+set return type for reference callback or use a standalone `foreignKey` operator.
+
+	```typescript {6,15-19}
+    import { integer, text, foreignKey, sqliteTable, type AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+      parentId: integer("parent_id").references((): AnySQLiteColumn => user.id)
+    });
+
+    //or
+    export const user = sqliteTable("user", {
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+      parentId: integer(),
+    }, (table) => [
+      foreignKey({
+        columns: [table.parentId],
+        foreignColumns: [table.id],
+        name: "custom_fk"
+      })
+    ]);
+    ```
+
+To declare multi-column foreign keys you can use a dedicated `foreignKey` operator:
+
+	```typescript {4-5,15-19}
+    import { integer, text, primaryKey, foreignKey, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      firstName: text("firstName"),
+      lastName: text("lastName"),
+    }, (table) => [
+      primaryKey({ columns: [table.firstName, table.lastName]})
+    ]);
+
+    export const profile = sqliteTable("profile", {
+      id: integer().primaryKey({ autoIncrement: true }),
+      userFirstName: text("user_first_name"),
+      userLastName: text("user_last_name"),
+    }, (table) => [
+      foreignKey({
+        columns: [table.userFirstName, table.userLastName],
+        foreignColumns: [user.firstName, user.lastName],
+        name: "custom_name"
+      })
+    ]);
+    ```
+
+## Indexes
+
+Drizzle ORM provides API for both `index` and `unique index` declaration:
+
+<Section>
+    ```typescript {8-9}
+    import { integer, text, index, uniqueIndex, sqliteTable } from "drizzle-orm/sqlite-core";
+
+    export const user = sqliteTable("user", {
+      id: integer().primaryKey({ autoIncrement: true }),
+      name: text(),
+      email: text(),
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
+    ```
+    ```sql {5-6}
+    CREATE TABLE `user` (
+      ...
+    );
+
+    CREATE INDEX `name_idx` ON `user` (`name`);
+    CREATE UNIQUE INDEX `email_idx` ON `user` (`email`);
+    ```
+    </Section>
+
+     Drizzle ORM provides set of all params for index creation:
+     
+    ```typescript
+    // Index declaration reference
+    index("name")
+      .on(table.name)
+      .where(sql`...`)
+    ```

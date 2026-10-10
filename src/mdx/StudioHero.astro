@@ -1,0 +1,120 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  /** quiet aside under the title, set in the handwritten face */
+  punchline?: string;
+  description?: string;
+}
+
+const { eyebrow, title, punchline, description } = Astro.props;
+---
+
+<section class="hero">
+  {eyebrow && <div class="hero__eyebrow">{eyebrow}</div>}
+  <h1 class="hero__title">{title}</h1>
+  {punchline && <p class="hero__punchline">{punchline}</p>}
+  {description && <p class="hero__description">{description}</p>}
+  <div class="hero__actions">
+    <slot name="actions" />
+  </div>
+  <div class="hero__frame">
+    <slot name="image" />
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .hero__eyebrow {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #909090;
+    margin-bottom: 10px;
+  }
+
+  .hero__punchline {
+    margin: 14px 0 0;
+    font-family: FirstTimeWriting, cursive;
+    font-size: 26px;
+    line-height: 1;
+    color: #909090;
+    transform: rotate(-2deg);
+  }
+
+  .hero__title {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    color: #0f172a;
+    margin: 8px 0 0;
+  }
+
+  html[class~='dark'] .hero__title {
+    color: #f3f4f6;
+  }
+
+  .hero__description {
+    max-width: 620px;
+    margin: 12px 0 0;
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: center;
+    color: #64748b;
+  }
+
+  html[class~='dark'] .hero__description {
+    color: #909090;
+  }
+
+  .hero__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  /* framed screenshot that dissolves into the page, as on the landing page */
+  .hero__frame {
+    width: 100%;
+    margin-top: 24px;
+    padding: 4px 4px 0;
+    border: 1px solid #e8e8e8;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background-color: #ffffff;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+
+  html[class~='dark'] .hero__frame {
+    border-color: rgb(64, 64, 64);
+    background-color: #282828;
+  }
+
+  .hero__frame :global(img) {
+    border-radius: 4px 4px 0 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hero__title {
+      font-size: 32px;
+    }
+
+    .hero__description {
+      font-size: 16px;
+    }
+
+    .hero__punchline {
+      font-size: 20px;
+    }
+  }
+</style>

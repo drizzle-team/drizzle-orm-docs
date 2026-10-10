@@ -1,0 +1,132 @@
+---
+interface Company {
+  name: string;
+  href: string;
+  /** public path to the logo, either a single file or per theme variants */
+  logo?: string | { light: string; dark: string };
+}
+
+interface Props {
+  title?: string;
+  companies: Company[];
+}
+
+const { title, companies } = Astro.props;
+
+const getLogo = (logo: Company["logo"], theme: "light" | "dark") => {
+  if (!logo) return undefined;
+  return typeof logo === "string" ? logo : logo[theme];
+};
+---
+
+{!!title && <div class="companies__title">{title}</div>}
+<div class="companies">
+  {companies.map((company) => (
+    <a
+      class="companies__item"
+      href={company.href}
+      target="_blank"
+      rel="noreferrer"
+    >
+      {!!company.logo && (
+        <span class="companies__logo">
+          <img
+            class="companies__img light"
+            src={getLogo(company.logo, "light")}
+            alt={company.name}
+            loading="lazy"
+          />
+          <img
+            class="companies__img dark"
+            src={getLogo(company.logo, "dark")}
+            alt={company.name}
+            loading="lazy"
+          />
+        </span>
+      )}
+      <span class="companies__name">{company.name}</span>
+    </a>
+  ))}
+</div>
+
+<style is:global>
+  .companies__title {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 20px;
+  }
+
+  html[class~="dark"] .companies__title {
+    color: #94a3b8;
+  }
+
+  .companies {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(max(160px, calc((100% - 8px * 3) / 4)), 1fr));
+    margin-top: 8px;
+  }
+
+  .companies__item {
+    align-items: center;
+    border: 1px solid #efefef;
+    border-radius: 4px;
+    color: inherit !important;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 10px 12px;
+    text-decoration: none !important;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .companies__item:hover {
+    background-color: #fafafa;
+    border-color: #d4d4d4;
+  }
+
+  html[class~="dark"] .companies__item {
+    border-color: #262626;
+  }
+
+  html[class~="dark"] .companies__item:hover {
+    background-color: #171717;
+    border-color: #404040;
+  }
+
+  .companies__logo {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    height: 20px;
+    justify-content: center;
+    width: 20px;
+  }
+
+  .companies__img {
+    height: 20px;
+    max-width: 20px;
+    object-fit: contain;
+  }
+
+  .companies__name {
+    font-size: 15px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .companies__img.dark {
+    display: none;
+  }
+
+  html[class~="dark"] .companies__img.light {
+    display: none;
+  }
+
+  html[class~="dark"] .companies__img.dark {
+    display: block;
+  }
+</style>

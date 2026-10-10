@@ -1,0 +1,39 @@
+---
+import { studioIcons, type StudioIconName } from "@/data/studio-icons";
+
+interface Props {
+  name: StudioIconName;
+  size?: number;
+}
+
+const { name, size = 18 } = Astro.props;
+---
+
+<svg
+  class="studio-icon"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <path d={studioIcons[name]} />
+</svg>
+
+<style>
+  .studio-icon {
+    display: inline-block;
+    vertical-align: -4px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    color: #6b7280;
+  }
+
+  html[class~="dark"] .studio-icon {
+    color: #909090;
+  }
+</style>

@@ -1,7 +1,15 @@
 
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "This guide assumes familiarity with:" } = Astro.props;
+---
+
 <div class="prerequisites_wrap">
   <div class="prerequisites_title">
-    This guide assumes familiarity with:
+    {title}
   </div>
   <slot />
 </div>

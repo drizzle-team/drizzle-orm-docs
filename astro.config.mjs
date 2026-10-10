@@ -51,7 +51,9 @@ export default defineConfig({
     react({
       experimentalReactChildren: true,
     }),
-    ...(isProd ? [sitemap()] : []),
+    ...(isProd
+      ? [sitemap({ filter: (page) => !/\/docs\/[^/]+\/get-started\/?$/.test(page) })]
+      : []),
   ],
   markdown: {
     rehypePlugins: [

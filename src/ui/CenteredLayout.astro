@@ -12,11 +12,12 @@ import { getContentTree } from "@/utils";
 interface Props {
   customTitle?: string;
   description?: string;
+  image?: string;
   headings: IHeading[];
   isStudio?: boolean;
 }
 
-const { customTitle, headings, description, isStudio } = Astro.props;
+const { customTitle, headings, description, image, isStudio } = Astro.props;
 const { slug } = Astro.params;
 const { title, tree } = await getContentTree({
   headings,
@@ -29,6 +30,7 @@ const { title, tree } = await getContentTree({
   <BaseHead
     title={`Drizzle ORM - ${customTitle || title}`}
     description={description}
+    image={image}
   />
   <body class="banner-shown">
     <MDXStyles />

@@ -17,7 +17,7 @@
 - [x] Migrate to folder v3, remove journal
 - [x] Add explain mode for push
 - [x] Add commutative migrations check (PostgreSQL, MySQL)
-- [ ] Add commutative migrations check (SQLite, MSSQL, CockroachDB, SingleStore)
+- [x] Add commutative migrations check (SQLite, MSSQL)
 - [x] `generated` columns support [beta branch]
 - [x] MySQL `.$returningIds()`
 - [x] `mode: number` and `mode: bigint` support for PostgreSQL `decimals`

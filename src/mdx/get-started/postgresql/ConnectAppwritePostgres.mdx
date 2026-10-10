@@ -1,0 +1,41 @@
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Callout from '@mdx/Callout.astro';
+
+Create a `index.ts` file in the `src` directory and initialize the connection:
+
+<CodeTabs items={["node-postgres", "node-postgres with config", "your node-postgres driver"]}>
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+const db = drizzle(process.env.DATABASE_URL!);
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/node-postgres';
+
+// You can specify any property from the node-postgres connection options
+const db = drizzle({ 
+  connection: { 
+    connectionString: process.env.DATABASE_URL!,
+    ssl: true
+  }
+});
+```
+```typescript copy
+import 'dotenv/config';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL!,
+});
+const db = drizzle({ client: pool });
+```
+</CodeTabs>
+
+<Callout title='Connection ports' type='info'>
+Appwrite Postgres supports two connection ports on the same hostname:
+- **Port 5432** — Direct connection to the PostgreSQL engine. Use it for Drizzle Kit migrations and introspection.
+- **Port 6432** — Connection via the [connection pooler](https://appwrite.io/docs/products/databases/postgresql/connection-pooling) in transaction mode. Recommended for serverless and edge environments. See the [Appwrite Postgres connection guide](/docs/connect-appwrite-postgres#connection-pooling-for-serverless) for details.
+</Callout>

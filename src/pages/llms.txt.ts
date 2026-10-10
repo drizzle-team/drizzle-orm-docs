@@ -138,6 +138,10 @@ export const GET: APIRoute = async ({ url }) => {
     }
   });
 
+  // Drizzle Studio
+  llms += `\n## Drizzle Studio\n\n`;
+  llms += `- [Meet Drizzle Studio](${url.origin}/drizzle-studio/overview)\n`;
+
   // Tutorials
   llms += `\n## Tutorials\n\n`;
 
