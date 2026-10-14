@@ -31,7 +31,7 @@ await db.select({ value: count(users.id) }).from(users);
 
 // It's equivalent to writing
 await db.select({ 
-  value: sql`count('*'))`.mapWith(Number) 
+  value: sql`count(*)`.mapWith(Number) 
 }).from(users);
 await db.select({ 
   value: sql`count(${users.id})`.mapWith(Number) 
