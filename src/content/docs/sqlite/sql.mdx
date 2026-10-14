@@ -31,7 +31,7 @@ is the ability to use `sql` queries as-is for raw queries.
 import { sql } from 'drizzle-orm' 
 
 const id = 69;
-await db.execute(sql`select * from ${usersTable} where ${usersTable.id} = ${id}`)
+await db.all(sql`select * from ${usersTable} where ${usersTable.id} = ${id}`)
 ```
 
 It will generate the current query
