@@ -4,7 +4,7 @@ import CodeWithProps from "@mdx/CodeWithProps.astro";
 
 Create a `drizzle.config.ts` file in the root of your project and add the following content:
 
-<CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
+<CodeWithProps dialect={props.dialect} env_variable={props.env_variable} driverLine={props.driver ? `\n  driver: '${props.driver}',\n` : ''}>
 ```typescript copy filename="drizzle.config.ts"
 import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
@@ -12,7 +12,7 @@ import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
   out: './drizzle',
   schema: './src/db/schema.ts',
-  dialect: '$dialect$',
+  dialect: '$dialect$',$driverLine$
   dbCredentials: {
     url: process.env.$env_variable$!,
   },
