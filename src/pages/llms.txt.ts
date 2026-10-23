@@ -6,10 +6,21 @@ import {
   description,
   title,
 } from "@/data/llms";
+import { defaultDocsDialect } from "@/dialect-docs";
 
 export const GET: APIRoute = async ({ url }) => {
   // Get the URL
-  const getUrl = (path: string) => `${url.origin}/docs/${path}`;
+  // The default dialect's own docs are served unprefixed (see the
+  // `routePrefix` logic in src/pages/[...slug].astro) - a link like
+  // `${defaultDocsDialect}/select` has no route and 404s, so strip that
+  // prefix here too before building the URL.
+  const defaultDialectPrefix = `${defaultDocsDialect}/`;
+  const getUrl = (path: string) => {
+    const unprefixedPath = path.startsWith(defaultDialectPrefix)
+      ? path.slice(defaultDialectPrefix.length)
+      : path;
+    return `${url.origin}/docs/${unprefixedPath}`;
+  };
 
   // Create the LLMS
   let llms = `# ${title}\n\n> ${description}\n`;
