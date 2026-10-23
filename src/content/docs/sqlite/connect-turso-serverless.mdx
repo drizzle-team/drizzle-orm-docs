@@ -54,6 +54,30 @@ const db = drizzle({ client });
 const result = await db.all('select 1');
 ```
 
+#### Transaction modes
+You can set the transaction mode with the `behavior` option. Drizzle passes it to the driver, which opens the transaction with `BEGIN <mode>`.
+Without `behavior`, a plain `BEGIN` is used, which SQLite runs as `deferred`.
+
+```typescript
+import { drizzle } from 'drizzle-orm/tursodatabase-serverless';
+import { users } from './schema';
+
+const db = drizzle({ connection: { url: process.env.TURSO_URL, authToken: process.env.TURSO_TOKEN } });
+
+await db.transaction(async (tx) => {
+  await tx.insert(users).values({ name: 'Dan' });
+}, {
+  behavior: 'immediate', // 'deferred' | 'immediate' | 'exclusive' | 'concurrent'
+});
+```
+
+- `deferred` - takes the lock on the first read or write
+- `immediate` - takes the write lock at the start of the transaction
+- `exclusive` - takes the write lock at the start and blocks other connections
+- `concurrent` - lets several write transactions run at the same time. It needs MVCC to be turned on in Turso Database
+
+Nested `tx.transaction()` calls use savepoints and don't take a `behavior` option.
+
 #### What's next?
 
 <WhatsNextSQLite/>
