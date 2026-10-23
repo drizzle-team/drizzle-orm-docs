@@ -258,7 +258,7 @@ import { migrate } from 'drizzle-orm/node-mssql/migrator';
 
 const db = drizzle(process.env.DATABASE_URL);
 
-await migrate(db);
+await migrate(db, { migrationsFolder: './drizzle' });
 ```
 ```
 ┌───────────────────────┐                  
