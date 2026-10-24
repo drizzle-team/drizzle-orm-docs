@@ -97,7 +97,7 @@ const columns = getColumns(users);
 
 <br/>
 
-- No more `journal.json`
+- No more `meta/_journal.json`
 - SQL files and snapshots grouped into separate migration folders
 - `drizzle-kit drop` command removed
 
@@ -215,7 +215,9 @@ Bypasses commutativity checks when you know the conflicts are expected.
 
 #### Updates to the migration table
 
-The migration table is automatically upgraded when you run `drizzle-kit up`. Two new columns are added:
+`drizzle-kit up` only converts local migration files and snapshots. The database's migration history table is upgraded, if needed, by the v1 migrator when you run `drizzle-kit migrate` or your driver's v1 `migrate()` helper. This happens before pending migration SQL is applied.
+
+Two new columns are added to an existing migration table:
 
 - **`name`** — the full migration folder name (e.g. `20250220153045_brave_wolverine`)
 - **`applied_at`** — timestamp of when the migration was executed (pre-existing rows are backfilled with `NULL`)

@@ -22,6 +22,8 @@ import Dialects from "@mdx/Dialects.mdx"
 `drizzle-kit up` command lets you upgrade drizzle schema snapshots to a newer version. 
 It's required whenever we introduce breaking changes to the json snapshots of the schema and upgrade the internal version.
 
+`up` operates on the local migration folder and snapshots. It does not connect to a database, apply SQL migrations, or upgrade the database's migration history table. Use [`drizzle-kit migrate`](/docs/sqlite/drizzle-kit-migrate) to apply migrations to a database.
+
 <br/>
 <hr/>
 <br/>
@@ -49,10 +51,10 @@ npx drizzle-kit up --dialect=sqlite
 </CodeTabs>
 
 ### Multiple configuration files in one project
-You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases on the same project:
+Use `--config` to select the configuration whose `out` points to the local migration folder you want to upgrade. This converts files, not the database configured by that file:
 <Npx>
-  drizzle-kit migrate --config=drizzle-dev.config.ts
-  drizzle-kit migrate --config=drizzle-prod.config.ts
+  drizzle-kit up --config=drizzle-dev.config.ts
+  drizzle-kit up --config=drizzle-prod.config.ts
 </Npx>
 ```plaintext {5-6}
 📦 <project root>
