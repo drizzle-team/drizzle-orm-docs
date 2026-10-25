@@ -123,7 +123,7 @@ await db.selectDistinct().from(users).orderBy(users.id, users.name);
 await db.selectDistinct({ id: users.id }).from(users).orderBy(users.id);
 ```
 ```sql
-select distinct `id`, `name` from `users` order by `users`.`id`, `users`.`name`;
+select distinct `id`, `name`, `age` from `users` order by `users`.`id`, `users`.`name`;
 
 select distinct `id` from `users` order by `users`.`id`;
 ```
@@ -227,7 +227,7 @@ await db.select().from(users).where(eq(users.id, 42));
 ```
 will be translated to:
 ```sql
-select `id`, `name`, `age` from `users` where `id` = ?; -- params: [42]
+select `id`, `name`, `age` from `users` where `users`.`id` = ?; -- params: [42]
 ```
 </Callout>
 
@@ -662,7 +662,7 @@ select max(`id`) from `users`;
 ```ts
 // It's equivalent to writing
 await db.select({ 
-  value: sql`max(${expression})`.mapWith(users.id) 
+  value: sql`max(${users.id})`.mapWith(users.id) 
 }).from(users);
 ```
 </Section>
