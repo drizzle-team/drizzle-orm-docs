@@ -83,71 +83,71 @@ await db.query.users.findMany({
 	`drizzle` import path depends on the **[database driver](/docs/connect-overview)** you're using.
 </Callout>
 <CodeTabs items={["index.ts", "schema.ts", "relations.ts"]}>
-	<CodeTab>
-	```typescript copy
-	import { relations } from "./relations";
-	import { drizzle } from "drizzle-orm/...";
+<CodeTab>
+```typescript copy
+import { relations } from "./relations";
+import { drizzle } from "drizzle-orm/...";
 
-	const db = drizzle(process.env.DATABASE_URL, { relations });
+const db = drizzle(process.env.DATABASE_URL, { relations });
 
-	const result = await db.query.users.findMany({
-	  with: {
-	    posts: true,
-	  },
-	});
-	```
+const result = await db.query.users.findMany({
+  with: {
+    posts: true,
+  },
+});
+```
 
-	```ts
-	[{
-		id: 10,
-		name: "Dan",
-		posts: [
-			{
-				id: 1,
-				content: "SQL is awesome",
-				authorId: 10,
-			},
-			{
-				id: 2,
-				content: "But check relational queries",
-				authorId: 10,
-			}
-		]
-	}]
-	```
-	</CodeTab>
+```ts
+[{
+  id: 10,
+  name: "Dan",
+  posts: [
+    {
+      id: 1,
+      content: "SQL is awesome",
+      authorId: 10,
+    },
+    {
+      id: 2,
+      content: "But check relational queries",
+      authorId: 10,
+    }
+  ]
+}]
+```
+</CodeTab>
 
-		```typescript copy
-    import * as p from "drizzle-orm/pg-core";
-    
-    export const posts = p.pgTable("posts", {
-      id: p.integer().primaryKey(),
-      content: p.text().notNull(),
-      authorId: p.integer("author_id").notNull(),
-    });
-    
-    export const users = p.pgTable("users", {
-      id: p.integer().primaryKey(),
-      name: p.text().notNull(),
-    });
-	```
+```typescript copy
+import * as p from "drizzle-orm/pg-core";
 
-	```typescript copy
-	import { defineRelations } from "drizzle-orm";
-	import { posts, users } from "./schema";
+export const posts = p.pgTable("posts", {
+  id: p.integer().primaryKey(),
+  content: p.text().notNull(),
+  authorId: p.integer("author_id").notNull(),
+});
 
-	export const relations = defineRelations({ users, posts }, (r) => ({
-      posts: {
-        author: r.one.users({
-          from: r.posts.authorId,
-          to: r.users.id,
-        }),
-      },
-      users: {
-        posts: r.many.posts(),
-      },
-    }));
-	```
+export const users = p.pgTable("users", {
+  id: p.integer().primaryKey(),
+  name: p.text().notNull(),
+});
+```
+
+```typescript copy
+import { defineRelations } from "drizzle-orm";
+import { posts, users } from "./schema";
+
+export const relations = defineRelations({ users, posts }, (r) => ({
+    posts: {
+      author: r.one.users({
+        from: r.posts.authorId,
+        to: r.users.id,
+      }),
+    },
+    users: {
+      posts: r.many.posts(),
+    },
+  }));
+```
 </CodeTabs>
 
 Relational queries are an extension to Drizzle's original **[query builder](/docs/select)**.

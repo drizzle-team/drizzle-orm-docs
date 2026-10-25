@@ -178,7 +178,7 @@ export const relations = defineRelations({ users }, (r) => ({
 }));
 ```
 
-Another example would be a user having a profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
+Another example would be a user having profile information stored in separate table. In this case, because the foreign key is stored in the "profile_info" table, the user relation have neither fields or references. This tells Typescript that `user.profileInfo` is nullable:
 
 ```typescript copy {15-22}
 import { pgTable, serial, text, integer, jsonb } from 'drizzle-orm/pg-core';
@@ -538,7 +538,7 @@ and having `{ ...relations, ...part }` will result in
 
 </Callout>
 
-**Rule 2**: You should have min relations, so drizzle can infer all of the table for autocomplete. If you want to have only parts, then 
+**Rule 2**: You should have main relations, so drizzle can infer all of the table for autocomplete. If you want to have only parts, then 
 one of your parts should be empty, like this:
 
 ```ts
