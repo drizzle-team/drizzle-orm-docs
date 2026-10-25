@@ -34,7 +34,7 @@ If you're expecting values above 2^31 but below 2^53, you can utilize `mode: 'nu
 import { int8, bigint, cockroachTable } from "drizzle-orm/cockroach-core";
 
 export const table = cockroachTable('table', {
-	int8: int8({ mode: 'number' })
+	int8: int8({ mode: 'number' }),
 	bigint: bigint({ mode: 'number' })
 });
 
