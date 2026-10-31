@@ -80,7 +80,7 @@ import { drizzle } from 'drizzle-orm/node-sqlite';
 
 const db = drizzle(process.env.DB_FILE_NAME);
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 ```typescript copy
 import { drizzle } from 'drizzle-orm/node-sqlite';
@@ -88,7 +88,7 @@ import { drizzle } from 'drizzle-orm/node-sqlite';
 // You can specify any property from the node-sqlite connection options
 const db =  drizzle({ connection: { path: process.env.DB_FILE_NAME }});
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 </CodeTabs>
 
@@ -100,7 +100,7 @@ import { DatabaseSync } from 'node:sqlite';
 const sqlite = new DatabaseSync('sqlite.db');
 const db = drizzle({ client: sqlite });
 
-const result = await db.execute('select 1');
+const result = await db.all('select 1');
 ```
 
 ## better-sqlite3
