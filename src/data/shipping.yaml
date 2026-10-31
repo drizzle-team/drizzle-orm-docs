@@ -1,5 +1,23 @@
 2026-10:
   - |
+    <b>Drizzle Beta <a href='/docs/latest-releases/drizzle-orm-v1rc5'>v1.0.0-rc.5</a> release</b>
+
+    More ways to query relations, smaller PostgreSQL migration snapshots, and fixes across drivers and dialects.
+    <ul>
+    <li>Relational Queries v2 now supports CockroachDB and MSSQL, ordering by related data, and using subqueries as relational entities.</li>
+    <li>Improved relational query plans on PostgreSQL, MySQL, CockroachDB and MSSQL with a new default query strategy.</li>
+    <li>Added relational query caching with `withCache`, enabled by default for caches using the `all` strategy.</li>
+    <li>Added incremental PostgreSQL migration snapshots: the initial snapshot stores the full schema, and later snapshots store only each migration's changes.</li>
+    <li>Added Aurora DSQL adapters for postgres-js and node-postgres, async queries for expo-sqlite, and PostgreSQL transaction snapshot support.</li>
+    <li>Fixed transaction connection leaks, cache invalidation for nested and aliased queries, and React Native blob handling.</li>
+    <li>Improved `drizzle-kit pull` results for relations, constraints and indexes, and fixed migration generation and SQLite table recreation issues.</li>
+    <li>Changed `withReplicas()` to send queries to the primary by default, with explicit replica reads through `db.$replica`.</li>
+    <li>Relational filters now reject `undefined` and accept `EmptyFilter` for intentionally omitted conditions. Empty relation filters are skipped; `true` and `false` check for related rows' presence and absence.</li>
+    <li>Fixed postgres-js serialization of dates, times and JSON values in raw SQL and driver calls.</li>
+    <li>Query errors now omit parameters by default, with a `paramsInErrors` option to include them.</li>
+    <li>SQLite proxy now takes separate `run`, `all` and `get` executors. SQLite columns with both `.$defaultFn()` and `.default()` now use the function when inserting without a value.</li>
+    </ul>
+  - |
     <b>Drizzle Studio updates</b>
 
     <ul>
@@ -39,6 +57,20 @@
     <li>Reworked refresh shortcuts: `Cmd/Ctrl+R` refreshes rows, while `Shift + Cmd/Ctrl+R` refreshes schema and rows.</li>
     </ul>
 2026-06:
+  - |
+    <b>Drizzle Beta <a href='/docs/latest-releases/drizzle-orm-v1rc4'>v1.0.0-rc.4</a> release</b>
+
+    SQLite query improvements, more Turso and Effect drivers, and Drizzle Kit tools for scripts and AI coding agents.
+    <ul>
+    <li>SQLite now uses optimized row mappers and array-mode results for Relational Queries v2. The old relational query API (`db._query`) has been removed from SQLite.</li>
+    <li>Added Turso serverless and sync drivers, plus Effect drivers for PGlite, SQLite, libSQL, D1 and MySQL.</li>
+    <li>Added nested transactions for Turso database and WASM drivers, plus a filesystem-free WASM migrator.</li>
+    <li>Typed `sql` expressions now preserve nullability through `.mapWith()`, with a new `.nullable()` method for possibly null results.</li>
+    <li>`db.insert(table).select(...)` no longer requires matching column order and can omit columns with defaults or nullable columns.</li>
+    <li>Added MySQL codecs and fixed value conversions in SQL expressions, subqueries and unions, along with MySQL float and timestamp handling.</li>
+    <li>Drizzle Kit now offers JSON output and a typed SDK at `drizzle-kit/cli`. Scripts can supply hints for renames and data-loss decisions without interactive prompts.</li>
+    <li>Added `drizzle-kit mcp` to expose migration commands to AI agents, and `drizzle-kit skills` to install the accompanying agent instructions.</li>
+    </ul>
   - |
     <b>Drizzle Studio updates</b>
 

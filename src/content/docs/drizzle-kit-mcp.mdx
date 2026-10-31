@@ -1,0 +1,221 @@
+---
+title: Drizzle Kit MCP server
+description: Connect your AI agent to your project's Drizzle Kit, generate migrations from chat and add workflow guidance with the Drizzle skill.
+---
+
+import CodeTabs from "@mdx/CodeTabs.astro";
+import Npm from "@mdx/Npm.astro";
+import Tab from "@mdx/Tab.astro";
+import Tabs from "@mdx/Tabs.astro";
+
+The Drizzle Kit MCP server lets you ask your coding agent to generate migrations, check migration history or pull a schema from an existing database. The agent calls the Drizzle Kit installed in your project.
+
+Connecting the server gives your agent access to operations that write project files and change the database selected by your config. Generating a migration writes a file but does not apply it to the database. Your client's permissions and approval settings govern tool execution.
+
+## Install rc5 in your project
+
+These examples use `drizzle-kit@rc` and `drizzle-orm@rc`. Install them in the package that owns your Drizzle schema and config:
+
+<Npm>
+drizzle-orm@rc
+-D drizzle-kit@rc
+</Npm>
+
+In a monorepo, use the workspace package that uses Drizzle. **Start the MCP server from that directory** so it can find both packages and your config.
+
+The server uses your project's [Drizzle Kit configuration](/docs/drizzle-config-file). For `push` or `pull`, that config also needs database credentials.
+
+## Connect your MCP client
+
+Choose your client below. For CLI setup, run the command from your Drizzle package with the client's CLI installed.
+
+<Tabs items={["Claude Code", "Codex", "OpenCode", "Grok", "Cursor", "Other clients"]}>
+<Tab>
+
+Register the server for this project:
+
+```shell
+claude mcp add --transport stdio --scope project drizzle -- npx --no-install drizzle-kit mcp
+```
+
+This writes the entry to `.mcp.json`. When Claude Code asks to approve the project server, approve it to connect. Use `/mcp` inside Claude Code to check its status.
+
+See [Claude Code's MCP setup](https://code.claude.com/docs/en/mcp) for configuration scopes and client-specific options.
+
+</Tab>
+<Tab>
+
+Register the server with the Codex CLI:
+
+```shell
+codex mcp add drizzle -- npx --no-install drizzle-kit mcp
+```
+
+This adds the server to your user configuration, normally `~/.codex/config.toml`. Start Codex from your Drizzle package when using this server. Use `/mcp` inside Codex to check the active tools.
+
+For project-only configuration or an explicit server working directory, see [Codex's MCP configuration](https://learn.chatgpt.com/docs/extend/mcp).
+
+</Tab>
+<Tab>
+
+Start OpenCode's interactive setup:
+
+```shell
+opencode mcp add
+```
+
+Choose a local server, name it `drizzle`, and enter this command when prompted:
+
+```shell
+npx --no-install drizzle-kit mcp
+```
+
+Check the configured servers with:
+
+```shell
+opencode mcp list
+```
+
+See [OpenCode's CLI reference](https://opencode.ai/docs/cli/#mcp) for the interactive setup supported by your version.
+
+</Tab>
+<Tab>
+
+Register the server for this project with the Grok CLI:
+
+```shell
+grok mcp add --scope project drizzle -- npx --no-install drizzle-kit mcp
+```
+
+This writes the entry to `.grok/config.toml` in the current directory. Check the configuration and connection with:
+
+```shell
+grok mcp doctor drizzle
+```
+
+These instructions are for the local Grok CLI. See [Grok's MCP reference](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-pager/docs/user-guide/07-mcp-servers.md) for configuration scopes.
+
+</Tab>
+<Tab>
+
+Open your Drizzle package as the project in Cursor. Create `.cursor/mcp.json` with the following content, or add the `drizzle` entry to its existing `mcpServers` object:
+
+```json
+{
+  "mcpServers": {
+    "drizzle": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--no-install", "drizzle-kit", "mcp"]
+    }
+  }
+}
+```
+
+If you also use Cursor's CLI, inspect the available tools with:
+
+```shell
+agent mcp list-tools drizzle
+```
+
+The editor and CLI share this configuration. See [Cursor's MCP setup](https://cursor.com/docs/mcp) and [CLI commands](https://cursor.com/docs/cli/mcp).
+
+</Tab>
+<Tab>
+
+Add a stdio server to your client's MCP configuration. For clients that use an `mcpServers` object, choose your package manager and copy the configuration:
+
+<CodeTabs items={["npm", "yarn", "pnpm", "bun"]}>
+```json
+{
+  "mcpServers": {
+    "drizzle": {
+      "command": "npx",
+      "args": ["--no-install", "drizzle-kit", "mcp"]
+    }
+  }
+}
+```
+```json
+{
+  "mcpServers": {
+    "drizzle": {
+      "command": "yarn",
+      "args": ["drizzle-kit", "mcp"]
+    }
+  }
+}
+```
+```json
+{
+  "mcpServers": {
+    "drizzle": {
+      "command": "pnpm",
+      "args": ["exec", "drizzle-kit", "mcp"]
+    }
+  }
+}
+```
+```json
+{
+  "mcpServers": {
+    "drizzle": {
+      "command": "bun",
+      "args": ["run", "drizzle-kit", "mcp"]
+    }
+  }
+}
+```
+</CodeTabs>
+
+Set the server's working directory to your Drizzle package in your client. The config file location and working-directory setting depend on the client.
+
+</Tab>
+</Tabs>
+
+Restart or reconnect the server in your client, then check that its Drizzle tools are available.
+
+Your client manages the server process. You do not need an HTTP port or a separate terminal running it.
+
+## Use the right configuration
+
+Drizzle Kit looks for `drizzle.config.*` in the **server's working directory**. If you use a different config file, tell your agent which path to use. Relative paths resolve from that directory, not the client's.
+
+## Try it with your agent
+
+Once connected, describe the work you want done. For example, inspect migration history without changing it:
+
+```text
+Use the Drizzle MCP server to check my migration history.
+Explain any conflicts or warnings without changing files or the database.
+```
+
+Generate a migration for a schema change you've already made:
+
+```text
+Use the Drizzle MCP server to generate a migration for my schema changes.
+Show me the SQL and explain what it changes. Don't apply it to the database.
+```
+
+For PostgreSQL, you can also compare your configured schema with your migrations:
+
+```text
+Use the Drizzle MCP server to check whether my PostgreSQL schema
+and migrations are in sync. Explain any differences without changing files.
+```
+
+Apply reviewed migration files through your existing [migration workflow](/docs/drizzle-kit-migrate). rc5 does not expose a `migrate` MCP tool.
+
+## Add the Drizzle skill
+
+Add the [Drizzle skill](/docs/drizzle-kit-skills) to help your agent choose a migration workflow, handle rename decisions and interpret results.
+
+[Install the skill from your project's Drizzle Kit](/docs/drizzle-kit-skills#install-the-skill-from-your-projects-drizzle-kit), then ask your agent to use it:
+
+```text
+Use the Drizzle skill and MCP server. In src/db/schema.ts, rename
+users.full_name to users.display_name and generate a migration.
+Show me the SQL before applying anything to the database.
+```
+
+For tool arguments and response details, see the [MCP reference](https://github.com/drizzle-team/drizzle-orm/blob/beta/drizzle-kit/MCP.md).
