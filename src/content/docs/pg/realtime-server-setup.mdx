@@ -1,0 +1,209 @@
+import Callout from "@mdx/Callout.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+# Server setup
+
+<Prerequisites>
+- [Drizzle Pulse overview](/docs/realtime-overview)
+- [Queries](/docs/realtime-queries)
+</Prerequisites>
+
+The runtime runs inside your application process. It reads the PostgreSQL write-ahead log (WAL) and gives your code [live collections and CDC event streams](/docs/realtime-live-collections) for the queries that you defined. You deploy no extra service.
+
+A typical setup has three steps. You create and start the runtime once when your application starts, create live collections or subscribe to CDC event streams wherever you need data, and stop the runtime when the application shuts down.
+
+Import the runtime from `drizzle-pulse/embedded`.
+
+## `wal_level = logical`
+
+Drizzle Pulse reads changes through logical replication, so the PostgreSQL setting `wal_level` must be `logical`. If it has another value, `runtime.start()` throws an error. The runtime cannot change this setting for you, because PostgreSQL applies it only after a restart.
+
+Check the current value:
+
+```sql
+SHOW wal_level;
+```
+
+If the result is not `logical`, set it and then restart PostgreSQL:
+
+```sql
+ALTER SYSTEM SET wal_level = logical;
+```
+
+Some hosted providers set `wal_level` in their dashboard or settings instead of SQL. See your provider's documentation.
+
+## Create and start the runtime
+
+`createRuntime()` takes your queries and two database connections.
+
+```ts copy
+import { drizzle } from 'drizzle-orm/postgres';
+import { createRuntime } from 'drizzle-pulse/embedded';
+import { ordersByStatus, ordersPulse } from './queries';
+
+const runtime = createRuntime({
+  queries: { allOrders: ordersPulse, ordersByStatus },
+  databaseUrl: process.env.DATABASE_URL!,
+  sourceDb: drizzle(process.env.DATABASE_URL!),
+});
+
+await runtime.start();
+```
+
+| Option | Description |
+| :----- | :---------- |
+| `queries` | The query definitions to serve, keyed by query name. The names become the names on `runtime.client` and `runtime.events`. |
+| `databaseUrl` | The connection URL of the database. The database must have [`wal_level = logical`](#wal_level--logical). The runtime uses it for the replication stream and for its own setup statements. Pass either `databaseUrl` or [`client`](#use-your-own-pool), not both. |
+| `sourceDb` | Your own Drizzle database instance for PostgreSQL. A live collection reads its first rows through it, so the first read keeps your session settings, such as row-level security and `search_path`. After a reconnect, the runtime reads the rows again through the `databaseUrl` connection. That read does not use the session settings of `sourceDb`. |
+| `wal` | Optional. `{ publicationName?, slotName? }`. Both default to `drizzle_pulse`. |
+| `logLevel` | Optional. `LogLevel.Silent`, `LogLevel.Error`, `LogLevel.Info`, or `LogLevel.Debug`. The default is `LogLevel.Info`. Import `LogLevel` from `drizzle-pulse/embedded`. |
+| `telemetry` | Optional. A function that receives a [telemetry event](#telemetry) for each applied batch of changes. |
+
+`runtime.start()` prepares the [database objects](#database-objects) and then starts the replication stream. Create live collections and subscribe to CDC event streams only after `start()` finishes.
+
+### Use your own pool
+
+By default, the runtime creates its own connections from `databaseUrl`. If your application already has a Drizzle Postgres pool, pass it as `client` instead. The runtime then runs its setup statements on that pool and starts the replication stream with the pool's connection settings.
+
+If you create your database with `drizzle()` from `drizzle-orm/postgres`, its pool is `db.$client`:
+
+```ts copy
+import { drizzle } from 'drizzle-orm/postgres';
+import { createRuntime } from 'drizzle-pulse/embedded';
+
+const db = drizzle(process.env.DATABASE_URL!);
+
+const runtime = createRuntime({
+  queries: { allOrders: ordersPulse, ordersByStatus },
+  client: db.$client,
+  sourceDb: db,
+});
+```
+
+A pool from the standalone `@drizzle-team/postgres` package works too. In that case the runtime uses only that pool and creates no connections with the driver that `drizzle-orm` bundles:
+
+```ts copy
+import { createPool } from '@drizzle-team/postgres';
+import { drizzle } from 'drizzle-orm/postgres';
+import { createRuntime } from 'drizzle-pulse/embedded';
+
+const pool = createPool(process.env.DATABASE_URL!);
+
+const runtime = createRuntime({
+  queries: { allOrders: ordersPulse, ordersByStatus },
+  client: pool,
+  sourceDb: drizzle({ client: pool }),
+});
+```
+
+The role of the pool needs the `REPLICATION` attribute.
+
+<Callout type="info">
+`runtime.stop()` does not close a pool that you passed as `client`, because your application owns it. Close the pool yourself after `runtime.stop()`.
+</Callout>
+
+## Stop the runtime
+
+`runtime.stop()` disposes all live collections and closes all CDC event streams of the runtime. Then it closes the replication stream and the connections of the runtime. It does not close `sourceDb`, because your application owns it.
+
+```ts copy
+await runtime.stop();
+```
+
+## Database objects
+
+When the runtime starts, it creates the database objects that it needs.
+
+1. The runtime sets `REPLICA IDENTITY FULL` on every source table. PostgreSQL then writes the complete old row for each update and delete.
+2. The runtime creates a publication. Its default name is `drizzle_pulse`. The publication has the publish options `insert, update, delete`, so `TRUNCATE` produces no events. The runtime adds every source table of your queries to it.
+3. The runtime creates a temporary replication slot. The slot name is the `slotName` option, an underscore, and a random suffix of 8 characters. PostgreSQL removes the slot when the connection closes, so a crashed process leaves no slot that holds WAL files.
+
+`slotName` must have 1 to 54 characters. It can contain only lower-case letters, digits, and underscores. If `slotName` breaks these rules, `start()` throws an error.
+
+`start()` only adds tables to the publication and sets `REPLICA IDENTITY FULL`. It never removes a table from the publication and never resets a replica identity. This keeps rolling deploys safe. During a rolling deploy, the old and the new version of your application run at the same time with different queries. If `start()` removed tables, each version would remove the tables of the other version.
+
+A table that no query reads any more stays in the publication until the next provisioning. Until then, the runtime reads the changes of the table and discards them. [Provisioning](#provision-with-a-separate-role) removes unused tables from the publication and resets their replica identity to `DEFAULT`.
+
+## Provision with a separate role
+
+By default, the role in `databaseUrl` runs the setup statements when the runtime starts. This role needs:
+
+1. Ownership of every source table, to set `REPLICA IDENTITY FULL`.
+2. The `CREATE` privilege on the database, to create the publication.
+3. Ownership of the publication, after it exists.
+4. The `REPLICATION` attribute, to start the replication stream.
+
+If your application role has fewer privileges, run the setup as a separate deploy step under an elevated role. The elevated role needs items 1 to 3. It does not need the `REPLICATION` attribute, because provisioning does not start the replication stream.
+
+Call `provision()` from `drizzle-pulse/embedded`. It does the same as `runtime.provision()`, but it needs no runtime and no `sourceDb`. Pass the same `queries` and `wal` as the runtime. Like the runtime, it takes either `databaseUrl` or a [`client`](#use-your-own-pool) pool.
+
+```ts copy
+import { provision } from 'drizzle-pulse/embedded';
+import { ordersByStatus, ordersPulse } from './queries';
+
+await provision({
+  queries: { allOrders: ordersPulse, ordersByStatus },
+  databaseUrl: process.env.ADMIN_DATABASE_URL!,
+});
+```
+
+If you already have a runtime object, `runtime.provision()` does the same. It throws an error if the runtime is already started.
+
+After provisioning, `start()` finds every source table in the publication with `REPLICA IDENTITY FULL`, so it runs no setup statements. The application role then needs:
+
+1. The `REPLICATION` attribute, to start the replication stream.
+2. The `SELECT` privilege on every source table. After a reconnect, the runtime reads the rows of each live collection again through the `databaseUrl` connection.
+
+<Callout type="warning">
+If you add a query with a new source table, run provisioning again before you deploy. Otherwise `start()` tries to change the new table and the publication, and fails if the application role has no privileges for that.
+</Callout>
+
+If a setup statement fails, the error names the statement and the privilege that is probably missing.
+
+## Telemetry
+
+Pass a `telemetry` function to `createRuntime()` to measure the delay between a commit and its delivery. The runtime calls it once for each group of changes in each transaction that it applies. A group holds the changes of one operation on one table. The runtime also calls it once for each live collection after a reconnect. Each call happens after the runtime delivers the changes to live collections and CDC event streams. If your function throws an error, the runtime logs the error and continues replication.
+
+```ts copy
+const runtime = createRuntime({
+  queries: { allOrders: ordersPulse, ordersByStatus },
+  databaseUrl: process.env.DATABASE_URL!,
+  sourceDb,
+  telemetry: (event) => {
+    const latencyMicros = event.appliedAtMicros - event.committedAtMicros;
+    console.log(`${event.schema}.${event.table} ${event.op}: ${latencyMicros} microseconds`);
+  },
+});
+```
+
+| Field | Description |
+| :---- | :---------- |
+| `schema` | The schema of the source table. |
+| `table` | The name of the source table. |
+| `op` | `'insert'`, `'update'`, `'delete'`, or `'rebaseline'`. `'rebaseline'` marks a live collection that loaded its rows again after a reconnect. |
+| `rowCount` | The number of row changes in the group. On `'rebaseline'`, it is the number of recovered rows. |
+| `committedAtMicros` | The commit time on the database host, in epoch microseconds. |
+| `appliedAtMicros` | The time at which this process applied the commit, in epoch microseconds. On `'rebaseline'`, it equals `committedAtMicros`. |
+| `commitLsn` | The log sequence number of the commit. |
+
+`appliedAtMicros - committedAtMicros` is the sync latency in microseconds. `committedAtMicros` comes from the clock of the database server, and `appliedAtMicros` comes from the clock of the server that runs your application. If the two clocks differ, a single latency value can be negative.
+
+A table that two live collections read reports two `'rebaseline'` events, one for each live collection.
+
+## Fatal errors
+
+If all reconnect attempts fail, replication fails permanently and the runtime stops itself. Register a listener with `runtime.onFatalError()` to alert and restart your process. The method returns a function that removes the listener.
+
+```ts copy
+const removeListener = runtime.onFatalError((error) => {
+  console.error('Replication failed', error);
+  process.exit(1);
+});
+```
+
+Before the runtime stops, each live collection calls its [`onError`](/docs/realtime-live-collections#errors) listeners with the error, and each CDC event stream calls its [`onError`](/docs/realtime-live-collections#stream-errors) option. Then the runtime disposes the live collections and closes the CDC event streams.
+
+## Next steps
+
+- [Live collections](/docs/realtime-live-collections#live-collections): read the rows of a query and get a notification after each change.
+- [CDC event streams](/docs/realtime-live-collections#cdc-event-streams): react to each row change of a query.

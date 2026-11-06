@@ -1,0 +1,121 @@
+import Npm from "@mdx/Npm.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+# Drizzle Pulse
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- [Schema declaration](/docs/sql-schema-declaration)
+- A PostgreSQL database
+</Prerequisites>
+
+Drizzle Pulse keeps your application in sync with your PostgreSQL database as rows change. You describe the rows that you care about as a query on a Drizzle table, for example "all accepted orders". Drizzle Pulse then keeps those rows in memory and updates them shortly after each transaction commits.
+
+Drizzle Pulse is a library that runs inside your existing server process, next to your request handlers. It connects to the database that your application already uses, so there is no extra service to deploy and operate. You add a package and a few lines of code, and you deploy your application as before.
+
+Use it to:
+
+- answer requests from an in-memory list of rows that is always up to date, such as the open orders on a dispatch screen;
+- send changes to connected clients, for example over WebSockets or server-sent events;
+- run code when data changes, such as sending a notification or updating a search index.
+
+Your application writes to the database as before. Drizzle Pulse reads the changes from PostgreSQL itself, so it also sees changes from other services, scripts and manual SQL.
+
+Here is a complete example. It uses a plain Drizzle table, starts Drizzle Pulse in the same process as an HTTP server, and serves the current accepted orders:
+
+```ts copy
+import { createServer } from 'node:http';
+import { drizzle } from 'drizzle-orm/postgres';
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { pulse } from 'drizzle-pulse';
+import { createRuntime } from 'drizzle-pulse/embedded';
+
+// An ordinary Drizzle table.
+const orders = pgTable('orders', {
+  id: serial('id').primaryKey(),
+  status: text('status').notNull(),
+  price: integer('price').notNull(),
+});
+
+// The rows to keep in sync: all orders with the status 'accepted'.
+const acceptedOrders = pulse(orders).query((ctx) => ctx.query({ status: 'accepted' }));
+
+// The runtime runs inside your application process.
+const runtime = createRuntime({
+  queries: { acceptedOrders },
+  databaseUrl: process.env.DATABASE_URL!,
+  sourceDb: drizzle(process.env.DATABASE_URL!),
+});
+await runtime.start();
+
+// A live collection holds the matching rows and stays up to date.
+const collection = await runtime.client.acceptedOrders();
+
+createServer((req, res) => {
+  res.setHeader('content-type', 'application/json');
+  res.end(JSON.stringify(collection.list()));
+}).listen(3000);
+```
+
+The code expects an `orders` table with these columns in the database. Each request returns the current accepted orders from memory, without a database query. Insert a row with the status `accepted`, or change the status of a row to or from `accepted`, from anywhere, for example from `psql`. The next request returns the new list.
+
+You can also run code when the rows change. Register a listener on the live collection, or subscribe to a CDC event stream to get each row change as an event:
+
+```ts
+// Called after each change to the accepted orders.
+collection.onChange(({ state }) => {
+  console.log('Accepted orders now:', state);
+});
+
+// Called for each row that enters, changes in, or leaves the accepted orders.
+runtime.events.acceptedOrders((event) => {
+  if (event.op === 'insert') console.log('New accepted order', event.row);
+});
+```
+
+When an order changes to `accepted`, it appears in the live collection and the CDC event stream gets an `insert`. When the order is completed or deleted, it leaves the live collection and the CDC event stream gets a `delete`.
+
+The example shows the two ways to use a query:
+
+- A **live collection** is the current set of rows that match a query. Drizzle Pulse keeps it in memory and updates it after each change. Read it with `list()` and listen with `onChange()`.
+- A **CDC event stream** delivers each row change for a query as an `insert`, `update` or `delete` event. CDC stands for change data capture. The stream keeps no rows.
+
+Drizzle Pulse works with PostgreSQL only.
+
+To try the example:
+
+1. Turn on [logical replication](/docs/realtime-server-setup#wal_level--logical) in PostgreSQL.
+2. [Install the packages](#installation).
+3. Run the code above.
+
+## Installation
+
+<Npm>
+ drizzle-pulse drizzle-orm@rc
+</Npm>
+
+Drizzle Pulse needs Node.js 20 or newer. Your project must install `drizzle-orm`, version `^1.0.0-rc.6`.
+
+To describe [query arguments](/docs/realtime-queries#arguments), you also need a schema library that supports [Standard Schema](https://standardschema.dev). The examples on these pages use `zod`:
+
+<Npm>
+ zod
+</Npm>
+
+The package has two entrypoints:
+
+1. `drizzle-pulse` has `pulse()`, which defines Pulse tables and queries. See [Queries](/docs/realtime-queries).
+2. `drizzle-pulse/embedded` has the runtime. See [Server setup](/docs/realtime-server-setup).
+
+## How it works
+
+PostgreSQL writes every change to its write-ahead log (WAL). Drizzle Pulse reads the WAL through logical replication, checks each changed row against your queries, and sends the matching changes to your live collections and CDC event streams.
+
+Logical replication needs the PostgreSQL setting `wal_level = logical`, which you must set yourself. Drizzle Pulse creates the other [database objects](/docs/realtime-server-setup#database-objects) that it needs when it starts.
+
+## Next steps
+
+- [Queries](/docs/realtime-queries): define the rows to keep in sync.
+- [Server setup](/docs/realtime-server-setup): create, start and stop the runtime, and set up the database.
+- [Live collections](/docs/realtime-live-collections#live-collections): read the rows of a query and get a notification after each change.
+- [CDC event streams](/docs/realtime-live-collections#cdc-event-streams): react to each row change of a query.
