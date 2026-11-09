@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import AgentSetupPrompt from "@components/AgentSetupPrompt.astro";
 import JavaScriptIcon from "@/assets/icons/JavaScriptIcon.astro";
 import TypeScriptIcon from "@/assets/icons/TypeScriptIcon.astro";
 import WithDBImage from '@/assets/images/landing/WithDB.png'
@@ -143,6 +144,10 @@ import PlanetScaleDarkImage from "@/assets/images/landing/planetScale-dark.png"
           >
         </div>
       </button>
+    </div>
+    <div class="agent-setup-entry">
+      <p>Build with your AI agent</p>
+      <AgentSetupPrompt placement="hero" />
     </div>
   </div>
   <div class="header-middle-container">
@@ -344,6 +349,21 @@ import PlanetScaleDarkImage from "@/assets/images/landing/planetScale-dark.png"
   .header-left {
     display: flex;
     flex-direction: column;
+  }
+
+  .agent-setup-entry {
+    margin-top: 24px;
+  }
+
+  .agent-setup-entry p {
+    margin: 0 0 10px;
+    color: #626262;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  html.dark .agent-setup-entry p {
+    color: #b1b1b1;
   }
 
   .header-right {
