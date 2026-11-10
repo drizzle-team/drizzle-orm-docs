@@ -36,7 +36,12 @@ Each call creates a new, independent live collection. Create a live collection o
 `list()` returns the current rows synchronously. The rows are sorted by primary key, in the direction that the query's `.order()` sets. Call it whenever you need the rows, for example in a request handler.
 
 ```ts copy
-const rows = orders.list();
+import type { PulseRow } from 'drizzle-pulse/embedded';
+
+// The row type of a live collection: the selected columns of the query.
+type AcceptedOrder = PulseRow<typeof orders>;
+
+const rows: readonly AcceptedOrder[] = orders.list();
 ```
 
 ### Change notifications
@@ -48,9 +53,25 @@ const rows = orders.list();
 3. `lsn`: the log sequence number of the commit.
 
 ```ts copy
-orders.onChange(({ events, state, lsn }) => {
-  console.log(`${events.length} changes, ${state.length} rows at ${lsn}`);
+const removeListener = orders.onChange(({ events, state, lsn }) => {
+  for (const event of events) {
+    switch (event.op) {
+      case 'insert':
+        console.log('added', event.pk, event.row);
+        break;
+      case 'update':
+        console.log('changed', event.pk, event.oldRow, '->', event.row);
+        break;
+      case 'delete':
+        console.log('removed', event.pk, event.oldRow);
+        break;
+    }
+  }
+  console.log(`${state.length} rows at ${lsn}`);
 });
+
+// Later, when you no longer need the notifications.
+removeListener();
 ```
 
 `onChange()` returns a function that removes the listener.
@@ -142,7 +163,13 @@ const stop = runtime.events.ordersByStatus(
 stop();
 ```
 
-A query without arguments takes the callback first: `runtime.events.allOrders((event, lsn) => { ... })`.
+A query without arguments takes the callback first:
+
+```ts copy
+const stopAll = runtime.events.allOrders((event, lsn) => {
+  console.log(event.op, event.pk, lsn);
+});
+```
 
 The callback must handle its own errors, the same as the [listeners of a live collection](#change-notifications).
 
@@ -163,7 +190,15 @@ Every row in an event is a full row with the columns of the query. Columns outsi
 
 ### Order and repeated delivery
 
-Events arrive in commit order. All events of one transaction share one `lsn`. If a disconnect happens between a delivery and its acknowledgement, the runtime can deliver the same commit again after the reconnect. If your callback has side effects, use the pair `(event.pk, lsn)` as an idempotency key.
+Events arrive in commit order. All events of one transaction share one `lsn`. If a disconnect happens between a delivery and its acknowledgement, the runtime can deliver the same commit again after the reconnect. If your callback has side effects, use the pair `(event.pk, lsn)` as an idempotency key:
+
+```ts copy
+runtime.events.allOrders((event, lsn) => {
+  // The same commit can arrive again after a reconnect, with the same key.
+  const idempotencyKey = `${event.pk}:${lsn}`;
+  enqueueNotification(idempotencyKey, event);
+});
+```
 
 ### Resync after a reconnect
 
