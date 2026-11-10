@@ -1,0 +1,174 @@
+import Callout from "@mdx/Callout.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+
+# Live collections and CDC event streams
+
+<Prerequisites>
+- [Drizzle Pulse overview](/docs/realtime-overview)
+- [Queries](/docs/realtime-queries)
+- A started runtime. See [Server setup](/docs/realtime-server-setup).
+</Prerequisites>
+
+For each query that you pass to `createRuntime()`, the runtime gives you two ways to get its data:
+
+1. `runtime.client.<queryName>()` creates a [live collection](#live-collections): the current rows of the query, kept up to date in memory.
+2. `runtime.events.<queryName>()` subscribes to a [CDC event stream](#cdc-event-streams): each row change of the query, one event at a time.
+
+The examples on this page use the `allOrders` and `ordersByStatus` queries from [Server setup](/docs/realtime-server-setup#create-and-start-the-runtime).
+
+## Live collections
+
+A live collection is like the result of a Drizzle `select` that stays up to date by itself. The runtime reads the rows that match the query once, keeps them in memory, and updates them after each commit that changes them. Use it when your code needs the current rows, for example to render a list or to answer requests from memory.
+
+### Create a live collection
+
+Create a live collection with `runtime.client.<queryName>()`. If the query has arguments, pass them as the only parameter. The call returns a promise that resolves when the live collection has loaded its first rows. The promise rejects if the runtime is not started.
+
+```ts copy
+const orders = await runtime.client.ordersByStatus({ status: 'accepted' });
+const everyOrder = await runtime.client.allOrders();
+```
+
+Each call creates a new, independent live collection. Create a live collection once, keep it for as long as you need it, and then dispose it.
+
+### Read rows
+
+`list()` returns the current rows synchronously. The rows are sorted by primary key, in the direction that the query's `.order()` sets. Call it whenever you need the rows, for example in a request handler.
+
+```ts copy
+const rows = orders.list();
+```
+
+### Change notifications
+
+`onChange()` calls your listener after each change to the rows. The listener gets three fields:
+
+1. `events`: the changes that the runtime applied. Each change has `op` set to `'insert'`, `'update'`, or `'delete'`, as described in [Events](#events).
+2. `state`: the rows after the change. It is the same as `list()`.
+3. `lsn`: the log sequence number of the commit.
+
+```ts copy
+orders.onChange(({ events, state, lsn }) => {
+  console.log(`${events.length} changes, ${state.length} rows at ${lsn}`);
+});
+```
+
+`onChange()` returns a function that removes the listener.
+
+<Callout type="warning">
+The runtime calls listeners synchronously and does not wait for a promise that a listener returns. If a listener is `async`, catch its errors inside the listener. A rejected promise that nobody catches is an unhandled rejection, and Node.js stops the process on it by default. This applies to all listeners on this page, including the callbacks of CDC event streams.
+</Callout>
+
+### Resync
+
+After a connection loss, the live collection loads its rows again. The runtime does not know which rows changed during the connection loss, so `onChange()` does not fire for those changes. Instead, the live collection calls the listeners that you register with `onResync()`. The listener gets the new `state` and the `lsn` from which the live collection continues.
+
+```ts copy
+orders.onResync(({ state }) => {
+  // Send the full list again, for example to connected clients.
+  broadcast(state);
+});
+```
+
+<Callout type="warning">
+If your code uses `state` from `onChange()`, for example to render a list, register the same handling in `onResync()` too. Otherwise your code keeps the rows from before the connection loss until the next change.
+</Callout>
+
+`onResync()` also returns a function that removes the listener.
+
+### Errors
+
+`onError()` calls your listener when the live collection fails after you create it. This happens in two cases:
+
+1. The live collection cannot load its rows again after a reconnect.
+2. Replication [fails permanently](/docs/realtime-server-setup#fatal-errors).
+
+`onError()` also returns a function that removes the listener.
+
+```ts copy
+orders.onError((error) => {
+  console.error('Live collection failed', error);
+});
+```
+
+### Dispose
+
+`dispose()` stops the live collection. After that, the runtime calls none of its listeners. You can call it more than once.
+
+```ts copy
+orders.dispose();
+```
+
+## CDC event streams
+
+A CDC event stream delivers the row changes for one query with its arguments, one by one. Use it when you want to react to changes, for example to send a notification or to update another system. The stream keeps no rows and has no first load. It reports only changes that happen after you subscribe.
+
+### Subscribe
+
+Subscribe to a CDC event stream with `runtime.events.<queryName>()`. Pass these parameters in this order:
+
+1. The arguments, if the query has them.
+2. A callback.
+3. Optional options.
+
+The call returns a function that closes the stream. It throws an error if the runtime is not started.
+
+```ts copy
+const stop = runtime.events.ordersByStatus(
+  { status: 'accepted' },
+  (event, lsn) => {
+    switch (event.op) {
+      case 'insert':
+        console.log('entered the result', event.row);
+        break;
+      case 'update':
+        console.log('changed', event.oldRow, '->', event.row);
+        break;
+      case 'delete':
+        console.log('left the result', event.oldRow);
+        break;
+    }
+  },
+  {
+    onResync: () => {
+      // Load your state again.
+    },
+    onError: (error) => {
+      console.error('CDC event stream closed', error);
+    },
+  },
+);
+
+stop();
+```
+
+A query without arguments takes the callback first: `runtime.events.allOrders((event, lsn) => { ... })`.
+
+The callback must handle its own errors, the same as the [listeners of a live collection](#change-notifications).
+
+### Events
+
+Events describe changes to the query result. For this reason, one table update can produce different events for different queries. For example, if an order changes from `requested` to `accepted`, a query for accepted orders gets an `insert` and a query for requested orders gets a `delete`.
+
+There are three kinds of events:
+
+1. `insert`: a row starts to match the query, or a matching row is inserted.
+   Fields: `op`, `row`, `pk`.
+2. `update`: a row changes and still matches the query.
+   Fields: `op`, `row`, `oldRow`, `pk`.
+3. `delete`: a row stops matching the query, or a matching row is deleted.
+   Fields: `op`, `oldRow`, `pk`.
+
+Every row in an event is a full row with the columns of the query. Columns outside the query never reach your callback. Your callback cannot tell a table insert from a table update that made a row match.
+
+### Order and repeated delivery
+
+Events arrive in commit order. All events of one transaction share one `lsn`. If a disconnect happens between a delivery and its acknowledgement, the runtime can deliver the same commit again after the reconnect. If your callback has side effects, use the pair `(event.pk, lsn)` as an idempotency key.
+
+### Resync after a reconnect
+
+After a connection loss, the runtime creates a new replication slot. It does not deliver the changes from commits that happened during the outage. Instead, the runtime calls `onResync`. When this happens, load again any state that you build from the events.
+
+### Stream errors
+
+The runtime calls `onError` when replication fails permanently. After this call, the runtime closes the CDC event stream.
