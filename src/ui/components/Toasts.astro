@@ -225,10 +225,9 @@ const toasts = [
     text-align: center;
   }
 
-  @media screen and (max-height: 870px) {
-    .toasts-wrap {
-      display: none;
-    }
+  /* visibility, not display: the wrap must keep its height to be measured */
+  .toasts-wrap_hidden {
+    visibility: hidden;
   }
 </style>
 <style is:global>
@@ -250,6 +249,34 @@ const toasts = [
   });
 </script>
 <script>
+  let fitObserver: ResizeObserver | undefined;
+  // minimal space to keep between the aside content (sponsors) and the toasts
+  const FIT_GAP = 4;
+
+  // show the toasts only while they fit between the aside content (sponsors) and the bottom
+  const observeFit = (toastsWrap: HTMLElement) => {
+    fitObserver?.disconnect();
+    const aside = toastsWrap.parentElement;
+    const content = aside?.querySelector<HTMLElement>(".aside-right__content");
+    if (!aside || !content) return;
+
+    const update = () => {
+      const freeSpace =
+        aside.getBoundingClientRect().bottom -
+        content.getBoundingClientRect().bottom;
+      const neededSpace =
+        FIT_GAP +
+        toastsWrap.offsetHeight +
+        parseFloat(getComputedStyle(toastsWrap).marginBottom);
+      toastsWrap.classList.toggle("toasts-wrap_hidden", freeSpace < neededSpace);
+    };
+
+    fitObserver = new ResizeObserver(update);
+    fitObserver.observe(aside);
+    fitObserver.observe(content);
+    update();
+  };
+
   const initToasts = () => {
     const productByDrizzle = document.getElementById("product-by-drizzle");
     if (productByDrizzle) {
@@ -297,8 +324,9 @@ const toasts = [
       }
     });
 
-    const toastsWrap = document.querySelector("[data-toasts]");
+    const toastsWrap = document.querySelector<HTMLElement>("[data-toasts]");
     if (toastsWrap) {
+      observeFit(toastsWrap);
       setTimeout(() => {
         toastsWrap.classList.remove("animated_bottom");
       }, 300);
