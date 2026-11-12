@@ -813,7 +813,6 @@ export const usersToGroups = p.pgTable(
     p.primaryKey({ columns: [t.userId, t.groupId] }),
     p.index('users_to_groups_user_id_idx').on(t.userId),
     p.index('users_to_groups_group_id_idx').on(t.groupId),
-    p.index('users_to_groups_composite_idx').on(t.userId, t.groupId),
   ],
 );
 
@@ -834,7 +833,6 @@ export const relations = defineRelations({ users, groups, usersToGroups },
 ```sql
 CREATE INDEX "users_to_groups_user_id_idx" ON "users_to_groups" ("user_id");
 CREATE INDEX "users_to_groups_group_id_idx" ON "users_to_groups" ("group_id");
-CREATE INDEX "users_to_groups_composite_idx" ON "users_to_groups" ("user_id","group_id");
 ```
 
 By applying these indexing strategies, you can significantly improve the performance of your Drizzle ORM applications when working with relational data, especially as your data volume grows and your queries become more complex. Remember to choose the indexes that best suit your specific query patterns and application needs.
