@@ -607,10 +607,10 @@ using the Drizzle relational query builder.
 <Section>
 ```ts copy
 const prepared = db._query.users.findMany({
-	where: ((users, { eq }) => eq(users.id, placeholder('id'))),
+	where: ((users, { eq }) => eq(users.id, sql.placeholder('id'))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
+			where: ((users, { eq }) => eq(users.id, sql.placeholder('pid'))),
 		},
 	},
 }).prepare('query_name');
@@ -626,7 +626,7 @@ const usersWithPosts = await prepared.execute({ id: 1, pid: 1 });
 const prepared = db._query.users.findMany({
 	with: {
 		posts: {
-			limit: placeholder('limit'),
+			limit: sql.placeholder('limit'),
 		},
 	},
 }).prepare('query_name');
@@ -640,7 +640,7 @@ const usersWithPosts = await prepared.execute({ limit: 1 });
 <Section>
 ```ts copy
 const prepared = db._query.users.findMany({
-	offset: placeholder('offset'),
+	offset: sql.placeholder('offset'),
 	with: {
 		posts: true,
 	},
@@ -655,13 +655,13 @@ const usersWithPosts = await prepared.execute({ offset: 1 });
 <Section>
 ```ts copy
 const prepared = db._query.users.findMany({
-	limit: placeholder('uLimit'),
-	offset: placeholder('uOffset'),
-	where: ((users, { eq, or }) => or(eq(users.id, placeholder('id')), eq(users.id, 3))),
+	limit: sql.placeholder('uLimit'),
+	offset: sql.placeholder('uOffset'),
+	where: ((users, { eq, or }) => or(eq(users.id, sql.placeholder('id')), eq(users.id, 3))),
 	with: {
 		posts: {
-			where: ((users, { eq }) => eq(users.id, placeholder('pid'))),
-			limit: placeholder('pLimit'),
+			where: ((users, { eq }) => eq(users.id, sql.placeholder('pid'))),
+			limit: sql.placeholder('pLimit'),
 		},
 	},
 }).prepare('query_name');
