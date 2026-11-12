@@ -13,7 +13,7 @@ await db.insert(users).values({ id: 1, name: 'Andrew' });
 ```
 will be translated to:
 ```sql
-insert into "users" ("id", "name") values (?, ?) -- params: ['Andrew']
+insert into "users" ("id", "name") values (?, ?) -- params: [1, 'Andrew']
 ```
 </Callout>
 
@@ -156,7 +156,7 @@ const result = await db.with(userCount)
 ```sql
 with "user_count" as (select count(*) as "value" from "users")
 insert into "users" ("username", "admin")
-values ('user1' ((select * from "user_count") = 0))
+values ('user1', ((select * from "user_count") = 0))
 returning "admin"
 ```
 </Section>

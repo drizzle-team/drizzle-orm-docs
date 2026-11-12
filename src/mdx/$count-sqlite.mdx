@@ -18,8 +18,8 @@ select count(*) from "users" where "users"."name" = 'Dan';
 It is exceptionally useful in [subqueries](/docs/sqlite/select#select-from-subquery):
 
 ```ts
-const users = await db.select({
-  ...users,
+const usersWithPostsCount = await db.select({
+  ...getColumns(users),
   postsCount: db.$count(posts, eq(posts.authorId, users.id)),
 }).from(users);
 ```

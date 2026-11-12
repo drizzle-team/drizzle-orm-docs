@@ -121,7 +121,7 @@ name for the field, making your queries more intuitive and readable.
 sql`lower(${usersTable.name})`.as('lower_name')
 ```
 ```sql
-... "users"."name" as lower_name ...
+... lower("name") as "lower_name" ...
 ```
 </Section>
 
@@ -158,7 +158,7 @@ SQL code or expressions that should remain untouched by the template function's 
 ```typescript
 sql`select * from ${usersTable} where id = ${12}`;
 // vs
-sql`select * from ${usersTable} where id = ${sql.raw(12)}`;
+sql`select * from ${usersTable} where id = ${sql.raw('12')}`;
 ```
 ```sql
 select * from "users" where id = $1; --> [12]
@@ -408,7 +408,7 @@ await db.select()
         .where(sql`to_tsvector('simple', ${usersTable.name}) @@ to_tsquery('simple', ${searchParam})`)
 ```
 ```sql
-select * from "users" where to_tsvector('simple', "users"."name") @@ to_tsquery('simple', '$1'); --> [ "Ale" ]
+select * from "users" where to_tsvector('simple', "users"."name") @@ to_tsquery('simple', $1); --> [ "Ale" ]
 ```
 </Section>
 

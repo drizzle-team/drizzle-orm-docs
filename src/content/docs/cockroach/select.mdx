@@ -351,7 +351,7 @@ await db.select().from(users).orderBy(asc(users.name), desc(users.name2));
 select "id", "name", "name2", "age" from "users" order by "users"."name";
 select "id", "name", "name2", "age" from "users" order by "users"."name" desc;
 
-select "id", "name", "name2", "age" from "users" order by "users"."name", "users"."name";
+select "id", "name", "name2", "age" from "users" order by "users"."name", "users"."name2";
 select "id", "name", "name2", "age" from "users" order by "users"."name" asc, "users"."name2" desc;
 ```
 </Section>
@@ -707,7 +707,7 @@ select max("id") from "users";
 ```ts
 // It's equivalent to writing
 await db.select({ 
-  value: sql`max(${expression})`.mapWith(users.id) 
+  value: sql`max(${users.id})`.mapWith(users.id) 
 }).from(users);
 ```
 </Section>

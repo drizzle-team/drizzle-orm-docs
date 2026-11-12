@@ -120,10 +120,10 @@ name for the field, making your queries more intuitive and readable.
 
 <Section>
 ```typescript
-sql`lower(usersTable.name)`.as('lower_name')
+sql`lower(${usersTable.name})`.as('lower_name')
 ```
 ```sql
-... (usersTable.name) as lower_name ...
+... lower("name") as "lower_name" ...
 ```
 </Section>
 
@@ -160,7 +160,7 @@ SQL code or expressions that should remain untouched by the template function's 
 ```typescript
 sql`select * from ${usersTable} where id = ${12}`;
 // vs
-sql`select * from ${usersTable} where id = ${sql.raw(12)}`;
+sql`select * from ${usersTable} where id = ${sql.raw('12')}`;
 ```
 ```sql
 select * from "users" where id = ?; --> [12]
@@ -361,7 +361,7 @@ await db.select({
 }).from(usersTable)
 ```
 ```sql
-select `id`, lower(`name`), lower(`name`) as `aliased_column`, count(*) from `users`;
+select "id", lower("name"), lower("name") as "aliased_column", count(*) from "users";
 ```
 </Section>
 

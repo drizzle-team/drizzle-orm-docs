@@ -656,7 +656,7 @@ select max(`id`) from `users`;
 ```ts
 // It's equivalent to writing
 await db.select({ 
-  value: sql`max(${expression})`.mapWith(users.id) 
+  value: sql`max(${users.id})`.mapWith(users.id) 
 }).from(users);
 ```
 </Section>
