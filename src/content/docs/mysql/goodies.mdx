@@ -199,7 +199,7 @@ if (is(value, Column)) {
 ### Mock Driver
 This API is a successor to an undefined `drizzle({} as any)` API which we've used internally in Drizzle tests and rarely recommended to external developers. 
 
-We decided to build and expose a proper API, every `drizzle` driver now has `drizzle.mock()`:
+We decided to build and expose a proper API, most `drizzle` drivers now have `drizzle.mock()` (the `drizzle-orm/mysql-proxy` driver does not):
 ```ts
 import { drizzle } from "drizzle-orm/mysql2";
 
