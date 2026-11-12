@@ -64,7 +64,7 @@ const result = await db.query.posts.findMany({
 [{
   id: 10,
   content: "My first post!",
-  ownerId: 14,
+  ownerId: 1,
   author: {
     id: 1,
     name: "Alex"
@@ -944,7 +944,7 @@ export const relations = defineRelations({ users, posts }, (r) => ({
       alias: "author",
     }),
     reviewer: r.one.users({
-      from: r.posts.authorId,
+      from: r.posts.reviewerId,
       to: r.users.id,
       alias: "reviewer",
     }),
