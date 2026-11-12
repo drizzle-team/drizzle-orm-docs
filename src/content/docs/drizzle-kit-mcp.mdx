@@ -7,12 +7,18 @@ import CodeTabs from "@mdx/CodeTabs.astro";
 import Npm from "@mdx/Npm.astro";
 import Tab from "@mdx/Tab.astro";
 import Tabs from "@mdx/Tabs.astro";
+import Stepper from "@mdx/Stepper.astro";
 
 The Drizzle Kit MCP server lets you ask your coding agent to generate migrations, check migration history or pull a schema from an existing database. The agent calls the Drizzle Kit installed in your project.
 
 Connecting the server gives your agent access to operations that write project files and change the database selected by your config. Generating a migration writes a file but does not apply it to the database. Your client's permissions and approval settings govern tool execution.
 
-## Install rc5 in your project
+## Quick start
+
+<Stepper>
+<li>
+
+### Install Drizzle in your project
 
 These examples use `drizzle-kit@rc` and `drizzle-orm@rc`. Install them in the package that owns your Drizzle schema and config:
 
@@ -25,7 +31,10 @@ In a monorepo, use the workspace package that uses Drizzle. **Start the MCP serv
 
 The server uses your project's [Drizzle Kit configuration](/docs/drizzle-config-file). For `push` or `pull`, that config also needs database credentials.
 
-## Connect your MCP client
+</li>
+<li>
+
+### Connect your MCP client
 
 Choose your client below. For CLI setup, run the command from your Drizzle package with the client's CLI installed.
 
@@ -173,15 +182,19 @@ Set the server's working directory to your Drizzle package in your client. The c
 </Tab>
 </Tabs>
 
+</li>
+<li>
+
+### Verify the connection
+
 Restart or reconnect the server in your client, then check that its Drizzle tools are available.
 
 Your client manages the server process. You do not need an HTTP port or a separate terminal running it.
 
-## Use the right configuration
+</li>
+<li>
 
-Drizzle Kit looks for `drizzle.config.*` in the **server's working directory**. If you use a different config file, tell your agent which path to use. Relative paths resolve from that directory, not the client's.
-
-## Try it with your agent
+### Try it with your agent
 
 Once connected, describe the work you want done. For example, inspect migration history without changing it:
 
@@ -189,6 +202,15 @@ Once connected, describe the work you want done. For example, inspect migration 
 Use the Drizzle MCP server to check my migration history.
 Explain any conflicts or warnings without changing files or the database.
 ```
+
+</li>
+</Stepper>
+
+## Use the right configuration
+
+Drizzle Kit looks for `drizzle.config.*` in the **server's working directory**. If you use a different config file, tell your agent which path to use. Relative paths resolve from that directory, not the client's.
+
+## Generate and check migrations
 
 Generate a migration for a schema change you've already made:
 

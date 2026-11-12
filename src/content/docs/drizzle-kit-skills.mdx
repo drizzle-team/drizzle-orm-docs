@@ -1,11 +1,12 @@
 ---
 title: Drizzle agent skills
-description: Install the Drizzle skill bundled with Drizzle Kit rc5 and keep your agent's instructions matched to your installed version.
+description: Install the Drizzle skill bundled with Drizzle Kit and keep your agent's instructions matched to your installed version.
 ---
 
 import Callout from "@mdx/Callout.astro";
 import CodeTabs from "@mdx/CodeTabs.astro";
 import Npm from "@mdx/Npm.astro";
+import Stepper from "@mdx/Stepper.astro";
 
 Use the `drizzle` skill when working on Drizzle schema, queries or config with your coding agent. It covers:
 
@@ -15,7 +16,12 @@ Use the `drizzle` skill when working on Drizzle schema, queries or config with y
 
 You can use the skill with the [MCP server](/docs/drizzle-kit-mcp), the CLI or the SDK.
 
-## Install the skill from your project's Drizzle Kit
+## Quick start
+
+<Stepper>
+<li>
+
+### Install Drizzle in your project
 
 These examples use rc5. Install the packages where your Drizzle schema and config live. In a monorepo, use that workspace package:
 
@@ -24,7 +30,16 @@ drizzle-orm@rc
 -D drizzle-kit@rc
 </Npm>
 
-Then run the skills command from that directory:
+</li>
+<li>
+
+### Install the skill from your project's Drizzle Kit
+
+<Callout type="warning" title="Upgrading skills from rc4">
+rc5 replaces rc4's separate skills with one `drizzle` skill and automatically removes the old project skills. Back up any custom edits before upgrading. User-level skills are unchanged.
+</Callout>
+
+Run the skills command from your Drizzle package directory:
 
 <CodeTabs items={["npm", "yarn", "pnpm", "bun"]}>
 ```shell
@@ -43,11 +58,10 @@ bun run drizzle-kit skills
 
 Choose your agent and installation scope when prompted. Installation needs network access to run `skills@latest`, but the Drizzle instructions come from your project's installed Drizzle Kit.
 
-<Callout type="warning" title="Upgrading skills from rc4">
-rc5 replaces rc4's separate skills with one `drizzle` skill and automatically removes the old project skills. Back up any custom edits before upgrading. User-level skills are unchanged.
-</Callout>
+</li>
+<li>
 
-## Ask your agent to use the Drizzle skill
+### Ask your agent to use the Drizzle skill
 
 Use your agent's skill picker or ask it to load the `drizzle` skill. For example:
 
@@ -58,6 +72,9 @@ before applying anything to the database.
 ```
 
 The skill guides your agent through the rename decision so the migration preserves the existing column's data. Generating the migration does not apply it. Your agent's permissions and approval settings still govern command execution.
+
+</li>
+</Stepper>
 
 ## Keep the installed instructions current
 

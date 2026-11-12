@@ -1,0 +1,273 @@
+---
+import AgentLogos from "./AgentLogos.astro";
+
+interface Props {
+  placement?: "docs" | "hero";
+}
+
+const { placement = "docs" } = Astro.props;
+const prompt =
+  "Set up my coding agent for Drizzle in this project. Fetch and follow the instructions at https://orm.drizzle.team/agent-setup/prompt.md";
+---
+
+<agent-setup-prompt
+  class:list={["agent-setup", { "agent-setup--hero": placement === "hero" }]}
+>
+  <div class="agent-setup__actions">
+    <button class="agent-setup__copy" type="button" data-setup-copy disabled>
+      <AgentLogos />
+      <span data-setup-copy-label>Copy prompt</span>
+    </button>
+    {
+      placement === "docs" && (
+        <a
+          class="agent-setup__source"
+          href="/agent-setup/prompt.md"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read setup instructions <span aria-hidden="true">↗</span>
+        </a>
+      )
+    }
+  </div>
+
+  <p
+    class="agent-setup__status"
+    role="status"
+    aria-live="polite"
+    data-setup-status
+  >
+  </p>
+
+  <details class="agent-setup__details" data-setup-details>
+    <summary>View prompt</summary>
+    <pre class="agent-setup__prompt" aria-label="Agent setup prompt"><code data-setup-prompt>{prompt}</code></pre>
+    <a
+      class="agent-setup__source"
+      href="/agent-setup/prompt.md"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Read the full setup instructions <span aria-hidden="true">↗</span>
+    </a>
+  </details>
+  {
+    placement === "hero" && (
+      <noscript>
+        <a href="/docs/agents">Set up your agent</a>
+      </noscript>
+    )
+  }
+</agent-setup-prompt>
+
+<script>
+  class AgentSetupPrompt extends HTMLElement {
+    private resetTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    connectedCallback() {
+      const copyButton =
+        this.querySelector<HTMLButtonElement>("[data-setup-copy]")!;
+      const copyLabel = this.querySelector<HTMLElement>(
+        "[data-setup-copy-label]",
+      )!;
+      const idleLabel = copyLabel.textContent;
+      const prompt = this.querySelector<HTMLElement>("[data-setup-prompt]")!;
+      const details = this.querySelector<HTMLDetailsElement>(
+        "[data-setup-details]",
+      );
+      const status = this.querySelector<HTMLElement>("[data-setup-status]")!;
+
+      copyButton.disabled = false;
+      copyButton.addEventListener("click", async () => {
+        clearTimeout(this.resetTimeout);
+        copyButton.disabled = true;
+        copyLabel.textContent = idleLabel;
+        status.textContent = "";
+
+        try {
+          await navigator.clipboard.writeText(prompt.textContent!);
+          copyLabel.textContent = "Copied prompt!";
+          status.textContent =
+            "Paste the prompt into your coding agent to get started.";
+          this.resetTimeout = setTimeout(() => {
+            copyLabel.textContent = idleLabel;
+            status.textContent = "";
+          }, 3_000);
+        } catch {
+          if (details) {
+            details.open = true;
+          }
+
+          const selection = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(prompt);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          status.textContent =
+            "Couldn't copy automatically. Copy the selected prompt.";
+        } finally {
+          copyButton.disabled = false;
+        }
+      });
+    }
+
+    disconnectedCallback() {
+      clearTimeout(this.resetTimeout);
+    }
+  }
+
+  customElements.define("agent-setup-prompt", AgentSetupPrompt);
+</script>
+
+<style>
+  .agent-setup {
+    --setup-background: #fafafa;
+    --setup-border: #e3e3e3;
+    --setup-text: #202020;
+    --setup-muted: #626262;
+    display: block;
+    max-width: 100%;
+    margin: 12px 0 24px;
+    color: var(--setup-text);
+    text-align: left;
+  }
+
+  :global(html.dark) .agent-setup {
+    --setup-background: #1c1c1c;
+    --setup-border: #363636;
+    --setup-text: #f1f1f1;
+    --setup-muted: #b1b1b1;
+  }
+
+  .agent-setup__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .agent-setup__copy {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px 16px;
+    border: 1px solid var(--setup-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--setup-text);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    cursor: pointer;
+  }
+
+  .agent-setup__copy:hover {
+    opacity: 0.85;
+  }
+
+  .agent-setup__copy:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .agent-setup [data-setup-copy-label] {
+    min-width: 112px;
+    text-align: left;
+  }
+
+  .agent-setup__copy:focus-visible,
+  .agent-setup a:focus-visible,
+  .agent-setup summary:focus-visible,
+  .agent-setup__prompt:focus-visible {
+    outline: 2px solid #638f1b;
+    outline-offset: 4px;
+  }
+
+  :global(html.dark) .agent-setup :focus-visible {
+    outline-color: #c5f74f;
+  }
+
+  .agent-setup .agent-setup__source {
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  .agent-setup a:hover {
+    text-decoration: underline;
+  }
+
+  .agent-setup .agent-setup__status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .agent-setup .agent-setup__prompt {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 14px;
+    border: 1px solid var(--setup-border);
+    border-radius: 8px;
+    background: var(--setup-background);
+    color: var(--setup-text);
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .agent-setup .agent-setup__prompt code {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .agent-setup--hero {
+    align-self: flex-start;
+    margin: 0;
+  }
+
+  .agent-setup__details {
+    font-size: 12px;
+  }
+
+  .agent-setup__details:not([open]) {
+    display: none;
+  }
+
+  .agent-setup__details[open] {
+    max-width: 400px;
+    margin-top: 12px;
+  }
+
+  .agent-setup__details summary {
+    color: var(--setup-muted);
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 400px) {
+    .agent-setup__copy {
+      gap: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .agent-setup [data-setup-copy-label] {
+      min-width: 100px;
+    }
+  }
+</style>
