@@ -67,20 +67,30 @@ const {
     }
 
     <a class="pm__action pm__action--accent" href={calLink} target="_blank" rel="nofollow noreferrer">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <path d="M16 2v4M8 2v4M3 10h18" />
-      </svg>
-      Book a call
+      <span class="pm__icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+      </span>
+      <span class="pm__text">
+        <span>Book a call with Alex</span>
+        <span class="pm__detail">Partnerships and product integrations</span>
+      </span>
     </a>
 
     <div class="pm__action pm__action--with-copy">
       <a class="pm__link" href={`mailto:${email}`}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="4" width="20" height="16" rx="2" />
-          <path d="m2 7 10 6 10-6" />
-        </svg>
-        <span class="pm__value">{email}</span>
+        <span class="pm__icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="m2 7 10 6 10-6" />
+          </svg>
+        </span>
+        <span class="pm__text">
+          <span>Email the team</span>
+          <span class="pm__detail">{email}</span>
+        </span>
       </a>
       <button class="pm__copy" type="button" data-pm-copy={email} aria-label={`Copy ${email}`}>
         <svg class="pm__copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -93,23 +103,19 @@ const {
       </button>
     </div>
 
-    <div class="pm__action pm__action--with-copy">
-      <a class="pm__link" href={`https://x.com/${twitter}`} target="_blank" rel="nofollow noreferrer">
+    <a class="pm__action" href={`https://x.com/${twitter}`} target="_blank" rel="nofollow noreferrer">
+      <span class="pm__icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
-        <span class="pm__value">@{twitter}</span>
-      </a>
-      <button class="pm__copy" type="button" data-pm-copy={`@${twitter}`} aria-label={`Copy @${twitter}`}>
-        <svg class="pm__copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" />
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-        </svg>
-        <svg class="pm__check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 6 9 17l-5-5" />
-        </svg>
-      </button>
-    </div>
+      </span>
+      <span class="pm__text">
+        <span>Official X account</span>
+        <span class="pm__detail">@{twitter}</span>
+      </span>
+      <span class="pm__external" aria-hidden="true">↗</span>
+    </a>
+
   </dialog>
 </div>
 
@@ -159,10 +165,12 @@ const {
     position: fixed;
     inset: 0;
     margin: auto;
-    width: 320px;
+    width: 360px;
     max-width: calc(100vw - 32px);
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
     padding: 24px;
-    border-radius: 12px;
+    border-radius: 20px;
     border: 1px solid #e8e8e8;
     background-color: #ffffff;
     color: #14151a;
@@ -187,8 +195,8 @@ const {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     border: none;
     border-radius: 6px;
     background: none;
@@ -235,9 +243,9 @@ const {
   }
 
   .pm__name {
-    margin-top: 12px;
-    margin-bottom: 20px;
-    font-size: 18px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    font-size: 22px;
     font-weight: 700;
   }
 
@@ -250,11 +258,6 @@ const {
     color: #6b7280;
   }
 
-  /* no role lines: 3x the usual 28px gap between the name and the buttons */
-  .pm__name + .pm__action {
-    margin-top: 64px;
-  }
-
   html[class~="dark"] .pm__role {
     color: #909090;
   }
@@ -265,10 +268,10 @@ const {
     justify-content: flex-start;
     text-align: left;
     margin-top: 8px;
-    gap: 8px;
-    height: 40px;
-    padding: 0 14px;
-    border-radius: 3px;
+    gap: 12px;
+    min-height: 60px;
+    padding: 10px 14px;
+    border-radius: 10px;
     border: 1px solid rgba(33, 39, 46, 0.12);
     background-color: rgba(240, 241, 242, 0.27);
     color: #282b3b;
@@ -288,9 +291,9 @@ const {
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    height: 100%;
-    padding: 0 14px;
+    gap: 12px;
+    min-height: 60px;
+    padding: 10px 14px;
     color: inherit;
     text-decoration: none !important;
     transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -301,11 +304,11 @@ const {
   }
 
   .pm__action--accent {
-    border: none;
+    border-color: transparent;
     background-color: #282b3b;
     color: #ffffff;
     font-weight: 700;
-    height: 44px;
+    min-height: 48px;
   }
 
   .pm__action:not(.pm__action--with-copy):hover {
@@ -321,17 +324,54 @@ const {
   html[class~="dark"] .pm__action--accent {
     color: #282828;
     background-color: rgb(226, 232, 240);
-    border: none;
+    border-color: transparent;
   }
 
   .pm__action svg {
     flex-shrink: 0;
   }
 
-  .pm__value {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .pm__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 32px;
+    height: 32px;
+  }
+
+  .pm__text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .pm__detail {
+    color: #606066;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  html[class~="dark"] .pm__detail {
+    color: #aaa;
+  }
+
+  .pm__action--accent .pm__detail {
+    color: #dedee5;
+  }
+
+  html[class~="dark"] .pm__action--accent .pm__detail {
+    color: #484852;
+  }
+
+  .pm__external {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 24px;
+    margin-left: auto;
   }
 
   .pm__copy {
@@ -339,8 +379,8 @@ const {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border: none;
     border-radius: 3px;
     background: none;

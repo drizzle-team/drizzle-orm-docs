@@ -1,0 +1,31 @@
+---
+import AgentSetupPrompt from "./AgentSetupPrompt.astro";
+---
+
+<div class="agent-entry">
+  <div class="agent-entry__copy">
+    <div><strong>Using an AI coding agent?</strong></div>
+    <div>Set up Drizzle skills and tools in your project.</div>
+  </div>
+  <AgentSetupPrompt placement="hero">
+    <a slot="actions" href="/docs/agents"
+      >Setup guide <span aria-hidden="true">↗</span></a
+    >
+  </AgentSetupPrompt>
+</div>
+
+<style>
+  .agent-entry {
+    display: grid;
+    gap: 10px;
+    margin: 12px 0 20px;
+  }
+
+  .agent-entry__copy {
+    line-height: 1.5;
+  }
+
+  .agent-entry a {
+    white-space: nowrap;
+  }
+</style>
