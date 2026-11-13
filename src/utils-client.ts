@@ -1,5 +1,5 @@
 import { customSponsors } from "@/data/custom-sponsors";
-import { rotateArrayDaily } from "@/utils";
+import { rotateArrayDaily } from "@/rotate-array-daily";
 import { type ISponsor } from "@/types";
 
 interface AnchorProps {
