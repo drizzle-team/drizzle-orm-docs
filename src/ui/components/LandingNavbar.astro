@@ -1,18 +1,30 @@
-<div class="landing-navbar__wrap">
+---
+import { siteNavigation } from "@/data/site-navigation";
+
+const pathname = Astro.url.pathname;
+const activeHref = pathname === "/latest-releases" || pathname.startsWith("/latest-releases/")
+  ? "/latest-releases"
+  : pathname.startsWith("/docs/")
+  ? "/docs/overview"
+  : siteNavigation.find(({ href }) =>
+      pathname.startsWith(href.replace("/overview", "")),
+    )?.href;
+---
+
+<nav class="landing-navbar__wrap" aria-label="Main navigation">
   <div class="landing-navbar__wrap_buttons">
-    <a href="/docs/get-started" class="landing-navbar__wrap_button">Get Started</a>
-    <a href="/docs/overview" class="landing-navbar__wrap_button">Documentation</a>
-    <a href="/drizzle-studio/overview" class="landing-navbar__wrap_button">Studio</a>
-    <a href="/benchmarks" class="landing-navbar__wrap_button">Benchmarks</a>
+    {siteNavigation.map(({ label, href }) => (
+      <a href={href} class="landing-navbar__wrap_button" aria-current={href === activeHref ? "page" : undefined}>{label}</a>
+    ))}
   </div>
-</div>
+</nav>
 <style>
   .landing-navbar__wrap {
     align-items: center;
     justify-content: center;
     display: flex;
-    flex-grow: 1;
-    max-width: 424px;
+    flex: 0 0 auto;
+    width: max-content;
   }
 
   html.dark .landing-navbar__wrap_buttons {
@@ -23,7 +35,7 @@
   .landing-navbar__wrap_buttons {
     display: flex;
     border-radius: 40px;
-    padding: 4px 16px;
+    padding: 4px;
     background-color: #fff;
     border: 1px solid #00000014;
   }
@@ -34,6 +46,8 @@
 
   .landing-navbar__wrap_button {
     display: flex;
+    flex-shrink: 0;
+    white-space: nowrap;
     align-items: center;
     font-size: 14px;
     font-weight: 600;
@@ -50,6 +64,20 @@
 
   .landing-navbar__wrap_button:hover {
     color: #000;
+  }
+
+  .landing-navbar__wrap_button[aria-current="page"] {
+    color: #111827;
+    background: #f3f4f6;
+  }
+
+  html.dark .landing-navbar__wrap_button[aria-current="page"] {
+    color: #fff;
+    background: #282828;
+  }
+
+  .landing-navbar__wrap_button:focus-visible {
+    outline-color: #3e7ff0;
   }
 
   @media screen and (max-width: 836px){

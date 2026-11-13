@@ -1,0 +1,80 @@
+---
+import type { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
+
+interface Props {
+  icon: (typeof dialectSwitcherItems)[number]["icon"];
+}
+
+const { icon } = Astro.props;
+const svgFiles = import.meta.glob<string>("/public/svg/*.svg", {
+  query: "?raw",
+  import: "default",
+});
+const [lightSvg, darkSvg] = await Promise.all([
+  icon.light.path.endsWith(".svg") ? svgFiles[icon.light.path]() : null,
+  icon.dark.path.endsWith(".svg") ? svgFiles[icon.dark.path]() : null,
+]);
+---
+
+<span class="database-logo" aria-hidden="true">
+  <span class="database-logo-light" style={{ fill: icon.light.style?.fill }}>
+    {
+      lightSvg ? (
+        <Fragment set:html={lightSvg} />
+      ) : (
+        <img
+          src={icon.light.path.replace("/public", "")}
+          alt=""
+          width="32"
+          height="32"
+        />
+      )
+    }
+  </span>
+  <span class="database-logo-dark" style={{ fill: icon.dark.style?.fill }}>
+    {
+      darkSvg ? (
+        <Fragment set:html={darkSvg} />
+      ) : (
+        <img
+          src={icon.dark.path.replace("/public", "")}
+          alt=""
+          width="32"
+          height="32"
+        />
+      )
+    }
+  </span>
+</span>
+
+<style>
+  .database-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--database-logo-size, 20px);
+    height: var(--database-logo-size, 20px);
+    flex-shrink: 0;
+  }
+  .database-logo-light,
+  .database-logo-dark {
+    width: 100%;
+    height: 100%;
+  }
+  .database-logo-dark {
+    display: none;
+  }
+  html.dark .database-logo-light {
+    display: none;
+  }
+  html.dark .database-logo-dark {
+    display: block;
+  }
+  .database-logo :global(svg),
+  .database-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+</style>

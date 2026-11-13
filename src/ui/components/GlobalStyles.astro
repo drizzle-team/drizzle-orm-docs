@@ -280,7 +280,13 @@
     -webkit-tap-highlight-color: transparent;
     line-height: 1.5;
     scroll-padding-top: 104px;
+    scrollbar-gutter: stable;
     overflow-x: hidden;
+  }
+
+  html:has(body.DocSearch--active) {
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   button,

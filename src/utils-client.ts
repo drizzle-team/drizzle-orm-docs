@@ -3,7 +3,7 @@ import { rotateArrayDaily } from "@/utils";
 import { type ISponsor } from "@/types";
 
 interface AnchorProps {
-  viewportHeight: number;
+  scrollOffset: number;
   anchors: {
     id: string;
     offsetTop: number;
@@ -11,44 +11,26 @@ interface AnchorProps {
   scrollTop: number;
 }
 
-export const handleAnchorHighlighting = (props: AnchorProps) => {
-  const activeAnchors: string[] = [];
+/** Headings must be in document order; return at most one active section. */
+export function handleAnchorHighlighting({
+  anchors,
+  scrollTop,
+  scrollOffset,
+}: AnchorProps): string[] {
+  let activeId: string | undefined;
+  const sectionTop = Math.round(scrollTop + scrollOffset);
 
-  const { anchors } = props;
-
-  for (let i = anchors.length - 1; i >= 0; i--) {
-    const anchorTop = anchors[i].offsetTop;
-
-    if (
-      anchorTop < props.scrollTop + props.viewportHeight &&
-      anchorTop + 75 > props.scrollTop
-    ) {
-      activeAnchors.push(anchors[i].id);
+  for (const anchor of anchors) {
+    // Browser scrolling rounds document positions to CSS pixels.
+    if (Math.round(anchor.offsetTop) > sectionTop) {
+      break;
     }
+
+    activeId = anchor.id;
   }
 
-  const closestAnchor = anchors.find(
-    (anchor) => anchor.offsetTop > props.scrollTop,
-  );
-
-  if (closestAnchor && closestAnchor.offsetTop - 75 > props.scrollTop) {
-    const index = anchors.findIndex(
-      (anchor) => anchor.offsetTop === closestAnchor.offsetTop,
-    );
-    if (index !== -1) {
-      const item = anchors[index - 1];
-      if (item && !activeAnchors.includes(item.id)) {
-        activeAnchors.push(item.id);
-      }
-    }
-  }
-
-  if (!closestAnchor) {
-    activeAnchors.push(anchors[anchors.length - 1]?.id);
-  }
-
-  return activeAnchors;
-};
+  return activeId === undefined ? [] : [activeId];
+}
 
 export const sponsorsHandler = async () => {
   const response = await fetch("https://api.drizzle.team/v2/sponsors");

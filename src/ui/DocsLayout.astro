@@ -36,7 +36,7 @@ const pageHasDialects = Object.keys(dialects).includes(
     title={`Drizzle ORM - ${customTitle || title}`}
     description={description}
   />
-  <body class="banner-shown">
+  <body class="banner-shown docs-page">
     <MDXStyles />
     <Banner />
     <Header slug={slug} />
@@ -64,6 +64,39 @@ const pageHasDialects = Object.keys(dialects).includes(
       </div>
     </main>
     <style is:global>
+      :root {
+        --site-header-height: 64px;
+        --docs-header-height: var(--site-header-height);
+      }
+
+      :root:has(#banner) {
+        --site-header-height: 104px;
+      }
+
+      html:has(.docs-page) {
+        scroll-padding-top: calc(var(--docs-header-height) + 16px);
+      }
+
+      body.docs-page,
+      body.docs-page:has(#banner) {
+        margin-top: var(--docs-header-height);
+      }
+
+      body.docs-page .fixed-container,
+      body.docs-page:has(#banner) .fixed-container {
+        top: var(--docs-header-height);
+      }
+
+      body.docs-page .aside-scroll,
+      body.docs-page:has(#banner) .aside-scroll {
+        height: calc(100dvh - var(--docs-header-height));
+      }
+
+      body.docs-page .aside-right,
+      body.docs-page:has(#banner) .aside-right {
+        height: calc(100dvh - var(--docs-header-height));
+      }
+
       .fixed-container {
         position: fixed;
         left: 0;

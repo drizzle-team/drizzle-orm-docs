@@ -4,19 +4,28 @@ import Logo from "./Logo.astro";
 import GithubStars from "./GithubStars.astro";
 import LandingNavbar from "./LandingNavbar.astro";
 import AnnouncementsButton from "./AnnouncementsButton.astro";
+import MobileNavigation from "./MobileNavigation.astro";
+
+interface Props {
+  variant?: "site" | "docs";
+}
+
+const { variant = "site" } = Astro.props;
 ---
 
-<div class="header" id="header">
+<div class:list={["header", variant === "docs" && "header--docs"]} id="header">
   <div class="header_content">
     <div class="header__logo">
       <Logo />
+      <slot name="context" />
     </div>
     <LandingNavbar />
     <div class="header_nav">
+      {variant === "docs" && <div class="header_search"><slot name="search" /></div>}
       <GithubStars isAccent={true} />
       <AnnouncementsButton isAccent={true} />
       <ThemeSelector isAccent={true} />
-      <div class="burger" data-nav-burger-btn>
+      <button type="button" class="burger" data-mobile-panel="site" aria-label="Open site menu" aria-controls="mobile-navigation" aria-expanded="false">
         <svg
           fill="none"
           width="24"
@@ -44,10 +53,11 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
               d="M4 18h16"></path>
           </g>
         </svg>
-      </div>
+      </button>
     </div>
   </div>
 </div>
+<MobileNavigation />
 
 <style>
     html.dark .header {
@@ -74,7 +84,9 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
     }
 
     .header_content {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 16px;
         min-height: 64px;
         align-items: center;
         justify-content: space-between;
@@ -99,6 +111,84 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
         flex: 1;
         justify-content: flex-end;
         width: 100%;
+    }
+
+    .header--docs .header__logo {
+        flex: 0 0 auto;
+        gap: 16px;
+    }
+
+    .header--docs .header_nav {
+        flex: 0 0 auto;
+        width: auto;
+        margin-inline-start: auto;
+    }
+
+    .header_search {
+        width: 160px;
+        flex-shrink: 0;
+    }
+
+    .header_search :global(.nav_search-wrap),
+    .header_search :global(.search-wrap--centered),
+    .header_search :global(.DocSearch-Button) {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .header_search :global(.DocSearch-Button) {
+        height: 36px;
+    }
+
+    .header--docs .header_search :global(.DocSearch-Button) {
+        border-radius: 8px;
+    }
+
+    .header_search :global(.DocSearch-Search-Icon) {
+        width: 18px;
+        height: 18px;
+    }
+
+    @media screen and (max-width: 1280px) {
+        .header_search {
+            width: 44px;
+        }
+
+        .header_search :global(.DocSearch-Button) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+        }
+
+        .header_search :global(.DocSearch-Button-Placeholder),
+        .header_search :global(.DocSearch-Button-Keys) {
+            display: none;
+        }
+    }
+
+    @media screen and (max-width: 1160px) {
+        .header_content {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .header_content :global(.landing-navbar__wrap) {
+            display: none;
+        }
+
+        .header_content .burger {
+            display: flex;
+        }
+    }
+
+    @media screen and (max-width: 400px) {
+        .header_nav :global(.github-stars__wrap_number) {
+            position: absolute;
+            clip-path: inset(50%);
+        }
     }
 
     html.dark .header_nav__link {
@@ -139,23 +229,6 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
         }
     }
 </style>
-<script is:inline>
-  const toggleBurgerMenu = () => {
-    document.getElementById("header").classList.toggle("nav_container_open");
-    document.getElementById("aside").classList.toggle("invisible");
-    document.body.style.overflow = document.getElementById("header").classList.contains(
-      "nav_container_open",
-    )
-      ? "hidden"
-      : "auto";
-  };
-
-  document.addEventListener("astro:page-load", () => {
-    document.querySelector("[data-nav-burger-btn]").removeEventListener("click", toggleBurgerMenu, false)
-    if (document.querySelector("[data-nav-burger-btn]") && document.getElementById("header") && document.getElementById("aside")) {
-      document.querySelector("[data-nav-burger-btn]").addEventListener("click", toggleBurgerMenu)
-    }})
-</script>
 <style>
     .nav_container {
         position: sticky;
@@ -217,31 +290,31 @@ import AnnouncementsButton from "./AnnouncementsButton.astro";
         display: none;
     }
 
-    .nav_container_open .burger svg g {
+    .burger[aria-expanded="true"] svg g {
         transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s;
         transform-origin: 50%;
     }
 
-    .nav_container_open .burger svg g:first-of-type {
+    .burger[aria-expanded="true"] svg g:first-of-type {
         transform: rotate(45deg);
     }
 
-    .nav_container_open .burger svg g:first-of-type path {
+    .burger[aria-expanded="true"] svg g:first-of-type path {
         transform: translateY(6px);
         opacity: 1;
     }
 
-    .nav_container_open .burger svg path {
+    .burger[aria-expanded="true"] svg path {
         opacity: 0;
         transition:
                 transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
                 opacity 0s 0.2s;
     }
 
-    .nav_container_open .burger svg g:nth-of-type(2) {
+    .burger[aria-expanded="true"] svg g:nth-of-type(2) {
         transform: rotate(-45deg);
     }
-    .nav_container_open .burger svg g:nth-of-type(2) path {
+    .burger[aria-expanded="true"] svg g:nth-of-type(2) path {
         opacity: 1;
         transform: translateY(-6px);
     }
