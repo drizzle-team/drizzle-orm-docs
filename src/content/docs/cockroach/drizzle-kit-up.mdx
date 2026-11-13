@@ -19,8 +19,7 @@ import Dialects from "@mdx/Dialects.mdx"
 - `drizzle-kit generate` command - [read here](/docs/cockroach/drizzle-kit-generate)
 </Prerequisites>
 
-`drizzle-kit up` command lets you upgrade drizzle schema snapshots to a newer version. 
-It's required whenever we introduce breaking changes to the json snapshots of the schema and upgrade the internal version.
+For CockroachDB, `drizzle-kit up` currently returns without changing migration files or snapshots. It does not connect to a database, apply SQL migrations, or upgrade the database's migration history table. Use [`drizzle-kit migrate`](/docs/cockroach/drizzle-kit-migrate) to apply migrations to a database.
 
 <br/>
 <hr/>
@@ -49,10 +48,10 @@ npx drizzle-kit up --dialect=cockroach
 </CodeTabs>
 
 ### Multiple configuration files in one project
-You can have multiple config files in the project, it's very useful when you have multiple database stages or multiple databases on the same project:
+Use `--config` to select a configuration. The CockroachDB `up` handler currently leaves its `out` folder unchanged and does not connect to the configured database:
 <Npx>
-  drizzle-kit migrate --config=drizzle-dev.config.ts
-  drizzle-kit migrate --config=drizzle-prod.config.ts
+  drizzle-kit up --config=drizzle-dev.config.ts
+  drizzle-kit up --config=drizzle-prod.config.ts
 </Npx>
 ```plaintext {5-6}
 📦 <project root>
