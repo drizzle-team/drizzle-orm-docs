@@ -1,0 +1,45 @@
+---
+title: "Drizzle ORM v0.45.3 release"
+pubDate: 2026-09-21T10:02:25Z
+version: "0.45.3"
+description: "Adds the Netlify Database driver, developed and maintained by the Netlify team."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/0.45.3)
+
+## New Netlify DB Driver
+
+> Note: The Netlify DB driver is developed and maintained by the Netlify team.
+
+**Installation:**
+```bash
+npm i @netlify/db
+```
+
+**Usage example:**
+```typescript
+import { drizzle } from 'drizzle-orm/netlify-db';
+
+// reads NETLIFY_DB_URL and NETLIFY_DB_DRIVER env vars
+const db = drizzle();
+
+const result = await db.execute('select 1');
+```
+
+```typescript
+import { drizzle } from 'drizzle-orm/netlify-db';
+
+const db = drizzle(process.env.DATABASE_URL);
+
+const result = await db.execute('select 1');
+```
+
+```typescript
+import { drizzle } from 'drizzle-orm/netlify-db';
+
+// Explicit client — consumer controls the driver
+const db = drizzle({ client: netlifyDbClient });
+
+const result = await db.execute('select 1');
+```
+

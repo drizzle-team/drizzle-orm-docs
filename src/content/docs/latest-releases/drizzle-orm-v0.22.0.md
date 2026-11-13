@@ -1,0 +1,53 @@
+---
+title: "Drizzle ORM v0.22.0 release"
+pubDate: 2023-03-15T23:37:35Z
+version: "0.22.0"
+description: "Introduces a standalone query builder that works without a database connection and revises common table expression syntax."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/0.22.0)
+
+- 🎉 Introduced a standalone query builder that can be used without a DB connection:
+
+  ```ts
+  import { queryBuilder as qb } from 'drizzle-orm/pg-core';
+
+  const query = qb.select().from(users).where(eq(users.name, 'Dan'));
+  const { sql, params } = query.toSQL();
+  ```
+
+- 🎉 Improved `WITH ... SELECT` subquery creation syntax to more resemble SQL:
+
+  **Before**:
+  
+  ```ts
+  const regionalSales = db
+    .select({
+      region: orders.region,
+      totalSales: sql`sum(${orders.amount})`.as<number>('total_sales'),
+  })
+  .from(orders)
+  .groupBy(orders.region)
+  .prepareWithSubquery('regional_sales');
+
+  await db.with(regionalSales).select(...).from(...);
+  ```
+
+  **After**:
+  
+  ```ts
+  const regionalSales = db
+    .$with('regional_sales')
+    .as(
+      db
+        .select({
+          region: orders.region,
+          totalSales: sql<number>`sum(${orders.amount})`.as('total_sales'),
+        })
+        .from(orders)
+        .groupBy(orders.region),
+    );
+
+  await db.with(regionalSales).select(...).from(...);
+  ```
+

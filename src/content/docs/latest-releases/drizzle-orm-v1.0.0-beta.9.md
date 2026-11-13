@@ -1,0 +1,19 @@
+---
+title: "Drizzle ORM v1.0.0-beta.9 release"
+pubDate: 2026-01-15T11:50:11Z
+version: "1.0.0-beta.9"
+description: "Adds native Effect PostgreSQL support and simplifies PostgreSQL column types. Multidimensional arrays now use an explicit dimensions argument."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.9)
+
+- Drizzle now has native `@effect/sql-pg` driver support  
+That is a big milestone for Drizzle. We did rework our query builder chain and it supports both EffectLike and PromiseLike flows, we will gather feedback from the community and ship other dialects support  
+- We did also rework(simplified) `PgColumn` type chain, it's now mostly decoupled from other dialects, it now has better type performance and simpler declaration chain. We did remove PgArray column recursive wrapper, every `PgColumn` now has dimensions property both in runtime and type chain for external usage like validation packages
+- We have 1 breaking API change too, postgres `.array()` is now not chainable, if you want to have multidimensional array it's now `.array('[][]')`,`.array('[][][]')`, etc.  
+- Fixed lack of query result recalculation on pg dynamic update with joins  
+- Switched `MySQL2` default client from `CallbackPool` to `Pool`  
+
+- We've migrated away from `esbuild-register` to `tsx` loader, it will now allow to use drizzle-kit seamlessly with both ESM and CJS modules  
+- We've also added native Bun and Deno launch support, which will not trigger tsx loader and utilise native bun and deno imports capabilities and faster startup times
+
