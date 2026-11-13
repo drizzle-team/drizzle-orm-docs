@@ -1,0 +1,176 @@
+/* DocSearch compensates for a removed scrollbar; the root already reserves its space. */
+body.docs-page.DocSearch--active {
+  margin-right: 0 !important;
+  /* Keep the viewport as the sticky sidebars' scroll container. */
+  overflow: visible !important;
+}
+
+.docs-page .DocSearch-Container {
+  --docsearch-primary-color: #3e7ff0;
+  --docsearch-highlight-color: #3e7ff0;
+  --docsearch-text-color: #222124;
+  --docsearch-muted-color: #6b7280;
+  --docsearch-modal-background: #fff;
+  --docsearch-searchbox-focus-background: transparent;
+  --docsearch-searchbox-shadow: none;
+  --docsearch-hit-background: transparent;
+  --docsearch-hit-color: #37352f;
+  --docsearch-hit-active-color: #111;
+  --docsearch-hit-shadow: none;
+  --docsearch-footer-background: #fff;
+  --docsearch-footer-shadow: none;
+  --docsearch-logo-color: #6b7280;
+  --docsearch-key-gradient: none;
+  --docsearch-key-shadow: none;
+  --docsearch-container-background: rgb(17 24 39 / 32%);
+  --search-panel-border: #e2e2e5;
+  --search-result-active: #f3f4f6;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: auto;
+  height: 100dvh;
+  padding: calc(var(--docs-header-height) + 12px) 24px 24px;
+  background: var(--docsearch-container-background);
+  font-family: var(--default-font);
+}
+
+html.dark .docs-page .DocSearch-Container {
+  --docsearch-text-color: #e1e3e6;
+  --docsearch-muted-color: #a1a1aa;
+  --docsearch-modal-background: #171717;
+  --docsearch-hit-color: #e1e3e6;
+  --docsearch-hit-active-color: #e1e3e6;
+  --docsearch-footer-background: #171717;
+  --docsearch-logo-color: #a1a1aa;
+  --docsearch-container-background: rgb(0 0 0 / 45%);
+  --search-panel-border: #333;
+  --search-result-active: #292929;
+}
+
+.docs-page .DocSearch-Modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-width: 704px;
+  max-height: calc(100dvh - var(--docs-header-height) - 36px);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--search-panel-border);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
+}
+
+.docs-page .DocSearch-SearchBar {
+  flex-shrink: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--search-panel-border);
+}
+
+.docs-page .DocSearch-Form {
+  padding: 0;
+  border-radius: 0;
+}
+
+.docs-page .DocSearch-MagnifierLabel {
+  color: var(--docsearch-muted-color);
+}
+
+.docs-page .DocSearch-Input {
+  min-width: 0;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.docs-page .DocSearch-Dropdown {
+  order: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.docs-page .DocSearch-Footer {
+  order: 1;
+  position: relative;
+  flex-shrink: 0;
+  height: 36px;
+  border-bottom: 1px solid var(--search-panel-border);
+  border-radius: 0;
+}
+
+.docs-page .DocSearch-Commands-Key {
+  border: 1px solid var(--search-panel-border);
+}
+
+.docs-page .DocSearch-Hit[aria-selected="true"] a {
+  background: var(--search-result-active);
+}
+
+.docs-page .DocSearch-Hit {
+  padding-bottom: 0;
+}
+
+.docs-page .DocSearch-Hit a {
+  border-radius: 2px;
+}
+
+.docs-page .DocSearch-Hit-Container {
+  min-height: 52px;
+  height: auto;
+}
+
+.docs-page .DocSearch-Hit-source {
+  color: var(--docsearch-text-color);
+}
+
+.docs-page .DocSearch-Cancel {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 2px 6px;
+  border: 1px solid var(--search-panel-border);
+  border-radius: 3px;
+  color: var(--docsearch-muted-color);
+  font-size: 12px;
+}
+
+.docs-page .DocSearch-Cancel:focus-visible {
+  outline: 2px solid #3e7ff0;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .docs-page .DocSearch-Container {
+    display: flex;
+    align-items: flex-start;
+    padding: max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+    background: var(--docsearch-container-background);
+  }
+
+  .docs-page .DocSearch-Modal {
+    max-width: none;
+    height: auto;
+    max-height: calc(
+      var(--docsearch-vh, 1vh) * 100 - 24px - env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+    );
+  }
+
+  .docs-page .DocSearch-Cancel {
+    min-width: 44px;
+    min-height: 44px;
+    border-color: transparent;
+  }
+}

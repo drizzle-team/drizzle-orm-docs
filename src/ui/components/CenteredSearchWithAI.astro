@@ -1,6 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 
+import "./docsearch.css";
+
 import {
   defaultDocsDialect,
   dialectRelatedFolder,
@@ -239,6 +241,14 @@ const docSearchScopes = Object.fromEntries(
     apiKey: "7c390e262ac8858df0b6624d01d9dfef",
     indexName: "orm-drizzle",
     placeholder: "Search documentation...",
+    translations: {
+      modal: {
+        searchBox: {
+          cancelButtonText: "Esc",
+          cancelButtonAriaLabel: "Close search",
+        },
+      },
+    },
     transformSearchClient(searchClient) {
       return {
         ...searchClient,
@@ -305,7 +315,107 @@ const docSearchScopes = Object.fromEntries(
       : 'light';
   }
 </script>
+<script>
+  /** Activate the mobile keyboard during the tap, before DocSearch renders asynchronously. */
+  function initializeMobileSearchFocus(): () => void {
+    if (!document.querySelector(".nav_search-wrap")) {
+      return () => {};
+    }
+
+    const media = window.matchMedia("(max-width: 768px) and (pointer: coarse)");
+    let keyboardInput: HTMLInputElement | null = null;
+    let inputObserver: MutationObserver | null = null;
+
+    function releaseKeyboardInput() {
+      inputObserver?.disconnect();
+      inputObserver = null;
+      keyboardInput?.remove();
+      keyboardInput = null;
+      document.removeEventListener("focusin", handleSearchFocus);
+    }
+
+    function focusMountedSearchInput() {
+      const searchInput = document.querySelector<HTMLInputElement>("#docsearch-input");
+
+      if (searchInput) {
+        // Transfer before DocSearch's deferred autofocus can lose the iOS keyboard session.
+        searchInput.focus({ preventScroll: true });
+      }
+    }
+
+    function handleSearchFocus(event: FocusEvent) {
+      if (
+        event.target instanceof HTMLInputElement &&
+        event.target.id === "docsearch-input"
+      ) {
+        releaseKeyboardInput();
+      }
+    }
+
+    function handleSearchTap(event: MouseEvent) {
+      if (
+        !media.matches ||
+        !(event.target instanceof Element) ||
+        !event.target.closest("#docsearch .DocSearch-Button")
+      ) {
+        return;
+      }
+
+      const searchInput =
+        document.querySelector<HTMLInputElement>("#docsearch-input");
+
+      if (searchInput) {
+        searchInput.focus({ preventScroll: true });
+        return;
+      }
+
+      releaseKeyboardInput();
+      keyboardInput = document.createElement("input");
+      keyboardInput.type = "search";
+      keyboardInput.className = "mobile-search-keyboard-input";
+      keyboardInput.tabIndex = -1;
+      keyboardInput.setAttribute("aria-label", "Search documentation");
+      keyboardInput.setAttribute("autocomplete", "off");
+      document.body.append(keyboardInput);
+      document.addEventListener("focusin", handleSearchFocus);
+      keyboardInput.focus({ preventScroll: true });
+      inputObserver = new MutationObserver(focusMountedSearchInput);
+      inputObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    document.addEventListener("click", handleSearchTap, true);
+
+    return () => {
+      document.removeEventListener("click", handleSearchTap, true);
+      releaseKeyboardInput();
+    };
+  }
+
+  let dispose: (() => void) | undefined;
+
+  document.addEventListener("astro:page-load", () => {
+    dispose?.();
+    dispose = initializeMobileSearchFocus();
+  });
+  document.addEventListener("astro:before-swap", () => {
+    dispose?.();
+    dispose = undefined;
+  });
+</script>
 <style>
+  :global(.mobile-search-keyboard-input) {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    font-size: 16px;
+    pointer-events: none;
+  }
+
   .nav_search-wrap {
     align-items: center;
     display: flex;
@@ -316,8 +426,38 @@ const docSearchScopes = Object.fromEntries(
 
   @media screen and (max-width: 768px) {
     .nav_search-wrap {
+      display: flex;
+      flex: 0 0 44px;
+      width: 44px;
+      max-width: 44px;
+    }
+
+    .search-wrap--centered {
+      width: 44px;
+    }
+
+    .nav_search-wrap :global(.DocSearch-Button) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      margin: 0;
+      opacity: 1;
+      background: transparent !important;
+      border-radius: 6px;
+      box-shadow: none;
+    }
+
+    .nav_search-wrap :global(.DocSearch-Button-Placeholder),
+    .nav_search-wrap :global(.DocSearch-Button-Keys) {
       display: none;
     }
-    
+
+    .nav_search-wrap :global(.DocSearch-Search-Icon) {
+      width: 20px;
+      height: 20px;
+    }
   }
 </style>
