@@ -1,0 +1,22 @@
+---
+title: "Drizzle ORM v0.19.1 release"
+pubDate: 2023-02-16T12:46:09Z
+version: "0.19.1"
+description: "Adds the PostgreSQL char data type."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/0.19.1)
+
+## Changelog
+
+---
+
+- Add `char` data type support for postgresql by @AlexandrLi in [#177](https://github.com/drizzle-team/drizzle-orm/pull/177)
+- Adding new section with `New Contributors` for release notes. Took this template from [bun](https://github.com/oven-sh/bun) release notes pattern
+
+## New Contributors
+
+---
+
+- @AlexandrLi made their first contribution in [#177](https://github.com/drizzle-team/drizzle-orm/pull/177)
+

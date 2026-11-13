@@ -1,0 +1,35 @@
+---
+title: "Drizzle ORM v0.17.0 release"
+pubDate: 2023-01-26T17:56:59Z
+version: "0.17.0"
+description: "Consolidates the dialect-specific packages into drizzle-orm. Applications must update their PostgreSQL, MySQL and SQLite import paths."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/0.17.0)
+
+## ❗ All ORM packages are now merged into `drizzle-orm`
+
+Starting from release `0.17.0` and onwards, all dialect-specific packages are merged into `drizzle-orm`. Legacy ORM packages will be archived.
+
+### Import paths changes
+
+#### PostgreSQL
+
+- `import { ... } from 'drizzle-orm-pg'` -> `import { ... } from 'drizzle-orm/pg-core'`
+- `import { ... } from 'drizzle-orm-pg/node'` -> `import { ... } from 'drizzle-orm/node-postgres'`
+- `import { ... } from 'drizzle-orm-pg/neondb'` -> `import { ... } from 'drizzle-orm/neon'`
+- `import { ... } from 'drizzle-orm-pg/postgres.js'` -> `import { ... } from 'drizzle-orm/postgres.js'`
+
+#### MySQL
+
+- `import { ... } from 'drizzle-orm-mysql'` -> `import { ... } from 'drizzle-orm/mysql-core'`
+- `import { ... } from 'drizzle-orm-mysql/mysql2'` -> `import { ... } from 'drizzle-orm/mysql2'`
+
+#### SQLite
+
+- `import { ... } from 'drizzle-orm-sqlite'` -> `import { ... } from 'drizzle-orm/sqlite-core'`
+- `import { ... } from 'drizzle-orm-sqlite/better-sqlite3'` -> `import { ... } from 'drizzle-orm/better-sqlite3'`
+- `import { ... } from 'drizzle-orm-sqlite/d1'` -> `import { ... } from 'drizzle-orm/d1'`
+- `import { ... } from 'drizzle-orm-sqlite/bun'` -> `import { ... } from 'drizzle-orm/bun-sqlite'`
+- `import { ... } from 'drizzle-orm-sqlite/sql.js'` -> `import { ... } from 'drizzle-orm/sql.js'`
+
