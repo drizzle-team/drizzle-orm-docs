@@ -1,14 +1,14 @@
 ---
 title: DrizzleORM v0.31.0 release
 pubDate: 2024-05-31
-description: PostgreSQL indexes API changes
+description: "Redesigns PostgreSQL indexes and adds pgvector, point/line and PostGIS support. Requires Drizzle Kit 0.22.0 or later."
 ---
 
-## Breaking changes
+### Breaking changes
 
 > Note: `drizzle-orm@0.31.0` can be used with `drizzle-kit@0.22.0` or higher. The same applies to Drizzle Kit. If you run a Drizzle Kit command, it will check and prompt you for an upgrade (if needed). You can check for Drizzle Kit updates. [below](#drizzle-kit-updates-drizzle-kit0220)
 
-### PostgreSQL indexes API was changed
+#### PostgreSQL indexes API was changed
 
 The previous Drizzle+PostgreSQL indexes API was incorrect and was not aligned with the PostgreSQL documentation. The good thing is that it was not used in queries, and drizzle-kit didn't support all properties for indexes. This means we can now change the API to the correct one and provide full support for it in drizzle-kit
 
@@ -46,9 +46,9 @@ index('name')
   .with({ fillfactor: '70' })
 ```
 
-## New Features
+### New Features
 
-### 🎉 "pg_vector" extension support
+#### 🎉 "pg_vector" extension support
 
 > There is no specific code to create an extension inside the Drizzle schema. We assume that if you are using vector types, indexes, and queries, you have a PostgreSQL database with the `pg_vector` extension installed.
 
@@ -56,7 +56,7 @@ You can now specify indexes for `pg_vector` and utilize `pg_vector` functions fo
 
 Let's take a few examples of `pg_vector` indexes from the `pg_vector` docs and translate them to Drizzle
 
-#### L2 distance, Inner product and Cosine distance
+##### L2 distance, Inner product and Cosine distance
 
 ```ts
 // CREATE INDEX ON items USING hnsw (embedding vector_l2_ops);
@@ -72,7 +72,7 @@ const table = pgTable('items', {
 }))
 ```
 
-#### L1 distance, Hamming distance and Jaccard distance - added in pg_vector 0.7.0 version
+##### L1 distance, Hamming distance and Jaccard distance - added in pg_vector 0.7.0 version
 
 ```ts
 // CREATE INDEX ON items USING hnsw (embedding vector_l1_ops);
@@ -122,7 +122,7 @@ export function l2Distance(
 
 Name it as you wish and change the operator. This example allows for a numbers array, strings array, string, or even a select query. Feel free to create any other type you want or even contribute and submit a PR
 
-#### Examples
+##### Examples
 
 Let's take a few examples of `pg_vector` queries from the `pg_vector` docs and translate them to Drizzle
 
@@ -145,7 +145,7 @@ db.select({ innerProduct: sql`(${maxInnerProduct(items.embedding, [3,1,2])}) * -
 // and more!
 ```
 
-## 🎉 New PostgreSQL types: `point`, `line`
+### 🎉 New PostgreSQL types: `point`, `line`
 
 You can now use `point` and `line` from [PostgreSQL Geometric Types](https://www.postgresql.org/docs/current/datatype-geometric.html)
 
@@ -175,7 +175,7 @@ const items = pgTable('items', {
 });
 ```
 
-## 🎉 Basic "postgis" extension support
+### 🎉 Basic "postgis" extension support
 
 > There is no specific code to create an extension inside the Drizzle schema. We assume that if you are using postgis types, indexes, and queries, you have a PostgreSQL database with the `postgis` extension installed.
 
@@ -199,13 +199,13 @@ Type `geometry` has 2 modes for mappings from the database: `tuple` and `xy`.
 
 The current release has a predefined type: `point`, which is the `geometry(Point)` type in the PostgreSQL PostGIS extension. You can specify any string there if you want to use some other type
 
-# Drizzle Kit updates: `drizzle-kit@0.22.0`
+## Drizzle Kit updates: `drizzle-kit@0.22.0`
 
 > Release notes here are partially duplicated from [drizzle-kit@0.22.0](https://github.com/drizzle-team/drizzle-kit-mirror/releases/tag/v0.22.0)
 
-## New Features
+### New Features
 
-### 🎉 Support for new types
+#### 🎉 Support for new types
 
 Drizzle Kit can now handle:
 
@@ -213,7 +213,7 @@ Drizzle Kit can now handle:
 - `vector` from the PostgreSQL `pg_vector` extension
 - `geometry` from the PostgreSQL `PostGIS` extension
 
-### 🎉 New param in drizzle.config - `extensionsFilters`
+#### 🎉 New param in drizzle.config - `extensionsFilters`
 
 The PostGIS extension creates a few internal tables in the `public` schema. This means that if you have a database with the PostGIS extension and use `push` or `introspect`, all those tables will be included in `diff` operations. In this case, you would need to specify `tablesFilter`, find all tables created by the extension, and list them in this parameter.
 
@@ -231,9 +231,9 @@ export default defaultConfig({
 })
 ```
 
-## Improvements
+### Improvements
 
-### Update zod schemas for database credentials and write tests to all the positive/negative cases
+#### Update zod schemas for database credentials and write tests to all the positive/negative cases
 
 - support full set of SSL params in kit config, provide types from node:tls connection
 
@@ -259,11 +259,11 @@ export default defaultConfig({
 })
 ```
 
-### Normilized SQLite urls for `libsql` and `better-sqlite3` drivers
+#### Normilized SQLite urls for `libsql` and `better-sqlite3` drivers
 
 Those drivers have different file path patterns, and Drizzle Kit will accept both and create a proper file path format for each
 
-### Updated MySQL and SQLite index-as-expression behavior
+#### Updated MySQL and SQLite index-as-expression behavior
 
 In this release MySQL and SQLite will properly map expressions into SQL query. Expressions won't be escaped in string but columns will be
 
@@ -288,7 +288,7 @@ CREATE UNIQUE INDEX `emailUniqueIndex` ON `users` (`lower("users"."email")`);
 CREATE UNIQUE INDEX `emailUniqueIndex` ON `users` (lower("email"));
 ```
 
-## Bug Fixes
+### Bug Fixes
 
 - [BUG]: multiple constraints not added (only the first one is generated) - [#2341](https://github.com/drizzle-team/drizzle-orm/issues/2341) 
 - Drizzle Studio: Error: Connection terminated unexpectedly - [#435](https://github.com/drizzle-team/drizzle-kit-mirror/issues/435)
@@ -296,11 +296,11 @@ CREATE UNIQUE INDEX `emailUniqueIndex` ON `users` (lower("email"));
 - error: unknown option '--config' - [#423](https://github.com/drizzle-team/drizzle-kit-mirror/issues/423)
 
 
-## How `push` and `generate` works for indexes
+### How `push` and `generate` works for indexes
 
-### Limitations
+#### Limitations
 
-#### You should specify a name for your index manually if you have an index on at least one expression
+##### You should specify a name for your index manually if you have an index on at least one expression
 
 Example
 
@@ -314,7 +314,7 @@ index().on(sql`lower(${table.email})`) // error
 index('my_name').on(sql`lower(${table.email})`) // will work well
 ```
 
-#### Push won't generate statements if these fields(list below) were changed in an existing index:
+##### Push won't generate statements if these fields(list below) were changed in an existing index:
 
 - expressions inside `.on()` and `.using()`
 - `.where()` statements

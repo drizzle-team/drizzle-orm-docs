@@ -5,6 +5,8 @@ import Link from "@mdx/Link.astro";
 import { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
 import DocsLayout from "@/ui/DocsLayout.astro";
 import CustomHeader from "@components/CustomHeader.astro";
+import ReleaseNav from "@mdx/releases/ReleaseNav.astro";
+import { formatReleaseDate } from "@/releases/posts";
 import {
   commonFolders,
   defaultDocsDialect,
@@ -153,6 +155,11 @@ export async function getStaticPaths() {
 const { entry, frontmatter } = Astro.props;
 
 const { Content, headings } = await entry.render();
+const releaseSlug = entry.slug.replace(/^latest-releases\//, "");
+const releaseDate =
+  entry.slug.startsWith("latest-releases/") && frontmatter.pubDate
+    ? new Date(frontmatter.pubDate)
+    : undefined;
 ---
 
 <DocsLayout
@@ -160,6 +167,26 @@ const { Content, headings } = await entry.render();
   description={frontmatter.description}
   headings={headings}
 >
+  {
+    releaseDate && (
+      <ReleaseNav slug={releaseSlug} date={releaseDate} placement="top" />
+    )
+  }
   {frontmatter?.title && <CustomHeader>{frontmatter.title}</CustomHeader>}
+  {
+    releaseDate && (
+      <p>
+        Released{" "}
+        <time datetime={releaseDate.toISOString()}>
+          {formatReleaseDate(releaseDate)}
+        </time>
+      </p>
+    )
+  }
   <Content components={{ a: Link }} />
+  {
+    releaseDate && (
+      <ReleaseNav slug={releaseSlug} date={releaseDate} placement="bottom" />
+    )
+  }
 </DocsLayout>

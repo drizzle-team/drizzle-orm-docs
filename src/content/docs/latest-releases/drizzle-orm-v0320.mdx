@@ -1,16 +1,16 @@
 ---
 title: DrizzleORM v0.32.0 release
 pubDate: 2024-07-10
-description: Generated columns, identity columns, sequences and more
+description: "Adds MySQL returning IDs, PostgreSQL sequences and identity columns, and generated columns across dialects with matching Kit migration support."
 ---
 
-# Release notes for `drizzle-orm@0.32.0` and `drizzle-kit@0.23.0`
+## Release notes for `drizzle-orm@0.32.0` and `drizzle-kit@0.23.0`
 
 > It's not mandatory to upgrade both packages, but if you want to use the new features in both queries and migrations, you will need to upgrade both packages
 
-## New Features
+### New Features
 
-### 🎉 MySQL `$returningId()` function
+#### 🎉 MySQL `$returningId()` function
 
 MySQL itself doesn't have native support for `RETURNING` after using `INSERT`. There is only one way to do it for `primary keys` with `autoincrement` (or `serial`) types, where you can access `insertId` and `affectedRows` fields. We've prepared an automatic way for you to handle such cases with Drizzle and automatically receive all inserted IDs as separate objects
 
@@ -46,11 +46,11 @@ const result = await db.insert(usersTableDefFn).values([{ name: 'John' }, { name
 
 > If there is no primary keys -> type will be `{}[]` for such queries
 
-### 🎉 PostgreSQL Sequences
+#### 🎉 PostgreSQL Sequences
 
 You can now specify sequences in Postgres within any schema you need and define all the available properties
 
-##### **Example**
+###### **Example**
 
 ```ts
 import { pgSchema, pgSequence } from "drizzle-orm/pg-core";
@@ -74,11 +74,11 @@ export const customSchema = pgSchema('custom_schema');
 export const customSequence = customSchema.sequence("name");
 ```
 
-### 🎉 PostgreSQL Identity Columns
+#### 🎉 PostgreSQL Identity Columns
 
 [Source](https://wiki.postgresql.org/wiki/Don%27t_Do_This#Don.27t_use_serial): As mentioned, the `serial` type in Postgres is outdated and should be deprecated. Ideally, you should not use it. `Identity columns` are the recommended way to specify sequences in your schema, which is why we are introducing the `identity columns` feature
 
-##### **Example**
+###### **Example**
 
 ```ts
 import { pgTable, integer, text } from 'drizzle-orm/pg-core' 
@@ -94,11 +94,11 @@ You can specify all properties available for sequences in the `.generatedAlwaysA
 
 PostgreSQL docs [reference](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-PARMS-GENERATED-IDENTITY).
 
-### 🎉 PostgreSQL Generated Columns
+#### 🎉 PostgreSQL Generated Columns
 
 You can now specify generated columns on any column supported by PostgreSQL to use with generated columns
 
-##### **Example** with generated column for `tsvector`
+###### **Example** with generated column for `tsvector`
 
 > Note: we will add `tsVector` column type before latest release
 
@@ -140,7 +140,7 @@ export const users = pgTable("users", {
 }),
 ```
 
-### 🎉 MySQL Generated Columns
+#### 🎉 MySQL Generated Columns
 
 You can now specify generated columns on any column supported by MySQL to use with generated columns
 
@@ -154,7 +154,7 @@ Drizzle Kit will also have limitations for `push` command:
 
 2. `generate` should have no limitations
 
-##### **Example**
+###### **Example**
 
 ```ts
 export const users = mysqlTable("users", {
@@ -174,7 +174,7 @@ export const users = mysqlTable("users", {
 
 In case you don't need to reference any columns from your table, you can use just `sql` template or a `string` in `.generatedAlwaysAs()`
 
-### 🎉 SQLite Generated Columns
+#### 🎉 SQLite Generated Columns
 
 You can now specify generated columns on any column supported by SQLite to use with generated columns
 
@@ -192,17 +192,17 @@ Drizzle Kit will also have limitations for `push` and `generate` command:
 
 4. You can't change the generated constraint type from `virtual` to `stored` for the same reason as above. However, you can change from `stored` to `virtual`.
 
-## New Drizzle Kit features
+### New Drizzle Kit features
 
-### 🎉 Migrations support for all the new orm features
+#### 🎉 Migrations support for all the new orm features
 
 PostgreSQL sequences, identity columns and generated columns for all dialects
 
-### 🎉 New flag `--force` for `drizzle-kit push`
+#### 🎉 New flag `--force` for `drizzle-kit push`
 
 You can auto-accept all data-loss statements using the push command. It's only available in CLI parameters. Make sure you always use it if you are fine with running data-loss statements on your database
 
-### 🎉 New `migrations` flag `prefix`
+#### 🎉 New `migrations` flag `prefix`
 
 You can now customize migration file prefixes to make the format suitable for your migration tools:
 
@@ -212,7 +212,7 @@ You can now customize migration file prefixes to make the format suitable for yo
 - `none` will omit the prefix completely;
 
 
-##### **Example**: Supabase migrations format
+###### **Example**: Supabase migrations format
 ```ts
 import { defineConfig } from "drizzle-kit";
 

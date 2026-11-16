@@ -1,0 +1,183 @@
+---
+import {
+  formatReleaseDate,
+  getReleasePath,
+  getReleasePosts,
+} from "@/releases/posts";
+
+interface Props {
+  /** Release slug without the `latest-releases/` prefix. */
+  slug: string;
+  /** Publication date from the release frontmatter. */
+  date: Date;
+  placement: "top" | "bottom";
+}
+
+const { slug, date, placement } = Astro.props;
+
+const posts = await getReleasePosts();
+const index = posts.findIndex((post) => post.slug === slug);
+// Posts are sorted newest first.
+const newer = index > 0 ? posts[index - 1] : undefined;
+const older = index >= 0 ? posts[index + 1] : undefined;
+
+const month = date.toISOString().slice(0, 7);
+const monthHref = `/docs/latest-releases#changelog-${month}`;
+const monthLabel = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(date);
+---
+
+{
+  placement === "top" ? (
+    <nav class="release-breadcrumbs" aria-label="Breadcrumb">
+      <a href="/docs/latest-releases">Roadmap and changelog</a>
+      <span class="dot" aria-hidden="true" />
+      <a href="/docs/latest-releases#changelog">Changelog</a>
+      <span class="dot" aria-hidden="true" />
+      <a href={monthHref}>{monthLabel}</a>
+    </nav>
+  ) : (
+    <nav class="release-pager" aria-label="Releases">
+      <a class="release-pager-back" href={monthHref}>
+        ← Back to changelog
+      </a>
+      <div class="release-pager-links">
+        {newer ? (
+          <a class="release-pager-card" href={getReleasePath(newer.slug)}>
+            <span class="release-pager-label">← Newer release</span>
+            <span class="release-pager-title">{newer.data.title}</span>
+            <span class="release-pager-date">
+              {formatReleaseDate(newer.data.pubDate)}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )}
+        {older && (
+          <a
+            class="release-pager-card release-pager-older"
+            href={getReleasePath(older.slug)}
+          >
+            <span class="release-pager-label">Older release →</span>
+            <span class="release-pager-title">{older.data.title}</span>
+            <span class="release-pager-date">
+              {formatReleaseDate(older.data.pubDate)}
+            </span>
+          </a>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+<style>
+  /* Matches the get-started Breadcrumbs component. */
+  .release-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .release-breadcrumbs a {
+    color: #0f172a;
+    text-decoration: none;
+  }
+
+  .release-breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+
+  .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 100%;
+    background: #0f172a;
+    flex-shrink: 0;
+  }
+
+  html.dark .release-breadcrumbs a {
+    color: #c4c5c6;
+  }
+
+  html.dark .dot {
+    background: #f1f5f9;
+  }
+
+  .release-pager {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #e4e4e5;
+  }
+
+  html.dark .release-pager {
+    border-top-color: #303030;
+  }
+
+  .release-pager-back {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .release-pager-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .release-pager-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 16px;
+    border: 1px solid #e4e4e5;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .release-pager-card:hover {
+    border-color: #a1a1aa;
+  }
+
+  html.dark .release-pager-card {
+    border-color: #303030;
+  }
+
+  html.dark .release-pager-card:hover {
+    border-color: #6b6b6b;
+  }
+
+  .release-pager-older {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .release-pager-label,
+  .release-pager-date {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .release-pager-title {
+    font-weight: 500;
+  }
+
+  @media screen and (max-width: 640px) {
+    .release-pager-links {
+      grid-template-columns: 1fr;
+    }
+
+    .release-pager-older {
+      grid-column: 1;
+    }
+  }
+</style>

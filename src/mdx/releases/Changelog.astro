@@ -1,0 +1,39 @@
+---
+import { getReleasePath, getReleasePosts } from "@/releases/posts";
+
+const posts = await getReleasePosts();
+const monthFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const months = Map.groupBy(posts, (post) =>
+  post.data.pubDate.toISOString().slice(0, 7),
+);
+---
+
+<p>
+  Release notes for Drizzle ORM and Drizzle Kit, newest first. Follow new
+  releases with the <a href="/docs/latest-releases/rss.xml"
+    type="application/rss+xml">RSS feed</a
+  >.
+</p>
+
+{
+  [...months].map(([month, monthPosts]) => (
+    <>
+      <h3 id={`changelog-${month}`}>
+        {monthFormatter.format(new Date(`${month}-01T00:00:00Z`))}
+      </h3>
+      <ul>
+        {monthPosts.map((post) => (
+          <li>
+            <a href={getReleasePath(post.slug)}>{post.data.title}</a>{post.data.description && `: ${post.data.description}`}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))
+}
+
+{posts.length === 0 && <p>No releases yet.</p>}

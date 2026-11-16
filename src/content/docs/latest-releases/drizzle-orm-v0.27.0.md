@@ -1,0 +1,68 @@
+---
+title: "Drizzle ORM v0.27.0 release"
+pubDate: 2023-06-17T06:54:22Z
+version: "0.27.0"
+description: "Adds DISTINCT queries and SQLite bigint/boolean support, and fixes interoperability between multiple Drizzle instances in monorepos."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/0.27.0)
+
+## Correct behavior when installed in a monorepo (multiple Drizzle instances)
+
+Replacing all `instanceof` statements with a custom `is()` function allowed us to handle multiple Drizzle packages interacting properly.
+
+**It also fixes one of our biggest Discord tickets: `maximum call stack exceeded` 🎉**
+
+You should now use `is()` instead of `instanceof` to check if specific objects are instances of specific Drizzle types. It might be useful if you are building something on top of the Drizzle API.
+
+```ts
+import { is, Column } from 'drizzle-orm'
+
+if (is(value, Column)) {
+  // value's type is narrowed to Column
+}
+```
+
+## `distinct` clause support
+
+```ts
+await db.selectDistinct().from(usersDistinctTable).orderBy(
+  usersDistinctTable.id,
+  usersDistinctTable.name,
+);
+```
+
+Also, `distinct on` clause is available for PostgreSQL:
+
+```ts
+await db.selectDistinctOn([usersDistinctTable.id]).from(usersDistinctTable).orderBy(
+  usersDistinctTable.id,
+);
+
+await db.selectDistinctOn([usersDistinctTable.name], { name: usersDistinctTable.name }).from(
+  usersDistinctTable,
+).orderBy(usersDistinctTable.name);
+```
+
+## `bigint` and `boolean` support for SQLite
+
+Contributed by @MrRahulRamkumar (#558), @raducristianpopa (#411) and @meech-ward (#725)
+
+```ts
+const users = sqliteTable('users', {
+  bigintCol: blob('bigint', { mode: 'bigint' }).notNull(),
+  boolCol: integer('bool', { mode: 'boolean' }).notNull(),
+});
+```
+
+## DX improvements
+
+- Added verbose type error when relational queries are used on a database type without a schema generic
+- Fix `where` callback in RQB for tables without relations
+
+## Various docs improvements
+
+- Fix joins docs typo (#522) by @arjunyel
+- Add Supabase guide to readme (#690) by @saltcod
+- Make the column type in sqlite clearer (#717) by @shairez
+
