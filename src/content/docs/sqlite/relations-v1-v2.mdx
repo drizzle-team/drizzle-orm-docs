@@ -162,7 +162,10 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.users.invitedBy,
       to: r.users.id,
     }),
-    posts: r.many.posts(),
+    posts: r.many.posts({
+      from: r.users.id,
+      to: r.posts.authorId,
+    }),
   }
 }));
 
