@@ -114,17 +114,16 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle` directory by default. Each migration has its own timestamped folder containing a `migration.sql` file and a `snapshot.json` file.
 
 Example of a generated migration:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "users_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE "users_table" (
+	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"age" text NOT NULL,
-	"email" text NOT NULL,
-	CONSTRAINT "users_table_email_unique" UNIQUE("email")
+	"email" text NOT NULL UNIQUE
 );
 ```
 
@@ -274,17 +273,16 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle` directory by default. Each migration has its own timestamped folder containing a `migration.sql` file and a `snapshot.json` file.
 
 Example of a generated migration:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "users_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE "users_table" (
+	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"age" text NOT NULL,
-	"email" text NOT NULL,
-	CONSTRAINT "users_table_email_unique" UNIQUE("email")
+	"email" text NOT NULL UNIQUE
 );
 ```
 
@@ -390,13 +388,13 @@ Install the `@planetscale/database` driver:
 Create a `schema.ts` file in the `src/db` directory and declare a table schema:
 
 ```typescript copy filename="src/db/schema.ts"
-import { mysqlTable, serial, text } from "drizzle-orm/mysql-core";
+import { mysqlTable, serial, text, varchar } from "drizzle-orm/mysql-core";
 
 export const usersTable = mysqlTable('users_table', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   age: text('age').notNull(),
-  email: text('email').notNull().unique(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
 })
 ```
 
@@ -434,18 +432,17 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle` directory by default. Each migration has its own timestamped folder containing a `migration.sql` file and a `snapshot.json` file.
 
 Example of a generated migration:
 
 ```sql
 CREATE TABLE `users_table` (
-	`id` serial AUTO_INCREMENT NOT NULL,
+	`id` serial PRIMARY KEY,
 	`name` text NOT NULL,
 	`age` text NOT NULL,
-	`email` text NOT NULL,
-	CONSTRAINT `users_table_id` PRIMARY KEY(`id`),
-	CONSTRAINT `users_table_email_unique` UNIQUE(`email`)
+	`email` varchar(255) NOT NULL,
+	CONSTRAINT `email_unique` UNIQUE INDEX(`email`)
 );
 ```
 
@@ -596,19 +593,17 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `drizzle` directory by default. Each migration has its own timestamped folder containing a `migration.sql` file and a `snapshot.json` file.
 
 Example of a generated migration:
 
 ```sql
 CREATE TABLE `users_table` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY,
 	`name` text NOT NULL,
 	`age` text NOT NULL,
-	`email` text NOT NULL
+	`email` text NOT NULL UNIQUE
 );
---> statement-breakpoint
-CREATE UNIQUE INDEX `users_table_email_unique` ON `users_table` (`email`);
 ```
 
 Run migrations:
