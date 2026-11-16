@@ -3,11 +3,19 @@ import AgentLogos from "./AgentLogos.astro";
 
 interface Props {
   placement?: "docs" | "hero";
+  prompt?: string;
+  instructionsHref?: string;
+  instructionsLabel?: string;
+  promptLabel?: string;
 }
 
-const { placement = "docs" } = Astro.props;
-const prompt =
-  "Set up my coding agent for Drizzle in this project. Fetch and follow the instructions at https://orm.drizzle.team/agent-setup/prompt.md";
+const {
+  placement = "docs",
+  prompt = "Set up my coding agent for Drizzle in this project. Fetch and follow the instructions at https://orm.drizzle.team/agent-setup/prompt.md",
+  instructionsHref = "/agent-setup/prompt.md",
+  instructionsLabel = "Read setup instructions",
+  promptLabel = "Agent setup prompt",
+} = Astro.props;
 ---
 
 <agent-setup-prompt
@@ -22,11 +30,11 @@ const prompt =
       placement === "docs" && (
         <a
           class="agent-setup__source"
-          href="/agent-setup/prompt.md"
+          href={instructionsHref}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Read setup instructions <span aria-hidden="true">↗</span>
+          {instructionsLabel} <span aria-hidden="true">↗</span>
         </a>
       )
     }
@@ -42,14 +50,14 @@ const prompt =
 
   <details class="agent-setup__details" data-setup-details>
     <summary>View prompt</summary>
-    <pre class="agent-setup__prompt" aria-label="Agent setup prompt"><code data-setup-prompt>{prompt}</code></pre>
+    <pre class="agent-setup__prompt" aria-label={promptLabel}><code data-setup-prompt>{prompt}</code></pre>
     <a
       class="agent-setup__source"
-      href="/agent-setup/prompt.md"
+      href={instructionsHref}
       target="_blank"
       rel="noopener noreferrer"
     >
-      Read the full setup instructions <span aria-hidden="true">↗</span>
+      {instructionsLabel} <span aria-hidden="true">↗</span>
     </a>
   </details>
   {
@@ -123,6 +131,8 @@ const prompt =
 <style>
   .agent-setup {
     --setup-background: #fafafa;
+    --setup-button: #f6f6f7;
+    --setup-button-hover: #eff0f3;
     --setup-border: #e3e3e3;
     --setup-text: #202020;
     --setup-muted: #626262;
@@ -135,6 +145,8 @@ const prompt =
 
   :global(html.dark) .agent-setup {
     --setup-background: #1c1c1c;
+    --setup-button: #1c1c1c;
+    --setup-button-hover: #282828;
     --setup-border: #363636;
     --setup-text: #f1f1f1;
     --setup-muted: #b1b1b1;
@@ -149,24 +161,24 @@ const prompt =
 
   .agent-setup__copy {
     display: inline-flex;
-    min-height: 44px;
+    min-height: 40px;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 10px 16px;
-    border: 1px solid var(--setup-border);
-    border-radius: 999px;
-    background: transparent;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 4px;
+    background: var(--setup-button);
     color: var(--setup-text);
     font: inherit;
-    font-size: 16px;
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out;
     cursor: pointer;
   }
 
   .agent-setup__copy:hover {
-    opacity: 0.85;
+    background: var(--setup-button-hover);
   }
 
   .agent-setup__copy:disabled {
@@ -175,7 +187,7 @@ const prompt =
   }
 
   .agent-setup [data-setup-copy-label] {
-    min-width: 112px;
+    min-width: 100px;
     text-align: left;
   }
 
@@ -236,8 +248,18 @@ const prompt =
   }
 
   .agent-setup--hero {
-    align-self: flex-start;
+    width: 100%;
+    max-width: 400px;
     margin: 0;
+  }
+
+  .agent-setup--hero .agent-setup__actions,
+  .agent-setup--hero .agent-setup__copy {
+    width: 100%;
+  }
+
+  .agent-setup--hero .agent-setup__copy {
+    justify-content: space-between;
   }
 
   .agent-setup__details {
