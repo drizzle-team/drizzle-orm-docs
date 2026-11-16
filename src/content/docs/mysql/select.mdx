@@ -77,6 +77,23 @@ select `id`, lower(`name`) from `users`;
 ```
 </Section>
 
+To select all columns of a table and add more fields, spread `getColumns(table)` into the selection object.
+In v1, `getTableColumns` is deprecated. Use `getColumns` instead:
+
+<Section>
+```typescript
+import { getColumns, sql } from 'drizzle-orm';
+
+const result = await db.select({
+  ...getColumns(users),
+  lowerName: sql<string>`lower(${users.name})`,
+}).from(users);
+```
+```sql
+select `id`, `name`, `age`, lower(`name`) from `users`;
+```
+</Section>
+
 <Callout type="warning">
 By specifying `sql<string>`, you are telling Drizzle that the **expected** type of the field is `string`.<br />
 If you specify it incorrectly (e.g. use `sql<number>` for a field that will be returned as a string), the runtime value won't match the expected type.

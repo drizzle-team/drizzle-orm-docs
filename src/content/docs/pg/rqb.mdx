@@ -819,7 +819,10 @@ await db.query.posts.findMany({
 Relational query API lets you add custom additional fields. 
 It's useful when you need to retrieve data and apply additional functions to it.
 <Callout type="warning" emoji="⚠️">
-	As of now aggregations are not supported in `extras`, please use **[`core queries`](/docs/select)** for that.
+	Aggregate functions over the rows of the queried table, such as `count(*)` or `sum(...)`, are not supported in `extras`.
+	Relational queries do not add a `GROUP BY` clause.
+	To count or sum related rows, use a subquery in `extras`, for example `db.$count(...)`. See [Include subqueries](#include-subqueries).
+	For grouped results, use **[`core queries`](/docs/select)**.
 </Callout>
 
 <Section>
