@@ -1,0 +1,913 @@
+---
+import { siteNavigation } from "@/data/site-navigation";
+import { isDocsDialectId, resolveDocsDialectFromSlug } from "@/dialect-docs";
+import { dialectSwitcherItems } from "@mdx/dialect-switcher/data";
+import { getDialectHref } from "@mdx/dialect-switcher/routes";
+import AsideSocials from "./AsideSocials.astro";
+import Logo from "./Logo.astro";
+import GithubStars from "./GithubStars.astro";
+import DatabaseLogo from "./DatabaseLogo.astro";
+import TeamContactCard from "./TeamContactCard.astro";
+
+const pathname = Astro.url.pathname.replace(/\.html$/, "");
+const isRelease = /^\/latest-releases(?:\/|$)/.test(pathname);
+const isDocs = pathname.startsWith("/docs/") && !isRelease;
+const currentDialect = resolveDocsDialectFromSlug(pathname.slice(1));
+const currentDatabase = dialectSwitcherItems.find(
+  (item) => item.id === currentDialect,
+);
+const sectionLinks = siteNavigation.filter(
+  (item) => item.href !== "/docs/get-started",
+);
+const activeHref = isRelease
+  ? "/latest-releases"
+  : isDocs
+    ? "/docs/overview"
+    : sectionLinks.find(({ href }) =>
+        pathname === href || pathname.startsWith(`${href.replace(/\/overview$/, "")}/`),
+      )?.href;
+---
+
+{
+  pathname === "/" && (
+    <nav class="mobile-site-sections" aria-label="Explore Drizzle">
+      {sectionLinks.map(({ label, href }) => (
+        <a href={href}>{label === "Documentation" ? "Docs" : label}</a>
+      ))}
+    </nav>
+  )
+}
+
+{
+  isDocs && (
+    <nav class="mobile-docs-dock" aria-label="Documentation controls">
+      <button
+        type="button"
+        data-mobile-panel="docs"
+        aria-controls="mobile-navigation"
+        aria-expanded="false"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"
+            stroke-linecap="round"
+          />
+        </svg>
+        Browse docs
+      </button>
+      <button
+        type="button"
+        data-mobile-panel="database"
+        aria-controls="mobile-navigation"
+        aria-expanded="false"
+        aria-label={`Switch database, currently ${currentDatabase?.name}`}
+      >
+        {currentDatabase && <DatabaseLogo icon={currentDatabase.icon} />}
+        <span>{currentDatabase?.name}</span>
+      </button>
+    </nav>
+  )
+}
+
+<dialog
+  id="mobile-navigation"
+  class="mobile-navigation"
+  aria-labelledby="mobile-navigation-title"
+>
+  <div class="mobile-navigation-heading">
+    <div class="mobile-navigation-brand"><Logo /></div>
+    <h2 id="mobile-navigation-title">Explore Drizzle</h2>
+    <span data-mobile-menu-button></span>
+    <button
+      type="button"
+      data-mobile-close
+      aria-label="Close navigation"
+      autofocus>✕</button
+    >
+  </div>
+  <div data-mobile-view="site">
+    <nav class="mobile-site-links" aria-label="Drizzle sections">
+      <a href="/" aria-current={pathname === "/" ? "page" : undefined}
+        >Home <span aria-hidden="true">↗</span></a
+      >
+      {
+        sectionLinks.map(({ label, href }) => (
+          <a
+            href={href}
+            aria-current={
+              href === activeHref
+                ? "page"
+                : undefined
+            }
+          >
+            {label}
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))
+      }
+    </nav>
+    <a class="mobile-get-started" href="/docs/get-started">Get Started →</a>
+    <TeamContactCard placement="menu" />
+    <nav class="mobile-tools" aria-labelledby="mobile-tools-title">
+      <h3 id="mobile-tools-title">Tools &amp; goodies</h3>
+      <a href="https://driz.link/extension" target="_blank" rel="noopener">
+        Drizzle Studio browser extension <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        href="https://github.com/drizzle-team/drizzle-studio-npm"
+        target="_blank"
+        rel="noopener"
+      >
+        Drizzle Studio package <span aria-hidden="true">↗</span>
+      </a>
+      <a href="https://gateway.drizzle.team" target="_blank" rel="noopener">
+        Drizzle Gateway <span aria-hidden="true">↗</span>
+      </a>
+      <a href="https://drizzle.run" target="_blank" rel="noopener">
+        Drizzle Run <span aria-hidden="true">↗</span>
+      </a>
+    </nav>
+    <div class="mobile-secondary-links">
+      <GithubStars />
+    </div>
+    <div class="mobile-site-utilities">
+      <label for="mobile-site-theme">Appearance</label>
+      <select id="mobile-site-theme" data-mobile-theme>
+        <option value="system">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </div>
+    <AsideSocials />
+  </div>
+  {
+    isDocs && (
+      <>
+        <div data-mobile-view="docs" hidden>
+          <div data-mobile-docs-mount />
+        </div>
+        <div data-mobile-view="database" hidden>
+          <nav
+            class="mobile-database-links"
+            aria-label="Database versions of this page"
+          >
+            {dialectSwitcherItems.map((item) => {
+              const href =
+                item.id && isDocsDialectId(item.id)
+                  ? getDialectHref(Astro.url.pathname, item.id)
+                  : null;
+
+              return href ? (
+                <a
+                  href={href}
+                  data-mobile-database-link
+                  aria-current={item.id === currentDialect ? "page" : undefined}
+                >
+                  <DatabaseLogo icon={item.icon} />
+                  <span>{item.name}</span>
+                  <span aria-hidden="true">
+                    {item.id === currentDialect ? "✓" : "→"}
+                  </span>
+                </a>
+              ) : (
+                <span class="mobile-database-unavailable" aria-disabled="true">
+                  <DatabaseLogo icon={item.icon} />
+                  <span>{item.name}</span>
+                  <small class="mobile-database-unavailable-label">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                    Not available
+                  </small>
+                  <small>For this topic</small>
+                </span>
+              );
+            })}
+          </nav>
+        </div>
+      </>
+    )
+  }
+</dialog>
+
+<script>
+  /** Native dialog owns modal state, focus trapping, Escape, and focus restoration. */
+  function initializeMobileNavigation(): () => void {
+    const dialog =
+      document.querySelector<HTMLDialogElement>("#mobile-navigation");
+
+    if (!dialog) {
+      return () => {};
+    }
+
+    const media = window.matchMedia("(max-width: 1160px)");
+    const docsMedia = window.matchMedia("(max-width: 768px)");
+    const aside = document.getElementById("aside");
+    const sidebarWasInvisible = aside?.classList.contains("invisible");
+    const placeholder = document.createComment("Documentation sidebar position");
+    const mount = dialog.querySelector("[data-mobile-docs-mount]");
+    const title = dialog.querySelector("#mobile-navigation-title");
+    const theme = dialog.querySelector<HTMLSelectElement>("[data-mobile-theme]");
+    const siteButton = document.querySelector<HTMLButtonElement>(
+      '#header [data-mobile-panel="site"]',
+    );
+    const siteButtonMount = dialog.querySelector("[data-mobile-menu-button]");
+    const siteButtonPlaceholder = document.createComment(
+      "Site menu button position",
+    );
+
+    function restoreSidebar() {
+      if (placeholder.parentNode && aside) {
+        placeholder.replaceWith(aside);
+        aside.classList.toggle("invisible", sidebarWasInvisible);
+      }
+    }
+
+    function closeNavigation() {
+      const restoreButtonFocus = siteButtonPlaceholder.parentNode !== null;
+      for (const child of dialog?.querySelectorAll<HTMLDialogElement>(
+        "dialog[open]",
+      ) ?? []) {
+        child.close();
+      }
+
+      dialog?.close();
+      restoreSidebar();
+
+      if (siteButtonPlaceholder.parentNode && siteButton) {
+        siteButtonPlaceholder.replaceWith(siteButton);
+        siteButton.setAttribute("aria-label", "Open site menu");
+        // WebKit needs the reparented button's current style resolved before transitioning.
+        siteButton.getBoundingClientRect();
+
+        if (restoreButtonFocus) {
+          siteButton.focus({ preventScroll: true });
+        }
+      }
+
+      for (const button of document.querySelectorAll("[data-mobile-panel]")) {
+        button.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    function handleClosed() {
+      if (!dialog?.open) {
+        closeNavigation();
+      }
+    }
+
+    function handleOpen(event: MouseEvent) {
+      if (!(event.target instanceof Element)) {
+        return;
+      }
+
+      const button = event.target.closest<HTMLElement>("[data-mobile-panel]");
+
+      if (!button || !media.matches) {
+        return;
+      }
+
+      const panel = button.dataset.mobilePanel;
+
+      if (dialog?.open && button === siteButton) {
+        closeNavigation();
+        return;
+      }
+
+      const view = dialog?.querySelector<HTMLElement>(
+        `[data-mobile-view="${panel}"]`,
+      );
+
+      if (!view || !dialog) {
+        return;
+      }
+
+      restoreSidebar();
+
+      for (const item of dialog.querySelectorAll<HTMLElement>(
+        "[data-mobile-view]",
+      )) {
+        item.hidden = item !== view;
+      }
+
+      if (panel === "docs" && aside && mount) {
+        aside.before(placeholder);
+        aside.classList.remove("invisible");
+        mount.append(aside);
+      }
+
+      if (title) {
+        title.textContent =
+          panel === "docs"
+            ? "Browse docs"
+            : panel === "database"
+              ? "Switch database"
+              : "Explore Drizzle";
+      }
+
+      dialog.dataset.view = panel;
+      dialog.showModal();
+
+      if (panel === "site" && siteButton && siteButtonMount) {
+        siteButton.before(siteButtonPlaceholder);
+        siteButtonMount.append(siteButton);
+        siteButton.setAttribute("aria-label", "Close site menu");
+        siteButton.getBoundingClientRect();
+        siteButton.focus({ preventScroll: true });
+      }
+
+      button.setAttribute("aria-expanded", "true");
+    }
+
+    function handleDialogClick(event: MouseEvent) {
+      if (!(event.target instanceof Element)) {
+        return;
+      }
+
+      if (event.target.closest("dialog") !== dialog) {
+        return;
+      }
+
+      const link = event.target.closest<HTMLAnchorElement>("a[href]");
+
+      if (link?.hasAttribute("data-mobile-database-link")) {
+        const target = new URL(link.href);
+        target.search = window.location.search;
+        target.hash = window.location.hash;
+        link.href = target.href;
+      }
+
+      const bounds = dialog?.getBoundingClientRect();
+      const clickedBackdrop =
+        event.target === dialog &&
+        bounds &&
+        (event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom);
+
+      if (
+        link ||
+        event.target.closest("[data-mobile-close]") ||
+        clickedBackdrop
+      ) {
+        closeNavigation();
+      }
+    }
+
+    function handleDialogKeydown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        // The homepage game's Escape shortcut must not cancel native dialog dismissal.
+        event.stopPropagation();
+      }
+    }
+
+    function changeTheme() {
+      const existingTheme =
+        document.querySelector<HTMLSelectElement>("#theme__select");
+
+      if (existingTheme && theme) {
+        existingTheme.value = theme.value;
+        existingTheme.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+
+    document.addEventListener("click", handleOpen);
+    dialog.addEventListener("click", handleDialogClick);
+    dialog.addEventListener("keydown", handleDialogKeydown);
+    dialog.addEventListener("cancel", closeNavigation);
+    dialog.addEventListener("close", handleClosed);
+    media.addEventListener("change", closeNavigation);
+    docsMedia.addEventListener("change", closeNavigation);
+
+    if (theme) {
+      theme.value = localStorage.getItem("theme") || "system";
+      theme.addEventListener("change", changeTheme);
+    }
+
+    return () => {
+      closeNavigation();
+      document.removeEventListener("click", handleOpen);
+      dialog.removeEventListener("click", handleDialogClick);
+      dialog.removeEventListener("keydown", handleDialogKeydown);
+      dialog.removeEventListener("cancel", closeNavigation);
+      dialog.removeEventListener("close", handleClosed);
+      media.removeEventListener("change", closeNavigation);
+      docsMedia.removeEventListener("change", closeNavigation);
+      theme?.removeEventListener("change", changeTheme);
+    };
+  }
+
+  let dispose: (() => void) | undefined;
+
+  document.addEventListener("astro:page-load", () => {
+    dispose?.();
+    dispose = initializeMobileNavigation();
+  });
+  document.addEventListener("astro:before-swap", () => {
+    dispose?.();
+    dispose = undefined;
+  });
+</script>
+
+<style is:global>
+  html:has(#mobile-navigation[open]) {
+    overflow: hidden;
+  }
+  .mobile-docs-dock {
+    display: none;
+  }
+  body:has(#banner) {
+    --mobile-announcement-height: 40px;
+  }
+  .mobile-site-sections,
+  .mobile-navigation-brand {
+    display: none;
+  }
+  .mobile-navigation {
+    color: #222124;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 16px;
+    padding: 0 20px 20px;
+    width: min(440px, calc(100% - 24px));
+    max-height: min(76dvh, 720px);
+    margin: auto auto max(16px, env(safe-area-inset-bottom));
+    inset: auto 0 0;
+    overscroll-behavior: contain;
+  }
+  .mobile-navigation::backdrop {
+    background: #0007;
+  }
+  .mobile-navigation[data-view="site"] {
+    position: fixed;
+    inset: var(--mobile-announcement-height, 0px) 0 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    height: calc(100dvh - var(--mobile-announcement-height, 0px));
+    max-height: calc(100dvh - var(--mobile-announcement-height, 0px));
+    padding-left: 24px;
+    padding-right: 22px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border: 0;
+    border-radius: 0;
+  }
+  .mobile-navigation[data-view="site"]::backdrop {
+    clip-path: inset(var(--mobile-announcement-height, 0px) 0 0);
+  }
+  .mobile-navigation[data-view="site"] .mobile-navigation-heading > button {
+    display: none;
+  }
+  [data-mobile-menu-button] {
+    display: contents;
+  }
+  .mobile-navigation[data-view="site"] .mobile-navigation-brand {
+    display: block;
+  }
+  .mobile-navigation[data-view="site"] .mobile-navigation-heading h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .mobile-navigation[data-view="site"] .mobile-navigation-heading {
+    border-bottom: 0;
+    margin-bottom: 0;
+  }
+  .mobile-navigation[data-view="site"] .mobile-site-links a {
+    min-height: 64px;
+    font-size: 26px;
+    font-weight: 600;
+  }
+  .mobile-site-links a span {
+    color: #888;
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .mobile-site-links a[aria-current="page"] {
+    color: inherit;
+  }
+  .mobile-site-links a[aria-current="page"]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #c5f74f;
+  }
+  .mobile-site-links a[aria-current="page"] span {
+    margin-left: auto;
+  }
+  .mobile-get-started {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 48px;
+    margin-top: 28px;
+    background: #c5f74f;
+    color: #111;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .mobile-secondary-links {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .mobile-tools {
+    margin-top: 24px;
+  }
+  .mobile-tools h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .mobile-tools a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding-block: 8px;
+    border-bottom: 1px solid #8883;
+    color: inherit;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .mobile-tools a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .mobile-tools a span {
+    color: #888;
+  }
+  .mobile-secondary-links > a {
+    color: inherit;
+    font-size: 13px;
+  }
+  .mobile-navigation[data-view="docs"] {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(320px, 85vw);
+    height: 100dvh;
+    max-width: none;
+    max-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-right: 1px solid #8883;
+    border-radius: 0;
+  }
+  html.dark .mobile-navigation {
+    background: #111;
+    color: #e1e3e6;
+    border-color: #303030;
+  }
+  .mobile-navigation [hidden] {
+    display: none !important;
+  }
+  .mobile-navigation-heading {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 64px;
+    border-bottom: 1px solid #8883;
+    margin-bottom: 12px;
+  }
+  .mobile-navigation-heading h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .mobile-navigation-heading button {
+    min-width: 44px;
+    min-height: 44px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .mobile-site-links,
+  .mobile-database-links {
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-database-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .mobile-site-links a,
+  .mobile-database-links a,
+  .mobile-database-unavailable {
+    padding: 12px 0;
+    min-height: 48px;
+    border-bottom: 1px solid #8883;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .mobile-site-links a:hover,
+  .mobile-database-links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .mobile-database-links a[aria-current="page"] {
+    color: #486514;
+  }
+  html.dark .mobile-database-links a[aria-current="page"] {
+    color: #c5f74f;
+  }
+  .mobile-database-unavailable {
+    color: #777;
+  }
+  .mobile-database-unavailable small {
+    font-size: 11px;
+    text-align: right;
+  }
+  .mobile-database-links a,
+  .mobile-database-links .mobile-database-unavailable {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 104px;
+    padding: 16px 8px;
+    gap: 10px;
+    border: 1px solid #8884;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    text-decoration: none;
+    --database-logo-size: 36px;
+  }
+  .mobile-database-links a:hover {
+    background: #8881;
+    text-decoration: none;
+  }
+  .mobile-database-links a[aria-current="page"] {
+    border: 2px solid #486514;
+    background: #4865140a;
+  }
+  html.dark .mobile-database-links a[aria-current="page"] {
+    border-color: #c5f74f;
+    background: #c5f74f0a;
+  }
+  .mobile-database-links a > span:last-child[aria-hidden] {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 14px;
+  }
+  .mobile-database-links
+    a:not([aria-current="page"])
+    > span:last-child[aria-hidden] {
+    display: none;
+  }
+  .mobile-database-links .mobile-database-unavailable {
+    gap: 6px;
+    background: #f3f3f3;
+    border-style: dashed;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+  .mobile-database-links .mobile-database-unavailable small {
+    text-align: center;
+  }
+  .mobile-database-unavailable-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: #e4e4e4;
+    color: #555;
+    font-weight: 600;
+  }
+  .mobile-database-links .mobile-database-unavailable .database-logo {
+    filter: grayscale(1);
+    opacity: 0.5;
+  }
+  html.dark .mobile-database-unavailable {
+    color: #aaa;
+  }
+  html.dark .mobile-database-links .mobile-database-unavailable {
+    background: #1c1c1c;
+    border-color: #444;
+  }
+  html.dark .mobile-database-unavailable-label {
+    background: #303030;
+    color: #ccc;
+  }
+  .mobile-site-utilities {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .mobile-site-utilities select {
+    min-height: 44px;
+    padding: 8px 12px;
+    background: transparent;
+    color: inherit;
+    border: 1px solid #8885;
+    border-radius: 6px;
+    font: inherit;
+  }
+  #mobile-navigation .aside-socials__wrap {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+  #mobile-navigation #aside {
+    display: flex;
+    position: static;
+    width: 100%;
+    border: 0;
+    box-shadow: none;
+    mask-image: none;
+    background: transparent;
+    padding: 0;
+    height: auto;
+  }
+  #mobile-navigation #aside .aside-content {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+  }
+  #mobile-navigation[data-view="docs"] .mobile-navigation-heading {
+    margin-bottom: 8px;
+  }
+  #mobile-navigation #aside .nav-items > .nav-separator:first-child {
+    padding-top: 0;
+  }
+  #mobile-navigation .db-switcher-mobile,
+  #mobile-navigation #aside .theme__mobile {
+    display: none;
+  }
+  #mobile-navigation .nav_sticky {
+    display: none;
+  }
+  @media (max-width: 1160px) {
+    .burger {
+      display: flex !important;
+      min-width: 44px;
+      min-height: 44px;
+      color: inherit;
+    }
+  }
+  @media (max-width: 768px) {
+    .mobile-navigation[data-view="site"] {
+      padding-inline: 16px;
+    }
+    body:has(#header):has(.mobile-site-sections) {
+      margin-top: 148px;
+    }
+    body:has(#header):has(.mobile-site-sections) .fixed-container {
+      top: 148px;
+    }
+    body:has(#header):has(.mobile-site-sections) :is(h1, h2, h3)[id] {
+      scroll-margin-top: 164px;
+    }
+    .mobile-site-sections {
+      position: fixed;
+      z-index: 100;
+      top: 104px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+      padding-inline: 16px;
+      background: #fff;
+      color: #222124;
+      border-bottom: 1px solid #e6e6e6;
+    }
+    html.dark .mobile-site-sections {
+      background: #111;
+      color: #e1e3e6;
+      border-color: #303030;
+    }
+    .mobile-site-sections a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      font-size: 13px;
+      white-space: nowrap;
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+    }
+    .mobile-site-sections a[aria-current="page"] {
+      border-bottom-color: #486514;
+    }
+    html.dark .mobile-site-sections a[aria-current="page"] {
+      border-bottom-color: #c5f74f;
+    }
+    .mobile-docs-dock {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      position: fixed;
+      z-index: 101;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      color: #222124;
+      pointer-events: none;
+    }
+    html.dark .mobile-docs-dock {
+      color: #e1e3e6;
+    }
+    .mobile-docs-dock button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-width: 0;
+      min-height: 48px;
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #e6e6e6;
+      pointer-events: auto;
+    }
+    html.dark .mobile-docs-dock button {
+      background: #111;
+      border-color: #303030;
+    }
+    .mobile-docs-dock button:first-child {
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .mobile-docs-dock svg {
+      flex-shrink: 0;
+    }
+    body:has(.mobile-docs-dock) .documentation-content {
+      padding-bottom: calc(96px + env(safe-area-inset-bottom));
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mobile-navigation[open] {
+      animation: mobile-navigation-enter 140ms ease-out;
+    }
+    .mobile-navigation[data-view="site"][open] {
+      animation: none;
+    }
+    .mobile-navigation[data-view="docs"][open] {
+      animation: mobile-docs-drawer-enter 180ms ease-out;
+    }
+    @keyframes mobile-docs-drawer-enter {
+      from {
+        transform: translateX(-100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+    @keyframes mobile-navigation-enter {
+      from {
+        transform: translateY(12px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  }
+</style>

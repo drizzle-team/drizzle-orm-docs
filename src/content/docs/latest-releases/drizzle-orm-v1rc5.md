@@ -1,8 +1,11 @@
 ---
 title: Drizzle ORM and Drizzle Kit v1.0.0-rc.5 release
 pubDate: 2026-10-21
-description: Relational query improvements, incremental PostgreSQL snapshots, breaking changes and fixes across drivers and dialects.
+description: "Adds relational ordering and caching, incremental PostgreSQL snapshots and async Expo SQLite, with breaking query and driver behavior changes."
+version: 1.0.0-rc.5
 ---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-rc.5)
 
 ## Drizzle ORM
 
@@ -277,9 +280,3 @@ description: Relational query improvements, incremental PostgreSQL snapshots, br
 - Fixed [composition of `not` with `or` or `and` causing compile errors](https://github.com/drizzle-team/drizzle-orm/issues/4160).
 - Fixed [`snakeCase.table` converting Korean column names to empty identifiers](https://github.com/drizzle-team/drizzle-orm/issues/6082).
 - Fixed [the missing `decimal` property when using `pgTable`](https://github.com/drizzle-team/drizzle-orm/issues/3059).
-
-## Sources
-
-- [Published release](https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-rc.5)
-- [Drizzle ORM changelog](https://github.com/drizzle-team/drizzle-orm/blob/v1.0.0-rc.5/changelogs/drizzle-orm/1.0.0-rc.5.md)
-- [Drizzle Kit changelog](https://github.com/drizzle-team/drizzle-orm/blob/v1.0.0-rc.5/changelogs/drizzle-kit/1.0.0-rc.5.md)

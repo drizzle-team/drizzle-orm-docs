@@ -19,7 +19,10 @@ import mssqlMeta from "../content/docs/mssql/_meta.json";
 import cockroachMeta from "../content/docs/cockroach/_meta.json";
 
 export async function getStaticPaths() {
-  const allDocsEntries = await getCollection("docs");
+  const allDocsEntries = await getCollection(
+    "docs",
+    ({ slug }) => !slug.startsWith("latest-releases/"),
+  );
   type DocsEntry = (typeof allDocsEntries)[number];
   type DocsRoute = {
     params: { slug: string };

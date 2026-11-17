@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import AgentSetupPrompt from "@components/AgentSetupPrompt.astro";
+import AgentSetupEntry from "@components/AgentSetupEntry.astro";
 import JavaScriptIcon from "@/assets/icons/JavaScriptIcon.astro";
 import TypeScriptIcon from "@/assets/icons/TypeScriptIcon.astro";
 import WithDBImage from '@/assets/images/landing/WithDB.png'
@@ -50,119 +50,29 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
         <div class="tag-text">TypeScript</div>
       </div>
     </div>
-    <div class="buttons">
-      <a href="/docs/get-started" class="header-button">
-        <div class="header-button-image">
-          <div class="header-button-image-learn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M21 15.998v-6c0-2.828 0-4.242-.879-5.121C19.353 4.109 18.175 4.012 16 4H8c-2.175.012-3.353.109-4.121.877C3 5.756 3 7.17 3 9.998v6c0 2.829 0 4.243.879 5.122c.878.878 2.293.878 5.121.878h6c2.828 0 4.243 0 5.121-.878c.879-.88.879-2.293.879-5.122" opacity="0.5"/><path fill="currentColor" d="M8 3.5A1.5 1.5 0 0 1 9.5 2h5A1.5 1.5 0 0 1 16 3.5v1A1.5 1.5 0 0 1 14.5 6h-5A1.5 1.5 0 0 1 8 4.5z"/><path fill="currentColor" fill-rule="evenodd" d="M15.548 10.488a.75.75 0 0 1-.036 1.06l-4.286 4a.75.75 0 0 1-1.024 0l-1.714-1.6a.75.75 0 1 1 1.024-1.096l1.202 1.122l3.774-3.522a.75.75 0 0 1 1.06.036" clip-rule="evenodd"/></svg>
-          </div>
-        </div>
-        <div class="header-button-text"><span>Get Started</span></div>
-        <div class="header-button-arrow">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-right"
-          ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-            points="12 5 19 12 12 19"></polyline></svg
-          >
-        </div>
-      </a>
-      <a href="/docs/overview" class="header-button">
-        <div class="header-button-image">
-          <div class="header-button-image-learn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M2 16.144V4.998c0-1.098.886-1.99 1.982-1.923c.977.06 2.131.179 3.018.413c1.05.276 2.296.866 3.282 1.388A3.478 3.478 0 0 0 12 5.275v15.2a3.46 3.46 0 0 1-1.628-.406c-1-.532-2.29-1.15-3.372-1.435c-.877-.232-2.016-.35-2.985-.411C2.906 18.153 2 17.255 2 16.143" clip-rule="evenodd" opacity="0.5"/><path fill="currentColor" d="M22 16.144V4.934c0-1.073-.846-1.953-1.918-1.916c-1.129.04-2.535.156-3.582.47c-.908.271-1.965.816-2.826 1.315A3.529 3.529 0 0 1 12 5.275v15.2c.56 0 1.121-.136 1.628-.406c1-.532 2.29-1.15 3.372-1.435c.877-.232 2.016-.35 2.985-.411c1.109-.07 2.015-.968 2.015-2.08"/></svg>
-          </div>
-        </div>
-        <div class="header-button-text"><span>Documentation</span></div>
-        <div class="header-button-arrow">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-right"
-          ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-            points="12 5 19 12 12 19"></polyline></svg
-          >
-        </div>
-      </a>
-      <div class="header-button button--search">
-        <div class="header-button-image">
-          <div class="header-button-image-learn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12" opacity="0.5"/><path fill="currentColor" d="M14.018 7.364a.75.75 0 1 0-1.449-.388l-2.588 9.66a.75.75 0 0 0 1.449.388z"/></svg>
-          </div>
-        </div>
-        <div class="header-button-text"><span>Search Docs</span></div>
-        <div class="header-button-arrow">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-right"
-          ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-            points="12 5 19 12 12 19"></polyline></svg
-          >
-        </div>
-        <div id="docsearch"></div>
+    <div class="hero-entry-points">
+      <div class="hero-actions">
+        <a href="/docs/get-started" class="hero-action hero-action--start">
+          Get Started <span aria-hidden="true">→</span>
+        </a>
+        <ContactProductManager
+          name="Drizzle Team"
+          role={[]}
+          people={[
+            { name: "Andrew Sherman", photo: sherman },
+            { name: "Alex Blokh", photo: blokh },
+            { name: "Dan Kochetov", photo: bloberenober },
+          ]}
+          email="help@drizzle.team"
+        >
+          <button slot="trigger" type="button" class="hero-action hero-action--partner" data-pm-trigger>
+            Build with us <span aria-hidden="true">→</span>
+          </button>
+        </ContactProductManager>
       </div>
-      <ContactProductManager
-        name="Drizzle Team"
-        role={[]}
-        people={[
-          { name: "Andrew Sherman", photo: sherman },
-          { name: "Alex Blokh", photo: blokh },
-          { name: "Dan Kochetov", photo: bloberenober },
-        ]}
-        email="help@drizzle.team"
-      >
-      <button slot="trigger" type="button" class="header-button" data-pm-trigger>
-        <div class="header-button-image">
-          <div class="header-button-image-learn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.797 1.797 0 0 1 1.262.147A10.955 10.955 0 0 0 12 23" opacity="0.5"/><path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/></svg>
-          </div>
-        </div>
-        <div class="header-button-text"><span>Talk to creator</span></div>
-        <div class="header-button-arrow">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-right"
-          ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-            points="12 5 19 12 12 19"></polyline></svg
-          >
-        </div>
-      </button>
-      </ContactProductManager>
-    </div>
-    <div class="agent-setup-entry">
-      <p>Build with your AI agent</p>
-      <AgentSetupPrompt placement="hero" />
+      <div class="agent-setup-entry">
+        <AgentSetupEntry />
+      </div>
     </div>
   </div>
   <div class="header-middle-container">
@@ -229,29 +139,10 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
       document.querySelector('.board').classList.add('safari-board');
   }
 
-  docsearch({
-    container: "#docsearch",
-    appId: "MXZNUT59HV",
-    apiKey: "7c390e262ac8858df0b6624d01d9dfef",
-    indexName: "orm-drizzle",
-    placeholder: "Search documentation...",
-  });
 </script>
 
 <script src="./snake/index.ts"></script>
 
-<style is:inline>
-  .DocSearch-Button {
-    opacity: 0;
-    margin-left: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    height: 100%;
-  }
-</style>
 <style>
   .ps-label {
     display: flex;
@@ -293,19 +184,18 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
     flex-direction: column;
   }
 
-  .agent-setup-entry {
+  .hero-entry-points {
+    display: grid;
+    gap: 24px;
     margin-top: 24px;
   }
 
-  .agent-setup-entry p {
-    margin: 0 0 10px;
-    color: #626262;
-    font-size: 12px;
-    line-height: 1.5;
+  .agent-setup-entry {
+    margin-top: 0;
   }
 
-  html.dark .agent-setup-entry p {
-    color: #b1b1b1;
+  .agent-setup-entry :global(.agent-entry) {
+    margin: 0;
   }
 
   .header-right {
@@ -535,27 +425,62 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
       display: none;
   }
 
-  .buttons {
-    margin-top: 80px;
+  .hero-actions {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
-    z-index: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     max-width: 400px;
-    border-radius: 4px;
-    overflow: hidden;
+    margin-top: 0;
   }
 
-  .header-button {
-    height: 40px;
-    width: 100%;
-    background-color: #f6f6f7;
+  .hero-actions .hero-action {
     display: flex;
-    justify-content: flex-start;
     align-items: center;
-    transition: background-color 0.2s ease-in-out;
-    position: relative;
-    z-index: 2;
+    justify-content: space-between;
+    gap: 12px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 24px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .hero-actions .hero-action--start {
+    background: #c5f74f;
+    color: #111;
+  }
+
+  .hero-actions .hero-action--start:hover {
+    background: #b5e63f;
+  }
+
+  .hero-actions .hero-action--partner {
+    background: #282b3b;
+    color: #fff;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero-actions .hero-action--partner:hover {
+    opacity: 0.85;
+  }
+
+  html.dark .hero-actions .hero-action--partner {
+    background: #e2e8f0;
+    color: #282828;
+  }
+
+  @media (max-width: 599px) {
+    .hero-actions .hero-action {
+      height: 46px;
+      min-height: 46px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
   }
 
   .settle {
@@ -586,103 +511,6 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
   }
 
 
-  html.dark .header-button {
-      background-color: #1c1c1c;
-  }
-
-  html.dark .header-button:hover {
-      background-color: #282828;
-  }
-
-  .header-button:hover {
-      background-color: #eff0f3;
-  }
-
-  .header-button:hover .header-button-arrow {
-      opacity: 1;
-      transform: translateX(0);
-  }
-
-  .header-button:hover .header-button-text {
-      color: #000;
-  }
-
-  .header-button:hover .header-button-image svg {
-      color: #404040;
-  }
-
-  .header-button-text {
-      font-size: 14px;
-      color: #000;
-      font-weight: 600;
-      transition: color 0.2s ease-in-out;
-  }
-
-  .header-button-image {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      aspect-ratio: 1 / 1;
-      border-top-left-radius: 4px;
-      border-bottom-left-radius: 4px;
-      margin: 12px 8px 12px 12px;
-  }
-
-  .header-button-image svg {
-      transition: color 0.2s ease-in-out;
-      color: #909090;
-      width: 24px;
-      height: 24px;
-  }
-
-  html.dark .header-button-image svg {
-      color: #707070;
-  }
-
-  .header-button-image-learn {
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-  }
-
-  .header-button-arrow {
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: 8px;
-      margin-right: 8px;
-      opacity: 0;
-      transform: translateX(-4px);
-      transition: all 0.2s ease-in-out;
-  }
-
-  html.dark .header-button-arrow svg {
-      color: #fff;
-  }
-
-  html.dark .header-button .header-button-text {
-      color: #e1e3e6;
-  }
-
-  html.dark .header-button:hover .header-button-text {
-      color: #fff;
-  }
-
-  html.dark .header-button:hover .header-button-image svg {
-      color: #fff;
-  }
-
-  #docsearch {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
 
   .tags {
     margin-top: 12px;
@@ -769,25 +597,6 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
       margin-top: -1px;
   }
 
-  .header-button-svg {
-      height: 18px;
-      width: 18px;
-      margin-left: -18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: margin-left 150ms ease-in-out, opacity 150ms ease-in-out;
-      opacity: 0;
-  }
-
-  .header-button:hover .header-button-svg {
-      margin-left: 6px;
-      opacity: 1;
-  }
-  .header-button-svg svg {
-      width: 14px;
-      height: 14px;
-  }
 
   @media (max-width: 1024px) {
       .board-moved {
@@ -854,7 +663,7 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
 
       .header_container {
           flex-direction: column;
-          margin: 120px auto 0;
+          margin: 32px auto 0;
           align-items: center;
           gap: 24px;
       }
@@ -864,33 +673,9 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
           width: 100%;
       }
 
-      .buttons {
-          justify-items: center;
-          align-self: center;
+      .hero-actions {
           width: 100%;
-          margin-top: 80px;
-      }
-
-      .header-button {
-          font-size: 14px;
-          height: 40px;
-          width: 100%;
-      }
-
-      .header-button-arrow {
-          display: none;
-      }
-
-      .header-button:hover .header-button-arrow {
-          opacity: 0;
-      }
-
-      html.dark .header-button-image  svg{
-          color: #e1e3e6;
-      }
-
-      .header-button-image svg {
-          color: #4b5563;
+          margin-top: 0;
       }
 
 
@@ -910,5 +695,46 @@ import bloberenober from "@/assets/images/team/bloberenober.png";
           color: #3e7ff0;
           text-shadow: 0.5px 0.5px 0.3px #3e7ff0;
       }
+  }
+  @media (min-width: 600px) and (max-width: 783px) {
+    .hero-entry-points {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .agent-setup-entry,
+    .hero-actions {
+      margin-top: 0;
+    }
+
+    .header-left,
+    .header-middle-container {
+      max-width: 640px;
+    }
+
+    .agent-setup-entry,
+    .hero-actions,
+    .header-middle {
+      max-width: none;
+    }
+
+    .title {
+      font-size: 36px;
+      line-height: 44px;
+    }
+
+    .settle .ship {
+      font-size: 28px;
+    }
+
+    .tag-text {
+      font-size: 14px;
+    }
+
+    .header-middle img {
+      height: 130px;
+    }
   }
 </style>

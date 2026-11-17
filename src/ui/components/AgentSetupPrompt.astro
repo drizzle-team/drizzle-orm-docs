@@ -30,6 +30,7 @@ const prompt =
         </a>
       )
     }
+    <slot name="actions" />
   </div>
 
   <p
@@ -42,7 +43,9 @@ const prompt =
 
   <details class="agent-setup__details" data-setup-details>
     <summary>View prompt</summary>
-    <pre class="agent-setup__prompt" aria-label="Agent setup prompt"><code data-setup-prompt>{prompt}</code></pre>
+    <pre
+      class="agent-setup__prompt"
+      aria-label="Agent setup prompt"><code data-setup-prompt>{prompt}</code></pre>
     <a
       class="agent-setup__source"
       href="/agent-setup/prompt.md"
@@ -240,6 +243,20 @@ const prompt =
     margin: 0;
   }
 
+  .agent-setup--hero .agent-setup__actions {
+    gap: 12px;
+  }
+
+  .agent-setup--hero .agent-setup__copy {
+    gap: 12px;
+    padding-inline: 12px;
+  }
+
+  .agent-setup--hero [data-setup-copy-label] {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
   .agent-setup__details {
     font-size: 12px;
   }
@@ -268,6 +285,30 @@ const prompt =
 
     .agent-setup [data-setup-copy-label] {
       min-width: 100px;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .agent-setup--hero .agent-setup__actions {
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .agent-setup--hero .agent-setup__copy {
+      gap: 8px;
+      padding-inline: 10px;
+    }
+
+    .agent-setup--hero [data-setup-copy-label] {
+      min-width: 0;
+    }
+
+    .agent-setup--hero :global(.agent-logos) {
+      gap: 3px;
+    }
+
+    .agent-setup--hero :global(.agent-logos svg) {
+      width: 16px;
     }
   }
 </style>

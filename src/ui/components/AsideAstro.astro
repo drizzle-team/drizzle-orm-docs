@@ -457,7 +457,9 @@ let i = 0;
 
   document.addEventListener("astro:page-load", () => {
     const container = document.querySelector("html");
-    const anchors = document.querySelectorAll<HTMLElement>("h2, h3");
+    const anchors = document.querySelectorAll<HTMLElement>(
+      ".documentation-content h2[id], .documentation-content h3[id]",
+    );
     const links = document.querySelectorAll<HTMLElement>("[data-slug]");
     let expandedSections: string[] = JSON.parse(
       localStorage.getItem("expandedSections") || "[]",
@@ -506,12 +508,12 @@ let i = 0;
     const updateLinks = () => {
       if (!container || !links || !anchors) return;
       const activeAnchors = handleAnchorHighlighting({
-        viewportHeight: window.innerHeight,
+        scrollOffset: parseFloat(getComputedStyle(container).scrollPaddingTop),
         anchors: [...anchors].map((anchor) => ({
           id: anchor.id,
-          offsetTop: anchor.offsetTop,
+          offsetTop: anchor.getBoundingClientRect().top + window.scrollY,
         })),
-        scrollTop: container.scrollTop,
+        scrollTop: window.scrollY,
       });
 
       links.forEach((link) => {

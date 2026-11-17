@@ -1,6 +1,7 @@
 // https://llmstxthub.com/guides/getting-started-llms-txt
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
+import { getReleasePosts, getReleasePath } from "@/releases/posts";
 
 import {
   description,
@@ -158,6 +159,13 @@ export const GET: APIRoute = async ({ url }) => {
       llms += `- [${tutorialTitle}](` + getUrl(tutorialsSlug) + `)\n`;
     }
   });
+
+  llms += "\n## Releases\n\n";
+  llms += `- [Drizzle Releases](${url.origin}/latest-releases)\n`;
+
+  for (const post of await getReleasePosts()) {
+    llms += `- [${post.data.title}](${url.origin}${getReleasePath(post.slug)}.md): ${post.data.description}\n`;
+  }
 
   return new Response(llms);
 };

@@ -1,6 +1,7 @@
 import { description, title } from "@/data/llms";
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
+import { getReleasePosts, getReleasePath, toReleaseMarkdown } from "@/releases/posts";
 
 // Pages which live outside of the "docs" content collection
 const standalonePages = import.meta.glob("./drizzle-studio/*.mdx", {
@@ -40,7 +41,7 @@ export const GET: APIRoute = async ({ url }) => {
   });
 
   docCollection.filter((entry) => {
-    if (entry.slug.includes("latest-releases") || entry.slug.includes("migrate/")) {
+    if (entry.slug.includes("migrate/") || entry.slug.startsWith("latest-releases/")) {
       return false;
     }
     return true;
@@ -57,6 +58,11 @@ export const GET: APIRoute = async ({ url }) => {
     const source = (await standalonePages[path]()) as string;
     const slug = path.replace("./", "").replace(".mdx", "");
     llms += `Source: ${url.origin}/${slug}\n\n${stripMdx(source)}\n\n`;
+  }
+
+  for (const post of await getReleasePosts()) {
+    const canonicalUrl = `${url.origin}${getReleasePath(post.slug)}`;
+    llms += `${toReleaseMarkdown(post, canonicalUrl)}\n`;
   }
 
   return new Response(llms);

@@ -2,25 +2,8 @@
 import type { SVGProps } from "@/types";
 import type { CSSProperties } from "react";
 import { dialectSwitcherItems } from "./data";
-import { defaultDocsDialect, resolveDocsDialectFromSlug } from "@/dialect-docs";
-import pgMeta from "@/content/docs/pg/_meta.json";
-import mysqlMeta from "@/content/docs/mysql/_meta.json";
-import sqliteMeta from "@/content/docs/sqlite/_meta.json";
-import singlestoreMeta from "@/content/docs/singlestore/_meta.json";
-import mssqlMeta from "@/content/docs/mssql/_meta.json";
-import cockroachMeta from "@/content/docs/cockroach/_meta.json";
-
-// Page slugs each dialect exposes (mirrors route generation in [...slug].astro).
-const getMetaSlugs = (items: Array<string | string[]>): string[] =>
-  items.flatMap((item) => (Array.isArray(item) ? [`${item[0]}`] : []));
-const pageSlugsByDialect: Record<string, string[]> = {
-  pg: getMetaSlugs(pgMeta as any),
-  mysql: getMetaSlugs(mysqlMeta as any),
-  sqlite: getMetaSlugs(sqliteMeta as any),
-  singlestore: getMetaSlugs(singlestoreMeta as any),
-  mssql: getMetaSlugs(mssqlMeta as any),
-  cockroach: getMetaSlugs(cockroachMeta as any),
-};
+import { isDocsDialectId, resolveDocsDialectFromSlug } from "@/dialect-docs";
+import { getDialectHref } from "./routes";
 
 interface Props {
   slug: string;
@@ -77,14 +60,24 @@ const darkStylesSVGString = svgCodeDark.replace(
 <div class="db-switcher">
   <select
     class="db-switcher-select"
+    aria-label="Switch documentation database"
     style="opacity: 0; position: absolute; inset: 0; width: 100%; cursor: pointer"
   >
     {
-      dialectSwitcherItems.map((item) => (
-        <option value={item.id} selected={item.name === currentDb?.name}>
-          {item.name}
-        </option>
-      ))
+      dialectSwitcherItems.map((item) => {
+        const href = item.id && isDocsDialectId(item.id) ? getDialectHref(Astro.url.pathname, item.id) : null;
+
+        return (
+          <option
+            value={item.id}
+            data-href={href}
+            disabled={!href}
+            selected={item.name === currentDb?.name}
+          >
+            {item.name}{!href ? " — unavailable for this page" : ""}
+          </option>
+        );
+      })
     }
   </select>
   <div class="img_light">
@@ -214,50 +207,18 @@ const darkStylesSVGString = svgCodeDark.replace(
   }
 </style>
 
-<script
-  is:inline
-  define:vars={{ dialectSwitcherItems, pageSlugsByDialect, defaultDocsDialect }}
->
-  if (!window.__dbSwitcherBound) {
-    window.__dbSwitcherBound = true;
+<script>
+  document.addEventListener("change", event => {
+    const select = event.target;
 
-    // Slug of the current docs page, without /docs and any dialect prefix.
-    const currentPageSlug = () => {
-      const rest = window.location.pathname
-        .replace(/^\/docs\/?/, "")
-        .replace(/\/$/, "");
-      if (!rest) return "";
-      const [first, ...tail] = rest.split("/");
-      if (first !== defaultDocsDialect && pageSlugsByDialect[first]) {
-        return tail.join("/");
-      }
-      return rest;
-    };
+    if (!(select instanceof HTMLSelectElement) || !select.matches(".db-switcher-select")) {
+      return;
+    }
 
-    document.addEventListener("change", (e) => {
-      const sel = e.target;
-      if (!sel.classList || !sel.classList.contains("db-switcher-select"))
-        return;
-      const item = dialectSwitcherItems.find(({ id }) => id === sel.value);
-      if (!item) return;
+    const href = select.selectedOptions[0]?.dataset.href;
 
-      // Stay on the same page if the target dialect has it; fall back to the
-      // parent page, then to the dialect overview.
-      const slug = currentPageSlug();
-      const slugs = pageSlugsByDialect[item.id] || [];
-      const prefix =
-        item.id === defaultDocsDialect ? "/docs" : "/docs/" + item.id;
-      const parent = slug.includes("/") ? slug.split("/")[0] : "";
-
-      if (slug && slugs.includes(slug)) {
-        window.location.href = prefix + "/" + slug;
-      } else if (parent && slugs.includes(parent)) {
-        // child pages (e.g. get-started/postgresql-new) are not per-dialect,
-        // so the nested url would 404 — land on the parent instead
-        window.location.href = prefix + "/" + parent;
-      } else {
-        window.location.href = item.path;
-      }
+    if (href) {
+      window.location.assign(href + window.location.search + window.location.hash);
+    }
     });
-  }
 </script>

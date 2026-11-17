@@ -5,16 +5,23 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  pageType?: "website" | "article";
 }
 
-const { title, description, image } = Astro.props;
+const { title, description, image, pageType = "website" } = Astro.props;
 const defaultDescription =
   "Drizzle ORM is a lightweight and performant TypeScript ORM with developer experience in mind.";
 const pageDescription = description || defaultDescription;
 const imageUrl = image
   ? new URL(image, Astro.site ?? Astro.url).toString()
   : undefined;
-const pageUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
+const canonicalPath = /^\/latest-releases(?:\/|\.html$|$)/.test(Astro.url.pathname)
+  ? Astro.url.pathname.replace(/(?:\.html|\/)$/, "")
+  : Astro.url.pathname;
+const isReleasePage =
+  canonicalPath === "/latest-releases" ||
+  canonicalPath.startsWith("/latest-releases/");
+const pageUrl = new URL(canonicalPath, Astro.site ?? Astro.url).toString();
 const isProd = import.meta.env.PROD_BUILD === "true" || process.env.PROD_BUILD === "true";
 const noindex = /\/docs\/[^/]+\/get-started\/?$/.test(Astro.url.pathname);
 const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "index,follow";
@@ -38,7 +45,8 @@ const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "inde
   <meta name="generator" content={Astro.generator} />
   <title>{title}</title>
   <meta name="description" content={pageDescription} />
-  <meta property="og:type" content="website" />
+  {isReleasePage && <link rel="canonical" href={pageUrl} />}
+  <meta property="og:type" content={pageType} />
   <meta property="og:url" content={pageUrl} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={pageDescription} />
@@ -168,4 +176,5 @@ const robots = !isProd ? "noindex,nofollow" : noindex ? "noindex,follow" : "inde
     data-key="SKUeEfeeQbx1VaWCrIf53A"
     async></script>
   <GlobalStyles />
+  <slot />
 </head>

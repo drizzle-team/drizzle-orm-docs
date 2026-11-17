@@ -1,0 +1,513 @@
+---
+import { parse } from "node-html-parser";
+
+import {
+  getReleasePosts,
+  formatReleaseDate,
+  getReleasePath,
+} from "@/releases/posts";
+import * as roadmap from "@/data/roadmap.md";
+import ReleaseLayout from "@/ui/ReleasesLayout.astro";
+
+const posts = await getReleasePosts();
+const months = [
+  ...new Set(posts.map(({ data }) => data.pubDate.toISOString().slice(0, 7))),
+];
+const roadmapContent = parse(roadmap.compiledContent());
+const releasesByPath = new Map(
+  posts.map((post) => [getReleasePath(post.slug), post]),
+);
+const roadmapGroups = roadmapContent.querySelectorAll("h3").map((heading) => {
+  const items = (heading.nextElementSibling?.querySelectorAll("li") ?? []).map(
+    (item) => {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      const completed = checkbox?.hasAttribute("checked") ?? false;
+      checkbox?.remove();
+      const releaseLink = item.querySelector('a[href^="/latest-releases/"]');
+      const releasePath = releaseLink?.getAttribute("href");
+      const release = releasePath ? releasesByPath.get(releasePath) : undefined;
+      releaseLink?.remove();
+
+      return {
+        completed,
+        html: item.innerHTML.replace(/\s*·\s*$/, "").trim(),
+        releasePath,
+        releaseVersion: release
+          ? (release.data.version ??
+            release.data.title.match(/\bv\d[\w.-]*/)?.[0] ??
+            "Release notes")
+          : "Release notes",
+        releaseTitle: release?.data.title ?? "Release notes",
+      };
+    },
+  );
+
+  return {
+    title: heading.textContent,
+    id: heading.getAttribute("id"),
+    items,
+    completed: items.filter((item) => item.completed).length,
+  };
+});
+const roadmapTotal = roadmapGroups.reduce(
+  (total, group) => total + group.items.length,
+  0,
+);
+const roadmapCompleted = roadmapGroups.reduce(
+  (total, group) => total + group.completed,
+  0,
+);
+const roadmapPercent = roadmapTotal
+  ? Math.round((roadmapCompleted / roadmapTotal) * 100)
+  : 0;
+const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+const monthFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+---
+
+<ReleaseLayout
+  title="Drizzle ORM - Roadmap and changelog"
+  description="Release notes for Drizzle ORM and Drizzle Kit."
+>
+  <header class="releases-intro">
+    <h1 class="post-title">Roadmap and changelog</h1>
+    <p>Release notes for Drizzle ORM and Drizzle Kit.</p>
+  </header>
+
+  <section class="roadmap" aria-labelledby="roadmap">
+    <details class="roadmap-disclosure">
+      <summary
+        aria-label={`v1.0 roadmap: ${roadmapCompleted} of ${roadmapTotal} milestones completed. Expand or collapse roadmap.`}
+      >
+        <h2 id="roadmap"><span class="roadmap-version">v1.0</span> Roadmap</h2>
+        <progress
+          value={roadmapCompleted}
+          max={roadmapTotal}
+          style={`--milestones: ${roadmapTotal}`}
+          aria-label="Roadmap milestones completed"></progress>
+        <span class="roadmap-percentage">{roadmapPercent}%</span>
+        <svg
+          class="roadmap-chevron"
+          aria-hidden="true"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </summary>
+      <div class="roadmap-details">
+        {
+          roadmapGroups.map((group) => (
+            <section class="roadmap-group" aria-labelledby={group.id}>
+              <header class="roadmap-group-heading">
+                <h3 id={group.id}>{group.title}</h3>
+                <span>
+                  {group.completed} / {group.items.length} complete
+                </span>
+              </header>
+              <ul class="roadmap-items">
+                {group.items.map((item) => (
+                  <li
+                    class:list={[
+                      "roadmap-item",
+                      { "is-completed": item.completed },
+                    ]}
+                  >
+                    <span
+                      class="roadmap-status"
+                      role="img"
+                      aria-label={item.completed ? "Completed" : "Upcoming"}
+                    >
+                      {item.completed ? "✓" : ""}
+                    </span>
+                    <div class="roadmap-item-content" set:html={item.html} />
+                    <div class="roadmap-item-meta">
+                      {item.releasePath ? (
+                        <a
+                          href={item.releasePath}
+                          aria-label={item.releaseTitle}
+                        >
+                          {item.releaseVersion.startsWith("v")
+                            ? item.releaseVersion
+                            : `v${item.releaseVersion}`}{" "}
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      ) : (
+                        <span>{item.completed ? "Completed" : "Upcoming"}</span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </details>
+  </section>
+
+  <section class="changelog" aria-labelledby="changelog">
+    <div class="changelog-heading">
+      <h2 id="changelog">Changelog</h2>
+      <a href="/latest-releases/rss.xml" type="application/rss+xml"
+        >Subscribe via RSS <span aria-hidden="true">↗</span></a
+      >
+    </div>
+    {
+      months.map((month) => (
+        <section class="release-month" aria-labelledby={`month-${month}`}>
+          <h3 id={`month-${month}`}>
+            {monthFormatter.format(new Date(`${month}-01T00:00:00Z`))}
+          </h3>
+          <ul>
+            {posts
+              .filter(({ data }) =>
+                data.pubDate.toISOString().startsWith(month),
+              )
+              .map((post) => (
+                <li>
+                  <time
+                    datetime={post.data.pubDate.toISOString()}
+                    aria-label={formatReleaseDate(post.data.pubDate)}
+                  >
+                    {releaseDateFormatter.format(post.data.pubDate)}
+                  </time>
+                  <div class="release-content">
+                    <div class="release-heading">
+                      <h4>
+                        <a href={getReleasePath(post.slug)}>
+                          {post.data.title}
+                        </a>
+                      </h4>
+                    </div>
+                    {post.data.description && <p>{post.data.description}</p>}
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    }
+    {posts.length === 0 && <p>No releases yet.</p>}
+  </section>
+</ReleaseLayout>
+
+<style>
+  .releases-intro h1 {
+    margin: 0 0 16px;
+  }
+  .releases-intro p {
+    color: var(--releases-muted);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .roadmap {
+    margin-top: 36px;
+  }
+  .changelog {
+    margin-top: 56px;
+  }
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.6px;
+    margin: 0;
+    scroll-margin-top: 128px;
+  }
+  .roadmap-disclosure {
+    border-top: 1px solid var(--releases-border);
+    border-bottom: 1px solid var(--releases-border);
+  }
+  .roadmap-disclosure > summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px auto 16px;
+    align-items: center;
+    gap: 20px;
+    list-style: none;
+    cursor: pointer;
+    padding: 24px 0;
+  }
+  .roadmap-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+  .roadmap-disclosure > summary:focus-visible {
+    outline: 2px solid var(--releases-text);
+    outline-offset: 6px;
+  }
+  .roadmap-disclosure h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.2px;
+  }
+  .roadmap-version {
+    font-family: monospace;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+  }
+  .roadmap-percentage {
+    color: var(--releases-muted);
+    font-family: monospace;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .roadmap-chevron {
+    color: var(--releases-muted);
+    transition: transform 160ms ease;
+  }
+  .roadmap-disclosure > summary:hover .roadmap-chevron {
+    color: var(--releases-text);
+    transform: translateY(2px);
+  }
+  .roadmap-disclosure[open] > summary .roadmap-chevron {
+    transform: rotate(180deg);
+  }
+  .roadmap-disclosure progress {
+    appearance: none;
+    border: 0;
+    width: 100%;
+    height: 14px;
+    overflow: hidden;
+    background: var(--releases-border);
+    color: #4bb74b;
+    /* Each segment represents one milestone in the published roadmap. */
+    mask-image: linear-gradient(to right, #000 calc(100% - 2px), transparent 0);
+    mask-size: calc(100% / var(--milestones)) 100%;
+    mask-repeat: repeat-x;
+  }
+  .roadmap-disclosure progress::-webkit-progress-bar {
+    background: var(--releases-border);
+  }
+  .roadmap-disclosure progress::-webkit-progress-value {
+    background: #4bb74b;
+  }
+  .roadmap-disclosure progress::-moz-progress-bar {
+    background: #4bb74b;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .roadmap-chevron {
+      transition: none;
+    }
+  }
+  .roadmap-group-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .roadmap-details {
+    padding: 24px 0 28px;
+    border-top: 1px solid var(--releases-border);
+  }
+
+  .roadmap-group + .roadmap-group {
+    margin-top: 32px;
+  }
+  .roadmap-group-heading h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    scroll-margin-top: 128px;
+  }
+  .roadmap-group-heading > span {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--releases-muted);
+  }
+  .roadmap-items {
+    padding: 0;
+    margin: 14px 0 0;
+    list-style: none;
+  }
+  .roadmap-item {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 13px 0;
+    border-top: 1px solid var(--releases-border);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .roadmap-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border: 1px solid var(--releases-muted);
+    border-radius: 50%;
+    font-size: 10px;
+    line-height: 1;
+    position: relative;
+    top: 2px;
+  }
+  .is-completed .roadmap-status {
+    color: var(--releases-muted);
+    border-color: transparent;
+    background: color-mix(in srgb, var(--releases-muted) 12%, transparent);
+  }
+  .roadmap-item-content {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .roadmap-item-content :global(code) {
+    font-size: 0.9em;
+    background: var(--releases-surface);
+    border-radius: 4px;
+    padding: 2px 4px;
+  }
+  .roadmap-item-content :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--releases-border);
+  }
+  .roadmap-item-meta {
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--releases-muted);
+  }
+  .roadmap-item-meta a {
+    display: inline-flex;
+    gap: 6px;
+    color: var(--releases-text);
+  }
+  .changelog-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--releases-border);
+  }
+  .changelog-heading > a {
+    color: var(--releases-muted);
+    font-size: 12px;
+  }
+  .release-month {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 24px;
+    padding: 32px 0;
+  }
+  .release-month + .release-month {
+    border-top: 1px solid var(--releases-border);
+  }
+  .release-month > h3 {
+    margin: 0;
+    padding-top: 3px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--releases-muted);
+    scroll-margin-top: 128px;
+  }
+  .release-month ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .release-month li {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 14px;
+  }
+  .release-month li + li {
+    margin-top: 28px;
+  }
+  .release-content {
+    min-width: 0;
+  }
+  .release-heading h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: -0.15px;
+    overflow-wrap: anywhere;
+  }
+  .release-month time {
+    padding-top: 3px;
+    color: var(--releases-muted);
+    font-size: 12px;
+    line-height: 1.6;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .release-month p {
+    color: var(--releases-muted);
+    font-size: 13px;
+    margin-top: 5px;
+    max-width: 72ch;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 600px) {
+    .roadmap-disclosure > summary {
+      grid-template-columns: minmax(0, 1fr) 90px auto 14px;
+      gap: 10px;
+      padding: 20px 0;
+    }
+    .roadmap-disclosure h2 {
+      gap: 8px;
+      font-size: 14px;
+    }
+    .roadmap-version {
+      font-size: 18px;
+    }
+    .roadmap-disclosure progress {
+      height: 12px;
+      mask-image: linear-gradient(
+        to right,
+        #000 calc(100% - 1px),
+        transparent 0
+      );
+    }
+    .roadmap-details {
+      padding: 20px 0;
+    }
+    .roadmap-item {
+      grid-template-columns: 16px minmax(0, 1fr);
+      gap: 4px 10px;
+    }
+    .roadmap-item-meta {
+      grid-column: 2;
+    }
+    .changelog {
+      margin-top: 40px;
+    }
+    .changelog-heading > a {
+      font-size: 11px;
+    }
+    .release-month {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      padding: 24px 0;
+    }
+    .release-month > h3 {
+      color: var(--releases-text);
+      font-weight: 600;
+    }
+    .release-month li {
+      gap: 12px;
+    }
+  }
+</style>

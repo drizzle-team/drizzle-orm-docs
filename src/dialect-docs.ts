@@ -13,7 +13,7 @@ export const defaultDocsDialect: DocsDialectId = "pg";
 
 export const dialectRelatedFolder = ["tutorials", "guides"] as const;
 
-export const commonFolders = ["latest-releases", "get-started"] as const;
+export const commonFolders = ["get-started"] as const;
 const docsDialectIdSet = new Set<string>(docsDialectIds);
 
 export const isDocsDialectId = (value: string): value is DocsDialectId =>

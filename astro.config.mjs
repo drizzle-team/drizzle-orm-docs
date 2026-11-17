@@ -3,6 +3,7 @@ import { loadEnv } from "vite";
 import mdx from "@astrojs/mdx";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { releaseLinks } from "./src/releases/rehype-external-links.mjs";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import yaml from "@rollup/plugin-yaml";
@@ -58,6 +59,7 @@ export default defineConfig({
   markdown: {
     rehypePlugins: [
       rehypeSlug,
+      releaseLinks,
       [
         rehypeAutolinkHeadings,
         {

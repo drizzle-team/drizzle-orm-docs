@@ -1,0 +1,399 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+
+import {
+  getReleasePosts,
+  formatReleaseDate,
+  getReleasePath,
+} from "@/releases/posts";
+import ReleaseLayout from "@/ui/ReleasesLayout.astro";
+import MDXStyles from "@/ui/components/MDXStyles.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getReleasePosts();
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { post } = Astro.props;
+const { Content, headings } = await post.entry.render();
+const contents = headings.filter(({ depth }) => depth === 2 || depth === 3);
+const hasContents = contents.length > 1;
+const hasTopLevelSections = contents.some(({ depth }) => depth === 2);
+const canonicalUrl = new URL(getReleasePath(post.slug), Astro.site).toString();
+const image = post.data.image;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  ...(post.data.updatedDate
+    ? { dateModified: post.data.updatedDate.toISOString() }
+    : {}),
+  publisher: { "@type": "Organization", name: "Drizzle" },
+  mainEntityOfPage: canonicalUrl,
+  ...(image ? { image: new URL(image, Astro.site).toString() } : {}),
+};
+---
+
+<ReleaseLayout
+  title={`${post.data.title} | Drizzle Releases`}
+  description={post.data.description}
+  image={image}
+  isArticle
+>
+  <Fragment slot="head">
+    <link
+      rel="alternate"
+      type="text/markdown"
+      title="Markdown source"
+      href={`${getReleasePath(post.slug)}.md`}
+    />
+    <meta
+      property="article:published_time"
+      content={post.data.pubDate.toISOString()}
+    />
+    {
+      post.data.updatedDate && (
+        <meta
+          property="article:modified_time"
+          content={post.data.updatedDate.toISOString()}
+        />
+      )
+    }
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")}
+    />
+  </Fragment>
+  <MDXStyles />
+  <div class="release-article">
+    <header class="post-intro">
+      <div class="post-utility">
+        <a class="back-link" href="/latest-releases">← All releases</a>
+        <div class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}
+            >{formatReleaseDate(post.data.pubDate)}</time
+          >
+        </div>
+      </div>
+      <h1>{post.data.title}</h1>
+      {
+        post.data.updatedDate && (
+          <p class="updated-date">
+            Updated {formatReleaseDate(post.data.updatedDate)}
+          </p>
+        )
+      }
+    </header>
+    <div class="post-layout">
+      <article class="documentation-content releases-prose">
+        <Content />
+      </article>
+      {
+        hasContents && (
+          <aside class="post-aside" aria-label="Release contents">
+            <nav aria-label="On this page" data-releases-contents>
+              <h2>On this page</h2>
+              {contents.map((heading) => (
+                <a
+                  class:list={[
+                    hasTopLevelSections && heading.depth === 3 && "nested",
+                  ]}
+                  href={`#${heading.slug}`}
+                >
+                  {heading.text}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )
+      }
+    </div>
+    <div class="post-bottom">
+      <a href="/latest-releases">← Back to Releases</a><a
+        href="/latest-releases/rss.xml">Subscribe with RSS ↗</a
+      >
+    </div>
+  </div>
+</ReleaseLayout>
+
+<script>
+  /** Highlights the section at the reading position and returns navigation cleanup. */
+  function initializeReleaseContents(): () => void {
+    const navigation = document.querySelector("[data-releases-contents]");
+    const sections = Array.from(
+      navigation?.querySelectorAll<HTMLAnchorElement>("a[href]") ?? [],
+    ).flatMap((link) => {
+      const heading = document.getElementById(
+        link.getAttribute("href")!.slice(1),
+      );
+
+      return heading ? [{ link, heading }] : [];
+    });
+
+    if (!sections.length) {
+      return () => {};
+    }
+
+    let activeLink = sections.find(
+      ({ link }) => link.getAttribute("aria-current") === "location",
+    )?.link;
+
+    function updateCurrentSection() {
+      const scrollPadding =
+        parseFloat(
+          getComputedStyle(document.documentElement).scrollPaddingTop,
+        ) || 0;
+      let currentSection = sections[0];
+
+      for (const section of sections) {
+        const scrollMargin =
+          parseFloat(getComputedStyle(section.heading).scrollMarginTop) || 0;
+
+        if (
+          section.heading.getBoundingClientRect().top >
+          scrollPadding + scrollMargin + 1
+        ) {
+          break;
+        }
+
+        currentSection = section;
+      }
+
+      if (
+        window.scrollY > 0 &&
+        window.scrollY + window.innerHeight >=
+          document.documentElement.scrollHeight - 1
+      ) {
+        currentSection = sections[sections.length - 1];
+      }
+
+      if (activeLink === currentSection.link) {
+        return;
+      }
+
+      activeLink?.removeAttribute("aria-current");
+      currentSection.link.setAttribute("aria-current", "location");
+      activeLink = currentSection.link;
+    }
+
+    updateCurrentSection();
+    window.addEventListener("scroll", updateCurrentSection, { passive: true });
+    window.addEventListener("resize", updateCurrentSection);
+
+    return () => {
+      window.removeEventListener("scroll", updateCurrentSection);
+      window.removeEventListener("resize", updateCurrentSection);
+    };
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    const cleanupContents = initializeReleaseContents();
+    document.addEventListener("astro:before-swap", cleanupContents, {
+      once: true,
+    });
+    const article = document.querySelector(".releases-prose");
+
+    if (!article) {
+      return;
+    }
+
+    for (const button of article.querySelectorAll<HTMLButtonElement>(
+      "[data-copy-btn]",
+    )) {
+      button.addEventListener("click", async () => {
+        if (!button.dataset.code) {
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(button.dataset.code);
+          button.setAttribute("aria-label", "Copied");
+        } catch {
+          button.setAttribute(
+            "aria-label",
+            "Copy failed. Select and copy the code.",
+          );
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .release-article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px;
+    column-gap: 56px;
+  }
+  .post-intro,
+  .post-bottom {
+    grid-column: 1;
+    min-width: 0;
+  }
+  .post-intro {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--releases-border);
+    padding-bottom: 28px;
+  }
+  .post-utility {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+  }
+  .back-link {
+    display: inline-block;
+    color: var(--releases-muted);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .post-intro h1 {
+    margin: 28px 0 0;
+    color: var(--releases-text);
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.2;
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+  .updated-date {
+    color: var(--releases-muted);
+    font-size: 12px;
+    margin-top: 16px;
+  }
+  .post-layout {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    padding-top: 28px;
+  }
+  .releases-prose {
+    min-width: 0;
+    padding: 0;
+    color: var(--releases-text);
+    overflow-wrap: anywhere;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .releases-prose :global(p) {
+    line-height: 1.75;
+  }
+  .releases-prose
+    :global(
+      > p:first-child:has(
+          > a:only-child[href*="github.com/"][href*="/releases/"]
+        )
+    ) {
+    padding: 0;
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+  .releases-prose
+    :global(
+      > p:first-child > a:only-child[href*="github.com/"][href*="/releases/"]
+    ) {
+    color: var(--releases-muted);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--releases-border);
+  }
+  .releases-prose :global(li) {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .releases-prose :global(h2),
+  .releases-prose :global(h3),
+  .releases-prose :global(h4) {
+    color: var(--releases-text);
+    scroll-margin-top: 128px;
+  }
+  .releases-prose :global(h2) {
+    font-size: 24px;
+    margin-top: 40px;
+    margin-bottom: 12px;
+  }
+  .releases-prose :global(h3) {
+    font-size: 19px;
+    margin-top: 32px;
+    margin-bottom: 10px;
+  }
+  .releases-prose :global(> :is(h2, h3):first-child) {
+    margin-top: 0;
+  }
+  .releases-prose :global(pre) {
+    max-width: 100%;
+  }
+  .releases-prose :global(:not(pre) > code) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .releases-prose :global(img) {
+    max-width: 100%;
+    height: auto;
+  }
+  .post-aside {
+    align-self: start;
+    border-left: 1px solid var(--releases-border);
+    padding-left: 20px;
+  }
+  .post-aside h2 {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .post-aside a {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--releases-muted);
+    margin-bottom: 12px;
+  }
+  .post-aside nav a[aria-current="location"] {
+    color: var(--releases-text);
+    font-weight: 600;
+  }
+  .post-aside .nested {
+    padding-left: 10px;
+  }
+  .post-bottom {
+    border-top: 1px solid var(--releases-border);
+    margin-top: 40px;
+    padding: 20px 0 40px;
+    color: var(--releases-muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 13px;
+  }
+
+  @media (min-width: 761px) {
+    .post-aside {
+      position: sticky;
+      top: 128px;
+      max-height: calc(100dvh - 152px);
+      overflow-y: auto;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .release-article {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .post-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 30px;
+    }
+    .post-aside {
+      display: none;
+    }
+  }
+</style>

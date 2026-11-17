@@ -43,6 +43,8 @@ window.addEventListener(
   "keydown",
   (e) => {
     if (e.code === "Escape") {
+      if (document.querySelector("dialog:modal")) return;
+
       const rightImage = document.getElementById("right-image");
       const board = document.querySelector(".board");
       const score = document.querySelector("#score");

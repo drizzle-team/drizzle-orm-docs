@@ -1,0 +1,148 @@
+---
+import BaseHead from "./BaseHead.astro";
+import Banner from "./components/Banner.astro";
+import Footer from "./components/Footer.astro";
+import NavigationAstro from "./components/NavigationAstro.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  isArticle?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  isArticle = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <BaseHead
+    title={title}
+    description={description}
+    image={image}
+    pageType={isArticle ? "article" : "website"}
+  >
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Drizzle Releases"
+      href="/latest-releases/rss.xml"
+    />
+    <slot name="head" />
+  </BaseHead>
+  <body class="releases-body banner-shown">
+    <a class="skip-link" href="#releases-main">Skip to content</a>
+    <Banner />
+    <NavigationAstro />
+    <main id="releases-main" class="releases-main">
+      <slot />
+    </main>
+    <footer class="releases-footer">
+      <Footer isCenteredLayout />
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  .releases-body {
+    --releases-background: #fff;
+    --releases-surface: #f6f6f7;
+    --releases-text: #222124;
+    --releases-muted: #65656c;
+    --releases-border: #e6e6e6;
+    --releases-accent: #486514;
+    margin: 64px 0 0;
+    color: var(--releases-text);
+    background: var(--releases-background);
+  }
+
+  html.dark .releases-body {
+    --releases-background: #111;
+    --releases-surface: #191919;
+    --releases-text: #e1e3e6;
+    --releases-muted: #a0a0a7;
+    --releases-border: #303030;
+    --releases-accent: #c5f74f;
+    color: var(--releases-text);
+    background: var(--releases-background);
+  }
+
+  .releases-body *,
+  .releases-body *::before,
+  .releases-body *::after {
+    box-sizing: border-box;
+  }
+  .releases-main a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .releases-body button {
+    cursor: pointer;
+  }
+  .releases-body [hidden] {
+    display: none !important;
+  }
+  .releases-body .post-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--releases-muted);
+  }
+  .releases-body .post-title {
+    font-size: clamp(34px, 5.5vw, 56px);
+    line-height: 1.15;
+    font-weight: 650;
+    letter-spacing: -0.045em;
+  }
+  .releases-body .code-snippet {
+    max-width: 100%;
+  }
+  .releases-body .releases-prose pre code {
+    font-size: 13px;
+  }
+  .releases-body .code-snippet pre {
+    overflow-x: auto;
+  }
+</style>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -80px;
+    z-index: 200;
+    background: var(--releases-background);
+    padding: 12px;
+  }
+  .skip-link:focus {
+    top: 12px;
+  }
+  .releases-main {
+    max-width: 1040px;
+    padding: 56px 40px 0;
+    margin: 0 auto;
+    min-height: 60vh;
+  }
+  .releases-footer {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media (max-width: 768px) {
+    .releases-main {
+      padding: 16px 16px 0;
+    }
+    .releases-footer {
+      padding: 0 16px;
+    }
+  }
+
+</style>

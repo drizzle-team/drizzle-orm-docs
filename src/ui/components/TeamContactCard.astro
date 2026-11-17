@@ -1,0 +1,175 @@
+---
+import { Image } from "astro:assets";
+
+import sherman from "@/assets/images/team/sherman.png";
+import blokh from "@/assets/images/team/blokh.png";
+import bloberenober from "@/assets/images/team/bloberenober.png";
+import ContactProductManager from "@mdx/ContactProductManager.astro";
+
+interface Props {
+  placement: "menu" | "home";
+}
+
+const { placement } = Astro.props;
+const titleId = `${placement}-contact-title`;
+const Heading = placement === "home" ? "h2" : "h3";
+const contactPeople = [
+  { name: "Andrew Sherman", photo: sherman },
+  { name: "Alex Blokh", photo: blokh },
+  { name: "Dan Kochetov", photo: bloberenober },
+];
+---
+
+<section
+  class:list={["team-contact-card", `team-contact-card--${placement}`]}
+  aria-labelledby={titleId}
+>
+  <div class="team-contact-copy">
+    <div class="team-contact-people">
+      {
+        contactPeople.map((person) => (
+          <Image src={person.photo} alt={person.name} width={40} height={40} />
+        ))
+      }
+      <span>The Drizzle team</span>
+    </div>
+    <Heading id={titleId}>What could we build together?</Heading>
+    <p>
+      Bring Drizzle into your product, build an integration, or talk through
+      what your company needs.
+    </p>
+  </div>
+  <ContactProductManager
+    name="Drizzle Team"
+    role={[]}
+    people={contactPeople}
+    email="help@drizzle.team"
+  >
+    <button
+      slot="trigger"
+      type="button"
+      class="team-contact-button"
+      data-pm-trigger
+    >
+      Talk to the team <span aria-hidden="true">→</span>
+    </button>
+  </ContactProductManager>
+</section>
+
+<style>
+  .team-contact-card {
+    padding: 20px;
+    border: 1px solid #e2e2e5;
+    border-radius: 5px;
+    background: #f6f6f7;
+    color: #222124;
+  }
+  .team-contact-card--menu {
+    margin-top: 12px;
+  }
+  .team-contact-card--home {
+    margin-top: 48px;
+  }
+  :global(html.dark) .team-contact-card {
+    border-color: #333;
+    background: #1c1c1c;
+    color: #e1e3e6;
+  }
+  .team-contact-people {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .team-contact-people img {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #f6f6f7;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .team-contact-people img + img {
+    margin-left: -10px;
+  }
+  :global(html.dark) .team-contact-people img {
+    border-color: #1c1c1c;
+  }
+  .team-contact-people span {
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .team-contact-copy :is(h2, h3) {
+    margin: 0;
+    max-width: 250px;
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+  .team-contact-copy p {
+    margin: 8px 0 0;
+    color: #606066;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  :global(html.dark) .team-contact-copy p {
+    color: #aaa;
+  }
+  .team-contact-card .team-contact-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    margin-top: 20px;
+    padding: 0 24px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: #282b3b;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  :global(html.dark) .team-contact-card .team-contact-button {
+    background: #e2e8f0;
+    color: #282828;
+  }
+  .team-contact-card .team-contact-button:hover {
+    opacity: 0.85;
+  }
+  @media (max-width: 599px) {
+    .team-contact-card .team-contact-button {
+      height: 46px;
+      min-height: 46px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+  }
+  @media (min-width: 769px) {
+    .team-contact-card--home {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      padding: 32px;
+      margin-top: 64px;
+    }
+    .team-contact-card--home .team-contact-copy {
+      max-width: 580px;
+    }
+    .team-contact-card--home h2 {
+      max-width: none;
+      font-size: 32px;
+    }
+    .team-contact-card--home .team-contact-button {
+      flex: 0 0 210px;
+      width: 210px;
+      margin-top: 0;
+    }
+  }
+</style>
