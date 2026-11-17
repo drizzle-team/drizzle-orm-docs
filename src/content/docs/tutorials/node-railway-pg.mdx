@@ -163,13 +163,13 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-The `generate` command only creates migration SQL files based on your schema — it does **not** apply any changes to the database. These migrations are stored in the `migrations` directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+The `generate` command only creates migration SQL files based on your schema — it does **not** apply any changes to the database. These migrations are stored in the `migrations` directory, as specified in your `drizzle.config.ts`. Each migration has its own timestamped folder containing a `migration.sql` file and a `snapshot.json` file.
 
 Example of a generated migration:
 
 ```sql
 CREATE TABLE "posts" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY,
 	"title" text NOT NULL,
 	"content" text NOT NULL,
 	"userId" integer NOT NULL,
@@ -178,14 +178,13 @@ CREATE TABLE "posts" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"age" integer NOT NULL,
-	"email" text NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	"email" text NOT NULL UNIQUE
 );
 --> statement-breakpoint
-ALTER TABLE "posts" ADD CONSTRAINT "posts_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "posts" ADD CONSTRAINT "posts_userId_users_id_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
 ```
 
 Apply the generated migrations to the database:
@@ -226,10 +225,9 @@ This is the basic file structure of the project. In the `src` directory, we have
  │  ├ 📜 schema.ts
  │  └ 📜 index.ts
  ├ 📂 migrations
- │  ├ 📂 meta
- │  │  ├ 📜 _journal.json
- │  │  └ 📜 0000_snapshot.json
- │  └ 📜 0000_optimal_the_fury.sql
+ │  └ 📂 20261116104358_clever_rocket_racer
+ │     ├ 📜 migration.sql
+ │     └ 📜 snapshot.json
  ├ 📜 .env
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
