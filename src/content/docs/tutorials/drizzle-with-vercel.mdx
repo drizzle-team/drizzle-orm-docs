@@ -1,5 +1,5 @@
 ---
-title: "Drizzle with Vercel Postgres"
+title: "Drizzle with Postgres on Vercel"
 date: "2024-06-09"
 svgs: ['<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 43.4805 67.3037)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 76.9395 46.5342)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 128.424 46.5352)" fill="currentColor"></rect><rect width="9.63139" height="40.8516" rx="4.8157" transform="matrix(0.873028 0.48767 -0.497212 0.867629 94.957 67.3037)" fill="currentColor"></rect></svg>', <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 5L4 19H20L12 5Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>]
 ---
@@ -10,9 +10,14 @@ import Steps from '@mdx/Steps.astro';
 import Section from "@mdx/Section.astro";
 import Callout from '@mdx/Callout.astro';
 
-This tutorial demonstrates how to use Drizzle ORM with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres). Vercel Postgres is a serverless SQL database designed to integrate with Vercel Functions and your frontend framework.
+This tutorial uses the Drizzle ORM and Drizzle Kit v1 release candidate to set up a new project with Postgres on Vercel. For this example, we use a Neon database connected through [Vercel Marketplace](https://vercel.com/marketplace/neon).
+
+<Callout type="info">
+[Vercel Postgres is no longer available](https://vercel.com/docs/postgres). New projects use a Postgres provider from Marketplace. Other providers have their own connection setup.
+</Callout>
 
 <Prerequisites>
+- Use Node.js 22 or later for the Neon serverless driver.
 - You should have installed Drizzle ORM and [Drizzle kit](/docs/kit-overview). You can do this by running the following command:
 <Npm>
   drizzle-orm@rc
@@ -24,31 +29,32 @@ This tutorial demonstrates how to use Drizzle ORM with [Vercel Postgres](https:/
   dotenv
 </Npm>
 
-- You should have installed `@vercel/postgres` package. Read more about this package [here](https://www.npmjs.com/package/@vercel/postgres)
+- You should have installed `@neondatabase/serverless` package. Read more about this package [here](https://www.npmjs.com/package/@neondatabase/serverless)
 <Npm>
-  @vercel/postgres
+  @neondatabase/serverless
 </Npm>  
 </Prerequisites>
 
-Check [Vercel documentation](https://vercel.com/docs/storage/vercel-postgres/using-an-orm#drizzle) to learn how to connect to the database with Drizzle ORM.
-
-## Setup Vercel Postgres and Drizzle ORM
+## Setup Neon on Vercel and Drizzle ORM
 
 <Steps>
-#### Create a new Vercel Postgres database
+#### Create and connect a Neon database
 
-You can create new Vercel Postgres database in the [dashboard](https://vercel.com/dashboard).
+Add [Neon from Vercel Marketplace](https://vercel.com/marketplace/neon) to your Vercel project. Follow the integration's setup to create a database and connect it to the project.
 
-Read Vercel Postgres [documentation](https://vercel.com/docs/storage/vercel-postgres/quickstart) to learn how to create a new database.
+#### Setup the connection string
 
-#### Setup connection string variable
+The integration adds database environment variables to the connected project. Link your local directory and download the development variables:
 
-Navigate to your Vercel Postgres database and copy `POSTGRES_URL` from `.env.local` section.
+```bash copy
+npx vercel link
+npx vercel env pull .env.local
+```
 
-Add `POSTGRES_URL` to your `.env.local` or `.env` file.
+Confirm that `.env.local` contains `DATABASE_URL`. If you configured a prefix for the integration, use the corresponding variable name throughout this tutorial. Keep this file out of version control.
 
-```plaintext copy
-POSTGRES_URL=<YOUR_DATABASE_URL>
+```plaintext copy filename=".env.local"
+DATABASE_URL=<YOUR_NEON_DATABASE_URL>
 ```
 
 #### Connect Drizzle ORM to your database
@@ -56,13 +62,14 @@ POSTGRES_URL=<YOUR_DATABASE_URL>
 Create a `index.ts` file in the `src/db` directory and set up your database configuration:
 
 ```typescript copy filename="src/db/index.ts"
-import { drizzle } from 'drizzle-orm/vercel-postgres';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
 import { config } from 'dotenv';
 
-config({ path: '.env.local' }); // or .env
+config({ path: '.env.local' });
 
-export const db = drizzle();
-
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle({ client: sql });
 ```
 
 #### Create tables
@@ -116,7 +123,7 @@ export default defineConfig({
   out: './migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.POSTGRES_URL!,
+    url: process.env.DATABASE_URL!,
   },
 });
 ```
@@ -131,13 +138,13 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `drizzle/migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `migrations` directory, as specified in your `drizzle.config.ts`. Each migration has its own timestamped folder containing `migration.sql` and `snapshot.json`.
 
 Example of a generated migration:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "posts_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE "posts_table" (
+	"id" serial PRIMARY KEY,
 	"title" text NOT NULL,
 	"content" text NOT NULL,
 	"user_id" integer NOT NULL,
@@ -145,19 +152,14 @@ CREATE TABLE IF NOT EXISTS "posts_table" (
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "users_table" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE "users_table" (
+	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"age" integer NOT NULL,
-	"email" text NOT NULL,
-	CONSTRAINT "users_table_email_unique" UNIQUE("email")
+	"email" text NOT NULL UNIQUE
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fk" FOREIGN KEY ("user_id") REFERENCES "users_table"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
+ALTER TABLE "posts_table" ADD CONSTRAINT "posts_table_user_id_users_table_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users_table"("id") ON DELETE CASCADE;
 ```
 
 Run migrations:
@@ -178,7 +180,7 @@ npx drizzle-kit push
 
 ## Basic file structure
 
-This is the basic file structure of the project. In the `src/db` directory, we have database-related files including connection in `index.ts` and schema definitions in `schema.ts`.
+The `src/db` directory contains the connection in `index.ts` and table definitions in `schema.ts`. Drizzle Kit writes migrations to `migrations`. Your generated migration timestamp and name will differ from this example.
 
 ```plaintext
 📦 <project root>
@@ -187,10 +189,9 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │   │  ├ 📜 index.ts
  │   │  └ 📜 schema.ts
  ├ 📂 migrations
- │   ├ 📂 meta
- │   │  ├ 📜 _journal.json
- │   │  └ 📜 0000_snapshot.json
- │   └ 📜 0000_watery_spencer_smythe.sql
+ │   └ 📂 20261117000000_initial
+ │      ├ 📜 migration.sql
+ │      └ 📜 snapshot.json
  ├ 📜 .env.local
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json
@@ -222,11 +223,7 @@ export async function createPost(data: InsertPost) {
 
 Read more about select query in the [documentation](/docs/select).
 
-<Callout type='warning'>
-`getColumns` available starting from `drizzle-orm@1.0.0-beta.2`(read more [here](/docs/upgrade-v1))
-
-If you are on pre-1 version(like `0.45.1`) then use `getTableColumns`
-</Callout>
+Use `getColumns(usersTable)` to include all user columns alongside the computed post count in the second query below.
 
 ```typescript copy filename="src/db/queries/select.ts" {5, 16, 41}
 import { asc, between, count, eq, getColumns, sql } from 'drizzle-orm';
