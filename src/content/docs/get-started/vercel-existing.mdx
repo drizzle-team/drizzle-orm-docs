@@ -68,7 +68,7 @@ In the Vercel Postgres storage tab, you can find the `.env.local` tab and copy t
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
-import { usersTable } from './db/schema';
+import { users as usersTable } from './db/schema';
 
 async function main() {
   const db = drizzle();
@@ -126,7 +126,7 @@ main();
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
-import { usersTable } from './db/schema';
+import { users as usersTable } from './db/schema';
 
 async function main() {
   const db = drizzle();

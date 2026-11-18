@@ -2,12 +2,12 @@ import CodeWithProps from "@mdx/CodeWithProps.astro";
 
 Let's **update** the `src/index.ts` file with queries to create, read, update, and delete users
 
-<CodeWithProps dialect={props.dialect} env_variable={props.env_variable}>
+<CodeWithProps dialect={props.dialect} env_variable={props.env_variable} usersImport={props.usersImport ?? "usersTable"} closeClient={props.closeClient ? ".finally(() => db.$client.end())" : ""}>
 ```typescript copy filename="src/index.ts"
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/$dialect$';
 import { eq } from 'drizzle-orm';
-import { usersTable } from './db/schema';
+import { $usersImport$ } from './db/schema';
   
 const db = drizzle(process.env.$env_variable$!);
 
@@ -44,6 +44,6 @@ async function main() {
   console.log('User deleted!')
 }
 
-main();
+main()$closeClient$;
 ```
 </CodeWithProps>
