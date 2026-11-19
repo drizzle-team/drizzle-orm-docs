@@ -49,7 +49,7 @@ Create a `schema.ts` file in the `src/db` directory and declare your tables. Sin
 import { pgTable, uuid, text, timestamp, varchar, vector, boolean } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-export const tenantsTable = pgTable("tenants", {
+export const tenants = pgTable("tenants", {
 	id: uuid().default(sql`public.uuid_generate_v7()`).primaryKey().notNull(),
 	name: text(),
 	created: timestamp({ mode: 'string' }).default(sql`LOCALTIMESTAMP`).notNull(),
