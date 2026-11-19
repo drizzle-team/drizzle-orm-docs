@@ -914,9 +914,10 @@ when the row is inserted as well, and the returned value will be used as the col
 
 ```ts
 import { int4, timestamp, text, cockroachTable } from "drizzle-orm/cockroach-core";
+import { SQL, sql } from "drizzle-orm";
 
 const table = cockroachTable('table', {
-	updateCounter: int4().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
+	updateCounter: int4().default(sql`1`).$onUpdateFn((): SQL => sql`${table.updateCounter} + 1`),
 	updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
 	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });

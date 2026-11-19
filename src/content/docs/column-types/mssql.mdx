@@ -760,6 +760,7 @@ when the row is inserted as well, and the returned value will be used as the col
 
 ```ts
 import { int, datetime2, text, mssqlTable } from "drizzle-orm/mssql-core";
+import { SQL, sql } from "drizzle-orm";
 
 const table = mssqlTable('table', {
 	updateCounter: int().default(sql`1`).$onUpdateFn((): SQL => sql`${table.updateCounter} + 1`),
