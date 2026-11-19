@@ -1000,9 +1000,10 @@ when the row is inserted as well, and the returned value will be used as the col
 
 ```ts
 import { integer, timestamp, text, pgTable } from "drizzle-orm/pg-core";
+import { SQL, sql } from "drizzle-orm";
 
 export const table = pgTable('table', {
-	updateCounter: integer().default(sql`1`).$onUpdateFn((): SQL => sql`${table.update_counter} + 1`),
+	updateCounter: integer().default(sql`1`).$onUpdateFn((): SQL => sql`${table.updateCounter} + 1`),
 	updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
 	alwaysNull: text().$type<string | null>().$onUpdate(() => null),
 });
