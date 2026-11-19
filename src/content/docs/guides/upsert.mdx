@@ -256,6 +256,57 @@ If you want to implement upsert query with `where` clause for `update` statement
 </CodeTabs>
 
 
+If the conflict can only happen on a **partial unique index** (for example, an email must be unique only among rows that are not soft-deleted), the conflict target has to repeat the index predicate, otherwise PostgreSQL and SQLite can't infer which index to use. Use the `targetWhere` property for this:
+
+<CodeTabs items={["index.ts", "schema.ts"]}>
+  <CodeTab>
+  ```ts copy {10}
+  import { sql } from 'drizzle-orm';
+  import { users } from './schema';
+
+  await db
+    .insert(users)
+    .values({ email: 'john@email.com', name: 'John' })
+    .onConflictDoUpdate({
+      target: users.email,
+      // must match the predicate of the partial unique index
+      targetWhere: sql`${users.deletedAt} is null`,
+      set: { name: 'John' },
+    });
+  ```
+
+  ```sql
+  insert into users ("email", "name") values ('john@email.com', 'John')
+    on conflict ("email") where deleted_at is null do update set name = 'John';
+  ```
+  </CodeTab>
+
+  ```ts copy {13,14,15}
+  import { pgTable, serial, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+  import { sql } from 'drizzle-orm';
+
+  export const users = pgTable(
+    'users',
+    {
+      id: serial('id').primaryKey(),
+      name: text('name').notNull(),
+      email: text('email').notNull(),
+      deletedAt: timestamp('deleted_at'),
+    },
+    (table) => [
+      uniqueIndex('users_active_email_idx')
+        .on(table.email)
+        .where(sql`${table.deletedAt} is null`),
+    ],
+  );
+  ```
+</CodeTabs>
+
+`targetWhere` and `setWhere` are independent and can be combined:
+- `targetWhere` is part of the **conflict target**. It selects which partial unique index is used to detect the conflict.
+- `setWhere` is part of the **update**. The conflict is detected as usual, but the existing row is only updated when the predicate is true; otherwise it is left untouched.
+
+
 If you want to update all columns except of specific one, you can leave the previous value like this:
 
 <Section>
