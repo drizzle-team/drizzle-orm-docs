@@ -22,15 +22,10 @@ We’ve tested different SQL dialects across all the competitors, and while we w
 
 From business perspective— request roundtrip is the most important metric when it comes down to the server-side performance. While you can influence network latency with services like Cloudflare Argo, on the server side it usually comes down to the database queries.
 
-We’ve composed a test case with a ~370k records in a PostgreSQL database and generated production-like E-commerce traffic benchmarks on 1GB ethernet to eliminate any discrepancies. On Lenovo M720q Drizzle can handle 4.6k reqs/s while maintaining a ~100ms p95 latency.
+We’ve composed a test case with ~370k records in a PostgreSQL database and generated production-like E-commerce traffic over a direct 1Gb ethernet link to eliminate any discrepancies. On Lenovo M720q Drizzle on Bun 1.4.4 peaks at 23.8k reqs/s with 4,800 concurrent users, averaging a ~55ms p95 latency at that load with zero failed requests.
 
-![](@/assets/images/benchmark-result.webp)
-
-We ran our benchmarks on 2 separate machines, so that observer does not influence results. For database we're using PostgreSQL instance with 42MB of E-commerce data(~370k records).  
-K6 benchmarking instance lives on MacBook Air and makes [1M prepared requests](https://github.com/drizzle-team/drizzle-benchmarks/blob/main/data/requests.json) through 1GB ethernet to Lenovo M720q with Intel Core i3-9100T and 32GB of RAM.
-
-![image](@/assets/images/how-it-works.png)
-
+We ran our benchmarks on 2 separate machines, so that the observer does not influence results. For the database we're using a PostgreSQL instance with 42MB of E-commerce data (~370k records).  
+The load generator lives on a Beelink mini PC and sends [a production-like E-commerce request mix](https://github.com/drizzle-team/drizzle-benchmarks/blob/main/bench/requests.ts) through 1Gb ethernet to Lenovo M720q with Intel Core i3-9100T and 32GB of RAM.
 
 To run your own tests - follow instructions below!
 
@@ -40,12 +35,12 @@ To run your own tests - follow instructions below!
 ...
 }
 
-const desiredPostgresPort = 5432; // change here
+const desiredPostgresPort = 5435; // change here
 main();
 ```
 2. Update `DATABASE_URL` with allocated database port in .env file:
 ```ts
-DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres"
+DATABASE_URL="postgres://postgres:postgres@localhost:5435/postgres"
 ```
 3. Seed your database with test data using `pnpm start:seed` command, you can change the size of the database in `./src/seed.ts` file:
 ```ts
@@ -54,7 +49,7 @@ DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres"
 
 main("micro"); // nano | micro
 ```
-4. Make sure you have Node version 18 installed or above. You can use [`nvm use 18`](https://github.com/nvm-sh/nvm) command
+4. Make sure you have Node version 22.18 installed or above. You can use [`nvm use 24`](https://github.com/nvm-sh/nvm) command
 5. Start Drizzle/Prisma server:
 ```bash
 ## Drizzle
@@ -66,12 +61,12 @@ pnpm start:prisma
 ```
 
 ## Prepare testing machine
-1. Generate a list of http requests with `pnpm start:generate`. It will output a list of http requests to be run on the tested server | `./data/requests.json`
-2. Install [k6 load tester](https://k6.io/)
+1. Install [Bun](https://bun.sh) 1.3 or later
+2. Install the load generator dependencies with `cd bunload && bun install`
 3. Run benchmarks 🚀  
 Use the built-in benchmark runner:
 ```bash
-tsx bench/index --host http://192.168.31.144:3000 --name my-bench --folder results
+bun bench/index.ts http://192.168.31.144:3000 my-bench
 
 http://192.168.31.144:3000 // drizzle
 http://192.168.31.144:3001 // prisma
@@ -79,6 +74,6 @@ http://192.168.31.144:3001 // prisma
 4. Prepare final combined results  
 After benchmarks finish, merge all outputs into a single JSON file:
 ```bash
-tsx bench/prepare --folder results
+bun scripts/site-data.ts
 ```
 </CenteredLayout>
