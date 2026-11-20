@@ -41,9 +41,14 @@ export function useBenchmarkContext() {
 // Define the BenchmarkProvider component
 interface BenchmarkProviderProps {
   children: ReactNode;
+  /** overrides of the default selection */
+  initial?: Partial<IParams>;
 }
 
-export function BenchmarkProvider({ children }: BenchmarkProviderProps) {
+export function BenchmarkProvider({
+  children,
+  initial,
+}: BenchmarkProviderProps) {
   const [time, setTime] = useState<number>(0);
   const intervalId = useRef<number>(0);
   const [concatedDataDrizzle, setConcatedDataDrizzle] = useState<IData[]>([]);
@@ -56,6 +61,7 @@ export function BenchmarkProvider({ children }: BenchmarkProviderProps) {
     database: "postgres",
     joins: false,
     runtime: "bun-1.4.4-drizzle",
+    ...initial,
   });
 
   const contextValue: BenchmarkContextProps = {

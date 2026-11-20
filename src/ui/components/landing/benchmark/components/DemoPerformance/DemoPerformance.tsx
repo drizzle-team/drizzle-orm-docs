@@ -7,8 +7,9 @@ import LatencyChart from "../LatencyChart/LatencyChart";
 import ReqsChart from "../ReqsChart/ReqsChart";
 import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
+import configurationData from "../../configurationData";
+import { demoSelection } from "../../utils/getDemoBenchmarkData";
 import RuntimeSelector from "@components/landing/benchmark/components/RuntimeSelector/RuntimeSelector";
-import JoinsSelector from "@components/landing/benchmark/components/JoinsSelector/JoinsSelector";
 
 interface Props {
   data: IData[] | null;
@@ -54,7 +55,7 @@ const DemoPerformance: FC<Props> = ({
           <div>
             <div className={styles.name}>Drizzle</div>
             <div className={styles.version}>
-              v1.0.0-beta.2
+              {configurationData.orm.items[demoSelection.orm].drizzle_version}
             </div>
           </div>
         </div>
@@ -63,18 +64,14 @@ const DemoPerformance: FC<Props> = ({
       <div className={styles["compare-item-container"]}>
         <div className={styles["compare-item"]}>
           <div className={styles["compare-icon-wrap"]}>
-            <Logo logo="prisma" />
+            <Logo logo="go" />
           </div>
           <div>
-            <div className={styles.name}>Prisma</div>
+            <div className={styles.name}>Go</div>
             <div className={styles.version}>
-              v7.1.0
+              {configurationData.orm.items[demoSelection.orm].compare_version}
             </div>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <RuntimeSelector />
-          <JoinsSelector />
         </div>
       </div>
       <div className={styles.block}>
