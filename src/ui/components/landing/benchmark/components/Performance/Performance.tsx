@@ -12,7 +12,6 @@ import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
 import configurationData from "../../configurationData";
 import RuntimeSelector from "@components/landing/benchmark/components/RuntimeSelector/RuntimeSelector";
-import JoinsSelector from "@components/landing/benchmark/components/JoinsSelector/JoinsSelector";
 
 interface Props {
   selectedItems: IParams;
@@ -123,7 +122,7 @@ const Performance: FC<Props> = ({
             </div>
           </div>
         </div>
-        {selectedItems.orm !== "go" && <RuntimeSelector />}
+        <RuntimeSelector />
       </div>
       <div className={styles["compare-item-container"]}>
         <div className={styles["compare-item"]}>
@@ -146,7 +145,6 @@ const Performance: FC<Props> = ({
         {!selectedItems.orm.startsWith("go") && (
           <div style={{ display: "flex", gap: "12px" }}>
             <RuntimeSelector />
-            {selectedItems.orm === "prisma-v5.18.0" && <JoinsSelector />}
           </div>
         )}
       </div>
@@ -185,7 +183,7 @@ const Performance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          avgRequests={data ? data[index].avg.reqs : 0}
+          peakRequests={data ? data[index].max.reqs : 0}
           requests={data ? data[index].reqs : 0}
           totalRequests={data ? data[index].totalReqs : 0}
           totalRequestsCompare={compareData ? compareData[index].totalReqs : 0}
@@ -201,7 +199,7 @@ const Performance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          avgRequests={compareData ? compareData[index].avg.reqs : 0}
+          peakRequests={compareData ? compareData[index].max.reqs : 0}
           requests={compareData ? compareData[index].reqs : 0}
           totalRequests={compareData ? compareData[index].totalReqs : 0}
           totalRequestsCompare={data ? data[index].totalReqs : 0}

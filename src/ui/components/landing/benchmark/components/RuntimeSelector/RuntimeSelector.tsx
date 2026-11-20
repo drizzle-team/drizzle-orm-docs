@@ -21,38 +21,25 @@ const RuntimeSelector: FC<Props> = ({ disabled }) => {
   const [selectWidth, setSelectWidth] = useState("109px");
 
   const items: Item[] =
-    selectedItems.orm === "prisma-v7.1.0"
+    selectedItems.orm === "go-20261120"
       ? [
-          { value: "bun-1.3.4", name: "Bun v1.3.4" },
-          { value: "node-24", name: "Node 24.6.0" },
+          { value: "bun-1.4.4-drizzle", name: "Bun v1.4.4 / Drizzle driver" },
+          { value: "bun-1.4.4-bun-sql", name: "Bun v1.4.4 / Bun SQL" },
+          { value: "bun-1.4.4-node-pg", name: "Bun v1.4.4 / node-postgres" },
+          { value: "bun-1.3.13-drizzle", name: "Bun v1.3.13 / Drizzle driver" },
+          { value: "bun-1.3.13-bun-sql", name: "Bun v1.3.13 / Bun SQL" },
+          { value: "bun-1.3.13-node-pg", name: "Bun v1.3.13 / node-postgres" },
+          { value: "node-26-drizzle", name: "Node v26.13.0 / Drizzle driver" },
+          { value: "node-26-node-pg", name: "Node v26.13.0 / node-postgres" },
+          { value: "node-24-drizzle", name: "Node v24.22.2 / Drizzle driver" },
+          { value: "node-24-node-pg", name: "Node v24.22.2 / node-postgres" },
         ]
-      : selectedItems.orm === "prisma-v7.8.0-20260430-jit"
-        ? [
-            {
-              value: "bun-1.3.13-bun-sql",
-              name: "Bun v1.3.13 / node-postgres",
-            },
-          ]
-        : selectedItems.orm === "go-20260430-jit" ||
-            selectedItems.orm === "go-20260430-default"
-          ? [
-              {
-                value: "bun-1.3.13-bun-sql",
-                name: "Bun v1.3.13 / Bun SQL",
-              },
-              {
-                value: "bun-1.3.13-node-pg",
-                name: "Bun v1.3.13 / node-postgres",
-              },
-            ]
-          : selectedItems.orm === "go"
-            ? [{ value: "bun-1.3.4", name: "Bun v1.3.4" }]
-            : [
-                { value: "bun-1.1.25", name: "Bun v1.1.25" },
-                { value: "node-22", name: "Node 22.6.0" },
-                { value: "node-20", name: "Node v20.16.0" },
-                { value: "node-18", name: "Node v18.20.4" },
-              ];
+      : [
+          { value: "bun-1.4.4", name: "Bun v1.4.4" },
+          { value: "bun-1.3.13", name: "Bun v1.3.13" },
+          { value: "node-26", name: "Node v26.13.0" },
+          { value: "node-24", name: "Node v24.22.2" },
+        ];
   const selectedItem = items.find(
     ({ value }) => value === selectedItems.runtime,
   );

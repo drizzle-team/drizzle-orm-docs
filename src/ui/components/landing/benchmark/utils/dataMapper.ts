@@ -3,9 +3,20 @@ import type {
   IJSONData,
 } from "@components/landing/benchmark/types";
 
+type Core = "core1" | "core2" | "core3" | "core4";
+
+// A second with no CPU sample (null) takes the value of the nearest second that has one.
+const nearest = (data: IJSONData[], index: number, core: Core): number => {
+  for (let d = 0; d < data.length; d++) {
+    const value = data[index - d]?.[core] ?? data[index + d]?.[core];
+    if (value != null) return value;
+  }
+  return 0;
+};
+
 export default (data: IJSONData[]): IData[] => {
   return data
-    .map((item) => ({
+    .map((item, index) => ({
       time: new Date(item.time).getMilliseconds(),
       latency: {
         avg: item.latency_average,
@@ -13,13 +24,19 @@ export default (data: IJSONData[]): IData[] => {
         p95: item.latency_95,
       },
       cpus: {
-        cpu1: item.core1,
-        cpu2: item.core2,
-        cpu3: item.core3,
-        cpu4: item.core4,
-        cpus: (item.core1 + item.core2 + item.core3 + item.core4) / 4,
+        cpu1: nearest(data, index, "core1"),
+        cpu2: nearest(data, index, "core2"),
+        cpu3: nearest(data, index, "core3"),
+        cpu4: nearest(data, index, "core4"),
+        cpus:
+          (nearest(data, index, "core1") +
+            nearest(data, index, "core2") +
+            nearest(data, index, "core3") +
+            nearest(data, index, "core4")) /
+          4,
       },
       reqs: item.reqs_per_sec,
+      vus: item.vus,
       failReqs: item.fail_reqs_per_sec,
       totalReqs: null,
       totalFail: null,

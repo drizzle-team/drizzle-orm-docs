@@ -7,7 +7,6 @@ import LatencyChart from "../LatencyChart/LatencyChart";
 import ReqsChart from "../ReqsChart/ReqsChart";
 import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
-import configurationData from "../../configurationData";
 import RuntimeSelector from "@components/landing/benchmark/components/RuntimeSelector/RuntimeSelector";
 import JoinsSelector from "@components/landing/benchmark/components/JoinsSelector/JoinsSelector";
 
@@ -55,7 +54,7 @@ const DemoPerformance: FC<Props> = ({
           <div>
             <div className={styles.name}>Drizzle</div>
             <div className={styles.version}>
-              {configurationData.orm.items["prisma-v7.1.0"].drizzle_version}
+              v1.0.0-beta.2
             </div>
           </div>
         </div>
@@ -69,7 +68,7 @@ const DemoPerformance: FC<Props> = ({
           <div>
             <div className={styles.name}>Prisma</div>
             <div className={styles.version}>
-              {configurationData.orm.items["prisma-v7.1.0"].compare_version}
+              v7.1.0
             </div>
           </div>
         </div>
@@ -121,7 +120,7 @@ const DemoPerformance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          avgRequests={data ? data[maxDataLength].avg.reqs : 0}
+          peakRequests={data ? data[maxDataLength].max.reqs : 0}
           requests={data ? data[maxDataLength].reqs : 0}
           totalRequests={data ? data[maxDataLength].totalReqs : 0}
           totalRequestsCompare={
@@ -138,7 +137,7 @@ const DemoPerformance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          avgRequests={compareData ? compareData[maxDataLength].avg.reqs : 0}
+          peakRequests={compareData ? compareData[maxDataLength].max.reqs : 0}
           requests={compareData ? compareData[maxDataLength].reqs : 0}
           totalRequests={compareData ? compareData[maxDataLength].totalReqs : 0}
           totalRequestsCompare={data ? data[maxDataLength].totalReqs : 0}
