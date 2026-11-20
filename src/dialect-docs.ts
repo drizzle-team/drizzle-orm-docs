@@ -31,6 +31,7 @@ const getStartedDialectBySlug: Record<string, DocsDialectId> = {
   "effect-postgresql": "pg",
   "planetscale-postgres": "pg",
   "appwrite-postgres": "pg",
+  "prisma-postgres": "pg",
   mysql: "mysql",
   planetscale: "mysql",
   tidb: "mysql",

@@ -1,0 +1,85 @@
+import Callout from '@mdx/Callout.astro';
+import Breadcrumbs from '@mdx/Breadcrumbs.astro';
+import Prerequisites from "@mdx/Prerequisites.astro";
+import FileStructure from '@mdx/get-started/FileStructure.mdx';
+import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
+import ConnectPrismaPostgres from '@mdx/get-started/postgresql/ConnectPrismaPostgres.mdx'
+import CreateTable from '@mdx/get-started/postgresql/CreateTable.mdx'
+import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
+import RunFile from '@mdx/get-started/RunFile.mdx';
+import QueryDatabase from '@mdx/get-started/QueryDatabase.mdx';
+
+<Breadcrumbs/>
+
+# Get Started with Drizzle and Prisma Postgres
+
+<Prerequisites>
+  - **dotenv** - package for managing environment variables - [read here](https://www.npmjs.com/package/dotenv)
+  - **tsx** - package for running TypeScript files - [read here](https://tsx.hirok.io/)
+  - **Prisma Postgres** - managed PostgreSQL database by Prisma - [read here](https://www.prisma.io/docs/postgres)
+  - **node-postgres** - package for querying your PostgreSQL database - [read here](https://node-postgres.com/)
+</Prerequisites>
+
+Prisma Postgres is a managed PostgreSQL database that you connect to over TLS with a regular connection string. This guide uses the standard `node-postgres` driver. If you prefer `postgres.js`, see the [Prisma Postgres connection guide](/docs/connect-prisma-postgres).
+
+<FileStructure/>
+
+#### Step 1 - Install **node-postgres** package
+<InstallPackages lib='pg' devlib=' @types/pg'/>
+
+#### Step 2 - Setup connection variables
+
+Create a `.env` file in the root of your project and add your database connection variable:
+
+```plaintext copy
+DATABASE_URL="postgres://<user>:<password>@db.prisma.io:5432/postgres?sslmode=require"
+```
+
+<Callout title='tips'>
+If you don't have a database yet, run `npx create-db@latest --env .env`. It creates a temporary Prisma Postgres database and writes `DATABASE_URL` to your `.env` file, see the [create-db documentation](https://www.prisma.io/docs/postgres/npx-create-db). For an existing database, copy the direct connection string from the [Prisma Console](https://console.prisma.io).
+</Callout>
+
+#### Step 3 - Connect Drizzle ORM to the database
+
+<ConnectPrismaPostgres/>
+
+#### Step 4 - Create a table
+
+<CreateTable />
+
+#### Step 5 - Setup Drizzle config file
+
+**Drizzle config** - a configuration file that is used by [Drizzle Kit](/docs/kit-overview) and contains all the information about your database connection, migration folder and schema files.
+
+Create a `drizzle.config.ts` file in the root of your project and add the following content:
+
+```typescript copy filename="drizzle.config.ts" {8}
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  out: './drizzle',
+  schema: './src/db/schema.ts',
+  dialect: 'postgresql',
+  schemaFilter: ['public'],
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+
+<Callout type='warning'>
+Every Prisma Postgres database has a `ppg` schema that belongs to the platform. Drizzle Kit manages all schemas by default, so without [`schemaFilter`](/docs/drizzle-config-file#schemafilter) the `drizzle-kit push` command asks you to confirm dropping `ppg`. Keep `schemaFilter` limited to the schemas you own.
+</Callout>
+
+#### Step 6 - Applying changes to the database
+
+<ApplyChanges />
+
+#### Step 7 - Seed and Query the database
+
+<QueryDatabase dialect='node-postgres' env_variable='DATABASE_URL'/>
+
+#### Step 8 - Run index.ts file
+
+<RunFile/>

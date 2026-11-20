@@ -254,6 +254,27 @@ export const getStartedItems: GetStartedItems = [
           },
         },
       },
+      {
+        name: "Prisma Postgres",
+        path: {
+          existing: "/docs/get-started/prisma-postgres-existing",
+          new: "/docs/get-started/prisma-postgres-new",
+        },
+        icon: {
+          light: {
+            path: "/public/svg/prisma.svg",
+            style: {
+              width: 28,
+            },
+          },
+          dark: {
+            path: "/public/svg/prisma-dark.svg",
+            style: {
+              width: 28,
+            },
+          },
+        },
+      },
     ],
   },
   {
