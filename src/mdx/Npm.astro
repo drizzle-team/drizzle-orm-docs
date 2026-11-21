@@ -1,7 +1,7 @@
 ---
-const items = ["npm", "yarn", "pnpm", "bun"];
+const items = ["npm", "yarn", "pnpm", "bun", "deno"];
 const html = await Astro.slots.render("default");
-const installCommands = ["npm i", "yarn add", "pnpm add", "bun add"];
+const installCommands = ["npm i", "yarn add", "pnpm add", "bun add", "deno add"];
 const installLines = html.replaceAll(/<\/?p>/g, "").replaceAll('—', '--').split("\n");
 
 const getCopyButton = (index: number) => {
