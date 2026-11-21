@@ -95,7 +95,7 @@ CREATE TABLE `table` (
 import { bigint, singlestoreTable } from "drizzle-orm/singlestore-core";
 
 const table = singlestoreTable('table', {
-	bigint: bigint({ mode: 'number' })
+	bigint: bigint({ mode: 'number' }),
 	bigintUnsigned: bigint({ mode: 'number', unsigned: true })
 });
 

@@ -66,8 +66,8 @@ Let's take a few examples of `pg_vector` indexes from the `pg_vector` docs and t
 const table = pgTable('items', {
     embedding: vector('embedding', { dimensions: 3 })
 }, (table) => ({
-    l2: index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops'))
-    ip: index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops'))
+    l2: index('l2_index').using('hnsw', table.embedding.op('vector_l2_ops')),
+    ip: index('ip_index').using('hnsw', table.embedding.op('vector_ip_ops')),
     cosine: index('cosine_index').using('hnsw', table.embedding.op('vector_cosine_ops'))
 }))
 ```
@@ -82,8 +82,8 @@ const table = pgTable('items', {
 const table = pgTable('table', {
     embedding: vector('embedding', { dimensions: 3 })
 }, (table) => ({
-    l1: index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops'))
-    hamming: index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops'))
+    l1: index('l1_index').using('hnsw', table.embedding.op('vector_l1_ops')),
+    hamming: index('hamming_index').using('hnsw', table.embedding.op('bit_hamming_ops')),
     bit: index('bit_jaccard_index').using('hnsw', table.embedding.op('bit_jaccard_ops'))
 }))
 ```
