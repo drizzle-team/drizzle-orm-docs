@@ -1,0 +1,94 @@
+---
+import { parse } from "node-html-parser";
+
+import * as roadmap from "@/data/roadmap.md";
+
+const content = parse(roadmap.compiledContent());
+const groups = content.querySelectorAll("h3").map((heading) => {
+  const items = (heading.nextElementSibling?.querySelectorAll("li") ?? []).map(
+    (item) => {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      const shipped = checkbox?.hasAttribute("checked") ?? false;
+      checkbox?.remove();
+
+      // Release links stay readable next to the struck-through milestone.
+      const releaseLink = item.querySelector(
+        'a[href^="/docs/latest-releases/"]',
+      );
+      const release = releaseLink
+        ? {
+            href: releaseLink.getAttribute("href")!,
+            label: releaseLink.textContent.trim(),
+          }
+        : undefined;
+      releaseLink?.remove();
+
+      return {
+        shipped,
+        html: item.innerHTML.replace(/\s*·\s*$/, "").trim(),
+        release,
+      };
+    },
+  );
+
+  return {
+    title: heading.textContent.trim(),
+    id: `roadmap-${heading.getAttribute("id")}`,
+    // Upcoming milestones first: they are what readers come for.
+    items: [
+      ...items.filter((item) => !item.shipped),
+      ...items.filter((item) => item.shipped),
+    ],
+  };
+});
+
+const items = groups.flatMap((group) => group.items);
+const shipped = items.filter((item) => item.shipped).length;
+---
+
+<p>
+  <strong>v1.0:</strong>
+  {shipped} of {items.length} milestones shipped. Upcoming milestones are listed
+  first, shipped ones are struck through.
+</p>
+
+{
+  groups.map((group) => (
+    <>
+      <h3 id={group.id}>{group.title}</h3>
+      <ul class="roadmap-list">
+        {group.items.map((item) => (
+          <li>
+            {item.shipped && <span class="roadmap-sr-only">Shipped: </span>}
+            <span
+              class:list={[{ "roadmap-shipped": item.shipped }]}
+              set:html={item.html}
+            />
+            {item.release && (
+              <>
+                {" · "}
+                <a href={item.release.href}>{item.release.label}</a>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))
+}
+
+<style>
+  .roadmap-shipped {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  .roadmap-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>

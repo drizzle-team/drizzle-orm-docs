@@ -1,0 +1,34 @@
+---
+title: "Drizzle Kit v0.24.0 release"
+pubDate: 2024-08-08T14:03:20Z
+version: "0.24.0"
+description: "Corrects SQLite composite primary key ordering and PostgreSQL array defaults. Existing SQLite schemas may require migration review."
+---
+
+[View this release on GitHub](https://github.com/drizzle-team/drizzle-orm/releases/tag/drizzle-kit%400.24.0)
+
+## Breaking changes (for SQLite users)
+
+#### Fixed [Composite primary key order is not consistent](https://github.com/drizzle-team/drizzle-kit-mirror/issues/342) by removing `sort` in SQLite and to be consistent with the same logic in PostgreSQL and MySQL
+
+The issue that may arise for SQLite users with any driver using composite primary keys is that the order in the database may differ from the Drizzle schema.
+
+- If you are using `push`, you **MAY** be prompted to update your table with a new order of columns in the composite primary key. You will need to either change it manually in the database or push the changes, but this may lead to data loss, etc.
+
+- If you are using `generate`, you **MAY** also be prompted to update your table with a new order of columns in the composite primary key. You can either keep that migration or skip it by emptying the SQL migration file.
+
+If nothing works for you and you are blocked, please reach out to me @AndriiSherman. I will try to help you!
+
+
+## Bug fixes
+
+- [[BUG] When using double type columns, import is not inserted](https://github.com/drizzle-team/drizzle-kit-mirror/issues/403) - thanks @Karibash
+- [[BUG] A number value is specified as the default for a column of type char](https://github.com/drizzle-team/drizzle-kit-mirror/issues/404) - thanks @Karibash
+- [[BUG]: Array default in migrations are wrong](https://github.com/drizzle-team/drizzle-orm/issues/2621) - thanks @L-Mario564
+- [[FEATURE]: Simpler default array fields](https://github.com/drizzle-team/drizzle-orm/issues/2709) - thanks @L-Mario564
+- [[BUG]: drizzle-kit generate succeeds but generates invalid SQL for default([]) - Postgres](https://github.com/drizzle-team/drizzle-orm/issues/2432) - thanks @L-Mario564
+- [[BUG]: Incorrect type for array column default value](https://github.com/drizzle-team/drizzle-orm/issues/2334) - thanks @L-Mario564
+- [[BUG]: error: column is of type integer[] but default expression is of type integer](https://github.com/drizzle-team/drizzle-orm/issues/2224) - thanks @L-Mario564
+- [[BUG]: Default value in array generating wrong migration file](https://github.com/drizzle-team/drizzle-orm/issues/1003) - thanks @L-Mario564
+- [[BUG]: enum as array, not possible?](https://github.com/drizzle-team/drizzle-orm/issues/1564) - thanks @L-Mario564
+
