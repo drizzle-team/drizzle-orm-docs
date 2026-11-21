@@ -118,7 +118,15 @@ config.resolver.sourceExts.push('sql');
 module.exports = config;
 ```
 
-#### Step 7 - Update `babel` config
+#### Step 7 - Install babel plugin
+It's necessary to bundle SQL migration files as string directly to your bundle.
+
+<Npm>
+    babel-plugin-inline-import
+</Npm>
+
+#### Step 8 - Update `babel` config
+
 ```js copy filename="babel.config.js"
 module.exports = function(api) {
   api.cache(true);
@@ -129,7 +137,7 @@ module.exports = function(api) {
 };
 ```
 
-#### Step 8 - Applying changes to the database
+#### Step 9 - Applying changes to the database
 
 With Expo, you would need to generate migrations using the `drizzle-kit generate` command and then apply them at runtime using the `drizzle-orm` `migrate()` function
 
@@ -138,7 +146,7 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-#### Step 9 - Apply migrations and query your db:
+#### Step 10 - Apply migrations and query your db:
 
 Let's **App.tsx** file with migrations and queries to create, read, update, and delete users
 
@@ -223,7 +231,7 @@ export default function App() {
 }
 ```
 
-#### Step 10 - Prebuild and run expo app
+#### Step 11 - Prebuild and run expo app
 
 <CodeTabs items={['npm', 'yarn', 'pnpm', 'bun']}>
 ```bash copy
