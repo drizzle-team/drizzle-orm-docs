@@ -58,17 +58,46 @@ const response = await db.batch([
     .where(eq(products.sku, sku))
     .returning({ stock: products.stock }),
   db.insert(stockReceipts).values({ id: 'receipt-1042', sku, quantity }),
-], { metrics: 'us' });
+]);
 
 console.log(response[0]); // [{ stock: 20 }] if the product started at zero
-console.log(response.metrics.roundTrips);
 ```
 
-The driver sends the batch in one round trip and returns results in input order. Set `metrics` to read telemetry from `response.metrics`. Use `true` for fractional milliseconds, `'ms'` for whole milliseconds, or `'us'` for whole microseconds.
+The driver sends the batch in one round trip and returns results in input order.
 
-`batch` accepts `isolation`, `readOnly`, `deferrable`, and `snapshot`. To use an exported snapshot, set `isolation` to `'repeatable read'` or `'serializable'`.
+<h3 id="batch-options">Batch options</h3>
 
-`batch`, `pipeline`, and `parallel` also accept prepared queries. Use `.bind(values)` to fill any placeholders before passing the query in.
+**Isolation**
+
+Use `isolation` to control which changes from other transactions each query can see.
+
+At PostgreSQL's default isolation level, `read committed`, the count can include a product inserted after the list was read. With `repeatable read`, both queries read from the same snapshot. [PostgreSQL transaction isolation](https://www.postgresql.org/docs/current/transaction-iso.html)
+
+```ts copy
+const [page, total] = await db.batch([
+  db.select().from(products).orderBy(products.sku).limit(25),
+  db.$count(products),
+], { isolation: 'repeatable read', readOnly: true });
+```
+
+Set `readOnly: true` to run a read-only transaction. In a read-only `serializable` transaction, `deferrable: true` lets PostgreSQL wait for a safe snapshot.
+
+Use `snapshot` to import a snapshot exported by another transaction that is still open. This requires `repeatable read` or `serializable`. [PostgreSQL transaction options](https://www.postgresql.org/docs/current/sql-set-transaction.html)
+
+**Metrics**
+
+Set `metrics` to measure the batch. `response.metrics.total` includes time spent waiting for a connection, and `roundTrips` counts network round trips. Find each query's timings in `response.metrics.queries`, in input order.
+
+```ts copy
+const response = await db.batch([
+  db.$count(products),
+  db.$count(stockReceipts),
+], { metrics: 'us' });
+
+console.log(response.metrics.total, response.metrics.roundTrips);
+```
+
+Use `metrics: true` for fractional milliseconds, `'ms'` for whole milliseconds, or `'us'` for whole microseconds.
 
 ## Pipeline
 
@@ -110,7 +139,7 @@ const catalog = {
 };
 ```
 
-The list and count can see different snapshots. Use `db.batch()` with `isolation: 'repeatable read'` when both reads need the same snapshot.
+When the list and count need the same snapshot, use a [batch with `repeatable read`](#batch-options).
 
 ## bulkInsert
 
@@ -147,11 +176,26 @@ Both bulk methods split the input into chunks and run them in one transaction by
 
 Use `rowCount` to read the total affected rows after a successful call. To get the written rows back, use `.returning()` on the regular insert or update builder.
 
+## Prepared queries
+
+`batch`, `pipeline`, and `parallel` accept prepared queries. The bulk methods take rows. In this example, call `.prepare()` once and `.bind()` for each SKU.
+
+```ts copy
+const productBySku = db.select().from(products)
+  .where(eq(products.sku, sql.placeholder('sku')))
+  .prepare('product_by_sku');
+
+const [usb, hdmi] = await db.batch([
+  productBySku.bind({ sku: 'usb-c-cable' }),
+  productBySku.bind({ sku: 'hdmi-cable' }),
+]);
+```
+
 ## HTTP connections
 
 - `drizzle-orm/postgres/http` supports `batch`, `pipeline`, and `parallel`. A pipeline sends its queries in one HTTP request. Parallel queries use a separate request per query.
 - `drizzle-orm/postgres/neon-http` supports `batch` and `parallel`. Use `batch` to run the queries in a transaction.
-- Use `drizzle-orm/postgres` for the bulk methods shown above.
+- Use `drizzle-orm/postgres` for prepared queries, batch metrics, and the bulk methods shown above.
 
 ## Upgrading to v1
 
