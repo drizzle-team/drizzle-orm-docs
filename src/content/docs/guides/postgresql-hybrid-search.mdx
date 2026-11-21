@@ -1,0 +1,369 @@
+---
+title: PostgreSQL hybrid search
+---
+
+import Section from "@mdx/Section.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import CodeTabs from '@mdx/CodeTabs.astro';
+import CodeTab from '@mdx/CodeTab.astro';
+import Npm from "@mdx/Npm.astro";
+
+<Prerequisites>
+- Get started with [PostgreSQL](/docs/get-started-postgresql)
+- [Select statement](/docs/select) and [WITH clause](/docs/select#with-clause)
+- [Indexes](/docs/indexes-constraints#indexes)
+- [sql operator](/docs/sql)
+- [Set operations](/docs/set-operations)
+- [Generated columns](/docs/generated-columns)
+- [PostgreSQL full-text search](/docs/guides/postgresql-full-text-search)
+- [Full-text search with Generated Columns](/docs/guides/full-text-search-with-generated-columns)
+- [Vector similarity search with pgvector extension](/docs/guides/vector-similarity-search)
+- [pgvector extension](/docs/extensions#pg_vector)
+- [Drizzle kit](/docs/kit-overview)
+- You should have installed the `openai` [package](https://www.npmjs.com/package/openai) for generating embeddings.
+<Npm>
+  openai
+</Npm>
+- You should have `drizzle-orm@0.31.0` and `drizzle-kit@0.22.0` or higher.
+</Prerequisites>
+
+This guide demonstrates how to implement hybrid search in PostgreSQL with Drizzle ORM. Hybrid search combines multiple retrieval signals — full-text search, fuzzy trigram matching, and semantic vector similarity — and merges their rankings with [reciprocal rank fusion](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf) (RRF).
+
+Each method covers a different failure mode:
+
+- **Full-text** matches exact keywords and phrases
+- **Fuzzy** (`pg_trgm`) handles typos and partial tokens
+- **Semantic** (`pgvector`) finds conceptually related documents even when wording differs
+
+RRF then scores each document by its rank in each result list, so a document that ranks well across multiple signals rises to the top.
+
+As for now, Drizzle doesn't create extensions automatically, so you need to create them manually. Create an empty migration file and add SQL queries:
+
+<Section>
+```bash
+npx drizzle-kit generate --custom
+```
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+```
+</Section>
+
+Create a table with three search columns and matching indexes: a weighted `tsvector` for full-text search, a concatenated text column for trigram similarity, and a vector embedding for semantic search:
+
+<CodeTabs items={["schema.ts", "migration.sql"]}>
+  <CodeTab>
+  ```ts copy {25-39,42-47,50,53-61}
+  import { type SQL, type SQLChunk, sql } from 'drizzle-orm';
+  import {
+    customType,
+    index,
+    pgTable,
+    serial,
+    text,
+    vector,
+  } from 'drizzle-orm/pg-core';
+
+  export const tsvector = customType<{ data: string }>({
+    dataType() {
+      return 'tsvector';
+    },
+  });
+
+  export const documents = pgTable(
+    'documents',
+    {
+      id: serial('id').primaryKey(),
+      title: text('title'),
+      body: text('body'),
+
+      // Full-text: weighted tsvector over title (A) + body (B)
+      searchVector: tsvector('search_vector')
+        .notNull()
+        .generatedAlwaysAs((): SQL => {
+          const columnsWithWeights = [
+            { column: documents.title, weight: 'A' },
+            { column: documents.body, weight: 'B' },
+          ];
+
+          const chunks: SQLChunk[] = columnsWithWeights.map(
+            ({ column, weight }) =>
+              sql`setweight(to_tsvector('english', coalesce(${column}, '')), '${sql.raw(weight)}')`,
+          );
+
+          return sql.join(chunks, sql.raw(' || '));
+        }),
+
+      // Fuzzy: concatenated text for pg_trgm word_similarity
+      searchTrigram: text('search_trigram')
+        .notNull()
+        .generatedAlwaysAs((): SQL => {
+          const columnsToConcat = [documents.title];
+
+          const chunks: SQLChunk[] = columnsToConcat.map(
+            (column) => sql`coalesce(${column}, '')`,
+          );
+
+          return sql.join(chunks, sql.raw(" || ' ' || "));
+        }),
+
+      // Semantic: store the embedding from your model (not generated)
+      searchEmbedding: vector('search_embedding', { dimensions: 3072 }).notNull(),
+    },
+    (table) => [
+      index('documents_search_vector_index').using('gin', table.searchVector),
+      index('documents_search_trigram_index').using(
+        'gin',
+        table.searchTrigram.op('gin_trgm_ops'),
+      ),
+      index('documents_search_embedding_index').using(
+        'hnsw',
+        table.searchEmbedding.op('vector_cosine_ops'),
+      ),
+    ],
+  );
+  ```
+  </CodeTab>
+  ```sql
+  CREATE TABLE IF NOT EXISTS "documents" (
+    "id" serial PRIMARY KEY NOT NULL,
+    "title" text,
+    "body" text,
+    "search_vector" "tsvector" GENERATED ALWAYS AS (setweight(to_tsvector('english', coalesce("title", '')), 'A') || setweight(to_tsvector('english', coalesce("body", '')), 'B')) STORED NOT NULL,
+    "search_trigram" text GENERATED ALWAYS AS (coalesce("title", '')) STORED NOT NULL,
+    "search_embedding" vector(3072) NOT NULL
+  );
+  --> statement-breakpoint
+  CREATE INDEX IF NOT EXISTS "documents_search_vector_index" ON "documents" USING gin ("search_vector");
+  --> statement-breakpoint
+  CREATE INDEX IF NOT EXISTS "documents_search_trigram_index" ON "documents" USING gin ("search_trigram" gin_trgm_ops);
+  --> statement-breakpoint
+  CREATE INDEX IF NOT EXISTS "documents_search_embedding_index" ON "documents" USING hnsw ("search_embedding" vector_cosine_ops);
+  ```
+</CodeTabs>
+
+The `searchVector` and `searchTrigram` columns are generated from `title` and `body`, so they stay in sync automatically. The `searchEmbedding` column is not generated — you write the embedding yourself when inserting or updating rows.
+
+In this example we will use an `OpenAI` model to generate [embeddings](https://platform.openai.com/docs/guides/embeddings):
+
+```ts copy
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env['OPENAI_API_KEY'],
+});
+
+export const generateEmbedding = async (value: string): Promise<number[]> => {
+  const input = value.replaceAll('\n', ' ');
+
+  const { data } = await openai.embeddings.create({
+    model: 'text-embedding-3-large',
+    input,
+  });
+
+  return data[0].embedding;
+};
+```
+
+The hybrid search query runs three retrievals as CTEs, converts each score into a rank with `row_number()`, then fuses those ranks with weighted RRF:
+
+`score = weight / (smoothing + rank)`
+
+Documents that appear in multiple lists accumulate score via `sum()`. Tune `topK`, `weight`, and `rrf.smoothing` (commonly `60`) per signal to balance precision and recall.
+
+<Section>
+```ts copy
+import {
+  asc,
+  cosineDistance,
+  desc,
+  eq,
+  sql,
+  sum,
+} from 'drizzle-orm';
+import { unionAll } from 'drizzle-orm/pg-core';
+import { generateEmbedding } from './embedding';
+import { documents } from './schema';
+
+const db = drizzle(...);
+
+export type HybridSearchParams = {
+  query: string;
+  limit: number;
+  offset: number;
+  fullText: {
+    topK: number;
+    weight: number;
+  };
+  fuzzy: {
+    topK: number;
+    weight: number;
+  };
+  semantic: {
+    topK: number;
+    weight: number;
+  };
+  rrf: {
+    smoothing: number;
+  };
+};
+
+export async function hybridSearch({
+  query,
+  limit,
+  offset,
+  fullText,
+  semantic,
+  fuzzy,
+  rrf,
+}: HybridSearchParams) {
+  const embedding = await generateEmbedding(query);
+
+  const fullTextQuery = sql`websearch_to_tsquery('english', ${query})`;
+
+  const fullTextMatches = db.$with('full_text_matches').as(
+    db
+      .select({
+        id: documents.id,
+        score: sql<number>`
+          ts_rank_cd(${documents.searchVector}, ${fullTextQuery}, 5)
+        `.as('score'),
+      })
+      .from(documents)
+      .where(sql`${documents.searchVector} @@ ${fullTextQuery}`)
+      .orderBy(desc(sql`score`), asc(documents.id))
+      .limit(fullText.topK),
+  );
+
+  const fullTextRanking = db.$with('full_text_ranking').as(
+    db
+      .select({
+        id: fullTextMatches.id,
+        rank: sql<number>`
+          row_number() over (order by ${fullTextMatches.score} desc, ${fullTextMatches.id} asc)
+        `.as('rank'),
+      })
+      .from(fullTextMatches),
+  );
+
+  const fuzzyMatches = db.$with('fuzzy_matches').as(
+    db
+      .select({
+        id: documents.id,
+        similarity: sql<number>`
+          word_similarity(${query}, ${documents.searchTrigram})
+        `.as('similarity'),
+      })
+      .from(documents)
+      .where(sql`${documents.searchTrigram} %> ${query}`)
+      .orderBy(desc(sql`similarity`), asc(documents.id))
+      .limit(fuzzy.topK),
+  );
+
+  const fuzzyRanking = db.$with('fuzzy_ranking').as(
+    db
+      .select({
+        id: fuzzyMatches.id,
+        rank: sql<number>`
+          row_number() over (order by ${fuzzyMatches.similarity} desc, ${fuzzyMatches.id} asc)
+        `.as('rank'),
+      })
+      .from(fuzzyMatches),
+  );
+
+  const semanticMatches = db.$with('semantic_matches').as(
+    db
+      .select({
+        id: documents.id,
+        distance: cosineDistance(documents.searchEmbedding, embedding).as(
+          'distance',
+        ),
+      })
+      .from(documents)
+      .orderBy(asc(sql`distance`), asc(documents.id))
+      .limit(semantic.topK),
+  );
+
+  const semanticRanking = db.$with('semantic_ranking').as(
+    db
+      .select({
+        id: semanticMatches.id,
+        rank: sql<number>`
+          row_number() over (order by ${semanticMatches.distance} asc, ${semanticMatches.id} asc)
+        `.as('rank'),
+      })
+      .from(semanticMatches),
+  );
+
+  const combinedResults = db.$with('combined_results').as(
+    unionAll(
+      db
+        .select({
+          id: fullTextRanking.id,
+          score: sql<number>`
+            ${fullText.weight} / (${rrf.smoothing} + ${fullTextRanking.rank})
+          `.as('score'),
+        })
+        .from(fullTextRanking),
+      db
+        .select({
+          id: fuzzyRanking.id,
+          score: sql<number>`
+            ${fuzzy.weight} / (${rrf.smoothing} + ${fuzzyRanking.rank})
+          `.as('score'),
+        })
+        .from(fuzzyRanking),
+      db
+        .select({
+          id: semanticRanking.id,
+          score: sql<number>`
+            ${semantic.weight} / (${rrf.smoothing} + ${semanticRanking.rank})
+          `.as('score'),
+        })
+        .from(semanticRanking),
+    ),
+  );
+
+  const reciprocalRankFusion = db.$with('reciprocal_rank_fusion').as(
+    db
+      .select({
+        id: combinedResults.id,
+        score: sum(combinedResults.score).as('score'),
+      })
+      .from(combinedResults)
+      .groupBy(combinedResults.id),
+  );
+
+  return await db
+    .with(
+      fullTextMatches,
+      fullTextRanking,
+      fuzzyMatches,
+      fuzzyRanking,
+      semanticMatches,
+      semanticRanking,
+      combinedResults,
+      reciprocalRankFusion,
+    )
+    .select()
+    .from(reciprocalRankFusion)
+    .innerJoin(documents, eq(documents.id, reciprocalRankFusion.id))
+    .orderBy(desc(reciprocalRankFusion.score), asc(documents.id))
+    .limit(limit)
+    .offset(offset);
+}
+```
+
+```ts
+const results = await hybridSearch({
+  query: 'tips for a family trip',
+  limit: 10,
+  offset: 0,
+  fullText: { topK: 50, weight: 0.4 },
+  fuzzy: { topK: 50, weight: 0.2 },
+  semantic: { topK: 50, weight: 0.4 },
+  rrf: { smoothing: 60 },
+});
+```
+</Section>
