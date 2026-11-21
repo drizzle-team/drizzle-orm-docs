@@ -8,7 +8,7 @@ or invalidation - you'll always see exactly what runs. If you want caching, you 
 
 By default, Drizzle uses a `explicit` caching strategy (i.e. `global: false`), so nothing is ever cached unless you ask. 
 This prevents surprises or hidden performance traps in your application. 
-Alternatively, you can flip on `all` caching (`global: true`) so that every select will look in cache first.
+Alternatively, you can flip on `all` caching (`global: true`) so that every select and relational query will look in cache first.
 
 ## Quickstart
 
@@ -175,6 +175,32 @@ await db.$cache.invalidate({ tags: "custom_key" });
 await db.$cache.invalidate({ tags: ["custom_key", "custom_key1"] });
 ```
 
+## Relational queries
+
+Relational queries use the same cache. Set `withCache` in the root config of `findMany` or `findFirst`.
+
+With `global: false` (default), pass `withCache: true` to read this query from the cache:
+
+```ts
+const res = await db.query.users.findMany({
+  with: { posts: true },
+  withCache: true,
+});
+```
+
+With `global: true`, relational queries read from the cache by default. Pass `withCache: false` to send this query to the database:
+
+```ts
+const res = await db.query.users.findMany({
+  with: { posts: true },
+  withCache: false,
+});
+```
+
+A cached relational query is invalidated like a cached select: a mutation on any table that the query reads, including the tables of nested relations, removes it from the cache.
+
+`withCache` takes only `true` or `false`. To set a custom `tag`, `config` or `autoInvalidate` for a query, use a select query with `.$withCache()`.
+
 ## Custom cache
 
 This example shows how to plug in a custom `cache` in Drizzle: you provide functions to fetch data from the cache, store results back into cache, and invalidate entries whenever a mutation runs.
@@ -333,11 +359,6 @@ await db.transaction(async (tx) => {
 ```
 
 #### Limitations that are temporary and will be handled soon:
-
-- Using cache with Drizzle Relational Queries
-```ts
-await db.query.users.findMany();
-```
 
 - Using cache with AWS Data API drivers
 - Using cache with views
