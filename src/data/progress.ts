@@ -1,1 +1,1 @@
-export default 99.5;
+export default 99.6;
