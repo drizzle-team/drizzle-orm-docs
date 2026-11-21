@@ -64,7 +64,7 @@ We've created a [github issue](https://github.com/oven-sh/bun/issues/16774) that
 
 #### Step 7 - Query the database
 
-<QueryDatabase dialect='bun-sql' env_variable='DATABASE_URL' />
+<QueryDatabase dialect='bun-sql' env_variable='DATABASE_URL' usersImport='users as usersTable' />
 
 #### Step 8 - Run index.ts file
 
@@ -83,4 +83,4 @@ bun src/index.ts
 
 #### Step 10 - Query the database with a new field (optional)
 
-<QueryDatabaseUpdated dialect='bun-sql' env_variable='DATABASE_URL' />
+<QueryDatabaseUpdated dialect='bun-sql' env_variable='DATABASE_URL' usersImport='users as usersTable' />

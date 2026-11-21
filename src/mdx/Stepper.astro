@@ -1,0 +1,82 @@
+<ol class="setup-steps" role="list">
+  <slot />
+</ol>
+
+<style>
+  .setup-steps {
+    --step-surface: #f6f6f7;
+    --step-border: #e3e3e3;
+    --step-text: #37352f;
+    counter-reset: setup-step;
+    list-style: none;
+    margin: 16px 0 28px;
+    padding: 0;
+  }
+
+  :global(html.dark) .setup-steps {
+    --step-surface: #1c1c1c;
+    --step-border: #363636;
+    --step-text: #c4c5c6;
+  }
+
+  .setup-steps > :global(li) {
+    position: relative;
+    counter-increment: setup-step;
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 28px 42px;
+  }
+
+  .setup-steps > :global(li:last-child) {
+    padding-bottom: 0;
+  }
+
+  .setup-steps > :global(li)::before {
+    content: counter(setup-step);
+    position: absolute;
+    inset: 0 auto auto 0;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--step-border);
+    border-radius: 8px;
+    background: var(--step-surface);
+    color: var(--step-text);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .setup-steps > :global(li:not(:last-child))::after {
+    content: "";
+    position: absolute;
+    left: 13px;
+    top: 28px;
+    bottom: 0;
+    width: 1px;
+    background: var(--step-border);
+  }
+
+  .setup-steps > :global(li > h3:first-child) {
+    margin: 0 0 8px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 28px;
+  }
+
+  .setup-steps > :global(li > p) {
+    margin: 8px 0;
+    padding: 0;
+  }
+
+  .setup-steps > :global(li > :last-child) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 600px) {
+    .setup-steps > :global(li) {
+      padding-left: 36px;
+    }
+  }
+</style>

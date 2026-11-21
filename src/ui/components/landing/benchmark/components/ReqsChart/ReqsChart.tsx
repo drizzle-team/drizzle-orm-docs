@@ -15,7 +15,7 @@ interface IProps {
   maxDataLength: number;
   max: number;
   isCompleted: boolean;
-  avgRequests: number;
+  peakRequests: number;
   requests: number;
   totalRequests: number;
   totalRequestsCompare: number;
@@ -30,7 +30,7 @@ const CustomBarChart: FC<IProps> = ({
   max,
   maxDataLength,
   isCompleted,
-  avgRequests,
+  peakRequests,
   requests,
   totalRequests,
   totalRequestsCompare,
@@ -155,7 +155,7 @@ const CustomBarChart: FC<IProps> = ({
       <div className={styles.header}>
         {isCompleted ? (
           <div className={styles.label}>
-            avg: {roundToThousand(avgRequests)} req/sec
+            peak: {roundToThousand(peakRequests)} req/sec
           </div>
         ) : selectedItemIndex === null ? (
           <div className={styles.label}>

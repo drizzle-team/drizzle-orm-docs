@@ -24,23 +24,13 @@ const Configuration: FC<IProps> = ({ isOpened }) => {
     setSelectedItems({
       ...selectedItems,
       [currentTab]: item,
-      ...(currentTab === "orm" && item === "go"
-        ? { runtime: "bun-1.3.4", joins: false }
+      ...(currentTab === "orm" && item === "go-20261120"
+        ? { runtime: "bun-1.4.4-drizzle", joins: false }
         : {}),
-      ...(currentTab === "orm" && item === "go-20260430-jit"
-        ? { runtime: "bun-1.3.13-bun-sql", joins: false }
-        : {}),
-      ...(currentTab === "orm" && item === "go-20260430-default"
-        ? { runtime: "bun-1.3.13-bun-sql", joins: false }
-        : {}),
-      ...(currentTab === "orm" && item === "prisma-v7.1.0"
-        ? { runtime: "bun-1.3.4", joins: false }
-        : {}),
-      ...(currentTab === "orm" && item === "prisma-v7.1.0-20260430-jit"
-        ? { runtime: "bun-1.3.13-bun-sql", joins: false }
-        : {}),
-      ...(currentTab === "orm" && item === "prisma-v5.18.0"
-        ? { runtime: "bun-1.1.25", joins: false }
+      ...(currentTab === "orm" &&
+      (item === "prisma-v8.0.0-rc.33-20261120" ||
+        item === "prisma-v7.10.1-20261120")
+        ? { runtime: "bun-1.4.4", joins: false }
         : {}),
     });
   };

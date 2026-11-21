@@ -1,58 +1,97 @@
+import AgentSetupPrompt from "@components/AgentSetupPrompt.astro";
+import Callout from "@mdx/Callout.astro";
 import Npm from "@mdx/Npm.astro";
 import Npx from "@mdx/Npx.astro";
-import Prerequisites from "@mdx/Prerequisites.astro";
 
 # Upgrading to Drizzle v1
 
+Upgrade from Drizzle 0.x or an earlier v1 beta or RC to `drizzle-orm@rc` and `drizzle-kit@rc`.
+
+## Upgrade with an AI agent
+
+Let your coding agent prepare the upgrade without applying database changes.
+
+<AgentSetupPrompt
+  prompt="Upgrade this project to Drizzle v1 using drizzle-orm@rc and drizzle-kit@rc. Fetch and follow the instructions at https://orm.drizzle.team/agent-upgrade/v1/prompt.md"
+  instructionsHref="/agent-upgrade/v1/prompt.md"
+  instructionsLabel="Read upgrade instructions"
+  promptLabel="Agent upgrade prompt"
+/>
+
+## 1. Update your packages
+
+Back up your database and migration files before converting the history.
+
+Update both packages:
+
 <Npm>
- drizzle-orm@rc
- -D drizzle-kit@rc
+drizzle-orm@rc
+-D drizzle-kit@rc
 </Npm>
 
-#### Step 1 - Upgrade the migration files with `drizzle-kit up`
-
-`drizzle-kit up` converts your local migration folder and snapshots to the new format. It does not connect to a database or upgrade its migration history table.
-
-> v3 migration folder discussion: https://github.com/drizzle-team/drizzle-orm/discussions/2832  
-
-We've updated the migrations folder structure by:
-- removing `meta/_journal.json`
-- grouping SQL files and snapshots into separate migration folders
-- removing the `drizzle-kit drop` command
-
-These changes eliminate potential Git conflicts with the journal file and simplify the process of dropping or fixing conflicted migrations
-
-The drizzle-kit has been architecturally redesigned:
-- Migrated from database snapshots to DDL snapshots
-
-Commutativity checks were added:
-- Detecting non-commutative migrations across branches
-> Commutativity discussion: https://github.com/drizzle-team/drizzle-orm/discussions/5005
-
-To migrate from old structure to a new one you would need to run
+## 2. Convert your migration files
 
 <Npx>
 drizzle-kit up
 </Npx>
 
-#### Step 2 - Review breaking changes
+`up` converts local files without changing the database. Each migration gets its own folder, named from the old journal's timestamp and migration name:
 
-You can find out the full list of breaking changes [here](/docs/mysql/v0-v1-changes#breaking-changes) and make sure to update your code accordingly
+```plaintext
+# Before: Drizzle 0.x
+ drizzle/
+ ├ 0000_create_users.sql
+ └ meta/
+   ├ 0000_snapshot.json
+   └ _journal.json
 
-If you were using Relational Queries, you need to upgrade to v2:
-- [How to migrate relations definition from v1 to v2](/docs/mysql/relations-v1-v2#how-to-migrate-relations-schema-definition-from-v1-to-v2)
-- [How to migrate queries from v1 to v2](/docs/mysql/relations-v1-v2#how-to-migrate-queries-from-v1-to-v2)
+# After: Drizzle v1
+ drizzle/
+ └ 20260101120000_create_users/
+   ├ migration.sql
+   └ snapshot.json
+```
 
-#### Step 3 - Upgrade each database with the v1 migrator
+The SQL is preserved, snapshots move to a DDL-based format and `meta/_journal.json` is removed. Removing the shared journal avoids Git conflicts in that file and makes migration conflicts easier to resolve. `drizzle-kit drop` has been removed.
 
-Run `drizzle-kit migrate` for each target database, using the converted migration folder and the existing migration table configuration:
+See the [v3 migration folder discussion](https://github.com/drizzle-team/drizzle-orm/discussions/2832) for the design and background.
+
+If conversion reports missing SQL files or snapshots, restore them from Git instead of deleting applied migrations.
+
+## 3. Update your application code
+
+Review the [breaking changes](/docs/mysql/v0-v1-changes#breaking-changes) for your dialect and update the affected code.
+
+If you use Relational Queries, migrate your [relation definitions](/docs/mysql/relations-v1-v2#how-to-migrate-relations-schema-definition-from-v1-to-v2) and [queries](/docs/mysql/relations-v1-v2#how-to-migrate-queries-from-v1-to-v2) to v2.
+
+## 4. Check the converted history
+
+<Npx>
+drizzle-kit check
+</Npx>
+
+Review the Git diff: every previous migration should have its converted folder, with unchanged SQL. `check` validates the local history and detects non-commutative migrations across branches, such as one branch renaming a table that another alters. It does not verify the applied history in your database.
+
+See the [commutativity discussion](https://github.com/drizzle-team/drizzle-orm/discussions/5005) for the reasoning behind these checks.
+
+Resolve reported conflicts before migrating. Deleting or regenerating an already-applied migration can require resetting the database that ran it.
+
+## 5. Run your migrations
+
+Run your migrations as usual, using your application's `migrate()` function or the Kit CLI:
 
 <Npx>
 drizzle-kit migrate
 </Npx>
 
-The v1 migrator upgrades an existing migration history table if needed, backfills migration names for previously applied migrations, and then applies any pending SQL migrations. This step connects to the target database using its configured credentials.
+On the first run after upgrading, the migrator updates the existing migration history table. It adds `name` and `applied_at` and associates previously applied migrations with their converted folders. `applied_at` remains `NULL` for older migrations because their execution date was not recorded.
 
-If you apply migrations through your driver's v1 `migrate()` helper, use that workflow instead. Custom runners that do not call the v1 migrator need to handle the database history upgrade themselves; running `drizzle-kit up` only converts the files.
+Previously applied migrations are marked as applied in the updated history. Their SQL is not executed a second time. Any pending migrations are then applied.
 
-#### Step 4 - Done ✅
+<Callout type="warning" title="This also applies pending migrations">
+After upgrading the history, the migrator applies every local migration whose full folder name is missing from the database, even if its timestamp is older than the latest applied migration. Keep folder names stable after this upgrade.
+</Callout>
+
+If a database history entry cannot be matched, the upgrade stops. Restore the corresponding local migration rather than deleting the database history or creating a new initial migration.
+
+Verify that previously applied migrations were not rerun and only expected pending migrations ran.

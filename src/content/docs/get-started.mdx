@@ -2,6 +2,19 @@ import Callout from '@mdx/Callout.astro';
 import CodeTabs from '@mdx/CodeTabs.astro';
 import YoutubeCards from '@mdx/YoutubeCards.astro';
 import GetStartedLinks from '@mdx/GetStartedLinks/index.astro';
+import AgentSetupPrompt from '@components/AgentSetupPrompt.astro';
 
 # Get started with Drizzle
+
+<div style="display: grid; gap: 10px; margin: 12px 0 20px;">
+  <div style="line-height: 1.5;">
+    <div><strong>Using an AI coding agent?</strong></div>
+    <div>Set up Drizzle skills and tools in your project.</div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
+    <AgentSetupPrompt placement="hero" />
+    <a href="/docs/agents">Setup guide <span aria-hidden="true">↗</span></a>
+  </div>
+</div>
+
 <GetStartedLinks />

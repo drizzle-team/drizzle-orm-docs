@@ -447,7 +447,10 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.users.invitedBy,
       to: r.users.id,
     }),
-    posts: r.many.posts(),
+    posts: r.many.posts({
+      from: r.users.id,
+      to: r.posts.authorId,
+    }),
   }
 }));
 
@@ -490,7 +493,10 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.users.invitedBy,
       to: r.users.id,
     }),
-    posts: r.many.posts(),
+    posts: r.many.posts({
+      from: r.users.id,
+      to: r.posts.authorId,
+    }),
   }
 }));
 
@@ -527,7 +533,7 @@ Having `{ ...relations, ...part }` will result in
 }
 ```
 
-and having `{ ...relations, ...part }` will result in
+and having `{ ...part, ...relations }` will result in
 ```json
 {
   "users": {"invitee": {...}, "posts": {...}},

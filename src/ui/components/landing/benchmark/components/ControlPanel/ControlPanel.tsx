@@ -42,6 +42,13 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
     return 0;
   }, [drizzleData, compareData]);
 
+  const vus = useMemo(() => {
+    if (!drizzleData || drizzleData.some((item) => item.vus == null)) {
+      return null;
+    }
+    return drizzleData.map((item) => item.vus as number);
+  }, [drizzleData]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.innerWidth > minWidth) {
@@ -214,7 +221,12 @@ const ControlPanel: FC<Props> = ({ minWidth = 940 }) => {
             </>
           )}
           {!isConfigOpen && (
-            <Rewind maxDataLength={maxDataLength} time={time} rewind={rewind} />
+            <Rewind
+              maxDataLength={maxDataLength}
+              time={time}
+              rewind={rewind}
+              vus={vus}
+            />
           )}
         </div>
         <div className={styles.config}>

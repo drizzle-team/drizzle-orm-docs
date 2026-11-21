@@ -14,14 +14,6 @@ export interface TreeNode {
   items?: TreeNode[];
 }
 
-declare global {
-  interface Window {
-    inkeepWidget: {
-      render: () => void;
-    };
-  }
-}
-
 interface SponsorCSS extends CSSProperties {
   "max-width"?: string;
   "aspect-ratio"?: string | number;

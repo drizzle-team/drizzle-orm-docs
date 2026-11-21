@@ -170,29 +170,27 @@ Generate migrations:
 npx drizzle-kit generate
 ```
 
-These migrations are stored in the `migrations`  directory, as specified in your `drizzle.config.ts`. This directory will contain the SQL files necessary to update your database schema and a `meta` folder for storing snapshots of the schema at different migration stages.
+These migrations are stored in the `migrations` directory, as specified in your `drizzle.config.ts`. Each migration has its own timestamped folder containing a `migration.sql` file and a `snapshot.json` file.
 
 Example of a generated migration:
 
 ```sql
 CREATE TABLE `posts` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY,
 	`title` text NOT NULL,
 	`content` text NOT NULL,
 	`user_id` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` integer,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
+	CONSTRAINT `fk_posts_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 );
 --> statement-breakpoint
 CREATE TABLE `users` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY,
 	`name` text NOT NULL,
 	`age` integer NOT NULL,
-	`email` text NOT NULL
+	`email` text NOT NULL UNIQUE
 );
---> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
 ```
 
 Run migrations:
@@ -221,10 +219,9 @@ This is the basic file structure of the project. In the `src/db` directory, we h
  │   │  ├ 📜 index.ts
  │   │  └ 📜 schema.ts
  ├ 📂 migrations
- │  ├ 📂 meta
- │  │  ├ 📜 _journal.json
- │  │  └ 📜 0000_snapshot.json
- │  └ 📜 0000_watery_spencer_smythe.sql
+ │  └ 📂 20261116103058_powerful_hercules
+ │     ├ 📜 migration.sql
+ │     └ 📜 snapshot.json
  ├ 📜 .env
  ├ 📜 drizzle.config.ts
  ├ 📜 package.json

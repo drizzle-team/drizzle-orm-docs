@@ -8,8 +8,8 @@ import ReqsChart from "../ReqsChart/ReqsChart";
 import CPUChart from "../CpuChart/CPUChart";
 import Logo from "../../utils/Logo";
 import configurationData from "../../configurationData";
+import { demoSelection } from "../../utils/getDemoBenchmarkData";
 import RuntimeSelector from "@components/landing/benchmark/components/RuntimeSelector/RuntimeSelector";
-import JoinsSelector from "@components/landing/benchmark/components/JoinsSelector/JoinsSelector";
 
 interface Props {
   data: IData[] | null;
@@ -55,7 +55,7 @@ const DemoPerformance: FC<Props> = ({
           <div>
             <div className={styles.name}>Drizzle</div>
             <div className={styles.version}>
-              {configurationData.orm.items["prisma-v7.1.0"].drizzle_version}
+              {configurationData.orm.items[demoSelection.orm].drizzle_version}
             </div>
           </div>
         </div>
@@ -64,18 +64,14 @@ const DemoPerformance: FC<Props> = ({
       <div className={styles["compare-item-container"]}>
         <div className={styles["compare-item"]}>
           <div className={styles["compare-icon-wrap"]}>
-            <Logo logo="prisma" />
+            <Logo logo="go" />
           </div>
           <div>
-            <div className={styles.name}>Prisma</div>
+            <div className={styles.name}>Go</div>
             <div className={styles.version}>
-              {configurationData.orm.items["prisma-v7.1.0"].compare_version}
+              {configurationData.orm.items[demoSelection.orm].compare_version}
             </div>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <RuntimeSelector />
-          <JoinsSelector />
         </div>
       </div>
       <div className={styles.block}>
@@ -121,7 +117,7 @@ const DemoPerformance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          avgRequests={data ? data[maxDataLength].avg.reqs : 0}
+          peakRequests={data ? data[maxDataLength].max.reqs : 0}
           requests={data ? data[maxDataLength].reqs : 0}
           totalRequests={data ? data[maxDataLength].totalReqs : 0}
           totalRequestsCompare={
@@ -138,7 +134,7 @@ const DemoPerformance: FC<Props> = ({
       </div>
       <div className={styles.block}>
         <ReqsChart
-          avgRequests={compareData ? compareData[maxDataLength].avg.reqs : 0}
+          peakRequests={compareData ? compareData[maxDataLength].max.reqs : 0}
           requests={compareData ? compareData[maxDataLength].reqs : 0}
           totalRequests={compareData ? compareData[maxDataLength].totalReqs : 0}
           totalRequestsCompare={data ? data[maxDataLength].totalReqs : 0}

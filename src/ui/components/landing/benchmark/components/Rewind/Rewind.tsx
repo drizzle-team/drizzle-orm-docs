@@ -6,73 +6,52 @@ interface Props {
   maxDataLength: number;
   time: number;
   rewind: (e: any) => void;
+  /** virtual users per second of the run; null until the data is loaded */
+  vus: number[] | null;
 }
 
-const steps = [
-  { duration: 5, target: 200 },
-  { duration: 15, target: 200 },
-  { duration: 5, target: 400 },
-  { duration: 15, target: 400 },
-  { duration: 5, target: 600 },
-  { duration: 15, target: 600 },
-  { duration: 5, target: 800 },
-  { duration: 15, target: 800 },
-  { duration: 5, target: 1000 },
-  { duration: 15, target: 1000 },
-  { duration: 5, target: 1200 },
-  { duration: 15, target: 1200 },
-  { duration: 5, target: 1400 },
-  { duration: 15, target: 1400 },
-  { duration: 5, target: 1600 },
-  { duration: 15, target: 1600 },
-  { duration: 5, target: 1800 },
-  { duration: 15, target: 1800 },
-  { duration: 5, target: 2000 },
-  { duration: 15, target: 2000 },
-  { duration: 5, target: 2200 },
-  { duration: 15, target: 2200 },
-  { duration: 5, target: 2400 },
-  { duration: 15, target: 2400 },
-  { duration: 5, target: 2600 },
-  { duration: 15, target: 2600 },
-  { duration: 5, target: 2800 },
-  { duration: 15, target: 2800 },
-  { duration: 5, target: 3000 },
-  { duration: 55, target: 3000 },
-];
+const formatVus = (vus: number) => (vus >= 1000 ? `${vus / 1000}k` : `${vus}`);
 
-const Rewind: FC<Props> = ({ maxDataLength, time, rewind }) => {
+// Splits the run at every 1k VUs crossed: "0 → 1k", "1k → 2k", …, up to the run's peak
+const getSegments = (series: number[]) => {
+  if (series.length === 0) return [];
+  const peak = Math.max(...series);
+  const segments: { from: number; to: number | null; seconds: number }[] = [];
+  let start = 0;
+  let from = 0;
+  for (let to = 1000; to < peak; to += 1000) {
+    const end = series.findIndex((vus) => vus > to);
+    segments.push({ from, to, seconds: end - start });
+    start = end;
+    from = to;
+  }
+  if (peak % 1000 === 0) {
+    // the ramp ends on a round number: its plateau gets its own segment
+    const end = series.findIndex((vus) => vus >= peak);
+    segments.push({ from, to: peak, seconds: end - start });
+    segments.push({ from: peak, to: null, seconds: series.length - end });
+  } else {
+    segments.push({ from, to: peak, seconds: series.length - start });
+  }
+  return segments;
+};
+
+const Rewind: FC<Props> = ({ maxDataLength, time, rewind, vus }) => {
   const sliderRef = useRef<any>();
 
   const progress = useMemo(() => {
     return (time / (maxDataLength * 100)) * 100;
   }, [time, maxDataLength]);
 
-  const currentUsers = useMemo(() => {
-    const timeInSeconds = Math.floor(time / 100);
-    let elapsed = 0;
-    let previousTarget = 0;
+  const series = useMemo(
+    () => (vus ?? []).slice(0, maxDataLength + 1),
+    [vus, maxDataLength],
+  );
 
-    for (const step of steps) {
-      if (step.duration === 5) {
-        const growthRate = (step.target - previousTarget) / step.duration;
+  const segments = useMemo(() => getSegments(series), [series]);
 
-        if (timeInSeconds <= elapsed + step.duration) {
-          const timeWithinStep = timeInSeconds - elapsed;
-          return previousTarget + growthRate * timeWithinStep;
-        }
-      } else {
-        if (timeInSeconds <= elapsed + step.duration) {
-          return step.target;
-        }
-      }
-
-      elapsed += step.duration;
-      previousTarget = step.target;
-    }
-
-    return steps[steps.length - 1].target;
-  }, [time]);
+  const currentUsers =
+    series[Math.min(Math.floor(time / 100), series.length - 1)] ?? 0;
 
   return (
     <div className={styles.wrap}>
@@ -87,81 +66,40 @@ const Rewind: FC<Props> = ({ maxDataLength, time, rewind }) => {
           className={styles["progress-line"]}
           style={{ width: `${progress}%` }}
         ></div>
-        <div
-          className={styles.rangeStep}
-          style={{ width: `${350 / (360 / 100)}px` }}
-        >
-          0
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-arrow-right"
+        {segments.map(({ from, to, seconds }, i) => (
+          <div
+            key={from}
+            className={styles.rangeStep}
+            style={{
+              width: `${(seconds / series.length) * 100}%`,
+              ...(i === segments.length - 1 && {
+                borderRight: "1px solid transparent",
+              }),
+            }}
           >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-          1k
-        </div>
-        <div
-          className={styles.rangeStep}
-          style={{ width: `${350 / (360 / 100)}px` }}
-        >
-          1k
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-arrow-right"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-          2k
-        </div>
-        <div
-          className={styles.rangeStep}
-          style={{ width: `${350 / (360 / 105)}px` }}
-        >
-          2k
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-arrow-right"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-          3k
-        </div>
-        <div
-          className={styles.rangeStep}
-          style={{
-            borderRight: "1px solid transparent",
-            width: `${350 / (360 / 55)}px`,
-          }}
-        >
-          3k
-        </div>
+            {formatVus(from)}
+            {to !== null && (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-arrow-right"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                {formatVus(to)}
+              </>
+            )}
+          </div>
+        ))}
         <input
           ref={sliderRef}
           className={styles["rewind-input"]}

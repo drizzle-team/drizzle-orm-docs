@@ -41,21 +41,27 @@ export function useBenchmarkContext() {
 // Define the BenchmarkProvider component
 interface BenchmarkProviderProps {
   children: ReactNode;
+  /** overrides of the default selection */
+  initial?: Partial<IParams>;
 }
 
-export function BenchmarkProvider({ children }: BenchmarkProviderProps) {
+export function BenchmarkProvider({
+  children,
+  initial,
+}: BenchmarkProviderProps) {
   const [time, setTime] = useState<number>(0);
   const intervalId = useRef<number>(0);
   const [concatedDataDrizzle, setConcatedDataDrizzle] = useState<IData[]>([]);
   const [concatedDataCompare, setConcatedDataCompare] = useState<IData[]>([]);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(true);
   const [selectedItems, setSelectedItems] = useState<IParams>({
-    orm: "go-20260430-jit",
+    orm: "go-20261120",
     dbSize: "micro",
     projectType: "ecommerce",
     database: "postgres",
     joins: false,
-    runtime: "bun-1.3.13-bun-sql",
+    runtime: "bun-1.4.4-drizzle",
+    ...initial,
   });
 
   const contextValue: BenchmarkContextProps = {

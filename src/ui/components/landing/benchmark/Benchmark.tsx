@@ -2,7 +2,9 @@ import styles from "./Benchmark.module.css";
 import { useEffect, useMemo, useState } from "react";
 import DemoPerformance from "./components/DemoPerformance/DemoPerformance.tsx";
 import { type IData } from "./types.ts";
-import getDemoBenchmarkData from "./utils/getDemoBenchmarkData.ts";
+import getDemoBenchmarkData, {
+  demoSelection,
+} from "./utils/getDemoBenchmarkData.ts";
 import { BenchmarkProvider } from "./context/useBenchmarkContext.tsx";
 
 const Benchmark = () => {
@@ -30,7 +32,7 @@ const Benchmark = () => {
   }, []);
 
   return (
-    <BenchmarkProvider>
+    <BenchmarkProvider initial={demoSelection}>
       <div className={styles.wrap}>
         <div className={styles.header}>Performance</div>
         <div className={styles.description}>

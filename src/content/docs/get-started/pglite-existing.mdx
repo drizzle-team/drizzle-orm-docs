@@ -10,8 +10,6 @@ import Prerequisites from "@mdx/Prerequisites.astro";
 import IntrospectPostgreSQL from '@mdx/get-started/postgresql/IntrospectPostgreSQL.mdx';
 import FileStructure from '@mdx/get-started/FileStructure.mdx';
 import InstallPackages from '@mdx/get-started/InstallPackages.mdx';
-import SetupConfig from '@mdx/get-started/SetupConfig.mdx';
-import SetupEnv from '@mdx/get-started/SetupEnv.mdx';
 import TransferCode from '@mdx/get-started/TransferCode.mdx';
 import ApplyChanges from '@mdx/get-started/ApplyChanges.mdx';
 import RunFile from '@mdx/get-started/RunFile.mdx';
@@ -38,11 +36,30 @@ import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
 #### Step 2 - Setup connection variables
 
-<SetupEnv env_variable='DATABASE_URL' />
+Set `DATABASE_URL` in `.env` to your database directory, relative to the project root.
+
+```dotenv copy filename=".env"
+DATABASE_URL=./database
+```
 
 #### Step 3 - Setup Drizzle config file
 
-<SetupConfig dialect='postgresql' env_variable='DATABASE_URL'/>
+Create `drizzle.config.ts` at the project root.
+
+```typescript copy filename="drizzle.config.ts"
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  out: './drizzle',
+  schema: './src/db/schema.ts',
+  dialect: 'postgresql',
+  driver: 'pglite',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
 
 #### Step 4 - Introspect your database
 
@@ -58,7 +75,7 @@ import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
 #### Step 7 - Query the database
 
-<QueryDatabase dialect='pglite' env_variable='DATABASE_URL'/>
+<QueryDatabase dialect='pglite' env_variable='DATABASE_URL' usersImport='users as usersTable'/>
 
 #### Step 8 - Run index.ts file
 
@@ -74,4 +91,4 @@ import UpdateSchema from '@mdx/get-started/postgresql/UpdateSchema.mdx';
 
 #### Step 11 - Query the database with a new field (optional)
 
-<QueryDatabaseUpdated dialect='pglite' env_variable='DATABASE_URL' />
+<QueryDatabaseUpdated dialect='pglite' env_variable='DATABASE_URL' usersImport='users as usersTable' />
