@@ -117,7 +117,7 @@ export function tenantDB<T>(cb: (tx: any) => T | Promise<T>): Promise<T> {
 }
 ```
 
-And then, configure a middleware to populate the the AsyncLocalStorage and use `tenantDB` method when handling requests:
+And then, configure a middleware to populate the AsyncLocalStorage and use `tenantDB` method when handling requests:
 
 ```typescript copy filename="app.ts"
 // Middleware to set tenant context
