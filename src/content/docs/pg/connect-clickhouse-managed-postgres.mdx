@@ -1,0 +1,61 @@
+import Npm from "@mdx/Npm.astro";
+import Prerequisites from "@mdx/Prerequisites.astro";
+import WhatsNextPostgres from "@mdx/WhatsNextPostgres.astro";
+
+# Drizzle \<\> ClickHouse Managed Postgres
+
+[ClickHouse Managed Postgres](https://clickhouse.com/cloud/postgres) is a managed PostgreSQL service. Connect with Drizzle's `node-postgres` driver.
+
+<Prerequisites>
+- Database [connection basics](/docs/connect-overview) with Drizzle
+- A ClickHouse Managed Postgres instance
+- Node.js and a TypeScript project
+</Prerequisites>
+
+#### Step 1 - Get your connection details
+
+In the ClickHouse Cloud console, open the **Connect** view for your instance and leave the **via PgBouncer** toggle off to connect directly to PostgreSQL. Copy the connection URL, then download your instance's CA certificate bundle from the **Settings** tab.
+
+Create a `.env` file with the connection URL. Append `sslmode=verify-full` and the absolute path to the CA bundle so that `node-postgres` verifies the server's certificate and hostname:
+
+```plaintext copy filename=".env"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/postgres?sslmode=verify-full&sslrootcert=/absolute/path/to/ca-certificate.pem"
+```
+
+Keep `.env` out of version control. See the [connection and TLS documentation](https://clickhouse.com/docs/products/managed-postgres/connection) for details.
+
+#### Step 2 - Install packages
+
+<Npm>
+ drizzle-orm@rc pg dotenv
+ -D @types/pg tsx
+</Npm>
+
+#### Step 3 - Initialize the driver and make a query
+
+```typescript copy filename="index.ts"
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { sql } from 'drizzle-orm';
+
+const db = drizzle(process.env.DATABASE_URL!);
+
+try {
+  const result = await db.execute(sql`select current_database() as database`);
+  console.log(result.rows);
+} finally {
+  await db.$client.end();
+}
+```
+
+Run the query:
+
+```bash copy
+npx tsx index.ts
+```
+
+The result contains the name of the database you connected to, such as `postgres`.
+
+#### What's next?
+
+<WhatsNextPostgres/>
