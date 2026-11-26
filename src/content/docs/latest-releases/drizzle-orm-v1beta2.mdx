@@ -1,7 +1,7 @@
 ---
 title: Drizzle ORM and Drizzle Kit v1.0.0-beta.2 release
 pubDate: 2025-02-12
-description: v1 pre-release
+description: "Adds MSSQL and CockroachDB, modular relation definitions and the rewritten Drizzle Kit migration workflow. Includes breaking v1 beta changes."
 ---
 
 > We've introduced a lot of changes in this version, and something will definitely break. If anything goes wrong, you can either downgrade to version `1.0.0-beta.1` or `0.44.7`, and please report any issues on GitHub or our Discord!
@@ -14,9 +14,9 @@ description: v1 pre-release
 
 > Check new RQBv2 query docs: https://orm.drizzle.team/docs/rqb
 
-# New Features
+## New Features
 
-## MSSQL dialect 
+### MSSQL dialect
 
 Drizzle now supports MSSQL in `drizzle-orm`, `drizzle-kit` and `drizzle-seed` packages. It support most of the columns, query builder capabilities, migration strategies, etc.
 
@@ -45,7 +45,7 @@ const db = drizzle({
 const result = await db.execute('select 1');
 ```
 
-## CockroachDB dialect
+### CockroachDB dialect
 
 Drizzle now supports CockroachDB in `drizzle-orm`, `drizzle-kit` and `drizzle-seed` packages. It support most of the columns, query builder capabilities, migration strategies, etc.
 
@@ -74,7 +74,7 @@ const db = drizzle({
 const result = await db.execute('select 1');
 ```
 
-## Relational Query Parts
+### Relational Query Parts
 
 In a case you need to separate relations config into several parts you can use `defineRelationsPart` helpers
 
@@ -106,7 +106,7 @@ and then you can provide it to the db instance
 const db = drizzle(process.env.DB_URL, { relations: { ...relations, ...part } })
 ```
 
-## Folders v3 migrations
+### Folders v3 migrations
 
 > Linked discussion: https://github.com/drizzle-team/drizzle-orm/discussions/2832
 
@@ -125,7 +125,7 @@ To migrate previous folders to a new format you would need to run
 drizzle-kit up
 ```
 
-## Full `drizzle-kit` rewrite
+### Full `drizzle-kit` rewrite
 
 Architecture rewrite to close major kit and migration issues. We’ve completed a set of valuable and necessary updates to help us iterate faster, improve test coverage, and enhance overall stability.
 
@@ -137,18 +137,18 @@ Summary of work completed:
 - Added query hints and explain support for push
 - Expanded test coverage - each test case now runs up to 6 different scenarios (e.g., push+push, pull+generate, etc.)
 
-## Added `drizzle-kit pull --init`
+### Added `drizzle-kit pull --init`
 
 This flag will create a drizzle migration table in the database and will mark first pulled migration as applied, so you can contrinue iterating from there
 
-## `schemaFilter` behavior update
+### `schemaFilter` behavior update
 
 `drizzle-kit` will start managing all the schemas defined in your code. If you want to filter them, you can use `schemaFilter` 
 Previously, only the public schema was managed unless you explicitly added more schemas to `schemaFilter`.
 
 It now also supports glob patterns, allowing you to filter schemas in any way you like
 
-## `.enableRLS()` deprecation
+### `.enableRLS()` deprecation
 
 Previously to mark PostgreSQL table with RLS enabled you would need to:
 
@@ -163,7 +163,7 @@ We moved this option to a different place
 pgTable.withRLS('users', {});
 ```
 
-## Alias directly on columns
+### Alias directly on columns
 
 You can now add `as` alias to the column in a simple way:
 
@@ -174,7 +174,7 @@ const query = db
 	.orderBy(asc(users.id.as('userId')));
 ```
 
-## MySQL new column types
+### MySQL new column types
 
 We've added a few more MySQL column types:
 
@@ -183,7 +183,7 @@ We've added a few more MySQL column types:
 - [mediumblob](/docs/mysql/column-types#mediumblob)
 - [longblob](/docs/mysql/column-types#longblob)
 
-## More Updates and Fixes
+### More Updates and Fixes
 
 - Fixed pg-native Pool detection in node-postgres transactions  
 - Allowed subqueries in select fields  
@@ -191,7 +191,7 @@ We've added a few more MySQL column types:
 - Fixed `$onUpdate` not handling `SQL` values (fixes [#2388](https://github.com/drizzle-team/drizzle-orm/issues/2388), tests implemented by [L-Mario564](https://github.com/L-Mario564) in [#2911](https://github.com/drizzle-team/drizzle-orm/pull/2911))
 - Fixed `pg` mappers not handling `Date` instances in `bun-sql:postgresql` driver responses for `date`, `timestamp` types (fixes [#4493](https://github.com/drizzle-team/drizzle-orm/issues/4493))  
 
-## Bugs fixed
+### Bugs fixed
 
 > This list is not full, we just had a time to get through some of the issues. This list will be updated through the next few weeks
 
