@@ -176,6 +176,38 @@ Both bulk methods split the input into chunks and run them in one transaction by
 
 Use `rowCount` to read the total affected rows after a successful call. To get the written rows back, use `.returning()` on the regular insert or update builder.
 
+<h3 id="cancel-a-bulk-write">Cancel a bulk write</h3>
+
+With a pooled connection from `drizzle-orm/postgres`, you can pass your own `AbortSignal` to either bulk method through the `signal` option.
+
+In this example, if the insert is still running after five seconds, `AbortSignal.timeout(5_000)` requests cancellation. This can help limit how long the import holds locks.
+
+```ts copy
+const inserted = await db.bulkInsert(products, [
+  { sku: 'usb-c-hub', name: 'USB-C Hub' },
+  { sku: 'usb-c-adapter', name: 'USB-C Adapter' },
+], { signal: AbortSignal.timeout(5_000) });
+```
+
+For a stock update that the caller can cancel, use an `AbortController`.
+
+```ts copy
+const controller = new AbortController();
+
+const pending = db.bulkUpdate(products, [
+  { sku: 'usb-c-hub', name: 'USB-C Hub', stock: 40 },
+  { sku: 'usb-c-adapter', name: 'USB-C Adapter', stock: 75 },
+], {
+  by: products.sku,
+  signal: controller.signal,
+});
+
+// Call controller.abort() from your cancel handler.
+const updated = await pending;
+```
+
+If cancellation interrupts the write, the call rejects. By default, PostgreSQL rolls back the whole bulk write. With `atomic: false`, chunks that already committed stay in the database.
+
 ## Prepared queries
 
 `batch`, `pipeline`, and `parallel` accept prepared queries. The bulk methods take rows. In this example, call `.prepare()` once and `.bind()` for each SKU.
