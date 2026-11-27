@@ -70,7 +70,7 @@ export const databases: {
     darkStyle: {
       width: 32,
     },
-    sponsorUrl: "https://driz.link/xataio",
+    // sponsorUrl: "https://driz.link/xataio",
   },
   Supabase: {
     imageSrc: "/public/svg/supabase.svg",
